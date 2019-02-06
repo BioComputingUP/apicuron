@@ -1,0 +1,34 @@
+@import "../../styles.scss";
+
+
+.nav-link {
+  color: #faf5ec;
+  background-color: transparent;
+  background-image: none;
+}
+
+.nav-link:hover {
+  color: #faf5ec;
+  background-color: theme-color(secondary);
+  border-color: theme-color(primary);
+}
+
+.nav-link:focus, .nav-link.focus {
+  box-shadow: 0 0 0 0.0rem rgba(23, 162, 184, 0.5);
+}
+
+.nav-link.disabled, .nav-link:disabled {
+  color: #2E90A7;
+  background-color: #a7662b;
+}
+
+.nav-link:not(:disabled):not(.disabled):active, .nav-link:not(:disabled):not(.disabled).active,
+.show > .nav-link.dropdown-toggle {
+  color: #faf5ec;
+  border-color: theme-color(primary);
+}
+
+.nav-link:not(:disabled):not(.disabled):active:focus, .nav-link:not(:disabled):not(.disabled).active:focus,
+.show > .nav-link.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.0rem rgba(23, 162, 184, 0.5);
+}

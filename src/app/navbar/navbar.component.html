@@ -1,0 +1,72 @@
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark  ">
+  <div class="container">
+    <!--<div class="row">-->
+    <!--<div class="col-md-8 offset-md-2">-->
+    <a class="navbar-brand" routerLink="">APICURON</a>
+    <button class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <!--<a class="nav-link" href="/browse">Browse</a>-->
+          <a class="nav-link active btn" routerLink="/browse">Browse</a>
+        </li>
+
+        <li class="nav-item dropdown" dropdown container="body">
+
+          <a class="nav-link btn active dropdown-toggle" dropdownToggle  aria-controls="basic-link-dropdown"> Documentation </a>
+          <!--<a class="nav-link dropdown-toggle" href="#" dropdownToggle  aria-controls="basic-link-dropdown"> Documentation </a>-->
+
+          <ul id="basic-link-dropdown" *dropdownMenu class="dropdown-menu"
+              role="menu" aria-labelledby="basic-link">
+            <li>
+              <a class="dropdown-item" routerLink="/help">Help</a>
+            </li>
+            <li>
+              <a class="dropdown-item" routerLink="/tutorial">Tutorial</a>
+            </li>
+            <li>
+              <a class="dropdown-item" routerLink="/api">API</a>
+            </li>
+            <li>
+              <a class="dropdown-item" routerLink="/statistics">Statistics</a>
+            </li>
+            <li>
+              <a class="dropdown-item" routerLink="/about">About</a>
+            </li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link btn active" routerLink="/feedback">Feedback</a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav navbar-right">
+
+
+        <!--<form class="form-inline my-2 my-lg-0">-->
+        <!--<input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">-->
+        <!--<button class="btn btn-outline-dp-blue my-2 my-sm-0" type="submit">Search</button>-->
+        <!--</form>-->
+
+
+        <li class="nav-item float-right">
+          <a class="nav-link btn active" routerLink="/login">Login</a>
+
+
+        </li>
+
+      </ul>
+
+    </div>
+  </div>
+</nav>

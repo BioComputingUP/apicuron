@@ -1,0 +1,255 @@
+/* You can add global styles to this file, and also import other style files */
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+
+$theme-colors: (
+  primary: #2274a5,
+  secondary: #766359,
+  secondary-light: #A3948C,
+  secondary-dark: #211B19,
+
+  text: #0A202D,
+  backround:#EFF4F9,
+  footer: #021A20,
+  success: $green,
+  info: $cyan,
+  warning: $yellow,
+  danger: $red,
+  light: #EFF4F9,
+
+);
+
+
+@media (prefers-color-scheme: dark) {
+  $theme-colors: (
+    primary: #2274a5,
+    secondary: #766359,
+    secondary-light: #A3948C,
+    secondary-dark: #211B19,
+    text: #EFF4F9,
+    backround:#0A202D,
+    footer: #021A20,
+    success: $green,
+    info: $cyan,
+    warning: $yellow,
+    danger: $red,
+    light: #EFF4F9,
+
+  );
+}
+
+body {
+  background: theme-color(light);
+  color: theme-color(text);
+}
+
+.flagBackground{
+  fill: #faf5ec;
+}
+
+.bg-dark {
+  background-color: theme-color(primary) !important;
+}
+
+
+@media (min-width: 1200px) {
+  .container {
+    max-width: 85vw;
+  }
+}
+
+
+.card {
+  border: 1px solid theme-color(secondary);
+  background-color: transparent;
+  margin-top: 5px;
+  margin-bottom: 5px;
+
+
+}
+
+.card-header {
+  background-color: transparent;
+}
+
+
+.btn-outline-second {
+  color: theme-color(secondary);
+  border-color: theme-color(secondary);
+}
+
+.btn-outline-second:hover {
+  color: theme-color(light);
+  background-color: theme-color(secondary);
+  border-color: theme-color(secondary);
+}
+
+.btn-outline-second:focus, .btn-outline-second.focus {
+  box-shadow: 0 0 0 0.2rem rgba(theme-color(secondary), 0.5);
+}
+
+.btn-outline-second.disabled, .btn-outline-second:disabled {
+  color: theme-color(secondary-light);
+  background-color: transparent;
+}
+
+.btn-outline-second:not(:disabled):not(.disabled):active, .btn-outline-second:not(:disabled):not(.disabled).active,
+.show > .btn-outline-second.dropdown-toggle {
+  color: #fff;
+  background-color: theme-color(secondary-light);
+  border-color: theme-color(secondary-light);
+}
+
+.btn-outline-second:not(:disabled):not(.disabled):active:focus, .btn-outline-second:not(:disabled):not(.disabled).active:focus,
+.show > .btn-outline-second.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.2rem rgba(theme-color(secondary), 0.5);
+}
+
+.input-group-text {
+  background-color:  rgba(theme-color(secondary), 0.125);
+  border-color: theme-color(secondary);
+  color: theme-color(secondary);
+}
+
+.input-group-text:focus, .input-group-text.focus {
+  border-color: theme-color(secondary);
+  box-shadow: 0 0 0 0.2rem rgba(theme-color(secondary), 0.5);
+}
+
+.form-control{
+  border-color: theme-color(secondary);
+  background-color: rgba(255, 255, 255, 0.975);
+}
+.form-control:focus, .form-control.focus {
+  border-color: theme-color(secondary);
+  box-shadow: 0 0 0 0.2rem rgba(theme-color(secondary), 0.5);
+}
+
+
+.btn-outline-second-form {
+  color: theme-color(secondary);
+  background-color: rgba(255, 255, 255, 0.975);
+  border-color: theme-color(secondary);
+}
+
+.btn-outline-second-form:hover {
+  color: theme-color(light);
+  background-color: theme-color(secondary);
+  border-color: theme-color(secondary);
+}
+
+.btn-outline-second-form:focus, .btn-outline-second-form.focus {
+  box-shadow: 0 0 0 0.2rem rgba(theme-color(secondary), 0.5);
+}
+
+.btn-outline-second-form.disabled, .btn-outline-second-form:disabled {
+  color: theme-color(secondary-light);
+  background-color: transparent;
+}
+
+.btn-outline-second-form:not(:disabled):not(.disabled):active, .btn-outline-second-form:not(:disabled):not(.disabled).active,
+.show > .btn-outline-second-form.dropdown-toggle {
+  color: #fff;
+  background-color: theme-color(secondary-light);
+  border-color: theme-color(secondary-light);
+}
+
+.btn-outline-second-form:not(:disabled):not(.disabled):active:focus, .btn-outline-second-form:not(:disabled):not(.disabled).active:focus,
+.show > .btn-outline-second-form.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.2rem rgba(theme-color(secondary), 0.5);
+}
+
+.jumbotron {
+  background-color: transparent
+}
+
+.btn-link-second {
+  font-weight: 400;
+  color: theme-color(secondary);
+}
+
+.btn-link-second:hover {
+  color:theme-color(secondary);
+  text-decoration: underline;
+}
+
+.btn-link-second:focus, .btn-link-second.focus {
+  text-decoration: underline;
+  box-shadow: none;
+}
+
+.btn-link-second:disabled, .btn-link-second.disabled {
+  color: theme-color(secondary-light);
+  pointer-events: none;
+}
+
+
+.pagination {
+  display: -ms-flexbox;
+  display: flex;
+  padding-left: 0;
+  list-style: none;
+  border-radius: 0.25rem;
+
+
+}
+
+.page-link {
+  position: relative;
+  display: block;
+  padding: 0.5rem 0.75rem;
+  margin-left: -1px;
+  line-height: 1.25;
+  color: theme-color(secondary);
+  background-color: transparent;
+  border: 1px solid theme-color(secondary);
+}
+
+.page-link:hover {
+  z-index: 2;
+  color: theme-color(light);
+  text-decoration: none;
+  background-color: theme-color(secondary-light);
+  border-color: theme-color(secondary);
+}
+
+.page-link:focus {
+  z-index: 2;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(theme-color(secondary), 0.25);
+}
+
+.page-link:not(:disabled):not(.disabled) {
+  cursor: pointer;
+}
+
+.page-item:first-child .page-link {
+  margin-left: 0;
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+}
+
+.page-item:last-child .page-link {
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.page-item.active .page-link {
+  z-index: 1;
+  color: #fff;
+  background-color: theme-color(secondary);
+  border-color: theme-color(secondary);
+}
+
+.page-item.disabled .page-link {
+  color: theme-color(secondary-light);
+  pointer-events: none;
+  cursor: auto;
+  background-color: transparent;
+  border-color:  theme-color(secondary);
+}
+
+
+.bg-info {
+  background-color: theme-color(secondary) !important;
+}
