@@ -32,30 +32,30 @@
                 <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
 
                 <ng-container cdkColumnDef="curatorName">
-                    <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('curatorName')"> curatorName ID
-                        <span *ngIf="sortKey.value === 'curatorName'">
+                    <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('displayName')"> curatorName ID
+                        <span *ngIf="sortKey.value === 'displayName'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
                     </th>
-                    <td cdk-cell *cdkCellDef="let row"> {{row.curatorName}}</td>
+                    <td cdk-cell *cdkCellDef="let row" routerLink="/profile/{{row.orcd_id}}"> {{row.displayName}}</td>
                 </ng-container>
 
                 <ng-container cdkColumnDef="entriesSum">
-                    <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('entriesSum')"> entriesSum
+                    <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('list_disprot_terms')"> entriesSum
                         <span *ngIf="sortKey.value === 'entriesSum'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
                     </th>
-                    <td cdk-cell *cdkCellDef="let row"> {{row.entriesSum}}</td>
+                    <td cdk-cell *cdkCellDef="let row"> {{row.list_disprot_entries.length}}</td>
                 </ng-container>
 
                 <ng-container cdkColumnDef="termsSum">
-                    <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('termsSum')"> termsSum
-                        <span *ngIf="sortKey.value === 'termsSum'">
+                    <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('list_disprot_terms')"> termsSum
+                        <span *ngIf="sortKey.value === 'list_disprot_terms'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
                     </th>
-                    <td cdk-cell *cdkCellDef="let row"> {{row.termsSum}}</td>
+                    <td cdk-cell *cdkCellDef="let row"> {{row.list_disprot_terms.length}}</td>
                 </ng-container>
 
                 <!--<ng-container cdkColumnDef="ncbi_taxon_id">-->

@@ -2,49 +2,77 @@
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 
-$theme-colors: (
-  primary: #2274a5,
-  secondary: #766359,
-  secondary-light: #A3948C,
-  secondary-dark: #211B19,
 
-  text: #0A202D,
-  backround:#EFF4F9,
-  footer: #021A20,
+$theme-colors: (
+  primary: #3A9B00,
+  secondary: #60006E,
+  secondary-light: #9A00B0,
+  //tertiary: #4a89aa,
+  //quaternary: #586473,
+  //quinary: #e7dacb,
+  text: #060F00,
+  footer: #010001,
   success: $green,
   info: $cyan,
   warning: $yellow,
   danger: $red,
-  light: #EFF4F9,
-
+  light: #EDF5E7,
+  dark: #412708
 );
 
 
-@media (prefers-color-scheme: dark) {
-  $theme-colors: (
-    primary: #2274a5,
-    secondary: #766359,
-    secondary-light: #A3948C,
-    secondary-dark: #211B19,
-    text: #EFF4F9,
-    backround:#0A202D,
-    footer: #021A20,
-    success: $green,
-    info: $cyan,
-    warning: $yellow,
-    danger: $red,
-    light: #EFF4F9,
 
-  );
+//
+//$theme-colors: (
+//  primary: #2274a5,
+//  secondary: #766359,
+//  secondary-light: #A3948C,
+//  secondary-dark: #211B19,
+//
+//  text: #0A202D,
+//  backround:#EFF4F9,
+//  footer: #021A20,
+//  success: $green,
+//  info: $cyan,
+//  warning: $yellow,
+//  danger: $red,
+//  light: #EFF4F9,
+//
+//);
+//
+//
+//@media (prefers-color-scheme: dark) {
+//  $theme-colors: (
+//    primary: #2274a5,
+//    secondary: #766359,
+//    secondary-light: #A3948C,
+//    secondary-dark: #211B19,
+//    text: #EFF4F9,
+//    backround:#0A202D,
+//    footer: #021A20,
+//    success: $green,
+//    info: $cyan,
+//    warning: $yellow,
+//    danger: $red,
+//    light: #EFF4F9,
+//
+//  );
+//}
+
+html {
+  height: 100%;
+  overflow: -moz-scrollbars-vertical;
+  overflow-y: scroll;
 }
 
 body {
-  background: theme-color(light);
-  color: theme-color(text);
+  height: 100%;
+  background: theme-color("light");
+  color: theme-color("dark");
 }
 
-.flagBackground{
-  fill: #faf5ec;
+.flagBackground {
+  fill: theme-color("light");
 }
 
 .bg-dark {

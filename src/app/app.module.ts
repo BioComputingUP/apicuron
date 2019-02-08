@@ -30,6 +30,7 @@ import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import {AuthService} from './services/auth.service';
+import { ProfileComponent } from './profile/profile.component';
 
 
 
@@ -43,6 +44,7 @@ const appRoutes: Routes = [
   { path: 'statistics', component: StatisticsComponent},
   { path: 'about', component: AboutComponent},
   { path: 'dashboard', component: DashboardComponent},
+  { path: 'profile/:orcid', component: ProfileComponent},
   { path: '', component: HomeComponent },
   { path: '**', component: PageNotFoundComponent}
 ];
@@ -62,7 +64,8 @@ const appRoutes: Routes = [
     FeedbackComponent,
     LoginComponent,
     DashboardComponent,
-    PageNotFoundComponent
+    PageNotFoundComponent,
+    ProfileComponent
   ],
   imports: [
     RouterModule.forRoot(

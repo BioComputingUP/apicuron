@@ -67,37 +67,35 @@ export class BrowseComponent implements OnInit {
     concat(...observables).subscribe(
       browseData => {
         this.disprotBrowse = browseData;
-        this.disprotBrowse.forEach(currProteinObj => {
-          let list_involvedCurators = new Set();
-          currProteinObj.regions.forEach(currRegionObj => {
-            if (!this.curatorData.hasOwnProperty(currRegionObj.curator)) {
-              this.curatorData[currRegionObj.curator] = {
-                curatorName: currRegionObj.curator,
-                entriesSum: 0,
-                termsSum: 0,
-                disprotIDs: [],
-                uniprotACCs: []
-              }
-            }
-            list_involvedCurators.add(currRegionObj.curator);
-            this.curatorData[currRegionObj.curator].termsSum++;
-          });
-          list_involvedCurators.forEach(key => {
-             this.curatorData[key].entriesSum++;
-             this.curatorData[key].disprotIDs.push(currProteinObj.disprot_id);
-             this.curatorData[key].uniprotACCs.push(currProteinObj.acc);
-          });
-          //
-          // console.log(currProteinObj)
-        });
+        // this.disprotBrowse.forEach(currProteinObj => {
+        //   let list_involvedCurators = new Set();
+        //   currProteinObj.regions.forEach(currRegionObj => {
+        //     if (!this.curatorData.hasOwnProperty(currRegionObj.curator)) {
+        //       this.curatorData[currRegionObj.curator] = {
+        //         curatorName: currRegionObj.curator,
+        //         entriesSum: 0,
+        //         termsSum: 0,
+        //         disprotIDs: [],
+        //         uniprotACCs: []
+        //       }
+        //     }
+        //     list_involvedCurators.add(currRegionObj.curator);
+        //     this.curatorData[currRegionObj.curator].termsSum++;
+        //   });
+        //   list_involvedCurators.forEach(key => {
+        //      this.curatorData[key].entriesSum++;
+        //      this.curatorData[key].disprotIDs.push(currProteinObj.disprot_id);
+        //      this.curatorData[key].uniprotACCs.push(currProteinObj.acc);
+        //   });
+        //   //
+        //   // console.log(currProteinObj)
+        // });
 
 
 
         // console.log();
 
-        this.tableDataSource_f.next(Object.keys(this.curatorData).map(currCuratorObj => {
-          return this.curatorData[currCuratorObj]
-        }));
+        this.tableDataSource_f.next(this.disprotBrowse);
         // console.log(browseData);
       },
       err => console.log(err),
