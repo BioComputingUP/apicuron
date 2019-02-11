@@ -10,14 +10,14 @@ $theme-colors: (
   //tertiary: #4a89aa,
   //quaternary: #586473,
   //quinary: #e7dacb,
-  text: #060F00,
-  footer: #010001,
+  text: #0B1D00,
+  footer: #040004,
   success: $green,
   info: $cyan,
   warning: $yellow,
   danger: $red,
   light: #EDF5E7,
-  dark: #412708
+  dark: #412708,
 );
 
 
@@ -68,8 +68,23 @@ html {
 body {
   height: 100%;
   background: theme-color("light");
-  color: theme-color("dark");
+  color: theme-color("text");
 }
+
+a {
+  color: theme-color("text");
+}
+
+.btn-link {
+  font-weight: 400;
+  color: theme-color("secondary");
+}
+
+.btn-link:hover {
+  color: darken(theme-color("secondary"), 0.5);
+  text-decoration: underline;
+}
+
 
 .flagBackground {
   fill: theme-color("light");

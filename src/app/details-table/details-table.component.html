@@ -1,0 +1,75 @@
+
+<div class="col-12" >
+  <div class="input-group mb-3" >
+    <div class="input-group-prepend">
+      <span class="input-group-text text-center" style="min-width: 180px" id="basic-addon1" >Search in DisProt</span>
+    </div>
+    <!--<input type="text" class="form-control" formControlName="search_term" placeholder="e.g.: p53">-->
+    <input type="text" class="form-control"  [formControl]="searchFormControl" placeholder="e.g.: P04637">
+    <div class="input-group-append" >
+      <button class="btn btn-outline-second-form" (click)="exampleSearch()"> example </button>
+    </div>
+  </div>
+</div>
+
+<div class="col-12">
+  <div class="col-12">
+    <!--<div class="col-12"> {{dataOnPage_old | json}}</div>-->
+    <table cdk-table [dataSource]="dataOnPage" class="table">
+
+      <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value"></tr>
+      <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
+
+      <ng-container cdkColumnDef="entry_id">
+        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('entry_id')"> Entry ID
+          <span *ngIf="sortKey.value === 'entry_id'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+        </th>
+        <td cdk-cell *cdkCellDef="let row" > <a href="https://beta.disprot.bio.unipd.it/{{row.entry_id}}" target="_blank">{{row.entry_id}}</a></td>
+      </ng-container>
+      <ng-container cdkColumnDef="acc">
+        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('acc')"> Accession (UniProt)
+          <span *ngIf="sortKey.value === 'acc'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+        </th>
+        <td cdk-cell *cdkCellDef="let row" > {{row.acc}}</td>
+      </ng-container>
+      <ng-container cdkColumnDef="name">
+        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('name')"> Protein name
+          <span *ngIf="sortKey.value === 'acc'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+        </th>
+        <td cdk-cell *cdkCellDef="let row" > {{row.name}}</td>
+      </ng-container>
+
+    </table>
+    <pagination
+      [totalItems]="tableDataSource.value.length"
+      [itemsPerPage]="pageSize.value"
+      [maxSize]="5"
+      [boundaryLinks]="true"
+      (pageChanged)="currentPage.next($event)"
+    >
+    </pagination>
+
+
+    <!--<pagination-->
+    <!--[totalItems]="disprotBrowse.value.length"-->
+    <!--[itemsPerPage]="pageSize.value"-->
+    <!--[maxSize]="5"-->
+    <!--[boundaryLinks]="true"-->
+    <!--[rotate]="true"-->
+    <!--[(ngModel)]="currentPage"-->
+    <!--(pageChanged)="pageChanged.next($event)">-->
+    <!---->
+    <!--</pagination>-->
+  </div>
+
+
+
+
+
+</div>

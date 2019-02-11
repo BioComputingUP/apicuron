@@ -112,7 +112,9 @@ export class BrowseComponent implements OnInit {
               const filteredResults = heroesArray.filter(hero => {
                 return Object.values(hero).reduce((prev, curr) => {
                   if (curr) {
-                    return prev || curr.toString().toLowerCase().includes(searchTerm.toLowerCase());
+                    // console.log(curr.toString().toLowerCase());
+                    // console.log(JSON.stringify(curr).toLowerCase());
+                    return prev || JSON.stringify(curr).toLowerCase().includes(searchTerm.toLowerCase());
                   }
                   return prev;
                 }, false);

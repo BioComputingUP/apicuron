@@ -32,7 +32,7 @@
                 <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
 
                 <ng-container cdkColumnDef="curatorName">
-                    <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('displayName')"> curatorName ID
+                    <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('displayName')"> Curator
                         <span *ngIf="sortKey.value === 'displayName'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
@@ -41,7 +41,7 @@
                 </ng-container>
 
                 <ng-container cdkColumnDef="entriesSum">
-                    <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('list_disprot_terms')"> entriesSum
+                    <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('list_disprot_terms')"> Number of entries
                         <span *ngIf="sortKey.value === 'entriesSum'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
@@ -50,7 +50,7 @@
                 </ng-container>
 
                 <ng-container cdkColumnDef="termsSum">
-                    <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('list_disprot_terms')"> termsSum
+                    <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('list_disprot_terms')"> Numbers of terms
                         <span *ngIf="sortKey.value === 'list_disprot_terms'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>

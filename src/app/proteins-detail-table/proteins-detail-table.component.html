@@ -1,0 +1,67 @@
+
+<div class="col-12" >
+  <div class="input-group mb-3" >
+    <div class="input-group-prepend">
+      <span class="input-group-text text-center" style="min-width: 180px" id="basic-addon1" >Search in DisProt</span>
+    </div>
+    <!--<input type="text" class="form-control" formControlName="search_term" placeholder="e.g.: p53">-->
+    <input type="text" class="form-control"  [formControl]="searchFormControl" placeholder="e.g.: P04637">
+    <div class="input-group-append" >
+      <button class="btn btn-outline-second-form" (click)="exampleSearch()"> example </button>
+    </div>
+  </div>
+</div>
+
+<div class="col-12">
+  <div class="col-12">
+    <!--<div class="col-12"> {{dataOnPage_old | json}}</div>-->
+    <table cdk-table [dataSource]="dataOnPage" class="table">
+
+      <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value"></tr>
+      <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
+
+      <ng-container cdkColumnDef="acc">
+        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('acc')"> ACC
+          <span *ngIf="sortKey.value === 'acc'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+        </th>
+        <td cdk-cell *cdkCellDef="let row" > {{row.acc}}</td>
+      </ng-container>
+      <ng-container cdkColumnDef="dbs">
+        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('dbs')"> Databases
+          <span *ngIf="sortKey.value === 'acc'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+        </th>
+        <td cdk-cell *cdkCellDef="let row" > <span *ngFor="let curr of row.dbs">{{curr[0]}}</span></td>
+      </ng-container>
+
+    </table>
+    <pagination
+      [totalItems]="tableDataSource.value.length"
+      [itemsPerPage]="pageSize.value"
+      [maxSize]="5"
+      [boundaryLinks]="true"
+      (pageChanged)="currentPage.next($event)"
+    >
+    </pagination>
+
+
+    <!--<pagination-->
+    <!--[totalItems]="disprotBrowse.value.length"-->
+    <!--[itemsPerPage]="pageSize.value"-->
+    <!--[maxSize]="5"-->
+    <!--[boundaryLinks]="true"-->
+    <!--[rotate]="true"-->
+    <!--[(ngModel)]="currentPage"-->
+    <!--(pageChanged)="pageChanged.next($event)">-->
+    <!---->
+    <!--</pagination>-->
+  </div>
+
+
+
+
+
+</div>

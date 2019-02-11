@@ -13,6 +13,7 @@ import { ButtonsModule } from 'ngx-bootstrap/buttons';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { AccordionModule } from 'ngx-bootstrap/accordion';
+import {AlertModule} from 'ngx-bootstrap/alert';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -31,6 +32,9 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import {AuthService} from './services/auth.service';
 import { ProfileComponent } from './profile/profile.component';
+import { DetailsTableComponent } from './details-table/details-table.component';
+import { AlarmBannerComponent } from './alarm-banner/alarm-banner.component';
+import { ProteinsDetailTableComponent } from './proteins-detail-table/proteins-detail-table.component';
 
 
 
@@ -65,7 +69,10 @@ const appRoutes: Routes = [
     LoginComponent,
     DashboardComponent,
     PageNotFoundComponent,
-    ProfileComponent
+    ProfileComponent,
+    DetailsTableComponent,
+    AlarmBannerComponent,
+    ProteinsDetailTableComponent
   ],
   imports: [
     RouterModule.forRoot(
@@ -79,6 +86,7 @@ const appRoutes: Routes = [
     AppRoutingModule,
     CdkTableModule,
     TabsModule.forRoot(),
+    AlertModule.forRoot(),
     ProgressbarModule.forRoot(),
     PaginationModule.forRoot(),
     BsDropdownModule.forRoot(),
