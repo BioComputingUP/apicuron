@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "epicuron-ui": {
+    "apicuron-ui": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/epicuron-ui",
+            "outputPath": "dist/apicuron-ui",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -63,18 +63,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "epicuron-ui:build"
+            "browserTarget": "apicuron-ui:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "epicuron-ui:build:production"
+              "browserTarget": "apicuron-ui:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "epicuron-ui:build"
+            "browserTarget": "apicuron-ui:build"
           }
         },
         "test": {
@@ -110,7 +110,7 @@
         }
       }
     },
-    "epicuron-ui-e2e": {
+    "apicuron-ui-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "prefix": "",
@@ -119,11 +119,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "epicuron-ui:serve"
+            "devServerTarget": "apicuron-ui:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "epicuron-ui:serve:production"
+              "devServerTarget": "apicuron-ui:serve:production"
             }
           }
         },
@@ -139,5 +139,5 @@
       }
     }
   },
-  "defaultProject": "epicuron-ui"
+  "defaultProject": "apicuron-ui"
 }
