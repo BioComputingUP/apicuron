@@ -3,8 +3,12 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start-dev": "ng serve",
+    "start-prod": "ng serve --prod",
+    "build": "ng build --prod --build-optimizer",
+    "delpoy-dev": "rsync -avzh --delete dist biocomp@persefone:/var/www/apicuron-dev/ && echo \"\nDone with deploy-dev!\"",
+    "deploy-prod-quick": "(colC='\\033[0;36m';colN='\\033[0m'; echo ${colC}Running npm build ...${colN} && npm run build && echo ${colC}Rsyncing dist ...${colN} && rsync -avh --delete dist/* biocomp@persefone:/var/www/apicuron/dist/ && echo ${colC}Done with deploy-prod-quick!${colC})",
+    "deploy-prod": "ssh -tt biocomp@persefone 'bash -c \"cd /var/www/apicuron/ && echo -e \\${colC}Running git pull ...\\${colN} && git pull && echo -e \\${colC}Deleting node_modules ...\\${colN} && rm -rf node_modules && echo -e \\${colC}Running npm install ...\\${colN} && nvm use && npm install && echo -e \\${colC}Running npm run build ...\\${colN} && npm run build && echo -e \\${colC}Done with deploy-prod!\\${colN}\"'",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
