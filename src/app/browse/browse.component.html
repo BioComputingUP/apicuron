@@ -1,3 +1,5 @@
+<div class="container-fluid container-wide">
+
 <br style="margin: 10px;">
 
 <div *ngIf="!loading_finished">
@@ -10,102 +12,87 @@
 </div>
 
 <div class="row" *ngIf="loading_finished">
-    <div class="col-12" >
-        <div class="input-group mb-3" >
-            <div class="input-group-prepend">
-                <span class="input-group-text text-center" style="min-width: 180px" id="basic-addon1" >Search in DisProt</span>
-            </div>
-            <!--<input type="text" class="form-control" formControlName="search_term" placeholder="e.g.: p53">-->
-            <input type="text" class="form-control"  [formControl]="searchFormControl" placeholder="e.g.: P04637">
-            <div class="input-group-append" >
-                <button class="btn btn-outline-second-form" (click)="exampleSearch()"> example </button>
-            </div>
-        </div>
+  <div class="col-12">
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+                <span class="input-group-text text-center" style="min-width: 180px" id="basic-addon1">
+                  Search in DisProt
+                </span>
+      </div>
+      <!--<input type="text" class="form-control" formControlName="search_term" placeholder="e.g.: p53">-->
+      <input type="text" class="form-control" [formControl]="searchFormControl" placeholder="e.g.: P04637">
+      <div class="input-group-append">
+        <button class="btn btn-outline-second-input" (click)="exampleSearch()"> example</button>
+      </div>
     </div>
-
-    <div class="col-12">
-        <div class="col-12">
-            <!--<div class="col-12"> {{dataOnPage_old | json}}</div>-->
-            <table cdk-table [dataSource]="dataOnPage" class="table">
-
-                <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value"></tr>
-                <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
-
-                <ng-container cdkColumnDef="curatorName">
-                    <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('displayName')"> Curator
-                        <span *ngIf="sortKey.value === 'displayName'">
-                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
-              </span>
-                    </th>
-                    <td cdk-cell *cdkCellDef="let row" routerLink="/profile/{{row.orcd_id}}"> {{row.displayName}}</td>
-                </ng-container>
-
-                <ng-container cdkColumnDef="entriesSum">
-                    <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('list_disprot_terms')"> Number of entries
-                        <span *ngIf="sortKey.value === 'entriesSum'">
-                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
-              </span>
-                    </th>
-                    <td cdk-cell *cdkCellDef="let row"> {{row.list_disprot_entries.length}}</td>
-                </ng-container>
-
-                <ng-container cdkColumnDef="termsSum">
-                    <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('list_disprot_terms')"> Numbers of terms
-                        <span *ngIf="sortKey.value === 'list_disprot_terms'">
-                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
-              </span>
-                    </th>
-                    <td cdk-cell *cdkCellDef="let row"> {{row.list_disprot_terms.length}}</td>
-                </ng-container>
-
-                <!--<ng-container cdkColumnDef="ncbi_taxon_id">-->
-                    <!--<th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('ncbi_taxon_id')"> Taxon ID-->
-                        <!--<span *ngIf="sortKey.value === 'ncbi_taxon_id'">-->
-                <!--{{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
-              <!--</span>-->
-                    <!--</th>-->
-                    <!--<td cdk-cell *cdkCellDef="let row"> {{row.ncbi_taxon_id}}</td>-->
-                <!--</ng-container>-->
-
-                <!--<ng-container cdkColumnDef="name">-->
-                    <!--<th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('name')"> Protein Name-->
-                        <!--<span *ngIf="sortKey.value === 'name'">-->
-                <!--{{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
-              <!--</span>-->
-                    <!--</th>-->
-                    <!--<td cdk-cell *cdkCellDef="let row"> {{row.name}}</td>-->
-                <!--</ng-container>-->
-
-            </table>
-            <pagination
-                    [totalItems]="tableDataSource.value.length"
-                    [itemsPerPage]="pageSize.value"
-                    [maxSize]="5"
-                    [boundaryLinks]="true"
-                    (pageChanged)="currentPage.next($event)"
-                    >
-            </pagination>
-
-
-            <!--<pagination-->
-            <!--[totalItems]="disprotBrowse.value.length"-->
-            <!--[itemsPerPage]="pageSize.value"-->
-            <!--[maxSize]="5"-->
-            <!--[boundaryLinks]="true"-->
-            <!--[rotate]="true"-->
-            <!--[(ngModel)]="currentPage"-->
-            <!--(pageChanged)="pageChanged.next($event)">-->
-            <!---->
-            <!--</pagination>-->
-        </div>
-
-
-
-
-
-    </div>
-
+  </div>
 </div>
+<div class="row"  *ngIf="loading_finished">
+  <div class="col-12">
+    <!--<div class="col-12"> {{dataOnPage_old | json}}</div>-->
+    <table cdk-table [dataSource]="dataOnPage" class="table">
+
+      <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value"></tr>
+      <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
+
+      <ng-container cdkColumnDef="curatorName">
+        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('surname')"> Curator
+          <span *ngIf="sortKey.value === 'surname'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+        </th>
+        <td cdk-cell *cdkCellDef="let row" routerLink="/profile/{{row.orcid}}"> {{row.firstname}} {{row.surname}}</td>
+      </ng-container>
+
+      <ng-container cdkColumnDef="entriesSum">
+        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('number_disprot_entries')"> Number of entries
+          <span *ngIf="sortKey.value === 'number_disprot_entries'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+        </th>
+        <td cdk-cell *cdkCellDef="let row"> {{row.number_disprot_entries}}</td>
+      </ng-container>
+
+      <ng-container cdkColumnDef="termsSum">
+        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('number_disprot_terms')"> Numbers of terms
+          <span *ngIf="sortKey.value === 'number_disprot_terms'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+        </th>
+        <td cdk-cell *cdkCellDef="let row"> {{row.number_disprot_terms}}</td>
+      </ng-container>
+
+      <ng-container cdkColumnDef="contributed_resources">
+        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('contributed_resources')"> Contributed resources
+          <span *ngIf="sortKey.value === 'contributed_resources'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+        </th>
+        <td cdk-cell *cdkCellDef="let row"> {{row.contributed_resources}}</td>
+      </ng-container>
+
+
+    </table>
+  </div>
+</div>
+<div class="row"  *ngIf="loading_finished">
+  <div class="col-4">
+    <pagination
+      [totalItems]="tableDataSource.value.length"
+      [itemsPerPage]="pageSize.value"
+      [maxSize]="5"
+      [boundaryLinks]="true"
+      (pageChanged)="currentPage.next($event)">
+    </pagination>
+  </div>
+  <div class="col-2">
+    Show only:
+    <button class="btn btn-outline-second">DisProt</button>
+  </div>
+</div>
+</div>
+
+
 
 
 <!--<tabset>-->

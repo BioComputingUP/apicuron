@@ -14,9 +14,10 @@ export class DetailsTableComponent implements OnInit {
   tableDataSource = new BehaviorSubject<any[]>([]);
 
   displayedColumns = new BehaviorSubject<string[]>([
-    'entry_id',
+    'entry',
     'acc',
-    'name'
+    'name',
+    'term_number'
   ]);
 
   // declaration, pagination
@@ -26,17 +27,13 @@ export class DetailsTableComponent implements OnInit {
 
   // declaration, search
   searchFormControl = new FormControl();
-  sortKey = new BehaviorSubject<string>('entry_id');
+  sortKey = new BehaviorSubject<string>('entry');
   sortDirection = new BehaviorSubject<string>('asc');
 
   constructor() { }
 
   ngOnInit() {
-
-
-
     this.tableDataSource_f.next(this.dataArray);
-
     combineLatest(this.tableDataSource_f, this.searchFormControl.valueChanges, this.sortKey, this.sortDirection)
       .subscribe(([changedHeroData, searchTerm, sortKey, sortDirection]) => {
         const heroesArray = Object.values(changedHeroData);

@@ -1,20 +1,27 @@
-@import "../../styles.scss";
+@import '../../styles';
 
 .footer {
-
-  min-height: 300px;
-
-  background-color: theme-color('footer');
-  color: theme-color(light);
+  background-color: theme-color("footer");
+  color: theme-color("light");
 }
 
 .footer-link {
-  color: #faf5ec;
+  color: theme-color("light");
 }
+
 .footer-link:hover {
   color: #61CCE5;
 }
 
+.logoimg {
+  max-width: 6rem;
+}
+
+.logoimg2 {
+  //max-width: 6rem ;
+  max-height: 3rem;
+  margin: 1rem !important;
+}
 
 
 a {

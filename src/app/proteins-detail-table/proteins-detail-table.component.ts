@@ -15,7 +15,9 @@ export class ProteinsDetailTableComponent implements OnInit {
 
   displayedColumns = new BehaviorSubject<string[]>([
     'acc',
-    'dbs'
+    'name',
+    'term_number',
+    'resources'
   ]);
 
   // declaration, pagination
@@ -25,7 +27,7 @@ export class ProteinsDetailTableComponent implements OnInit {
 
   // declaration, search
   searchFormControl = new FormControl();
-  sortKey = new BehaviorSubject<string>('entry_id');
+  sortKey = new BehaviorSubject<string>('acc');
   sortDirection = new BehaviorSubject<string>('asc');
   constructor() { }
 

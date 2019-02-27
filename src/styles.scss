@@ -1,7 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
 @import "../node_modules/bootstrap/scss/bootstrap";
-
-
 
 $theme-colors: (
   primary: #3A9B00,
@@ -21,44 +18,6 @@ $theme-colors: (
 );
 
 
-
-//
-//$theme-colors: (
-//  primary: #2274a5,
-//  secondary: #766359,
-//  secondary-light: #A3948C,
-//  secondary-dark: #211B19,
-//
-//  text: #0A202D,
-//  backround:#EFF4F9,
-//  footer: #021A20,
-//  success: $green,
-//  info: $cyan,
-//  warning: $yellow,
-//  danger: $red,
-//  light: #EFF4F9,
-//
-//);
-//
-//
-//@media (prefers-color-scheme: dark) {
-//  $theme-colors: (
-//    primary: #2274a5,
-//    secondary: #766359,
-//    secondary-light: #A3948C,
-//    secondary-dark: #211B19,
-//    text: #EFF4F9,
-//    backround:#0A202D,
-//    footer: #021A20,
-//    success: $green,
-//    info: $cyan,
-//    warning: $yellow,
-//    danger: $red,
-//    light: #EFF4F9,
-//
-//  );
-//}
-
 html {
   height: 100%;
   overflow: -moz-scrollbars-vertical;
@@ -68,10 +27,6 @@ html {
 body {
   height: 100%;
   background: theme-color("light");
-  color: theme-color("text");
-}
-
-a {
   color: theme-color("text");
 }
 
@@ -85,25 +40,175 @@ a {
   text-decoration: underline;
 }
 
-
 .flagBackground {
   fill: theme-color("light");
 }
 
+@media (prefers-color-scheme: dark) {
+  body {
+    background: theme-color("dark");
+    color: theme-color("light");
+  }
+  .flagBackground {
+    fill: theme-color("dark");
+  }
+
+}
+
 .bg-dark {
-  background-color: theme-color(primary) !important;
+  background-color: theme-color("primary") !important;
+}
+
+.fg-primary {
+  color: theme-color("primary") !important
+}
+
+.btn-outline-second {
+  color: theme-color("secondary");
+  background-color: transparent;
+  background-image: none;
+  border-color: theme-color("secondary");
+}
+
+.btn-outline-second:hover {
+  color: theme-color("light");
+  background-color: theme-color("secondary");
+  border-color: theme-color("secondary");
+}
+
+.btn-outline-second:focus, .btn-outline-second.focus {
+  box-shadow: 0 0 0 0.0rem rgba(theme-color("secondary"), 0.5);
+}
+
+.btn-outline-second.disabled, .btn-outline-second:disabled {
+  color: theme-color("secondary");
+  background-color: transparent;
+}
+
+.btn-outline-second:not(:disabled):not(.disabled):active, .btn-outline-second:not(:disabled):not(.disabled).active,
+.show > .btn-outline-second.dropdown-toggle {
+  color: theme-color("light");
+  background-color: theme-color("secondary");
+  border-color: theme-color("secondary");
+}
+
+.btn-outline-second:not(:disabled):not(.disabled):active:focus, .btn-outline-second:not(:disabled):not(.disabled).active:focus,
+.show > .btn-outline-second.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.0rem rgba(23, 162, 184, 0.5);
 }
 
 
-@media (min-width: 1200px) {
-  .container {
-    max-width: 85vw;
-  }
+.btn-outline-second-input {
+  color: theme-color("secondary");
+  background-color: rgba(255, 255, 255, 0.975);
+  background-image: none;
+  border-color: theme-color("secondary");
+}
+
+.btn-outline-second-input:hover {
+  color: theme-color("light");
+  background-color: theme-color("secondary");
+  border-color: theme-color("secondary");
+}
+
+.btn-outline-second-input:focus, .btn-outline-second-input.focus {
+  box-shadow: 0 0 0 0.0rem rgba(theme-color("secondary"), 0.5);
+}
+
+.btn-outline-second-input.disabled, .btn-outline-second-input:disabled {
+  color: theme-color("secondary");
+  background-color: rgba(255, 255, 255, 0.975);
+}
+
+.btn-outline-second-input:not(:disabled):not(.disabled):active, .btn-outline-second-input:not(:disabled):not(.disabled).active,
+.show > .btn-outline-second-input.dropdown-toggle {
+  color: theme-color("light");
+  background-color: theme-color("secondary");
+  border-color: theme-color("secondary");
+}
+
+.btn-outline-second-input:not(:disabled):not(.disabled):active:focus, .btn-outline-second-input:not(:disabled):not(.disabled).active:focus,
+.show > .btn-outline-second-input.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.0rem rgba(theme-color("secondary"), 0.5);
+}
+
+
+.btn-outline-danger-input {
+  color: theme-color("danger");
+  background-color: rgba(255, 255, 255, 0.975);
+  background-image: none;
+  border-color: theme-color("danger");
+}
+
+.btn-outline-danger-input:hover {
+  color: theme-color("light");
+  background-color: theme-color("danger");
+  border-color: theme-color("danger");
+}
+
+.btn-outline-danger-input:focus, .btn-outline-danger-input.focus {
+  box-shadow: 0 0 0 0.0rem rgba(theme-color("danger"), 0.5);
+}
+
+.btn-outline-danger-input.disabled, .btn-outline-danger-input:disabled {
+  color: theme-color("danger");
+  background-color: rgba(255, 255, 255, 0.975);
+}
+
+.btn-outline-danger-input:not(:disabled):not(.disabled):active, .btn-outline-danger-input:not(:disabled):not(.disabled).active,
+.show > .btn-outline-second-input.dropdown-toggle {
+  color: theme-color("light");
+  background-color: theme-color("danger");
+  border-color: theme-color("danger");
+}
+
+.btn-outline-danger-input:not(:disabled):not(.disabled):active:focus, .btn-outline-danger-input:not(:disabled):not(.disabled).active:focus,
+.show > .btn-outline-second-input.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.0rem rgba(theme-color("danger"), 0.5);
+}
+
+
+.input-group-text {
+  background-color:  rgba(theme-color(secondary), 0.125);
+  border-color: theme-color("secondary");
+  color: theme-color("secondary");
+}
+
+
+.form-control {
+  border-color: theme-color("secondary");
+  background-color: rgba(255, 255, 255, 0.975);
+}
+
+.form-control:focus, .form-control.focus {
+  border-color: theme-color("secondary");
+  box-shadow: 0 0 0 0.2rem rgba(theme-color("secondary"), 0.5);
+}
+
+.input-group-text-danger {
+  background-color:rgba(theme-color("danger"), 0.175);
+  border-color: theme-color("danger");
+  color: theme-color("danger");
+}
+
+
+.form-control-danger {
+  border-color: theme-color("danger");
+  background-color: rgba(255, 255, 255, 0.975);
+}
+
+.form-control-danger:focus, .form-control-danger.focus {
+  border-color: theme-color("danger");
+  box-shadow: 0 0 0 0.2rem rgba(theme-color("danger"), 0.5);
+}
+
+.jumbotron {
+  background-color: transparent;
 }
 
 
 .card {
-  border: 1px solid theme-color(secondary);
+  border: 1px solid theme-color("secondary");
   background-color: transparent;
   margin-top: 5px;
   margin-bottom: 5px;
@@ -115,117 +220,29 @@ a {
   background-color: transparent;
 }
 
-
-.btn-outline-second {
-  color: theme-color(secondary);
-  border-color: theme-color(secondary);
+.container-wide {
+  max-width: 1600px;
 }
 
-.btn-outline-second:hover {
-  color: theme-color(light);
-  background-color: theme-color(secondary);
-  border-color: theme-color(secondary);
+.flex-grow {
+  flex: 1 0 auto;
 }
 
-.btn-outline-second:focus, .btn-outline-second.focus {
-  box-shadow: 0 0 0 0.2rem rgba(theme-color(secondary), 0.5);
-}
-
-.btn-outline-second.disabled, .btn-outline-second:disabled {
-  color: theme-color(secondary-light);
-  background-color: transparent;
-}
-
-.btn-outline-second:not(:disabled):not(.disabled):active, .btn-outline-second:not(:disabled):not(.disabled).active,
-.show > .btn-outline-second.dropdown-toggle {
-  color: #fff;
-  background-color: theme-color(secondary-light);
-  border-color: theme-color(secondary-light);
-}
-
-.btn-outline-second:not(:disabled):not(.disabled):active:focus, .btn-outline-second:not(:disabled):not(.disabled).active:focus,
-.show > .btn-outline-second.dropdown-toggle:focus {
-  box-shadow: 0 0 0 0.2rem rgba(theme-color(secondary), 0.5);
-}
-
-.input-group-text {
-  background-color:  rgba(theme-color(secondary), 0.125);
-  border-color: theme-color(secondary);
-  color: theme-color(secondary);
-}
-
-.input-group-text:focus, .input-group-text.focus {
-  border-color: theme-color(secondary);
-  box-shadow: 0 0 0 0.2rem rgba(theme-color(secondary), 0.5);
-}
-
-.form-control{
-  border-color: theme-color(secondary);
-  background-color: rgba(255, 255, 255, 0.975);
-}
-.form-control:focus, .form-control.focus {
-  border-color: theme-color(secondary);
-  box-shadow: 0 0 0 0.2rem rgba(theme-color(secondary), 0.5);
-}
+//.container {
+//  width: 100%;
+//  padding-right: 15px;
+//  padding-left: 15px;
+//  margin-right: auto;
+//  margin-left: auto;
+//  max-width: 85vw;
+//}
 
 
-.btn-outline-second-form {
-  color: theme-color(secondary);
-  background-color: rgba(255, 255, 255, 0.975);
-  border-color: theme-color(secondary);
-}
-
-.btn-outline-second-form:hover {
-  color: theme-color(light);
-  background-color: theme-color(secondary);
-  border-color: theme-color(secondary);
-}
-
-.btn-outline-second-form:focus, .btn-outline-second-form.focus {
-  box-shadow: 0 0 0 0.2rem rgba(theme-color(secondary), 0.5);
-}
-
-.btn-outline-second-form.disabled, .btn-outline-second-form:disabled {
-  color: theme-color(secondary-light);
-  background-color: transparent;
-}
-
-.btn-outline-second-form:not(:disabled):not(.disabled):active, .btn-outline-second-form:not(:disabled):not(.disabled).active,
-.show > .btn-outline-second-form.dropdown-toggle {
-  color: #fff;
-  background-color: theme-color(secondary-light);
-  border-color: theme-color(secondary-light);
-}
-
-.btn-outline-second-form:not(:disabled):not(.disabled):active:focus, .btn-outline-second-form:not(:disabled):not(.disabled).active:focus,
-.show > .btn-outline-second-form.dropdown-toggle:focus {
-  box-shadow: 0 0 0 0.2rem rgba(theme-color(secondary), 0.5);
-}
-
-.jumbotron {
-  background-color: transparent
-}
-
-.btn-link-second {
-  font-weight: 400;
-  color: theme-color(secondary);
-}
-
-.btn-link-second:hover {
-  color:theme-color(secondary);
-  text-decoration: underline;
-}
-
-.btn-link-second:focus, .btn-link-second.focus {
-  text-decoration: underline;
-  box-shadow: none;
-}
-
-.btn-link-second:disabled, .btn-link-second.disabled {
-  color: theme-color(secondary-light);
-  pointer-events: none;
-}
-
+//@media (min-width: 1200px) {
+//  .container {
+//    max-width: 85vw;
+//  }
+//}
 
 .pagination {
   display: -ms-flexbox;
@@ -233,8 +250,6 @@ a {
   padding-left: 0;
   list-style: none;
   border-radius: 0.25rem;
-
-
 }
 
 .page-link {
@@ -243,23 +258,23 @@ a {
   padding: 0.5rem 0.75rem;
   margin-left: -1px;
   line-height: 1.25;
-  color: theme-color(secondary);
+  color: theme-color("secondary");
   background-color: transparent;
-  border: 1px solid theme-color(secondary);
+  border: 1px solid theme-color("secondary");
 }
 
 .page-link:hover {
   z-index: 2;
   color: theme-color(light);
   text-decoration: none;
-  background-color: theme-color(secondary-light);
-  border-color: theme-color(secondary);
+  background-color: rgba(theme-color("secondary"), 0.5);
+  border-color: theme-color("secondary");
 }
 
 .page-link:focus {
   z-index: 2;
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(theme-color(secondary), 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(theme-color("secondary"), 0.25);
 }
 
 .page-link:not(:disabled):not(.disabled) {
@@ -279,20 +294,25 @@ a {
 
 .page-item.active .page-link {
   z-index: 1;
-  color: #fff;
-  background-color: theme-color(secondary);
-  border-color: theme-color(secondary);
+  color: white;
+  background-color: theme-color("secondary");
+  border-color: theme-color("secondary");
 }
 
 .page-item.disabled .page-link {
-  color: theme-color(secondary-light);
+  color: rgba(theme-color("secondary"), 0.5);
   pointer-events: none;
   cursor: auto;
   background-color: transparent;
-  border-color:  theme-color(secondary);
+  border-color: theme-color("secondary");
+}
+
+.bg-info {
+  background-color: theme-color("secondary") !important;
 }
 
 
-.bg-info {
-  background-color: theme-color(secondary) !important;
+
+a {
+  color: theme-color("text");
 }

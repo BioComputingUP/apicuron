@@ -1,31 +1,19 @@
-<br style="margin: 10px;">
-<div class="jumbotron">
-  <div class="row">
-    <div class="col-12">
-      <p>
-        <strong>Please log-in</strong> to enter the APICURON <br>
-        See <a routerLink="/about"><strong>About</strong></a> page for more information.
-      </p>
-    </div>
+<div class="container-fluid container-wide">
+  <div class="jumbotron">
+    <p>
+      <strong>Please log-in</strong> to enter the curators interface! <br>
+      See <a routerLink="/about"><strong>About</strong></a> page for more information.
+    </p>
+    <a href="{{env.ws}}google">
+      <img class="align-items-center mr-3" src="assets/btn_google_signin_light_normal_web.png">
+    </a>
+    <a >
+      <img class="align-items-center mr-3" src="assets/ms-symbollockup_signin_light.png">
+    </a>
+    <a >
+      <img class="align-items-center mr-3" style="max-width: 105px"  src="assets/login-button-blue-medium.png">
+    </a>
+    <!--<i class="btn btn-outline-second disabled">Elixir-AAI</i>-->
   </div>
-  <div class="row">
-    <div class="col-2">
-      <p>
-        <a href="http://localhost:8099/google">
-          <img class="align-items-center"  src="assets/btn_google_signin_light_normal_web.png">
-        </a>
-      </p>
-    </div>
-    <div class="col-2 text-center">
-      <p class="input-group mb-3">
-        <i class="btn btn-outline-second">Elixir-AAI</i>
-      </p>
-    </div>
-  </div>
-
-
-  <p class="input-group mb-3 col-4" style="padding-top: 200px">
-    <button class="btn btn-outline-second" style="width: 120px" routerLink="/dashboard">dashboard</button>
-  </p>
-
 </div>
+

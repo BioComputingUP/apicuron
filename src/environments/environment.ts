@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  ws: 'http://localhost/ws/'
+  ws: 'http://localhost:8098/'
 
 };
 

@@ -35,6 +35,8 @@ import { ProfileComponent } from './profile/profile.component';
 import { DetailsTableComponent } from './details-table/details-table.component';
 import { AlarmBannerComponent } from './alarm-banner/alarm-banner.component';
 import { ProteinsDetailTableComponent } from './proteins-detail-table/proteins-detail-table.component';
+import { PubmedDetailTableComponent } from './pubmed-detail-table/pubmed-detail-table.component';
+import { EditProfileComponent } from './edit-profile/edit-profile.component';
 
 
 
@@ -49,6 +51,7 @@ const appRoutes: Routes = [
   { path: 'about', component: AboutComponent},
   { path: 'dashboard', component: DashboardComponent},
   { path: 'profile/:orcid', component: ProfileComponent},
+  { path: 'editprofile/:orcid', component: ProfileComponent},
   { path: '', component: HomeComponent },
   { path: '**', component: PageNotFoundComponent}
 ];
@@ -72,7 +75,9 @@ const appRoutes: Routes = [
     ProfileComponent,
     DetailsTableComponent,
     AlarmBannerComponent,
-    ProteinsDetailTableComponent
+    ProteinsDetailTableComponent,
+    PubmedDetailTableComponent,
+    EditProfileComponent
   ],
   imports: [
     RouterModule.forRoot(

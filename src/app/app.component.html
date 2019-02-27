@@ -17,12 +17,24 @@
     <!--<h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>-->
   <!--</li>-->
 <!--</ul>-->
-<app-navbar></app-navbar>
+<!--<app-navbar></app-navbar>-->
 
-<div class="container">
-  <app-alarm-banner></app-alarm-banner>
-  <router-outlet></router-outlet>
+<!--<div class="container">-->
+  <!--<app-alarm-banner></app-alarm-banner>-->
+  <!--<router-outlet></router-outlet>-->
+<!--</div>-->
+
+<!--<app-foot></app-foot>-->
+
+<div class="d-flex flex-column h-100">
+  <div class="container-fluid">
+    <app-navbar></app-navbar>
+  </div>
+  <div class="container-fluid flex-grow">
+    <app-alarm-banner></app-alarm-banner>
+    <router-outlet></router-outlet>
+  </div>
+  <div class="container-fluid">
+    <app-foot></app-foot>
+  </div>
 </div>
-
-<app-foot></app-foot>
-

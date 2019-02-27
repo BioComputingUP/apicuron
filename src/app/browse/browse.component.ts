@@ -44,7 +44,8 @@ export class BrowseComponent implements OnInit {
   displayedColumns = new BehaviorSubject<string[]>([
     'curatorName',
     'entriesSum',
-    'termsSum'
+    'termsSum',
+    'contributed_resources'
   ]);
 
   // declaration, pagination
@@ -54,7 +55,7 @@ export class BrowseComponent implements OnInit {
 
   // declaration, search
   searchFormControl = new FormControl();
-  sortKey = new BehaviorSubject<string>('disprot_id');
+  sortKey = new BehaviorSubject<string>('surname');
   sortDirection = new BehaviorSubject<string>('asc');
 
   constructor(
@@ -67,6 +68,7 @@ export class BrowseComponent implements OnInit {
     concat(...observables).subscribe(
       browseData => {
         this.disprotBrowse = browseData;
+
         // this.disprotBrowse.forEach(currProteinObj => {
         //   let list_involvedCurators = new Set();
         //   currProteinObj.regions.forEach(currRegionObj => {
@@ -100,7 +102,18 @@ export class BrowseComponent implements OnInit {
       },
       err => console.log(err),
       () => {
-
+        this.disprotBrowse.forEach(currObj => {
+          currObj['number_disprot_terms'] = currObj['contribution'].length;
+          const entriesSet = new Set();
+          const resourcesSet = new Set();
+          currObj['contribution'].forEach(currEntry => {
+            entriesSet.add(currEntry.resource_entry_id);
+            resourcesSet.add(currEntry.resource);
+          });
+          currObj['number_disprot_entries'] = Array.from(entriesSet).length;
+          currObj['contributed_resources'] = Array.from(resourcesSet).join(', ');
+          currObj['displayName'] = currObj.firstname + ' ' + currObj.surname;
+        });
         combineLatest(this.tableDataSource_f, this.searchFormControl.valueChanges, this.sortKey, this.sortDirection)
           .subscribe(([changedHeroData, searchTerm, sortKey, sortDirection]) => {
             const heroesArray = Object.values(changedHeroData);
