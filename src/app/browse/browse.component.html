@@ -22,7 +22,7 @@
       <!--<input type="text" class="form-control" formControlName="search_term" placeholder="e.g.: p53">-->
       <input type="text" class="form-control" [formControl]="searchFormControl" placeholder="e.g.: P04637">
       <div class="input-group-append">
-        <button class="btn btn-outline-second-input" (click)="exampleSearch()"> example</button>
+        <button class="btn btn-outline-primary-input" (click)="exampleSearch()"> example</button>
       </div>
     </div>
   </div>
@@ -41,7 +41,7 @@
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
         </th>
-        <td cdk-cell *cdkCellDef="let row" routerLink="/profile/{{row.orcid}}"> {{row.firstname}} {{row.surname}}</td>
+        <td cdk-cell *cdkCellDef="let row" routerLink="/profile/{{row.id}}"> {{row.firstname}} {{row.surname}}</td>
       </ng-container>
 
       <ng-container cdkColumnDef="entriesSum">
@@ -87,7 +87,7 @@
   </div>
   <div class="col-2">
     Show only:
-    <button class="btn btn-outline-second">DisProt</button>
+    <button class="btn btn-outline-primary">DisProt</button>
   </div>
 </div>
 </div>

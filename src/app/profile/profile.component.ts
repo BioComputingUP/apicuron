@@ -5,6 +5,7 @@ import {ProgressbarConfig} from 'ngx-bootstrap';
 export function getProgressbarConfig(): ProgressbarConfig {
   return Object.assign(new ProgressbarConfig(), { animate: true, striped: true,  max: 100 });
 }
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-profile',
@@ -16,9 +17,9 @@ export function getProgressbarConfig(): ProgressbarConfig {
 
 
 export class ProfileComponent implements OnInit {
-
+  env;
   profileData: object;
-  loading_finished:boolean;
+  loading_finished: boolean;
   editMode: boolean;
 
   resourcesList = [];
@@ -30,6 +31,7 @@ export class ProfileComponent implements OnInit {
   constructor(private internalService: InternalService) { }
 
   ngOnInit() {
+    this.env = environment;
     console.log(window.location.pathname.substring(1, 8))
     let orcidID = ''
     if (window.location.pathname.substring(1, 8) === 'profile') {
@@ -55,19 +57,23 @@ export class ProfileComponent implements OnInit {
         const pmidSet = new Set();
         const proteinSet = new Set();
 
-        this.profileData['contribution'].forEach(currObj => {
-          entriesSet.add(currObj.resource_entry_id);
-          resourcesSet.add(currObj.resource);
-          pmidSet.add(currObj.pmid);
-          proteinSet.add(currObj.acc);
-        });
+        if (this.profileData['contribution']) {
+
+          this.profileData['contribution'].forEach(currObj => {
+            entriesSet.add(currObj.resource_entry_id);
+            resourcesSet.add(currObj.resource);
+            pmidSet.add(currObj.pmid);
+            proteinSet.add(currObj.acc);
+          });
+        }
+
         // console.log(entriesSet)
          this.entriesList =  Array.from(entriesSet);
          this.resourcesList =  Array.from(resourcesSet);
          this.pmidList = Array.from(pmidSet);
          this.proteinList = Array.from(proteinSet);
         // this.entriesNumber = this.profileData['contribution'].filter()
-          this.loading_finished= true
+         this.loading_finished = true;
       }
     );
 

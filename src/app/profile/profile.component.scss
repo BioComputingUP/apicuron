@@ -1,0 +1,21 @@
+@import '../../styles';
+
+
+.logoimg {
+  min-height: 8rem;
+  max-height: 12rem;
+  display: block;
+  width: auto;
+  height: auto;
+
+}
+
+
+.img-border {
+  //border-color: ;
+  border: 1px solid theme-color("primary");
+  border-radius: 0.25rem;
+  //border-left: 0;
+  //border-bottom-left-radius: 0;
+  //border-top-left-radius: 0;
+}

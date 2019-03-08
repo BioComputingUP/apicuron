@@ -11,6 +11,9 @@ import { environment } from '../../environments/environment';
 export class InternalService {
   private apicuronBrowse = environment.ws + 'browse';
   private apicuronProfile = environment.ws + 'profile/';
+  private apicuronPostProfileData = environment.ws + 'postProfileData';
+  private apicuronPostProfilePicture = environment.ws + 'postProfilePicture/';
+  private apicuronGetProfilePicture = environment.ws + 'getProfilePicture/';
 
   constructor (private http: HttpClient) {
 
@@ -23,10 +26,25 @@ export class InternalService {
     // .pipe(catchError(err => of(console.error(err))));
   }
 
-  GetProfile(orcid_id): Observable<any> {
+  GetProfile(id): Observable<any> {
     return this.http.get(
-      this.apicuronProfile + orcid_id,
+      this.apicuronProfile + id,
       {responseType: 'json'});
     // .pipe(catchError(err => of(console.error(err))));
   }
+
+  PostProfileData(profileObj): Observable<any> {
+    return this.http.post(this.apicuronPostProfileData, profileObj);
+  }
+
+  PostProfilePicture(profilePicture, id): Observable<any> {
+    return this.http.post(this.apicuronPostProfilePicture + id, profilePicture);
+  }
+
+  GetProfilePicture(id): Observable<any> {
+    return this.http.get(
+      this.apicuronGetProfilePicture + id);
+    // .pipe(catchError(err => of(console.error(err))));
+  }
+
 }

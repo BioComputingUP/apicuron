@@ -15,22 +15,20 @@
   <div *ngIf="!editMode">
     <div class="row pt-2 pb-3 align-items-center">
       <div class="col-lg-2 col-md-4 col-sm-4 d-none d-sm-block">
-        <!--<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="125" height="125"-->
-        <!--viewBox="0 0 100 100">-->
-        <!--<g>-->
-        <!--<g transform="translate(50 50) scale(1 1) rotate(0) translate(-50 -50)" style="fill:#60006e">-->
-        <svg fill="#60006e" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-             version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100"
-             xml:space="preserve"><g><g><g><path d="M50,57.076c8.78,0,15.924-8.732,15.924-19.461c0-10.732-7.147-19.465-15.924-19.465c-4.33,0-8.377,2.076-11.395,5.848     c-2.923,3.654-4.53,8.49-4.53,13.617C34.076,48.344,41.219,57.076,50,57.076z M50,21.691c6.828,0,12.385,7.143,12.385,15.924     c0,8.779-5.557,15.924-12.385,15.924c-6.829,0-12.386-7.145-12.39-15.924C37.611,28.834,43.167,21.691,50,21.691z M62.385,53.539     c-0.978,0-1.77,0.791-1.77,1.767c0,0.979,0.792,1.77,1.77,1.77c6.829,0,12.386,5.559,12.386,12.387c0,0.975-0.795,1.77-1.77,1.77     H26.998c-0.975,0-1.769-0.795-1.769-1.77c0-6.828,5.557-12.387,12.386-12.387c0.978,0,1.77-0.791,1.77-1.77     c0-0.976-0.792-1.767-1.77-1.767c-8.781,0-15.925,7.142-15.925,15.924c0,2.928,2.381,5.309,5.308,5.309h46.003     c2.928,0,5.309-2.381,5.309-5.309C78.31,60.682,71.166,53.539,62.385,53.539z"></path></g></g><g><path d="c25.366,0,46.003,20.637,46.003,46.004C96.003,75.365,75.367,96.004,50,96.004z M50,7.535C26.586,7.535,7.536,26.584,7.536,50    c0,23.414,19.05,42.465,42.465,42.465c23.414,0,42.464-19.051,42.464-42.465C92.464,26.584,73.415,7.535,50,7.535z"></path></g></g></svg>
-        <!--</g>-->
-        <!--</g>-->
-        <!--</svg>-->
+        <div *ngIf="profileData['profile_picture']">
+          <img
+            src="{{env.ws}}getProfilePicture/{{profileData['profile_picture']}}"
+            class="logoimg img-border">
+        </div>
+        <div *ngIf="!profileData['profile_picture']">
+          <img class="logoimg" src="assets/user.png">
+        </div>
       </div>
       <div class="col-lg-4 col-md-8 col-sm-8">
         <h3><strong> {{profileData['firstname']}} {{profileData['surname']}} </strong></h3>
-        <strong>Organisation: </strong><br>
-        <strong>Position: </strong><br>
-        <strong>Personal page: </strong> urlurlurlurlurlurlurlurlurlurl<br>
+        <strong>Organisation: </strong>{{profileData['organization']}}<br>
+        <strong>Position: </strong>{{profileData['position']}}<br>
+        <strong>Personal page: </strong>{{profileData['personal_page']}}<br>
         <strong>ORCID iD: </strong>{{profileData['orcid']}}<br>
         <strong>Number of entries: </strong>{{entriesList.length}}<br>
         <strong>Number of terms: </strong>{{profileData['contribution'].length}}<br>
@@ -38,10 +36,7 @@
 
       </div>
       <div class="col-lg-6 text-justify">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        {{profileData['summary']}}
       </div>
     </div>
     <div class="row">
@@ -52,7 +47,7 @@
           class="badge  badge-pill badge-warning pl-1 text-center"> Gold IDP curator</span></p>
       </div>
       <div class="col-2">
-        <button class="btn btn-outline-danger btn-block" routerLink="/editprofile/{{profileData['orcid']}}">Edit your profile</button>
+        <button class="btn btn-outline-danger btn-block" routerLink="/editprofile/{{profileData['id']}}">Edit your profile</button>
       </div>
     </div>
     <accordion>
