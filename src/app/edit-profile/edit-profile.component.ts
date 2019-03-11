@@ -4,6 +4,7 @@ import {InternalService} from '../services/internal.service';
 import { Router } from '@angular/router';
 import {logger} from 'codelyzer/util/logger';
 import { environment } from '../../environments/environment';
+import {concat} from 'rxjs';
 
 @Component({
   selector: 'app-edit-profile',
@@ -78,16 +79,21 @@ export class EditProfileComponent implements OnInit {
     //   sendData. = this.pubmedForm.value.;
     // }
 
-    this.internalService.PostProfileData(sendData).subscribe();
 
-    console.log(sendData);
 
+    const observables = [];
+    observables.push(this.internalService.PostProfileData(sendData));
     if (this.imgURL) {
-      this.internalService.PostProfilePicture(this.formData,  this.profile_obj.id).subscribe();
+      observables.push(this.internalService.PostProfilePicture(this.formData,  this.profile_obj.id));
+      // this.internalService.PostProfilePicture(this.formData,  this.profile_obj.id).subscribe();
       // this.internalService.PostProfilePicture('valmai').subscribe();
     }
-
-    this.router.navigate(['/profile/' + this.profile_obj.id]);
+    concat(...observables).subscribe(
+      profileData => {},
+      err => console.log(err),
+      () => {
+        this.router.navigate(['/profile/' + this.profile_obj.id]);
+      });
   }
 
   addFiles() {
