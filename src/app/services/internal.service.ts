@@ -15,8 +15,10 @@ export class InternalService {
   private apicuronPostProfilePicture = environment.ws + 'postProfilePicture/';
   private apicuronGetProfilePicture = environment.ws + 'getProfilePicture/';
   private apicuronGetJwtToken = environment.ws + 'token';
+  private apicuronGetJwtTokenForUser = environment.ws + 'tokenForUser/';
   private apicuronListUser = environment.ws + 'listUser';
   private apicuronRegNewUser = environment.ws + 'registerUser';
+  private apicuronDeteteUser = environment.ws + 'deleteUser/';
 
   constructor (private http: HttpClient) {
 
@@ -50,9 +52,21 @@ export class InternalService {
     // .pipe(catchError(err => of(console.error(err))));
   }
 
+  DeleteUser(id): Observable<any> {
+    return this.http.get(
+      this.apicuronDeteteUser + id);
+    // .pipe(catchError(err => of(console.error(err))));
+  }
+
   GetPubDisProtGetJwtToken(): Observable<any> {
     return this.http.get(
       this.apicuronGetJwtToken,
+      {responseType: 'json'});
+  }
+
+  GetApucuronJwtTokenForUser(id): Observable<any> {
+    return this.http.get(
+      this.apicuronGetJwtTokenForUser + id,
       {responseType: 'json'});
   }
 

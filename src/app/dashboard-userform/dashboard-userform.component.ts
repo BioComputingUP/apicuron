@@ -1,5 +1,5 @@
-import { Component,  Input, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, Validators} from '@angular/forms';
+import {Component, Input, OnInit} from '@angular/core';
+import {ValidatorFn, FormGroup, FormArray, FormBuilder, Validators, AbstractControl, FormControl} from '@angular/forms';
 import {InternalService} from '../services/internal.service';
 
 @Component({
@@ -8,18 +8,8 @@ import {InternalService} from '../services/internal.service';
   styleUrls: ['./dashboard-userform.component.scss']
 })
 export class DashboardUserformComponent implements OnInit {
-  buttomName = 'register'
-  newUserRegForm = this.fb.group(
-    {
-      username: ['', Validators.required],
-      role: ['', Validators.required],
-      displayedName: ['', Validators.required],
-      institution: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      gmail: ['', Validators.email],
-      // alternativeEmail: ['', Validators.email]
-    }
-  );
+  buttomName = 'register';
+  newUserRegForm;
   @Input()
   user_obj: object;
 
@@ -27,25 +17,69 @@ export class DashboardUserformComponent implements OnInit {
   modalRef;
 
   constructor(private fb: FormBuilder,
-              private internalService: InternalService) { }
+              private internalService: InternalService) {
+  }
 
   ngOnInit() {
     if (this.user_obj.hasOwnProperty('username')) {
-      this.newUserRegForm.setValue({
-        'username': this.user_obj['username'],
-        'role': this.user_obj.hasOwnProperty('role') ? this.user_obj['role'] : '',
-        'displayedName':  this.user_obj.hasOwnProperty('displayedName') ? this.user_obj['displayedName'] : '',
-        'institution':  this.user_obj.hasOwnProperty('institution') ? this.user_obj['institution'] : '',
-        'email':  this.user_obj.hasOwnProperty('email') ? this.user_obj['email'] : '',
-        'gmail': this.user_obj.hasOwnProperty('gmail') ? this.user_obj['gmail'] : '',
-      });
+
       this.buttomName = 'update';
     }
+      this.newUserRegForm = this.fb.group(
+        {
+          username: [this.user_obj.hasOwnProperty('username') ? this.user_obj['username'] : '', Validators.required],
+          role: [this.user_obj.hasOwnProperty('role') ? this.user_obj['role'] : '', Validators.required],
+          displayedName: [this.user_obj.hasOwnProperty('displayedName') ? this.user_obj['displayedName'] : '', Validators.required],
+          institution: [this.user_obj.hasOwnProperty('institution') ? this.user_obj['institution'] : '', Validators.required],
+          email: [this.user_obj.hasOwnProperty('email') ? this.user_obj['email'] : '', [Validators.required, Validators.email]],
+          gmail: [this.user_obj.hasOwnProperty('gmail') ? this.user_obj['gmail'] : '', Validators.email],
+          resources: this.fb.array([]),
+        }
+      );
+
+    if (this.user_obj.hasOwnProperty('resources') ? this.user_obj['resources'].length > 0 : false) {
+      const resources = this.newUserRegForm.get('resources') as FormArray;
+      this.user_obj['resources'].forEach(condition => {
+        resources.push(this.fb.group(condition));
+      });
+    } else {
+      const resources = this.newUserRegForm.get('resources') as FormArray;
+      resources.push(this.fb.group({
+        name: [null, Validators.required],
+        id: [null, Validators.required]
+      }));
+    }
   }
+
   regNewUser() {
     console.log(this.newUserRegForm.value);
     this.internalService.RegisterNewUser(this.newUserRegForm.value).subscribe();
     this.modalRef.hide();
 
+  }
+  deleteUser() {
+    console.log(this.newUserRegForm.value['username']);
+    this.internalService.DeleteUser(this.newUserRegForm.value['username']).subscribe();
+    this.modalRef.hide();
+
+  }
+
+  addFormArrayElement() {
+    const rows = this.newUserRegForm.get('resources') as FormArray;
+    rows.push(this.fb.group({
+      name: [null, Validators.required],
+      id: [null, Validators.required]
+    }));
+  }
+
+  removeFormArrayElement(index) {
+    const rows = this.newUserRegForm.get('resources') as FormArray;
+    rows.removeAt(index);
+    if (rows.length === 0) {
+      rows.push(this.fb.group({
+        name: [null, Validators.required],
+        id: [null, Validators.required]
+      }));
+    }
   }
 }

@@ -13,6 +13,9 @@ import {BsModalService, BsModalRef} from 'ngx-bootstrap/modal';
 export class DashboardComponent implements OnInit, OnDestroy {
   localAuth = new BehaviorSubject<object>({});
   currentJwtToken = null;
+  tokenForUser = new BehaviorSubject<object>({
+    username: null
+  });
   modalRef: BsModalRef;
 
   displayedColumns = new BehaviorSubject<string[]>([
@@ -22,6 +25,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     'role',
     'email',
     'gmail',
+    'resources',
     'edit',
   ]);
   currentPage = new BehaviorSubject<object>({
@@ -53,6 +57,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
               this.dataOnPage.next(userlist);
             });
           });
+
+        this.searchFormControl.setValue('');
       }
     });
   }
@@ -81,6 +87,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  getApucuronJwtTokenForUser(username) {
+    this.internalService.GetApucuronJwtTokenForUser(username).subscribe(res => {
+      this.tokenForUser.next(
+        { username: username,
+          token: res.token}
+          );
+    });
+  }
+
   openModal(template: TemplateRef<any>) {
     this.modalRef = this.modalService.show(
       template,
@@ -104,4 +119,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
     copyElement.remove();
   }
 
+  copyJWTforUser(inputElement) {
+    const copyElement = document.createElement('span');
+    copyElement.appendChild(document.createTextNode(inputElement));
+    copyElement.id = 'tempCopyToClipboard';
+    document.body.append(copyElement);
+
+    const range = document.createRange();
+    range.selectNode(copyElement);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    copyElement.remove();
+  }
+
+
+  mapResources(array) {
+    if (array) {
+      return array.map(x => x.name).join(', ');
+
+    } else  {
+      return '';
+    }
+  }
 }

@@ -79,22 +79,49 @@
               </ng-container>
 
               <ng-container cdkColumnDef="gmail">
-                <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('gmail')"> alternativeEmail
+                <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('gmail')"> Gmail
                   <span *ngIf="sortKey.value === 'gmail'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
                 </th>
                 <td cdk-cell *cdkCellDef="let row"> {{row.gmail}}</td>
               </ng-container>
+              <ng-container cdkColumnDef="resources">
+                <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('resources')"> Resources
+                  <span *ngIf="sortKey.value === 'resources'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+                </th>
+                <td cdk-cell *cdkCellDef="let row"> {{mapResources(row.resources)}}</td>
+              </ng-container>
 
               <ng-container cdkColumnDef="edit">
                 <th cdk-header-cell *cdkHeaderCellDef></th>
                 <td cdk-cell *cdkCellDef="let row" class="m-0 p-0 pt-2 pb-1">
-                  <button type="button"
-                          class="btn btn-outline-second mb-0 float-right"
-                          (click)="openModal(template_update)">
-                    update
-                  </button>
+
+                  <div class="row">
+                    <div class="col-auto">
+                        <div class="input-group-append"
+                             *ngIf="tokenForUser.value['username'] !== row.username">
+                          <button class="btn btn-outline-primary-input mb-0"
+                                  (click)="getApucuronJwtTokenForUser(row.username)">get token</button>
+                        </div>
+                        <div class="input-group-append"
+                             *ngIf="tokenForUser.value['username'] === row.username">
+                          <button class="btn btn-outline-primary-input mb-0"
+                                  (click)="copyJWTforUser(tokenForUser.value['token'])" >copy to clipboard</button>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                      <button type="button"
+                              class="btn btn-outline-primary-input mb-0"
+                              (click)="openModal(template_update)">
+                        update profile
+                      </button>
+                    </div>
+
+                  </div>
+
                   <ng-template #template_update>
                     <div class="modal-header">
                       <h4 class="modal-title pull-left">Update user</h4>
@@ -103,7 +130,7 @@
                       </button>
                     </div>
                     <div class="modal-body">
-                      {{row |json}}
+<!--                      {{row |json}}-->
                       <app-dashboard-userform [user_obj]="row" [modalRef]="modalRef"></app-dashboard-userform>
                     </div>
                   </ng-template>
@@ -124,6 +151,7 @@
 <!--            </pagination>-->
 <!--          </div>-->
           <div class="col">
+
             <button type="button" class="btn btn-outline-primary mb-3 float-right" (click)="openModal(template_new, {})">
               register new user
             </button>
