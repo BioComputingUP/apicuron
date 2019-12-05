@@ -1,0 +1,54 @@
+<form  [formGroup]="newUserRegForm">
+
+  <div class="row" style="margin-top: 10px">
+    <div class="col-12">
+      <!--<h6>Registration of the new user</h6>-->
+      <div class="input-group mb-3 col-12">
+        <div class="input-group-prepend">
+          <span class="input-group-text" style="width: 150px">Username</span>
+        </div>
+        <input type="text" class="form-control" formControlName="username">
+      </div>
+      <div class="input-group mb-3 col-12">
+        <div class="input-group-prepend">
+          <span class="input-group-text" style="width: 150px">Full name</span>
+        </div>
+        <input type="text" class="form-control" formControlName="displayedName">
+      </div>
+      <div class="input-group mb-3 col-12">
+        <div class="input-group-prepend">
+          <span class="input-group-text" style="width: 150px">role</span>
+        </div>
+        <input type="text" class="form-control" formControlName="role">
+      </div>
+      <div class="input-group mb-3 col-12">
+        <div class="input-group-prepend">
+          <span class="input-group-text" style="width: 150px">Institution</span>
+        </div>
+        <input type="text" class="form-control" formControlName="institution">
+      </div>
+
+      <div class="input-group mb-3 col-12">
+        <div class="input-group-prepend">
+          <span class="input-group-text" style="width: 150px">E-Mail address</span>
+        </div>
+        <input type="email" class="form-control" formControlName="email">
+      </div>
+      <div class="input-group mb-3 col-12">
+        <div class="input-group-prepend">
+          <span class="input-group-text" style="width: 150px">Gmail</span>
+        </div>
+        <input type="email" class="form-control" formControlName="gmail">
+      </div>
+      <div class="input-group mb-3 col-4">
+        <button
+          (click)="regNewUser()"
+          class="btn btn-outline-second"
+          style="width: 150px"
+          [disabled]="!newUserRegForm.valid"
+        >{{buttomName}}</button>
+      </div>
+
+    </div>
+  </div>
+</form>

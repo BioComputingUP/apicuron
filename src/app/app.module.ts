@@ -37,6 +37,7 @@ import { AlarmBannerComponent } from './alarm-banner/alarm-banner.component';
 import { ProteinsDetailTableComponent } from './proteins-detail-table/proteins-detail-table.component';
 import { PubmedDetailTableComponent } from './pubmed-detail-table/pubmed-detail-table.component';
 import { EditProfileComponent } from './edit-profile/edit-profile.component';
+import { DashboardUserformComponent } from './dashboard-userform/dashboard-userform.component';
 
 
 
@@ -44,14 +45,14 @@ const appRoutes: Routes = [
   { path: 'browse', component: BrowseComponent},
   { path: 'login', component: LoginComponent},
   { path: 'feedback', component: FeedbackComponent},
-  { path: 'help', component: HelpComponent},
-  { path: 'tutorial', component: TutorialComponent},
-  { path: 'api', component: ApiComponent},
-  { path: 'statistics', component: StatisticsComponent},
+  // { path: 'help', component: HelpComponent},
+  // { path: 'tutorial', component: TutorialComponent},
+  // { path: 'api', component: ApiComponent},
+  // { path: 'statistics', component: StatisticsComponent},
   { path: 'about', component: AboutComponent},
-  { path: 'dashboard', component: DashboardComponent},
-  { path: 'profile/:orcid', component: ProfileComponent},
-  { path: 'editprofile/:orcid', component: ProfileComponent},
+  { path: 'setting', component: DashboardComponent},
+  // { path: 'profile/:orcid', component: ProfileComponent},
+  // { path: 'editprofile/:orcid', component: ProfileComponent},
   { path: '', component: HomeComponent },
   { path: '**', component: PageNotFoundComponent}
 ];
@@ -77,7 +78,8 @@ const appRoutes: Routes = [
     AlarmBannerComponent,
     ProteinsDetailTableComponent,
     PubmedDetailTableComponent,
-    EditProfileComponent
+    EditProfileComponent,
+    DashboardUserformComponent
   ],
   imports: [
     RouterModule.forRoot(

@@ -1,3 +1,172 @@
 <div class="container-fluid container-wide">
-  dashboard works!
+<!--  {{localAuth | json}}-->
+  <div *ngIf="localAuth.value['authorized']">
+    <div class="row" style="padding-top: 10px">
+      <div class="col-12">
+        <h4>Welcome <strong>{{localAuth['displayedName']}}</strong> at PubDisProt!</h4>
+      </div>
+    </div>
+    <tabset style="padding-top: 10px">
+      <tab heading="List users" *ngIf="['admin'].includes(localAuth.value['role'])">
+<!--        <div class="row" style="margin-top: 10px">-->
+<!--          <div class="col-12">-->
+<!--            <div class="input-group mb-3">-->
+<!--              <div class="input-group-prepend">-->
+<!--                <span class="input-group-text text-center" style="min-width: 180px"-->
+<!--                      id="basic-addon1">Search in DisProt</span>-->
+<!--              </div>-->
+<!--              &lt;!&ndash;<input type="text" class="form-control" formControlName="search_term" placeholder="e.g.: p53">&ndash;&gt;-->
+<!--              <input type="text" class="form-control" [formControl]="searchFormControl"-->
+<!--                     placeholder="e.g.: Hatos András">-->
+<!--              <div class="input-group-append">-->
+<!--                <button class="btn btn-outline-second-input" (click)="exampleSearch()"> example</button>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+        <div class="row">
+          <div class="col-12">
+            <!--<div class="col-12"> {{dataOnPage_old | json}}</div>-->
+            <table cdk-table [dataSource]="dataOnPage" class="table">
+
+              <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value"></tr>
+              <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
+
+              <ng-container cdkColumnDef="displayedName">
+                <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('displayedName')"> displayedName
+                  <span *ngIf="sortKey.value === 'displayedName'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+                </th>
+                <td cdk-cell *cdkCellDef="let row"> {{row.displayedName}}</td>
+              </ng-container>
+
+              <ng-container cdkColumnDef="institution">
+                <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('institution')"> institution
+                  <span *ngIf="sortKey.value === 'institution'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+                </th>
+                <td cdk-cell *cdkCellDef="let row"> {{row.institution}}</td>
+              </ng-container>
+
+
+              <ng-container cdkColumnDef="username">
+                <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('username')"> username
+                  <span *ngIf="sortKey.value === 'username'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+                </th>
+                <td cdk-cell *cdkCellDef="let row"> {{row.username}}</td>
+              </ng-container>
+
+              <ng-container cdkColumnDef="role">
+                <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('role')"> role
+                  <span *ngIf="sortKey.value === 'role'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+                </th>
+                <td cdk-cell *cdkCellDef="let row"> {{row.role}}</td>
+              </ng-container>
+
+              <ng-container cdkColumnDef="email">
+                <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('email')"> email
+                  <span *ngIf="sortKey.value === 'email'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+                </th>
+                <td cdk-cell *cdkCellDef="let row"> {{row.email}}</td>
+              </ng-container>
+
+              <ng-container cdkColumnDef="gmail">
+                <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('gmail')"> alternativeEmail
+                  <span *ngIf="sortKey.value === 'gmail'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+                </th>
+                <td cdk-cell *cdkCellDef="let row"> {{row.gmail}}</td>
+              </ng-container>
+
+              <ng-container cdkColumnDef="edit">
+                <th cdk-header-cell *cdkHeaderCellDef></th>
+                <td cdk-cell *cdkCellDef="let row" class="m-0 p-0 pt-2 pb-1">
+                  <button type="button"
+                          class="btn btn-outline-second mb-0 float-right"
+                          (click)="openModal(template_update)">
+                    update
+                  </button>
+                  <ng-template #template_update>
+                    <div class="modal-header">
+                      <h4 class="modal-title pull-left">Update user</h4>
+                      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      {{row |json}}
+                      <app-dashboard-userform [user_obj]="row" [modalRef]="modalRef"></app-dashboard-userform>
+                    </div>
+                  </ng-template>
+                </td>
+              </ng-container>
+
+            </table>
+          </div>
+        </div>
+        <div class="row">
+<!--          <div class="col-6">-->
+<!--            <pagination-->
+<!--              [totalItems]="tableDataSource.value.length"-->
+<!--              [itemsPerPage]="pageSize.value"-->
+<!--              [maxSize]="5"-->
+<!--              [boundaryLinks]="true"-->
+<!--              (pageChanged)="currentPage.next($event)">-->
+<!--            </pagination>-->
+<!--          </div>-->
+          <div class="col">
+            <button type="button" class="btn btn-outline-primary mb-3 float-right" (click)="openModal(template_new, {})">
+              register new user
+            </button>
+            <ng-template #template_new>
+              <div class="modal-header">
+                <h4 class="modal-title pull-left">Register new user</h4>
+                <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <app-dashboard-userform [user_obj]="{}" [modalRef]="modalRef"></app-dashboard-userform>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </tab>
+      <tab heading="Your profile">
+        <div class="row" style="margin-top: 10px">
+          <div class="col-md-auto">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text text-center"
+                      id="basic-addon1">Your API token</span>
+              </div>
+              <p class="form-control"
+                 *ngIf="currentJwtToken">
+                {{ (currentJwtToken.length>25) ? (currentJwtToken | slice:0:25)+'...':(currentJwtToken) }}
+              </p>
+              <div class="input-group-append"
+                   *ngIf="!currentJwtToken">
+                <button class="btn btn-outline-primary-input"
+                        (click)="getPubDisProtGetJwtToken()">get token</button>
+              </div>
+              <div class="input-group-append"
+                   *ngIf="currentJwtToken">
+                <button class="btn btn-outline-primary-input"
+                        (click)="copyJWT(currentJwtToken)" >copy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </tab>
+    </tabset>
+  </div>
 </div>

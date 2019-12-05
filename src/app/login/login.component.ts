@@ -13,7 +13,6 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this.env = environment;
-    this.authService.login();
 
   }
 

@@ -14,6 +14,9 @@ export class InternalService {
   private apicuronPostProfileData = environment.ws + 'postProfileData';
   private apicuronPostProfilePicture = environment.ws + 'postProfilePicture/';
   private apicuronGetProfilePicture = environment.ws + 'getProfilePicture/';
+  private apicuronGetJwtToken = environment.ws + 'token';
+  private apicuronListUser = environment.ws + 'listUser';
+  private apicuronRegNewUser = environment.ws + 'registerUser';
 
   constructor (private http: HttpClient) {
 
@@ -45,6 +48,25 @@ export class InternalService {
     return this.http.get(
       this.apicuronGetProfilePicture + id);
     // .pipe(catchError(err => of(console.error(err))));
+  }
+
+  GetPubDisProtGetJwtToken(): Observable<any> {
+    return this.http.get(
+      this.apicuronGetJwtToken,
+      {responseType: 'json'});
+  }
+
+  GetUsersList(): Observable<any> {
+    return this.http.get(
+      this.apicuronListUser,
+      {responseType: 'json'});
+    // .pipe(catchError(err => of(console.error(err))));
+  }
+
+  RegisterNewUser(newUserObj): Observable<any> {
+    return this.http.post(
+      this.apicuronRegNewUser,
+      newUserObj).pipe();
   }
 
 }
