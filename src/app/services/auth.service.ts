@@ -4,7 +4,6 @@ import {environment} from '../../environments/environment';
 import {BehaviorSubject, concat, Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {Component, OnInit, Injectable} from '@angular/core';
-import {el} from '@angular/platform-browser/testing/src/browser_util';
 
 @Injectable({
   providedIn: 'root'
