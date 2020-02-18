@@ -153,6 +153,41 @@ body {
 .show > .btn-outline-primary-input.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.0rem rgba(theme-color("primary"), 0.5);
 }
+.btn-outline-primary-input-decorate {
+  color: theme-color("primary");
+  background-color: rgba(255, 255, 255, 0.975);
+  background-image: none;
+  border-color: theme-color("primary");
+}
+
+.btn-outline-primary-input-decorate:hover {
+  color: theme-color("primary");
+  background-color: rgba(255, 255, 255, 0.975);
+  background-image: none;
+  border-color: theme-color("primary");
+}
+
+.btn-outline-primary-input-decorate:focus, .btn-outline-primary-input-decorate.focus {
+  box-shadow: 0 0 0 0.0rem rgba(theme-color("primary"), 0.5);
+}
+
+.btn-outline-primary-input-decorate.disabled, .btn-outline-primary-input-decorate:disabled {
+  color: theme-color("primary");
+  background-color: rgba(255, 255, 255, 0.975);
+}
+
+.btn-outline-primary-input-decorate:not(:disabled):not(.disabled):active, .btn-outline-primary-input-decorate:not(:disabled):not(.disabled).active,
+.show > .btn-outline-primary-input-decorate.dropdown-toggle {
+  color: theme-color("primary");
+  background-color: rgba(255, 255, 255, 0.975);
+  background-image: none;
+  border-color: theme-color("primary");
+}
+
+.btn-outline-primary-input-decorate:not(:disabled):not(.disabled):active:focus, .btn-outline-primary-input-decorate:not(:disabled):not(.disabled).active:focus,
+.show > .btn-outline-primary-input-decorate.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.0rem rgba(theme-color("primary"), 0.5);
+}
 
 
 .btn-outline-danger-input {
@@ -338,4 +373,41 @@ body {
 
 a {
   color: theme-color("text");
+}
+
+
+
+
+.btn-primary {
+  color: theme-color("light");
+  background-color: theme-color("primary");
+  background-image: none;
+  border-color: theme-color("primary");
+}
+
+.btn-primary:hover {
+  background-color: darken(theme-color("primary"), 5);
+  border-color: theme-color("primary");
+  color: theme-color("light");
+
+}
+
+.btn-primary:focus, .btn-primary.focus {
+  box-shadow: 0 0 0 0.0rem rgba(theme-color("primary"), 0.5);
+}
+
+.btn-primary.disabled, .btn-primary:disabled {
+
+}
+
+.btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active,
+.show > .btn-primary.dropdown-toggle {
+  color: theme-color("light");
+  background-color: theme-color("primary");
+  border-color: theme-color("primary");
+}
+
+.btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus,
+.show > .btn-primary.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.0rem rgba(23, 162, 184, 0.5);
 }
