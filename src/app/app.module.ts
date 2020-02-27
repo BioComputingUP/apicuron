@@ -53,7 +53,7 @@ const appRoutes: Routes = [
   // { path: 'statistics', component: StatisticsComponent},
   {path: 'about', component: AboutComponent},
   {path: 'setting', component: DashboardComponent},
-  // { path: 'profile/:orcid', component: ProfileComponent},
+  { path: 'orcid/:orcid', component: ProfileComponent},
   // { path: 'editprofile/:orcid', component: ProfileComponent},
   {path: '', component: HomeComponent},
   {path: '**', component: PageNotFoundComponent}

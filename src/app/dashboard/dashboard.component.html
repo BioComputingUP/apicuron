@@ -69,6 +69,15 @@
                 <td cdk-cell *cdkCellDef="let row"> {{row.role}}</td>
               </ng-container>
 
+              <ng-container cdkColumnDef="orcid_id">
+                <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('orcid_id')"> ORCID iD
+                  <span *ngIf="sortKey.value === 'orcid_id'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+                </th>
+                <td cdk-cell *cdkCellDef="let row"> {{row.orcid_id}}</td>
+              </ng-container>
+
               <ng-container cdkColumnDef="email">
                 <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('email')"> email
                   <span *ngIf="sortKey.value === 'email'">

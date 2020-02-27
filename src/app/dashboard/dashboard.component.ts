@@ -23,6 +23,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     'institution',
     'username',
     'role',
+    'orcid_id',
     'email',
     'gmail',
     'resources',

@@ -1,241 +1,44 @@
 <div class="container-fluid container-wide">
+  <div class="row" *ngIf="loading_finished">
+    <div class="col" >
+      <table cdk-table [dataSource]="dataOnPage" class="table table-sm table-responsive-sm">
+        <tr cdk-header-row *cdkHeaderRowDef="displayedColumns"></tr>
+        <tr cdk-row *cdkRowDef="let row; columns: displayedColumns"></tr>
 
-<br style="margin: 10px;">
+        <ng-container cdkColumnDef="entry_id">
+          <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('entry_id')">
+            ORCID iD
+            <span *ngIf="sortKey.value === 'entry_id'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+            <a class="btn-block"
+               [routerLink]="['/orcid/' + row['_id']['orcid_id']]"
+            >
+              {{row['_id']['orcid_id']}}
+            </a>
+          </td>
+        </ng-container>
+        <ng-container cdkColumnDef="events">
+          <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('events')">
+            Number of biocuration events
+<!--            <span *ngIf="sortKey.value === 'entry_id'">-->
+<!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
+<!--              </span>-->
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+            <a class="btn-block"
+               [routerLink]="['/orcid/' + row['_id']['orcid_id']]"
+            >
+              {{row['data'].length}}
+            </a>
+          </td>
+        </ng-container>
 
-<div *ngIf="!loading_finished">
-    <div style="height: 38vh"></div>
-    <div class="row text-center">
-        <progressbar class=" progress-striped active text-center " [value]="100" type="info" style="height: 25px">
-            <strong><i>loading...</i></strong>
-        </progressbar>
+      </table>
     </div>
-</div>
-
-<div class="row" *ngIf="loading_finished">
-  <div class="col-12">
-    <div class="input-group mb-3">
-      <div class="input-group-prepend">
-                <span class="input-group-text text-center" style="min-width: 180px" id="basic-addon1">
-                  Search in DisProt
-                </span>
-      </div>
-      <!--<input type="text" class="form-control" formControlName="search_term" placeholder="e.g.: p53">-->
-      <input type="text" class="form-control" [formControl]="searchFormControl" placeholder="e.g.: P04637">
-      <div class="input-group-append">
-        <button class="btn btn-outline-primary-input" (click)="exampleSearch()"> example</button>
-      </div>
-    </div>
   </div>
+
+
 </div>
-<div class="row"  *ngIf="loading_finished">
-  <div class="col-12">
-    <!--<div class="col-12"> {{dataOnPage_old | json}}</div>-->
-    <table cdk-table [dataSource]="dataOnPage" class="table">
-
-      <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value"></tr>
-      <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
-
-      <ng-container cdkColumnDef="curatorName">
-        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('surname')"> Curator
-          <span *ngIf="sortKey.value === 'surname'">
-                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
-              </span>
-        </th>
-        <td cdk-cell *cdkCellDef="let row" routerLink="/profile/{{row.id}}"> {{row.firstname}} {{row.surname}}</td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="entriesSum">
-        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('number_disprot_entries')"> Number of entries
-          <span *ngIf="sortKey.value === 'number_disprot_entries'">
-                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
-              </span>
-        </th>
-        <td cdk-cell *cdkCellDef="let row"> {{row.number_disprot_entries}}</td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="termsSum">
-        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('number_disprot_terms')"> Numbers of terms
-          <span *ngIf="sortKey.value === 'number_disprot_terms'">
-                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
-              </span>
-        </th>
-        <td cdk-cell *cdkCellDef="let row"> {{row.number_disprot_terms}}</td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="contributed_resources">
-        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('contributed_resources')"> Contributed resources
-          <span *ngIf="sortKey.value === 'contributed_resources'">
-                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
-              </span>
-        </th>
-        <td cdk-cell *cdkCellDef="let row"> {{row.contributed_resources}}</td>
-      </ng-container>
-
-
-    </table>
-  </div>
-</div>
-<div class="row"  *ngIf="loading_finished">
-  <div class="col-4">
-    <pagination
-      [totalItems]="tableDataSource.value.length"
-      [itemsPerPage]="pageSize.value"
-      [maxSize]="5"
-      [boundaryLinks]="true"
-      (pageChanged)="currentPage.next($event)">
-    </pagination>
-  </div>
-  <div class="col-2">
-    Show only:
-    <button class="btn btn-outline-primary">DisProt</button>
-  </div>
-</div>
-</div>
-
-
-
-
-<!--<tabset>-->
-<!--<tab heading="Proteins">-->
-<!--<div class="col-12"> {{dataOnPage_old.length}}</div>-->
-
-
-
-
-<!--<table class="table">-->
-<!--<thead>-->
-<!--<tr>-->
-<!--<th scope="col">#</th>-->
-<!--<th scope="col">First</th>-->
-<!--<th scope="col">Last</th>-->
-<!--<th scope="col">Handle</th>-->
-<!--</tr>-->
-<!--</thead>-->
-<!--<tbody>-->
-<!--<tr>-->
-<!--<th scope="row">1</th>-->
-<!--<td>Mark</td>-->
-<!--<td>Otto</td>-->
-<!--<td>@mdo</td>-->
-<!--</tr>-->
-<!--<tr>-->
-<!--<th scope="row">2</th>-->
-<!--<td>Jacob</td>-->
-<!--<td>Thornton</td>-->
-<!--<td>@fat</td>-->
-<!--</tr>-->
-<!--<tr>-->
-<!--<th scope="row">3</th>-->
-<!--<td>Larry</td>-->
-<!--<td>the Bird</td>-->
-<!--<td>@twitter</td>-->
-<!--</tr>-->
-<!--</tbody>-->
-<!--</table>-->
-
-
-<!--</tab>-->
-<!--<tab heading="Regions">-->
-<!--bbb-->
-<!--</tab>-->
-<!--</tabset>-->
-
-<!--<div class="row">-->
-<!--<h2>PubMed search v1</h2>-->
-<!--</div>-->
-
-<!--<div class="row">-->
-<!--<div class="col-6">-->
-<!--<div class="input-group mb-3">-->
-<!--<div class="input-group-prepend">-->
-<!--<span class="input-group-text" id="basic-addon1">PubMed ID:</span>-->
-<!--</div>-->
-<!--<input type="text" class="form-control" [formControl]="pmid"  >-->
-<!--<div class="input-group-append">-->
-<!--<button class="btn btn-outline-info" (click)="checkPublication()" >Check publication</button>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-
-<!--</div>-->
-
-<!--<div class="row">-->
-<!--<div class="col-12" *ngIf="fasta">-->
-<!--<p>-->
-<!--<b>Title: </b>{{ fasta.resultList.result[0].title }}-->
-<!--</p>-->
-<!--<p>-->
-<!--<b>Abstract: </b> {{ fasta.resultList.result[0].abstractText }}-->
-<!--</p>-->
-<!--</div>-->
-
-<!--</div>-->
-
-
-
-<!--<form [formGroup]="pubmedForm" (ngSubmit)="onSubmit()">-->
-<!--<div class="row" formGroupName="simple">-->
-<!--<div class="col-7">-->
-<!--<h2>PubMed search</h2>-->
-<!--<div class="input-group mb-3">-->
-<!--<div class="input-group-prepend">-->
-<!--<span class="input-group-text text-center" style="min-width: 180px" id="basic-addon1" >PubMed ID</span>-->
-<!--</div>-->
-<!--<input type="text" class="form-control" formControlName="pmid" placeholder="e.g.: 27899601">-->
-<!--<div class="input-group-append" >-->
-<!--<button class="btn btn-outline-info-2" (click)="examplePubMed()"> example </button>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--<div class="col-12" *ngIf="pubmedData.title">-->
-<!--<p>-->
-<!--<b>Title: </b>{{ pubmedData.title}}-->
-<!--</p>-->
-<!--<p>-->
-<!--<b>Abstract: </b> {{ pubmedData.abstract}}-->
-<!--</p>-->
-<!--</div>-->
-
-<!--&lt;!&ndash;<div class="col-7">&ndash;&gt;-->
-<!--&lt;!&ndash;<h2>UniProt search</h2>&ndash;&gt;-->
-<!--&lt;!&ndash;<div class="input-group mb-3">&ndash;&gt;-->
-<!--&lt;!&ndash;<div class="input-group-prepend">&ndash;&gt;-->
-<!--&lt;!&ndash;<span class="input-group-text text-center" style="min-width: 180px" id="basic-addon1">UniProt accession</span>&ndash;&gt;-->
-<!--&lt;!&ndash;</div>&ndash;&gt;-->
-<!--&lt;!&ndash;<input type="text" class="form-control" formControlName="upacc" placeholder="e.g.: P04637">&ndash;&gt;-->
-<!--&lt;!&ndash;<div class="input-group-append">&ndash;&gt;-->
-<!--&lt;!&ndash;<button class="btn btn-outline-info-2" (click)="exampleUniProt()"> example </button>&ndash;&gt;-->
-<!--&lt;!&ndash;</div>&ndash;&gt;-->
-<!--&lt;!&ndash;</div>&ndash;&gt;-->
-<!--&lt;!&ndash;</div>&ndash;&gt;-->
-
-<!--&lt;!&ndash;<div class="col-12" *ngIf="uniprotData">&ndash;&gt;-->
-<!--&lt;!&ndash;<p>&ndash;&gt;-->
-<!--&lt;!&ndash;<strong>{{uniprotData.protein.recommendedName.fullName.value}}</strong>&ndash;&gt;-->
-<!--&lt;!&ndash;</p>&ndash;&gt;-->
-<!--&lt;!&ndash;<div class="row" style="margin-left: 10px">&ndash;&gt;-->
-<!--&lt;!&ndash;<div class="col-3">&ndash;&gt;-->
-<!--&lt;!&ndash;<b>UniProt ID: </b>{{ uniprotData.id}}&ndash;&gt;-->
-<!--&lt;!&ndash;</div>&ndash;&gt;-->
-<!--&lt;!&ndash;<div class="col-3">&ndash;&gt;-->
-<!--&lt;!&ndash;<b>Organism: </b>{{ uniprotData.organism.names[0].value}}&ndash;&gt;-->
-<!--&lt;!&ndash;</div>&ndash;&gt;-->
-<!--&lt;!&ndash;<div class="col-3">&ndash;&gt;-->
-<!--&lt;!&ndash;<b>Sequence length: </b>{{ uniprotData.sequence.length}}&ndash;&gt;-->
-<!--&lt;!&ndash;</div>&ndash;&gt;-->
-<!--&lt;!&ndash;<div class="col-3">&ndash;&gt;-->
-<!--&lt;!&ndash;<b>Database: </b>{{ uniprotData.info.type}}&ndash;&gt;-->
-<!--&lt;!&ndash;</div>&ndash;&gt;-->
-
-<!--&lt;!&ndash;</div>&ndash;&gt;-->
-
-<!--&lt;!&ndash;<p>&ndash;&gt;-->
-<!--&lt;!&ndash;&lt;!&ndash;<b>MobiDB: </b>{{ mobiDBData.acc }}&ndash;&gt;&ndash;&gt;-->
-<!--&lt;!&ndash;</p>&ndash;&gt;-->
-<!--&lt;!&ndash;<div id="featureviewer"></div>&ndash;&gt;-->
-
-<!--&lt;!&ndash;</div>&ndash;&gt;-->
-
-<!--</div>-->
-
-<!--</form>-->

@@ -33,6 +33,7 @@ export class DashboardUserformComponent implements OnInit {
           institution: [this.user_obj.hasOwnProperty('institution') ? this.user_obj['institution'] : '', Validators.required],
           email: [this.user_obj.hasOwnProperty('email') ? this.user_obj['email'] : '', [Validators.required, Validators.email]],
           gmail: [this.user_obj.hasOwnProperty('gmail') ? this.user_obj['gmail'] : '', Validators.email],
+          orcid_id: [this.user_obj.hasOwnProperty('orcid_id') ? this.user_obj['orcid_id'] : ''],
           resources: this.fb.array([]),
         }
       );

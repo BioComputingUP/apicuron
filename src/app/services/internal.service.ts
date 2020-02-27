@@ -9,7 +9,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class InternalService {
-  private apicuronBrowse = environment.ws + 'browse';
+  private apicuronSearch = environment.ws + 'search';
   private apicuronProfile = environment.ws + 'profile/';
   private apicuronPostProfileData = environment.ws + 'postProfileData';
   private apicuronPostProfilePicture = environment.ws + 'postProfilePicture/';
@@ -23,18 +23,23 @@ export class InternalService {
   constructor (private http: HttpClient) {
 
   }
-
-  GetDisProtBrowse(): Observable<any> {
-    return this.http.get(
-      this.apicuronBrowse,
-      {responseType: 'json'});
-    // .pipe(catchError(err => of(console.error(err))));
-  }
+  //
+  // GetSearch(params): Observable<any> {
+  //   return this.http.get(
+  //     this.apicuronSearch,
+  //     {responseType: 'json', params: params});
+  // }
 
   GetProfile(id): Observable<any> {
     return this.http.get(
       this.apicuronProfile + id,
       {responseType: 'json'});
+    // .pipe(catchError(err => of(console.error(err))));
+  }
+  GetSearch(params): Observable<any> {
+    return this.http.get(
+      this.apicuronSearch,
+      {responseType: 'json', params: params});
     // .pipe(catchError(err => of(console.error(err))));
   }
 

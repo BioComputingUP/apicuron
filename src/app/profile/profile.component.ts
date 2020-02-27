@@ -6,6 +6,7 @@ export function getProgressbarConfig(): ProgressbarConfig {
   return Object.assign(new ProgressbarConfig(), { animate: true, striped: true,  max: 100 });
 }
 import { environment } from '../../environments/environment';
+import {AuthService} from '../services/auth.service';
 
 @Component({
   selector: 'app-profile',
@@ -14,68 +15,51 @@ import { environment } from '../../environments/environment';
   providers: [{ provide: ProgressbarConfig, useFactory: getProgressbarConfig }]
 })
 
-
-
 export class ProfileComponent implements OnInit {
+  localAuth = new BehaviorSubject<object>({});
+  editMode = new BehaviorSubject<boolean>(false);
+  loading_finished = false;
   env;
   profileData: object;
-  loading_finished: boolean;
-  editMode: boolean;
 
   resourcesList = [];
   entriesList = [];
   proteinList = [];
   pmidList = [];
 
-
-  constructor(private internalService: InternalService) { }
+  constructor(public authService: AuthService,
+              private internalService: InternalService) { }
 
   ngOnInit() {
     this.env = environment;
-    console.log(window.location.pathname.substring(1, 8))
-    let orcidID = ''
-    if (window.location.pathname.substring(1, 8) === 'profile') {
-      this.editMode = false;
-      orcidID = window.location.pathname.substring(9);
-    } else if (window.location.pathname.substring(1, 12) === 'editprofile') {
-      this.editMode = true;
-      orcidID = window.location.pathname.substring(13);
-    }
-    // console.log(disprotId);
+    const orcid_id = window.location.pathname.substring(7, 26);
 
-    const observables = [];
-    observables.push(this.internalService.GetProfile(orcidID));
-    concat(...observables).subscribe(
-      profileData => {
-        this.profileData = profileData;
-      },
-      err => console.log(err),
-      () => {
-
-        const resourcesSet = new Set();
-        const entriesSet = new Set();
-        const pmidSet = new Set();
-        const proteinSet = new Set();
-
-        if (this.profileData['contribution']) {
-
-          this.profileData['contribution'].forEach(currObj => {
-            entriesSet.add(currObj.resource_entry_id);
-            resourcesSet.add(currObj.resource);
-            pmidSet.add(currObj.pmid);
-            proteinSet.add(currObj.acc);
-          });
-        }
-
-        // console.log(entriesSet)
-         this.entriesList =  Array.from(entriesSet);
-         this.resourcesList =  Array.from(resourcesSet);
-         this.pmidList = Array.from(pmidSet);
-         this.proteinList = Array.from(proteinSet);
-        // this.entriesNumber = this.profileData['contribution'].filter()
-         this.loading_finished = true;
+    this.authService.loginData.subscribe(authData => {
+      if (this.localAuth.value !== authData) {
+        this.localAuth.next(authData);
       }
-    );
+    });
+
+    this.localAuth.subscribe(authData => {
+      if (!authData.hasOwnProperty('initial')) {
+        console.log('authData', authData);
+        console.log(orcid_id);
+        this.internalService.GetSearch({
+          orcid_id: orcid_id
+        }).subscribe((browseData) => {
+          // this.dataOnPage.next(browseData);
+        }, (err) => {
+        }, () => {
+          this.loading_finished = true;
+          console.log('finish');
+        });
+      }
+
+
+
+    });
+
+
 
   }
 
