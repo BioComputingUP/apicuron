@@ -17,12 +17,12 @@ import {AuthService} from '../services/auth.service';
 
 export class ProfileComponent implements OnInit {
   localAuth = new BehaviorSubject<object>({});
+  profileData = new BehaviorSubject<object>({});
   editMode = new BehaviorSubject<boolean>(false);
   loading_finished = false;
   env;
-  profileData: object;
 
-  resourcesList = [];
+  resourcesList = new Set();
   entriesList = [];
   proteinList = [];
   pmidList = [];
@@ -47,7 +47,14 @@ export class ProfileComponent implements OnInit {
         this.internalService.GetSearch({
           orcid_id: orcid_id
         }).subscribe((browseData) => {
-          // this.dataOnPage.next(browseData);
+          if (browseData.length === 1) {
+            this.profileData.next(browseData[0]);
+            this.profileData.value['reports'].forEach( currReport => {
+              if (currReport.resource_name) {
+                this.resourcesList.add(currReport.resource_name);
+              }
+            });
+          }
         }, (err) => {
         }, () => {
           this.loading_finished = true;
@@ -74,32 +81,15 @@ export class ProfileComponent implements OnInit {
     return Array.from(entriesSet).length;
   }
 
-  numberOfTerms(resource) {
-    return this.profileData['contribution'].filter(currObj => {
-      return currObj.resource === resource;
+  numberOfActions(resource) {
+    return this.profileData.value['reports'].filter(currObj => {
+      return currObj.resource_name === resource;
     }).length;
   }
 
-  termsFilter(resource) {
-    const entriesSet = new Set();
-    this.profileData['contribution'].forEach(currObj => {
-      if (currObj.resource === resource) {
-        entriesSet.add(currObj.resource_entry_id);
-      }
-    });
-    return Array.from(entriesSet).map(currEntry => {
-      const term_number = this.profileData['contribution'].filter(currObj => {
-        return currObj.resource === resource && currObj.resource_entry_id === currEntry;
-      }).length;
-      const entry_data = this.profileData['contribution'].find(currObj => {
-        return currObj.resource === resource && currObj.resource_entry_id === currEntry;
-      });
-      return {
-        entry: currEntry,
-        acc: entry_data.acc,
-        name: entry_data.name,
-        term_number: term_number
-      };
+  reportFilter(resource) {
+    return this.profileData.value['reports'].filter(currObj => {
+      return currObj.resource_name === resource;
     });
   }
 

@@ -11,7 +11,7 @@ import {AuthService} from '../services/auth.service';
 export class BrowseComponent implements OnInit {
   loading_finished = false;
   dataOnPage = new BehaviorSubject<any[]>([]);
-  displayedColumns = ['entry_id', 'events'];
+  displayedColumns = ['entry_id', 'events', 'name'];
   sortKey = new BehaviorSubject<string>('entry_id');
   sortDirection = new BehaviorSubject<string>('asc');
 

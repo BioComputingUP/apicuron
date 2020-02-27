@@ -14,9 +14,24 @@
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
             <a class="btn-block"
-               [routerLink]="['/orcid/' + row['_id']['orcid_id']]"
+               [routerLink]="['/orcid/' + row['orcid_id']]"
             >
-              {{row['_id']['orcid_id']}}
+              {{row['orcid_id']}}
+            </a>
+          </td>
+        </ng-container>
+        <ng-container cdkColumnDef="name">
+          <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('name')">
+            ORCID iD
+            <span *ngIf="sortKey.value === 'name'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+            <a class="btn-block"
+               [routerLink]="['/orcid/' + row['orcid_id']]"
+            >
+              {{row['name']}}
             </a>
           </td>
         </ng-container>
@@ -29,9 +44,9 @@
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
             <a class="btn-block"
-               [routerLink]="['/orcid/' + row['_id']['orcid_id']]"
+               [routerLink]="['/orcid/' + row['orcid_id']]"
             >
-              {{row['data'].length}}
+              {{row['reports'].length}}
             </a>
           </td>
         </ng-container>

@@ -14,7 +14,7 @@ import {ModalModule} from 'ngx-bootstrap/modal';
 import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {AccordionModule} from 'ngx-bootstrap/accordion';
 import {AlertModule} from 'ngx-bootstrap/alert';
-import {ScrollToModule} from '@nicky-lenaers/ngx-scroll-to';
+// import {ScrollToModule} from '@nicky-lenaers/ngx-scroll-to';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
@@ -39,7 +39,7 @@ import {ProteinsDetailTableComponent} from './proteins-detail-table/proteins-det
 import {PubmedDetailTableComponent} from './pubmed-detail-table/pubmed-detail-table.component';
 import {EditProfileComponent} from './edit-profile/edit-profile.component';
 import {DashboardUserformComponent} from './dashboard-userform/dashboard-userform.component';
-import {DocumentationComponent} from './documentation/documentation.component';
+// import {DocumentationComponent} from './documentation/documentation.component';
 
 
 const appRoutes: Routes = [
@@ -47,7 +47,7 @@ const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
   {path: 'feedback', component: FeedbackComponent},
   // { path: 'help', component: HelpComponent},
-  {path: 'documentation', component: DocumentationComponent},
+  // {path: 'documentation', component: DocumentationComponent},
   // { path: 'tutorial', component: TutorialComponent},
   // { path: 'api', component: ApiComponent},
   // { path: 'statistics', component: StatisticsComponent},
@@ -82,7 +82,7 @@ const appRoutes: Routes = [
     PubmedDetailTableComponent,
     EditProfileComponent,
     DashboardUserformComponent,
-    DocumentationComponent
+    // DocumentationComponent
   ],
   imports: [
     RouterModule.forRoot(
@@ -90,7 +90,7 @@ const appRoutes: Routes = [
       // { enableTracing: true } // <-- debugging purposes only
     ),
     BrowserModule,
-    ScrollToModule.forRoot(),
+    // ScrollToModule.forRoot(),
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule,
