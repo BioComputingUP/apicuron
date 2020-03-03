@@ -46,8 +46,8 @@ export class DashboardUserformComponent implements OnInit {
     } else {
       const resources = this.newUserRegForm.get('resources') as FormArray;
       resources.push(this.fb.group({
-        name: [null, Validators.required],
-        id: [null, Validators.required]
+        name: [null],
+        id: [null]
       }));
     }
   }
