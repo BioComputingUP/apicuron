@@ -11,7 +11,7 @@ import {AuthService} from '../services/auth.service';
 export class BrowseComponent implements OnInit {
   loading_finished = false;
   dataOnPage = new BehaviorSubject<any[]>([]);
-  displayedColumns = ['entry_id', 'events', 'name'];
+  displayedColumns = ['entry_id', 'name', 'events', 'by_term'];
   sortKey = new BehaviorSubject<string>('entry_id');
   sortDirection = new BehaviorSubject<string>('asc');
 
@@ -72,5 +72,28 @@ export class BrowseComponent implements OnInit {
     this.sortDirection.next('asc');
   }
 
-
+  calc_by_terms(row) {
+    const map_terms = {};
+    const set_terms_name = new Set();
+    row.forEach(curr_activity => {
+      set_terms_name.add(curr_activity.activity_term);
+      if (!map_terms.hasOwnProperty(curr_activity.activity_term)) {
+        map_terms[curr_activity.activity_term] = new Set();
+      }
+      map_terms[curr_activity.activity_term].add(curr_activity.entity_uri);
+    });
+    // console.log('map_terms', map_terms);
+    // console.log('set_terms_name', set_terms_name);
+    const out_put = [];
+    Array.from(set_terms_name).sort().forEach(currTerm => {
+      if (map_terms.hasOwnProperty(currTerm)) {
+        // console.log('map_terms[currTerm]', map_terms[currTerm]);
+        // console.log('map_terms[currTerm].length', map_terms[currTerm].length);
+        // console.log('map_terms[currTerm].length.toString()', map_terms[currTerm].length.toString());
+        // out_put.push('<strong>' + currTerm + ':</strong> ');
+        out_put.push('<strong>' + currTerm + ':</strong> ' + map_terms[currTerm].size.toString());
+      }
+    });
+    return '<small>' + out_put.join('<br>') + '</small>';
+  }
 }

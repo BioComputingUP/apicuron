@@ -13,11 +13,11 @@
               </span>
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-            <a class="btn-block"
-               [routerLink]="['/orcid/' + row['orcid_id']]"
-            >
-              {{row['orcid_id']}}
-            </a>
+<!--            <a class="btn-block"-->
+<!--               [routerLink]="['/orcid/' + row['curator_orcid']]"-->
+<!--            >-->
+              {{row['curator_orcid']}}
+<!--            </a>-->
           </td>
         </ng-container>
         <ng-container cdkColumnDef="name">
@@ -28,11 +28,11 @@
               </span>
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-            <a class="btn-block"
-               [routerLink]="['/orcid/' + row['orcid_id']]"
-            >
+<!--            <a class="btn-block"-->
+<!--               [routerLink]="['/orcid/' + row['curator_orcid']]"-->
+<!--            >-->
               {{row['name']}}
-            </a>
+<!--            </a>-->
           </td>
         </ng-container>
         <ng-container cdkColumnDef="events">
@@ -43,11 +43,26 @@
 <!--              </span>-->
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-            <a class="btn-block"
-               [routerLink]="['/orcid/' + row['orcid_id']]"
-            >
+<!--            <a class="btn-block"-->
+<!--               [routerLink]="['/orcid/' + row['curator_orcid']]"-->
+<!--            >-->
               {{row['reports'].length}}
-            </a>
+<!--            </a>-->
+          </td>
+        </ng-container>
+        <ng-container cdkColumnDef="by_term">
+          <th cdk-header-cell *cdkHeaderCellDef>
+            by terms
+<!--            <span *ngIf="sortKey.value === 'entry_id'">-->
+<!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
+<!--              </span>-->
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+<!--            <a class="btn-block"-->
+<!--               [routerLink]="['/orcid/' + row['curator_orcid']]"-->
+<!--            >-->
+              <span [innerHTML]="calc_by_terms(row['reports'])"></span>
+<!--            </a>-->
           </td>
         </ng-container>
 
