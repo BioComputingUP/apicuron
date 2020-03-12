@@ -11,7 +11,7 @@ import {AuthService} from '../services/auth.service';
 export class BrowseComponent implements OnInit {
   loading_finished = false;
   dataOnPage = new BehaviorSubject<any[]>([]);
-  displayedColumns = ['entry_id', 'name', 'events', 'by_term'];
+  displayedColumns = ['entry_id', 'name', 'events', 'by_term', 'badges'];
   sortKey = new BehaviorSubject<string>('entry_id');
   sortDirection = new BehaviorSubject<string>('asc');
 
@@ -93,6 +93,15 @@ export class BrowseComponent implements OnInit {
         // out_put.push('<strong>' + currTerm + ':</strong> ');
         out_put.push('<strong>' + currTerm + ':</strong> ' + map_terms[currTerm].size.toString());
       }
+    });
+    return '<small>' + out_put.join('<br>') + '</small>';
+  }
+
+  calc_html_badges(row) {
+
+    const out_put = [];
+    row.forEach(currTerm => {
+      out_put.push('<span class="badge  badge-pill badge-warning pl-1 text-center">' + currTerm['badge_name'] + '</span>');
     });
     return '<small>' + out_put.join('<br>') + '</small>';
   }
