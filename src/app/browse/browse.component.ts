@@ -11,7 +11,7 @@ import {AuthService} from '../services/auth.service';
 export class BrowseComponent implements OnInit {
   loading_finished = false;
   dataOnPage = new BehaviorSubject<any[]>([]);
-  displayedColumns = ['entry_id', 'name', 'events', 'by_term', 'badges'];
+  displayedColumns = ['entry_id', 'name', 'events', 'by_category', 'by_term', 'badges'];
   sortKey = new BehaviorSubject<string>('entry_id');
   sortDirection = new BehaviorSubject<string>('asc');
 
@@ -98,11 +98,24 @@ export class BrowseComponent implements OnInit {
   }
 
   calc_html_badges(row) {
-
     const out_put = [];
-    row.forEach(currTerm => {
-      out_put.push('<span class="badge  badge-pill badge-warning pl-1 text-center">' + currTerm['badge_name'] + '</span>');
-    });
+
+    if (Array.isArray(row)) {
+      row.forEach(currTerm => {
+        out_put.push('<span class="badge  badge-pill badge-warning pl-1 text-center">' + currTerm + '</span>');
+      });
+    }
+
+    return '<small>' + out_put.join('<br>') + '</small>';
+  }
+  calc_html_categories(row) {
+    const out_put = [];
+    if (Array.isArray(row)) {
+      row.forEach(currTerm => {
+        out_put.push('<strong>' + currTerm['activity_category'] + ': </strong>' + currTerm['count_activity_category'].toString());
+      });
+    }
+
     return '<small>' + out_put.join('<br>') + '</small>';
   }
 }

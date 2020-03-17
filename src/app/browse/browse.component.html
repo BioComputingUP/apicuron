@@ -16,7 +16,7 @@
 <!--            <a class="btn-block"-->
 <!--               [routerLink]="['/orcid/' + row['curator_orcid']]"-->
 <!--            >-->
-              {{row['curator_orcid']}}
+              {{row['orcid']}}
 <!--            </a>-->
           </td>
         </ng-container>
@@ -51,6 +51,22 @@
           </td>
         </ng-container>
 
+        <ng-container cdkColumnDef="by_category">
+          <th cdk-header-cell *cdkHeaderCellDef>
+            by terms
+<!--            <span *ngIf="sortKey.value === 'entry_id'">-->
+<!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
+<!--              </span>-->
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+<!--            <a class="btn-block"-->
+<!--               [routerLink]="['/orcid/' + row['curator_orcid']]"-->
+<!--            >-->
+              <span [innerHTML]="calc_html_categories(row['count_by_category'])"></span>
+<!--            </a>-->
+          </td>
+        </ng-container>
+
         <ng-container cdkColumnDef="by_term">
           <th cdk-header-cell *cdkHeaderCellDef>
             by terms
@@ -78,7 +94,7 @@ Badges
 <!--            <a class="btn-block"-->
 <!--               [routerLink]="['/orcid/' + row['curator_orcid']]"-->
 <!--            >-->
-              <span [innerHTML]="calc_html_badges(row['badges'])"></span>
+              <span [innerHTML]="calc_html_badges(row['badge'])"></span>
 <!--            </a>-->
           </td>
         </ng-container>
