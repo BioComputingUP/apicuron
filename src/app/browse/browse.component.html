@@ -1,99 +1,387 @@
 <div class="container-fluid container-wide">
-  <div class="row" *ngIf="loading_finished">
+  <form [formGroup]="searchForm">
+
+    <div
+      *ngFor="let searchField of searchForm.controls; let index_xr = index">
+      <div [formGroupName]="index_xr" class="row">
+        <div class="float-right col">
+          <div class="input-group mb-3">
+            <div class="input-group-prepend" *ngIf="index_xr!==0">
+                            <span class="input-group-text text-center"
+                                  id="basic-addon1"
+                                  *ngIf="index_xr!==0"> and </span>
+
+            </div>
+
+            <select class="custom-select input-group-text text-left col-lg-3"
+                    id="inputGroupSelect01"
+                    formControlName="area">
+              <option value="free_text"
+                      *ngIf="checkFreeText(searchForm.value, index_xr)">Free text
+              </option>
+              <option value="name">Biocurator name</option>
+              <option value="orcid">ORCID</option>
+              <option value="time_from">From (date)</option>
+<!--              <option value="disprot_id">DisProt ID</option>-->
+<!--              <option value="organism">Organism</option>-->
+<!--              <option value="taxon">Taxon</option>-->
+<!--              <option value="ncbi_taxon_id">NCBI Taxon ID</option>-->
+<!--              <option value="uniref50">UniRef50</option>-->
+<!--              <option value="uniref90">UniRef90</option>-->
+<!--              <option value="uniref100">UniRef100</option>-->
+<!--              <option value="curator_name">Curator name</option>-->
+<!--              <option value="reference_id">Reference ID</option>-->
+<!--              <option value="reference_html">Reference name</option>-->
+<!--              <option value="do_id">Disorder Ontology ID</option>-->
+<!--              <option value="do_name">Disorder Ontology name</option>-->
+              <!--                            <option value="show_obsolete">Entries with obsolete marks</option>-->
+              <!--                            <option value="show_obsolete_protein">Show obsolete entries also</option>-->
+            </select>
+
+            <input type="text"
+                   *ngIf="['time_from'].includes(searchForm.value[index_xr]['area'])"
+                   class="form-control"
+                   #dp="bsDatepicker"
+                   bsDatepicker
+                   formControlName="key"
+                   [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">
+            <input type="text"
+                   *ngIf="!['time_from'].includes(searchForm.value[index_xr]['area'])"
+                   class="form-control col-lg-auto"
+                   formControlName="key"
+                   placeholder="e.g.: p53">
+
+            <div class="input-group-append">
+              <button
+                class="btn btn-outline-success-input"
+                (click)="addSearchField('', checkFreeText(searchForm.value, index_xr+1) ? 'free_text' : 'name')">
+                Add
+              </button>
+
+            </div>
+            <!--                            {{searchForm.get('advance_search').value[0] | json}}-->
+            <div class="input-group-append">
+              <button
+                class="btn btn-outline-danger-input"
+                (click)="removeSearchField(index_xr)">
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+<!--    <div class="row" *ngIf="loading_finished">-->
+<!--      <div class="col form-group">-->
+<!--        <strong>Starting at </strong>-->
+
+<!--      </div>-->
+<!--    </div>-->
+  </form>
+
+
+  <div class="col-lg-12 col-auto">
+
+    <h6><a [routerLink]="" (click)="collapseColumns = !collapseColumns">
+      Customize table columns
+    </a></h6>
+
+    <div id="collapseBasic" [collapse]="collapseColumns">
+      <form [formGroup]="columnsFormNew">
+
+        <div class="row justify-content-start mb-2">
+          <div class="col-auto">
+
+            <div class="custom-control custom-checkbox pt-1">
+              <input type="checkbox"
+                     id="orcid"
+                     class="custom-control-input"
+                     formControlName="orcid">
+              <label class="custom-control-label" for="orcid">orcid</label>
+              <br>
+            </div>
+
+            <div class="custom-control custom-checkbox pt-1">
+              <input type="checkbox"
+                     id="name"
+                     class="custom-control-input"
+                     formControlName="name">
+              <label class="custom-control-label" for="name">name</label>
+              <br>
+            </div>
+
+            <div class="custom-control custom-checkbox pt-1">
+              <input type="checkbox"
+                     id="badge"
+                     class="custom-control-input"
+                     formControlName="badge">
+              <label class="custom-control-label" for="badge">badge</label>
+              <br>
+            </div>
+
+            <div class="custom-control custom-checkbox pt-1">
+              <input type="checkbox"
+                     id="generation_reports"
+                     class="custom-control-input"
+                     formControlName="generation_reports">
+              <label class="custom-control-label" for="generation_reports">generation_reports</label>
+              <br>
+            </div>
+
+            <div class="custom-control custom-checkbox pt-1">
+              <input type="checkbox"
+                     id="generation_count"
+                     class="custom-control-input"
+                     formControlName="generation_count">
+              <label class="custom-control-label" for="generation_count">generation_count</label>
+              <br>
+            </div>
+
+            <div class="custom-control custom-checkbox pt-1">
+              <input type="checkbox"
+                     id="revision_reports"
+                     class="custom-control-input"
+                     formControlName="revision_reports">
+              <label class="custom-control-label" for="revision_reports">revision_reports</label>
+              <br>
+            </div>
+
+            <div class="custom-control custom-checkbox pt-1">
+              <input type="checkbox"
+                     id="revision_count"
+                     class="custom-control-input"
+                     formControlName="revision_count">
+              <label class="custom-control-label" for="revision_count">revision_count</label>
+              <br>
+            </div>
+
+            <div class="custom-control custom-checkbox pt-1">
+              <input type="checkbox"
+                     id="invalidation_reports"
+                     class="custom-control-input"
+                     formControlName="invalidation_reports">
+              <label class="custom-control-label" for="invalidation_reports">invalidation_reports</label>
+              <br>
+            </div>
+
+            <div class="custom-control custom-checkbox pt-1">
+              <input type="checkbox"
+                     id="invalidation_count"
+                     class="custom-control-input"
+                     formControlName="invalidation_count">
+              <label class="custom-control-label" for="invalidation_count">invalidation_count</label>
+              <br>
+            </div>
+
+          </div>
+
+
+        </div>
+
+      </form>
+    </div>
+
+
+  </div>
+
+  <!-- pagination -->
+  <div class="row justify-content-md-between mb-2" [hidden]="!loading_finished || !dataOnPage.value.length">
+    <!-- Number results -->
+    <div class="col-auto mr-auto mb-2">
+      <strong>Selected entries </strong> <span class="badge badge-info mx-1">{{totalItems}}</span>
+    </div>
+
+    <div class="col-auto">
+      <!-- Pagination -->
+      <div class="btn-group input-group text-center" >
+
+        <div class="input-group-prepend mb-2">
+                  <span class="btn-block input-group-text text-center small-button">
+                    Page
+                  </span>
+        </div>
+
+        <pagination
+          [totalItems]="totalItems"
+          [itemsPerPage]="pageSize.value"
+          [maxSize]="1"
+          [boundaryLinks]="true"
+          (pageChanged)="currentPage.next($event)"
+          previousText="&lsaquo;"
+          nextText="&rsaquo;"
+          firstText="&laquo;"
+          lastText="&raquo;"
+          class="border-left-0 small-button">
+        </pagination>
+
+      </div>
+    </div>
+
+    <!-- Items per page -->
+    <div class="col-auto">
+      <div class="btn-group input-group">
+        <div class="input-group-prepend" >
+                <span class="input-group-text text-center small-button">
+                  Show
+                </span>
+        </div>
+
+        <label class="btn btn-outline-second btn-sm mb-0" [(ngModel)]="radioModel"
+               (click)="changeValuePageSize(radioModel)"
+               btnRadio="10" tabindex="0" role="button">10</label>
+        <label class="btn btn-outline-second btn-sm mb-0" [(ngModel)]="radioModel"
+               (click)="changeValuePageSize(radioModel)"
+               btnRadio="20" tabindex="0" role="button">20</label>
+        <label class="btn btn-outline-second btn-sm mb-0" [(ngModel)]="radioModel"
+               (click)="changeValuePageSize(radioModel)"
+               btnRadio="50" tabindex="0" role="button">50</label>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Result table -->
+  <div class="row" *ngIf="loading_finished && dataOnPage.value.length > 0">
     <div class="col" >
       <table cdk-table [dataSource]="dataOnPage" class="table table-sm table-responsive-sm">
-        <tr cdk-header-row *cdkHeaderRowDef="displayedColumns"></tr>
-        <tr cdk-row *cdkRowDef="let row; columns: displayedColumns"></tr>
+        <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value"></tr>
+        <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
 
-        <ng-container cdkColumnDef="entry_id">
-          <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('entry_id')">
-            ORCID iD
-            <span *ngIf="sortKey.value === 'entry_id'">
+        <ng-container cdkColumnDef="orcid">
+          <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('orcid')">
+            orcid
+            <span *ngIf="sortKey.value === 'orcid'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-<!--            <a class="btn-block"-->
-<!--               [routerLink]="['/orcid/' + row['curator_orcid']]"-->
-<!--            >-->
-              {{row['orcid']}}
-<!--            </a>-->
+            <a class="btn-block"
+               [routerLink]="['/orcid/' + row.orcid]"
+               >
+              {{row.orcid}}
+            </a>
           </td>
         </ng-container>
+
         <ng-container cdkColumnDef="name">
           <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('name')">
-            ORCID iD
+            name
             <span *ngIf="sortKey.value === 'name'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-<!--            <a class="btn-block"-->
-<!--               [routerLink]="['/orcid/' + row['curator_orcid']]"-->
-<!--            >-->
-              {{row['name']}}
-<!--            </a>-->
+            <a class="btn-block"
+               [routerLink]="['/orcid/' + row.orcid]"
+               >
+              {{row.name}}
+            </a>
           </td>
         </ng-container>
-        <ng-container cdkColumnDef="events">
-          <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('events')">
-            Number of biocuration events
-<!--            <span *ngIf="sortKey.value === 'entry_id'">-->
-<!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
-<!--              </span>-->
+
+        <ng-container cdkColumnDef="generation_reports">
+          <th cdk-header-cell *cdkHeaderCellDef >
+            generation_reports
+
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
 <!--            <a class="btn-block"-->
-<!--               [routerLink]="['/orcid/' + row['curator_orcid']]"-->
-<!--            >-->
-              {{row['reports'].length}}
+<!--               [routerLink]="['/orcid/' + row.orcid]"-->
+<!--               >-->
+<!--              {{row.name}}-->
 <!--            </a>-->
           </td>
         </ng-container>
 
-        <ng-container cdkColumnDef="by_category">
+        <ng-container cdkColumnDef="generation_count">
+          <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('generation_count')">
+            generation_count
+            <span *ngIf="sortKey.value === 'generation_count'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+            <a class="btn-block"
+               [routerLink]="['/orcid/' + row.orcid]"
+               >
+              {{row.generation_count}}
+            </a>
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="revision_reports">
           <th cdk-header-cell *cdkHeaderCellDef>
-            by terms
-<!--            <span *ngIf="sortKey.value === 'entry_id'">-->
-<!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
-<!--              </span>-->
+            name
+
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
 <!--            <a class="btn-block"-->
-<!--               [routerLink]="['/orcid/' + row['curator_orcid']]"-->
-<!--            >-->
-              <span [innerHTML]="calc_html_categories(row['count_by_category'])"></span>
+<!--               [routerLink]="['/orcid/' + row.orcid]"-->
+<!--               >-->
+<!--              {{row.revision_reports }}-->
 <!--            </a>-->
           </td>
         </ng-container>
 
-        <ng-container cdkColumnDef="by_term">
+        <ng-container cdkColumnDef="revision_count">
+          <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('revision_count')">
+            revision_count
+            <span *ngIf="sortKey.value === 'revision_count'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+            <a class="btn-block"
+               [routerLink]="['/orcid/' + row.orcid]"
+               >
+              {{row.revision_count}}
+            </a>
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="invalidation_reports">
           <th cdk-header-cell *cdkHeaderCellDef>
-            by terms
-<!--            <span *ngIf="sortKey.value === 'entry_id'">-->
-<!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
-<!--              </span>-->
+            invalidation_reports
+
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
 <!--            <a class="btn-block"-->
-<!--               [routerLink]="['/orcid/' + row['curator_orcid']]"-->
-<!--            >-->
-              <span [innerHTML]="calc_by_terms(row['reports'])"></span>
+<!--               [routerLink]="['/orcid/' + row.orcid]"-->
+<!--               >-->
+<!--              {{row.revision_count}}-->
 <!--            </a>-->
           </td>
         </ng-container>
 
-        <ng-container cdkColumnDef="badges">
-          <th cdk-header-cell *cdkHeaderCellDef>
-Badges
-            <!--            <span *ngIf="sortKey.value === 'entry_id'">-->
+        <ng-container cdkColumnDef="invalidation_count">
+          <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('invalidation_count')">
+            invalidation_count
+            <span *ngIf="sortKey.value === 'invalidation_count'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+            <a class="btn-block"
+               [routerLink]="['/orcid/' + row.orcid]"
+               >
+              {{row.invalidation_count}}
+            </a>
+          </td>
+        </ng-container>
+
+<ng-container cdkColumnDef="badge">
+          <th cdk-header-cell *cdkHeaderCellDef >
+            badge
+<!--            <span *ngIf="sortKey.value === 'badge'">-->
 <!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
 <!--              </span>-->
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
 <!--            <a class="btn-block"-->
-<!--               [routerLink]="['/orcid/' + row['curator_orcid']]"-->
-<!--            >-->
+<!--               [routerLink]="['/orcid/' + row.orcid]"-->
+<!--               >-->
               <span [innerHTML]="calc_html_badges(row['badge'])"></span>
 <!--            </a>-->
           </td>
@@ -102,6 +390,110 @@ Badges
       </table>
     </div>
   </div>
+
+<!--  <div class="row" *ngIf="loading_finished">-->
+<!--    <div class="col" >-->
+<!--      <table cdk-table [dataSource]="dataOnPage" class="table table-sm table-responsive-sm">-->
+<!--        <tr cdk-header-row *cdkHeaderRowDef="displayedColumns"></tr>-->
+<!--        <tr cdk-row *cdkRowDef="let row; columns: displayedColumns"></tr>-->
+
+<!--        <ng-container cdkColumnDef="entry_id">-->
+<!--          <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('entry_id')">-->
+<!--            ORCID iD-->
+<!--            <span *ngIf="sortKey.value === 'entry_id'">-->
+<!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
+<!--              </span>-->
+<!--          </th>-->
+<!--          <td cdk-cell *cdkCellDef="let row" class=" pr-0">-->
+<!--&lt;!&ndash;            <a class="btn-block"&ndash;&gt;-->
+<!--&lt;!&ndash;               [routerLink]="['/orcid/' + row['curator_orcid']]"&ndash;&gt;-->
+<!--&lt;!&ndash;            >&ndash;&gt;-->
+<!--              {{row['orcid']}}-->
+<!--&lt;!&ndash;            </a>&ndash;&gt;-->
+<!--          </td>-->
+<!--        </ng-container>-->
+<!--        <ng-container cdkColumnDef="name">-->
+<!--          <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('name')">-->
+<!--            ORCID iD-->
+<!--            <span *ngIf="sortKey.value === 'name'">-->
+<!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
+<!--              </span>-->
+<!--          </th>-->
+<!--          <td cdk-cell *cdkCellDef="let row" class=" pr-0">-->
+<!--&lt;!&ndash;            <a class="btn-block"&ndash;&gt;-->
+<!--&lt;!&ndash;               [routerLink]="['/orcid/' + row['curator_orcid']]"&ndash;&gt;-->
+<!--&lt;!&ndash;            >&ndash;&gt;-->
+<!--              {{row['name']}}-->
+<!--&lt;!&ndash;            </a>&ndash;&gt;-->
+<!--          </td>-->
+<!--        </ng-container>-->
+<!--        <ng-container cdkColumnDef="events">-->
+<!--          <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('events')">-->
+<!--            Number of biocuration events-->
+<!--&lt;!&ndash;            <span *ngIf="sortKey.value === 'entry_id'">&ndash;&gt;-->
+<!--&lt;!&ndash;                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}&ndash;&gt;-->
+<!--&lt;!&ndash;              </span>&ndash;&gt;-->
+<!--          </th>-->
+<!--          <td cdk-cell *cdkCellDef="let row" class=" pr-0">-->
+<!--&lt;!&ndash;            <a class="btn-block"&ndash;&gt;-->
+<!--&lt;!&ndash;               [routerLink]="['/orcid/' + row['curator_orcid']]"&ndash;&gt;-->
+<!--&lt;!&ndash;            >&ndash;&gt;-->
+<!--              {{row['reports'].length}}-->
+<!--&lt;!&ndash;            </a>&ndash;&gt;-->
+<!--          </td>-->
+<!--        </ng-container>-->
+
+<!--        <ng-container cdkColumnDef="by_category">-->
+<!--          <th cdk-header-cell *cdkHeaderCellDef>-->
+<!--            by terms-->
+<!--&lt;!&ndash;            <span *ngIf="sortKey.value === 'entry_id'">&ndash;&gt;-->
+<!--&lt;!&ndash;                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}&ndash;&gt;-->
+<!--&lt;!&ndash;              </span>&ndash;&gt;-->
+<!--          </th>-->
+<!--          <td cdk-cell *cdkCellDef="let row" class=" pr-0">-->
+<!--&lt;!&ndash;            <a class="btn-block"&ndash;&gt;-->
+<!--&lt;!&ndash;               [routerLink]="['/orcid/' + row['curator_orcid']]"&ndash;&gt;-->
+<!--&lt;!&ndash;            >&ndash;&gt;-->
+<!--              <span [innerHTML]="calc_html_categories(row['count_by_category'])"></span>-->
+<!--&lt;!&ndash;            </a>&ndash;&gt;-->
+<!--          </td>-->
+<!--        </ng-container>-->
+
+<!--        <ng-container cdkColumnDef="by_term">-->
+<!--          <th cdk-header-cell *cdkHeaderCellDef>-->
+<!--            by terms-->
+<!--&lt;!&ndash;            <span *ngIf="sortKey.value === 'entry_id'">&ndash;&gt;-->
+<!--&lt;!&ndash;                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}&ndash;&gt;-->
+<!--&lt;!&ndash;              </span>&ndash;&gt;-->
+<!--          </th>-->
+<!--          <td cdk-cell *cdkCellDef="let row" class=" pr-0">-->
+<!--&lt;!&ndash;            <a class="btn-block"&ndash;&gt;-->
+<!--&lt;!&ndash;               [routerLink]="['/orcid/' + row['curator_orcid']]"&ndash;&gt;-->
+<!--&lt;!&ndash;            >&ndash;&gt;-->
+<!--              <span [innerHTML]="calc_by_terms(row['reports'])"></span>-->
+<!--&lt;!&ndash;            </a>&ndash;&gt;-->
+<!--          </td>-->
+<!--        </ng-container>-->
+
+<!--        <ng-container cdkColumnDef="badges">-->
+<!--          <th cdk-header-cell *cdkHeaderCellDef>-->
+<!--Badges-->
+<!--            &lt;!&ndash;            <span *ngIf="sortKey.value === 'entry_id'">&ndash;&gt;-->
+<!--&lt;!&ndash;                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}&ndash;&gt;-->
+<!--&lt;!&ndash;              </span>&ndash;&gt;-->
+<!--          </th>-->
+<!--          <td cdk-cell *cdkCellDef="let row" class=" pr-0">-->
+<!--&lt;!&ndash;            <a class="btn-block"&ndash;&gt;-->
+<!--&lt;!&ndash;               [routerLink]="['/orcid/' + row['curator_orcid']]"&ndash;&gt;-->
+<!--&lt;!&ndash;            >&ndash;&gt;-->
+<!--              <span [innerHTML]="calc_html_badges(row['badge'])"></span>-->
+<!--&lt;!&ndash;            </a>&ndash;&gt;-->
+<!--          </td>-->
+<!--        </ng-container>-->
+
+<!--      </table>-->
+<!--    </div>-->
+<!--  </div>-->
 
 
 </div>

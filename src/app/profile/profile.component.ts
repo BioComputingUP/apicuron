@@ -45,7 +45,7 @@ export class ProfileComponent implements OnInit {
         console.log('authData', authData);
         console.log(orcid_id);
         this.internalService.GetSearch({
-          orcid_id: orcid_id
+          orcid: orcid_id
         }).subscribe((browseData) => {
           if (browseData.length === 1) {
             this.profileData.next(browseData[0]);

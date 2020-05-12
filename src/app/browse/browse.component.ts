@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {concat, BehaviorSubject, combineLatest, of} from 'rxjs';
 import {InternalService} from '../services/internal.service';
 import {AuthService} from '../services/auth.service';
+import {FormControl, FormGroup, FormBuilder, FormArray} from '@angular/forms';
 
 @Component({
   selector: 'app-browse',
@@ -9,54 +10,104 @@ import {AuthService} from '../services/auth.service';
   styleUrls: ['./browse.component.scss']
 })
 export class BrowseComponent implements OnInit {
+  columnsFormNew;
+  collapseColumns = true;
+
+  searchForm;
   loading_finished = false;
-  dataOnPage = new BehaviorSubject<any[]>([]);
-  displayedColumns = ['entry_id', 'name', 'events', 'by_category', 'by_term', 'badges'];
-  sortKey = new BehaviorSubject<string>('entry_id');
-  sortDirection = new BehaviorSubject<string>('asc');
+  radioModel = '20';
 
   localAuth = new BehaviorSubject<object>({});
+  listColumns = [
+    {id: 'orcid', name: 'ORCID'},
+    {id: 'name', name: 'Name'},
+    {id: 'badge', name: 'Badge'},
+    {id: 'generation_reports', name: 'generation_reports'},
+    {id: 'generation_count', name: 'generation_count'},
+    {id: 'revision_reports', name: 'revision_reports'},
+    {id: 'revision_count', name: 'revision_count'},
+    {id: 'invalidation_reports', name: 'invalidation_reports'},
+    {id: 'invalidation_count', name: 'invalidation_count'}
+  ];
+  displayedColumns = new BehaviorSubject<object>(['orcid', 'name', 'generation_count', 'revision_count', 'invalidation_count', 'badge']);
+  currentPage = new BehaviorSubject<object>({
+    'page': 1
+  });
+  pageSize = new BehaviorSubject<number>(20);
+  dataOnPage = new BehaviorSubject<any[]>([]);
+  totalItems: number;
+  sortKey = new BehaviorSubject<string>('orcid');
+  sortDirection = new BehaviorSubject<string>('asc');
 
 
   constructor(public authService: AuthService,
+              private fb: FormBuilder,
               private internalService: InternalService) {
   }
 
   ngOnInit() {
+    this.searchForm = this.fb.array([]);
     this.authService.loginData.subscribe(authData => {
       if (this.localAuth.value !== authData) {
         this.localAuth.next(authData);
       }
     });
 
-    this.localAuth.subscribe(authData => {
-      console.log('authData', authData);
+    this.columnsFormNew = this.fb.group({
+      orcid: this.fb.control(true),
+      name: this.fb.control(true),
+      generation_reports: this.fb.control(false),
+      generation_count: this.fb.control(true),
+      revision_reports: this.fb.control(false),
+      revision_count: this.fb.control(true),
+      invalidation_reports: this.fb.control(false),
+      invalidation_count: this.fb.control(true),
+      badge: this.fb.control(true),
 
-      if (!authData.hasOwnProperty('initial')) {
-        this.internalService.GetSearch({
-          page_size: 100
-        }).subscribe((browseData) => {
-          this.dataOnPage.next(browseData);
-        }, (err) => {
-        }, () => {
-          this.loading_finished = true;
-          console.log('finish');
-        });
-        // this.internalService.GetSearch({
-        //   page_size: 100
-        // }).subscribe((browseData) => {
-        //     // console.log(browseData.data);
-        //     this.dataOnPage.next(browseData.data);
-        //   }, (err) => {
-        //   },
-        //   () => {
-        //     this.loading_finished = true;
-        //     console.log('finish');
-        //   });
-      }
+    });
+    this.columnsFormNew.valueChanges.subscribe(columsObj => {
+      // console.log(columsObj);
+      const newDisplayedColumns = [];
+      Object.keys(columsObj).forEach(currColumn => {
+        if (columsObj[currColumn]) {
+          newDisplayedColumns.push(currColumn);
+        }
+      });
+      this.displayedColumns.next(newDisplayedColumns);
     });
 
+
+    this.localAuth.subscribe(authData => {
+      console.log('authData', authData);
+      if (!authData.hasOwnProperty('initial')) {
+        this.searchForm.valueChanges.subscribe(formData => {
+          const search_params = {};
+          search_params['page_size'] = this.pageSize.value;
+          formData.forEach(currItem => {
+            if (currItem.area === 'time_from') {
+              search_params[currItem.area] = currItem.key.toISOString().slice(0, 10);
+            } else {
+              search_params[currItem.area] = currItem.key;
+            }
+          });
+          this.internalService.GetSearch(search_params).subscribe((browseData) => {
+            this.dataOnPage.next(browseData);
+          }, (err) => {
+          }, () => {
+            this.totalItems = this.dataOnPage.value[0].search_result_count;
+            this.loading_finished = true;
+            console.log('finish');
+          });
+        });
+        const rows = this.searchForm as FormArray;
+        rows.push(this.fb.group({
+          area: 'time_from',
+          key: new Date(2019, 9, 1)
+        }));
+      }
+    });
   }
+
 
   adjustSort(key: string) {
     if (this.sortKey.value === key) {
@@ -67,7 +118,6 @@ export class BrowseComponent implements OnInit {
       }
       return;
     }
-
     this.sortKey.next(key);
     this.sortDirection.next('asc');
   }
@@ -108,6 +158,7 @@ export class BrowseComponent implements OnInit {
 
     return '<small>' + out_put.join('<br>') + '</small>';
   }
+
   calc_html_categories(row) {
     const out_put = [];
     if (Array.isArray(row)) {
@@ -117,5 +168,38 @@ export class BrowseComponent implements OnInit {
     }
 
     return '<small>' + out_put.join('<br>') + '</small>';
+  }
+
+  checkFreeText(formObj, form_index) {
+    // console.log('itt', formObj);
+    for (let i = 0; i < formObj.length && i < form_index; i++) {
+      // console.log(formObj[i])
+      if (formObj[i].area === 'free_text') {
+        // console.log('checkFreeText false');
+        return false;
+      }
+    }
+    // console.log('checkFreeText true');
+    return true;
+  }
+
+  addSearchField(urlSearch, area) {
+    const rows = this.searchForm as FormArray;
+    rows.push(this.fb.group({
+      area: area,
+      key: null
+    }));
+  }
+
+  removeSearchField(index) {
+    const rows = this.searchForm as FormArray;
+    rows.removeAt(index);
+    if (rows.length === 0) {
+      this.addSearchField(null, 'free_text');
+    }
+
+  }
+  changeValuePageSize(itemsPerPage: string) {
+    this.pageSize.next(Number(itemsPerPage));
   }
 }

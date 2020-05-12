@@ -4,7 +4,9 @@ import {RouterModule, Routes, UrlSegment, UrlMatchResult} from '@angular/router'
 import {CdkTableModule} from '@angular/cdk/table';
 import {ReactiveFormsModule, FormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import {CollapseModule} from 'ngx-bootstrap/collapse';
 import {TabsModule} from 'ngx-bootstrap/tabs';
 import {ProgressbarModule} from 'ngx-bootstrap/progressbar';
 import {PaginationModule} from 'ngx-bootstrap/pagination';
@@ -90,12 +92,15 @@ const appRoutes: Routes = [
       // { enableTracing: true } // <-- debugging purposes only
     ),
     BrowserModule,
+    BrowserAnimationsModule,
+    BsDatepickerModule.forRoot(),
     ScrollToModule.forRoot(),
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule,
     AppRoutingModule,
     CdkTableModule,
+    CollapseModule.forRoot(),
     TabsModule.forRoot(),
     AlertModule.forRoot(),
     ProgressbarModule.forRoot(),

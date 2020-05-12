@@ -50,30 +50,30 @@ body {
 }
 
 
-@media (prefers-color-scheme: dark) {
-  body {
-    background: theme-color("text");
-    color: theme-color("light");
-  }
-  .flagBackground {
-    fill: theme-color("text");
-  }
-
-  .form-control {
-    background-color: theme-color("footer");
-    color: theme-color("light");
-  }
-  .form-control:focus {
-    background-color: theme-color("footer");
-    color: theme-color("light");
-  }
-  .form-control:disabled {
-    background-color: theme-color("text");
-    color: theme-color("light");
-  }
-
-
-}
+//@media (prefers-color-scheme: dark) {
+//  body {
+//    background: theme-color("text");
+//    color: theme-color("light");
+//  }
+//  .flagBackground {
+//    fill: theme-color("text");
+//  }
+//
+//  .form-control {
+//    background-color: theme-color("footer");
+//    color: theme-color("light");
+//  }
+//  .form-control:focus {
+//    background-color: theme-color("footer");
+//    color: theme-color("light");
+//  }
+//  .form-control:disabled {
+//    background-color: theme-color("text");
+//    color: theme-color("light");
+//  }
+//
+//
+//}
 
 .bg-dark {
   background-color: theme-color("primary") !important;
