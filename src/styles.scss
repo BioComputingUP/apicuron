@@ -84,6 +84,40 @@ body {
 }
 
 
+.btn-outline-success-input {
+  color: theme-color("success");
+  background-color: rgba(255, 255, 255, 0.975);
+  background-image: none;
+  border-color: theme-color("success");
+}
+
+.btn-outline-success-input:hover {
+  color: theme-color("light");
+  background-color: theme-color("success");
+  border-color: theme-color("success");
+}
+
+.btn-outline-success-input:focus, .btn-outline-success-input.focus {
+  box-shadow: 0 0 0 0.0rem rgba(theme-color("success"), 0.5);
+}
+
+.btn-outline-success-input.disabled, .btn-outline-success-input:disabled {
+  color: theme-color("success");
+  background-color: rgba(255, 255, 255, 0.975);
+}
+
+.btn-outline-success-input:not(:disabled):not(.disabled):active, .btn-outline-success-input:not(:disabled):not(.disabled).active,
+.show > .btn-outline-success-input.dropdown-toggle {
+  color: theme-color("light");
+  background-color: theme-color("success");
+  border-color: theme-color("success");
+}
+
+.btn-outline-success-input:not(:disabled):not(.disabled):active:focus, .btn-outline-success-input:not(:disabled):not(.disabled).active:focus,
+.show > .btn-outline-success-input.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.0rem rgba(theme-color("success"), 0.5);
+}
+
 
 .btn-outline-primary {
   color: theme-color("primary");

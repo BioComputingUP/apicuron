@@ -14,11 +14,13 @@
                   <li [ngx-scroll-to]="api"><a href="javascript:void(0)">Application Programing Interface (API)</a></li>
                   <ul>
                     <li [ngx-scroll-to]="search"><a href="javascript:void(0)">Perform search</a></li>
-                    <li [ngx-scroll-to]="report" *ngIf="localAuth.value['authorized']"><a href="javascript:void(0)">Report
+                    <li [ngx-scroll-to]="report" ><a href="javascript:void(0)">Report
                       biocuration event</a></li>
-                    <li [ngx-scroll-to]="registration" *ngIf="localAuth.value['authorized']"><a
+                    <li [ngx-scroll-to]="registration" ><a
                       href="javascript:void(0)">Update resource description</a></li>
                   </ul>
+<!--                  *ngIf="localAuth.value['authorized']"-->
+
                   <!--                  <h6><a href="javascript:void(0)" [ngx-scroll-to]="examples">Examples</a></h6>-->
                   <!--                  <h6><a href="javascript:void(0)" [ngx-scroll-to]="output">Output</a></h6>-->
                   <!--                  <ul>-->
@@ -102,7 +104,7 @@
         </table>
       </div>
       <div class="pb-2 pt-3" id="report"  #report>
-        <div *ngIf="localAuth.value['authorized']">
+        <div >
           <h3>Report biocuration activity</h3>
           <div class="btn-group">
             <label class="btn btn-danger">POST</label>
@@ -167,7 +169,7 @@
         </div>
       </div>
       <div id="registration" class="pb-2" #registration class="pt-3">
-        <div *ngIf="localAuth.value['authorized']">
+        <div >
           <h3>Update resource description (including gamification scoring matrix)</h3>
           <div class="btn-group">
             <label class="btn btn-danger">POST</label>

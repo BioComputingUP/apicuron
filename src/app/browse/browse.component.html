@@ -1,6 +1,5 @@
 <div class="container-fluid container-wide">
   <form [formGroup]="searchForm">
-
     <div
       *ngFor="let searchField of searchForm.controls; let index_xr = index">
       <div [formGroupName]="index_xr" class="row">
@@ -20,33 +19,24 @@
                       *ngIf="checkFreeText(searchForm.value, index_xr)">Free text
               </option>
               <option value="name">Biocurator name</option>
-              <option value="orcid">ORCID</option>
-              <option value="time_from">From (date)</option>
-<!--              <option value="disprot_id">DisProt ID</option>-->
-<!--              <option value="organism">Organism</option>-->
-<!--              <option value="taxon">Taxon</option>-->
-<!--              <option value="ncbi_taxon_id">NCBI Taxon ID</option>-->
-<!--              <option value="uniref50">UniRef50</option>-->
-<!--              <option value="uniref90">UniRef90</option>-->
-<!--              <option value="uniref100">UniRef100</option>-->
-<!--              <option value="curator_name">Curator name</option>-->
-<!--              <option value="reference_id">Reference ID</option>-->
-<!--              <option value="reference_html">Reference name</option>-->
-<!--              <option value="do_id">Disorder Ontology ID</option>-->
-<!--              <option value="do_name">Disorder Ontology name</option>-->
-              <!--                            <option value="show_obsolete">Entries with obsolete marks</option>-->
-              <!--                            <option value="show_obsolete_protein">Show obsolete entries also</option>-->
+              <option value="curator_orcid">ORCID</option>
+              <option value="resource_uri">Resource identifier</option>
+              <option value="entity_uri">Entity identifier</option>
+              <option value="activity_term">Activity term</option>
+              <option value="activity_category">Activity category</option>
+              <option value="time_from">First day (date)</option>
+              <option value="time_last">Last day (date)</option>
             </select>
 
             <input type="text"
-                   *ngIf="['time_from'].includes(searchForm.value[index_xr]['area'])"
+                   *ngIf="['time_from', 'time_last'].includes(searchForm.value[index_xr]['area'])"
                    class="form-control"
                    #dp="bsDatepicker"
                    bsDatepicker
                    formControlName="key"
                    [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">
             <input type="text"
-                   *ngIf="!['time_from'].includes(searchForm.value[index_xr]['area'])"
+                   *ngIf="!['time_from', 'time_last'].includes(searchForm.value[index_xr]['area'])"
                    class="form-control col-lg-auto"
                    formControlName="key"
                    placeholder="e.g.: p53">
@@ -71,14 +61,6 @@
         </div>
       </div>
     </div>
-
-
-<!--    <div class="row" *ngIf="loading_finished">-->
-<!--      <div class="col form-group">-->
-<!--        <strong>Starting at </strong>-->
-
-<!--      </div>-->
-<!--    </div>-->
   </form>
 
 
@@ -185,17 +167,17 @@
 
 
   </div>
+  <div class="col-auto mr-auto mb-2">
+    <strong>Selected entries </strong> <span class="badge badge-info mx-1">{{totalItems}}</span>
+  </div>
 
   <!-- pagination -->
   <div class="row justify-content-md-between mb-2" [hidden]="!loading_finished || !dataOnPage.value.length">
     <!-- Number results -->
-    <div class="col-auto mr-auto mb-2">
-      <strong>Selected entries </strong> <span class="badge badge-info mx-1">{{totalItems}}</span>
-    </div>
 
     <div class="col-auto">
       <!-- Pagination -->
-      <div class="btn-group input-group text-center" >
+      <div class="btn-group input-group text-center">
 
         <div class="input-group-prepend mb-2">
                   <span class="btn-block input-group-text text-center small-button">
@@ -222,19 +204,19 @@
     <!-- Items per page -->
     <div class="col-auto">
       <div class="btn-group input-group">
-        <div class="input-group-prepend" >
+        <div class="input-group-prepend">
                 <span class="input-group-text text-center small-button">
                   Show
                 </span>
         </div>
 
-        <label class="btn btn-outline-second btn-sm mb-0" [(ngModel)]="radioModel"
+        <label class="btn btn-outline-primary btn-sm mb-0" [(ngModel)]="radioModel"
                (click)="changeValuePageSize(radioModel)"
                btnRadio="10" tabindex="0" role="button">10</label>
-        <label class="btn btn-outline-second btn-sm mb-0" [(ngModel)]="radioModel"
+        <label class="btn btn-outline-primary btn-sm mb-0" [(ngModel)]="radioModel"
                (click)="changeValuePageSize(radioModel)"
                btnRadio="20" tabindex="0" role="button">20</label>
-        <label class="btn btn-outline-second btn-sm mb-0" [(ngModel)]="radioModel"
+        <label class="btn btn-outline-primary btn-sm mb-0" [(ngModel)]="radioModel"
                (click)="changeValuePageSize(radioModel)"
                btnRadio="50" tabindex="0" role="button">50</label>
 
@@ -244,7 +226,7 @@
 
   <!-- Result table -->
   <div class="row" *ngIf="loading_finished && dataOnPage.value.length > 0">
-    <div class="col" >
+    <div class="col">
       <table cdk-table [dataSource]="dataOnPage" class="table table-sm table-responsive-sm">
         <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value"></tr>
         <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
@@ -259,7 +241,7 @@
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
             <a class="btn-block"
                [routerLink]="['/orcid/' + row.orcid]"
-               >
+            >
               {{row.orcid}}
             </a>
           </td>
@@ -275,23 +257,23 @@
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
             <a class="btn-block"
                [routerLink]="['/orcid/' + row.orcid]"
-               >
+            >
               {{row.name}}
             </a>
           </td>
         </ng-container>
 
         <ng-container cdkColumnDef="generation_reports">
-          <th cdk-header-cell *cdkHeaderCellDef >
+          <th cdk-header-cell *cdkHeaderCellDef>
             generation_reports
 
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-<!--            <a class="btn-block"-->
-<!--               [routerLink]="['/orcid/' + row.orcid]"-->
-<!--               >-->
-<!--              {{row.name}}-->
-<!--            </a>-->
+            <!--            <a class="btn-block"-->
+            <!--               [routerLink]="['/orcid/' + row.orcid]"-->
+            <!--               >-->
+            <span [innerHTML]="calc_by_terms(row['generation_reports'])"></span>
+            <!--            </a>-->
           </td>
         </ng-container>
 
@@ -305,7 +287,7 @@
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
             <a class="btn-block"
                [routerLink]="['/orcid/' + row.orcid]"
-               >
+            >
               {{row.generation_count}}
             </a>
           </td>
@@ -313,15 +295,15 @@
 
         <ng-container cdkColumnDef="revision_reports">
           <th cdk-header-cell *cdkHeaderCellDef>
-            name
+            revision_reports
 
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-<!--            <a class="btn-block"-->
-<!--               [routerLink]="['/orcid/' + row.orcid]"-->
-<!--               >-->
-<!--              {{row.revision_reports }}-->
-<!--            </a>-->
+            <!--            <a class="btn-block"-->
+            <!--               [routerLink]="['/orcid/' + row.orcid]"-->
+            <!--               >-->
+            <span [innerHTML]="calc_by_terms(row['revision_reports'])"></span>
+            <!--            </a>-->
           </td>
         </ng-container>
 
@@ -335,7 +317,7 @@
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
             <a class="btn-block"
                [routerLink]="['/orcid/' + row.orcid]"
-               >
+            >
               {{row.revision_count}}
             </a>
           </td>
@@ -347,11 +329,11 @@
 
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-<!--            <a class="btn-block"-->
-<!--               [routerLink]="['/orcid/' + row.orcid]"-->
-<!--               >-->
-<!--              {{row.revision_count}}-->
-<!--            </a>-->
+            <!--            <a class="btn-block"-->
+            <!--               [routerLink]="['/orcid/' + row.orcid]"-->
+            <!--               >-->
+            <span [innerHTML]="calc_by_terms(row['invalidation_reports'])"></span>
+            <!--            </a>-->
           </td>
         </ng-container>
 
@@ -365,25 +347,25 @@
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
             <a class="btn-block"
                [routerLink]="['/orcid/' + row.orcid]"
-               >
+            >
               {{row.invalidation_count}}
             </a>
           </td>
         </ng-container>
 
-<ng-container cdkColumnDef="badge">
-          <th cdk-header-cell *cdkHeaderCellDef >
+        <ng-container cdkColumnDef="badge">
+          <th cdk-header-cell *cdkHeaderCellDef>
             badge
-<!--            <span *ngIf="sortKey.value === 'badge'">-->
-<!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
-<!--              </span>-->
+            <!--            <span *ngIf="sortKey.value === 'badge'">-->
+            <!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
+            <!--              </span>-->
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-<!--            <a class="btn-block"-->
-<!--               [routerLink]="['/orcid/' + row.orcid]"-->
-<!--               >-->
-              <span [innerHTML]="calc_html_badges(row['badge'])"></span>
-<!--            </a>-->
+            <!--            <a class="btn-block"-->
+            <!--               [routerLink]="['/orcid/' + row.orcid]"-->
+            <!--               >-->
+            <span [innerHTML]="calc_html_badges(row['badge'])"></span>
+            <!--            </a>-->
           </td>
         </ng-container>
 
@@ -391,109 +373,18 @@
     </div>
   </div>
 
-<!--  <div class="row" *ngIf="loading_finished">-->
-<!--    <div class="col" >-->
-<!--      <table cdk-table [dataSource]="dataOnPage" class="table table-sm table-responsive-sm">-->
-<!--        <tr cdk-header-row *cdkHeaderRowDef="displayedColumns"></tr>-->
-<!--        <tr cdk-row *cdkRowDef="let row; columns: displayedColumns"></tr>-->
-
-<!--        <ng-container cdkColumnDef="entry_id">-->
-<!--          <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('entry_id')">-->
-<!--            ORCID iD-->
-<!--            <span *ngIf="sortKey.value === 'entry_id'">-->
-<!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
-<!--              </span>-->
-<!--          </th>-->
-<!--          <td cdk-cell *cdkCellDef="let row" class=" pr-0">-->
-<!--&lt;!&ndash;            <a class="btn-block"&ndash;&gt;-->
-<!--&lt;!&ndash;               [routerLink]="['/orcid/' + row['curator_orcid']]"&ndash;&gt;-->
-<!--&lt;!&ndash;            >&ndash;&gt;-->
-<!--              {{row['orcid']}}-->
-<!--&lt;!&ndash;            </a>&ndash;&gt;-->
-<!--          </td>-->
-<!--        </ng-container>-->
-<!--        <ng-container cdkColumnDef="name">-->
-<!--          <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('name')">-->
-<!--            ORCID iD-->
-<!--            <span *ngIf="sortKey.value === 'name'">-->
-<!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
-<!--              </span>-->
-<!--          </th>-->
-<!--          <td cdk-cell *cdkCellDef="let row" class=" pr-0">-->
-<!--&lt;!&ndash;            <a class="btn-block"&ndash;&gt;-->
-<!--&lt;!&ndash;               [routerLink]="['/orcid/' + row['curator_orcid']]"&ndash;&gt;-->
-<!--&lt;!&ndash;            >&ndash;&gt;-->
-<!--              {{row['name']}}-->
-<!--&lt;!&ndash;            </a>&ndash;&gt;-->
-<!--          </td>-->
-<!--        </ng-container>-->
-<!--        <ng-container cdkColumnDef="events">-->
-<!--          <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('events')">-->
-<!--            Number of biocuration events-->
-<!--&lt;!&ndash;            <span *ngIf="sortKey.value === 'entry_id'">&ndash;&gt;-->
-<!--&lt;!&ndash;                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}&ndash;&gt;-->
-<!--&lt;!&ndash;              </span>&ndash;&gt;-->
-<!--          </th>-->
-<!--          <td cdk-cell *cdkCellDef="let row" class=" pr-0">-->
-<!--&lt;!&ndash;            <a class="btn-block"&ndash;&gt;-->
-<!--&lt;!&ndash;               [routerLink]="['/orcid/' + row['curator_orcid']]"&ndash;&gt;-->
-<!--&lt;!&ndash;            >&ndash;&gt;-->
-<!--              {{row['reports'].length}}-->
-<!--&lt;!&ndash;            </a>&ndash;&gt;-->
-<!--          </td>-->
-<!--        </ng-container>-->
-
-<!--        <ng-container cdkColumnDef="by_category">-->
-<!--          <th cdk-header-cell *cdkHeaderCellDef>-->
-<!--            by terms-->
-<!--&lt;!&ndash;            <span *ngIf="sortKey.value === 'entry_id'">&ndash;&gt;-->
-<!--&lt;!&ndash;                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}&ndash;&gt;-->
-<!--&lt;!&ndash;              </span>&ndash;&gt;-->
-<!--          </th>-->
-<!--          <td cdk-cell *cdkCellDef="let row" class=" pr-0">-->
-<!--&lt;!&ndash;            <a class="btn-block"&ndash;&gt;-->
-<!--&lt;!&ndash;               [routerLink]="['/orcid/' + row['curator_orcid']]"&ndash;&gt;-->
-<!--&lt;!&ndash;            >&ndash;&gt;-->
-<!--              <span [innerHTML]="calc_html_categories(row['count_by_category'])"></span>-->
-<!--&lt;!&ndash;            </a>&ndash;&gt;-->
-<!--          </td>-->
-<!--        </ng-container>-->
-
-<!--        <ng-container cdkColumnDef="by_term">-->
-<!--          <th cdk-header-cell *cdkHeaderCellDef>-->
-<!--            by terms-->
-<!--&lt;!&ndash;            <span *ngIf="sortKey.value === 'entry_id'">&ndash;&gt;-->
-<!--&lt;!&ndash;                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}&ndash;&gt;-->
-<!--&lt;!&ndash;              </span>&ndash;&gt;-->
-<!--          </th>-->
-<!--          <td cdk-cell *cdkCellDef="let row" class=" pr-0">-->
-<!--&lt;!&ndash;            <a class="btn-block"&ndash;&gt;-->
-<!--&lt;!&ndash;               [routerLink]="['/orcid/' + row['curator_orcid']]"&ndash;&gt;-->
-<!--&lt;!&ndash;            >&ndash;&gt;-->
-<!--              <span [innerHTML]="calc_by_terms(row['reports'])"></span>-->
-<!--&lt;!&ndash;            </a>&ndash;&gt;-->
-<!--          </td>-->
-<!--        </ng-container>-->
-
-<!--        <ng-container cdkColumnDef="badges">-->
-<!--          <th cdk-header-cell *cdkHeaderCellDef>-->
-<!--Badges-->
-<!--            &lt;!&ndash;            <span *ngIf="sortKey.value === 'entry_id'">&ndash;&gt;-->
-<!--&lt;!&ndash;                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}&ndash;&gt;-->
-<!--&lt;!&ndash;              </span>&ndash;&gt;-->
-<!--          </th>-->
-<!--          <td cdk-cell *cdkCellDef="let row" class=" pr-0">-->
-<!--&lt;!&ndash;            <a class="btn-block"&ndash;&gt;-->
-<!--&lt;!&ndash;               [routerLink]="['/orcid/' + row['curator_orcid']]"&ndash;&gt;-->
-<!--&lt;!&ndash;            >&ndash;&gt;-->
-<!--              <span [innerHTML]="calc_html_badges(row['badge'])"></span>-->
-<!--&lt;!&ndash;            </a>&ndash;&gt;-->
-<!--          </td>-->
-<!--        </ng-container>-->
-
-<!--      </table>-->
-<!--    </div>-->
-<!--  </div>-->
-
-
+  <div class="row mb-2">
+    <div class="col" *ngIf="loading_new_table">
+      <button class="btn btn-second small-button " type="button" disabled>
+        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+        Loading...
+      </button>
+    </div>
+    <div class="col" *ngIf="loading_finished && totalItems === 0">
+      <button class="btn btn-danger small-button " type="button" disabled>
+        <!--              <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>-->
+        Entries not found
+      </button>
+    </div>
+  </div>
 </div>

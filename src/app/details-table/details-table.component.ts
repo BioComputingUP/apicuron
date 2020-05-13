@@ -17,7 +17,7 @@ export class DetailsTableComponent implements OnInit {
     'entry',
     'acc',
     'name',
-    'term_number'
+    // 'term_number'
   ]);
 
   // declaration, pagination

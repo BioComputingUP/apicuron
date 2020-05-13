@@ -24,46 +24,36 @@
           <img class="logoimg" src="assets/user.png">
 <!--        </div>-->
       </div>
-      <div class="col-lg-4 col-md-8 col-sm-8">
+      <div class="col">
 <!--        {{profileData.value | json}}-->
         <h3><strong> {{profileData.value['name']}} </strong></h3>
-        <strong>Organisation: </strong>{{profileData.value['institution']}}<br>
-        <strong>Position: </strong>{{profileData.value['position']}}<br>
-        <strong>Personal page: </strong>{{profileData.value['personal_homepage']}}<br>
-        <strong>ORCID iD: </strong>{{profileData.value['orcid_id']}}<br>
-        <strong>Number of curation activities: </strong>{{profileData.value['reports'].length}}<br>
-      </div>
-      <div class="col-lg-6 text-justify">
-        {{profileData.value['description']}}
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-10">
-        <p><strong>Contributed resources: </strong>
-          <span class="badge badge-pill badge-success pl-1 text-center" *ngFor="let resource of resourcesList">
+<!--        <strong>Organisation: </strong>{{profileData.value['institution']}}<br>-->
+<!--        <strong>Position: </strong>{{profileData.value['position']}}<br>-->
+<!--        <strong>Personal page: </strong>{{profileData.value['personal_homepage']}}<br>-->
+        <strong>ORCID: </strong>{{profileData.value['orcid']}}<br>
+        <strong>Number of entity generation: </strong>{{profileData.value['generation_count']}}<br>
+        <strong>Number of entity revision: </strong>{{profileData.value['revision_count']}}<br>
+        <strong>Number of entity invalidation: </strong>{{profileData.value['invalidation_count']}}<br>
+        <strong>Contributed resources: </strong>
+        <span class="badge badge-pill badge-success pl-1 text-center" *ngFor="let resource of resourcesList">
             {{resource}}
-          </span>
-        </p>
-        <p><strong>Badges: </strong> <span
-          class="badge  badge-pill badge-warning pl-1 text-center"> Gold IDP curator</span></p>
+        </span><br>
+        <strong>Badges: </strong><span class="badge badge-pill badge-warning pl-1 text-center mr-1" *ngFor="let resource of profileData.value['badge']">
+            {{resource}}
+        </span>
       </div>
-      <div class="col-2">
-        <button class="btn btn-outline-danger btn-block"
-                (click)="editMode.next(true)"
-                *ngIf="profileData.value['orcid_id'] === localAuth.value['orcid_id']">
-          Edit your profile
-        </button>
-      </div>
+<!--      <div class="col-lg-6 text-justify">-->
+<!--        {{profileData.value['description']}}-->
+<!--      </div>-->
     </div>
     <accordion>
       <accordion-group [isOpen]="false" *ngFor="let database of resourcesList">
         <button class="btn btn-link btn-block clearfix" accordion-heading>
           <div class="pull-left float-left">Contribution in <strong>{{database}}</strong></div>
-          <span class="float-right pull-right pl-2 pr-2"><strong>Number of biocuration events: </strong>{{numberOfActions(database)}}</span>
 <!--          <span-->
 <!--            class="float-right pull-right pl-2 pr-2"><strong>Number of terms: </strong>{{numberOfTerms(database)}}</span>-->
         </button>
-<!--        <app-details-table [dataArray]="reportFilter(database)"></app-details-table>-->
+        <app-details-table [dataArray]="reportFilter(database)"></app-details-table>
       </accordion-group>
 <!--      <accordion-group [isOpen]="false">-->
 <!--        <button class="btn btn-link btn-block clearfix" accordion-heading>-->

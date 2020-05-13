@@ -1,18 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {InternalService} from '../services/internal.service';
 import {concat, BehaviorSubject, Observable, combineLatest} from 'rxjs';
 import {ProgressbarConfig} from 'ngx-bootstrap';
+
 export function getProgressbarConfig(): ProgressbarConfig {
-  return Object.assign(new ProgressbarConfig(), { animate: true, striped: true,  max: 100 });
+  return Object.assign(new ProgressbarConfig(), {animate: true, striped: true, max: 100});
 }
-import { environment } from '../../environments/environment';
+
+import {environment} from '../../environments/environment';
 import {AuthService} from '../services/auth.service';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
-  providers: [{ provide: ProgressbarConfig, useFactory: getProgressbarConfig }]
+  providers: [{provide: ProgressbarConfig, useFactory: getProgressbarConfig}]
 })
 
 export class ProfileComponent implements OnInit {
@@ -28,7 +30,8 @@ export class ProfileComponent implements OnInit {
   pmidList = [];
 
   constructor(public authService: AuthService,
-              private internalService: InternalService) { }
+              private internalService: InternalService) {
+  }
 
   ngOnInit() {
     this.env = environment;
@@ -41,31 +44,45 @@ export class ProfileComponent implements OnInit {
     });
 
     this.localAuth.subscribe(authData => {
-      if (!authData.hasOwnProperty('initial')) {
-        console.log('authData', authData);
-        console.log(orcid_id);
-        this.internalService.GetSearch({
-          orcid: orcid_id
-        }).subscribe((browseData) => {
-          if (browseData.length === 1) {
-            this.profileData.next(browseData[0]);
-            this.profileData.value['reports'].forEach( currReport => {
-              if (currReport.resource_name) {
-                this.resourcesList.add(currReport.resource_name);
-              }
-            });
-          }
-        }, (err) => {
-        }, () => {
-          this.loading_finished = true;
-          console.log('finish');
-        });
-      }
+      // if (!authData.hasOwnProperty('initial')) {
+      console.log('authData', authData);
+      console.log(orcid_id);
+      this.internalService.GetSearch({
+        curator_orcid: orcid_id
+      }).subscribe((browseData) => {
+        this.profileData.next(browseData.data[0]);
+      }, (err) => {
+      }, () => {
+        if (this.profileData.value.hasOwnProperty('generation_reports')) {
+          this.profileData.value['generation_reports'].forEach(currReport => {
+            if (currReport.resource_uri) {
+              this.resourcesList.add(currReport.resource_uri.substr(42));
+            }
+          });
+
+        }
+        if (this.profileData.value.hasOwnProperty('revision_reports')) {
+          this.profileData.value['revision_reports'].forEach(currReport => {
+            if (currReport.resource_uri) {
+              this.resourcesList.add(currReport.resource_uri.substr(42));
+            }
+          });
+        }
+        if (this.profileData.value.hasOwnProperty('invalidation_reports')) {
+          this.profileData.value['invalidation_reports'].forEach(currReport => {
+            if (currReport.resource_uri) {
+              this.resourcesList.add(currReport.resource_uri.substr(42));
+            }
+          });
+        }
+        this.loading_finished = true;
+        console.log('finish');
+      });
 
 
+      // }
 
     });
-
 
 
   }
@@ -88,15 +105,30 @@ export class ProfileComponent implements OnInit {
   }
 
   reportFilter(resource) {
-    return this.profileData.value['reports'].filter(currObj => {
-      return currObj.resource_name === resource;
-    });
+    let returnArray = [];
+    if (this.profileData.value.hasOwnProperty('generation_reports')) {
+      returnArray = returnArray.concat(this.profileData.value['generation_reports'].filter(currObj => {
+        return currObj.resource_uri === 'https://registry.identifiers.org/registry/' + resource;
+      }));
+    }
+    if (this.profileData.value.hasOwnProperty('revision_reports')) {
+      returnArray = returnArray.concat(this.profileData.value['revision_reports'].filter(currObj => {
+        return currObj.resource_uri === 'https://registry.identifiers.org/registry/' + resource;
+      }));
+
+    }
+    if (this.profileData.value.hasOwnProperty('invalidation_reports')) {
+      returnArray = returnArray.concat(this.profileData.value['invalidation_reports'].filter(currObj => {
+        return currObj.resource_uri === 'https://registry.identifiers.org/registry/' + resource;
+      }));
+    }
+    return returnArray;
   }
 
   proteinsFilter() {
     const proteinsSet = new Set();
     this.profileData['contribution'].forEach(currObj => {
-        proteinsSet.add(currObj.acc);
+      proteinsSet.add(currObj.acc);
     });
 
     return Array.from(proteinsSet).map(currACC => {
@@ -146,8 +178,6 @@ export class ProfileComponent implements OnInit {
       };
     });
   }
-
-
 
 
 }

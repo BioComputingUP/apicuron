@@ -21,37 +21,37 @@
       <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
 
       <ng-container cdkColumnDef="entry">
-        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('entry')"> Entry ID
+        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('entry')"> Entity identifier
           <span *ngIf="sortKey.value === 'entry'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
         </th>
-        <td cdk-cell *cdkCellDef="let row" > <a href="https://beta.disprot.bio.unipd.it/{{row.entry}}" target="_blank">{{row.entry}}</a></td>
+        <td cdk-cell *cdkCellDef="let row" > <a href="{{row.entity_uri}}" target="_blank">{{row.entity_uri}}</a></td>
       </ng-container>
       <ng-container cdkColumnDef="acc">
-        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('acc')"> Accession (UniProt)
+        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('acc')"> Activity term
           <span *ngIf="sortKey.value === 'acc'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
         </th>
-        <td cdk-cell *cdkCellDef="let row" > {{row.acc}}</td>
+        <td cdk-cell *cdkCellDef="let row" > {{row.activity_term}}</td>
       </ng-container>
       <ng-container cdkColumnDef="name">
-        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('name')"> Protein name
+        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('name')"> Timestamp
           <span *ngIf="sortKey.value === 'name'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
         </th>
-        <td cdk-cell *cdkCellDef="let row" > {{row.name}}</td>
+        <td cdk-cell *cdkCellDef="let row" > {{row.timestamp}}</td>
       </ng-container>
-      <ng-container cdkColumnDef="term_number">
-        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('term_number')"> Number of terms
-          <span *ngIf="sortKey.value === 'acterm_numberc'">
-                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
-              </span>
-        </th>
-        <td cdk-cell *cdkCellDef="let row" > {{row.term_number}}</td>
-      </ng-container>
+<!--      <ng-container cdkColumnDef="term_number">-->
+<!--        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('term_number')"> Number of terms-->
+<!--          <span *ngIf="sortKey.value === 'acterm_numberc'">-->
+<!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
+<!--              </span>-->
+<!--        </th>-->
+<!--        <td cdk-cell *cdkCellDef="let row" > {{row.term_number}}</td>-->
+<!--      </ng-container>-->
 
     </table>
     <pagination

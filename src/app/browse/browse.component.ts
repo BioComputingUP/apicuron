@@ -12,23 +12,23 @@ import {FormControl, FormGroup, FormBuilder, FormArray} from '@angular/forms';
 export class BrowseComponent implements OnInit {
   columnsFormNew;
   collapseColumns = true;
-
-  searchForm;
+  loading_new_table = true;
+  searchForm: FormArray;
   loading_finished = false;
   radioModel = '20';
 
   localAuth = new BehaviorSubject<object>({});
-  listColumns = [
-    {id: 'orcid', name: 'ORCID'},
-    {id: 'name', name: 'Name'},
-    {id: 'badge', name: 'Badge'},
-    {id: 'generation_reports', name: 'generation_reports'},
-    {id: 'generation_count', name: 'generation_count'},
-    {id: 'revision_reports', name: 'revision_reports'},
-    {id: 'revision_count', name: 'revision_count'},
-    {id: 'invalidation_reports', name: 'invalidation_reports'},
-    {id: 'invalidation_count', name: 'invalidation_count'}
-  ];
+  // listColumns = [
+  //   {id: 'orcid', name: 'ORCID'},
+  //   {id: 'name', name: 'Name'},
+  //   {id: 'badge', name: 'Badge'},
+  //   {id: 'generation_reports', name: 'generation_reports'},
+  //   {id: 'generation_count', name: 'generation_count'},
+  //   {id: 'revision_reports', name: 'revision_reports'},
+  //   {id: 'revision_count', name: 'revision_count'},
+  //   {id: 'invalidation_reports', name: 'invalidation_reports'},
+  //   {id: 'invalidation_count', name: 'invalidation_count'}
+  // ];
   displayedColumns = new BehaviorSubject<object>(['orcid', 'name', 'generation_count', 'revision_count', 'invalidation_count', 'badge']);
   currentPage = new BehaviorSubject<object>({
     'page': 1
@@ -79,32 +79,58 @@ export class BrowseComponent implements OnInit {
 
     this.localAuth.subscribe(authData => {
       console.log('authData', authData);
-      if (!authData.hasOwnProperty('initial')) {
-        this.searchForm.valueChanges.subscribe(formData => {
-          const search_params = {};
-          search_params['page_size'] = this.pageSize.value;
-          formData.forEach(currItem => {
-            if (currItem.area === 'time_from') {
+      // if (!authData.hasOwnProperty('initial')) {
+      this.loading_new_table = true;
+      this.dataOnPage.next([]);
+      this.totalItems = 0;
+
+
+      combineLatest(this.searchForm.valueChanges,
+        this.pageSize,
+        this.sortKey,
+        this.sortDirection,
+        this.currentPage,
+      ).subscribe(([formData,
+                     pageSize,
+                     sortKey,
+                     sortDirection,
+                     currentPage]) => {
+        const search_params = {};
+        search_params['sort_field'] = sortKey;
+        search_params['sort_value'] = sortDirection;
+        search_params['page_size'] = pageSize;
+        search_params['page'] = currentPage['page'] - 1;
+        // console.log('formData', formData);
+        formData.forEach(currItem => {
+          if (['time_from', 'time_last'].includes(currItem.area)) {
+            try {
               search_params[currItem.area] = currItem.key.toISOString().slice(0, 10);
-            } else {
-              search_params[currItem.area] = currItem.key;
+            } catch (e) {
+
             }
-          });
-          this.internalService.GetSearch(search_params).subscribe((browseData) => {
-            this.dataOnPage.next(browseData);
-          }, (err) => {
-          }, () => {
-            this.totalItems = this.dataOnPage.value[0].search_result_count;
-            this.loading_finished = true;
-            console.log('finish');
-          });
+          } else if (currItem.key) {
+            search_params[currItem.area] = currItem.key;
+          }
         });
-        const rows = this.searchForm as FormArray;
+
+        this.internalService.GetSearch(search_params).subscribe((browseData) => {
+          this.dataOnPage.next(browseData.data);
+          this.totalItems = browseData.size;
+        }, (err) => {
+        }, () => {
+          this.loading_new_table = false;
+          this.loading_finished = true;
+          console.log('finish');
+        });
+      });
+      const rows = this.searchForm as FormArray;
+      if (rows.length === 0) {
         rows.push(this.fb.group({
           area: 'time_from',
           key: new Date(2019, 9, 1)
         }));
       }
+      // }
     });
   }
 
@@ -125,26 +151,29 @@ export class BrowseComponent implements OnInit {
   calc_by_terms(row) {
     const map_terms = {};
     const set_terms_name = new Set();
-    row.forEach(curr_activity => {
-      set_terms_name.add(curr_activity.activity_term);
-      if (!map_terms.hasOwnProperty(curr_activity.activity_term)) {
-        map_terms[curr_activity.activity_term] = new Set();
-      }
-      map_terms[curr_activity.activity_term].add(curr_activity.entity_uri);
-    });
-    // console.log('map_terms', map_terms);
-    // console.log('set_terms_name', set_terms_name);
-    const out_put = [];
-    Array.from(set_terms_name).sort().forEach(currTerm => {
-      if (map_terms.hasOwnProperty(currTerm)) {
-        // console.log('map_terms[currTerm]', map_terms[currTerm]);
-        // console.log('map_terms[currTerm].length', map_terms[currTerm].length);
-        // console.log('map_terms[currTerm].length.toString()', map_terms[currTerm].length.toString());
-        // out_put.push('<strong>' + currTerm + ':</strong> ');
-        out_put.push('<strong>' + currTerm + ':</strong> ' + map_terms[currTerm].size.toString());
-      }
-    });
-    return '<small>' + out_put.join('<br>') + '</small>';
+    if (row) {
+      row.forEach(curr_activity => {
+        set_terms_name.add(curr_activity.activity_term);
+        if (!map_terms.hasOwnProperty(curr_activity.activity_term)) {
+          map_terms[curr_activity.activity_term] = new Set();
+        }
+        map_terms[curr_activity.activity_term].add(curr_activity.entity_uri);
+      });
+      const out_put = [];
+      Array.from(set_terms_name).sort().forEach(currTerm => {
+        if (map_terms.hasOwnProperty(currTerm)) {
+          // console.log('map_terms[currTerm]', map_terms[currTerm]);
+          // console.log('map_terms[currTerm].length', map_terms[currTerm].length);
+          // console.log('map_terms[currTerm].length.toString()', map_terms[currTerm].length.toString());
+          // out_put.push('<strong>' + currTerm + ':</strong> ');
+          out_put.push('<strong>' + currTerm + ':</strong> ' + map_terms[currTerm].size.toString());
+        }
+      });
+      return '<small>' + out_put.join('<br>') + '</small>';
+    } else {
+      return '';
+    }
+
   }
 
   calc_html_badges(row) {
@@ -199,6 +228,7 @@ export class BrowseComponent implements OnInit {
     }
 
   }
+
   changeValuePageSize(itemsPerPage: string) {
     this.pageSize.next(Number(itemsPerPage));
   }
