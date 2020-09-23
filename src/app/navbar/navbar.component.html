@@ -1,12 +1,18 @@
-<div class="row bg-dark">
+<div class="row bg-dark page-header">
   <div class="container-fluid container-wide">
 
-    <nav class="navbar navbar-expand-sm navbar-dark">
+    <nav class="navbar navbar-expand-sm navbar-dark navbar-fixed-top" id="navbar">
       <!--<div class="container">-->
       <!--<div class="row">-->
       <!--<div class="col-md-8 offset-md-2">-->
-      <a class="navbar-brand" routerLink="">APICURON</a>
-      <button class="navbar-toggler"
+
+
+      <a routerLink=""  (click)="isCollapsed.next(true)">
+        <span class="img-fluid" >APICURON </span>
+      </a>
+
+      <button (click)="isCollapsed.next(!isCollapsed.value)"
+              class="navbar-toggler"
               type="button"
               data-toggle="collapse"
               data-target="#navbarSupportedContent"
@@ -16,30 +22,37 @@
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <div class="collapse navbar-collapse" id="navbarSupportedContent"  [collapse]="isCollapsed.value">
         <ul class="navbar-nav mr-auto">
 
           <li class="nav-item">
-            <a class="nav-link active btn" routerLink="/browse">Browse</a>
+            <a class="nav-link active btn"></a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link btn active" routerLink="/documentation">Documentation</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link btn active" routerLink="/about">About</a>
-          </li>
-
 
         </ul>
 
-        <ul class="navbar-nav navbar-right">
-
-
-
-
-          <li class="nav-item float-right">
+        <ul class="navbar-nav navbar-right"  id="navbarButtons" (click)="isCollapsed.next(true)">
+          <li class="nav-item my-auto">
+            <a class="nav-link active btn" routerLink="/browse">Browse</a>
+          </li>
+          <li class="nav-item my-auto">
+            <a class="nav-link active btn" *ngIf="loginData['authorized']" routerLink="/submit">Submit</a>
+          </li>
+          <li class="nav-item my-auto">
+            <a class="nav-link btn active" routerLink="/help">Help</a>
+          </li>
+          <li class="nav-item  my-auto">
+            <a class="nav-link btn active" routerLink="/about">About</a>
+          </li>
+          <li class="nav-item float-right  my-auto">
+            <a class="nav-link btn active" routerLink="/feedback">Feedback</a>
+          </li>
+          <li class="nav-item float-right  my-auto">
+            <a class="nav-link btn active" routerLink="/login">Login</a>
+          </li>
+          <li class="nav-item float-right  my-auto">
             <!--          {{loginData | json}}-->
-            <a class="nav-link btn active" *ngIf="!loginData['authorized']" routerLink="/login">Login</a>
+            <!--            <a class="nav-link btn active" *ngIf="!loginData['authorized']" routerLink="/login">Login</a>-->
             <div *ngIf="loginData['authorized']">
               <ul class="navbar-nav mr-auto">
                 <li class="nav-item dropdown" dropdown container="body">
@@ -59,13 +72,16 @@
               </ul>
             </div>
           </li>
-          <li class="nav-item float-right">
-            <a class="nav-link btn active" routerLink="/feedback">Feedback</a>
-          </li>
         </ul>
 
       </div>
       <!--</div>-->
     </nav>
+
+
+
   </div>
 </div>
+
+
+

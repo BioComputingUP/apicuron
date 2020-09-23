@@ -10,6 +10,8 @@ import {FormControl} from '@angular/forms';
 export class DetailsTableComponent implements OnInit {
   // declaration, data loading
   @Input() dataArray: [];
+  @Input() database;
+  @Input() profileData;
   tableDataSource_f = new BehaviorSubject<any[]>([]);
   tableDataSource = new BehaviorSubject<any[]>([]);
 

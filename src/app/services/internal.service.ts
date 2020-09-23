@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient} from '@angular/common/http';
 import {Observable, throwError, of} from 'rxjs';
-
 import { environment } from '../../environments/environment';
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class InternalService {
+  private getORCIDprofile = 'https://pub.orcid.org/v3.0/';
   private apicuronSearch = environment.ws + 'search';
   private apicuronProfile = environment.ws + 'profile/';
   private apicuronPostProfileData = environment.ws + 'postProfileData';
@@ -19,16 +18,10 @@ export class InternalService {
   private apicuronListUser = environment.ws + 'listUser';
   private apicuronRegNewUser = environment.ws + 'registerUser';
   private apicuronDeteteUser = environment.ws + 'deleteUser/';
+  private disprotFeedback = environment.ws + 'feedback';
 
   constructor (private http: HttpClient) {
-
   }
-  //
-  // GetSearch(params): Observable<any> {
-  //   return this.http.get(
-  //     this.apicuronSearch,
-  //     {responseType: 'json', params: params});
-  // }
 
   GetProfile(id): Observable<any> {
     return this.http.get(
@@ -42,6 +35,11 @@ export class InternalService {
       {responseType: 'json', params: params});
     // .pipe(catchError(err => of(console.error(err))));
   }
+   SendFeedback(mailObj): Observable<any> {
+    return this.http.post(
+      this.disprotFeedback,
+      mailObj).pipe();
+  }
 
   PostProfileData(profileObj): Observable<any> {
     return this.http.post(this.apicuronPostProfileData, profileObj);
@@ -51,6 +49,11 @@ export class InternalService {
     return this.http.post(this.apicuronPostProfilePicture + id, profilePicture);
   }
 
+  GetORCIDprofile(id): Observable<any> {
+    return this.http.get(
+      this.getORCIDprofile + id, {responseType: 'json', headers: {Accept: 'application/json'}});
+    // .pipe(catchError(err => of(console.error(err))));
+  }
   GetProfilePicture(id): Observable<any> {
     return this.http.get(
       this.apicuronGetProfilePicture + id);
@@ -87,5 +90,4 @@ export class InternalService {
       this.apicuronRegNewUser,
       newUserObj).pipe();
   }
-
 }

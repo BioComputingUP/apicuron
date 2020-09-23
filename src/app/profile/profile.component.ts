@@ -23,11 +23,16 @@ export class ProfileComponent implements OnInit {
   editMode = new BehaviorSubject<boolean>(false);
   loading_finished = false;
   env;
-
+  public today: Date = new Date();
   resourcesList = new Set();
   entriesList = [];
   proteinList = [];
   pmidList = [];
+  orcidData = {};
+  selectedResource = new BehaviorSubject<string>('');
+  listResourcesSmall = new BehaviorSubject<object[]>([]);
+  selectedResourceData = new BehaviorSubject<object>({});
+
 
   constructor(public authService: AuthService,
               private internalService: InternalService) {
@@ -45,14 +50,23 @@ export class ProfileComponent implements OnInit {
 
     this.localAuth.subscribe(authData => {
       // if (!authData.hasOwnProperty('initial')) {
-      console.log('authData', authData);
-      console.log(orcid_id);
+      // console.log('authData', authData);
+      console.log('orcid_id', orcid_id);
       this.internalService.GetSearch({
         curator_orcid: orcid_id
       }).subscribe((browseData) => {
         this.profileData.next(browseData.data[0]);
       }, (err) => {
       }, () => {
+
+          this.internalService.GetORCIDprofile(orcid_id).subscribe(currORCIDdata => {
+            this.orcidData = currORCIDdata;
+
+          });
+
+
+
+
         if (this.profileData.value.hasOwnProperty('generation_reports')) {
           this.profileData.value['generation_reports'].forEach(currReport => {
             if (currReport.resource_uri) {
@@ -177,6 +191,23 @@ export class ProfileComponent implements OnInit {
         acc: Array.from(accSet)
       };
     });
+  }
+
+  isCurrentPosition(date) {
+    if (date) {
+      if (date['year'] && date['month'] && date['day']) {
+        if ( Date.UTC(date['year']['value'], date['month']['value'], date['day']['value']) >=  Date.now()) {
+          return true;
+        }
+      } else if (date['year'] && date['month']) {
+        if ( Date.UTC(date['year']['value'], date['month']['value']) >=  Date.now()) {
+          return true;
+        }
+      }
+      return false;
+    } else {
+      return true;
+    }
   }
 
 

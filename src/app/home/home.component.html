@@ -1,19 +1,95 @@
 <div class="container-fluid container-wide">
   <div class="col jumbotron p-5">
     <div class="row align-items-center">
-      <div class="col-3 d-none d-md-block m-0">
-        <img class="m-0 img-fluid logoimg" src="assets/logo_APICURON.png">
-      </div>
-      <div class="col-9 m-0">
+      <!--      <div class="col-3 d-none d-md-block m-0">-->
+      <!--        <img class="m-0 img-fluid logoimg" src="assets/logo_APICURON.png">-->
+      <!--      </div>-->
+      <div class="col ">
         <h1 class="page-header mb-1">
-          Welcome to <strong class="fg-primary">APICURON</strong>
+          Welcome to <strong>APICURON</strong>
         </h1>
         <hr class="m-0 mt-1">
-        <p class="mt-2">
-         APICURON offers a solution to the biomedical databases - especially if a database uses
-          a community curation model - to encourage biocurators' work and to present their achievements to the society.
+        <p class="mt-2 text-justify">
+          APICURON provides biological databases with a real-time automatic tracking system of the
+          activities of their biocurators, allowing them to properly credit their work. APICURON adopts the key concept
+          of gamification, using a badge system and scores to acknowledge the effort of biocurators and to reward and encourage
+          their engagement. In order to provide flexible and personalized badges, each partner database can define their
+          own list of badges and rules to assign them.
         </p>
       </div>
     </div>
+    <div class="row pt-3">
+      <div class="col-lg-8 offset-lg-2 ">
+        <div class="form-group m-0">
+          <div class="input-group">
+            <input id="searchform" class="form-control pb-0" placeholder="Search in APICURON ..."
+                   type="text">
+<!--                   [formControl]="searchFormControl" type="text">-->
+            <div class="input-group-append">
+              <a class="btn btn-outline-primary" [routerLink]="['/browse']"
+                 >Search</a>
+<!--                 [queryParams]="{free_text:searchFormControl.value}">Search</a>-->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row pt-3">
+      <div class="col-lg-4">
+        <div class="card" style="border: none">
+          <div class="card-header"><span class="card-title">Info</span></div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-12  text-md-left">
+                How to cite
+              </div>
+              <div class="col-12   mb-3 small">
+                <br>
+                </div>
+              <div class="col-12  text-md-left">
+                API
+              </div>
+              <div class="col-12   mb-3 small">
+                REST API documentation <a routerLink="/help" fragment="api">here</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      <div class="col-lg-4">
+        <div class="card" style="border: none">
+          <div class="card-header"><span class="card-title">Partner databases</span></div>
+          <div class="card-body">
+            <div class="row justify-content-center">
+              <div class="col-md-4 col-sm-2 col-4">
+                <div class="card" style="border: none">
+                  <img class="card-img" src="/assets/DisProt_prot_vect_brownonly.svg">
+                </div>
+
+              </div>
+              <div class="col-md-4 col-sm-2 col-4">
+
+                <div class="card" style="border: none">
+                  <img class="card-img" src="/assets/PED_logo.svg">
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-2 col-4">
+                <div class="card" style="border: none">
+                  <span> <strong>RepeatsDB </strong><img class="card-img card-img-rp" src="/assets/repeatsdb.png"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card" style="border: none">
+        <div class="card-header"><span class="card-title">Leaderboard</span></div>
+        <div class="card-body"></div>
+      </div></div>
+
+    </div>
+
   </div>
 </div>

@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  ws: 'https://' + window.location.hostname + '/api/'
+  ws: window.location.protocol + '//' + window.location.hostname + '/api/'
 };

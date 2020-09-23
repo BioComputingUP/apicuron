@@ -1,14 +1,14 @@
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 $theme-colors: (
-  primary: #148230,
-  secondary: #058e75,
+  primary: #4D194D,
+  secondary: #4D194D,
   secondary-light: #06a084,
   //tertiary: #4a89aa,
   //quaternary: #586473,
   //quinary: #e7dacb,
   text: #041809,
-  footer: #090C0A,
+  footer: black,
   success: $green,
   info: $cyan,
   warning: $yellow,
@@ -17,6 +17,21 @@ $theme-colors: (
   dark: #041809,
 );
 
+a {
+  color: #0F4C5C;
+  @media (prefers-color-scheme: dark) {
+    color: #156e84;
+  }
+  text-decoration: none;
+}
+
+a:hover{
+  color: #0F4C5C;
+  @media (prefers-color-scheme: dark) {
+    color: #156e84;
+  }
+  text-decoration: none;
+}
 
 html {
   height: 100%;
@@ -26,8 +41,13 @@ html {
 
 body {
   height: 100%;
-  background: theme-color("light");
+  background: white;
   color: theme-color("text");
+  @media (prefers-color-scheme: dark) {
+    background: #181A1B;
+    color: white;
+  }
+
 }
 
 .btn-link {
@@ -406,6 +426,15 @@ body {
 
 
 
+.sidebar {
+  float: left;
+  width: 100%;
+}
+
+.sticky {
+  position: sticky;
+  top: 60px;
+}
 
 
 .btn-primary {
@@ -440,4 +469,18 @@ body {
 .btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus,
 .show > .btn-primary.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.0rem rgba(23, 162, 184, 0.5);
+}
+
+
+.card {
+  border: 1px solid transparent;
+  background-color: transparent;
+  margin-top: 5px;
+  margin-bottom: 5px;
+
+}
+
+
+.card-header {
+  background-color: transparent;
 }

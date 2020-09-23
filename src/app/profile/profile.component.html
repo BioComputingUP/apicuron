@@ -1,6 +1,6 @@
-<div class="container-fluid container-wide" style="min-height: 60vh">
+<div class="container-fluid container-wide py-3" style="min-height: 60vh">
 
-  <div *ngIf="loading_finished">
+  <div *ngIf="loading_finished && orcidData['activities-summary']">
 <!--    <div style="height: 38vh"></div>-->
 <!--    <div class="row text-center">-->
 <!--      <progressbar class=" progress-striped active text-center " [value]="100" type="info" style="height: 25px">-->
@@ -13,66 +13,126 @@
 <!--    <app-edit-profile [profile_obj]="profileData" *ngIf="profileData"></app-edit-profile>-->
 <!--  </div>-->
   <div *ngIf="!editMode.value">
-    <div class="row pt-2 pb-3 align-items-center">
-      <div class="col-lg-2 col-md-4 col-sm-4 d-none d-sm-block">
+    <div class="row  align-items-start">
+      <div class="col-xl-auto pb-1">
+        <div class="row">
+          <div class="col-auto"><img class="logoimg" src="assets/user.png"></div>
+          <div class="col-auto">
+            <h3><strong> {{orcidData['person']['name']['given-names']['value']}} {{orcidData['person']['name']['family-name']['value']}} </strong></h3>
+            <p class="my-1" *ngFor="let currPosition of orcidData['activities-summary']['employments']['affiliation-group']">
+          <span *ngIf="isCurrentPosition(currPosition['summaries'][0]['employment-summary']['end-date'])">
+          <strong>{{currPosition['summaries'][0]['employment-summary']['role-title']}}</strong> at
+          <a href="{{currPosition['summaries'][0]['employment-summary']['url']['value']}}"
+             target="_blank">
+            {{currPosition['summaries'][0]['employment-summary']['organization']['name']}}
+          </a>
+          </span>
+
+            </p>
+            <strong>ORCID: </strong>{{profileData.value['orcid']}}<br>
+
+          </div>
+        </div>
 <!--        <div *ngIf="profileData['profile_picture']">-->
 <!--          <img-->
 <!--            src="{{env.ws}}getProfilePicture/{{profileData['profile_picture']}}"-->
 <!--            class="logoimg img-border">-->
 <!--        </div>-->
 <!--        <div *ngIf="!profileData['profile_picture']">-->
-          <img class="logoimg" src="assets/user.png">
+
 <!--        </div>-->
-      </div>
-      <div class="col">
+
 <!--        {{profileData.value | json}}-->
-        <h3><strong> {{profileData.value['name']}} </strong></h3>
 <!--        <strong>Organisation: </strong>{{profileData.value['institution']}}<br>-->
 <!--        <strong>Position: </strong>{{profileData.value['position']}}<br>-->
 <!--        <strong>Personal page: </strong>{{profileData.value['personal_homepage']}}<br>-->
-        <strong>ORCID: </strong>{{profileData.value['orcid']}}<br>
-        <strong>Number of entity generation: </strong>{{profileData.value['generation_count']}}<br>
-        <strong>Number of entity revision: </strong>{{profileData.value['revision_count']}}<br>
-        <strong>Number of entity invalidation: </strong>{{profileData.value['invalidation_count']}}<br>
-        <strong>Contributed resources: </strong>
-        <span class="badge badge-pill badge-success pl-1 text-center" *ngFor="let resource of resourcesList">
-            {{resource}}
-        </span><br>
-        <strong>Badges: </strong><span class="badge badge-pill badge-warning pl-1 text-center mr-1" *ngFor="let resource of profileData.value['badge']">
-            {{resource}}
-        </span>
+
+
+<!--        Date(currPosition['summaries'][0]['employment-summary']['end-date']['year']['value],currPosition['summaries'][0]['employment-summary']['end-date']['month']['value],currPosition['summaries'][0]['employment-summary']['end-date']['day']['value])-->
+
+
+
+
+<!--        <strong>Role: </strong> {{orcidData['activities-summary']['employments']['affiliation-group'][0]['summaries'][0]['employment-summary']['role-title']}}<br>-->
+
+
+
       </div>
+      <div class="col text-justify">
+        <p><strong>Biography </strong>{{orcidData['person']['biography']['content']}}</p>
+
+        <p *ngIf="orcidData['person']['keywords']">
+          <strong>Expertise </strong><span class="mx-1" *ngFor="let currKey of orcidData['person']['keywords']['keyword']">#{{currKey['content']}}</span>
+        </p>
+      </div>
+<!--      <div class="col">-->
+<!--        <strong>Number of entity generation: </strong>{{profileData.value['generation_count']}}<br>-->
+<!--        <strong>Number of entity revision: </strong>{{profileData.value['revision_count']}}<br>-->
+<!--        <strong>Number of entity invalidation: </strong>{{profileData.value['invalidation_count']}}<br>-->
+<!--        <strong>Contributed resources: </strong>-->
+<!--        <span class="badge badge-pill badge-success pl-1 text-center" *ngFor="let resource of resourcesList">-->
+<!--            {{resource}}-->
+<!--        </span>-->
+<!--&lt;!&ndash;        <br>&ndash;&gt;-->
+<!--&lt;!&ndash;        <strong>Badges: </strong><span class="badge badge-pill badge-warning pl-1 text-center mr-1" *ngFor="let resource of profileData.value['badge']">&ndash;&gt;-->
+<!--&lt;!&ndash;            {{resource}}&ndash;&gt;-->
+<!--&lt;!&ndash;        </span>&ndash;&gt;-->
+<!--      </div>-->
 <!--      <div class="col-lg-6 text-justify">-->
 <!--        {{profileData.value['description']}}-->
 <!--      </div>-->
     </div>
-    <accordion>
-      <accordion-group [isOpen]="false" *ngFor="let database of resourcesList">
-        <button class="btn btn-link btn-block clearfix" accordion-heading>
-          <div class="pull-left float-left">Contribution in <strong>{{database}}</strong></div>
-<!--          <span-->
-<!--            class="float-right pull-right pl-2 pr-2"><strong>Number of terms: </strong>{{numberOfTerms(database)}}</span>-->
-        </button>
-        <app-details-table [dataArray]="reportFilter(database)"></app-details-table>
-      </accordion-group>
-<!--      <accordion-group [isOpen]="false">-->
+    <div class="row" *ngIf="selectedResource.value">
+      <div class="col">
+        <div class="card card-body" style="border-color: #4D194D">
+          <app-details-table [profileData]="profileData" [database]="selectedResource.value" [dataArray]="reportFilter(selectedResource.value)"></app-details-table>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div  [class.col-xl-4]="selectedResource.value !==database" [class.d-none]="selectedResource.value === database"  (click)="selectedResource.next(database)" *ngFor="let database of resourcesList" >
+
+<!--            <div class="card-header">{{database}}</div>-->
+            <div class="card card-body" style="border-color: #4D194D">
+                       <p><strong>Resource: </strong> {{database}}</p><br>
+                      <p><strong>Number of entity generation: </strong>{{profileData.value['generation_count']}}</p>
+                      <p><strong>Number of entity revision: </strong>{{profileData.value['revision_count']}}</p>
+                      <p><strong>Number of entity invalidation: </strong>{{profileData.value['invalidation_count']}}</p>
+          </div>
+      </div>
+    </div>
+
+
+
+<!--    <accordion>-->
+<!--      <accordion-group [isOpen]="false" *ngFor="let database of resourcesList">-->
 <!--        <button class="btn btn-link btn-block clearfix" accordion-heading>-->
-<!--          <div class="pull-left float-left">Contributed proteins</div>-->
-<!--          <span-->
-<!--            class="float-right pull-right pl-2 pr-2"><strong>Number of proteins: </strong>{{proteinList.length}}</span>-->
-<!--          &lt;!&ndash;<span class="float-right pull-right pl-2 pr-2"><strong>Number of terms: </strong>{{profileData.list_disprot_terms.length}}</span>&ndash;&gt;-->
+<!--          <div class="pull-left float-left">Contribution in <strong>{{database}}</strong></div>-->
+<!--&lt;!&ndash;          <span&ndash;&gt;-->
+<!--&lt;!&ndash;            class="float-right pull-right pl-2 pr-2"><strong>Number of terms: </strong>{{numberOfTerms(database)}}</span>&ndash;&gt;-->
 <!--        </button>-->
-<!--        <app-proteins-detail-table [dataArray]="proteinsFilter()"></app-proteins-detail-table>-->
+<!--        <app-details-table [dataArray]="reportFilter(database)"></app-details-table>-->
 <!--      </accordion-group>-->
-<!--      <accordion-group [isOpen]="false">-->
-<!--        <button class="btn btn-link btn-block clearfix" accordion-heading>-->
-<!--          <div class="pull-left float-left">Annotated articles</div>-->
-<!--          <span class="float-right pull-right pl-2 pr-2"><strong>Number of articles: </strong>{{pmidList.length}}</span>-->
-<!--          &lt;!&ndash;<span class="float-right pull-right pl-2 pr-2"><strong>Number of terms: </strong>{{profileData.list_disprot_terms.length}}</span>&ndash;&gt;-->
-<!--        </button>-->
-<!--        <app-pubmed-detail-table [dataArray]="pubmedFilter()"></app-pubmed-detail-table>-->
-<!--      </accordion-group>-->
-    </accordion>
+<!--&lt;!&ndash;      <accordion-group [isOpen]="false">&ndash;&gt;-->
+<!--&lt;!&ndash;        <button class="btn btn-link btn-block clearfix" accordion-heading>&ndash;&gt;-->
+<!--&lt;!&ndash;          <div class="pull-left float-left">Contributed proteins</div>&ndash;&gt;-->
+<!--&lt;!&ndash;          <span&ndash;&gt;-->
+<!--&lt;!&ndash;            class="float-right pull-right pl-2 pr-2"><strong>Number of proteins: </strong>{{proteinList.length}}</span>&ndash;&gt;-->
+<!--&lt;!&ndash;          &lt;!&ndash;<span class="float-right pull-right pl-2 pr-2"><strong>Number of terms: </strong>{{profileData.list_disprot_terms.length}}</span>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;        </button>&ndash;&gt;-->
+<!--&lt;!&ndash;        <app-proteins-detail-table [dataArray]="proteinsFilter()"></app-proteins-detail-table>&ndash;&gt;-->
+<!--&lt;!&ndash;      </accordion-group>&ndash;&gt;-->
+<!--&lt;!&ndash;      <accordion-group [isOpen]="false">&ndash;&gt;-->
+<!--&lt;!&ndash;        <button class="btn btn-link btn-block clearfix" accordion-heading>&ndash;&gt;-->
+<!--&lt;!&ndash;          <div class="pull-left float-left">Annotated articles</div>&ndash;&gt;-->
+<!--&lt;!&ndash;          <span class="float-right pull-right pl-2 pr-2"><strong>Number of articles: </strong>{{pmidList.length}}</span>&ndash;&gt;-->
+<!--&lt;!&ndash;          &lt;!&ndash;<span class="float-right pull-right pl-2 pr-2"><strong>Number of terms: </strong>{{profileData.list_disprot_terms.length}}</span>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;        </button>&ndash;&gt;-->
+<!--&lt;!&ndash;        <app-pubmed-detail-table [dataArray]="pubmedFilter()"></app-pubmed-detail-table>&ndash;&gt;-->
+<!--&lt;!&ndash;      </accordion-group>&ndash;&gt;-->
+<!--    </accordion>-->
 
   </div>
 
