@@ -230,6 +230,8 @@
       <table cdk-table [dataSource]="dataOnPage" class="table table-sm table-responsive-sm">
         <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value"></tr>
         <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
+        <tr cdk-row *cdkRowDef="let row; columns: ['expandedDetail']"
+            [@detailExpand]="row.element == expandedElement ? 'expanded' : 'collapsed'"></tr>
 
         <ng-container cdkColumnDef="orcid">
           <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('orcid')">
@@ -366,6 +368,12 @@
             <!--               >-->
             <span [innerHTML]="calc_html_badges(row['badge'])"></span>
             <!--            </a>-->
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="expandedDetail">
+          <td cdk-cell *cdkCellDef="let detail">
+            The symbol for
           </td>
         </ng-container>
 

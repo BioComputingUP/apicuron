@@ -19,7 +19,7 @@ export class EditProfileComponent implements OnInit {
   imgURL: any;
 
   @Input()profile_obj;
-  @ViewChild('file') file;
+  @ViewChild('file', { static: true }) file;
 
   constructor(private fb: FormBuilder,
               private router: Router,

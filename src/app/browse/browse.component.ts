@@ -3,6 +3,7 @@ import {concat, BehaviorSubject, combineLatest, of} from 'rxjs';
 import {InternalService} from '../services/internal.service';
 import {AuthService} from '../services/auth.service';
 import {FormControl, FormGroup, FormBuilder, FormArray} from '@angular/forms';
+// import {MatTableModule} from '@angular/material/table';
 
 @Component({
   selector: 'app-browse',
@@ -16,6 +17,8 @@ export class BrowseComponent implements OnInit {
   searchForm: FormArray;
   loading_finished = false;
   radioModel = '20';
+  isExpansionDetailRow = true;
+  expandedElement: any;
 
   localAuth = new BehaviorSubject<object>({});
   // listColumns = [
@@ -160,7 +163,7 @@ export class BrowseComponent implements OnInit {
         map_terms[curr_activity.activity_term].add(curr_activity.entity_uri);
       });
       const out_put = [];
-      Array.from(set_terms_name).sort().forEach(currTerm => {
+      Array.from(set_terms_name).sort().forEach( (currTerm: string) => {
         if (map_terms.hasOwnProperty(currTerm)) {
           // console.log('map_terms[currTerm]', map_terms[currTerm]);
           // console.log('map_terms[currTerm].length', map_terms[currTerm].length);
