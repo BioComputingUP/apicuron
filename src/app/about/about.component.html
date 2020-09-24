@@ -7,16 +7,16 @@
             <div class="card">
               <div class="card-header"><h5>Navigate</h5></div>
               <div class="card-body">
-                <h6 [ngx-scroll-to]="top"><p>About</p></h6>
+                <h6   (click)="scroll(top)"><p>About</p></h6>
                 <ul>
-                  <li><a [ngx-scroll-to]="intro">Introduction to the APICURON</a></li>
+                  <li><a (click)="scroll(intro)">Introduction to the APICURON</a></li>
                   <ul>
-                    <li><a [ngx-scroll-to]="activities">Biocuration activities</a></li>
+                    <li><a (click)="scroll(activities)">Biocuration activities</a></li>
 
-                  <li><a [ngx-scroll-to]="gamification">Badges and scores</a></li>
+                  <li><a (click)="scroll(gamification)" >Badges and scores</a></li>
                   </ul>
-                  <li><a [ngx-scroll-to]="license">License</a></li>
-                  <li><a [ngx-scroll-to]="privacy">Privacy notice</a></li>
+                  <li><a (click)="scroll(license)"  >License</a></li>
+                  <li><a (click)="scroll(privacy)"   >Privacy notice</a></li>
                 </ul>
 
               </div>
@@ -26,7 +26,7 @@
       </div>
     </div>
     <div class="col-lg-9">
-      <h1 #top>About APICURON</h1>
+      <h1 id='top' #top>About APICURON</h1>
       <div class="row">
         <div class="col">
           <h2 class="pt-3 pb-2" #intro>Introduction</h2>

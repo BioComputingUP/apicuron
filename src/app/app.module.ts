@@ -16,7 +16,6 @@ import {ModalModule} from 'ngx-bootstrap/modal';
 import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {AccordionModule} from 'ngx-bootstrap/accordion';
 import {AlertModule} from 'ngx-bootstrap/alert';
-import {ScrollToModule} from '@nicky-lenaers/ngx-scroll-to';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
@@ -43,6 +42,9 @@ import {EditProfileComponent} from './edit-profile/edit-profile.component';
 import {DashboardUserformComponent} from './dashboard-userform/dashboard-userform.component';
 import {DocumentationComponent} from './documentation/documentation.component';
 
+
+import {MatTableModule} from '@angular/material/table';
+import { BrowseTestComponent } from './browse-test/browse-test.component';
 
 const appRoutes: Routes = [
   {path: 'browse', component: BrowseComponent},
@@ -84,7 +86,8 @@ const appRoutes: Routes = [
     PubmedDetailTableComponent,
     EditProfileComponent,
     DashboardUserformComponent,
-    DocumentationComponent
+    DocumentationComponent,
+    BrowseTestComponent
   ],
   imports: [
     RouterModule.forRoot(
@@ -94,9 +97,8 @@ const appRoutes: Routes = [
     BrowserModule,
     BrowserAnimationsModule,
     BsDatepickerModule.forRoot(),
-    ScrollToModule.forRoot(),
     CollapseModule.forRoot(),
-
+    MatTableModule,
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule,

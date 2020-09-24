@@ -19,7 +19,7 @@ export class BrowseComponent implements OnInit {
   radioModel = '20';
   isExpansionDetailRow = true;
   expandedElement: any;
-
+  selectedRow ="";
   localAuth = new BehaviorSubject<object>({});
   // listColumns = [
   //   {id: 'orcid', name: 'ORCID'},
@@ -32,7 +32,7 @@ export class BrowseComponent implements OnInit {
   //   {id: 'invalidation_reports', name: 'invalidation_reports'},
   //   {id: 'invalidation_count', name: 'invalidation_count'}
   // ];
-  displayedColumns = new BehaviorSubject<object>(['orcid', 'name', 'generation_count', 'revision_count', 'invalidation_count', 'badge']);
+  displayedColumns = new BehaviorSubject<object>(['expand', 'orcid', 'name', 'generation_count', 'revision_count', 'invalidation_count', 'badge']);
   currentPage = new BehaviorSubject<object>({
     'page': 1
   });

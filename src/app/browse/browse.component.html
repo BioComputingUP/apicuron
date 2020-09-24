@@ -227,24 +227,38 @@
   <!-- Result table -->
   <div class="row" *ngIf="loading_finished && dataOnPage.value.length > 0">
     <div class="col">
-      <table cdk-table [dataSource]="dataOnPage" class="table table-sm table-responsive-sm">
-        <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value"></tr>
-        <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
-        <tr cdk-row *cdkRowDef="let row; columns: ['expandedDetail']"
-            [@detailExpand]="row.element == expandedElement ? 'expanded' : 'collapsed'"></tr>
+      <table cdk-table multiTemplateDataRows [dataSource]="dataOnPage" class="table table-sm table-responsive-sm">
 
+<!--        <tr cdk-row *cdkRowDef="let row; columns: ['expandedDetail']"-->
+<!--            [@detailExpand]="row.element == expandedElement ? 'expanded' : 'collapsed'"></tr>-->
+
+        <ng-container cdkColumnDef="expand">
+          <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('orcid')">
+
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+            <a class="badge badge-apicuron"
+               (click)="selectedRow = selectedRow !==  row['orcid'] ? row['orcid'] : ''"
+            >
+               <i *ngIf="selectedRow !==  row['orcid']" class="material-icons" style="font-size: small">expand_more</i>
+               <i *ngIf="selectedRow ===  row['orcid']"class="material-icons" style="font-size: small">expand_less</i>
+            </a>
+          </td>
+        </ng-container>
         <ng-container cdkColumnDef="orcid">
           <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('orcid')">
             orcid
             <span *ngIf="sortKey.value === 'orcid'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
+<!--            <p>valami</p>-->
+<!--            <p>valami</p>-->
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-            <a class="btn-block"
+            <a class="badge badge-apicuron"
                [routerLink]="['/orcid/' + row.orcid]"
             >
-              {{row.orcid}}
+              {{row.orcid}} <i class="material-icons" style="font-size: small">link</i>
             </a>
           </td>
         </ng-container>
@@ -257,11 +271,9 @@
               </span>
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-            <a class="btn-block"
-               [routerLink]="['/orcid/' + row.orcid]"
-            >
+
               {{row.name}}
-            </a>
+
           </td>
         </ng-container>
 
@@ -287,11 +299,9 @@
               </span>
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-            <a class="btn-block"
-               [routerLink]="['/orcid/' + row.orcid]"
-            >
+
               {{row.generation_count}}
-            </a>
+
           </td>
         </ng-container>
 
@@ -317,11 +327,9 @@
               </span>
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-            <a class="btn-block"
-               [routerLink]="['/orcid/' + row.orcid]"
-            >
+
               {{row.revision_count}}
-            </a>
+
           </td>
         </ng-container>
 
@@ -347,11 +355,9 @@
               </span>
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-            <a class="btn-block"
-               [routerLink]="['/orcid/' + row.orcid]"
-            >
+
               {{row.invalidation_count}}
-            </a>
+
           </td>
         </ng-container>
 
@@ -371,14 +377,20 @@
           </td>
         </ng-container>
 
-        <ng-container cdkColumnDef="expandedDetail">
-          <td cdk-cell *cdkCellDef="let detail">
-            The symbol for
+        <ng-container cdkColumnDef="expandedDetail" >
+          <td cdk-cell *cdkCellDef="let element" [attr.colspan]="displayedColumns.value.length" [class.d-none]="selectedRow !== element['orcid']">
+
+            <p><strong>Name: </strong>{{element['name']}} (ORCID:{{element['orcid']}})
+            <p></p>
+
           </td>
         </ng-container>
-
+        <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value"></tr>
+        <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
+        <tr cdk-row *cdkRowDef="let element; columns: ['expandedDetail']"></tr>
       </table>
     </div>
+
   </div>
 
   <div class="row mb-2">

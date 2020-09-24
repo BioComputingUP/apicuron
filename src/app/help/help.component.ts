@@ -13,5 +13,7 @@ export class HelpComponent implements OnInit {
 
   ngOnInit() {
   }
-
+scroll(el: HTMLElement) {
+    el.scrollIntoView({behavior: 'smooth', block: 'center'});
+  }
 }

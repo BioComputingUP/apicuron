@@ -7,20 +7,20 @@
             <div class="card">
               <div class="card-header"><h5>Navigate</h5></div>
               <div class="card-body">
-                <h6 [ngx-scroll-to]="top"><a >Help page</a></h6>
+                <h6><a (click)="scroll(top)" >Help page</a></h6>
                 <ul>
-                  <li [ngx-scroll-to]="gui"><a >Graphical User Interface (GUI)</a></li>
+                  <li><a (click)="scroll(gui)">Graphical User Interface (GUI)</a></li>
                   <ul>
-                    <li [ngx-scroll-to]="browse"><a>Browse page</a></li>
-                    <li [ngx-scroll-to]="biocurator"><a>Biocurator profile</a></li>
+                    <li  (click)="scroll(browse)"><a>Browse page</a></li>
+                    <li  (click)="scroll(biocurator)"><a>Biocurator profile</a></li>
 
                   </ul>
-                  <li [ngx-scroll-to]="api"><a>Application Programing Interface (API)</a></li>
+                  <li  (click)="scroll(api)"><a>Application Programing Interface (API)</a></li>
                   <ul>
-                    <li [ngx-scroll-to]="search"><a>Perform search</a></li>
-                    <li [ngx-scroll-to]="report"><a>Report
+                    <li  (click)="scroll(search)" ><a>Perform search</a></li>
+                    <li   (click)="scroll(report)" ><a>Report
                       biocuration event</a></li>
-                    <li [ngx-scroll-to]="registration"><a>Update resource description</a></li>
+                    <li   (click)="scroll(registration)"><a>Update resource description</a></li>
                   </ul>
 
                 </ul>
@@ -35,7 +35,7 @@
       <h1 #top>Help</h1>
       <hr>
 
-      This section describes APICURON website use. For information about <strong [ngx-scroll-to]="api">RESTful
+      This section describes APICURON website use. For information about <strong  (click)="scroll(api)">RESTful
       endpoints</strong> and the output format see the API documentation below.
       <h2 class="pt-3 pb-2" id="gui" #gui>Graphical User Interface (GUI)</h2>
 
@@ -197,7 +197,7 @@
               <td>entry_cereated_by_homology</td>
               <td>Mandatory</td>
               <td>Description of the biocuration activity codified by resource specific controlled vocabulary under
-                <a [ngx-scroll-to]="registration" href="javascript:void(0)">
+                <a  (click)="scroll(registration)" href="javascript:void(0)">
                   /resource_registration
                 </a>
                 endpoint .
@@ -241,14 +241,14 @@
 
             <tr>
               <td><strong>scoring_table</strong></td>
-              <td><a [ngx-scroll-to]="scoring_table" href="javascript:void(0)">See blow</a></td>
+              <td><a  (click)="scroll(scoring_table)" href="javascript:void(0)">See blow</a></td>
               <td>Mandatory</td>
               <td>A list of objects representing APICURON scoring table activity terms</td>
             </tr>
 
             <tr>
               <td><strong>badge_table</strong></td>
-              <td><a [ngx-scroll-to]="badges" href="javascript:void(0)">See blow</a></td>
+              <td><a   (click)="scroll(badges)" href="javascript:void(0)">See blow</a></td>
               <td>Optionally</td>
               <td>A list of objects representing APICURON badges description</td>
             </tr>
