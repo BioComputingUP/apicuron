@@ -45,6 +45,7 @@ import {DocumentationComponent} from './documentation/documentation.component';
 
 import {MatTableModule} from '@angular/material/table';
 import { BrowseTestComponent } from './browse-test/browse-test.component';
+import { BrowseRibbonComponent } from './browse-ribbon/browse-ribbon.component';
 
 const appRoutes: Routes = [
   {path: 'browse', component: BrowseComponent},
@@ -87,7 +88,8 @@ const appRoutes: Routes = [
     EditProfileComponent,
     DashboardUserformComponent,
     DocumentationComponent,
-    BrowseTestComponent
+    BrowseTestComponent,
+    BrowseRibbonComponent
   ],
   imports: [
     RouterModule.forRoot(

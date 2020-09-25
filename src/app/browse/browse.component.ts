@@ -4,11 +4,19 @@ import {InternalService} from '../services/internal.service';
 import {AuthService} from '../services/auth.service';
 import {FormControl, FormGroup, FormBuilder, FormArray} from '@angular/forms';
 // import {MatTableModule} from '@angular/material/table';
+import {animate, keyframes, state, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'app-browse',
   templateUrl: './browse.component.html',
-  styleUrls: ['./browse.component.scss']
+  styleUrls: ['./browse.component.scss'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({ height: '0px', maxHeight: '0',  visibility: 'hidden'})),
+      state('expanded', style({ height: '*', visibility: 'visible' })),
+      transition('expanded <=> collapsed', animate('1000ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
 export class BrowseComponent implements OnInit {
   columnsFormNew;
@@ -21,18 +29,7 @@ export class BrowseComponent implements OnInit {
   expandedElement: any;
   selectedRow ="";
   localAuth = new BehaviorSubject<object>({});
-  // listColumns = [
-  //   {id: 'orcid', name: 'ORCID'},
-  //   {id: 'name', name: 'Name'},
-  //   {id: 'badge', name: 'Badge'},
-  //   {id: 'generation_reports', name: 'generation_reports'},
-  //   {id: 'generation_count', name: 'generation_count'},
-  //   {id: 'revision_reports', name: 'revision_reports'},
-  //   {id: 'revision_count', name: 'revision_count'},
-  //   {id: 'invalidation_reports', name: 'invalidation_reports'},
-  //   {id: 'invalidation_count', name: 'invalidation_count'}
-  // ];
-  displayedColumns = new BehaviorSubject<object>(['expand', 'orcid', 'name', 'generation_count', 'revision_count', 'invalidation_count', 'badge']);
+  displayedColumns = new BehaviorSubject<object>(['expand', 'name', 'orcid', 'generation_count', 'revision_count', 'invalidation_count', 'badge']);
   currentPage = new BehaviorSubject<object>({
     'page': 1
   });

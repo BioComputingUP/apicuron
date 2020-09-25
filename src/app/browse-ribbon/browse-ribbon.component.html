@@ -1,0 +1,20 @@
+<div class="container-fluid">
+  <div class="row ">
+    <div class="col-auto">
+      Contribution in <strong>DisProt</strong>:
+
+    </div><div class="col-lg">
+<!--      <strong>Sum of entity generation: </strong> {{userData['generation_count']}} <br>-->
+      <span [innerHTML]="calc_by_terms(userData['generation_reports'])"></span><br>
+<!--      <strong>Sum of entity revision: </strong> {{userData['revision_count']}} <br>-->
+      <span [innerHTML]="calc_by_terms(userData['revision_reports'])"></span><br>
+<!--      <strong>Sum of entity invalidation: </strong> {{userData['invalidation_count']}} <br>-->
+      <span [innerHTML]="calc_by_terms(userData['invalidation_reports'])"></span><br>
+    </div>
+
+    <div class="col-lg">
+      <span class="badge badge-pill badge-gold mr-2" *ngFor="let badge of userData['badge']"> {{badge['name']}}</span>
+    </div>
+  </div>
+</div>
+
