@@ -84,23 +84,61 @@
     </div>
     <div class="row" *ngIf="selectedResource.value">
       <div class="col">
-        <div class="card card-body" style="border-color: #4D194D">
+        <div class="card card-body">
+          <div class="row">
+            <div class="col-auto mr-auto">
+              <p><strong>Resource: </strong>
+                DisProt
+                <!--                {{selectedResource.value}}-->
+              </p>
+            </div>
+            <div class="col-auto">
+              <a class="badge badge-danger mr-2 mb-2" (click)="selectedResource.next('')"> Close <i class="material-icons" style="font-size: small">unfold_less</i></a>
+            </div>
+          </div>
+          <div class="row mb-4">
+            <div class="col-3">
+              <p class="mb-0"><strong>Number of entity generation: </strong>{{profileData.value['generation_count']}}</p>
+              <p class="mb-0"><strong>Number of entity revision: </strong>{{profileData.value['revision_count']}}</p>
+              <p class="mb-0"><strong>Number of entity invalidation: </strong>{{profileData.value['invalidation_count']}}</p>
+            </div>
+            <div class="col-auto mr-auto">
+              <span class="badge badge-pill badge-gold mr-2 mb-2"
+                    *ngFor="let badge of profileData.value['badge']"> {{badge['name']}}</span>
+            </div>
+          </div>
           <app-details-table [profileData]="profileData" [database]="selectedResource.value" [dataArray]="reportFilter(selectedResource.value)"></app-details-table>
-
         </div>
       </div>
     </div>
 
     <div class="row">
-      <div  [class.col-xl-4]="selectedResource.value !==database" [class.d-none]="selectedResource.value === database"  (click)="selectedResource.next(database)" *ngFor="let database of resourcesList" >
-
-<!--            <div class="card-header">{{database}}</div>-->
-            <div class="card card-body" style="border-color: #4D194D">
-                       <p><strong>Resource: </strong> {{database}}</p><br>
-                      <p><strong>Number of entity generation: </strong>{{profileData.value['generation_count']}}</p>
-                      <p><strong>Number of entity revision: </strong>{{profileData.value['revision_count']}}</p>
-                      <p><strong>Number of entity invalidation: </strong>{{profileData.value['invalidation_count']}}</p>
-          </div>
+      <div  [class.col-xl-6]="selectedResource.value !==database"
+            [class.d-none]="selectedResource.value === database"
+            (click)="selectedResource.next(database)"
+            *ngFor="let database of resourcesList" >
+         <div class="card card-body">
+           <div class="row">
+             <div class="col mr-auto"><p><strong>Resource: </strong>
+               DisProt
+               <!--                         {{database}}-->
+             </p></div>
+             <div class="col-auto">
+               <a class="badge badge-success mr-2 mb-2" (click)="selectedResource.next('')"> Extend <i class="material-icons" style="font-size: small">unfold_more</i></a>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col">
+               <p class="mb-0"><strong>Number of entity generation: </strong>{{profileData.value['generation_count']}}</p>
+               <p class="mb-0"><strong>Number of entity revision: </strong>{{profileData.value['revision_count']}}</p>
+               <p class="mb-0"><strong>Number of entity invalidation: </strong>{{profileData.value['invalidation_count']}}</p>
+             </div>
+             <div class="col">
+               <span class="badge badge-pill badge-gold mr-2 mb-2"
+                     *ngFor="let badge of profileData.value['badge']"> {{badge['name']}}</span>
+             </div>
+           </div>
+         </div>
       </div>
     </div>
 

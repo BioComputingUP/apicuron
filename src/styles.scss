@@ -557,20 +557,46 @@ body {
 }
 
 
+.badge-danger:hover {
+  text-decoration: none;
+  color: white;
+  transform: scale(1.1,1.1);
+  transition: 0.1s;
+}
+
+.badge-success:hover {
+  text-decoration: none;
+  color: white;
+  transform: scale(1.1,1.1);
+  transition: 0.1s;
+}
+
+
 
 .badge-bronze {
   background-color: #AC6339 !important;
   color: white !important;
+  font-size: medium;
+
 }
 .badge-silver {
   background-color: #999999 !important;
   color: white !important;
+  font-size: medium;
+
 }
+
 .badge-gold {
   background-color: #BA931C !important;
   color: white !important;
+  font-size: medium;
+  padding: 7px;
+  font-weight: normal;
+  //margin: 10px;
 }
 .badge-ruby {
   background-color: #9A031E !important;
   color: white !important;
+  font-size: medium;
+
 }

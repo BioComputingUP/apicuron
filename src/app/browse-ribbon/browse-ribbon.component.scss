@@ -2,7 +2,10 @@
 
 .container-fluid {
   background-color:  darken(theme-color("primary"), 10);
-  color: white
+  color: white;
+  -webkit-box-shadow: inset 0px 0px 17px 0px rgba(0,0,0,1);
+  -moz-box-shadow: inset 0px 0px 17px 0px rgba(0,0,0,1);
+  box-shadow: inset 0px 0px 17px 0px rgba(0,0,0,1);
 }
 //.logoimg {
 //  //min-height: 2rem;
