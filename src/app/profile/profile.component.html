@@ -59,9 +59,9 @@
 
       </div>
       <div class="col text-justify">
-        <p><strong>Biography </strong>{{orcidData['person']['biography']['content']}}</p>
+        <p *ngIf="orcidData['person'] && orcidData['person']['biography'] && orcidData['person']['biography']['content']"><strong>Biography </strong>{{orcidData['person']['biography']['content']}}</p>
 
-        <p *ngIf="orcidData['person']['keywords']">
+        <p *ngIf="orcidData['person']['keywords'] && orcidData['person']['keywords']['keyword'].length > 0">
           <strong>Expertise </strong><span class="mx-1" *ngFor="let currKey of orcidData['person']['keywords']['keyword']">#{{currKey['content']}}</span>
         </p>
       </div>
@@ -88,8 +88,8 @@
           <div class="row">
             <div class="col-auto mr-auto">
               <p><strong>Resource: </strong>
-                DisProt
-                <!--                {{selectedResource.value}}-->
+<!--                DisProt-->
+                {{map_resources[selectedResource.value]['resource_name']}}
               </p>
             </div>
             <div class="col-auto">
@@ -98,9 +98,9 @@
           </div>
           <div class="row mb-4">
             <div class="col-3">
-              <p class="mb-0"><strong>Number of entity generation: </strong>{{profileData.value['generation_count']}}</p>
-              <p class="mb-0"><strong>Number of entity revision: </strong>{{profileData.value['revision_count']}}</p>
-              <p class="mb-0"><strong>Number of entity invalidation: </strong>{{profileData.value['invalidation_count']}}</p>
+              <p class="mb-0"><strong>Number of entity generation: </strong>{{userDataByResources[selectedResource.value]['generation_reports_length']}}</p>
+              <p class="mb-0"><strong>Number of entity revision: </strong>{{userDataByResources[selectedResource.value]['revision_reports_length']}}</p>
+              <p class="mb-0"><strong>Number of entity invalidation: </strong>{{userDataByResources[selectedResource.value]['invalidation_reports_length']}}</p>
             </div>
             <div class="col-auto mr-auto">
               <span class="badge badge-pill badge-gold mr-2 mb-2"
@@ -113,15 +113,15 @@
     </div>
 
     <div class="row">
-      <div  [class.col-xl-6]="selectedResource.value !==database"
+      <div  [class.col-xl-6]="selectedResource.value !== database"
             [class.d-none]="selectedResource.value === database"
             (click)="selectedResource.next(database)"
             *ngFor="let database of resourcesList" >
          <div class="card card-body">
            <div class="row">
              <div class="col mr-auto"><p><strong>Resource: </strong>
-               DisProt
-               <!--                         {{database}}-->
+<!--               DisProt-->
+                                        {{map_resources[database]['resource_name']}}
              </p></div>
              <div class="col-auto">
                <a class="badge badge-success mr-2 mb-2" (click)="selectedResource.next('')"> Expand <i class="material-icons" style="font-size: small">unfold_more</i></a>
@@ -129,9 +129,9 @@
            </div>
            <div class="row">
              <div class="col">
-               <p class="mb-0"><strong>Number of entity generation: </strong>{{profileData.value['generation_count']}}</p>
-               <p class="mb-0"><strong>Number of entity revision: </strong>{{profileData.value['revision_count']}}</p>
-               <p class="mb-0"><strong>Number of entity invalidation: </strong>{{profileData.value['invalidation_count']}}</p>
+               <p class="mb-0"><strong>Number of entity generation: </strong>{{userDataByResources[database]['generation_reports_length']}}</p>
+               <p class="mb-0"><strong>Number of entity revision: </strong>{{userDataByResources[database]['revision_reports_length']}}</p>
+               <p class="mb-0"><strong>Number of entity invalidation: </strong>{{userDataByResources[database]['invalidation_reports_length']}}</p>
              </div>
              <div class="col">
                <span class="badge badge-pill badge-gold mr-2 mb-2"

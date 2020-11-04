@@ -38,6 +38,7 @@ export class BrowseComponent implements OnInit {
   totalItems: number;
   sortKey = new BehaviorSubject<string>('orcid');
   sortDirection = new BehaviorSubject<string>('asc');
+  map_resources = {};
 
 
   constructor(public authService: AuthService,
@@ -116,8 +117,14 @@ export class BrowseComponent implements OnInit {
         this.internalService.GetSearch(search_params).subscribe((browseData) => {
           this.dataOnPage.next(browseData.data);
           this.totalItems = browseData.size;
+          browseData.list_resources.forEach(currResource => {
+            this.map_resources[currResource.resource_uri] = currResource;
+          });
         }, (err) => {
         }, () => {
+
+
+
           this.loading_new_table = false;
           this.loading_finished = true;
           console.log('finish');
@@ -126,8 +133,10 @@ export class BrowseComponent implements OnInit {
       const rows = this.searchForm as FormArray;
       if (rows.length === 0) {
         rows.push(this.fb.group({
-          area: 'time_from',
-          key: new Date(2019, 9, 1)
+          // area: 'time_from',
+          // key: new Date(2019, 9, 1)
+          area: 'free_etxt',
+          key: null
         }));
       }
       // }

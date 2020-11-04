@@ -1,19 +1,19 @@
 <div class="container-fluid py-2">
-  <div class="row  py-2">
-    <div class="col-auto">
-      Contribution in <strong>DisProt</strong>:
+  <div class="row  py-2" *ngFor="let currResourceUserData of userDataByResources">
+    <div class="col-3">
+      Contribution in <strong>{{currResourceUserData['name']}}</strong>:
 
     </div><div class="col-lg">
 <!--      <strong>Sum of entity generation: </strong> {{userData['generation_count']}} <br>-->
-      <span [innerHTML]="calc_by_terms(userData['generation_reports'])"></span><br>
+      <span [innerHTML]="calc_by_terms(currResourceUserData['generation_reports'])"></span><br>
 <!--      <strong>Sum of entity revision: </strong> {{userData['revision_count']}} <br>-->
-      <span [innerHTML]="calc_by_terms(userData['revision_reports'])"></span><br>
+      <span [innerHTML]="calc_by_terms(currResourceUserData['revision_reports'])"></span><br>
 <!--      <strong>Sum of entity invalidation: </strong> {{userData['invalidation_count']}} <br>-->
-      <span [innerHTML]="calc_by_terms(userData['invalidation_reports'])"></span><br>
+      <span [innerHTML]="calc_by_terms(currResourceUserData['invalidation_reports'])"></span><br>
     </div>
 
     <div class="col-lg">
-      <span class="badge badge-pill badge-gold mr-2 mb-2" *ngFor="let badge of userData['badge']"> {{badge['name']}}</span>
+      <span class="badge badge-pill badge-medal  mr-2 mb-2" [style]="{'background-color':badge['color_code']}" *ngFor="let badge of userData['badge']"> {{badge['name']}}</span>
     </div>
   </div>
 </div>

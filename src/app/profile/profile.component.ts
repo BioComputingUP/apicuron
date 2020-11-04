@@ -29,6 +29,9 @@ export class ProfileComponent implements OnInit {
   proteinList = [];
   pmidList = [];
   orcidData = {};
+  map_resources = {};
+  userDataByResources = {};
+
   selectedResource = new BehaviorSubject<string>('');
   listResourcesSmall = new BehaviorSubject<object[]>([]);
   selectedResourceData = new BehaviorSubject<object>({});
@@ -56,6 +59,10 @@ export class ProfileComponent implements OnInit {
         curator_orcid: orcid_id
       }).subscribe((browseData) => {
         this.profileData.next(browseData.data[0]);
+        browseData.list_resources.forEach(currResource => {
+          this.map_resources[currResource.resource_uri.substr(42)] = currResource;
+        });
+
       }, (err) => {
       }, () => {
 
@@ -63,9 +70,6 @@ export class ProfileComponent implements OnInit {
             this.orcidData = currORCIDdata;
 
           });
-
-
-
 
         if (this.profileData.value.hasOwnProperty('generation_reports')) {
           this.profileData.value['generation_reports'].forEach(currReport => {
@@ -89,6 +93,43 @@ export class ProfileComponent implements OnInit {
             }
           });
         }
+
+        Array.from(this.resourcesList).forEach(currResourceURI => {
+          this.userDataByResources[String(currResourceURI)] = {
+            name: currResourceURI
+          };
+          if (this.profileData.value.hasOwnProperty('generation_reports')) {
+            this.userDataByResources[String(currResourceURI)]['generation_reports'] = this.profileData.value['generation_reports'].filter(x => {
+              return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
+            });
+            this.userDataByResources[String(currResourceURI)]['generation_reports_length'] = this.userDataByResources[String(currResourceURI)]['generation_reports'].length;
+          } else {
+            this.userDataByResources[String(currResourceURI)]['generation_reports_length'] = 0;
+          }
+          if (this.profileData.value.hasOwnProperty('revision_reports')) {
+            this.userDataByResources[String(currResourceURI)]['revision_reports'] = this.profileData.value['revision_reports'].filter(x => {
+              return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
+            });
+            this.userDataByResources[String(currResourceURI)]['revision_reports_length'] = this.userDataByResources[String(currResourceURI)]['revision_reports'].length;
+
+          } else {
+            this.userDataByResources[String(currResourceURI)]['revision_reports_length'] = 0;
+          }
+          if (this.profileData.value.hasOwnProperty('invalidation_reports')) {
+            this.userDataByResources[String(currResourceURI)]['invalidation_reports'] = this.profileData.value['invalidation_reports'].filter(x => {
+              return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
+            });
+            this.userDataByResources[String(currResourceURI)]['invalidation_reports_length'] = this.userDataByResources[String(currResourceURI)]['invalidation_reports'].length;
+
+          } else {
+            this.userDataByResources[String(currResourceURI)]['invalidation_reports_length'] = 0;
+          }
+
+
+
+        });
+
+
         this.loading_finished = true;
         console.log('finish');
       });

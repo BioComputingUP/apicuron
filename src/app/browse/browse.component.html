@@ -391,7 +391,8 @@
                 <div class="container p-0 m-0" [@detailExpand]="element.orcid == selectedRow ? 'expanded' : 'collapsed'"
                      style="overflow: hidden !important; max-width: none !important;">
                   <app-browse-ribbon
-                    [userData]="element" class="p-0 m-0"></app-browse-ribbon>
+                    [userData]="element"
+                    [map_resources]="map_resources" class="p-0 m-0"></app-browse-ribbon>
                 </div>
               </td>
             </ng-container>
