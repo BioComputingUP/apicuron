@@ -46,13 +46,14 @@ import {DocumentationComponent} from './documentation/documentation.component';
 import {MatTableModule} from '@angular/material/table';
 import { BrowseTestComponent } from './browse-test/browse-test.component';
 import { BrowseRibbonComponent } from './browse-ribbon/browse-ribbon.component';
+import { DatabasesComponent } from './databases/databases.component';
 
 const appRoutes: Routes = [
-  {path: 'browse', component: BrowseComponent},
+  {path: 'curators', component: BrowseComponent},
   {path: 'login', component: LoginComponent},
   {path: 'feedback', component: FeedbackComponent},
   { path: 'help', component: HelpComponent},
-  // {path: 'documentation', component: DocumentationComponent},
+  {path: 'databases', component: DatabasesComponent},
   // { path: 'tutorial', component: TutorialComponent},
   // { path: 'api', component: ApiComponent},
   // { path: 'statistics', component: StatisticsComponent},
@@ -89,7 +90,8 @@ const appRoutes: Routes = [
     DashboardUserformComponent,
     DocumentationComponent,
     BrowseTestComponent,
-    BrowseRibbonComponent
+    BrowseRibbonComponent,
+    DatabasesComponent
   ],
   imports: [
     RouterModule.forRoot(

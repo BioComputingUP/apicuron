@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import { HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
 import {Observable, throwError, of} from 'rxjs';
-import { environment } from '../../environments/environment';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -18,9 +18,10 @@ export class InternalService {
   private apicuronListUser = environment.ws + 'listUser';
   private apicuronRegNewUser = environment.ws + 'registerUser';
   private apicuronDeteteUser = environment.ws + 'deleteUser/';
+  private apicuronResources = environment.ws + 'resources';
   private disprotFeedback = environment.ws + 'feedback';
 
-  constructor (private http: HttpClient) {
+  constructor(private http: HttpClient) {
   }
 
   GetProfile(id): Observable<any> {
@@ -29,13 +30,15 @@ export class InternalService {
       {responseType: 'json'});
     // .pipe(catchError(err => of(console.error(err))));
   }
+
   GetSearch(params): Observable<any> {
     return this.http.get(
       this.apicuronSearch,
       {responseType: 'json', params: params});
     // .pipe(catchError(err => of(console.error(err))));
   }
-   SendFeedback(mailObj): Observable<any> {
+
+  SendFeedback(mailObj): Observable<any> {
     return this.http.post(
       this.disprotFeedback,
       mailObj).pipe();
@@ -54,6 +57,7 @@ export class InternalService {
       this.getORCIDprofile + id, {responseType: 'json', headers: {Accept: 'application/json'}});
     // .pipe(catchError(err => of(console.error(err))));
   }
+
   GetProfilePicture(id): Observable<any> {
     return this.http.get(
       this.apicuronGetProfilePicture + id);
@@ -81,6 +85,13 @@ export class InternalService {
   GetUsersList(): Observable<any> {
     return this.http.get(
       this.apicuronListUser,
+      {responseType: 'json'});
+    // .pipe(catchError(err => of(console.error(err))));
+  }
+
+  GetResearces(): Observable<any> {
+    return this.http.get(
+      this.apicuronResources,
       {responseType: 'json'});
     // .pipe(catchError(err => of(console.error(err))));
   }
