@@ -40,6 +40,11 @@ export class BrowseRibbonComponent implements OnInit {
         name: this.map_resources[String(currResourceURI)].resource_name,
       };
 
+
+
+      if (this.userData.hasOwnProperty('badge')) {
+        output['badge'] = this.userData['badge'].filter(x => x.resource_uri === currResourceURI);
+      }
       if (this.userData.hasOwnProperty('generation_reports')) {
         output['generation_reports'] = this.userData['generation_reports'].filter(x => x.resource_uri === currResourceURI);
       }

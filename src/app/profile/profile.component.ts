@@ -98,6 +98,15 @@ export class ProfileComponent implements OnInit {
           this.userDataByResources[String(currResourceURI)] = {
             name: currResourceURI
           };
+          if (this.profileData.value.hasOwnProperty('badge')) {
+            // this.userDataByResources[String(currResourceURI)]['generation_reports_length']
+            this.userDataByResources[String(currResourceURI)]['badge'] = this.profileData.value['badge'].filter(x => {
+              return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
+            });
+          } else {
+            // this.userDataByResources[String(currResourceURI)]['generation_reports_length']
+            this.userDataByResources[String(currResourceURI)]['badge'] = [];
+          }
           if (this.profileData.value.hasOwnProperty('generation_reports')) {
             this.userDataByResources[String(currResourceURI)]['generation_reports'] = this.profileData.value['generation_reports'].filter(x => {
               return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;

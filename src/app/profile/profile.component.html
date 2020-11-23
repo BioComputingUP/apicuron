@@ -103,8 +103,8 @@
               <p class="mb-0"><strong>Number of entity invalidation: </strong>{{userDataByResources[selectedResource.value]['invalidation_reports_length']}}</p>
             </div>
             <div class="col-auto mr-auto">
-              <span class="badge badge-pill badge-gold mr-2 mb-2"
-                    *ngFor="let badge of profileData.value['badge']"> {{badge['name']}}</span>
+              <span class="badge badge-pill badge-medal mr-2 mb-2" [style]="{'background-color':badge['color_code']}"
+                    *ngFor="let badge of userDataByResources[selectedResource.value]['badge']"> {{badge['name']}}</span>
             </div>
           </div>
           <app-details-table [profileData]="profileData" [database]="selectedResource.value" [dataArray]="reportFilter(selectedResource.value)"></app-details-table>
@@ -134,8 +134,10 @@
                <p class="mb-0"><strong>Number of entity invalidation: </strong>{{userDataByResources[database]['invalidation_reports_length']}}</p>
              </div>
              <div class="col">
-               <span class="badge badge-pill badge-gold mr-2 mb-2"
-                     *ngFor="let badge of profileData.value['badge']"> {{badge['name']}}</span>
+<!--               aa-->
+<!--               {{ userDataByResources[selectedResource.value]}}-->
+               <span class="badge badge-pill badge-medal mr-2 mb-2" [style]="{'background-color':badge['color_code']}"
+                     *ngFor="let badge of userDataByResources[database]['badge']"> {{badge['name']}}</span>
              </div>
            </div>
          </div>
