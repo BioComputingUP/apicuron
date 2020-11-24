@@ -47,6 +47,7 @@ import {MatTableModule} from '@angular/material/table';
 import { BrowseTestComponent } from './browse-test/browse-test.component';
 import { BrowseRibbonComponent } from './browse-ribbon/browse-ribbon.component';
 import { DatabasesComponent } from './databases/databases.component';
+import { BadgeMedalComponent } from './badge-medal/badge-medal.component';
 
 const appRoutes: Routes = [
   {path: 'curators', component: BrowseComponent},
@@ -91,7 +92,8 @@ const appRoutes: Routes = [
     DocumentationComponent,
     BrowseTestComponent,
     BrowseRibbonComponent,
-    DatabasesComponent
+    DatabasesComponent,
+    BadgeMedalComponent
   ],
   imports: [
     RouterModule.forRoot(

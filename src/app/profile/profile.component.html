@@ -93,18 +93,20 @@
               </p>
             </div>
             <div class="col-auto">
-              <a class="badge badge-danger mr-2 mb-2" (click)="selectedResource.next('')"> Close <i class="material-icons" style="font-size: small">unfold_less</i></a>
+              <a class="badge badge-danger mr-2 mb-2" (click)="selectedResource.next('')"> Collapse <i class="material-icons" style="font-size: small">unfold_less</i></a>
             </div>
           </div>
           <div class="row mb-4">
-            <div class="col-3">
+            <div class="col-3 mb-2">
               <p class="mb-0"><strong>Number of entity generation: </strong>{{userDataByResources[selectedResource.value]['generation_reports_length']}}</p>
               <p class="mb-0"><strong>Number of entity revision: </strong>{{userDataByResources[selectedResource.value]['revision_reports_length']}}</p>
               <p class="mb-0"><strong>Number of entity invalidation: </strong>{{userDataByResources[selectedResource.value]['invalidation_reports_length']}}</p>
             </div>
             <div class="col-auto mr-auto">
-              <span class="badge badge-pill badge-medal mr-2 mb-2" [style]="{'background-color':badge['color_code']}"
-                    *ngFor="let badge of userDataByResources[selectedResource.value]['badge']"> {{badge['name']}}</span>
+              <app-badge-medal [badge]="badge" [color]="'#000000'" *ngFor="let badge of userDataByResources[selectedResource.value]['badge']"></app-badge-medal>
+
+<!--              <span class="badge badge-pill badge-medal mr-2 mb-2" [style]="{'background-color':badge['color_code']}"-->
+<!--                    *ngFor="let badge of userDataByResources[selectedResource.value]['badge']"> {{badge['name']}}</span>-->
             </div>
           </div>
           <app-details-table [profileData]="profileData" [database]="selectedResource.value" [dataArray]="reportFilter(selectedResource.value)"></app-details-table>
@@ -128,52 +130,26 @@
              </div>
            </div>
            <div class="row">
-             <div class="col">
+             <div class="col  mb-2">
                <p class="mb-0"><strong>Number of entity generation: </strong>{{userDataByResources[database]['generation_reports_length']}}</p>
                <p class="mb-0"><strong>Number of entity revision: </strong>{{userDataByResources[database]['revision_reports_length']}}</p>
                <p class="mb-0"><strong>Number of entity invalidation: </strong>{{userDataByResources[database]['invalidation_reports_length']}}</p>
              </div>
-             <div class="col">
+             <div class="col-auto">
 <!--               aa-->
 <!--               {{ userDataByResources[selectedResource.value]}}-->
-               <span class="badge badge-pill badge-medal mr-2 mb-2" [style]="{'background-color':badge['color_code']}"
-                     *ngFor="let badge of userDataByResources[database]['badge']"> {{badge['name']}}</span>
+
+<!--               <app-badge-medal [badge]="badge"  *ngFor="let badge of currResourceUserData['badge']"></app-badge-medal>-->
+
+               <app-badge-medal [badge]="badge" [color]="'#000000'" *ngFor="let badge of userDataByResources[database]['badge']"></app-badge-medal>
+
+<!--               <span class="badge badge-pill badge-medal mr-2 mb-2" [style]="{'background-color':badge['color_code']}"-->
+<!--                     > {{badge['name']}}</span>-->
              </div>
            </div>
          </div>
       </div>
     </div>
-
-
-
-<!--    <accordion>-->
-<!--      <accordion-group [isOpen]="false" *ngFor="let database of resourcesList">-->
-<!--        <button class="btn btn-link btn-block clearfix" accordion-heading>-->
-<!--          <div class="pull-left float-left">Contribution in <strong>{{database}}</strong></div>-->
-<!--&lt;!&ndash;          <span&ndash;&gt;-->
-<!--&lt;!&ndash;            class="float-right pull-right pl-2 pr-2"><strong>Number of terms: </strong>{{numberOfTerms(database)}}</span>&ndash;&gt;-->
-<!--        </button>-->
-<!--        <app-details-table [dataArray]="reportFilter(database)"></app-details-table>-->
-<!--      </accordion-group>-->
-<!--&lt;!&ndash;      <accordion-group [isOpen]="false">&ndash;&gt;-->
-<!--&lt;!&ndash;        <button class="btn btn-link btn-block clearfix" accordion-heading>&ndash;&gt;-->
-<!--&lt;!&ndash;          <div class="pull-left float-left">Contributed proteins</div>&ndash;&gt;-->
-<!--&lt;!&ndash;          <span&ndash;&gt;-->
-<!--&lt;!&ndash;            class="float-right pull-right pl-2 pr-2"><strong>Number of proteins: </strong>{{proteinList.length}}</span>&ndash;&gt;-->
-<!--&lt;!&ndash;          &lt;!&ndash;<span class="float-right pull-right pl-2 pr-2"><strong>Number of terms: </strong>{{profileData.list_disprot_terms.length}}</span>&ndash;&gt;&ndash;&gt;-->
-<!--&lt;!&ndash;        </button>&ndash;&gt;-->
-<!--&lt;!&ndash;        <app-proteins-detail-table [dataArray]="proteinsFilter()"></app-proteins-detail-table>&ndash;&gt;-->
-<!--&lt;!&ndash;      </accordion-group>&ndash;&gt;-->
-<!--&lt;!&ndash;      <accordion-group [isOpen]="false">&ndash;&gt;-->
-<!--&lt;!&ndash;        <button class="btn btn-link btn-block clearfix" accordion-heading>&ndash;&gt;-->
-<!--&lt;!&ndash;          <div class="pull-left float-left">Annotated articles</div>&ndash;&gt;-->
-<!--&lt;!&ndash;          <span class="float-right pull-right pl-2 pr-2"><strong>Number of articles: </strong>{{pmidList.length}}</span>&ndash;&gt;-->
-<!--&lt;!&ndash;          &lt;!&ndash;<span class="float-right pull-right pl-2 pr-2"><strong>Number of terms: </strong>{{profileData.list_disprot_terms.length}}</span>&ndash;&gt;&ndash;&gt;-->
-<!--&lt;!&ndash;        </button>&ndash;&gt;-->
-<!--&lt;!&ndash;        <app-pubmed-detail-table [dataArray]="pubmedFilter()"></app-pubmed-detail-table>&ndash;&gt;-->
-<!--&lt;!&ndash;      </accordion-group>&ndash;&gt;-->
-<!--    </accordion>-->
-
   </div>
 
 </div>

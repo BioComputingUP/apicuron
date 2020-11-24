@@ -602,8 +602,9 @@ body {
 }
 
 .badge-medal {
-  color: white !important;
+  //color: white !important;
   //font-size: medium;
+   text-justify: inter-word;
   padding: 7px;
   font-weight: normal;
 }
