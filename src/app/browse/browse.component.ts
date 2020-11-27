@@ -114,7 +114,7 @@ export class BrowseComponent implements OnInit {
           }
         });
 
-        this.internalService.GetSearch(search_params).subscribe((browseData) => {
+        this.internalService.GetSearch2(search_params).subscribe((browseData) => {
           this.dataOnPage.next(browseData.data);
           this.totalItems = browseData.size;
           browseData.list_resources.forEach(currResource => {

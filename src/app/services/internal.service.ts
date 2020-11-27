@@ -9,6 +9,7 @@ import {environment} from '../../environments/environment';
 export class InternalService {
   private getORCIDprofile = 'https://pub.orcid.org/v3.0/';
   private apicuronSearch = environment.ws + 'search';
+  private apicuronSearch2 = environment.ws + 'search2';
   private apicuronProfile = environment.ws + 'profile/';
   private apicuronPostProfileData = environment.ws + 'postProfileData';
   private apicuronPostProfilePicture = environment.ws + 'postProfilePicture/';
@@ -34,6 +35,12 @@ export class InternalService {
   GetSearch(params): Observable<any> {
     return this.http.get(
       this.apicuronSearch,
+      {responseType: 'json', params: params});
+    // .pipe(catchError(err => of(console.error(err))));
+  }
+  GetSearch2(params): Observable<any> {
+    return this.http.get(
+      this.apicuronSearch2,
       {responseType: 'json', params: params});
     // .pipe(catchError(err => of(console.error(err))));
   }

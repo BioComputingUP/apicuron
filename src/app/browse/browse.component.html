@@ -42,14 +42,14 @@
                   <br>
                 </div>
 
-                <div class="custom-control custom-checkbox pt-1">
-                  <input type="checkbox"
-                         id="generation_reports"
-                         class="custom-control-input"
-                         formControlName="generation_reports">
-                  <label class="custom-control-label" for="generation_reports">generation_reports</label>
-                  <br>
-                </div>
+<!--                <div class="custom-control custom-checkbox pt-1">-->
+<!--                  <input type="checkbox"-->
+<!--                         id="generation_reports"-->
+<!--                         class="custom-control-input"-->
+<!--                         formControlName="generation_reports">-->
+<!--                  <label class="custom-control-label" for="generation_reports">generation_reports</label>-->
+<!--                  <br>-->
+<!--                </div>-->
 
                 <div class="custom-control custom-checkbox pt-1">
                   <input type="checkbox"
@@ -60,14 +60,14 @@
                   <br>
                 </div>
 
-                <div class="custom-control custom-checkbox pt-1">
-                  <input type="checkbox"
-                         id="revision_reports"
-                         class="custom-control-input"
-                         formControlName="revision_reports">
-                  <label class="custom-control-label" for="revision_reports">revision_reports</label>
-                  <br>
-                </div>
+<!--                <div class="custom-control custom-checkbox pt-1">-->
+<!--                  <input type="checkbox"-->
+<!--                         id="revision_reports"-->
+<!--                         class="custom-control-input"-->
+<!--                         formControlName="revision_reports">-->
+<!--                  <label class="custom-control-label" for="revision_reports">revision_reports</label>-->
+<!--                  <br>-->
+<!--                </div>-->
 
                 <div class="custom-control custom-checkbox pt-1">
                   <input type="checkbox"
@@ -78,14 +78,14 @@
                   <br>
                 </div>
 
-                <div class="custom-control custom-checkbox pt-1">
-                  <input type="checkbox"
-                         id="invalidation_reports"
-                         class="custom-control-input"
-                         formControlName="invalidation_reports">
-                  <label class="custom-control-label" for="invalidation_reports">invalidation_reports</label>
-                  <br>
-                </div>
+<!--                <div class="custom-control custom-checkbox pt-1">-->
+<!--                  <input type="checkbox"-->
+<!--                         id="invalidation_reports"-->
+<!--                         class="custom-control-input"-->
+<!--                         formControlName="invalidation_reports">-->
+<!--                  <label class="custom-control-label" for="invalidation_reports">invalidation_reports</label>-->
+<!--                  <br>-->
+<!--                </div>-->
 
                 <div class="custom-control custom-checkbox pt-1">
                   <input type="checkbox"
@@ -295,21 +295,20 @@
             </ng-container>
 
             <ng-container cdkColumnDef="generation_count">
-              <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('generation_count')">
+              <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('generation_count')" style="text-align: center">
                 Number of entity generation
                 <span *ngIf="sortKey.value === 'generation_count'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
               </th>
-              <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-
+              <td cdk-cell *cdkCellDef="let row" class=" pr-0" style="text-align: center">
                 {{row.generation_count}}
 
               </td>
             </ng-container>
 
             <ng-container cdkColumnDef="revision_reports">
-              <th cdk-header-cell *cdkHeaderCellDef>
+              <th cdk-header-cell *cdkHeaderCellDef style="text-align: center">
                 revision_reports
 
               </th>
@@ -317,7 +316,7 @@
                 <!--            <a class="btn-block"-->
                 <!--               [routerLink]="['/orcid/' + row.orcid]"-->
                 <!--               >-->
-                <span [innerHTML]="calc_by_terms(row['revision_reports'])"></span>
+                <span [innerHTML]="calc_by_terms(row['revision_reports'])" style="text-align: center"></span>
                 <!--            </a>-->
               </td>
             </ng-container>
@@ -377,7 +376,7 @@
                 <!--               >-->
 <!--                <span [innerHTML]="calc_html_badges(row['badge'])"></span>-->
                 <!--            </a>-->
-                <span *ngIf="row['badge']">{{row['badge'].length}}</span>
+                <span *ngIf="row['badges']">{{row['badges'].length}}</span>
               </td>
             </ng-container>
 
