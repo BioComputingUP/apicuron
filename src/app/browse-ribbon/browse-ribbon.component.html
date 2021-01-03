@@ -4,29 +4,38 @@
       Contribution in <strong>{{currResourceUserData['name']}}</strong>:
 
     </div>
-    <div class="col-lg">
+    <div class="col-9">
 <!--      <strong>Sum of entity generation: </strong> {{userData['generation_count']}} <br>-->
-      <div class="row mb-2" *ngIf="currResourceUserData['generation_terms'].length > 0">
-        <div class="col">Generation</div>
-        <div class="col">      <span [innerHTML]="calc_by_terms(currResourceUserData['generation_terms'])"></span>
+      <div class="row">
+        <div class="col-12">
+          <div class="row mb-2" *ngIf="currResourceUserData['generation_terms'].length > 0">
+            <div class="col-3">Generation</div>
+            <div class="col-9">      <span [innerHTML]="calc_by_terms(currResourceUserData['generation_terms'])"></span>
+            </div>
+          </div>
+          <div class="row mb-2" *ngIf="currResourceUserData['revision_terms'].length > 0">
+            <div class="col-3">Revision</div>
+            <div class="col-9">      <span [innerHTML]="calc_by_terms(currResourceUserData['revision_terms'])"></span>
+            </div>
+          </div>
+          <div class="row mb-2" *ngIf="currResourceUserData['invalidation_terms'].length > 0">
+            <div class="col-3">Invalidation</div>
+            <div class="col-9">      <span [innerHTML]="calc_by_terms(currResourceUserData['invalidation_terms'])"></span>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="row mb-2" *ngIf="currResourceUserData['revision_terms'].length > 0">
-        <div class="col">Revision</div>
-        <div class="col">      <span [innerHTML]="calc_by_terms(currResourceUserData['revision_terms'])"></span>
+        <div class="col-12">
+          <app-badge-medal [badge]="badge" [color]="'#ffffff'"  *ngFor="let badge of currResourceUserData['badges']"></app-badge-medal>
+
         </div>
+
       </div>
-      <div class="row mb-2" *ngIf="currResourceUserData['invalidation_terms'].length > 0">
-        <div class="col">Invalidation</div>
-        <div class="col">      <span [innerHTML]="calc_by_terms(currResourceUserData['invalidation_terms'])"></span>
-        </div>
-      </div>
+
+
+
 <!--      <strong>Sum of entity revision: </strong> {{userData['revision_count']}} <br>-->
 <!--      <strong>Sum of entity invalidation: </strong> {{userData['invalidation_count']}} <br>-->
-    </div>
 
-    <div class="col-lg">
-      <app-badge-medal [badge]="badge" [color]="'#ffffff'"  *ngFor="let badge of currResourceUserData['badges']"></app-badge-medal>
 
 <!--      <span class="badge badge-pill badge-medal  mr-2 mb-2" style="background-color: #ffffff20"-->
 <!--            *ngFor="let badge of currResourceUserData['badge']">-->
