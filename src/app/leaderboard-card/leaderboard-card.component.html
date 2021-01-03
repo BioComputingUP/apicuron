@@ -1,0 +1,87 @@
+<div class="card">
+  <div class="card-header">
+    Leaderboard - {{database['resource_name']}}
+  </div>
+  <div class="card-body">
+    <div class="row" *ngIf="loading_finished && curatorsData.length > 0">
+      <div class="col-1" style="background: lightgrey"></div>
+      <div class="col-10">
+        <table cdk-table multiTemplateDataRows [dataSource]="curatorsData" class="table table-sm table-responsive-sm">
+          <ng-container cdkColumnDef="name">
+            <th cdk-header-cell *cdkHeaderCellDef >
+              Name
+
+            </th>
+            <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+              <a class="badge badge-apicuron"
+                 [routerLink]="['/orcid/' + row.orcid]"
+              >
+                {{row.name}} <i class="material-icons" style="font-size: small">link</i>
+              </a>
+
+            </td>
+          </ng-container>
+
+          <ng-container cdkColumnDef="orcid">
+            <th cdk-header-cell *cdkHeaderCellDef >
+              ORCID
+              </th>
+            <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+
+              {{row.orcid}}
+            </td>
+          </ng-container>
+          <ng-container cdkColumnDef="score">
+            <th cdk-header-cell *cdkHeaderCellDef >
+              Total score
+              </th>
+            <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+
+              {{row.score}}
+            </td>
+          </ng-container>
+
+          <ng-container cdkColumnDef="generation_count">
+            <th cdk-header-cell *cdkHeaderCellDef  style="text-align: center">
+              Number of entity generation
+
+            </th>
+            <td cdk-cell *cdkCellDef="let row" class=" pr-0" style="text-align: center">
+              {{row.generation_count}}
+
+            </td>
+          </ng-container>
+
+          <ng-container cdkColumnDef="revision_count">
+            <th cdk-header-cell *cdkHeaderCellDef >
+              Number of entity revision
+
+            </th>
+            <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+
+              {{row.revision_count}}
+
+            </td>
+          </ng-container>
+
+          <ng-container cdkColumnDef="invalidation_count">
+            <th cdk-header-cell *cdkHeaderCellDef>
+              Number of entity invalidation
+
+            </th>
+            <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+
+              {{row.invalidation_count}}
+
+            </td>
+          </ng-container>
+
+          <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value" ></tr>
+          <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value" style="box-shadow: 0px 0px 1px 0px gray"></tr>
+        </table>
+      </div>
+      <div class="col-1" style="background: lightgrey"></div>
+
+    </div>
+  </div>
+</div>

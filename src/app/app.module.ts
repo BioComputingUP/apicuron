@@ -6,6 +6,7 @@ import {ReactiveFormsModule, FormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { CarouselModule } from 'ngx-bootstrap/carousel';
 import {CollapseModule} from 'ngx-bootstrap/collapse';
 import {TabsModule} from 'ngx-bootstrap/tabs';
 import {ProgressbarModule} from 'ngx-bootstrap/progressbar';
@@ -44,10 +45,11 @@ import {DocumentationComponent} from './documentation/documentation.component';
 
 
 import {MatTableModule} from '@angular/material/table';
-import { BrowseTestComponent } from './browse-test/browse-test.component';
+// import { BrowseTestComponent } from './browse-test/browse-test.component';
 import { BrowseRibbonComponent } from './browse-ribbon/browse-ribbon.component';
 import { DatabasesComponent } from './databases/databases.component';
 import { BadgeMedalComponent } from './badge-medal/badge-medal.component';
+import { LeaderboardCardComponent } from './leaderboard-card/leaderboard-card.component';
 
 const appRoutes: Routes = [
   {path: 'curators', component: BrowseComponent},
@@ -90,10 +92,11 @@ const appRoutes: Routes = [
     EditProfileComponent,
     DashboardUserformComponent,
     DocumentationComponent,
-    BrowseTestComponent,
+    // BrowseTestComponent,
     BrowseRibbonComponent,
     DatabasesComponent,
-    BadgeMedalComponent
+    BadgeMedalComponent,
+    LeaderboardCardComponent
   ],
   imports: [
     RouterModule.forRoot(
@@ -112,6 +115,7 @@ const appRoutes: Routes = [
     CdkTableModule,
     TabsModule.forRoot(),
     AlertModule.forRoot(),
+    CarouselModule.forRoot(),
     ProgressbarModule.forRoot(),
     PaginationModule.forRoot(),
     BsDropdownModule.forRoot(),

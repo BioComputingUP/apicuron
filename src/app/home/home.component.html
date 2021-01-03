@@ -36,6 +36,17 @@
     </div>
 
     <div class="row pt-3">
+      <div class="col">
+        <carousel>
+          <slide *ngFor="let currDatabase of listResourcesDescriptions let index=index">
+
+            <app-leaderboard-card [database]="currDatabase"></app-leaderboard-card>
+
+          </slide>
+        </carousel>
+      </div>
+    </div>
+    <div class="row pt-3">
       <div class="col-lg-4">
         <div class="card" style="border: none">
           <div class="card-header"><span class="card-title">Info</span></div>

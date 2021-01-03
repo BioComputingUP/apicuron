@@ -21,6 +21,7 @@ export class InternalService {
   private apicuronDeteteUser = environment.ws + 'deleteUser/';
   private apicuronResources = environment.ws + 'resources';
   private disprotFeedback = environment.ws + 'feedback';
+  private apicuronLeaderboard = environment.ws + 'leaderboard/';
 
   constructor(private http: HttpClient) {
   }
@@ -32,12 +33,21 @@ export class InternalService {
     // .pipe(catchError(err => of(console.error(err))));
   }
 
+  GetLeaderboard(database): Observable<any> {
+    return this.http.get(
+      this.apicuronLeaderboard + database,
+      {responseType: 'json'});
+    // .pipe(catchError(err => of(console.error(err))));
+  }
+
   GetSearch(params): Observable<any> {
     return this.http.get(
       this.apicuronSearch,
       {responseType: 'json', params: params});
     // .pipe(catchError(err => of(console.error(err))));
   }
+
+
   GetSearch2(params): Observable<any> {
     return this.http.get(
       this.apicuronSearch2,

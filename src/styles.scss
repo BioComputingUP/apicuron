@@ -56,17 +56,17 @@ $theme-colors: (
 
 a {
   color: #0F4C5C;
-  @media (prefers-color-scheme: dark) {
-    color: #156e84;
-  }
+  //@media (prefers-color-scheme: dark) {
+  //  color: #156e84;
+  //}
   text-decoration: none;
 }
 
 a:hover{
   color: #0F4C5C;
-  @media (prefers-color-scheme: dark) {
-    color: #156e84;
-  }
+  //@media (prefers-color-scheme: dark) {
+  //  color: #156e84;
+  //}
   text-decoration: none;
 }
 
@@ -80,10 +80,10 @@ body {
   height: 100%;
   background: white;
   color: theme-color("text");
-  @media (prefers-color-scheme: dark) {
-    background: #181A1B;
-    color: white;
-  }
+  //@media (prefers-color-scheme: dark) {
+  //  background: #181A1B;
+  //  color: white;
+  //}
 
 }
 

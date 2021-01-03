@@ -397,9 +397,7 @@
             </ng-container>
             <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value" ></tr>
             <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value" style="box-shadow: 0px 0px 1px 0px gray"></tr>
-            <tr cdk-row *cdkRowDef="let element;columns: ['expandedDetail']"
-
-               ></tr>
+            <tr cdk-row *cdkRowDef="let element;columns: ['expandedDetail']"></tr>
           </table>
         </div>
 
