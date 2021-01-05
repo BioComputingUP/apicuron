@@ -1,38 +1,76 @@
-<div class="container-fluid container-wide pt-3">
-  <div class="row" *ngFor="let currResource of listResourcesDescriptions">
-    <div class="col">
-      <div class="card">
-        <div class="card-body">
-          <div class="row">
-            <div class="col">
-              <h2>{{currResource['resource_name']}}</h2>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <span>{{currResource['resource_description']}}</span>
-            </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col-auto mr-3">
-              <strong>Available medals:</strong>
-            </div>
-            <div class="col">
+<div class="container-fluid container-wide" #top >
+  <div class="row mt-2">
 
-              <app-badge-medal [badge]="badge" [color]="'#000000'"  *ngFor="let badge of currResource['badges']"></app-badge-medal>
+    <div class="col-lg-3 d-none d-lg-block d-xl-block">
+      <div class="sticky sidebar">
+        <div class="row">
+          <div class="col">
+            <div class="card">
+              <div class="card-header"><h5>Navigate</h5></div>
+              <div class="card-body">
+                <h6 [ngxScrollTo]="top" [ngxScrollToOffset]="-150"><a href="javascript:void(0)">Databases</a></h6>
 
-<!--              <span class="badge badge-pill badge-des" *ngFor="let currBadge of currResource['badges']">-->
-<!--                <svg width="1.8em" height="1.8em" viewBox="0 0 16 16" class="bi bi-award-fill" [style]="{fill:currBadge['color_code'], 'font-size': 'large'}"-->
-<!--                     xmlns="http://www.w3.org/2000/svg">-->
-<!--  <path-->
-<!--    d="M8 0l1.669.864 1.858.282.842 1.68 1.337 1.32L13.4 6l.306 1.854-1.337 1.32-.842 1.68-1.858.282L8 12l-1.669-.864-1.858-.282-.842-1.68-1.337-1.32L2.6 6l-.306-1.854 1.337-1.32.842-1.68L6.331.864 8 0z"/>-->
-<!--  <path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1 4 11.794z"/>-->
-<!--</svg>-->
-<!--                {{currBadge['badge_name']}}</span>-->
+                <ul>
+                  <li [ngxScrollTo]="currResource['resource_id']" [ngxScrollToOffset]="-150" *ngFor="let currResource of listResourcesDescriptions"><a href="javascript:void(0)">{{currResource['resource_name']}}</a></li>
+<!--                  <li [ngx-scroll-to]="source"><a href="javascript:void(0)">Annotation Source</a></li>-->
+<!--                  <li [ngx-scroll-to]="ontology"><a href="javascript:void(0)">IDPontology</a></li>-->
+<!--                  <li [ngx-scroll-to]="license"><a href="javascript:void(0)">License</a></li>-->
+<!--                  <li [ngx-scroll-to]="privacy"><a href="javascript:void(0)">Privacy notice</a></li>-->
+                </ul>
+
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <div class="col-lg-9">
+      <div class="row" *ngFor="let currResource of listResourcesDescriptions">
+        <div class="col">
+          <div class="card">
+            <div class="card-body card-database-body">
+              <div class="row" [id]="currResource['resource_id']">
+                <div class="col">
+                  <h2>{{currResource['resource_name']}} - {{currResource['resource_long_name']}}</h2>
+                  <p><a class="badge badge-apicuron" href="{{currResource['resource_url']}}" target="_blank">{{currResource['resource_url']}} <i class="material-icons" style="font-size: small">link</i></a>
+                    <a class="badge badge-apicuron ml-3" routerLink="/curators" [queryParams]="{resource_uri: currResource['resource_id']}">Biocurators <i class="material-icons" style="font-size: small">search</i> </a>
+                  </p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <span>{{currResource['resource_description']}}</span>
+                </div>
+              </div>
+              <div class="row mt-2">
+                <div class="col-auto mr-3">
+                  <strong>Available medals:</strong>
+                </div>
+                <div class="col">
+
+                  <app-badge-medal [badge]="badge" [color]="'#000000'"  *ngFor="let badge of currResource['badges']"></app-badge-medal>
+
+                  <!--              <span class="badge badge-pill badge-des" *ngFor="let currBadge of currResource['badges']">-->
+                  <!--                <svg width="1.8em" height="1.8em" viewBox="0 0 16 16" class="bi bi-award-fill" [style]="{fill:currBadge['color_code'], 'font-size': 'large'}"-->
+                  <!--                     xmlns="http://www.w3.org/2000/svg">-->
+                  <!--  <path-->
+                  <!--    d="M8 0l1.669.864 1.858.282.842 1.68 1.337 1.32L13.4 6l.306 1.854-1.337 1.32-.842 1.68-1.858.282L8 12l-1.669-.864-1.858-.282-.842-1.68-1.337-1.32L2.6 6l-.306-1.854 1.337-1.32.842-1.68L6.331.864 8 0z"/>-->
+                  <!--  <path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1 4 11.794z"/>-->
+                  <!--</svg>-->
+                  <!--                {{currBadge['badge_name']}}</span>-->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
+</div>
+
+
+
+
+<div class="container-fluid container-wide pt-3">
 </div>

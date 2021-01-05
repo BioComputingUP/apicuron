@@ -31,12 +31,12 @@ export class NavbarComponent implements OnInit {
     window.addEventListener("scroll", event => {
       if (this.isCollapsed) {
         if (document.body.scrollTop > 40 || document.documentElement.scrollTop > 40) {
-          document.getElementById("navbar").style['height'] = '60px';
-          // document.getElementById("ped_logo_nav").style['padding'] = '0rem 0rem';
+          document.getElementById("navbar").style['min-height'] = '60px';
+          // document.getElementById("logo_nav").style['margin'] = '0rem 0rem';
 
         } else {
-          document.getElementById("navbar").style['height'] = '100px';
-          // document.getElementById("ped_logo_nav").style['padding'] = '3rem 0rem';
+          document.getElementById("navbar").style['min-height'] = '120px';
+          // document.getElementById("logo_nav").style['margin'] = '3rem 0rem';
         }
       }
     });

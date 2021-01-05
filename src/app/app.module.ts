@@ -17,6 +17,7 @@ import {ModalModule} from 'ngx-bootstrap/modal';
 import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {AccordionModule} from 'ngx-bootstrap/accordion';
 import {AlertModule} from 'ngx-bootstrap/alert';
+import { ScrollToModule } from '@nicky-lenaers/ngx-scroll-to';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
@@ -100,9 +101,14 @@ const appRoutes: Routes = [
   ],
   imports: [
     RouterModule.forRoot(
-      appRoutes,
+      appRoutes, {
+        scrollPositionRestoration: 'enabled',
+        anchorScrolling: 'enabled',
+        scrollOffset: [0, 64]
+      }
       // { enableTracing: true } // <-- debugging purposes only
     ),
+    ScrollToModule.forRoot(),
     BrowserModule,
     BrowserAnimationsModule,
     BsDatepickerModule.forRoot(),

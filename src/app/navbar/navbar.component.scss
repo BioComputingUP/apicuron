@@ -63,16 +63,17 @@
 
 .img-fluid {
   font-size: 25px;
-  max-height: 60px;
+  min-height: 120px;
   transition: 0.4s;
-  margin: 1rem 0rem;
   color: white;
-  text-decoration: none
+  text-decoration: none;
+  margin: 1rem 0rem;
+
 }
 
 
 .navbar {
-  height: 120px;
+  min-height: 120px;
     transition: 0.25s;
 
 }
