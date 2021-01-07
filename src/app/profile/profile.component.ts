@@ -32,6 +32,8 @@ export class ProfileComponent implements OnInit {
   map_resources = {};
   userDataByResources = {};
 
+  employment = [];
+
   selectedResource = new BehaviorSubject<string>('');
   listResourcesSmall = new BehaviorSubject<object[]>([]);
   selectedResourceData = new BehaviorSubject<object>({});
@@ -67,7 +69,12 @@ export class ProfileComponent implements OnInit {
       }, () => {
 
           this.internalService.GetORCIDprofile(orcid_id).subscribe(currORCIDdata => {
+
+
             this.orcidData = currORCIDdata;
+            if (currORCIDdata.hasOwnProperty('activities-summary') && currORCIDdata.hasOwnProperty('employments') && currORCIDdata.hasOwnProperty('affiliation-group') ) {
+              this.employment = currORCIDdata['activities-summary']['employments']['affiliation-group'];
+            }
 
           });
 
