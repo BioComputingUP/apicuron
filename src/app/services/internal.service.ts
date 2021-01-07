@@ -9,7 +9,7 @@ import {environment} from '../../environments/environment';
 export class InternalService {
   private getORCIDprofile = 'https://pub.orcid.org/v3.0/';
   private apicuronSearch = environment.ws + 'search';
-  private apicuronSearch2 = environment.ws + 'search2';
+  private apicuronSearch2 = environment.ws + 'browse';
   private apicuronProfile = environment.ws + 'profile/';
   private apicuronPostProfileData = environment.ws + 'postProfileData';
   private apicuronPostProfilePicture = environment.ws + 'postProfilePicture/';
