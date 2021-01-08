@@ -21,15 +21,16 @@ import {animate, keyframes, state, style, transition, trigger} from '@angular/an
 export class BrowseComponent implements OnInit {
   columnsFormNew;
   collapseColumns = true;
-  loading_new_table = true;
   searchForm: FormArray;
   loading_finished = false;
+  loading_new_table = true;
+
   radioModel = '20';
   isExpansionDetailRow = true;
   expandedElement: any;
-  selectedRow ="";
+  selectedRow = "";
   localAuth = new BehaviorSubject<object>({});
-  displayedColumns = new BehaviorSubject<object>(['expand', 'name', 'orcid', 'generation_count', 'revision_count', 'invalidation_count', 'badge']);
+  displayedColumns = new BehaviorSubject<object>(['name', 'orcid', 'generation_count', 'revision_count', 'invalidation_count', 'medals', 'badges', 'resources']);
   currentPage = new BehaviorSubject<object>({
     'page': 1
   });
@@ -113,10 +114,12 @@ export class BrowseComponent implements OnInit {
             search_params[currItem.area] = currItem.key;
           }
         });
+        this.loading_finished = false;
+        this.loading_new_table = true;
 
         this.internalService.GetSearch2(search_params).subscribe((browseData) => {
-          this.dataOnPage.next(browseData.data);
-          this.totalItems = browseData.size;
+          this.dataOnPage.next(browseData.biocurators);
+          this.totalItems = browseData.count_biocurators;
           browseData.list_resources.forEach(currResource => {
             this.map_resources[currResource.resource_uri] = currResource;
           });
@@ -185,16 +188,24 @@ export class BrowseComponent implements OnInit {
 
   }
 
-  calc_html_badges(row) {
+  calc_html_resources(row) {
+    const set_resources = new Set();
     const out_put = [];
-
-    if (Array.isArray(row)) {
-      row.forEach(currTerm => {
-        out_put.push('<span class="badge  badge-pill badge-warning pl-1 text-center">' + currTerm + '</span>');
+    row.generation_terms.forEach(curr_term => {
+      set_resources.add(curr_term['resource_uri']);
+    });
+    row.revision_terms.forEach(curr_term => {
+      set_resources.add(curr_term['resource_uri']);
+    });
+    row.invalidation_terms.forEach(curr_term => {
+      set_resources.add(curr_term['resource_uri']);
+    });
+    Array.from(set_resources).forEach(currTerm => {
+        out_put.push('<span class="badge  badge-pill badge-apicuron pl-1 text-center small">' + this.map_resources[currTerm.toString()]['resource_name'] + '</span>');
       });
-    }
 
-    return '<small>' + out_put.join('<br>') + '</small>';
+
+    return '' + out_put.join('<br>') + '';
   }
 
   calc_html_categories(row) {

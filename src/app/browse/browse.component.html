@@ -132,7 +132,7 @@
                   </option>
                   <option value="name">Biocurator name</option>
                   <option value="curator_orcid">ORCID</option>
-                  <option value="resource_uri">Resource identifier</option>
+<!--                  <option value="resource_uri">Resource identifier</option>-->
                   <option value="entity_uri">Entity identifier</option>
                   <option value="activity_term">Activity term</option>
                   <option value="activity_category">Activity category</option>
@@ -271,11 +271,12 @@
               </span>
               </th>
               <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-                <a class="badge badge-apicuron"
-                   [routerLink]="['/orcid/' + row.orcid]"
-                >
-                  {{row.name}} <i class="material-icons" style="font-size: small">link</i>
-                </a>
+<!--                <a class="badge badge-apicuron"-->
+<!--                   [routerLink]="['/orcid/' + row.orcid]"-->
+<!--                >-->
+                <strong>{{row.name}}</strong>
+<!--                <i class="material-icons" style="font-size: small">link</i>-->
+<!--                </a>-->
 
               </td>
             </ng-container>
@@ -363,10 +364,48 @@
               </td>
             </ng-container>
 
-            <ng-container cdkColumnDef="badge">
+            <ng-container cdkColumnDef="medals">
+              <th cdk-header-cell *cdkHeaderCellDef  (click)="adjustSort('medals')">
+                Number of medals
+                            <span *ngIf="sortKey.value === 'medals'">
+                                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+                              </span>
+              </th>
+              <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+                <!--            <a class="btn-block"-->
+                <!--               [routerLink]="['/orcid/' + row.orcid]"-->
+                <!--               >-->
+<!--                <span [innerHTML]="calc_html_badges(row['badge'])"></span>-->
+                <!--            </a>-->
+                <span *ngIf="row['count_medals']">{{row['count_medals']}}</span>
+                <span *ngIf="!row['count_medals']">0</span>
+
+              </td>
+            </ng-container>
+
+            <ng-container cdkColumnDef="badges">
+              <th cdk-header-cell *cdkHeaderCellDef  (click)="adjustSort('badges')">
+                Number of medals
+                            <span *ngIf="sortKey.value === 'badges'">
+                                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+                              </span>
+              </th>
+              <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+                <!--            <a class="btn-block"-->
+                <!--               [routerLink]="['/orcid/' + row.orcid]"-->
+                <!--               >-->
+<!--                <span [innerHTML]="calc_html_badges(row['badge'])"></span>-->
+                <!--            </a>-->
+                <span *ngIf="row['count_badges']">{{row['count_badges']}}</span>
+                <span *ngIf="!row['count_badges']">0</span>
+
+              </td>
+            </ng-container>
+
+
+            <ng-container cdkColumnDef="resources">
               <th cdk-header-cell *cdkHeaderCellDef>
-                Number of badges
-                <!--            <span *ngIf="sortKey.value === 'badge'">-->
+Resources                <!--            <span *ngIf="sortKey.value === 'badge'">-->
                 <!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
                 <!--              </span>-->
               </th>
@@ -376,7 +415,7 @@
                 <!--               >-->
 <!--                <span [innerHTML]="calc_html_badges(row['badge'])"></span>-->
                 <!--            </a>-->
-                <span *ngIf="row['badges']">{{row['badges'].length}}</span>
+                                <span [innerHTML]="calc_html_resources(row)"></span>
               </td>
             </ng-container>
 
@@ -395,8 +434,13 @@
                 </div>
               </td>
             </ng-container>
+
+
+
             <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value" ></tr>
-            <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value" style="box-shadow: 0px 0px 1px 0px gray"></tr>
+            <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"
+                style="box-shadow: 0px 0px 1px 0px gray"
+                [routerLink]="'/orcid/' + row['orcid']"></tr>
             <tr cdk-row *cdkRowDef="let element;columns: ['expandedDetail']"></tr>
           </table>
         </div>

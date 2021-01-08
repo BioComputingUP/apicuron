@@ -37,13 +37,20 @@
 
     <div class="row pt-3">
       <div class="col">
-        <carousel>
-          <slide *ngFor="let currDatabase of listResourcesDescriptions let index=index">
-
-            <app-leaderboard-card [database]="currDatabase"></app-leaderboard-card>
-
-          </slide>
-        </carousel>
+            <div class="card">
+              <div class="card-header">
+                Leaderboard -  <span class="badge badge-pill ml-2"
+                                     [class.badge-secondary]="currDatabase['resource_id'] !== selected_resource"
+                                     [class.badge-apicuron]="currDatabase['resource_id'] === selected_resource"
+                                     (click)="selected_resource = currDatabase['resource_id']"
+                                     *ngFor="let currDatabase of listResourcesDescriptions let index=index">{{currDatabase['resource_name']}}</span>
+              </div>
+              <div *ngFor="let currDatabase of listResourcesDescriptions let index=index">
+                <div *ngIf="currDatabase['resource_id'] === selected_resource">
+                  <app-leaderboard-card [database]="currDatabase"></app-leaderboard-card>
+                </div>
+              </div>
+            </div>
       </div>
     </div>
     <div class="row pt-3">
@@ -85,11 +92,11 @@
                   <img class="card-img" src="/assets/PED_logo.svg">
                 </div>
               </div>
-              <div class="col-md-4 col-sm-2 col-4">
-                <div class="card" style="border: none">
-                  <span> <strong>RepeatsDB </strong><img class="card-img card-img-rp" src="/assets/repeatsdb.png"></span>
-                </div>
-              </div>
+<!--              <div class="col-md-4 col-sm-2 col-4">-->
+<!--                <div class="card" style="border: none">-->
+<!--                  <span> <strong>RepeatsDB </strong><img class="card-img card-img-rp" src="/assets/repeatsdb.png"></span>-->
+<!--                </div>-->
+<!--              </div>-->
             </div>
           </div>
         </div>

@@ -1,13 +1,19 @@
-<div class="card">
-  <div class="card-header">
-    Leaderboard - {{database['resource_name']}}
-  </div>
+
   <div class="card-body">
     <div class="row" *ngIf="loading_finished && curatorsData.length > 0">
-      <div class="col-1" style="background: lightgrey"></div>
-      <div class="col-10">
+<!--      <div class="col-1" style="background: lightgrey"></div>-->
+      <div class="col">
         <table cdk-table multiTemplateDataRows [dataSource]="curatorsData" class="table table-sm table-responsive-sm">
-          <ng-container cdkColumnDef="name">
+          <ng-container cdkColumnDef="rank">
+            <th cdk-header-cell *cdkHeaderCellDef >
+
+
+            </th>
+            <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+
+                {{row.ranking}}
+            </td>
+          </ng-container><ng-container cdkColumnDef="name">
             <th cdk-header-cell *cdkHeaderCellDef >
               Name
 
@@ -16,7 +22,7 @@
               <a class="badge badge-apicuron"
                  [routerLink]="['/orcid/' + row.orcid]"
               >
-                {{row.name}} <i class="material-icons" style="font-size: small">link</i>
+                {{row.displayedName}} <i class="material-icons" style="font-size: small">link</i>
               </a>
 
             </td>
@@ -28,7 +34,7 @@
               </th>
             <td cdk-cell *cdkCellDef="let row" class=" pr-0">
 
-              {{row.orcid}}
+              {{row.curator_orcid}}
             </td>
           </ng-container>
           <ng-container cdkColumnDef="score">
@@ -37,7 +43,7 @@
               </th>
             <td cdk-cell *cdkCellDef="let row" class=" pr-0">
 
-              {{row.score}}
+              {{row.score_total}}
             </td>
           </ng-container>
 
@@ -47,7 +53,8 @@
 
             </th>
             <td cdk-cell *cdkCellDef="let row" class=" pr-0" style="text-align: center">
-              {{row.generation_count}}
+              <span [innerHTML]="calc_html_count_category(row['categories'], 'Generation')"></span>
+<!--              {{row.categories.filter(x => x.activity_category === 'Generation')[0]generation_count}}-->
 
             </td>
           </ng-container>
@@ -58,8 +65,9 @@
 
             </th>
             <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+              <span [innerHTML]="calc_html_count_category(row['categories'], 'Revision')"></span>
 
-              {{row.revision_count}}
+<!--              {{row.revision_count}}-->
 
             </td>
           </ng-container>
@@ -70,18 +78,19 @@
 
             </th>
             <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+              <span [innerHTML]="calc_html_count_category(row['categories'], 'Invalidation')"></span>
 
-              {{row.invalidation_count}}
+<!--              {{row.invalidation_count}}-->
 
             </td>
           </ng-container>
 
-          <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value" ></tr>
+          <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value" style="border: none"></tr>
           <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value" style="box-shadow: 0px 0px 1px 0px gray"></tr>
         </table>
       </div>
-      <div class="col-1" style="background: lightgrey"></div>
+<!--      <div class="col-1" style="background: lightgrey"></div>-->
 
     </div>
   </div>
-</div>
+

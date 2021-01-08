@@ -12,6 +12,7 @@ import { CarouselConfig } from 'ngx-bootstrap/carousel';
 export class HomeComponent implements OnInit {
   listResourcesDescriptions;
 
+  selected_resource;
   constructor(private internalService: InternalService) { }
 
   ngOnInit() {
@@ -19,6 +20,7 @@ export class HomeComponent implements OnInit {
       this.listResourcesDescriptions = data;
     }, (err) => {
     }, () => {
+      this.selected_resource = 'disprot';
     });
   }
 
