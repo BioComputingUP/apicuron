@@ -33,10 +33,10 @@ export class InternalService {
     // .pipe(catchError(err => of(console.error(err))));
   }
 
-  GetLeaderboard(database): Observable<any> {
+  GetLeaderboard(database, params): Observable<any> {
     return this.http.get(
       this.apicuronLeaderboard + database,
-      {responseType: 'json'});
+      {responseType: 'json', params: params});
     // .pipe(catchError(err => of(console.error(err))));
   }
 

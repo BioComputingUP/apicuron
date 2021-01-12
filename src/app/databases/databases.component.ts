@@ -8,7 +8,7 @@ import {InternalService} from '../services/internal.service';
 })
 export class DatabasesComponent implements OnInit {
   listResourcesDescriptions;
- leader
+
   constructor(private internalService: InternalService) {
   }
 

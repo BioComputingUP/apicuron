@@ -51,6 +51,7 @@ import { BrowseRibbonComponent } from './browse-ribbon/browse-ribbon.component';
 import { DatabasesComponent } from './databases/databases.component';
 import { BadgeMedalComponent } from './badge-medal/badge-medal.component';
 import { LeaderboardCardComponent } from './leaderboard-card/leaderboard-card.component';
+import { LeaderboardPageComponent } from './leaderboard-page/leaderboard-page.component';
 
 const appRoutes: Routes = [
   {path: 'curators', component: BrowseComponent},
@@ -58,7 +59,7 @@ const appRoutes: Routes = [
   {path: 'feedback', component: FeedbackComponent},
   { path: 'help', component: HelpComponent},
   {path: 'databases', component: DatabasesComponent},
-  // { path: 'tutorial', component: TutorialComponent},
+  { path: 'leaderboard', component: LeaderboardPageComponent},
   // { path: 'api', component: ApiComponent},
   // { path: 'statistics', component: StatisticsComponent},
   {path: 'about', component: AboutComponent},
@@ -97,7 +98,8 @@ const appRoutes: Routes = [
     BrowseRibbonComponent,
     DatabasesComponent,
     BadgeMedalComponent,
-    LeaderboardCardComponent
+    LeaderboardCardComponent,
+    LeaderboardPageComponent
   ],
   imports: [
     RouterModule.forRoot(

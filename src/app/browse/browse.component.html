@@ -259,7 +259,7 @@
               </th>
               <td cdk-cell *cdkCellDef="let row" class=" pr-0">
 
-                {{row.orcid}}
+                <span style="white-space: nowrap">{{row.orcid}}</span>
               </td>
             </ng-container>
 
@@ -385,7 +385,7 @@
 
             <ng-container cdkColumnDef="badges">
               <th cdk-header-cell *cdkHeaderCellDef  (click)="adjustSort('badges')">
-                Number of medals
+                Number of badges
                             <span *ngIf="sortKey.value === 'badges'">
                                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
                               </span>

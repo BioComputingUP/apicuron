@@ -1,96 +1,169 @@
+<div class="card-body">
+  <div class="row">
+    <div class="col">
+      <form [formGroup]="searchForm">
 
-  <div class="card-body">
-    <div class="row" *ngIf="loading_finished && curatorsData.length > 0">
-<!--      <div class="col-1" style="background: lightgrey"></div>-->
-      <div class="col">
-        <table cdk-table multiTemplateDataRows [dataSource]="curatorsData" class="table table-sm table-responsive-sm">
-          <ng-container cdkColumnDef="rank">
-            <th cdk-header-cell *cdkHeaderCellDef >
+        <div class="float-right col">
+          <div class="input-group mb-3">
 
 
-            </th>
-            <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+            <select class="custom-select input-group-text text-left col-lg-3"
+                    id="inputGroupSelect01"
+                    formControlName="area">
+              <option value="curator_name">Biocurator name</option>
+              <option value="curator_orcid">Biocurator ORCID</option>
+              <!--                    <option value="curator_orcid">ORCID</option>-->
+              <!--                    &lt;!&ndash;                  <option value="resource_uri">Resource identifier</option>&ndash;&gt;-->
+              <!--                    <option value="entity_uri">Entity identifier</option>-->
+              <!--                    <option value="activity_term">Activity term</option>-->
+              <!--                    <option value="activity_category">Activity category</option>-->
+              <!--                    <option value="time_from">First day (date)</option>-->
+              <!--                    <option value="time_last">Last day (date)</option>-->
+            </select>
 
-                {{row.ranking}}
-            </td>
-          </ng-container><ng-container cdkColumnDef="name">
-            <th cdk-header-cell *cdkHeaderCellDef >
-              Name
+            <input type="text"
+                   *ngIf="['time_from', 'time_last'].includes(searchForm.value['area'])"
+                   class="form-control"
+                   #dp="bsDatepicker"
+                   bsDatepicker
+                   formControlName="key"
+                   [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">
+            <input type="text"
+                   *ngIf="!['time_from', 'time_last'].includes(searchForm.value['area'])"
+                   class="form-control col-lg-auto"
+                   formControlName="key"
+                   placeholder="e.g.: p53">
 
-            </th>
-            <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-              <a class="badge badge-apicuron"
-                 [routerLink]="['/orcid/' + row.orcid]"
-              >
-                {{row.displayedName}} <i class="material-icons" style="font-size: small">link</i>
-              </a>
 
-            </td>
-          </ng-container>
-
-          <ng-container cdkColumnDef="orcid">
-            <th cdk-header-cell *cdkHeaderCellDef >
-              ORCID
-              </th>
-            <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-
-              {{row.curator_orcid}}
-            </td>
-          </ng-container>
-          <ng-container cdkColumnDef="score">
-            <th cdk-header-cell *cdkHeaderCellDef >
-              Total score
-              </th>
-            <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-
-              {{row.score_total}}
-            </td>
-          </ng-container>
-
-          <ng-container cdkColumnDef="generation_count">
-            <th cdk-header-cell *cdkHeaderCellDef  style="text-align: center">
-              Number of entity generation
-
-            </th>
-            <td cdk-cell *cdkCellDef="let row" class=" pr-0" style="text-align: center">
-              <span [innerHTML]="calc_html_count_category(row['categories'], 'Generation')"></span>
-<!--              {{row.categories.filter(x => x.activity_category === 'Generation')[0]generation_count}}-->
-
-            </td>
-          </ng-container>
-
-          <ng-container cdkColumnDef="revision_count">
-            <th cdk-header-cell *cdkHeaderCellDef >
-              Number of entity revision
-
-            </th>
-            <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-              <span [innerHTML]="calc_html_count_category(row['categories'], 'Revision')"></span>
-
-<!--              {{row.revision_count}}-->
-
-            </td>
-          </ng-container>
-
-          <ng-container cdkColumnDef="invalidation_count">
-            <th cdk-header-cell *cdkHeaderCellDef>
-              Number of entity invalidation
-
-            </th>
-            <td cdk-cell *cdkCellDef="let row" class=" pr-0">
-              <span [innerHTML]="calc_html_count_category(row['categories'], 'Invalidation')"></span>
-
-<!--              {{row.invalidation_count}}-->
-
-            </td>
-          </ng-container>
-
-          <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value" style="border: none"></tr>
-          <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value" style="box-shadow: 0px 0px 1px 0px gray"></tr>
-        </table>
-      </div>
-<!--      <div class="col-1" style="background: lightgrey"></div>-->
+          </div>
+        </div>
+      </form>
 
     </div>
   </div>
+
+
+  <div class="row" *ngIf="loading_finished && curatorsData.length > 0">
+    <!--      <div class="col-1" style="background: lightgrey"></div>-->
+    <div class="col">
+      <table cdk-table multiTemplateDataRows [dataSource]="curatorsData" class="table table-sm table-responsive-sm">
+        <ng-container cdkColumnDef="rank">
+          <th cdk-header-cell *cdkHeaderCellDef>
+            Rank
+
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+
+            <span class="badge badge-apicuron">{{row.ranking}}</span>
+          </td>
+        </ng-container>
+        <ng-container cdkColumnDef="name">
+          <th cdk-header-cell *cdkHeaderCellDef>
+            Name
+
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+            <!--              <a class="badge badge-apicuron"-->
+            <!--                 -->
+            <strong>
+              {{row.curator_name}}
+            </strong>
+            <!--              </a>-->
+
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="orcid">
+          <th cdk-header-cell *cdkHeaderCellDef>
+            ORCID
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+
+            <span style="white-space: nowrap">{{row.curator_orcid}}</span>
+          </td>
+        </ng-container>
+        <ng-container cdkColumnDef="score">
+          <th cdk-header-cell *cdkHeaderCellDef>
+            Total score
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+
+            {{row.score_total | number:'1.0':'en-US'}}
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="generation_count">
+          <th cdk-header-cell *cdkHeaderCellDef>
+            Entity generation score
+
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0" style="text-align: center">
+            <!--              {{row.categories.filter(x => x.activity_category === 'Generation')[0]generation_count}}-->
+            <span tooltip="{{calc_html_tooltip_count_category(row['categories'], 'Generation')}}">
+                {{calc_score_category(row['categories'], 'Generation') | number:'1.0':'en-US'}}
+</span>
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="revision_count">
+          <th cdk-header-cell *cdkHeaderCellDef>
+            Entity revision score
+
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+            <!--              <span [innerHTML]="calc_html_count_category(row['categories'], 'Revision')"></span>-->
+            <span tooltip="{{calc_html_tooltip_count_category(row['categories'], 'Revision')}}">
+                {{calc_score_category(row['categories'], 'Revision') | number:'1.0':'en-US'}}
+</span>
+            <!--              {{row.revision_count}}-->
+
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="invalidation_count">
+          <th cdk-header-cell *cdkHeaderCellDef>
+            Entity invalidation score
+
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+            <!--              <span [innerHTML]="calc_html_count_category(row['categories'], 'Invalidation')"></span>-->
+            <span tooltip="{{calc_html_tooltip_count_category(row['categories'], 'Invalidation')}}">
+                {{calc_score_category(row['categories'], 'Invalidation') | number:'1.0':'en-US'}}
+</span>
+            <!--              {{row.invalidation_count}}-->
+
+          </td>
+        </ng-container>
+
+<!--        <ng-container cdkColumnDef="expandedDetail"  >-->
+<!--          <td cdk-cell *cdkCellDef="let element"-->
+<!--              [attr.colspan]="displayedColumns.value.length"-->
+<!--              style="border-color: transparent"-->
+<!--              class="p-0 m-0"-->
+<!--          >-->
+
+<!--            <div class="container p-0 m-0"-->
+<!--                 style="overflow: hidden !important; max-width: none !important;">-->
+<!--              {{element | json}}-->
+
+<!--&lt;!&ndash;              <app-browse-ribbon&ndash;&gt;-->
+<!--&lt;!&ndash;                [userData]="element"&ndash;&gt;-->
+<!--&lt;!&ndash;                [map_resources]="map_resources" class="p-0 m-0"></app-browse-ribbon>&ndash;&gt;-->
+<!--            </div>-->
+<!--          </td>-->
+<!--        </ng-container>-->
+
+
+        <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value" style="border: none; text-align: center"></tr>
+        <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"
+            [routerLink]="['/orcid/' + row.curator_orcid]"
+            style="box-shadow: 0px 0px 1px 0px gray; text-align: center"></tr>
+<!--        <tr cdk-row *cdkRowDef="let element;columns: ['expandedDetail']" class="d-sm-none"></tr>-->
+
+      </table>
+    </div>
+    <!--      <div class="col-1" style="background: lightgrey"></div>-->
+
+  </div>
+</div>
 

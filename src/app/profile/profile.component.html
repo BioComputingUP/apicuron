@@ -20,13 +20,22 @@
           <div class="col-auto">
             <h3><strong> {{orcidData['person']['name']['given-names']['value']}} {{orcidData['person']['name']['family-name']['value']}} </strong></h3>
             <p class="my-1" *ngFor="let currPosition of employment">
-          <span *ngIf="isCurrentPosition(currPosition['summaries'][0]['employment-summary']['end-date'])">
-          <strong>{{currPosition['summaries'][0]['employment-summary']['role-title']}}</strong> at
-          <a href="{{currPosition['summaries'][0]['employment-summary']['url']['value']}}"
-             target="_blank">
-            {{currPosition['summaries'][0]['employment-summary']['organization']['name']}}
-          </a>
-          </span>
+
+              <span *ngIf="isCurrentPosition(currPosition['summaries'][0]['employment-summary']['end-date'], currPosition) && currPosition['summaries'][0]['employment-summary']['role-title']">
+                <strong>{{currPosition['summaries'][0]['employment-summary']['role-title']}}</strong>
+
+               <span *ngIf="currPosition['summaries'][0]['employment-summary']['url']">  <a
+              href="{{currPosition['summaries'][0]['employment-summary']['url']['value']}}"
+              target="_blank">
+                 at  {{currPosition['summaries'][0]['employment-summary']['organization']['name']}}
+                </a> </span>
+                <span *ngIf="!currPosition['summaries'][0]['employment-summary']['url'] && currPosition['summaries'][0]['employment-summary']['organization']['name']">
+                 at  {{currPosition['summaries'][0]['employment-summary']['organization']['name']}}
+                 </span>
+
+
+
+              </span>
 
             </p>
             <strong>ORCID: </strong>{{profileData.value['orcid']}}<br>
@@ -96,14 +105,32 @@
               <a class="badge badge-danger mr-2 mb-2" (click)="selectedResource.next('')"> Collapse <i class="material-icons" style="font-size: small">unfold_less</i></a>
             </div>
           </div>
+          <div class="row">
+
+            <div class="col" *ngIf="userDataByResources[selectedResource.value].hasOwnProperty('ranking')">
+              <strong>Rank: </strong>
+              <a class="badge  badge-apicuron"
+                 tooltip="see at Leaderboard"
+                 routerLink="/leaderboard" [queryParams]="{'resource': selectedResource.value}">{{userDataByResources[selectedResource.value]['ranking']}}</a>
+            </div>
+          </div>
+          <div class="row"> <div class="col">
+             <strong>Badges: </strong>
+
+<!--            {{userDataByResources[selectedResource.value]}}-->
+            <app-badge-medal [badge]="medal" [color]="'#000000'" *ngFor="let medal of userDataByResources[selectedResource.value]['possible_badges']"></app-badge-medal>
+
+          </div>
+
+</div>
           <div class="row mb-4">
             <div class="col-3 mb-2">
-              <p class="mb-0"><strong>Number of entity generation: </strong>{{userDataByResources[selectedResource.value]['generation_reports_length']}}</p>
-              <p class="mb-0"><strong>Number of entity revision: </strong>{{userDataByResources[selectedResource.value]['revision_reports_length']}}</p>
-              <p class="mb-0"><strong>Number of entity invalidation: </strong>{{userDataByResources[selectedResource.value]['invalidation_reports_length']}}</p>
+              <p class="mb-0"><strong>Number of entity generation: </strong>{{userDataByResources[selectedResource.value]['generation_counts']}}</p>
+              <p class="mb-0"><strong>Number of entity revision: </strong>{{userDataByResources[selectedResource.value]['revision_counts']}}</p>
+              <p class="mb-0"><strong>Number of entity invalidation: </strong>{{userDataByResources[selectedResource.value]['invalidation_counts']}}</p>
             </div>
             <div class="col-auto mr-auto">
-              <app-badge-medal [badge]="badge" [color]="'#000000'" *ngFor="let badge of userDataByResources[selectedResource.value]['badge']"></app-badge-medal>
+              <app-badge-medal [badge]="medal" [color]="'#000000'" *ngFor="let medal of userDataByResources[selectedResource.value]['medal']"></app-badge-medal>
 
 <!--              <span class="badge badge-pill badge-medal mr-2 mb-2" [style]="{'background-color':badge['color_code']}"-->
 <!--                    *ngFor="let badge of userDataByResources[selectedResource.value]['badge']"> {{badge['name']}}</span>-->
@@ -130,10 +157,18 @@
              </div>
            </div>
            <div class="row">
+             <div class="col" *ngIf="userDataByResources[database].hasOwnProperty('ranking')">
+               <strong>Rank: </strong>
+               <a class="badge  badge-apicuron"
+                  tooltip="see at Leaderboard"
+               routerLink="/leaderboard" [queryParams]="{'resource': database}">{{userDataByResources[database]['ranking']}}</a>
+             </div>
+           </div>
+           <div class="row">
              <div class="col  mb-2">
-               <p class="mb-0"><strong>Number of entity generation: </strong>{{userDataByResources[database]['generation_reports_length']}}</p>
-               <p class="mb-0"><strong>Number of entity revision: </strong>{{userDataByResources[database]['revision_reports_length']}}</p>
-               <p class="mb-0"><strong>Number of entity invalidation: </strong>{{userDataByResources[database]['invalidation_reports_length']}}</p>
+               <p class="mb-0"><strong>Number of entity generation: </strong>{{userDataByResources[database]['generation_counts']}}</p>
+               <p class="mb-0"><strong>Number of entity revision: </strong>{{userDataByResources[database]['revision_counts']}}</p>
+               <p class="mb-0"><strong>Number of entity invalidation: </strong>{{userDataByResources[database]['invalidation_counts']}}</p>
              </div>
              <div class="col-auto">
 <!--               aa-->
@@ -141,7 +176,7 @@
 
 <!--               <app-badge-medal [badge]="badge"  *ngFor="let badge of currResourceUserData['badge']"></app-badge-medal>-->
 
-               <app-badge-medal [badge]="badge" [color]="'#000000'" *ngFor="let badge of userDataByResources[database]['badge']"></app-badge-medal>
+               <app-badge-medal [badge]="medal" [color]="'#000000'" *ngFor="let medal of userDataByResources[database]['medal']"></app-badge-medal>
 
 <!--               <span class="badge badge-pill badge-medal mr-2 mb-2" [style]="{'background-color':badge['color_code']}"-->
 <!--                     > {{badge['name']}}</span>-->
