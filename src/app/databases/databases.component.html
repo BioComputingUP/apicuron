@@ -47,7 +47,8 @@
                 </div>
                 <div class="col">
 
-                  <app-badge-medal [badge]="badge" [color]="'#000000'"  *ngFor="let badge of currResource['badges']"></app-badge-medal>
+                  <app-badge-view [active]="false"></app-badge-view>
+                  <app-badge-view [active]="true"></app-badge-view>
 
                   <!--              <span class="badge badge-pill badge-des" *ngFor="let currBadge of currResource['badges']">-->
                   <!--                <svg width="1.8em" height="1.8em" viewBox="0 0 16 16" class="bi bi-award-fill" [style]="{fill:currBadge['color_code'], 'font-size': 'large'}"-->

@@ -52,6 +52,8 @@ import { DatabasesComponent } from './databases/databases.component';
 import { BadgeMedalComponent } from './badge-medal/badge-medal.component';
 import { LeaderboardCardComponent } from './leaderboard-card/leaderboard-card.component';
 import { LeaderboardPageComponent } from './leaderboard-page/leaderboard-page.component';
+import { BadgeViewComponent } from './badge-view/badge-view.component';
+import { MedalViewComponent } from './medal-view/medal-view.component';
 
 const appRoutes: Routes = [
   {path: 'curators', component: BrowseComponent},
@@ -99,7 +101,9 @@ const appRoutes: Routes = [
     DatabasesComponent,
     BadgeMedalComponent,
     LeaderboardCardComponent,
-    LeaderboardPageComponent
+    LeaderboardPageComponent,
+    BadgeViewComponent,
+    MedalViewComponent
   ],
   imports: [
     RouterModule.forRoot(

@@ -603,9 +603,14 @@ body {
 }
 
 .badge-medal {
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  //border-color: #999999;
   //color: white !important;
   //font-size: medium;
    text-justify: inter-word;
   padding: 7px;
   font-weight: normal;
+  height: 3rem
 }
