@@ -54,6 +54,7 @@ import { LeaderboardCardComponent } from './leaderboard-card/leaderboard-card.co
 import { LeaderboardPageComponent } from './leaderboard-page/leaderboard-page.component';
 import { BadgeViewComponent } from './badge-view/badge-view.component';
 import { MedalViewComponent } from './medal-view/medal-view.component';
+import { DatabaseComponent } from './database/database.component';
 
 const appRoutes: Routes = [
   {path: 'curators', component: BrowseComponent},
@@ -61,6 +62,7 @@ const appRoutes: Routes = [
   {path: 'feedback', component: FeedbackComponent},
   { path: 'help', component: HelpComponent},
   {path: 'databases', component: DatabasesComponent},
+  {path: 'databases/:database_id', component: DatabaseComponent},
   { path: 'leaderboard', component: LeaderboardPageComponent},
   // { path: 'api', component: ApiComponent},
   // { path: 'statistics', component: StatisticsComponent},
@@ -103,7 +105,8 @@ const appRoutes: Routes = [
     LeaderboardCardComponent,
     LeaderboardPageComponent,
     BadgeViewComponent,
-    MedalViewComponent
+    MedalViewComponent,
+    DatabaseComponent
   ],
   imports: [
     RouterModule.forRoot(

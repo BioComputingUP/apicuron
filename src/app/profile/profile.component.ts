@@ -169,7 +169,7 @@ export class ProfileComponent implements OnInit {
 
 
         });
-        this.internalService.GetResearces().subscribe(data => {
+        this.internalService.GetResearces({}).subscribe(data => {
           data.forEach(currResource => {
 
             if (this.userDataByResources.hasOwnProperty(currResource['resource_id'])) {

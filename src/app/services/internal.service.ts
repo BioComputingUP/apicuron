@@ -106,10 +106,11 @@ export class InternalService {
     // .pipe(catchError(err => of(console.error(err))));
   }
 
-  GetResearces(): Observable<any> {
+  GetResearces(params): Observable<any> {
+    // console.log(params);
     return this.http.get(
       this.apicuronResources,
-      {responseType: 'json'});
+      {responseType: 'json', params: params});
     // .pipe(catchError(err => of(console.error(err))));
   }
 

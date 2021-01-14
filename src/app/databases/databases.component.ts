@@ -13,7 +13,7 @@ export class DatabasesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.internalService.GetResearces().subscribe(data => {
+    this.internalService.GetResearces({}).subscribe(data => {
       this.listResourcesDescriptions = data;
     }, (err) => {
     }, () => {

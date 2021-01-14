@@ -1,0 +1,241 @@
+<div *ngIf="resourcesDescription">
+  <div id="second-nav-bar" class="fixed-top " style="margin-top: 75px; padding-top: 0px">
+    <div class="container-fluid container-wide  d-none d-sm-block">
+      <div class="row" style="  ">
+        <div class="col-1 ">
+          <h2>{{resourcesDescription['resource_name']}}</h2>
+        </div>
+        <div class="col-auto pt-1 ml-3 offset-1 mr-auto">
+          <span class="ml-3"      [ngxScrollTo]="general" [ngxScrollToOffset]="-1800">General description</span>
+          <span class="ml-3"      [ngxScrollTo]="terms" [ngxScrollToOffset]="-180">Biocuration activities</span>
+          <span class="ml-3"     [ngxScrollTo]="badges" [ngxScrollToOffset]="-180">Badges</span>
+          <span class="ml-3"     [ngxScrollTo]="medals" [ngxScrollToOffset]="-180">Medals</span>
+          <span class="ml-3"     [ngxScrollTo]="leaderboard" [ngxScrollToOffset]="-180 ">Leaderborad</span>
+        </div>
+        <div class="col-2">
+          <a class="badge badge-apicuron"
+             href="{{resourcesDescription['resource_url']}}"
+             target="_blank">{{resourcesDescription['resource_url']}}
+
+            <i class="material-icons" style="font-size: small">link</i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+<div class="container-fluid container-wide  d-none d-sm-block" #top
+     style="padding-top: 70px">
+  <p class="mt-4" id="general" #general>
+    <strong>{{resourcesDescription['resource_long_name']}} </strong>
+  </p>
+  <p>
+    {{resourcesDescription['resource_description']}}
+  </p>
+
+  <p>[basic stat]</p>
+
+  <h3 id="terms" #terms>Biocuration activity terms</h3>
+  <table cdk-table multiTemplateDataRows [dataSource]="resourcesDescription['terms']" class="table table-sm table-responsive-sm">
+    <ng-container cdkColumnDef="name">
+      <th cdk-header-cell *cdkHeaderCellDef>
+        Name
+
+      </th>
+      <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+        <!--              <a class="badge badge-apicuron"-->
+        <!--                 -->
+        <strong>
+          {{row.activity_name}}
+        </strong>
+        <!--              </a>-->
+
+      </td>
+    </ng-container>
+
+
+    <ng-container cdkColumnDef="def">
+      <th cdk-header-cell *cdkHeaderCellDef>
+        Name
+
+      </th>
+      <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+        <!--              <a class="badge badge-apicuron"-->
+        <!--                 -->
+          {{row.description}}
+        <!--              </a>-->
+
+      </td>
+    </ng-container>
+
+
+        <ng-container cdkColumnDef="score">
+      <th cdk-header-cell *cdkHeaderCellDef>
+        Name
+
+      </th>
+      <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+        <!--              <a class="badge badge-apicuron"-->
+        <!--                 -->
+          {{row.score}}
+        <!--              </a>-->
+
+      </td>
+    </ng-container>
+
+
+        <ng-container cdkColumnDef="category">
+      <th cdk-header-cell *cdkHeaderCellDef>
+        Name
+
+      </th>
+      <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+        <!--              <a class="badge badge-apicuron"-->
+        <!--                 -->
+          {{row.activity_category}}
+        <!--              </a>-->
+
+      </td>
+    </ng-container>
+
+
+    <tr cdk-header-row *cdkHeaderRowDef="['category', 'name', 'def', 'score']" style="border: none; text-align: center"></tr>
+    <tr cdk-row *cdkRowDef="let row; columns: ['category', 'name', 'def', 'score']"
+        style="box-shadow: 0px 0px 1px 0px gray; text-align: center"></tr>
+  </table>
+
+  <h3 id="badges" #badges>Available badges</h3>
+
+  <div class="row">
+
+  <div class="col">
+
+<!--      <table cdk-table multiTemplateDataRows [dataSource]="resourcesDescription['badges']" class="table table-sm table-responsive-sm">-->
+<!--        <ng-container cdkColumnDef="name">-->
+<!--          <th cdk-header-cell *cdkHeaderCellDef>-->
+<!--            Name-->
+
+<!--          </th>-->
+<!--          <td cdk-cell *cdkCellDef="let row" class=" pr-0">-->
+<!--            &lt;!&ndash;              <a class="badge badge-apicuron"&ndash;&gt;-->
+<!--            &lt;!&ndash;                 &ndash;&gt;-->
+<!--            <strong>-->
+<!--              {{row.name}}-->
+<!--            </strong>-->
+<!--            &lt;!&ndash;              </a>&ndash;&gt;-->
+
+<!--          </td>-->
+<!--        </ng-container>-->
+<!--        <ng-container cdkColumnDef="category">-->
+<!--          <th cdk-header-cell *cdkHeaderCellDef>-->
+<!--            Category-->
+
+<!--          </th>-->
+<!--          <td cdk-cell *cdkCellDef="let row" class=" pr-0">-->
+<!--            &lt;!&ndash;              <a class="badge badge-apicuron"&ndash;&gt;-->
+<!--            &lt;!&ndash;                 &ndash;&gt;-->
+<!--            <app-badge-view [active]="true" [badge]="row" ></app-badge-view>            &lt;!&ndash;              </a>&ndash;&gt;-->
+
+<!--          </td>-->
+<!--        </ng-container>-->
+
+<!--        <ng-container cdkColumnDef="def">-->
+<!--          <th cdk-header-cell *cdkHeaderCellDef>-->
+<!--            Definition-->
+
+<!--          </th>-->
+<!--          <td cdk-cell *cdkCellDef="let row" class=" pr-0">-->
+<!--            &lt;!&ndash;              <a class="badge badge-apicuron"&ndash;&gt;-->
+<!--            &lt;!&ndash;                 &ndash;&gt;-->
+<!--            {{row.description}}-->
+<!--            &lt;!&ndash;              </a>&ndash;&gt;-->
+
+<!--          </td>-->
+<!--        </ng-container>-->
+
+
+<!--        <ng-container cdkColumnDef="score">-->
+<!--          <th cdk-header-cell *cdkHeaderCellDef>-->
+<!--            Score-->
+
+<!--          </th>-->
+<!--          <td cdk-cell *cdkCellDef="let row" class=" pr-0">-->
+<!--            &lt;!&ndash;              <a class="badge badge-apicuron"&ndash;&gt;-->
+<!--            &lt;!&ndash;                 &ndash;&gt;-->
+<!--            {{row}}-->
+<!--            &lt;!&ndash;              </a>&ndash;&gt;-->
+
+<!--          </td>-->
+<!--        </ng-container>-->
+
+
+
+
+
+<!--        <tr cdk-header-row *cdkHeaderRowDef="['name', 'category', 'def', 'score']" style="border: none; text-align: center"></tr>-->
+<!--        <tr cdk-row *cdkRowDef="let row; columns: ['category', 'name', 'def', 'score']"-->
+<!--            style="box-shadow: 0px 0px 1px 0px gray; text-align: center"></tr>-->
+<!--      </table>-->
+
+      <app-badge-view [active]="true" [badge]="currBadge" *ngFor="let currBadge of resourcesDescription['badges']"></app-badge-view>
+
+
+      <!--              <span class="badge badge-pill badge-des" *ngFor="let currBadge of currResource['badges']">-->
+      <!--                <svg width="1.8em" height="1.8em" viewBox="0 0 16 16" class="bi bi-award-fill" [style]="{fill:currBadge['color_code'], 'font-size': 'large'}"-->
+      <!--                     xmlns="http://www.w3.org/2000/svg">-->
+      <!--  <path-->
+      <!--    d="M8 0l1.669.864 1.858.282.842 1.68 1.337 1.32L13.4 6l.306 1.854-1.337 1.32-.842 1.68-1.858.282L8 12l-1.669-.864-1.858-.282-.842-1.68-1.337-1.32L2.6 6l-.306-1.854 1.337-1.32.842-1.68L6.331.864 8 0z"/>-->
+      <!--  <path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1 4 11.794z"/>-->
+      <!--</svg>-->
+      <!--                {{currBadge['badge_name']}}</span>-->
+    </div>
+  </div>
+  <h3 id="medals" #medals>Available medals</h3>
+
+  <div class="row mt-2">
+    <div class="col">
+      <app-medal-view [medal]="currMedal" *ngFor="let currMedal of resourcesDescription['medals']"></app-medal-view>
+
+
+
+      <!--              <span class="badge badge-pill badge-des" *ngFor="let currBadge of currResource['badges']">-->
+      <!--                <svg width="1.8em" height="1.8em" viewBox="0 0 16 16" class="bi bi-award-fill" [style]="{fill:currBadge['color_code'], 'font-size': 'large'}"-->
+      <!--                     xmlns="http://www.w3.org/2000/svg">-->
+      <!--  <path-->
+      <!--    d="M8 0l1.669.864 1.858.282.842 1.68 1.337 1.32L13.4 6l.306 1.854-1.337 1.32-.842 1.68-1.858.282L8 12l-1.669-.864-1.858-.282-.842-1.68-1.337-1.32L2.6 6l-.306-1.854 1.337-1.32.842-1.68L6.331.864 8 0z"/>-->
+      <!--  <path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1 4 11.794z"/>-->
+      <!--</svg>-->
+      <!--                {{currBadge['badge_name']}}</span>-->
+    </div>
+  </div>
+
+  <h3 id="leaderboard" #leaderboard>Leaderboard</h3>
+  <app-leaderboard-card [database]="resourcesDescription"></app-leaderboard-card>
+
+
+
+<!--  <dl>-->
+<!--   -->
+<!--    -->
+<!--    -->
+<!--    -->
+<!--    -->
+<!--    -->
+<!--    <div *ngFor="let currTerm of resourcesDescription['terms']">-->
+<!--      <dt>{{currTerm['activity_name']}}</dt>-->
+<!--      <dd>{{currTerm['description']}}</dd>-->
+<!--&lt;!&ndash;      &ndash;&gt;-->
+<!--&lt;!&ndash;      <dd>{{currTerm['score']}}</dd>&ndash;&gt;-->
+<!--    </div>-->
+
+<!--  </dl>-->
+
+
+
+
+
+</div>
+
+</div>

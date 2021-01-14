@@ -1,19 +1,21 @@
 <!--<div class="container-fluid container-wide p-0 m-0" #top  >-->
   <div id="second-nav-bar" class="fixed-top " style="margin-top: 75px; padding-top: 0px">
-  <div class="row" style="  ">
-    <div class="col-aut offset-1 ">
-      <h2>Leaderboard</h2>
+    <div class="row" style="  ">
+      <div class="col-aut offset-1 ">
+        <h2>Leaderboard</h2>
+      </div>
+      <div class="col pt-1 ml-3">
+        <span class="badge badge-pill ml-3 badge-apicuron"
+              [ngxScrollTo]="currDatabase['resource_id']" [ngxScrollToOffset]="-230"
+              *ngFor="let currDatabase of listResourcesDescriptions let index=index">{{currDatabase['resource_name']}}</span>
+      </div>
     </div>
-    <div class="col pt-1 ml-3">
-      <span class="badge badge-pill ml-3 badge-apicuron"
-            [ngxScrollTo]="currDatabase['resource_id']" [ngxScrollToOffset]="-230"
-            *ngFor="let currDatabase of listResourcesDescriptions let index=index">{{currDatabase['resource_name']}}</span>
-    </div>
-  </div>  </div>
+  </div>
 
 <!--</div>-->
 
-<div class="container-fluid container-wide  d-none d-sm-block" #top style="padding-top: 70px">
+<div class="container-fluid container-wide  d-none d-sm-block" #top
+     style="padding-top: 70px">
   <div class="row" *ngFor="let currResource of listResourcesDescriptions">
     <div class="col">
       <div class="card">

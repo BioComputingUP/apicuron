@@ -16,7 +16,7 @@ export class LeaderboardPageComponent implements OnInit {
                private internalService: InternalService) { }
 
   ngOnInit(): void {
-    this.internalService.GetResearces().subscribe(data => {
+    this.internalService.GetResearces({}).subscribe(data => {
       this.listResourcesDescriptions = data;
     }, (err) => {
     }, () => {
