@@ -115,10 +115,10 @@
             </div>
           </div>
           <div class="row"> <div class="col">
-             <strong>Badges: </strong>
+             <strong>Badges: </strong><br>
+            <app-badge-view [badge]="currBadge" [active]="userDataByResources[selectedResource.value]['badge'].includes(currBadge['name'])" *ngFor="let currBadge of userDataByResources[selectedResource.value]['possible_badges']"></app-badge-view>
 
 <!--            {{userDataByResources[selectedResource.value]}}-->
-            <app-badge-view ></app-badge-view>
 
           </div>
 
@@ -130,7 +130,8 @@
               <p class="mb-0"><strong>Number of entity invalidation: </strong>{{userDataByResources[selectedResource.value]['invalidation_counts']}}</p>
             </div>
             <div class="col-auto mr-auto">
-              <app-badge-medal [badge]="medal" [color]="'#000000'" *ngFor="let medal of userDataByResources[selectedResource.value]['medal']"></app-badge-medal>
+<!--              <app-badge-medal [badge]="medal" [color]="'#000000'" *ngFor="let medal of userDataByResources[selectedResource.value]['medal']"></app-badge-medal>-->
+              <app-medal-view [medal]="currMedal" *ngFor="let currMedal of userDataByResources[selectedResource.value]['medal']"></app-medal-view>
 
 <!--              <span class="badge badge-pill badge-medal mr-2 mb-2" [style]="{'background-color':badge['color_code']}"-->
 <!--                    *ngFor="let badge of userDataByResources[selectedResource.value]['badge']"> {{badge['name']}}</span>-->
@@ -175,8 +176,8 @@
 <!--               {{ userDataByResources[selectedResource.value]}}-->
 
 <!--               <app-badge-medal [badge]="badge"  *ngFor="let badge of currResourceUserData['badge']"></app-badge-medal>-->
-
-               <app-badge-medal [badge]="medal" [color]="'#000000'" *ngFor="let medal of userDataByResources[database]['medal']"></app-badge-medal>
+                  <app-medal-view [medal]="currMedal" *ngFor="let currMedal of userDataByResources[database]['medal']"></app-medal-view>
+<!--               <app-badge-medal [badge]="medal" [color]="'#000000'" *ngFor="let medal of userDataByResources[database]['medal']"></app-badge-medal>-->
 
 <!--               <span class="badge badge-pill badge-medal mr-2 mb-2" [style]="{'background-color':badge['color_code']}"-->
 <!--                     > {{badge['name']}}</span>-->

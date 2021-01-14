@@ -1,1 +1,43 @@
-<p>medal-view works!</p>
+<div class="badge  badge-badge-active  mr-2 mb-2"
+     [class]="medal['color']">
+  <div class="row  align-items-center">
+    <div class="col-3">
+
+
+      <svg width="1.8em"
+           height="1.8em"
+           viewBox="0 0 100 100"
+           class="bi bi-award-fill active"
+           xmlns="http://www.w3.org/2000/svg">
+        <style type="text/css">
+          .st2 {
+            fill: url(#MyGradient)
+          }
+        </style>
+        <defs>
+          <linearGradient id="MyGradient" x1="0%" y1="0%" x2="50%" y2="100%">
+            <stop offset="0%" stop-color="hsl(213, 100%, 100%)"/>
+            <stop offset="95%" stop-color="hsl(213, 100%, 100%)"/>
+          </linearGradient>
+        </defs>
+        <path class="st2"
+              d="M 12.33,5.83 C 11.25,4.26 12.26,2 14,2 h 21.46 c 1.327413,0.016883 2.559971,0.6912308 3.29,1.8 l 6.91,10 L 31.76,34 Z M 50,98 C 25.052929,98 12.563911,67.84012 30.202016,50.202016 47.84012,32.563911 78,45.052929 78,70 78,85.463973 65.463973,98 50,98 Z m 0,-63.05 c 5.274448,-0.0061 10.481637,1.183724 15.23,3.48 L 87.67,5.83 C 88.75,4.26 87.74,2 86,2 H 64.54 c -1.327413,0.016883 -2.559971,0.6912308 -3.29,1.8 L 38.47,36.9 C 42.176453,35.606719 46.074397,34.947483 50,34.95 Z">
+        </path>
+      </svg>
+
+
+    </div>
+
+    <div class="col-9" style="width: 8rem;">
+      <div class=" ">
+        <span class="align-middle"
+              style="white-space: normal; width: 7rem; text-align: left; color: white">
+<!--              style="white-space: normal; width: 7rem; text-align: left; color: white">-->
+          <!--          name-->
+          {{medal['name']}}
+        </span>
+
+      </div>
+    </div>
+  </div>
+</div>

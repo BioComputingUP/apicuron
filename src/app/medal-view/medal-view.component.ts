@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-medal-view',
@@ -6,7 +6,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./medal-view.component.scss']
 })
 export class MedalViewComponent implements OnInit {
-
+  @Input() medal;
   constructor() { }
 
   ngOnInit(): void {

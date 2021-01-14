@@ -7,6 +7,7 @@ import {Component, Input, OnInit} from '@angular/core';
 })
 export class BadgeViewComponent implements OnInit {
   @Input() active;
+  @Input() badge;
 
   constructor() { }
 

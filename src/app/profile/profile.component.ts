@@ -32,6 +32,9 @@ export class ProfileComponent implements OnInit {
   map_resources = {};
   userDataByResources = {};
 
+
+  map_all_badges = {};
+
   employment = [];
 
   selectedResource = new BehaviorSubject<string>('');
@@ -104,6 +107,10 @@ export class ProfileComponent implements OnInit {
         }
         // console.log(this.resourcesList);
         Array.from(this.resourcesList).forEach(currResourceURI => {
+
+
+
+
           this.userDataByResources[String(currResourceURI)] = {
             name: currResourceURI
           };
@@ -111,7 +118,7 @@ export class ProfileComponent implements OnInit {
             // this.userDataByResources[String(currResourceURI)]['generation_reports_length']
             this.userDataByResources[String(currResourceURI)]['badge'] = this.profileData.value['badges'].filter(x => {
               return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
-            });
+            }).map(x => x.name);
           } else {
             // this.userDataByResources[String(currResourceURI)]['generation_reports_length']
             this.userDataByResources[String(currResourceURI)]['badge'] = [];
