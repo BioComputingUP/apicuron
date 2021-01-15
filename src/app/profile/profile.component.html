@@ -99,23 +99,92 @@
               <p><strong>Resource: </strong>
 <!--                DisProt-->
                 {{map_resources[selectedResource.value]['resource_name']}}
+
+              <span class="ml-5" *ngIf="userDataByResources[selectedResource.value].hasOwnProperty('ranking')">
+                <strong>Rank: </strong>
+                <a class="badge  badge-apicuron"
+                   tooltip="see at Leaderboard"
+                   routerLink="/leaderboard" [queryParams]="{'resource': selectedResource.value}">{{userDataByResources[selectedResource.value]['ranking']}}</a>
+              </span>
               </p>
             </div>
             <div class="col-auto">
               <a class="badge badge-danger mr-2 mb-2" (click)="selectedResource.next('')"> Collapse <i class="material-icons" style="font-size: small">unfold_less</i></a>
             </div>
           </div>
-          <div class="row">
 
-            <div class="col" *ngIf="userDataByResources[selectedResource.value].hasOwnProperty('ranking')">
-              <strong>Rank: </strong>
-              <a class="badge  badge-apicuron"
-                 tooltip="see at Leaderboard"
-                 routerLink="/leaderboard" [queryParams]="{'resource': selectedResource.value}">{{userDataByResources[selectedResource.value]['ranking']}}</a>
+
+<h5 class="mb-1">Biocuration activities:</h5>
+          <div class="row" if *ngIf="userDataByResources[selectedResource.value]['generation_terms'].length > 0">
+            <div class="col-2">
+              <i>Category</i>
+            </div>
+
+            <div class="col">
+              <div class="row">
+                <div class="col-4"><i>Name</i></div>
+                <div class="col"><i>Count</i></div>
+              </div>
             </div>
           </div>
+
+
+          <div class="row mb-2" if *ngIf="userDataByResources[selectedResource.value]['generation_terms'].length > 0">
+            <div class="col-2">
+              Generation
+            </div>
+
+            <div class="col">
+              <div class="row" *ngFor="let currTerm of userDataByResources[selectedResource.value]['generation_terms']">
+                <div class="col-4"><strong>{{currTerm['activity_name']}}</strong></div>
+                <div class="col"> {{currTerm['count']}}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-2" if *ngIf="userDataByResources[selectedResource.value]['revision_terms'].length > 0">
+            <div class="col-2">
+              Revision
+            </div>
+            <div class="col">
+              <div class="row" *ngFor="let currTerm of userDataByResources[selectedResource.value]['revision_terms']">
+                <div class="col-4"><strong>{{currTerm['activity_name']}}</strong></div>
+                <div class="col"> {{currTerm['count']}}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-2" if *ngIf="userDataByResources[selectedResource.value]['invalidation_terms'].length > 0">
+            <div class="col-2">
+              Invalidation
+            </div>
+            <div class="col">
+              <div class="row" *ngFor="let currTerm of userDataByResources[selectedResource.value]['invalidation_terms']">
+                <div class="col-4"><strong>{{currTerm['activity_name']}}</strong></div>
+                <div class="col"> {{currTerm['count']}}</div>
+              </div>
+            </div>
+          </div>
+          <h5>Medals:</h5>
+
+          <div class="row mb-4">
+            <!--            <div class="col-3 mb-2">-->
+            <!--              <p class="mb-0"><strong>Number of entity generation: </strong>{{userDataByResources[selectedResource.value]['generation_counts']}}</p>-->
+            <!--              <p class="mb-0"><strong>Number of entity revision: </strong>{{userDataByResources[selectedResource.value]['revision_counts']}}</p>-->
+            <!--              <p class="mb-0"><strong>Number of entity invalidation: </strong>{{userDataByResources[selectedResource.value]['invalidation_counts']}}</p>-->
+            <!--            </div>-->
+            <div class="col-auto mr-auto">
+
+              <!--              <app-badge-medal [badge]="medal" [color]="'#000000'" *ngFor="let medal of userDataByResources[selectedResource.value]['medal']"></app-badge-medal>-->
+              <app-medal-view [medal]="currMedal" *ngFor="let currMedal of userDataByResources[selectedResource.value]['medal']"></app-medal-view>
+
+              <!--              <span class="badge badge-pill badge-medal mr-2 mb-2" [style]="{'background-color':badge['color_code']}"-->
+              <!--                    *ngFor="let badge of userDataByResources[selectedResource.value]['badge']"> {{badge['name']}}</span>-->
+            </div>
+          </div>
+          <h5>Badges:</h5>
+
           <div class="row"> <div class="col">
-             <strong>Badges: </strong><br>
             <app-badge-view [badge]="currBadge" [active]="userDataByResources[selectedResource.value]['badge'].includes(currBadge['name'])" *ngFor="let currBadge of userDataByResources[selectedResource.value]['possible_badges']"></app-badge-view>
 
 <!--            {{userDataByResources[selectedResource.value]}}-->
@@ -123,20 +192,7 @@
           </div>
 
 </div>
-          <div class="row mb-4">
-            <div class="col-3 mb-2">
-              <p class="mb-0"><strong>Number of entity generation: </strong>{{userDataByResources[selectedResource.value]['generation_counts']}}</p>
-              <p class="mb-0"><strong>Number of entity revision: </strong>{{userDataByResources[selectedResource.value]['revision_counts']}}</p>
-              <p class="mb-0"><strong>Number of entity invalidation: </strong>{{userDataByResources[selectedResource.value]['invalidation_counts']}}</p>
-            </div>
-            <div class="col-auto mr-auto">
-<!--              <app-badge-medal [badge]="medal" [color]="'#000000'" *ngFor="let medal of userDataByResources[selectedResource.value]['medal']"></app-badge-medal>-->
-              <app-medal-view [medal]="currMedal" *ngFor="let currMedal of userDataByResources[selectedResource.value]['medal']"></app-medal-view>
-
-<!--              <span class="badge badge-pill badge-medal mr-2 mb-2" [style]="{'background-color':badge['color_code']}"-->
-<!--                    *ngFor="let badge of userDataByResources[selectedResource.value]['badge']"> {{badge['name']}}</span>-->
-            </div>
-          </div>
+          <h5>Biocuration details: </h5>
           <app-details-table [profileData]="profileData" [database]="selectedResource.value" [dataArray]="reportFilter(selectedResource.value)"></app-details-table>
         </div>
       </div>
@@ -171,6 +227,11 @@
                <p class="mb-0"><strong>Number of entity revision: </strong>{{userDataByResources[database]['revision_counts']}}</p>
                <p class="mb-0"><strong>Number of entity invalidation: </strong>{{userDataByResources[database]['invalidation_counts']}}</p>
              </div>
+             </div>
+
+             <div class="row">
+
+
              <div class="col-auto">
 <!--               aa-->
 <!--               {{ userDataByResources[selectedResource.value]}}-->

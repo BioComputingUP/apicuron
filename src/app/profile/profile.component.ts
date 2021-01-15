@@ -127,31 +127,43 @@ export class ProfileComponent implements OnInit {
             // this.userDataByResources[String(currResourceURI)]['generation_reports_length']
             this.userDataByResources[String(currResourceURI)]['medal'] = this.profileData.value['medals'].filter(x => {
               return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
-            });
+            }).sort((a, b) =>  a.name > b.name );
           } else {
             // this.userDataByResources[String(currResourceURI)]['generation_reports_length']
             this.userDataByResources[String(currResourceURI)]['medal'] = [];
           }
 
           if (this.profileData.value.hasOwnProperty('generation_terms')) {
+            this.userDataByResources[String(currResourceURI)]['generation_terms'] =  this.profileData.value['generation_terms'].filter(x => {
+              return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
+            });
             this.userDataByResources[String(currResourceURI)]['generation_counts'] =  this.profileData.value['generation_terms'].filter(x => {
               return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
             }).map(x => x.count).reduce((a, b) => a + b, 0);
           } else {
+            this.userDataByResources[String(currResourceURI)]['generation_terms'] = [];
             this.userDataByResources[String(currResourceURI)]['generation_counts'] = 0;
           }
           if (this.profileData.value.hasOwnProperty('revision_terms')) {
+            this.userDataByResources[String(currResourceURI)]['revision_terms'] =  this.profileData.value['revision_terms'].filter(x => {
+              return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
+            });
             this.userDataByResources[String(currResourceURI)]['revision_counts'] =  this.profileData.value['revision_terms'].filter(x => {
               return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
             }).map(x => x.count).reduce((a, b) => a + b, 0);
           } else {
+            this.userDataByResources[String(currResourceURI)]['revision_terms'] = [];
             this.userDataByResources[String(currResourceURI)]['revision_counts'] = 0;
           }
-          if (this.profileData.value.hasOwnProperty('invalidation_reports')) {
+          if (this.profileData.value.hasOwnProperty('invalidation_terms')) {
+            this.userDataByResources[String(currResourceURI)]['invalidation_terms'] =  this.profileData.value['invalidation_terms'].filter(x => {
+              return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
+            });
             this.userDataByResources[String(currResourceURI)]['invalidation_counts'] =  this.profileData.value['invalidation_terms'].filter(x => {
               return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
             }).map(x => x.count).reduce((a, b) => a + b, 0);
           } else {
+            this.userDataByResources[String(currResourceURI)]['invalidation_terms'] = [];
             this.userDataByResources[String(currResourceURI)]['invalidation_counts'] = 0;
           }
 

@@ -99,8 +99,8 @@
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0" style="text-align: center">
             <!--              {{row.categories.filter(x => x.activity_category === 'Generation')[0]generation_count}}-->
-            <span tooltip="{{calc_html_tooltip_count_category(row['categories'], 'Generation')}}">
-                {{calc_score_category(row['categories'], 'Generation') | number:'1.0':'en-US'}}
+            <span tooltip="{{calc_html_tooltip_count_category(row['categories'], 'generation')}}">
+                {{calc_score_category(row['categories'], 'generation') | number:'1.0':'en-US'}}
 </span>
           </td>
         </ng-container>
@@ -112,8 +112,8 @@
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
             <!--              <span [innerHTML]="calc_html_count_category(row['categories'], 'Revision')"></span>-->
-            <span tooltip="{{calc_html_tooltip_count_category(row['categories'], 'Revision')}}">
-                {{calc_score_category(row['categories'], 'Revision') | number:'1.0':'en-US'}}
+            <span tooltip="{{calc_html_tooltip_count_category(row['categories'], 'revision')}}">
+                {{calc_score_category(row['categories'], 'revision') | number:'1.0':'en-US'}}
 </span>
             <!--              {{row.revision_count}}-->
 
@@ -127,8 +127,8 @@
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
             <!--              <span [innerHTML]="calc_html_count_category(row['categories'], 'Invalidation')"></span>-->
-            <span tooltip="{{calc_html_tooltip_count_category(row['categories'], 'Invalidation')}}">
-                {{calc_score_category(row['categories'], 'Invalidation') | number:'1.0':'en-US'}}
+            <span tooltip="{{calc_html_tooltip_count_category(row['categories'], 'invalidation')}}">
+                {{calc_score_category(row['categories'], 'invalidation') | number:'1.0':'en-US'}}
 </span>
             <!--              {{row.invalidation_count}}-->
 
