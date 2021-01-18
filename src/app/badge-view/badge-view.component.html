@@ -36,12 +36,12 @@
   </div>
 </div>
 
+<!--<div class="badge  badge-badge-active  mr-2 mb-2"-->
+<!--     *ngIf="active" [class]="badge['color']">-->
 <div class="badge  badge-badge-active  mr-2 mb-2"
-     *ngIf="active" [class]="badge['color']">
+     *ngIf="active" [style]="{background: badge['color_code'] + alpha_map[badge['count_threshold']]}">
   <div class="row  align-items-center">
     <div class="col-3">
-
-
       <svg width="1.8em"
            height="1.8em"
            viewBox="0 0 16 16"

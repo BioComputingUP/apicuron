@@ -184,8 +184,13 @@
           </div>
           <h5>Badges:</h5>
 
-          <div class="row"> <div class="col">
-            <app-badge-view [badge]="currBadge" [active]="userDataByResources[selectedResource.value]['badge'].includes(currBadge['name'])" *ngFor="let currBadge of userDataByResources[selectedResource.value]['possible_badges']"></app-badge-view>
+          <div class="row" *ngFor="let currBadgeCategory of userDataByResources[selectedResource.value]['badge_categories']">
+            <div class="col">
+<!--              {{currBadgeCategory}}-->
+            <app-badge-view [badge]="currBadge"
+                            [active]="userDataByResources[selectedResource.value]['badge'].includes(currBadge['name'])"
+                            *ngFor="let currBadge of userDataByResources[selectedResource.value]['possible_badges'][currBadgeCategory]">
+            </app-badge-view>
 
 <!--            {{userDataByResources[selectedResource.value]}}-->
 

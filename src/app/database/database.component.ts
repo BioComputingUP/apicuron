@@ -10,6 +10,11 @@ export class DatabaseComponent implements OnInit {
  resourcesDescription = false;
   constructor(private internalService: InternalService) { }
 
+  badge_categories = [];
+  medal_categories = [];
+  badgesData = {};
+  medalsData = {};
+
   ngOnInit(): void {
 
     const resource_id = window.location.pathname.substring(11);
@@ -20,6 +25,29 @@ export class DatabaseComponent implements OnInit {
       }).subscribe(data => {
         if (data.length === 1) {
           this.resourcesDescription = data[0];
+          this.resourcesDescription['badges'].forEach(currBadge => {
+
+            if (!this.badgesData.hasOwnProperty(currBadge['category'])) {
+              this.badgesData[currBadge['category']] = [];
+            }
+            this.badgesData[currBadge['category']].push(currBadge);
+          });
+          this.badge_categories = Object.keys(this.badgesData);
+          this.badge_categories.forEach(currCategory => {
+            this.badgesData[currCategory].sort((a, b) => a.count_threshold > b.count_threshold);
+          });
+
+          console.log(this.badgesData);
+          this.resourcesDescription['medals'].forEach(currMedal => {
+            if (!this.medalsData.hasOwnProperty(currMedal['category'])) {
+              this.medalsData[currMedal['category']] = [];
+            }
+            this.medalsData[currMedal['category']].push(currMedal);
+          });
+          this.medal_categories = Object.keys(this.medalsData);
+          this.medal_categories.forEach(currCategory => {
+            this.medalsData[currCategory].sort((a, b) => a.score_relative > b.score_relative);
+          });
         }
       }, (err) => {
       }, () => {

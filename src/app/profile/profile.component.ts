@@ -107,13 +107,12 @@ export class ProfileComponent implements OnInit {
         }
         // console.log(this.resourcesList);
         Array.from(this.resourcesList).forEach(currResourceURI => {
-
-
-
-
           this.userDataByResources[String(currResourceURI)] = {
             name: currResourceURI
           };
+
+
+
           if (this.profileData.value.hasOwnProperty('badges')) {
             // this.userDataByResources[String(currResourceURI)]['generation_reports_length']
             this.userDataByResources[String(currResourceURI)]['badge'] = this.profileData.value['badges'].filter(x => {
@@ -168,31 +167,42 @@ export class ProfileComponent implements OnInit {
           }
 
           this.internalService.GetLeaderboard(String(currResourceURI), {curator_orcid: orcid_id }).subscribe(data => {
-            console.log(data[0]['curators'][0]['ranking'])
+            // console.log(data[0]['curators'][0]['ranking']);
             this.userDataByResources[String(currResourceURI)]['ranking'] = data[0]['curators'][0]['ranking'];
           }, (err) => {
           }, () => {
             // this.loading_finished = true;
 
+
+
           });
-
-
-
-
-
         });
+
         this.internalService.GetResearces({}).subscribe(data => {
           data.forEach(currResource => {
-
             if (this.userDataByResources.hasOwnProperty(currResource['resource_id'])) {
+              this.userDataByResources[currResource['resource_id']]['possible_badges'] = {};
+              // = {'possible_badges': {}};
+              if (this.userDataByResources.hasOwnProperty(currResource['resource_id'])) {
+                currResource['badges'].forEach(currBadge => {
 
-              this.userDataByResources[currResource['resource_id']]['possible_badges'] = currResource['badges'];
-
+                  if (!this.userDataByResources[currResource['resource_id']]['possible_badges'].hasOwnProperty(currBadge['category'])) {
+                    this.userDataByResources[currResource['resource_id']]['possible_badges'][currBadge['category']] = [];
+                  }
+                  this.userDataByResources[currResource['resource_id']]['possible_badges'][currBadge['category']].push(currBadge);
+                });
+                console.log(this.userDataByResources[currResource['resource_id']]['possible_badges']);
+                this.userDataByResources[currResource['resource_id']]['badge_categories'] = Object.keys(this.userDataByResources[currResource['resource_id']]['possible_badges']);
+                this.userDataByResources[currResource['resource_id']]['badge_categories'].forEach(currCategory => {
+                  this.userDataByResources[currResource['resource_id']]['possible_badges'][currCategory].sort((a, b) => a.count_threshold > b.count_threshold);
+                });
+              }
             }
           });
         }, (err) => {
         }, () => {
         });
+
 
 
 
