@@ -34,7 +34,7 @@ export class DatabaseComponent implements OnInit {
           });
           this.badge_categories = Object.keys(this.badgesData);
           this.badge_categories.forEach(currCategory => {
-            this.badgesData[currCategory].sort((a, b) => a.count_threshold > b.count_threshold);
+            this.badgesData[currCategory] = this.badgesData[currCategory].sort((a, b) => a.count_threshold > b.count_threshold);
           });
 
           console.log(this.badgesData);
@@ -46,7 +46,7 @@ export class DatabaseComponent implements OnInit {
           });
           this.medal_categories = Object.keys(this.medalsData);
           this.medal_categories.forEach(currCategory => {
-            this.medalsData[currCategory].sort((a, b) => a.score_relative > b.score_relative);
+            this.medalsData[currCategory] = this.medalsData[currCategory].sort((a, b) => a.score_relative > b.score_relative);
           });
         }
       }, (err) => {
