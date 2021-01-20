@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {BehaviorSubject, combineLatest} from 'rxjs';
-import {FormControl} from '@angular/forms';
+import {FormControl, FormGroup, FormBuilder} from '@angular/forms';
+import {InternalService} from '../services/internal.service';
 
 @Component({
   selector: 'app-details-table',
@@ -9,11 +10,12 @@ import {FormControl} from '@angular/forms';
 })
 export class DetailsTableComponent implements OnInit {
   // declaration, data loading
-  @Input() dataArray: [];
+  // @Input() dataArray: [];
   @Input() database;
   @Input() profileData;
   tableDataSource_f = new BehaviorSubject<any[]>([]);
   tableDataSource = new BehaviorSubject<any[]>([]);
+  totalItems = 0;
 
   displayedColumns = new BehaviorSubject<string[]>([
     'entry',
@@ -28,63 +30,57 @@ export class DetailsTableComponent implements OnInit {
   dataOnPage = new BehaviorSubject<any[]>([]);
 
   // declaration, search
-  searchFormControl = new FormControl();
+  searchForm: FormGroup;
   sortKey = new BehaviorSubject<string>('entry');
   sortDirection = new BehaviorSubject<string>('asc');
 
-  constructor() { }
+statArray= [];
+
+  constructor(private fb: FormBuilder,
+              private internalService: InternalService) { }
 
   ngOnInit() {
-    this.tableDataSource_f.next(this.dataArray);
-    combineLatest(this.tableDataSource_f, this.searchFormControl.valueChanges, this.sortKey, this.sortDirection)
-      .subscribe(([changedHeroData, searchTerm, sortKey, sortDirection]) => {
-        const heroesArray = Object.values(changedHeroData);
-        let filteredHeroes: any[];
 
-        if (!searchTerm) {
-          filteredHeroes = heroesArray;
-        } else {
-          const filteredResults = heroesArray.filter(hero => {
-            return Object.values(hero).reduce((prev, curr) => {
-              if (curr) {
+    this.searchForm = this.fb.group({
+      textSearch: null,
+      firstDay:  new Date(1990, 0, 1),
+      lastDay:  new Date()
+    });
 
-                return prev || JSON.stringify(curr).toLowerCase().includes(searchTerm.toLowerCase());
-              }
-              return prev;
-            }, false);
-          });
-          filteredHeroes = filteredResults;
-        }
 
-        const sortedHeroes = filteredHeroes.sort((a, b) => {
-          if (a[sortKey] > b[sortKey]) {
-            return sortDirection === 'asc' ? 1 : -1;
-          }
-          if (a[sortKey] < b[sortKey]) {
-            return sortDirection === 'asc' ? -1 : 1;
-          }
-          return 0;
+    // this.tableDataSource_f.next(this.dataArray);
+    combineLatest(
+      this.searchForm.valueChanges,
+      this.sortKey,
+      this.sortDirection,
+      this.currentPage,
+      this.pageSize)
+      .subscribe(([
+                    searchTerm,
+                    sortKey,
+                    sortDirection,
+                    currentPage,
+                    pageSize
+                  ]) => {
+        this.internalService.GetSearchDetails({
+          curator_orcid: this.profileData.value['orcid'],
+          resource_id: this.database,
+          page_size: 10,
+          page: currentPage['page'] - 1,
+          first_day: searchTerm.firstDay,
+          last_day: searchTerm.lastDay
+        }).subscribe(currData => {
+           this.dataOnPage.next(currData.reports);
+           this.totalItems = currData.count_total_reports;
+           this.statArray = currData.stat.sort((a, b) => a.activity_name > b.activity_name);
         });
-
-        this.tableDataSource.next(sortedHeroes);
       });
 
-    this.searchFormControl.setValue('');
+    this.searchForm.get('textSearch').setValue('');
 
-    combineLatest(this.tableDataSource, this.currentPage, this.pageSize)
-      .subscribe(([allSources, currentPage, pageSize]) => {
-        const startingIndex = (currentPage['page'] - 1) * pageSize;
-        const onPage = allSources.slice(startingIndex, startingIndex + pageSize);
-        this.dataOnPage.next(onPage);
-      });
+  }
 
-    // this.loading_finished = true;
-  }
-  exampleSearch() {
-    // const exampleSearch = 'Cellular tumor antigen p53';
-    const exampleSearch = 'P04637';
-    this.searchFormControl.setValue(exampleSearch);
-  }
+
 
   adjustSort(key: string) {
     if (this.sortKey.value === key) {
