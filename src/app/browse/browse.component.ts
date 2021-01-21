@@ -74,7 +74,6 @@ export class BrowseComponent implements OnInit {
       badge: this.fb.control(true),
 
     });
-    console.log('this.route.snapshot.queryParams', this.route.snapshot.queryParams);
 
     this.columnsFormNew.valueChanges.subscribe(columsObj => {
       // console.log(columsObj);
@@ -140,7 +139,38 @@ export class BrowseComponent implements OnInit {
           console.log('finish');
         });
       });
-      this.searchForm.get('area').setValue('name');
+
+      console.log('this.route.snapshot.queryParams', this.route.snapshot.queryParams);
+      Object.keys(this.route.snapshot.queryParams).forEach(currParam => {
+        console.log('currParam', currParam);
+         if (['name', 'curator_orcid', 'resource_uri'].includes(currParam)) {
+           this.searchForm.get('area').setValue(currParam);
+           this.searchForm.get('key').setValue(this.route.snapshot.queryParams[currParam]);
+         } else {
+           if (currParam === 'sort_field') {
+             this.sortKey.next(this.route.snapshot.queryParams[currParam]);
+           } else if (currParam === 'sort_value') {
+             this.sortDirection.next(this.route.snapshot.queryParams[currParam]);
+           } else if (currParam === 'page_size') {
+             if (['10', '20', '50'].includes(this.route.snapshot.queryParams[currParam])) {
+               this.pageSize.next(Number(this.route.snapshot.queryParams[currParam]));
+               this.radioModel = this.route.snapshot.queryParams[currParam];
+             }
+
+           } else if (currParam === 'page') {
+             // this.currentPage = Number(this.route.snapshot.queryParams[currParam]) + 1;
+
+             // this.currentPage = Number(this.route.snapshot.queryParams[currParam]) + 1
+             this.currentPage.next({page: Number(this.route.snapshot.queryParams[currParam]) + 1});
+           }
+         }
+
+
+});
+
+      if (!this.searchForm.get('area').value) {
+        this.searchForm.get('area').setValue('name');
+      }
     });
   }
 
