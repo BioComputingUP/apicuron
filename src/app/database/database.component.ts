@@ -25,6 +25,15 @@ export class DatabaseComponent implements OnInit {
       }).subscribe(data => {
         if (data.length === 1) {
           this.resourcesDescription = data[0];
+          this.resourcesDescription['terms'].sort( (a, b) => {
+             if ( a.activity_category === b.activity_category) {
+               return  a.score > b.score ? -1 : 1;
+             } else if ( a.activity_category === 'generation' || b.activity_category === 'generation') {
+               return  a.activity_category === 'generation' ?  -1 : 1;
+             } else {
+               return  a.activity_category === 'revision' ?  -1 : 1;
+             }
+          });
           this.resourcesDescription['badges'].forEach(currBadge => {
 
             if (!this.badgesData.hasOwnProperty(currBadge['category'])) {
@@ -34,7 +43,7 @@ export class DatabaseComponent implements OnInit {
           });
           this.badge_categories = Object.keys(this.badgesData);
           this.badge_categories.forEach(currCategory => {
-            this.badgesData[currCategory] = this.badgesData[currCategory].sort((a, b) => a.count_threshold > b.count_threshold);
+            this.badgesData[currCategory] = this.badgesData[currCategory].sort((a, b) => a.count_threshold > b.count_threshold ? 1 : -1);
           });
 
           console.log(this.badgesData);
@@ -46,7 +55,7 @@ export class DatabaseComponent implements OnInit {
           });
           this.medal_categories = Object.keys(this.medalsData);
           this.medal_categories.forEach(currCategory => {
-            this.medalsData[currCategory] = this.medalsData[currCategory].sort((a, b) => a.score_relative > b.score_relative);
+            this.medalsData[currCategory] = this.medalsData[currCategory].sort((a, b) => a.score_relative > b.score_relative ? 1 : -1);
           });
         }
       }, (err) => {

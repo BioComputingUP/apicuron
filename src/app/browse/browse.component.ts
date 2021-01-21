@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {concat, BehaviorSubject, combineLatest, of} from 'rxjs';
+import {BehaviorSubject, combineLatest} from 'rxjs';
 import {InternalService} from '../services/internal.service';
 import {AuthService} from '../services/auth.service';
-import {FormControl, FormGroup, FormBuilder, FormArray} from '@angular/forms';
-// import {MatTableModule} from '@angular/material/table';
-import {animate, keyframes, state, style, transition, trigger} from '@angular/animations';
+import {FormBuilder, FormArray, FormGroup} from '@angular/forms';
+import {animate, state, style, transition, trigger} from '@angular/animations';
+import {Router, ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-browse',
@@ -21,14 +21,14 @@ import {animate, keyframes, state, style, transition, trigger} from '@angular/an
 export class BrowseComponent implements OnInit {
   columnsFormNew;
   collapseColumns = true;
-  searchForm: FormArray;
+  searchForm: FormGroup;
   loading_finished = false;
   loading_new_table = true;
 
   radioModel = '20';
   isExpansionDetailRow = true;
   expandedElement: any;
-  selectedRow = "";
+  selectedRow = '';
   localAuth = new BehaviorSubject<object>({});
   displayedColumns = new BehaviorSubject<object>(['name', 'orcid', 'generation_count', 'revision_count', 'invalidation_count', 'medals', 'badges', 'resources']);
   currentPage = new BehaviorSubject<object>({
@@ -43,12 +43,19 @@ export class BrowseComponent implements OnInit {
 
 
   constructor(public authService: AuthService,
+              private route: ActivatedRoute,
               private fb: FormBuilder,
+              private router: Router,
               private internalService: InternalService) {
   }
 
   ngOnInit() {
-    this.searchForm = this.fb.array([]);
+    this.searchForm = this.fb.group({
+      area: null,
+      key: null,
+      firstDay:  new Date(1990, 0, 1),
+      lastDay:  new Date()
+    });
     this.authService.loginData.subscribe(authData => {
       if (this.localAuth.value !== authData) {
         this.localAuth.next(authData);
@@ -67,6 +74,8 @@ export class BrowseComponent implements OnInit {
       badge: this.fb.control(true),
 
     });
+    console.log('this.route.snapshot.queryParams', this.route.snapshot.queryParams);
+
     this.columnsFormNew.valueChanges.subscribe(columsObj => {
       // console.log(columsObj);
       const newDisplayedColumns = [];
@@ -97,25 +106,23 @@ export class BrowseComponent implements OnInit {
                      sortKey,
                      sortDirection,
                      currentPage]) => {
-        const search_params = {};
-        search_params['sort_field'] = sortKey;
-        search_params['sort_value'] = sortDirection;
-        search_params['page_size'] = pageSize;
-        search_params['page'] = currentPage['page'] - 1;
-        // console.log('formData', formData);
-        formData.forEach(currItem => {
-          if (['time_from', 'time_last'].includes(currItem.area)) {
-            try {
-              search_params[currItem.area] = currItem.key.toISOString().slice(0, 10);
-            } catch (e) {
+        const search_params = {
+          sort_field: sortKey,
+          sort_value: sortDirection,
+          page_size: pageSize,
+          page: currentPage['page'] - 1,
+          first_day: formData.firstDay.toISOString().slice(0, 10),
+          last_day: formData.lastDay.toISOString().slice(0, 10),
 
-            }
-          } else if (currItem.key) {
-            search_params[currItem.area] = currItem.key;
-          }
-        });
+        };
+        if (formData.key && formData.key !== '') {
+          search_params[formData.area] = formData.key;
+        }
+
+
         this.loading_finished = false;
         this.loading_new_table = true;
+        this.router.navigate(['curators'], {queryParams: search_params});
 
         this.internalService.GetSearch2(search_params).subscribe((browseData) => {
           this.dataOnPage.next(browseData.biocurators);
@@ -133,16 +140,7 @@ export class BrowseComponent implements OnInit {
           console.log('finish');
         });
       });
-      const rows = this.searchForm as FormArray;
-      if (rows.length === 0) {
-        rows.push(this.fb.group({
-          // area: 'time_from',
-          // key: new Date(2019, 9, 1)
-          area: 'free_etxt',
-          key: null
-        }));
-      }
-      // }
+      this.searchForm.get('area').setValue('name');
     });
   }
 
@@ -217,36 +215,6 @@ export class BrowseComponent implements OnInit {
     }
 
     return '<small>' + out_put.join('<br>') + '</small>';
-  }
-
-  checkFreeText(formObj, form_index) {
-    // console.log('itt', formObj);
-    for (let i = 0; i < formObj.length && i < form_index; i++) {
-      // console.log(formObj[i])
-      if (formObj[i].area === 'free_text') {
-        // console.log('checkFreeText false');
-        return false;
-      }
-    }
-    // console.log('checkFreeText true');
-    return true;
-  }
-
-  addSearchField(urlSearch, area) {
-    const rows = this.searchForm as FormArray;
-    rows.push(this.fb.group({
-      area: area,
-      key: null
-    }));
-  }
-
-  removeSearchField(index) {
-    const rows = this.searchForm as FormArray;
-    rows.removeAt(index);
-    if (rows.length === 0) {
-      this.addSearchField(null, 'free_text');
-    }
-
   }
 
   changeValuePageSize(itemsPerPage: string) {
