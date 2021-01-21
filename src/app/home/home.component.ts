@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {InternalService} from '../services/internal.service';
 import { CarouselConfig } from 'ngx-bootstrap/carousel';
+import {FormControl} from '@angular/forms';
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -11,6 +13,7 @@ import { CarouselConfig } from 'ngx-bootstrap/carousel';
 })
 export class HomeComponent implements OnInit {
   listResourcesDescriptions;
+  searchFormControl = new FormControl();
 
   selected_resource;
   constructor(private internalService: InternalService) { }

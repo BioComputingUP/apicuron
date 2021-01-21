@@ -74,7 +74,15 @@ export class InternalService {
   }
 
   PostProfilePicture(profilePicture, id): Observable<any> {
-    return this.http.post(this.apicuronPostProfilePicture + id, profilePicture);
+    console.log(this.apicuronPostProfilePicture + id);
+    console.log(profilePicture);
+    return this.http.post(
+      this.apicuronPostProfilePicture + id,
+      profilePicture,
+      {
+        reportProgress: true,
+        observe: 'events'
+      });
   }
 
   GetORCIDprofile(id): Observable<any> {

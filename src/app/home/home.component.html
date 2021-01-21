@@ -18,41 +18,39 @@
         </p>
       </div>
     </div>
-<!--    <div class="row pt-3">-->
-<!--      <div class="col-lg-8 offset-lg-2 ">-->
-<!--        <div class="form-group m-0">-->
-<!--          <div class="input-group">-->
-<!--            <input id="searchform" class="form-control pb-0" placeholder="Search in APICURON ..."-->
-<!--                   type="text">-->
-<!--&lt;!&ndash;                   [formControl]="searchFormControl" type="text">&ndash;&gt;-->
-<!--            <div class="input-group-append">-->
-<!--              <a class="btn btn-outline-primary" [routerLink]="['/browse']"-->
-<!--                 >Search</a>-->
-<!--&lt;!&ndash;                 [queryParams]="{free_text:searchFormControl.value}">Search</a>&ndash;&gt;-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-
     <div class="row pt-3">
-      <div class="col">
-            <div class="card">
-              <div class="card-header">
-                Leaderboard -  <span class="badge badge-pill ml-2"
-                                     [class.badge-secondary]="currDatabase['resource_id'] !== selected_resource"
-                                     [class.badge-apicuron]="currDatabase['resource_id'] === selected_resource"
-                                     (click)="selected_resource = currDatabase['resource_id']"
-                                     *ngFor="let currDatabase of listResourcesDescriptions let index=index">{{currDatabase['resource_name']}}</span>
-              </div>
-              <div *ngFor="let currDatabase of listResourcesDescriptions let index=index">
-                <div *ngIf="currDatabase['resource_id'] === selected_resource">
-                  <app-leaderboard-card [database]="currDatabase"></app-leaderboard-card>
-                </div>
-              </div>
+      <div class="col-lg-8 offset-lg-2 ">
+        <div class="form-group m-0">
+          <div class="input-group">
+            <input id="searchform" class="form-control pb-0" placeholder="Search in APICURON ..."
+                   [formControl]="searchFormControl" type="text">
+            <div class="input-group-append">
+              <a class="btn btn-outline-primary" [routerLink]="['/browse']"
+                 [queryParams]="{name:searchFormControl.value}">Search</a>
             </div>
+          </div>
+        </div>
       </div>
     </div>
+
+<!--    <div class="row pt-3">-->
+<!--      <div class="col">-->
+<!--            <div class="card">-->
+<!--              <div class="card-header">-->
+<!--                Leaderboard -  <span class="badge badge-pill ml-2"-->
+<!--                                     [class.badge-secondary]="currDatabase['resource_id'] !== selected_resource"-->
+<!--                                     [class.badge-apicuron]="currDatabase['resource_id'] === selected_resource"-->
+<!--                                     (click)="selected_resource = currDatabase['resource_id']"-->
+<!--                                     *ngFor="let currDatabase of listResourcesDescriptions let index=index">{{currDatabase['resource_name']}}</span>-->
+<!--              </div>-->
+<!--              <div *ngFor="let currDatabase of listResourcesDescriptions let index=index">-->
+<!--                <div *ngIf="currDatabase['resource_id'] === selected_resource">-->
+<!--                  <app-leaderboard-card [database]="currDatabase"></app-leaderboard-card>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--      </div>-->
+<!--    </div>-->
     <div class="row pt-3">
       <div class="col-lg-7">
         <div class="card" style="border: none">

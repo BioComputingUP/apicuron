@@ -63,6 +63,7 @@ statArray= [];
                     pageSize
                   ]) => {
         this.internalService.GetSearchDetails({
+          filter: searchTerm.textSearch,
           curator_orcid: this.profileData.value['orcid'],
           resource_id: this.database,
           page_size: 10,
@@ -72,7 +73,7 @@ statArray= [];
         }).subscribe(currData => {
            this.dataOnPage.next(currData.reports);
            this.totalItems = currData.count_total_reports;
-           this.statArray = currData.stat.sort((a, b) => a.activity_name > b.activity_name);
+           this.statArray = currData.stat.sort((a, b) => a.activity_name > b.activity_name ? 1 : -1);
         });
       });
 

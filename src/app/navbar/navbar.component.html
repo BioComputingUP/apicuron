@@ -60,8 +60,8 @@
           <li class="nav-item float-right  my-auto">
             <!--          {{loginData | json}}-->
             <!--            <a class="nav-link btn active" *ngIf="!loginData['authorized']" routerLink="/login">Login</a>-->
-            <div *ngIf="loginData['authorized']">
-              <ul class="navbar-nav mr-auto">
+            <div *ngIf="loginData['authorized']" >
+              <ul class="navbar-nav mr-auto" style="z-index: 1000">
                 <li class="nav-item dropdown" dropdown container="body">
                   <a class="nav-link btn active dropdown-toggle" dropdownToggle
                      aria-controls="basic-link-dropdown">{{loginData['displayedName']}}</a>

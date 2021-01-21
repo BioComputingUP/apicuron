@@ -1,3 +1,8 @@
+<input #file
+       type="file"
+       style="display: none"
+       accept="image/*"
+       (change)="onFilesAdded()">
 <div class="container-fluid container-wide py-3" style="min-height: 60vh">
 
   <div *ngIf="loading_finished && orcidData['activities-summary']">
@@ -16,7 +21,36 @@
       <div class="row  align-items-start">
         <div class="col-xl-auto pb-1">
           <div class="row">
-            <div class="col-auto"><img class="logoimg" src="assets/user.png"></div>
+            <div class="col-auto">
+              <div class="row">
+                <div class="col">
+                  <div *ngIf="profileData.value['profile_picture']">
+                    <img
+                      src="{{env.ws}}getProfilePicture/{{profileData.value['profile_picture']}}"
+                      class="logoimg img-border">
+                  </div>
+                  <div *ngIf="!profileData.value['profile_picture']">
+                    <img class="logoimg" src="assets/user.png">
+                  </div>
+                </div>
+              </div>
+<!--              <div class="row">-->
+              <div class="row" *ngIf="logedIn">
+                <div class="col">
+                  <div *ngIf="profileData.value['profile_picture']">
+                    <button class="btn btn-danger btn-sm" (click)="addFiles()"> Select another profile picture </button>
+                  </div>
+                  <div *ngIf="!profileData.value['profile_picture']">
+                    <button class="btn btn-danger btn-sm" (click)="addFiles()"> Select profile picture </button>
+                  </div>
+                  <div *ngIf="imgURL">
+                    <button class="btn btn-success btn-sm" (click)="sendData()"> Upload </button>
+                  </div>
+                </div>
+              </div>
+
+
+            </div>
             <div class="col-auto">
               <h3>
                 <strong> {{orcidData['person']['name']['given-names']['value']}} {{orcidData['person']['name']['family-name']['value']}} </strong>

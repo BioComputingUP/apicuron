@@ -22,6 +22,7 @@ export class AuthService {
     role: null,
     message: null,
     initial: true,
+    orcid_id: null
   });
 
   constructor(public router: Router,

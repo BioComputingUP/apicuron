@@ -1,7 +1,8 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {InternalService} from '../services/internal.service';
 import {concat, BehaviorSubject, Observable, combineLatest} from 'rxjs';
 import {ProgressbarConfig} from 'ngx-bootstrap';
+import {HttpEvent, HttpClient, HttpRequest, HttpEventType} from '@angular/common/http';
 
 export function getProgressbarConfig(): ProgressbarConfig {
   return Object.assign(new ProgressbarConfig(), {animate: true, striped: true, max: 100});
@@ -19,6 +20,9 @@ import {AuthService} from '../services/auth.service';
 
 export class ProfileComponent implements OnInit {
   localAuth = new BehaviorSubject<object>({});
+  logedIn = false;
+  progress;
+  formData = new FormData();
   profileData = new BehaviorSubject<object>({});
   editMode = new BehaviorSubject<boolean>(false);
   loading_finished = false;
@@ -32,7 +36,7 @@ export class ProfileComponent implements OnInit {
   map_resources = {};
   userDataByResources = {};
 
-
+ orcidID = null;
   map_all_badges = {};
 
   employment = [];
@@ -40,7 +44,9 @@ export class ProfileComponent implements OnInit {
   selectedResource = new BehaviorSubject<string>('');
   listResourcesSmall = new BehaviorSubject<object[]>([]);
   selectedResourceData = new BehaviorSubject<object>({});
+  imgURL: any;
 
+  @ViewChild('file', { static: true }) file;
 
   constructor(public authService: AuthService,
               private internalService: InternalService) {
@@ -49,7 +55,7 @@ export class ProfileComponent implements OnInit {
   ngOnInit() {
     this.env = environment;
     const orcid_id = window.location.pathname.substring(7, 26);
-
+    this.orcidID = orcid_id;
     this.authService.loginData.subscribe(authData => {
       if (this.localAuth.value !== authData) {
         this.localAuth.next(authData);
@@ -60,6 +66,9 @@ export class ProfileComponent implements OnInit {
       // if (!authData.hasOwnProperty('initial')) {
       // console.log('authData', authData);
       console.log('orcid_id', orcid_id);
+
+      this.logedIn = orcid_id === authData['orcid_id'];
+
       this.internalService.GetSearch2({
         curator_orcid: orcid_id
       }).subscribe((browseData) => {
@@ -126,7 +135,7 @@ export class ProfileComponent implements OnInit {
             // this.userDataByResources[String(currResourceURI)]['generation_reports_length']
             this.userDataByResources[String(currResourceURI)]['medal'] = this.profileData.value['medals'].filter(x => {
               return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
-            }).sort((a, b) =>  a.name > b.name );
+            }).sort((a, b) =>  a.name > b.name  ? 1 : -1);
           } else {
             // this.userDataByResources[String(currResourceURI)]['generation_reports_length']
             this.userDataByResources[String(currResourceURI)]['medal'] = [];
@@ -194,7 +203,7 @@ export class ProfileComponent implements OnInit {
                 console.log(this.userDataByResources[currResource['resource_id']]['possible_badges']);
                 this.userDataByResources[currResource['resource_id']]['badge_categories'] = Object.keys(this.userDataByResources[currResource['resource_id']]['possible_badges']);
                 this.userDataByResources[currResource['resource_id']]['badge_categories'].forEach(currCategory => {
-                  this.userDataByResources[currResource['resource_id']]['possible_badges'][currCategory].sort((a, b) => a.count_threshold > b.count_threshold);
+                  this.userDataByResources[currResource['resource_id']]['possible_badges'][currCategory].sort((a, b) => a.count_threshold > b.count_threshold ? 1 : -1);
                 });
               }
             }
@@ -334,5 +343,50 @@ export class ProfileComponent implements OnInit {
     }
   }
 
+  onFilesAdded() {
+    console.log(this.file);
+    const reader = new FileReader();
+    this.formData.append('profile_picture', this.file.nativeElement.files[0], this.file.nativeElement.files[0].name);
+    reader.readAsDataURL(this.file.nativeElement.files[0]);
+    reader.onload = (_event) => {
+      this.imgURL = reader.result;
+    };
+  }
 
+  addFiles() {
+
+    console.log('file select window');
+    console.log(this.file);
+
+    this.file.nativeElement.click();
+  }
+
+  sendData() {
+    console.log('file uploading');
+
+
+    this.internalService.PostProfilePicture(this.formData,    this.orcidID).subscribe((event: HttpEvent<any>) => {
+      switch (event.type) {
+        case HttpEventType.Sent:
+          console.log('Request has been made!');
+          break;
+        case HttpEventType.ResponseHeader:
+          console.log('Response header has been received!');
+          break;
+        case HttpEventType.UploadProgress:
+          this.progress = Math.round(event.loaded / event.total * 100);
+          console.log(`Uploaded! ${this.progress}%`);
+          break;
+        case HttpEventType.Response:
+          console.log('User successfully created!', event.body);
+          setTimeout(() => {
+            this.progress = 0;
+            this.ngOnInit();
+          }, 500);
+
+
+      }
+
+    });
+  }
 }
