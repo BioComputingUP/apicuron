@@ -20,6 +20,7 @@ import {Router, ActivatedRoute} from '@angular/router';
 })
 export class BrowseComponent implements OnInit {
   columnsFormNew;
+  currentPageModel = 1;
   collapseColumns = true;
   searchForm: FormGroup;
   loading_finished = false;
@@ -158,7 +159,7 @@ export class BrowseComponent implements OnInit {
              }
 
            } else if (currParam === 'page') {
-             // this.currentPage = Number(this.route.snapshot.queryParams[currParam]) + 1;
+             this.currentPageModel = Number(this.route.snapshot.queryParams[currParam]) + 1;
 
              // this.currentPage = Number(this.route.snapshot.queryParams[currParam]) + 1
              this.currentPage.next({page: Number(this.route.snapshot.queryParams[currParam]) + 1});

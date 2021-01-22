@@ -51,6 +51,7 @@
               [itemsPerPage]="pageSize.value"
               [maxSize]="1"
               [boundaryLinks]="true"
+              [(ngModel)]="currentPageModel"
               (pageChanged)="currentPage.next($event)"
               previousText="&lsaquo;"
               nextText="&rsaquo;"
