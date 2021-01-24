@@ -34,7 +34,7 @@ export class DetailsTableComponent implements OnInit {
   sortKey = new BehaviorSubject<string>('entry');
   sortDirection = new BehaviorSubject<string>('asc');
 
-statArray= [];
+  statArray = [];
 
   constructor(private fb: FormBuilder,
               private internalService: InternalService) { }

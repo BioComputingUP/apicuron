@@ -6,7 +6,7 @@
           <h2>{{resourcesDescription['resource_name']}}</h2>
         </div>
         <div class="col-auto pt-1 ml-3 offset-1 mr-auto">
-          <span class="ml-3"      [ngxScrollTo]="general" [ngxScrollToOffset]="-1800">General description</span>
+          <span class="ml-3"      [ngxScrollTo]="general" [ngxScrollToOffset]="-180">General description</span>
           <span class="ml-3"      [ngxScrollTo]="terms" [ngxScrollToOffset]="-180">Biocuration activities</span>
           <span class="ml-3"     [ngxScrollTo]="badges" [ngxScrollToOffset]="-180">Badges</span>
           <span class="ml-3"     [ngxScrollTo]="medals" [ngxScrollToOffset]="-180">Medals</span>
@@ -31,7 +31,7 @@
   <p class="mt-4" id="general" #general>
     <strong>{{resourcesDescription['resource_long_name']}} </strong>
   </p>
-  <p>
+  <p class="text-justify">
     {{resourcesDescription['resource_description']}}
   </p>
 

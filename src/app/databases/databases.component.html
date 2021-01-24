@@ -1,49 +1,52 @@
-<div class="container-fluid container-wide" #top >
-  <div class="row mt-3">
-    <div class="col-lg-3 d-none d-lg-block d-xl-block">
-      <div class="sticky sidebar">
-        <div class="row">
-          <div class="col">
-            <div class="card"  >
-              <div class="card-header"><h5>Navigate</h5></div>
-              <div class="card-body">
-                <h6 [ngxScrollTo]="top" [ngxScrollToOffset]="-150"><a href="javascript:void(0)">Databases</a></h6>
-
-                <ul>
-                  <li [ngxScrollTo]="currResource['resource_id']" [ngxScrollToOffset]="-150" *ngFor="let currResource of listResourcesDescriptions"><a href="javascript:void(0)">{{currResource['resource_name']}}</a></li>
-<!--                  <li [ngx-scroll-to]="source"><a href="javascript:void(0)">Annotation Source</a></li>-->
-<!--                  <li [ngx-scroll-to]="ontology"><a href="javascript:void(0)">IDPontology</a></li>-->
-<!--                  <li [ngx-scroll-to]="license"><a href="javascript:void(0)">License</a></li>-->
-<!--                  <li [ngx-scroll-to]="privacy"><a href="javascript:void(0)">Privacy notice</a></li>-->
-                </ul>
-
-              </div>
-            </div>
-          </div>
-        </div>
+<div *ngIf="listResourcesDescriptions">
+  <div id="second-nav-bar" class="fixed-top " style="margin-top: 75px; padding-top: 0px">
+  <div class="container-fluid container-wide  d-none d-sm-block">
+    <div class="row" style="  ">
+      <div class="col-auto mr-auto ">
+        <h2>Databases</h2>
       </div>
+      <div class="col-auto pt-1 ml-3">
+        <span class="badge badge-pill ml-3 badge-apicuron"  [ngxScrollTo]="currResource['resource_id']" [ngxScrollToOffset]="-160" *ngFor="let currResource of listResourcesDescriptions">{{currResource['resource_name']}}</span>
+
+      </div>
+
     </div>
-    <div class="col-lg-9">
+  </div>
+</div>
+
+<div class="container-fluid container-wide" #top style="padding-top: 70px">
+  <div class="row mt-3">
+    <div class="col">
       <div class="row" *ngFor="let currResource of listResourcesDescriptions">
         <div class="col">
           <div class="card">
             <div class="card-body card-database-body">
               <div class="row" [id]="currResource['resource_id']">
                 <div class="col">
-                  <h2>{{currResource['resource_name']}} - {{currResource['resource_long_name']}}</h2>
-                  <p><a class="badge badge-apicuron" href="{{currResource['resource_url']}}" target="_blank">{{currResource['resource_url']}} <i class="material-icons" style="font-size: small">link</i></a>
-                    <a class="badge badge-apicuron ml-3" routerLink="/curators" [queryParams]="{resource_uri: currResource['resource_id']}">Biocurators <i class="material-icons" style="font-size: small">search</i> </a>
-                  </p>
+                  <div class="row">
+                    <div class="col col-auto mr-auto ">
+                      <h2>{{currResource['resource_name']}} - {{currResource['resource_long_name']}}</h2>
+                    </div>
+                    <div class="col col-auto">
+                      <a class="" href="{{currResource['resource_url']}}" target="_blank">{{currResource['resource_url']}} </a>
+                    </div>
+                  </div>
+<!--                  <p>-->
+<!--                    <a class="badge badge-apicuron ml-3" routerLink="/curators" [queryParams]="{resource_uri: currResource['resource_id']}">Biocurators <i class="material-icons" style="font-size: small">search</i> </a>-->
+<!--                  </p>-->
                 </div>
               </div>
               <div class="row">
                 <div class="col">
-                  <span>{{currResource['resource_description']}}</span> <br>
-                  [basic stat]
+                  <p class="text-justify">{{currResource['resource_description']}}</p>
                 </div>
-              </div>              <div class="row">
-                <div class="col">
-                  <a class="badge badge-apicuron" routerLink="/databases/{{currResource['resource_id']}}"> See more details  <i class="material-icons" style="font-size: small">search</i></a>
+              </div>
+              <div class="row">
+
+                <div class="col mr-auto">                </div>
+
+                <div class="col-auto ">
+                  <a class="btn badge badge-apicuron" routerLink="/databases/{{currResource['resource_id']}}"> See more details  <i class="material-icons" style="font-size: small">search</i></a>
                 </div>
               </div>
 
