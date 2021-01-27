@@ -1,5 +1,3 @@
-
-
 <div class="col-12" >
   <form [formGroup]="searchForm">
 
@@ -76,7 +74,7 @@
 <!--      </ng-container>-->
     </table>
 <div class="row">
-  <div class="col-md-4 ">
+  <div class="col-lx-4 mr-auto">
     <pagination
       [totalItems]="totalItems"
       [itemsPerPage]="pageSize.value"
@@ -86,14 +84,19 @@
     >
     </pagination>
   </div>
-  <div class="col-auto">  <h6>Statistics based on you query:</h6>
+  <div class="col-auto">
+    <div class="row">
+      <div class="col-lg-auto">  <h6>Statistics based on you query:</h6>
+      </div>
+      <div class="col">
+        <div class="row" *ngFor="let currTerm of statArray">
+          <div class="col mr-auto"><strong>{{currTerm['activity_name']}}</strong> ({{currTerm['activity_category']}})</div>
+          <div class="col-auto"> {{currTerm['count']}}</div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="col">
-  <div class="row" *ngFor="let currTerm of statArray">
-    <div class="col"><strong>{{currTerm['activity_name']}}</strong> ({{currTerm['activity_category']}})</div>
-    <div class="col-auto"> {{currTerm['count']}}</div>
-  </div>
-</div>
+
 
 </div>
 
