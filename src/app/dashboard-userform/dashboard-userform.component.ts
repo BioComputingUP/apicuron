@@ -29,7 +29,7 @@ export class DashboardUserformComponent implements OnInit {
         {
           username: [this.user_obj.hasOwnProperty('username') ? this.user_obj['username'] : '', Validators.required],
           role: [this.user_obj.hasOwnProperty('role') ? this.user_obj['role'] : '', Validators.required],
-          displayedName: [this.user_obj.hasOwnProperty('displayedName') ? this.user_obj['displayedName'] : ''],
+          displayedName: [this.user_obj.hasOwnProperty('full_name') ? this.user_obj['full_name'] : ''],
           institution: [this.user_obj.hasOwnProperty('institution') ? this.user_obj['institution'] : '', Validators.required],
           email: [this.user_obj.hasOwnProperty('email') ? this.user_obj['email'] : '', [Validators.required, Validators.email]],
           gmail: [this.user_obj.hasOwnProperty('gmail') ? this.user_obj['gmail'] : '', Validators.email],

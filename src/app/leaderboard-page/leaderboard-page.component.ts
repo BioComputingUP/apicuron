@@ -20,6 +20,7 @@ export class LeaderboardPageComponent implements OnInit {
       this.listResourcesDescriptions = data;
     }, (err) => {
     }, () => {
+
       if (this.route.snapshot.queryParams.hasOwnProperty('resource'))  {
         // console.log('this.route.snapshot.queryParams.hasOwnProperty(\'resource\')');
         // console.log('document.getElementById("ped")', document.getElementById("ped"));

@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {InternalService} from '../services/internal.service';
+import {ActivatedRoute} from '@angular/router';
+import {ScrollToConfigOptions, ScrollToService} from '@nicky-lenaers/ngx-scroll-to';
 
 @Component({
   selector: 'app-database',
@@ -8,7 +10,7 @@ import {InternalService} from '../services/internal.service';
 })
 export class DatabaseComponent implements OnInit {
  resourcesDescription = false;
-  constructor(private internalService: InternalService) { }
+  constructor(private scrollToService: ScrollToService, private route: ActivatedRoute, private internalService: InternalService) { }
 
   badge_categories = [];
   medal_categories = [];
@@ -18,6 +20,10 @@ export class DatabaseComponent implements OnInit {
   ngOnInit(): void {
 
     const resource_id = window.location.pathname.substring(11);
+
+    // console.log('this.route.snapshot', this.route.snapshot);
+    console.log('this.route.snapshot.fragment', this.route.snapshot.fragment);
+    // console.log('window.location', window.location);
     console.log(resource_id, resource_id.length > 1 );
     if (resource_id.length > 1) {
       this.internalService.GetResearces({
@@ -60,6 +66,20 @@ export class DatabaseComponent implements OnInit {
         }
       }, (err) => {
       }, () => {
+        console.log('this.route.snapshot.fragment', this.route.snapshot.fragment);
+        const config: ScrollToConfigOptions = {
+          // target: 'ped',
+          offset: -230,
+          duration: 0.2,
+          target: this.route.snapshot.fragment
+        };
+        // setTimeout(function () {
+        //   this.scrollToService.scrollTo(config);
+        //
+        // }, 5000);
+        // this.scrollToService.scrollTo(config);
+        this.scrolTo(this.scrollToService, config);
+
       });
     }
 // console.log(resource_id)
@@ -79,5 +99,9 @@ export class DatabaseComponent implements OnInit {
     });
   }
 
-
+  scrolTo(newState, config) {
+    setTimeout(function () {
+      newState.scrollTo(config);
+    }, 800);
+  }
 }

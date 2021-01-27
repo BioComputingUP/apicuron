@@ -21,19 +21,26 @@
         <div class="col">
           <div class="card">
             <div class="card-body card-database-body">
-              <div class="row" [id]="currResource['resource_id']">
+              <div class="row mb-0" [id]="currResource['resource_id']">
                 <div class="col">
                   <div class="row">
                     <div class="col col-auto mr-auto ">
                       <h2>{{currResource['resource_name']}} - {{currResource['resource_long_name']}}</h2>
                     </div>
                     <div class="col col-auto">
-                      <a class="" href="{{currResource['resource_url']}}" target="_blank">{{currResource['resource_url']}} </a>
+                      <a class="btn btn-apicuron btn-sm" routerLink="/databases/{{currResource['resource_id']}}"> See details  <i
+                                                                                                                                class="icon icon-common icon-analyse-graph"></i></a>
+
                     </div>
                   </div>
 <!--                  <p>-->
 <!--                    <a class="badge badge-apicuron ml-3" routerLink="/curators" [queryParams]="{resource_uri: currResource['resource_id']}">Biocurators <i class="material-icons" style="font-size: small">search</i> </a>-->
 <!--                  </p>-->
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col">
+                  <a class="" href="{{currResource['resource_url']}}" target="_blank">{{currResource['resource_url']}} </a>
                 </div>
               </div>
               <div class="row">
@@ -46,7 +53,6 @@
                 <div class="col mr-auto">                </div>
 
                 <div class="col-auto ">
-                  <a class="btn badge badge-apicuron" routerLink="/databases/{{currResource['resource_id']}}"> See more details  <i class="material-icons" style="font-size: small">search</i></a>
                 </div>
               </div>
 

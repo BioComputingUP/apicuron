@@ -142,8 +142,8 @@
                 <strong>Rank: </strong>
                 <a class="badge  badge-apicuron"
                    tooltip="see at Leaderboard"
-                   routerLink="/leaderboard"
-                   [queryParams]="{'resource': selectedResource.value}">{{userDataByResources[selectedResource.value]['ranking']}}</a>
+                   routerLink="/databases/{{selectedResource.value}}"
+                   fragment="leaderboard">{{userDataByResources[selectedResource.value]['ranking']}}</a>
               </span>
                 </p>
               </div>
@@ -269,8 +269,8 @@
                 <strong>Rank: </strong>
                 <a class="badge  badge-apicuron"
                    tooltip="see at Leaderboard"
-                   routerLink="/leaderboard"
-                   [queryParams]="{'resource': database}">{{userDataByResources[database]['ranking']}}</a>
+                   routerLink="/databases/{{database}}"
+                   fragment="leaderboard">{{userDataByResources[database]['ranking']}}</a>
               </div>
             </div>
             <div class="row">

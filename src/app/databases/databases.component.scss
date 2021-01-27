@@ -1,8 +1,8 @@
 @import '../../styles';
 
 .card-database-body {
-  box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.35);
-  border:0px;
+  box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.35);
+  border: 0px;
   border-radius: 4px;
 }
 
@@ -18,20 +18,21 @@
 }
 
 .card-database-body {
-  box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.35);
-  border:0px;
+  box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.35);
+  border: 0px;
   border-radius: 4px;
 }
+
 .card-database-body-sm {
-  box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.35);
-  border:0px;
+  box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.35);
+  border: 0px;
 }
 
 
 .fixed-top {
   top: 60px;
   z-index: 10;
-  box-shadow: 0px 11px 8px -5px rgba(0,0,0,0.35);
+  box-shadow: 0px 11px 8px -5px rgba(0, 0, 0, 0.35);
   background-color: white;
   transition: 0.25s;
 

@@ -9,6 +9,8 @@ export class BadgeViewComponent implements OnInit {
   @Input() active;
   @Input() badge;
 
+  tooltipHTML;
+
   alpha_map = {
     1: 'a0',
     10: 'b0',
@@ -22,6 +24,7 @@ export class BadgeViewComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    this.tooltipHTML = 'Threshold: ' + this.badge.count_threshold + ' activity from: ' + this.badge.list_terms.join(', ');
   }
 
 }

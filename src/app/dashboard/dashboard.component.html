@@ -3,7 +3,7 @@
   <div *ngIf="localAuth.value['authorized']">
     <div class="row" style="padding-top: 10px">
       <div class="col-12">
-        <h4>Welcome <strong>{{localAuth.value['displayedName']}}</strong> at PubDisProt!</h4>
+        <h4>Welcome <strong>{{localAuth.value['full_name']}}</strong> at PubDisProt!</h4>
       </div>
     </div>
     <tabset style="padding-top: 10px">
@@ -33,8 +33,8 @@
               <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
 
               <ng-container cdkColumnDef="displayedName">
-                <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('displayedName')"> displayedName
-                  <span *ngIf="sortKey.value === 'displayedName'">
+                <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('full_name')"> full_name
+                  <span *ngIf="sortKey.value === 'full_name'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
                 </th>

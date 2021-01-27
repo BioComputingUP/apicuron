@@ -51,7 +51,6 @@
               [itemsPerPage]="pageSize.value"
               [maxSize]="1"
               [boundaryLinks]="true"
-              [(ngModel)]="currentPageModel"
               (pageChanged)="currentPage.next($event)"
               previousText="&lsaquo;"
               nextText="&rsaquo;"
@@ -100,10 +99,10 @@
               </td>
             </ng-container>
 
-            <ng-container cdkColumnDef="name">
-              <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('name')">
-                Name
-                <span *ngIf="sortKey.value === 'name'">
+            <ng-container cdkColumnDef="family_name">
+              <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('family_name')">
+                Family Name
+                <span *ngIf="sortKey.value === 'family_name'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
               </th>
@@ -111,7 +110,24 @@
                 <!--                <a class="badge badge-apicuron"-->
                 <!--                   [routerLink]="['/orcid/' + row.orcid]"-->
                 <!--                >-->
-                <strong>{{row.name}}</strong>
+                <strong>{{row.family_name}}</strong>
+                <!--                <i class="material-icons" style="font-size: small">link</i>-->
+                <!--                </a>-->
+
+              </td>
+            </ng-container>
+            <ng-container cdkColumnDef="given_name">
+              <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('given_name')">
+                Given Name
+                <span *ngIf="sortKey.value === 'given_name'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+              </th>
+              <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+                <!--                <a class="badge badge-apicuron"-->
+                <!--                   [routerLink]="['/orcid/' + row.orcid]"-->
+                <!--                >-->
+                <strong>{{row.given_name}}</strong>
                 <!--                <i class="material-icons" style="font-size: small">link</i>-->
                 <!--                </a>-->
 

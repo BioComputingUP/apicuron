@@ -31,7 +31,7 @@ export class BrowseComponent implements OnInit {
   expandedElement: any;
   selectedRow = '';
   localAuth = new BehaviorSubject<object>({});
-  displayedColumns = new BehaviorSubject<object>(['name', 'orcid', 'generation_count', 'revision_count', 'invalidation_count', 'medals', 'badges', 'resources']);
+  displayedColumns = new BehaviorSubject<object>(['family_name', 'given_name', 'orcid', 'generation_count', 'revision_count', 'invalidation_count', 'medals', 'badges', 'resources']);
   currentPage = new BehaviorSubject<object>({
     'page': 1
   });
@@ -51,12 +51,42 @@ export class BrowseComponent implements OnInit {
   }
 
   ngOnInit() {
+    let redirect_homepage = this.route.snapshot.queryParams.hasOwnProperty('from_homepage');
     this.searchForm = this.fb.group({
       area: null,
       key: null,
       firstDay:  new Date(1990, 0, 1),
-      lastDay:  new Date()
+      lastDay:  new Date(),
+      start: null
     });
+
+    Object.keys(this.route.snapshot.queryParams).forEach(currParam => {
+      console.log('currParam', currParam);
+      if (['name', 'curator_orcid', 'resource_uri'].includes(currParam)) {
+        this.searchForm.get('area').setValue(currParam);
+        this.searchForm.get('key').setValue(this.route.snapshot.queryParams[currParam]);
+      } else {
+        if (currParam === 'sort_field') {
+          this.sortKey.next(this.route.snapshot.queryParams[currParam]);
+        } else if (currParam === 'sort_value') {
+          this.sortDirection.next(this.route.snapshot.queryParams[currParam]);
+        } else if (currParam === 'page_size') {
+          if (['10', '20', '50'].includes(this.route.snapshot.queryParams[currParam])) {
+            this.pageSize.next(Number(this.route.snapshot.queryParams[currParam]));
+            this.radioModel = this.route.snapshot.queryParams[currParam];
+          }
+
+        } else if (currParam === 'page') {
+          this.currentPageModel = Number(this.route.snapshot.queryParams[currParam]) + 1;
+
+          // this.currentPage = Number(this.route.snapshot.queryParams[currParam]) + 1
+          this.currentPage.next({page: Number(this.route.snapshot.queryParams[currParam]) + 1});
+        }
+      }
+    });
+    if (!this.searchForm.get('area').value) {
+      this.searchForm.get('area').setValue('name');
+    }
     this.authService.loginData.subscribe(authData => {
       if (this.localAuth.value !== authData) {
         this.localAuth.next(authData);
@@ -132,7 +162,10 @@ export class BrowseComponent implements OnInit {
           });
         }, (err) => {
         }, () => {
-
+          if (redirect_homepage && this.totalItems === 1) {
+           this.router.navigate(['orcid/' + this.dataOnPage.value[0].orcid]);
+          }
+          redirect_homepage = false;
 
 
           this.loading_new_table = false;
@@ -141,37 +174,10 @@ export class BrowseComponent implements OnInit {
         });
       });
 
+      this.searchForm.get('start').setValue(true);
       console.log('this.route.snapshot.queryParams', this.route.snapshot.queryParams);
-      Object.keys(this.route.snapshot.queryParams).forEach(currParam => {
-        console.log('currParam', currParam);
-         if (['name', 'curator_orcid', 'resource_uri'].includes(currParam)) {
-           this.searchForm.get('area').setValue(currParam);
-           this.searchForm.get('key').setValue(this.route.snapshot.queryParams[currParam]);
-         } else {
-           if (currParam === 'sort_field') {
-             this.sortKey.next(this.route.snapshot.queryParams[currParam]);
-           } else if (currParam === 'sort_value') {
-             this.sortDirection.next(this.route.snapshot.queryParams[currParam]);
-           } else if (currParam === 'page_size') {
-             if (['10', '20', '50'].includes(this.route.snapshot.queryParams[currParam])) {
-               this.pageSize.next(Number(this.route.snapshot.queryParams[currParam]));
-               this.radioModel = this.route.snapshot.queryParams[currParam];
-             }
-
-           } else if (currParam === 'page') {
-             this.currentPageModel = Number(this.route.snapshot.queryParams[currParam]) + 1;
-
-             // this.currentPage = Number(this.route.snapshot.queryParams[currParam]) + 1
-             this.currentPage.next({page: Number(this.route.snapshot.queryParams[currParam]) + 1});
-           }
-         }
 
 
-});
-
-      if (!this.searchForm.get('area').value) {
-        this.searchForm.get('area').setValue('name');
-      }
     });
   }
 

@@ -614,3 +614,37 @@ body {
   font-weight: normal;
   height: 3rem
 }
+
+.btn-apicuron {
+  color: white;
+  background-color: theme-color("primary");
+  border-color: theme-color("primary")
+}
+
+.btn-apicuron:hover {
+  color: white;
+  background-color: lighten(theme-color("primary"), 5);
+  border-color: lighten(theme-color("primary"), 5)
+}
+
+.btn-apicuron.focus, .btn-apicuron:focus {
+  color: white;
+  background-color: lighten(theme-color("primary"), 5);
+  border-color: lighten(theme-color("primary"), 5);
+  box-shadow: 0 0 0 .2rem darken(theme-color("primary"), 5);
+}
+
+.btn-apicuron.disabled, .btn-apicuron:disabled {
+  color: white;
+  background-color: lighten(theme-color("primary"), 50);
+  border-color: lighten(theme-color("primary"), 50);
+}
+
+//.btn-apicuron:not(:disabled):not(.disabled).active, .btn-apicuron:not(:disabled):not(.disabled):active, .show > .btn-apicuron.dropdown-toggle {
+//  color: #212529;
+//  background-color: #d39e00;
+//  border-color: #c69500
+//}
+//
+//.btn-apicuron:not(:disabled):not(.disabled).active:focus, .btn-apicuron:not(:disabled):not(.disabled):active:focus, .show > .btn-apicuron.dropdown-toggle:focus {
+//  box-shadow: 0 0 0 .2rem rgba(222, 170, 12, .5)
