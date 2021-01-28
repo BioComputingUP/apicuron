@@ -3,7 +3,7 @@
     <div class="col-auto">
       <h2>Curators</h2>
     </div>
-    <div class="col">
+    <div class="col" *ngIf="!loading_resources">
       <p class="mt-2"> resources:
         <span  class="mx-2 badge badge-pill"
                [class.badge-apicuron]="searchForm.value['resources'][currResource['resource_id']]"
@@ -295,7 +295,7 @@
         </div>
       </div>
 
-      <div class="row">
+      <div class="row  mb-3">
         <div class="col-auto">
           <div class="btn-group input-group">
             <div class="input-group-prepend">

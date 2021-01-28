@@ -30,6 +30,7 @@ export class BrowseComponent implements OnInit {
   searchForm: FormGroup;
   loading_finished = false;
   loading_new_table = true;
+  loading_resources = true;
 
   radioModel = '20';
   isExpansionDetailRow = true;
@@ -67,15 +68,7 @@ export class BrowseComponent implements OnInit {
       start: null,
       resources: this.fb.group({})
     });
-    this.internalService.GetStat().subscribe((statData) => {
-      this.statObj = statData;
-      statData['resources'].forEach(currResource => {
-        const resources = this.searchForm.get('resources') as FormGroup;
-        resources.addControl(currResource['resource_id'], new FormControl(true));
-      });
-    }, (err) => {
-    }, () => {
-    });
+
 
     Object.keys(this.route.snapshot.queryParams).forEach(currParam => {
       console.log('currParam', currParam);
@@ -181,30 +174,53 @@ export class BrowseComponent implements OnInit {
         this.loading_finished = false;
         this.loading_new_table = true;
         this.router.navigate(['curators'], {queryParams: search_params});
+        if (!this.loading_resources) {
+          this.internalService.GetSearch2(search_params).subscribe((browseData) => {
+            this.dataOnPage.next(browseData.biocurators);
+            this.totalItems = browseData.count_biocurators;
+            browseData.list_resources.forEach(currResource => {
+              this.map_resources[currResource.resource_uri] = currResource;
+            });
+          }, (err) => {
+          }, () => {
+            if (redirect_homepage && this.totalItems === 1) {
+              this.router.navigate(['orcid/' + this.dataOnPage.value[0].orcid]);
+            }
+            redirect_homepage = false;
 
-        this.internalService.GetSearch2(search_params).subscribe((browseData) => {
-          this.dataOnPage.next(browseData.biocurators);
-          this.totalItems = browseData.count_biocurators;
-          browseData.list_resources.forEach(currResource => {
-            this.map_resources[currResource.resource_uri] = currResource;
+
+            this.loading_new_table = false;
+            this.loading_finished = true;
+            console.log('finish');
           });
-        }, (err) => {
-        }, () => {
-          if (redirect_homepage && this.totalItems === 1) {
-           this.router.navigate(['orcid/' + this.dataOnPage.value[0].orcid]);
-          }
-          redirect_homepage = false;
+        }
 
-
-          this.loading_new_table = false;
-          this.loading_finished = true;
-          console.log('finish');
-        });
       });
 
-      this.searchForm.get('start').setValue(true);
-      console.log('this.route.snapshot.queryParams', this.route.snapshot.queryParams);
+      this.internalService.GetStat().subscribe((statData) => {
+        this.statObj = statData;
+        let listPreResources = [];
+        if (this.route.snapshot.queryParams.hasOwnProperty('resource_uri') && this.route.snapshot.queryParams.resource_uri !== 'none') {
+          listPreResources = this.route.snapshot.queryParams.resource_uri.split('|');
+        }
+        console.log(listPreResources);
+        console.log( this.route.snapshot.queryParams.resource_uri);
+        console.log( this.route.snapshot.queryParams.resource_uri !== 'none');
+        statData['resources'].forEach(currResource => {
+          const resources = this.searchForm.get('resources') as FormGroup;
+          if (listPreResources.includes(currResource['resource_id']) || listPreResources.length === 0) {
+            resources.addControl(currResource['resource_id'], new FormControl(true));
+          } else {
+            resources.addControl(currResource['resource_id'], new FormControl(false));
 
+          }
+        });
+      }, (err) => {
+      }, () => {
+        this.loading_resources = false;
+        this.searchForm.get('start').setValue(true);
+        console.log('this.route.snapshot.queryParams', this.route.snapshot.queryParams);
+      });
 
     });
   }
