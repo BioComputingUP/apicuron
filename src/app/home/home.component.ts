@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {InternalService} from '../services/internal.service';
 import { CarouselConfig } from 'ngx-bootstrap/carousel';
 import {FormControl, FormGroup} from '@angular/forms';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -21,7 +22,8 @@ export class HomeComponent implements OnInit {
   searchFormControl = new FormControl();
 
   selected_resource;
-  constructor(private internalService: InternalService) { }
+  constructor(             private router: Router,
+private internalService: InternalService) { }
 
   ngOnInit() {
     this.internalService.GetStat().subscribe((statData) => {
@@ -38,4 +40,8 @@ export class HomeComponent implements OnInit {
     // });
   }
 
+  goTocuratorsPage() {
+
+    this.router.navigate(['curators'], {queryParams: {name: this.searchFormControl.value, from_homepage: 'true'}})
+  }
 }

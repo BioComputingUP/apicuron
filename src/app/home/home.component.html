@@ -18,14 +18,14 @@
     <div class="row pt-3">
       <div class="col-lg-6 offset-lg-3 ">
         <div class="form-group m-0">
-          <div class="input-group">
+          <form class="input-group" (submit)="goTocuratorsPage()">
             <input id="searchform" class="form-control pb-0"
                    [formControl]="searchFormControl" type="text">
             <div class="input-group-append">
               <a class="btn btn-outline-primary" routerLink="/curators"
                  [queryParams]="{name:searchFormControl.value, from_homepage: 'true'}">Search</a>
             </div>
-          </div>
+          </form>
         </div>
       </div>
       <div class="col-lg-6 offset-lg-3 ">
