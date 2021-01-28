@@ -9,6 +9,7 @@ import {environment} from '../../environments/environment';
 export class InternalService {
   private getORCIDprofile = 'https://pub.orcid.org/v3.0/';
   private apicuronSearch = environment.ws + 'search';
+  private apicuronStat = environment.ws + 'stat';
   private apicuronSearchDetails = environment.ws + 'reports';
   private apicuronSearch2 = environment.ws + 'browse';
   private apicuronProfile = environment.ws + 'profile/';
@@ -106,6 +107,12 @@ export class InternalService {
   GetPubDisProtGetJwtToken(): Observable<any> {
     return this.http.get(
       this.apicuronGetJwtToken,
+      {responseType: 'json'});
+  }
+
+  GetStat(): Observable<any> {
+    return this.http.get(
+      this.apicuronStat,
       {responseType: 'json'});
   }
 

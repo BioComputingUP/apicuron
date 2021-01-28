@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {InternalService} from '../services/internal.service';
 import { CarouselConfig } from 'ngx-bootstrap/carousel';
-import {FormControl} from '@angular/forms';
+import {FormControl, FormGroup} from '@angular/forms';
 
 @Component({
   selector: 'app-home',
@@ -12,6 +12,11 @@ import {FormControl} from '@angular/forms';
   ]
 })
 export class HomeComponent implements OnInit {
+  statObj = {
+    count_biocurators: 0,
+    resources: []
+  };
+
   listResourcesDescriptions;
   searchFormControl = new FormControl();
 
@@ -19,12 +24,18 @@ export class HomeComponent implements OnInit {
   constructor(private internalService: InternalService) { }
 
   ngOnInit() {
-    this.internalService.GetResearces({}).subscribe(data => {
-      this.listResourcesDescriptions = data;
+    this.internalService.GetStat().subscribe((statData) => {
+      this.statObj = statData;
     }, (err) => {
     }, () => {
-      this.selected_resource = 'disprot';
     });
+
+    // this.internalService.GetResearces({}).subscribe(data => {
+    //   this.listResourcesDescriptions = data;
+    // }, (err) => {
+    // }, () => {
+    //   this.selected_resource = 'disprot';
+    // });
   }
 
 }

@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {BehaviorSubject, combineLatest} from 'rxjs';
 import {InternalService} from '../services/internal.service';
 import {AuthService} from '../services/auth.service';
-import {FormBuilder, FormArray, FormGroup} from '@angular/forms';
+import {FormControl, FormBuilder, FormGroup} from '@angular/forms';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {Router, ActivatedRoute} from '@angular/router';
 
@@ -19,6 +19,11 @@ import {Router, ActivatedRoute} from '@angular/router';
   ],
 })
 export class BrowseComponent implements OnInit {
+  statObj = {
+    count_biocurators: 0,
+    resources: []
+  };
+
   columnsFormNew;
   currentPageModel = 1;
   collapseColumns = true;
@@ -51,18 +56,34 @@ export class BrowseComponent implements OnInit {
   }
 
   ngOnInit() {
+
+
     let redirect_homepage = this.route.snapshot.queryParams.hasOwnProperty('from_homepage');
     this.searchForm = this.fb.group({
       area: null,
       key: null,
       firstDay:  new Date(1990, 0, 1),
       lastDay:  new Date(),
-      start: null
+      start: null,
+      resources: this.fb.group({})
+    });
+    this.internalService.GetStat().subscribe((statData) => {
+      this.statObj = statData;
+      statData['resources'].forEach(currResource => {
+        const resources = this.searchForm.get('resources') as FormGroup;
+        resources.addControl(currResource['resource_id'], new FormControl(true));
+      });
+    }, (err) => {
+    }, () => {
     });
 
     Object.keys(this.route.snapshot.queryParams).forEach(currParam => {
       console.log('currParam', currParam);
-      if (['name', 'curator_orcid', 'resource_uri'].includes(currParam)) {
+      if ([
+        'name',
+        'curator_orcid',
+        // 'resource_uri'
+      ].includes(currParam)) {
         this.searchForm.get('area').setValue(currParam);
         this.searchForm.get('key').setValue(this.route.snapshot.queryParams[currParam]);
       } else {
@@ -148,7 +169,14 @@ export class BrowseComponent implements OnInit {
         if (formData.key && formData.key !== '') {
           search_params[formData.area] = formData.key;
         }
-
+        const activeResources = [];
+        Object.keys(this.searchForm.get('resources').value).forEach(currResource => {
+          console.log(currResource);
+          if (this.searchForm.get('resources').get(currResource).value) {
+            activeResources.push(currResource);
+          }
+        });
+        search_params['resource_uri'] = activeResources.length > 0 ? activeResources.join('|') : 'none';
 
         this.loading_finished = false;
         this.loading_new_table = true;

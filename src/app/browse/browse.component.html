@@ -1,5 +1,26 @@
 <div class="container-fluid container-wide pt-3">
-  <h2 class="mt-2">Curators</h2>
+  <div class="row mt-2">
+    <div class="col-auto">
+      <h2>Curators</h2>
+    </div>
+    <div class="col">
+      <p class="mt-2"> resources:
+        <span  class="mx-2 badge badge-pill"
+               [class.badge-apicuron]="searchForm.value['resources'][currResource['resource_id']]"
+               [class.badge-secondary]="!searchForm.value['resources'][currResource['resource_id']]"
+               *ngFor="let currResource of statObj['resources']"
+               (click)="searchForm.get('resources').get(currResource['resource_id']).setValue(!searchForm.value['resources'][currResource['resource_id']])"
+        >
+          {{currResource['resource_name']}}
+        <i *ngIf="searchForm.value['resources'][currResource['resource_id']]" class="material-icons">close</i>
+        <i *ngIf="!searchForm.value['resources'][currResource['resource_id']]" class="material-icons">add</i>
+        </span>
+      </p>
+    </div>
+    <div class="col-auto ml-auto">
+      <p class="mt-2"> <span class="badge badge-apicuron">{{totalItems}}</span> biocurators found out of {{statObj['count_biocurators']}}</p>
+    </div>
+  </div>
   <div class="row mt-3">
 
     <div class="col">
@@ -13,7 +34,7 @@
                       formControlName="area">
                 <option value="name">Biocurator name</option>
                 <option value="curator_orcid">ORCID</option>
-                <option value="resource_uri">Resource identifier</option>
+<!--                <option value="resource_uri">Resource identifier</option>-->
               </select>
               <input type="text"
                      class="form-control col-lg-auto"
@@ -179,9 +200,9 @@
             </ng-container>
 
             <ng-container cdkColumnDef="medals">
-              <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('medals')">
+              <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('count_medals')">
                 Number of medals
-                <span *ngIf="sortKey.value === 'medals'">
+                <span *ngIf="sortKey.value === 'count_medals'">
                                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
                               </span>
               </th>
@@ -198,9 +219,9 @@
             </ng-container>
 
             <ng-container cdkColumnDef="badges">
-              <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('badges')">
+              <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('count_badges')">
                 Number of badges
-                <span *ngIf="sortKey.value === 'badges'">
+                <span *ngIf="sortKey.value === 'count_badges'">
                                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
                               </span>
               </th>
@@ -271,6 +292,29 @@
             <!--              <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>-->
             Entries not found
           </button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-auto">
+          <div class="btn-group input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text text-center small-button">
+                  Show
+                </span>
+            </div>
+
+            <label class="btn btn-outline-primary btn-sm mb-0" [(ngModel)]="radioModel"
+                   (click)="changeValuePageSize(radioModel)"
+                   btnRadio="10" tabindex="0" role="button">10</label>
+            <label class="btn btn-outline-primary btn-sm mb-0" [(ngModel)]="radioModel"
+                   (click)="changeValuePageSize(radioModel)"
+                   btnRadio="20" tabindex="0" role="button">20</label>
+            <label class="btn btn-outline-primary btn-sm mb-0" [(ngModel)]="radioModel"
+                   (click)="changeValuePageSize(radioModel)"
+                   btnRadio="50" tabindex="0" role="button">50</label>
+
+          </div>
         </div>
       </div>
 
