@@ -301,4 +301,9 @@ export class BrowseComponent implements OnInit {
   changeValuePageSize(itemsPerPage: string) {
     this.pageSize.next(Number(itemsPerPage));
   }
+
+  resetTime() {
+    this.searchForm.get('firstDay').setValue(new Date(1990, 0, 1));
+    this.searchForm.get('lastDay').setValue(new Date());
+  }
 }
