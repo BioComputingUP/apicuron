@@ -47,3 +47,17 @@
 .green {
   background: #197226
 }
+
+//.badge {
+//  height: 2.8rem;
+//}
+
+.showme {
+  display: none;
+}
+
+.showhim:hover .showme {
+  display: block;
+}
+
+

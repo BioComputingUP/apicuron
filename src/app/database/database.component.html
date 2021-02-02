@@ -37,6 +37,36 @@
 
 <!--  <p>[basic stat]</p>-->
 
+  <h3 id="leaderboard" #leaderboard>Leaderboard</h3>
+  <app-leaderboard-card [database]="resourcesDescription" [selectedBadgesMedals]="selectedBadgesMedals"></app-leaderboard-card>
+
+
+
+  <h3 id="badges" #badges>Available badges</h3>
+
+  <div class="row">
+    <div class="col">
+      <span  *ngFor="let currCategory of badge_categories">
+              <app-badge-view [active]="true"
+                              [badge]="currBadge"
+                              *ngFor="let currBadge of badgesData[currCategory]"
+                              (click)="addBadgeMedalToSelectedList(currBadge)"></app-badge-view>
+
+      </span>
+    </div>
+  </div>
+  <h3 id="medals" #medals>Available medals</h3>
+
+  <div class="row" >
+    <div class="col">
+      <span  *ngFor="let currCategory of medal_categories">
+              <app-medal-view [medal]="currMedal"
+                              *ngFor="let currMedal of medalsData[currCategory]"
+                              (click)="addBadgeMedalToSelectedList(currMedal)"></app-medal-view>
+      </span>
+
+    </div>
+  </div>
   <h3 id="terms" #terms>Biocuration activity terms</h3>
   <table cdk-table multiTemplateDataRows [dataSource]="resourcesDescription['terms']" class="table table-sm table-responsive-sm">
     <ng-container cdkColumnDef="name">
@@ -64,14 +94,14 @@
       <td cdk-cell *cdkCellDef="let row" class=" pr-0">
         <!--              <a class="badge badge-apicuron"-->
         <!--                 -->
-          {{row.description}}
+        {{row.description}}
         <!--              </a>-->
 
       </td>
     </ng-container>
 
 
-        <ng-container cdkColumnDef="score">
+    <ng-container cdkColumnDef="score">
       <th cdk-header-cell *cdkHeaderCellDef>
         Name
 
@@ -79,14 +109,14 @@
       <td cdk-cell *cdkCellDef="let row" class=" pr-0">
         <!--              <a class="badge badge-apicuron"-->
         <!--                 -->
-          {{row.score}}
+        {{row.score}}
         <!--              </a>-->
 
       </td>
     </ng-container>
 
 
-        <ng-container cdkColumnDef="category">
+    <ng-container cdkColumnDef="category">
       <th cdk-header-cell *cdkHeaderCellDef>
         Name
 
@@ -94,7 +124,7 @@
       <td cdk-cell *cdkCellDef="let row" class=" pr-0">
         <!--              <a class="badge badge-apicuron"-->
         <!--                 -->
-          {{row.activity_category}}
+        {{row.activity_category}}
         <!--              </a>-->
 
       </td>
@@ -105,26 +135,6 @@
     <tr cdk-row *cdkRowDef="let row; columns: ['category', 'name', 'def', 'score']"
         style="box-shadow: 0px 0px 1px 0px gray; text-align: center"></tr>
   </table>
-
-  <h3 id="badges" #badges>Available badges</h3>
-
-  <div class="row" *ngFor="let currCategory of badge_categories">
-    <div class="col">
-
-      <app-badge-view [active]="true" [badge]="currBadge" *ngFor="let currBadge of badgesData[currCategory]"></app-badge-view>
-    </div>
-  </div>
-  <h3 id="medals" #medals>Available medals</h3>
-
-  <div class="row" *ngFor="let currCategory of medal_categories">
-    <div class="col">
-      <app-medal-view [medal]="currMedal" *ngFor="let currMedal of medalsData[currCategory]"></app-medal-view>
-    </div>
-  </div>
-
-  <h3 id="leaderboard" #leaderboard>Leaderboard</h3>
-  <app-leaderboard-card [database]="resourcesDescription"></app-leaderboard-card>
-
 
 </div>
 

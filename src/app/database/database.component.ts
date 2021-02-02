@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {InternalService} from '../services/internal.service';
 import {ActivatedRoute} from '@angular/router';
 import {ScrollToConfigOptions, ScrollToService} from '@nicky-lenaers/ngx-scroll-to';
+import {BehaviorSubject} from 'rxjs';
 
 @Component({
   selector: 'app-database',
@@ -12,6 +13,7 @@ export class DatabaseComponent implements OnInit {
  resourcesDescription = false;
   constructor(private scrollToService: ScrollToService, private route: ActivatedRoute, private internalService: InternalService) { }
 
+  selectedBadgesMedals = new BehaviorSubject<object[]>([]);
   badge_categories = [];
   medal_categories = [];
   badgesData = {};
@@ -54,14 +56,14 @@ export class DatabaseComponent implements OnInit {
 
           console.log(this.badgesData);
           this.resourcesDescription['medals'].forEach(currMedal => {
-            if (!this.medalsData.hasOwnProperty(currMedal['category'])) {
-              this.medalsData[currMedal['category']] = [];
+            if (!this.medalsData.hasOwnProperty(currMedal['color'])) {
+              this.medalsData[currMedal['color']] = [];
             }
-            this.medalsData[currMedal['category']].push(currMedal);
+            this.medalsData[currMedal['color']].push(currMedal);
           });
           this.medal_categories = Object.keys(this.medalsData);
           this.medal_categories.forEach(currCategory => {
-            this.medalsData[currCategory] = this.medalsData[currCategory].sort((a, b) => a.score_relative > b.score_relative ? 1 : -1);
+            this.medalsData[currCategory] = this.medalsData[currCategory].sort((a, b) => a.name > b.name ? 1 : -1);
           });
         }
       }, (err) => {
@@ -103,5 +105,9 @@ export class DatabaseComponent implements OnInit {
     setTimeout(function () {
       newState.scrollTo(config);
     }, 800);
+  }
+
+  addBadgeMedalToSelectedList(currBadge) {
+    this.selectedBadgesMedals.next([...this.selectedBadgesMedals.getValue(), ...[currBadge]]);
   }
 }

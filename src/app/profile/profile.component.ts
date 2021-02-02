@@ -177,7 +177,7 @@ export class ProfileComponent implements OnInit {
 
           this.internalService.GetLeaderboard(String(currResourceURI), {curator_orcid: orcid_id }).subscribe(data => {
             // console.log(data[0]['curators'][0]['ranking']);
-            this.userDataByResources[String(currResourceURI)]['ranking'] = data[0]['curators'][0]['ranking'];
+            this.userDataByResources[String(currResourceURI)]['ranking'] = data[0]['biocurators'][0]['ranking'];
           }, (err) => {
           }, () => {
             // this.loading_finished = true;

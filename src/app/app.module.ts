@@ -63,7 +63,7 @@ const appRoutes: Routes = [
   { path: 'help', component: HelpComponent},
   {path: 'databases', component: DatabasesComponent},
   {path: 'databases/:database_id', component: DatabaseComponent},
-  { path: 'leaderboard', component: LeaderboardPageComponent},
+  // { path: 'leaderboard', component: LeaderboardPageComponent},
   // { path: 'api', component: ApiComponent},
   // { path: 'statistics', component: StatisticsComponent},
   {path: 'about', component: AboutComponent},

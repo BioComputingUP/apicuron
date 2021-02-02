@@ -2,7 +2,7 @@
 <!--<div  class="badge mr-2 mb-2" tooltip="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">-->
   <div class="badge  badge-badge-disabled mr-2 mb-2" *ngIf="!active" [tooltip]="tooltipHTML">
     <div class="row  align-items-center">
-      <div *ngIf="!active" class="col-3">
+      <div *ngIf="!active" class="col-2">
         <svg width="1.8em"
              height="1.8em"
              viewBox="0 0 16 16"
@@ -24,7 +24,7 @@
         </svg>
       </div>
 
-      <div class="col-9" style="width: 8rem">
+      <div class="col-10" style="width: 8rem">
         <div class=" ">
         <span class="align-middle"
               style="white-space: normal; width: 7rem; text-align: left; color: darkgray">
@@ -40,10 +40,10 @@
 
   <!--<div class="badge  badge-badge-active  mr-2 mb-2"-->
   <!--     *ngIf="active" [class]="badge['color']">-->
-  <div class="badge badge-badge-active mr-2 mb-2" [tooltip]="tooltipHTML"
+  <div class="badge badge-badge-active mr-2 mb-2 showhim" [tooltip]="tooltipHTML"
        *ngIf="active" [style]="{background: badge['color_code'] + alpha_map[badge['count_threshold']]}">
     <div class="row  align-items-center">
-      <div class="col-3">
+      <div class="col-2">
         <svg width="1.8em"
              height="1.8em"
              viewBox="0 0 16 16"
@@ -68,9 +68,9 @@
 
       </div>
 
-      <div class="col-9" style="width: 8rem">
+      <div class="col" style="width: 8rem">
         <div class=" ">
-        <span class="align-middle"
+        <span class="align-content-center"
               style="white-space: normal; width: 7rem; text-align: left; color: white">
 <!--              style="white-space: normal; width: 7rem; text-align: left; color: white">-->
           <!--          name-->
@@ -78,6 +78,9 @@
         </span>
 
         </div>
+      </div>
+      <div class="col-2 p-0 showme" *ngIf="atLeaderboard" >
+        <i class="material-icons" style="font-size: large; color: white">close</i>
       </div>
     </div>
   </div>

@@ -7,6 +7,8 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class MedalViewComponent implements OnInit {
   @Input() medal;
+  @Input() atLeaderboard = false;
+
   constructor() { }
 
   ngOnInit(): void {

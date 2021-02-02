@@ -7,6 +7,7 @@ import {Component, Input, OnInit} from '@angular/core';
 })
 export class BadgeViewComponent implements OnInit {
   @Input() active;
+  @Input() atLeaderboard = false;
   @Input() badge;
 
   tooltipHTML;
@@ -24,7 +25,10 @@ export class BadgeViewComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    this.tooltipHTML = 'Threshold: ' + this.badge.count_threshold + ' activity from: ' + this.badge.list_terms.join(', ');
+    if (!this.atLeaderboard) {
+      this.tooltipHTML = 'Threshold: ' + this.badge.count_threshold + ' activity from: ' + this.badge.list_terms.join(', ');
+
+    }
   }
 
 }

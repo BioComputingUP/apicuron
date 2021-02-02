@@ -41,7 +41,25 @@
 
     </div>
   </div>
+<div class="row">
+  <div class="col-auto">
+    <strong>Selected badges or medals: </strong>
+  </div>
+  <div class="col-auto" *ngIf="selectedBadgesMedals.value.length > 0">
+    <span *ngFor="let currBadgeMedal of selectedBadgesMedals.value; let index = index">
+      <app-badge-view (click)="removeBadgeMedal(index)" [active]="true" [atLeaderboard]="true" [badge]="currBadgeMedal" *ngIf="currBadgeMedal['type'] === 'badge'"></app-badge-view>
+      <app-medal-view (click)="removeBadgeMedal(index)" [medal]="currBadgeMedal"  [atLeaderboard]="true" *ngIf="currBadgeMedal['type'] === 'medal'"></app-medal-view>
 
+    </span>
+  </div>
+  <div class="col-auto" *ngIf="selectedBadgesMedals.value.length === 0">
+    <p><i>(Please select badge or medal to filter biocurators)</i></p>
+  </div>
+    <div class="col-auto ml-auto mr-3" *ngIf="selectedBadgesMedals.value.length > 0">
+      <button class="btn btn-danger btn-sm" (click)="selectedBadgesMedals.next([])"> clear all </button>
+    </div>
+
+</div>
 
   <div class="row" *ngIf="loading_finished && curatorsData.length > 0">
     <!--      <div class="col-1" style="background: lightgrey"></div>-->
@@ -57,16 +75,31 @@
             <span class="badge badge-apicuron">{{row.ranking}}</span>
           </td>
         </ng-container>
-        <ng-container cdkColumnDef="name">
+        <ng-container cdkColumnDef="family_name">
           <th cdk-header-cell *cdkHeaderCellDef>
-            Name
+            Family name
 
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
             <!--              <a class="badge badge-apicuron"-->
             <!--                 -->
             <strong>
-              {{row.curator_name}}
+              {{row.family_name}}
+            </strong>
+            <!--              </a>-->
+
+          </td>
+        </ng-container>
+        <ng-container cdkColumnDef="given_name">
+          <th cdk-header-cell *cdkHeaderCellDef>
+            Given name
+
+          </th>
+          <td cdk-cell *cdkCellDef="let row" class=" pr-0">
+            <!--              <a class="badge badge-apicuron"-->
+            <!--                 -->
+            <strong>
+              {{row.given_name}}
             </strong>
             <!--              </a>-->
 
@@ -99,8 +132,8 @@
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0" style="text-align: center">
             <!--              {{row.categories.filter(x => x.activity_category === 'Generation')[0]generation_count}}-->
-            <span tooltip="{{calc_html_tooltip_count_category(row['categories'], 'generation')}}">
-                {{calc_score_category(row['categories'], 'generation') | number:'1.0':'en-US'}}
+            <span tooltip="{{calc_html_tooltip_count_category(row['generation_count'], 'generation')}}">
+                {{row['generation_score'] | number:'1.0':'en-US'}}
 </span>
           </td>
         </ng-container>
@@ -112,8 +145,8 @@
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
             <!--              <span [innerHTML]="calc_html_count_category(row['categories'], 'Revision')"></span>-->
-            <span tooltip="{{calc_html_tooltip_count_category(row['categories'], 'revision')}}">
-                {{calc_score_category(row['categories'], 'revision') | number:'1.0':'en-US'}}
+            <span tooltip="{{calc_html_tooltip_count_category(row['revision_count'], 'revision')}}">
+                {{row['revision_score'] | number:'1.0':'en-US'}}
 </span>
             <!--              {{row.revision_count}}-->
 
@@ -127,31 +160,15 @@
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
             <!--              <span [innerHTML]="calc_html_count_category(row['categories'], 'Invalidation')"></span>-->
-            <span tooltip="{{calc_html_tooltip_count_category(row['categories'], 'invalidation')}}">
-                {{calc_score_category(row['categories'], 'invalidation') | number:'1.0':'en-US'}}
+            <span tooltip="{{calc_html_tooltip_count_category(row['invalidation_count'], 'invalidation')}}">
+                {{row['invalidation_score'] | number:'1.0':'en-US'}}
 </span>
             <!--              {{row.invalidation_count}}-->
 
           </td>
         </ng-container>
 
-<!--        <ng-container cdkColumnDef="expandedDetail"  >-->
-<!--          <td cdk-cell *cdkCellDef="let element"-->
-<!--              [attr.colspan]="displayedColumns.value.length"-->
-<!--              style="border-color: transparent"-->
-<!--              class="p-0 m-0"-->
-<!--          >-->
 
-<!--            <div class="container p-0 m-0"-->
-<!--                 style="overflow: hidden !important; max-width: none !important;">-->
-<!--              {{element | json}}-->
-
-<!--&lt;!&ndash;              <app-browse-ribbon&ndash;&gt;-->
-<!--&lt;!&ndash;                [userData]="element"&ndash;&gt;-->
-<!--&lt;!&ndash;                [map_resources]="map_resources" class="p-0 m-0"></app-browse-ribbon>&ndash;&gt;-->
-<!--            </div>-->
-<!--          </td>-->
-<!--        </ng-container>-->
 
 
         <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value" style="border: none; text-align: center"></tr>

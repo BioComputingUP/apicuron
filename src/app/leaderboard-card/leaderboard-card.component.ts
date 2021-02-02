@@ -10,9 +10,11 @@ import {FormControl, FormGroup, FormBuilder, FormArray} from '@angular/forms';
 })
 export class LeaderboardCardComponent implements OnInit {
   @Input() database;
+  @Input() selectedBadgesMedals: BehaviorSubject<object[]>;
+
   loading_finished = false;
   curatorsData;
-  displayedColumns = new BehaviorSubject<object>(['rank', 'name', 'orcid', 'generation_count', 'revision_count', 'invalidation_count', 'score']);
+  displayedColumns = new BehaviorSubject<object>(['rank', 'family_name', 'given_name', 'orcid', 'generation_count', 'revision_count', 'invalidation_count', 'score']);
   searchForm: FormGroup;
 
 
@@ -28,13 +30,15 @@ export class LeaderboardCardComponent implements OnInit {
         key: this.fb.control(null)
       });
 
-    combineLatest(this.searchForm.valueChanges).subscribe(([formData]) => {
+    combineLatest(this.searchForm.valueChanges, this.selectedBadgesMedals).subscribe(([formData, selectedBadgesMedals]) => {
       const search_params = {};
       search_params[formData.area] = formData.key;
+      search_params['achievements'] = selectedBadgesMedals.map(x => x['name']);
+
 
 
     this.internalService.GetLeaderboard(this.database['resource_uri'].substr(42), search_params).subscribe(data => {
-      this.curatorsData = data[0]['curators'];
+      this.curatorsData = data[0]['biocurators'];
     }, (err) => {
     }, () => {
       this.loading_finished = true;
@@ -45,23 +49,22 @@ export class LeaderboardCardComponent implements OnInit {
 
   }
 
-  calc_score_category(data, category) {
-    const filtered_data = data.filter(x => x.activity_category === category);
 
-    if (filtered_data.length > 0) {
-      return filtered_data[0]['score_category'];
-    } else {
-      return 0;
-    }
-  }
   calc_html_tooltip_count_category(data, category) {
-    const filtered_data = data.filter(x => x.activity_category === category);
 
-    if (filtered_data.length > 0) {
-      return filtered_data[0]['count_category'].toString() + ' ' + category + ' activity';
+    if (data > 0) {
+      return data + ' ' + category + ' activity';
     } else {
       return 'No ' + category + ' activity';
     }
   }
+
+  removeBadgeMedal(position) {
+    const listBadgesMedals = this.selectedBadgesMedals.value;
+    listBadgesMedals.splice(position, 1);
+    this.selectedBadgesMedals.next(listBadgesMedals);
+
+  }
+
 
 }
