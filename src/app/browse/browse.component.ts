@@ -73,7 +73,7 @@ export class BrowseComponent implements OnInit {
     Object.keys(this.route.snapshot.queryParams).forEach(currParam => {
       // console.log('currParam', currParam);
       if ([
-        'name',
+        'curator_name',
         'curator_orcid',
         // 'resource_uri'
       ].includes(currParam)) {
@@ -99,7 +99,7 @@ export class BrowseComponent implements OnInit {
       }
     });
     if (!this.searchForm.get('area').value) {
-      this.searchForm.get('area').setValue('name');
+      this.searchForm.get('area').setValue('curator_name');
     }
     this.authService.loginData.subscribe(authData => {
       if (this.localAuth.value !== authData) {
