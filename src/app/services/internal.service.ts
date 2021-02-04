@@ -24,6 +24,7 @@ export class InternalService {
   private apicuronResources = environment.ws + 'resources';
   private disprotFeedback = environment.ws + 'feedback';
   private apicuronLeaderboard = environment.ws + 'leaderboard/';
+  private apicuronStatistics = environment.ws + 'statistics';
 
   constructor(private http: HttpClient) {
   }
@@ -38,6 +39,12 @@ export class InternalService {
   GetLeaderboard(database, params): Observable<any> {
     return this.http.get(
       this.apicuronLeaderboard + database,
+      {responseType: 'json', params: params});
+    // .pipe(catchError(err => of(console.error(err))));
+  }
+  GetStatistics(params): Observable<any> {
+    return this.http.get(
+      this.apicuronStatistics,
       {responseType: 'json', params: params});
     // .pipe(catchError(err => of(console.error(err))));
   }

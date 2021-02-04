@@ -44,37 +44,37 @@
               </button>
             </div>
           </div>
-          <div class=" col-auto">
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text text-center"   >from</span>
-              </div>
-              <input type="text"
-                     class="form-control"
-                     #dp="bsDatepicker"
-                     bsDatepicker
-                     formControlName="firstDay"
-                     style="max-width: 200px"
+<!--          <div class=" col-auto">-->
+<!--            <div class="input-group mb-3">-->
+<!--              <div class="input-group-prepend">-->
+<!--                <span class="input-group-text text-center"   >from</span>-->
+<!--              </div>-->
+<!--              <input type="text"-->
+<!--                     class="form-control"-->
+<!--                     #dp="bsDatepicker"-->
+<!--                     bsDatepicker-->
+<!--                     formControlName="firstDay"-->
+<!--                     style="max-width: 200px"-->
 
-                     [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">
-              <div class="input-group-prepend">
-                <span class="input-group-text text-center"   style="border-left-width: 0" >to</span>
-              </div>
-              <input type="text"
-                     class="form-control"
-                     #dp="bsDatepicker"
-                     bsDatepicker
-                     formControlName="lastDay"
-                     style="max-width: 200px"
-                     [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">
-              <div class="input-group-prepend" >
-                <button class="form-control" style="border-left-width: 0; border-bottom-left-radius: 0; border-top-left-radius: 0;" (click)="resetTime()">
-                  reset
-                </button>
-              </div>
+<!--                     [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">-->
+<!--              <div class="input-group-prepend">-->
+<!--                <span class="input-group-text text-center"   style="border-left-width: 0" >to</span>-->
+<!--              </div>-->
+<!--              <input type="text"-->
+<!--                     class="form-control"-->
+<!--                     #dp="bsDatepicker"-->
+<!--                     bsDatepicker-->
+<!--                     formControlName="lastDay"-->
+<!--                     style="max-width: 200px"-->
+<!--                     [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">-->
+<!--              <div class="input-group-prepend" >-->
+<!--                <button class="form-control" style="border-left-width: 0; border-bottom-left-radius: 0; border-top-left-radius: 0;" (click)="resetTime()">-->
+<!--                  reset-->
+<!--                </button>-->
+<!--              </div>-->
 
-            </div>
-          </div>
+<!--            </div>-->
+<!--          </div>-->
           <div class="col-auto">
             <pagination
               [totalItems]="totalItems"
