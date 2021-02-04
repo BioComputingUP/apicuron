@@ -48,6 +48,12 @@ export class InternalService {
       {responseType: 'json', params: params});
     // .pipe(catchError(err => of(console.error(err))));
   }
+  GetStatistics2(params): Observable<any> {
+    return this.http.get(
+      this.apicuronStatistics,
+      { observe: 'response', params: params});
+    // .pipe(catchError(err => of(console.error(err))));
+  }
 
   GetSearch(params): Observable<any> {
     return this.http.get(

@@ -115,9 +115,9 @@
               </td>
             </ng-container>
             <ng-container cdkColumnDef="orcid">
-              <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('orcid')">
+              <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('curator_orcid')">
                 ORCID
-                <span *ngIf="sortKey.value === 'orcid'">
+                <span *ngIf="sortKey.value === 'curator_orcid'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
                 <!--            <p>valami</p>-->
@@ -125,7 +125,7 @@
               </th>
               <td cdk-cell *cdkCellDef="let row" class=" pr-0">
 
-                <span style="white-space: nowrap">{{row.orcid}}</span>
+                <span style="white-space: nowrap">{{row.curator_orcid}}</span>
               </td>
             </ng-container>
 
@@ -259,7 +259,7 @@
                 <!--               >-->
                 <!--                <span [innerHTML]="calc_html_badges(row['badge'])"></span>-->
                 <!--            </a>-->
-                <span [innerHTML]="calc_html_resources(row)"></span>
+                <span [innerHTML]="calc_html_resources(row['listResources'])"></span>
               </td>
             </ng-container>
 

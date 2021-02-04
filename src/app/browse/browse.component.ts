@@ -44,7 +44,7 @@ export class BrowseComponent implements OnInit {
   pageSize = new BehaviorSubject<number>(20);
   dataOnPage = new BehaviorSubject<any[]>([]);
   totalItems: number;
-  sortKey = new BehaviorSubject<string>('orcid');
+  sortKey = new BehaviorSubject<string>('curator_orcid');
   sortDirection = new BehaviorSubject<string>('asc');
   map_resources = {};
 
@@ -63,15 +63,15 @@ export class BrowseComponent implements OnInit {
     this.searchForm = this.fb.group({
       area: null,
       key: null,
-      firstDay:  new Date(1990, 0, 1),
-      lastDay:  new Date(),
+      // firstDay:  new Date(1990, 0, 1),
+      // lastDay:  new Date(),
       start: null,
       resources: this.fb.group({})
     });
 
 
     Object.keys(this.route.snapshot.queryParams).forEach(currParam => {
-      console.log('currParam', currParam);
+      // console.log('currParam', currParam);
       if ([
         'name',
         'curator_orcid',
@@ -133,7 +133,7 @@ export class BrowseComponent implements OnInit {
 
 
     this.localAuth.subscribe(authData => {
-      console.log('authData', authData);
+      // console.log('authData', authData);
       // if (!authData.hasOwnProperty('initial')) {
       this.loading_new_table = true;
       this.dataOnPage.next([]);
@@ -155,8 +155,8 @@ export class BrowseComponent implements OnInit {
           sort_value: sortDirection,
           page_size: pageSize,
           page: currentPage['page'] - 1,
-          first_day: formData.firstDay.toISOString().slice(0, 10),
-          last_day: formData.lastDay.toISOString().slice(0, 10),
+          // first_day: formData.firstDay.toISOString().slice(0, 10),
+          // last_day: formData.lastDay.toISOString().slice(0, 10),
 
         };
         if (formData.key && formData.key !== '') {
@@ -164,23 +164,65 @@ export class BrowseComponent implements OnInit {
         }
         const activeResources = [];
         Object.keys(this.searchForm.get('resources').value).forEach(currResource => {
-          console.log(currResource);
+          // console.log(currResource);
           if (this.searchForm.get('resources').get(currResource).value) {
             activeResources.push(currResource);
           }
         });
-        search_params['resource_uri'] = activeResources.length > 0 ? activeResources.join('|') : 'none';
+        search_params['resource'] = activeResources.length > 0 ? activeResources.join('|') : 'none';
 
         this.loading_finished = false;
         this.loading_new_table = true;
         this.router.navigate(['curators'], {queryParams: search_params});
         if (!this.loading_resources) {
-          this.internalService.GetSearch2(search_params).subscribe((browseData) => {
-            this.dataOnPage.next(browseData.biocurators);
-            this.totalItems = browseData.count_biocurators;
-            browseData.list_resources.forEach(currResource => {
-              this.map_resources[currResource.resource_uri] = currResource;
+          this.internalService.GetStatistics2(search_params).subscribe((browseData) => {
+
+
+            const biocuratorsData = browseData.body.map(currBiocurator =>  {
+              const currData = currBiocurator.statistics.filter(currDataObj => {
+                return !currDataObj.hasOwnProperty('resource_uri');
+              })[0];
+
+              const listResources = currBiocurator.statistics.filter(currDataObj => {
+                return currDataObj.hasOwnProperty('resource_uri');
+              }).map(x => x.resource_uri);
+
+              // console.log(listResources );
+              return {
+                curator_orcid: currBiocurator.curator_orcid,
+                family_name: currBiocurator.family_name,
+                given_name: currBiocurator.given_name,
+                ranking: currData.ranking,
+                score_total: currData.total_score,
+                generation_count: currData.generation_count,
+                revision_count: currData.revision_count,
+                invalidation_count: currData.invalidation_count,
+                generation_score: currData.generation_score,
+                revision_score: currData.revision_score,
+                invalidation_score: currData.invalidation_score,
+                listResources: listResources
+              };
             });
+
+            this.dataOnPage.next(biocuratorsData);
+            this.totalItems = browseData.headers.get('count');
+
+            // const keys = browseData.headers.keys();
+            // console.log('browseData', browseData);
+            // console.log('browseData', browseData.headers.get('count'));
+
+
+
+
+            // this.dataOnPage.next(browseData);
+            // this.totalItems = browseData.count_biocurators;
+            // browseData.list_resources.forEach(currResource => {
+            //   this.map_resources[currResource.resource_uri] = currResource;
+            // });
+            //
+
+
+
           }, (err) => {
           }, () => {
             if (redirect_homepage && this.totalItems === 1) {
@@ -191,7 +233,7 @@ export class BrowseComponent implements OnInit {
 
             this.loading_new_table = false;
             this.loading_finished = true;
-            console.log('finish');
+            // console.log('finish');
           });
         }
 
@@ -203,10 +245,9 @@ export class BrowseComponent implements OnInit {
         if (this.route.snapshot.queryParams.hasOwnProperty('resource_uri') && this.route.snapshot.queryParams.resource_uri !== 'none') {
           listPreResources = this.route.snapshot.queryParams.resource_uri.split('|');
         }
-        console.log(listPreResources);
-        console.log( this.route.snapshot.queryParams.resource_uri);
-        console.log( this.route.snapshot.queryParams.resource_uri !== 'none');
+
         statData['resources'].forEach(currResource => {
+          this.map_resources[currResource.resource_uri] = currResource;
           const resources = this.searchForm.get('resources') as FormGroup;
           if (listPreResources.includes(currResource['resource_id']) || listPreResources.length === 0) {
             resources.addControl(currResource['resource_id'], new FormControl(true));
@@ -219,7 +260,7 @@ export class BrowseComponent implements OnInit {
       }, () => {
         this.loading_resources = false;
         this.searchForm.get('start').setValue(true);
-        console.log('this.route.snapshot.queryParams', this.route.snapshot.queryParams);
+        // console.log('this.route.snapshot.queryParams', this.route.snapshot.queryParams);
       });
 
     });
@@ -268,19 +309,13 @@ export class BrowseComponent implements OnInit {
   }
 
   calc_html_resources(row) {
-    const set_resources = new Set();
     const out_put = [];
-    row.generation_terms.forEach(curr_term => {
-      set_resources.add(curr_term['resource_uri']);
-    });
-    row.revision_terms.forEach(curr_term => {
-      set_resources.add(curr_term['resource_uri']);
-    });
-    row.invalidation_terms.forEach(curr_term => {
-      set_resources.add(curr_term['resource_uri']);
-    });
-    Array.from(set_resources).forEach(currTerm => {
-        out_put.push('<span class="badge  badge-pill badge-apicuron pl-1 text-center small">' + this.map_resources[currTerm.toString()]['resource_name'] + '</span>');
+    // console.log('calc_html_resources', row);
+    Array.from(row).forEach(currTerm => {
+      // console.log('calc_html_resources v', currTerm);
+      // console.log('calc_html_resources v', this.map_resources[currTerm.toString()]['resource_name']);
+
+      out_put.push('<span class="badge  badge-pill badge-apicuron pl-1 text-center small">' + this.map_resources[currTerm.toString()]['resource_name'] + '</span>');
       });
 
 
