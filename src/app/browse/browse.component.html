@@ -283,7 +283,7 @@
             <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value"></tr>
             <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"
                 style="box-shadow: 0px 0px 1px 0px gray; text-align: center"
-                [routerLink]="'/orcid/' + row['orcid']"></tr>
+                [routerLink]="'/orcid/' + row['curator_orcid']"></tr>
           </table>
         </div>
 
