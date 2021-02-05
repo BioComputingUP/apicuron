@@ -1,22 +1,42 @@
 <div class="container-fluid container-wide">
   <div class="col jumbotron p-5">
-    <div class="row align-items-center">
-      <div class="col ">
-        <h1 class="page-header mb-1">
+
+    <div class="row justify-content-center text-center mb-5">
+      <div class="col">
+        <h1 class="page-header">
           Welcome to <strong>APICURON</strong>
         </h1>
-        <hr class="m-0 mt-1">
-        <p class="mt-2 text-justify">
-          APICURON provides biological databases with a real-time automatic tracking system of the
-          activities of their biocurators, allowing them to properly credit their work. APICURON adopts the key concept
-          of gamification, using a badge system and scores to acknowledge the effort of biocurators and to reward and encourage
-          their engagement. In order to provide flexible and personalized badges, each partner database can define their
-          own list of badges and rules to assign them.
-        </p>
       </div>
     </div>
-    <div class="row pt-3">
-      <div class="col-lg-6 offset-lg-3 ">
+
+    <div class="row justify-content-center mb-3">
+      <div class="col-lg-10">
+        <p>
+          <strong>APICURON</strong> is a database to credit and acknowledge the work of biocurators, it collects and
+          aggregates biocuration events from third party resources and generates achievements and
+          leaderboards. Read <a routerLink="/about">more</a>
+        </p>
+        </div>
+    </div>
+
+    <div class="row mb-3 justify-content-end">
+      <div class="col-lg-6 text-right">
+
+      </div>
+    </div>
+
+    <div class="row justify-content-center mb-3">
+      <div class="col-lg-6">
+
+        <p class="text-right">
+          Active biocurators <span class="badge badge-apicuron">{{statObj['count_biocurators']}}</span>
+          <br>
+          Registered resources <span class="badge badge-apicuron">{{statObj['resources'].length}}</span>
+        </p>
+
+        <strong>
+          Search biocurators
+        </strong>
         <div class="form-group m-0">
           <form class="input-group" (submit)="goTocuratorsPage()">
             <input id="searchform" class="form-control pb-0"
@@ -27,76 +47,32 @@
             </div>
           </form>
         </div>
-      </div>
-      <div class="col-lg-6 offset-lg-3 ">
-
-        <p class="mt-2"> Search between <a routerLink="/curators" class="badge badge-apicuron">{{statObj['count_biocurators']}}</a> biocurators from {{statObj['resources'].length}} resources</p>
-
+        <p style="color: gray">
+          ORCID, name, surname, database
+        </p>
       </div>
     </div>
-<!--    <div class="row pt-3">-->
-<!--      <div class="col">-->
-<!--            <div class="card">-->
-<!--              <div class="card-header">-->
-<!--                Leaderboard -  <span class="badge badge-pill ml-2"-->
-<!--                                     [class.badge-secondary]="currDatabase['resource_id'] !== selected_resource"-->
-<!--                                     [class.badge-apicuron]="currDatabase['resource_id'] === selected_resource"-->
-<!--                                     (click)="selected_resource = currDatabase['resource_id']"-->
-<!--                                     *ngFor="let currDatabase of listResourcesDescriptions let index=index">{{currDatabase['resource_name']}}</span>-->
-<!--              </div>-->
-<!--              <div *ngFor="let currDatabase of listResourcesDescriptions let index=index">-->
-<!--                <div *ngIf="currDatabase['resource_id'] === selected_resource">-->
-<!--                  <app-leaderboard-card [database]="currDatabase"></app-leaderboard-card>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--      </div>-->
-<!--    </div>-->
-    <div class="row pt-3">
-      <div class="col-12">
-        <div class="card" style="border: none">
-<!--          <div class="card-header"><span class="card-title">Partner databases</span></div>-->
-          <div class="card-body">
-            <div class="row justify-content-center">
-              <div class="col-md-4 col-sm-2 col-4">
-                <div class="card" style="border: none">
-                  <img class="card-img" src="/assets/DisProt_prot_vect_brownonly.svg">
-                </div>
 
-              </div>
-              <div class="col-md-4 col-sm-2 col-4">
 
-                <div class="card" style="border: none">
-                  <img class="card-img" src="/assets/PED_logo.svg">
-                </div>
-              </div>
-            </div>
+    <div class="row justify-content-center mb-3">
+      <div class="col-lg-6">
+        <strong>Database leaderboards</strong>
+        <div class="row mt-3">
+
+          <div class="col-auto">
+            <a routerLink="/databases/disprot">
+              <img class="card-img" src="/assets/DisProt_prot_vect_brownonly.svg">
+            </a>
           </div>
+
+          <div class="col-auto">
+            <a routerLink="/databases/ped">
+            <img class="card-img" src="/assets/PED_logo.svg">
+            </a>
+          </div>
+
         </div>
       </div>
-
-<!--      <div class="col-12 mb-0 ">-->
-<!--        <div class="card" style="border: none">-->
-<!--          <div class="card-header"><span class="card-title">How to cite</span></div>-->
-<!--          <div class="card-body pb-0">-->
-<!--            <div class="row">-->
-<!--              <div class="col ">-->
-<!--                <p class="mb-1 py-0 small " style="  text-align: left;">-->
-<!--                  <strong>APICURON: a database to credit and acknowledge the work of biocurators</strong>-->
-<!--                  <br>-->
-
-<!--                  <i>in preparation</i>-->
-<!--&lt;!&ndash;                  <a href="https://www.ncbi.nlm.nih.gov/pubmed/31713636"> <strong>PubMed </strong> <i class="material-icons" style="font-size: small">link</i>&ndash;&gt;-->
-<!--&lt;!&ndash;                  </a>,&ndash;&gt;-->
-<!--&lt;!&ndash;                  <a href="https://doi.org/10.1093/nar/gkz975"> <strong>NAR </strong> <i class="material-icons" style="font-size: small">link</i>&ndash;&gt;-->
-<!--&lt;!&ndash;                  </a>&ndash;&gt;-->
-<!--                </p>-->
-<!--              </div>-->
-<!--            </div>-->
-
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
     </div>
   </div>
 </div>
