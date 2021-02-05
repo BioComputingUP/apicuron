@@ -1,309 +1,313 @@
-<input #file
-       type="file"
-       style="display: none"
-       accept="image/*"
-       (change)="onFilesAdded()">
-<div class="container-fluid container-wide py-3" style="min-height: 60vh">
+<!--<input #file-->
+<!--       type="file"-->
+<!--       style="display: none"-->
+<!--       accept="image/*"-->
+<!--       (change)="onFilesAdded()">-->
+<!--<div class="container-fluid container-wide py-3" style="min-height: 60vh">-->
 
-  <div *ngIf="loading_finished && orcidData['activities-summary']">
-    <!--    <div style="height: 38vh"></div>-->
-    <!--    <div class="row text-center">-->
-    <!--      <progressbar class=" progress-striped active text-center " [value]="100" type="info" style="height: 25px">-->
-    <!--        <strong><i>loading...</i></strong>-->
-    <!--      </progressbar>-->
-    <!--    </div>-->
-    <!--  </div>-->
-    <!--  <div *ngIf="loading_finished">-->
-    <!--  <div *ngIf="editMode">-->
-    <!--    <app-edit-profile [profile_obj]="profileData" *ngIf="profileData"></app-edit-profile>-->
-    <!--  </div>-->
-    <div *ngIf="!editMode.value">
-      <div class="row  align-items-start">
-        <div class="col-xl-auto pb-1">
-          <div class="row">
-            <div class="col-auto">
-              <div class="row">
-                <div class="col">
-                  <div *ngIf="profileData.value['profile_picture']">
-                    <img
-                      src="{{env.ws}}getProfilePicture/{{profileData.value['profile_picture']}}"
-                      class="logoimg img-border">
-                  </div>
-                  <div *ngIf="!profileData.value['profile_picture']">
-                    <img class="logoimg" src="assets/user.png">
-                  </div>
-                </div>
-              </div>
+<!--  <div *ngIf="loading_finished && orcidData['activities-summary']">-->
+<!--    &lt;!&ndash;    <div style="height: 38vh"></div>&ndash;&gt;-->
+<!--    &lt;!&ndash;    <div class="row text-center">&ndash;&gt;-->
+<!--    &lt;!&ndash;      <progressbar class=" progress-striped active text-center " [value]="100" type="info" style="height: 25px">&ndash;&gt;-->
+<!--    &lt;!&ndash;        <strong><i>loading...</i></strong>&ndash;&gt;-->
+<!--    &lt;!&ndash;      </progressbar>&ndash;&gt;-->
+<!--    &lt;!&ndash;    </div>&ndash;&gt;-->
+<!--    &lt;!&ndash;  </div>&ndash;&gt;-->
+<!--    &lt;!&ndash;  <div *ngIf="loading_finished">&ndash;&gt;-->
+<!--    &lt;!&ndash;  <div *ngIf="editMode">&ndash;&gt;-->
+<!--    &lt;!&ndash;    <app-edit-profile [profile_obj]="profileData" *ngIf="profileData"></app-edit-profile>&ndash;&gt;-->
+<!--    &lt;!&ndash;  </div>&ndash;&gt;-->
+<!--    <div *ngIf="!editMode.value">-->
+<!--      <div class="row  align-items-start">-->
+<!--        <div class="col-xl-auto pb-1">-->
+<!--          <div class="row">-->
+<!--            <div class="col-auto">-->
 <!--              <div class="row">-->
-              <div class="row" *ngIf="logedIn">
-                <div class="col">
-                  <div *ngIf="profileData.value['profile_picture']">
-                    <button class="btn btn-danger btn-sm" (click)="addFiles()"> Select another profile picture </button>
-                  </div>
-                  <div *ngIf="!profileData.value['profile_picture']">
-                    <button class="btn btn-danger btn-sm" (click)="addFiles()"> Select profile picture </button>
-                  </div>
-                  <div *ngIf="imgURL">
-                    <button class="btn btn-success btn-sm" (click)="sendData()"> Upload </button>
-                  </div>
-                </div>
-              </div>
+<!--                <div class="col">-->
+<!--                  <div *ngIf="profileData.value['profile_picture']">-->
+<!--                    <img-->
+<!--                      src="{{env.ws}}getProfilePicture/{{profileData.value['profile_picture']}}"-->
+<!--                      class="logoimg img-border">-->
+<!--                  </div>-->
+<!--                  <div *ngIf="!profileData.value['profile_picture']">-->
+<!--                    <img class="logoimg" src="assets/user.png">-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--&lt;!&ndash;              <div class="row">&ndash;&gt;-->
+<!--              <div class="row" *ngIf="logedIn">-->
+<!--                <div class="col">-->
+<!--                  <div *ngIf="profileData.value['profile_picture']">-->
+<!--                    <button class="btn btn-danger btn-sm" (click)="addFiles()"> Select another profile picture </button>-->
+<!--                  </div>-->
+<!--                  <div *ngIf="!profileData.value['profile_picture']">-->
+<!--                    <button class="btn btn-danger btn-sm" (click)="addFiles()"> Select profile picture </button>-->
+<!--                  </div>-->
+<!--                  <div *ngIf="imgURL">-->
+<!--                    <button class="btn btn-success btn-sm" (click)="sendData()"> Upload </button>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
 
 
-            </div>
-            <div class="col-auto">
-              <h3>
-                <strong> {{orcidData['person']['name']['given-names']['value']}} {{orcidData['person']['name']['family-name']['value']}} </strong>
-              </h3>
-              <p class="my-1" *ngFor="let currPosition of employment">
+<!--            </div>-->
+<!--            <div class="col-auto">-->
+<!--              <h3>-->
+<!--                <strong> {{orcidData['person']['name']['given-names']['value']}} {{orcidData['person']['name']['family-name']['value']}} </strong>-->
+<!--              </h3>-->
+<!--              <p class="my-1" *ngFor="let currPosition of employment">-->
 
-              <span
-                *ngIf="isCurrentPosition(currPosition['summaries'][0]['employment-summary']['end-date'], currPosition) && currPosition['summaries'][0]['employment-summary']['role-title']">
-                <strong>{{currPosition['summaries'][0]['employment-summary']['role-title']}}</strong>
+<!--              <span-->
+<!--                *ngIf="isCurrentPosition(currPosition['summaries'][0]['employment-summary']['end-date'], currPosition) && currPosition['summaries'][0]['employment-summary']['role-title']">-->
+<!--                <strong>{{currPosition['summaries'][0]['employment-summary']['role-title']}}</strong>-->
 
-               <span *ngIf="currPosition['summaries'][0]['employment-summary']['url']">  <a
-                 href="{{currPosition['summaries'][0]['employment-summary']['url']['value']}}"
-                 target="_blank">
-                 at  {{currPosition['summaries'][0]['employment-summary']['organization']['name']}}
-                </a> </span>
-                <span
-                  *ngIf="!currPosition['summaries'][0]['employment-summary']['url'] && currPosition['summaries'][0]['employment-summary']['organization']['name']">
-                 at  {{currPosition['summaries'][0]['employment-summary']['organization']['name']}}
-                 </span>
-
-
-
-              </span>
-
-              </p>
-              <strong>ORCID: </strong>{{profileData.value['orcid']}}<br>
-
-            </div>
-          </div>
-          <!--        <div *ngIf="profileData['profile_picture']">-->
-          <!--          <img-->
-          <!--            src="{{env.ws}}getProfilePicture/{{profileData['profile_picture']}}"-->
-          <!--            class="logoimg img-border">-->
-          <!--        </div>-->
-          <!--        <div *ngIf="!profileData['profile_picture']">-->
-
-          <!--        </div>-->
-
-          <!--        {{profileData.value | json}}-->
-          <!--        <strong>Organisation: </strong>{{profileData.value['institution']}}<br>-->
-          <!--        <strong>Position: </strong>{{profileData.value['position']}}<br>-->
-          <!--        <strong>Personal page: </strong>{{profileData.value['personal_homepage']}}<br>-->
+<!--               <span *ngIf="currPosition['summaries'][0]['employment-summary']['url']">  <a-->
+<!--                 href="{{currPosition['summaries'][0]['employment-summary']['url']['value']}}"-->
+<!--                 target="_blank">-->
+<!--                 at  {{currPosition['summaries'][0]['employment-summary']['organization']['name']}}-->
+<!--                </a> </span>-->
+<!--                <span-->
+<!--                  *ngIf="!currPosition['summaries'][0]['employment-summary']['url'] && currPosition['summaries'][0]['employment-summary']['organization']['name']">-->
+<!--                 at  {{currPosition['summaries'][0]['employment-summary']['organization']['name']}}-->
+<!--                 </span>-->
 
 
-          <!--        Date(currPosition['summaries'][0]['employment-summary']['end-date']['year']['value],currPosition['summaries'][0]['employment-summary']['end-date']['month']['value],currPosition['summaries'][0]['employment-summary']['end-date']['day']['value])-->
+
+<!--              </span>-->
+
+<!--              </p>-->
+<!--              <strong>ORCID: </strong>{{profileData.value['orcid']}}<br>-->
+
+<!--            </div>-->
+<!--          </div>-->
+<!--          &lt;!&ndash;        <div *ngIf="profileData['profile_picture']">&ndash;&gt;-->
+<!--          &lt;!&ndash;          <img&ndash;&gt;-->
+<!--          &lt;!&ndash;            src="{{env.ws}}getProfilePicture/{{profileData['profile_picture']}}"&ndash;&gt;-->
+<!--          &lt;!&ndash;            class="logoimg img-border">&ndash;&gt;-->
+<!--          &lt;!&ndash;        </div>&ndash;&gt;-->
+<!--          &lt;!&ndash;        <div *ngIf="!profileData['profile_picture']">&ndash;&gt;-->
+
+<!--          &lt;!&ndash;        </div>&ndash;&gt;-->
+
+<!--          &lt;!&ndash;        {{profileData.value | json}}&ndash;&gt;-->
+<!--          &lt;!&ndash;        <strong>Organisation: </strong>{{profileData.value['institution']}}<br>&ndash;&gt;-->
+<!--          &lt;!&ndash;        <strong>Position: </strong>{{profileData.value['position']}}<br>&ndash;&gt;-->
+<!--          &lt;!&ndash;        <strong>Personal page: </strong>{{profileData.value['personal_homepage']}}<br>&ndash;&gt;-->
 
 
-          <!--        <strong>Role: </strong> {{orcidData['activities-summary']['employments']['affiliation-group'][0]['summaries'][0]['employment-summary']['role-title']}}<br>-->
+<!--          &lt;!&ndash;        Date(currPosition['summaries'][0]['employment-summary']['end-date']['year']['value],currPosition['summaries'][0]['employment-summary']['end-date']['month']['value],currPosition['summaries'][0]['employment-summary']['end-date']['day']['value])&ndash;&gt;-->
 
 
-        </div>
-        <div class="col text-justify">
-          <p
-            *ngIf="orcidData['person'] && orcidData['person']['biography'] && orcidData['person']['biography']['content']">
-            <strong>Biography </strong>{{orcidData['person']['biography']['content']}}</p>
-
-          <p *ngIf="orcidData['person']['keywords'] && orcidData['person']['keywords']['keyword'].length > 0">
-            <strong>Expertise </strong><span class="mx-1"
-                                             *ngFor="let currKey of orcidData['person']['keywords']['keyword']">#{{currKey['content']}}</span>
-          </p>
-        </div>
-        <!--      <div class="col">-->
-        <!--        <strong>Number of entity generation: </strong>{{profileData.value['generation_count']}}<br>-->
-        <!--        <strong>Number of entity revision: </strong>{{profileData.value['revision_count']}}<br>-->
-        <!--        <strong>Number of entity invalidation: </strong>{{profileData.value['invalidation_count']}}<br>-->
-        <!--        <strong>Contributed resources: </strong>-->
-        <!--        <span class="badge badge-pill badge-success pl-1 text-center" *ngFor="let resource of resourcesList">-->
-        <!--            {{resource}}-->
-        <!--        </span>-->
-        <!--&lt;!&ndash;        <br>&ndash;&gt;-->
-        <!--&lt;!&ndash;        <strong>Badges: </strong><span class="badge badge-pill badge-warning pl-1 text-center mr-1" *ngFor="let resource of profileData.value['badge']">&ndash;&gt;-->
-        <!--&lt;!&ndash;            {{resource}}&ndash;&gt;-->
-        <!--&lt;!&ndash;        </span>&ndash;&gt;-->
-        <!--      </div>-->
-        <!--      <div class="col-lg-6 text-justify">-->
-        <!--        {{profileData.value['description']}}-->
-        <!--      </div>-->
-      </div>
-      <div class="row" *ngIf="selectedResource.value">
-        <div class="col">
-          <div class="card card-body">
-            <div class="row">
-              <div class="col-auto mr-auto">
-                <p><strong>Resource: </strong>
-                  <!--                DisProt-->
-                  {{map_resources[selectedResource.value]['resource_name']}}
-
-                  <span class="ml-5" *ngIf="userDataByResources[selectedResource.value].hasOwnProperty('ranking')">
-                <strong>Rank: </strong>
-                <a class="badge  badge-apicuron"
-                   tooltip="see at Leaderboard"
-                   routerLink="/databases/{{selectedResource.value}}"
-                   fragment="leaderboard">{{userDataByResources[selectedResource.value]['ranking']}}</a>
-              </span>
-                </p>
-              </div>
-              <div class="col-auto">
-                <a class="badge badge-danger mr-2 mb-2" (click)="selectedResource.next('')"> Collapse <i
-                  class="material-icons" style="font-size: small">unfold_less</i></a>
-              </div>
-            </div>
+<!--          &lt;!&ndash;        <strong>Role: </strong> {{orcidData['activities-summary']['employments']['affiliation-group'][0]['summaries'][0]['employment-summary']['role-title']}}<br>&ndash;&gt;-->
 
 
-            <h5 class="mb-1">Biocuration activities:</h5>
-            <div class="row" if *ngIf="userDataByResources[selectedResource.value]['generation_terms'].length > 0">
-              <div class="col-2">
-                <i>Category</i>
-              </div>
+<!--        </div>-->
+<!--        <div class="col text-justify">-->
+<!--          <p-->
+<!--            *ngIf="orcidData['person'] && orcidData['person']['biography'] && orcidData['person']['biography']['content']">-->
+<!--            <strong>Biography </strong>{{orcidData['person']['biography']['content']}}</p>-->
 
-              <div class="col">
-                <div class="row">
-                  <div class="col-4"><i>Name</i></div>
-                  <div class="col"><i>Count</i></div>
-                </div>
-              </div>
-            </div>
+<!--          <p *ngIf="orcidData['person']['keywords'] && orcidData['person']['keywords']['keyword'].length > 0">-->
+<!--            <strong>Expertise </strong><span class="mx-1"-->
+<!--                                             *ngFor="let currKey of orcidData['person']['keywords']['keyword']">#{{currKey['content']}}</span>-->
+<!--          </p>-->
+<!--        </div>-->
+<!--        &lt;!&ndash;      <div class="col">&ndash;&gt;-->
+<!--        &lt;!&ndash;        <strong>Number of entity generation: </strong>{{profileData.value['generation_count']}}<br>&ndash;&gt;-->
+<!--        &lt;!&ndash;        <strong>Number of entity revision: </strong>{{profileData.value['revision_count']}}<br>&ndash;&gt;-->
+<!--        &lt;!&ndash;        <strong>Number of entity invalidation: </strong>{{profileData.value['invalidation_count']}}<br>&ndash;&gt;-->
+<!--        &lt;!&ndash;        <strong>Contributed resources: </strong>&ndash;&gt;-->
+<!--        &lt;!&ndash;        <span class="badge badge-pill badge-success pl-1 text-center" *ngFor="let resource of resourcesList">&ndash;&gt;-->
+<!--        &lt;!&ndash;            {{resource}}&ndash;&gt;-->
+<!--        &lt;!&ndash;        </span>&ndash;&gt;-->
+<!--        &lt;!&ndash;&lt;!&ndash;        <br>&ndash;&gt;&ndash;&gt;-->
+<!--        &lt;!&ndash;&lt;!&ndash;        <strong>Badges: </strong><span class="badge badge-pill badge-warning pl-1 text-center mr-1" *ngFor="let resource of profileData.value['badge']">&ndash;&gt;&ndash;&gt;-->
+<!--        &lt;!&ndash;&lt;!&ndash;            {{resource}}&ndash;&gt;&ndash;&gt;-->
+<!--        &lt;!&ndash;&lt;!&ndash;        </span>&ndash;&gt;&ndash;&gt;-->
+<!--        &lt;!&ndash;      </div>&ndash;&gt;-->
+<!--        &lt;!&ndash;      <div class="col-lg-6 text-justify">&ndash;&gt;-->
+<!--        &lt;!&ndash;        {{profileData.value['description']}}&ndash;&gt;-->
+<!--        &lt;!&ndash;      </div>&ndash;&gt;-->
+<!--      </div>-->
+<!--      <div class="row" *ngIf="selectedResource.value">-->
+<!--        <div class="col">-->
+<!--          <div class="card card-body">-->
+<!--            <div class="row">-->
+<!--              <div class="col-auto mr-auto">-->
+<!--                <p><strong>Resource: </strong>-->
+<!--                  &lt;!&ndash;                DisProt&ndash;&gt;-->
+<!--                  {{map_resources[selectedResource.value]['resource_name']}}-->
 
-
-            <div class="row mb-2" if *ngIf="userDataByResources[selectedResource.value]['generation_terms'].length > 0">
-              <div class="col-2">
-                Generation
-              </div>
-
-              <div class="col">
-                <div class="row"
-                     *ngFor="let currTerm of userDataByResources[selectedResource.value]['generation_terms']">
-                  <div class="col-4"><strong>{{currTerm['activity_name']}}</strong></div>
-                  <div class="col"> {{currTerm['count']}}</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="row mb-2" if *ngIf="userDataByResources[selectedResource.value]['revision_terms'].length > 0">
-              <div class="col-2">
-                Revision
-              </div>
-              <div class="col">
-                <div class="row" *ngFor="let currTerm of userDataByResources[selectedResource.value]['revision_terms']">
-                  <div class="col-4"><strong>{{currTerm['activity_name']}}</strong></div>
-                  <div class="col"> {{currTerm['count']}}</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="row mb-2" if
-                 *ngIf="userDataByResources[selectedResource.value]['invalidation_terms'].length > 0">
-              <div class="col-2">
-                Invalidation
-              </div>
-              <div class="col">
-                <div class="row"
-                     *ngFor="let currTerm of userDataByResources[selectedResource.value]['invalidation_terms']">
-                  <div class="col-4"><strong>{{currTerm['activity_name']}}</strong></div>
-                  <div class="col"> {{currTerm['count']}}</div>
-                </div>
-              </div>
-            </div>
-            <h5>Medals:</h5>
-
-            <div class="row mb-4">
-              <!--            <div class="col-3 mb-2">-->
-              <!--              <p class="mb-0"><strong>Number of entity generation: </strong>{{userDataByResources[selectedResource.value]['generation_counts']}}</p>-->
-              <!--              <p class="mb-0"><strong>Number of entity revision: </strong>{{userDataByResources[selectedResource.value]['revision_counts']}}</p>-->
-              <!--              <p class="mb-0"><strong>Number of entity invalidation: </strong>{{userDataByResources[selectedResource.value]['invalidation_counts']}}</p>-->
-              <!--            </div>-->
-              <div class="col-auto mr-auto">
-
-                <!--              <app-badge-medal [badge]="medal" [color]="'#000000'" *ngFor="let medal of userDataByResources[selectedResource.value]['medal']"></app-badge-medal>-->
-                <app-medal-view [medal]="currMedal"
-                                *ngFor="let currMedal of userDataByResources[selectedResource.value]['medal']"></app-medal-view>
-
-                <!--              <span class="badge badge-pill badge-medal mr-2 mb-2" [style]="{'background-color':badge['color_code']}"-->
-                <!--                    *ngFor="let badge of userDataByResources[selectedResource.value]['badge']"> {{badge['name']}}</span>-->
-              </div>
-            </div>
-            <h5>Badges:</h5>
-
-            <div class="row"
-                 *ngFor="let currBadgeCategory of userDataByResources[selectedResource.value]['badge_categories']">
-              <div class="col">
-                <!--              {{currBadgeCategory}}-->
-                <app-badge-view [badge]="currBadge"
-                                [active]="userDataByResources[selectedResource.value]['badge'].includes(currBadge['name'])"
-                                *ngFor="let currBadge of userDataByResources[selectedResource.value]['possible_badges'][currBadgeCategory]">
-                </app-badge-view>
-
-                <!--            {{userDataByResources[selectedResource.value]}}-->
-
-              </div>
-
-            </div>
-            <h5>Biocuration details: </h5>
-            <app-details-table [profileData]="profileData" [database]="selectedResource.value"></app-details-table>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div [class.col-xl-6]="selectedResource.value !== database"
-             [class.d-none]="selectedResource.value === database"
-             (click)="selectedResource.next(database)"
-             *ngFor="let database of resourcesList">
-          <div class="card card-body">
-            <div class="row">
-              <div class="col mr-auto"><p><strong>Resource: </strong>
-                <!--               DisProt-->
-                {{map_resources[database]['resource_name']}}
-              </p></div>
-              <div class="col-auto">
-                <a class="badge badge-success mr-2 mb-2" (click)="selectedResource.next('')"> Expand <i
-                  class="material-icons" style="font-size: small">unfold_more</i></a>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col" *ngIf="userDataByResources[database].hasOwnProperty('ranking')">
-                <strong>Rank: </strong>
-                <a class="badge  badge-apicuron"
-                   tooltip="see at Leaderboard"
-                   routerLink="/databases/{{database}}"
-                   fragment="leaderboard">{{userDataByResources[database]['ranking']}}</a>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col  mb-2">
-                <p class="mb-0"><strong>Number of entity
-                  generation: </strong>{{userDataByResources[database]['generation_counts']}}</p>
-                <p class="mb-0"><strong>Number of entity
-                  revision: </strong>{{userDataByResources[database]['revision_counts']}}</p>
-                <p class="mb-0"><strong>Number of entity
-                  invalidation: </strong>{{userDataByResources[database]['invalidation_counts']}}</p>
-              </div>
-            </div>
-
-            <div class="row">
+<!--                  <span class="ml-5" *ngIf="userDataByResources[selectedResource.value].hasOwnProperty('ranking')">-->
+<!--                <strong>Rank: </strong>-->
+<!--                <a class="badge  badge-apicuron"-->
+<!--                   tooltip="see at Leaderboard"-->
+<!--                   routerLink="/databases/{{selectedResource.value}}"-->
+<!--                   fragment="leaderboard">{{userDataByResources[selectedResource.value]['ranking']}}</a>-->
+<!--              </span>-->
+<!--                </p>-->
+<!--              </div>-->
+<!--              <div class="col-auto">-->
+<!--                <a class="badge badge-danger mr-2 mb-2" (click)="selectedResource.next('')"> Collapse <i-->
+<!--                  class="material-icons" style="font-size: small">unfold_less</i></a>-->
+<!--              </div>-->
+<!--            </div>-->
 
 
-              <div class="col-auto">
-                <!--               aa-->
-                <!--               {{ userDataByResources[selectedResource.value]}}-->
+<!--            <h5 class="mb-1">Biocuration activities:</h5>-->
+<!--            <div class="row" if *ngIf="userDataByResources[selectedResource.value]['generation_terms'].length > 0">-->
+<!--              <div class="col-2">-->
+<!--                <i>Category</i>-->
+<!--              </div>-->
 
-                <!--               <app-badge-medal [badge]="badge"  *ngFor="let badge of currResourceUserData['badge']"></app-badge-medal>-->
-                <app-medal-view [medal]="currMedal"
-                                *ngFor="let currMedal of userDataByResources[database]['medal']"></app-medal-view>
-                <!--               <app-badge-medal [badge]="medal" [color]="'#000000'" *ngFor="let medal of userDataByResources[database]['medal']"></app-badge-medal>-->
+<!--              <div class="col">-->
+<!--                <div class="row">-->
+<!--                  <div class="col-4"><i>Name</i></div>-->
+<!--                  <div class="col"><i>Count</i></div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
 
-                <!--               <span class="badge badge-pill badge-medal mr-2 mb-2" [style]="{'background-color':badge['color_code']}"-->
-                <!--                     > {{badge['name']}}</span>-->
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-  </div>
-</div>
+<!--            <div class="row mb-2" if *ngIf="userDataByResources[selectedResource.value]['generation_terms'].length > 0">-->
+<!--              <div class="col-2">-->
+<!--                Generation-->
+<!--              </div>-->
+
+<!--              <div class="col">-->
+<!--                <div class="row"-->
+<!--                     *ngFor="let currTerm of userDataByResources[selectedResource.value]['generation_terms']">-->
+<!--                  <div class="col-4"><strong>{{currTerm['activity_name']}}</strong></div>-->
+<!--                  <div class="col"> {{currTerm['count']}}</div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+
+<!--            <div class="row mb-2" if *ngIf="userDataByResources[selectedResource.value]['revision_terms'].length > 0">-->
+<!--              <div class="col-2">-->
+<!--                Revision-->
+<!--              </div>-->
+<!--              <div class="col">-->
+<!--                <div class="row" *ngFor="let currTerm of userDataByResources[selectedResource.value]['revision_terms']">-->
+<!--                  <div class="col-4"><strong>{{currTerm['activity_name']}}</strong></div>-->
+<!--                  <div class="col"> {{currTerm['count']}}</div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+
+<!--            <div class="row mb-2" if-->
+<!--                 *ngIf="userDataByResources[selectedResource.value]['invalidation_terms'].length > 0">-->
+<!--              <div class="col-2">-->
+<!--                Invalidation-->
+<!--              </div>-->
+<!--              <div class="col">-->
+<!--                <div class="row"-->
+<!--                     *ngFor="let currTerm of userDataByResources[selectedResource.value]['invalidation_terms']">-->
+<!--                  <div class="col-4"><strong>{{currTerm['activity_name']}}</strong></div>-->
+<!--                  <div class="col"> {{currTerm['count']}}</div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <h5>Medals:</h5>-->
+
+<!--            <div class="row mb-4">-->
+<!--              &lt;!&ndash;            <div class="col-3 mb-2">&ndash;&gt;-->
+<!--              &lt;!&ndash;              <p class="mb-0"><strong>Number of entity generation: </strong>{{userDataByResources[selectedResource.value]['generation_counts']}}</p>&ndash;&gt;-->
+<!--              &lt;!&ndash;              <p class="mb-0"><strong>Number of entity revision: </strong>{{userDataByResources[selectedResource.value]['revision_counts']}}</p>&ndash;&gt;-->
+<!--              &lt;!&ndash;              <p class="mb-0"><strong>Number of entity invalidation: </strong>{{userDataByResources[selectedResource.value]['invalidation_counts']}}</p>&ndash;&gt;-->
+<!--              &lt;!&ndash;            </div>&ndash;&gt;-->
+<!--              <div class="col-auto mr-auto">-->
+
+<!--                &lt;!&ndash;              <app-badge-medal [badge]="medal" [color]="'#000000'" *ngFor="let medal of userDataByResources[selectedResource.value]['medal']"></app-badge-medal>&ndash;&gt;-->
+<!--                <app-medal-view [medal]="currMedal"-->
+<!--                                *ngFor="let currMedal of userDataByResources[selectedResource.value]['medal']"></app-medal-view>-->
+
+<!--                &lt;!&ndash;              <span class="badge badge-pill badge-medal mr-2 mb-2" [style]="{'background-color':badge['color_code']}"&ndash;&gt;-->
+<!--                &lt;!&ndash;                    *ngFor="let badge of userDataByResources[selectedResource.value]['badge']"> {{badge['name']}}</span>&ndash;&gt;-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <h5>Badges:</h5>-->
+
+<!--            <div class="row"-->
+<!--                 *ngFor="let currBadgeCategory of userDataByResources[selectedResource.value]['badge_categories']">-->
+<!--              <div class="col">-->
+<!--                &lt;!&ndash;              {{currBadgeCategory}}&ndash;&gt;-->
+<!--                <app-badge-view [badge]="currBadge"-->
+<!--                                [active]="userDataByResources[selectedResource.value]['badge'].includes(currBadge['name'])"-->
+<!--                                *ngFor="let currBadge of userDataByResources[selectedResource.value]['possible_badges'][currBadgeCategory]">-->
+<!--                </app-badge-view>-->
+
+<!--                &lt;!&ndash;            {{userDataByResources[selectedResource.value]}}&ndash;&gt;-->
+
+<!--              </div>-->
+
+<!--            </div>-->
+<!--            <h5>Biocuration details: </h5>-->
+<!--            <app-details-table [profileData]="profileData" [database]="selectedResource.value"></app-details-table>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+
+<!--      <div class="row">-->
+<!--        <div [class.col-xl-6]="selectedResource.value !== database"-->
+<!--             [class.d-none]="selectedResource.value === database"-->
+<!--             (click)="selectedResource.next(database)"-->
+<!--             *ngFor="let database of resourcesList">-->
+<!--          <div class="card card-body">-->
+<!--            <div class="row">-->
+<!--              <div class="col mr-auto"><p><strong>Resource: </strong>-->
+<!--                &lt;!&ndash;               DisProt&ndash;&gt;-->
+<!--&lt;!&ndash;                {{map_resources[database]['resource_name']}} ///////////////    &ndash;&gt;-->
+<!--              </p></div>-->
+<!--              <div class="col-auto">-->
+<!--                <a class="badge badge-success mr-2 mb-2" (click)="selectedResource.next('')"> Expand <i-->
+<!--                  class="material-icons" style="font-size: small">unfold_more</i></a>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <div class="row">-->
+<!--              <div class="col" *ngIf="userDataByResources[database].hasOwnProperty('ranking')">-->
+<!--                <strong>Rank: </strong>-->
+<!--                <a class="badge  badge-apicuron"-->
+<!--                   tooltip="see at Leaderboard"-->
+<!--                   routerLink="/databases/{{database}}"-->
+<!--                   fragment="leaderboard">-->
+<!--&lt;!&ndash;                  {{userDataByResources[database]['ranking']}} ////////// &ndash;&gt;-->
+<!--                </a>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <iv class="row">-->
+<!--              <div class="col  mb-2">-->
+<!--                <p class="mb-0"><strong>Number of entity-->
+<!--                  generation: </strong>{{userDataByResources[database]['generation_counts']}}</p>-->
+<!--                <p class="mb-0"><strong>Number of entity-->
+<!--                  revision: </strong>{{userDataByResources[database]['revision_counts']}}</p>-->
+<!--                <p class="mb-0"><strong>Number of entity-->
+<!--                  invalidation: </strong>{{userDataByResources[database]['invalidation_counts']}}</p>-->
+<!--              </div>-->
+<!--            </div>-->
+
+<!--            <div class="row">-->
+
+
+<!--              <div class="col-auto">-->
+<!--                &lt;!&ndash;               aa&ndash;&gt;-->
+<!--                &lt;!&ndash;               {{ userDataByResources[selectedResource.value]}}&ndash;&gt;-->
+
+<!--                &lt;!&ndash;               <app-badge-medal [badge]="badge"  *ngFor="let badge of currResourceUserData['badge']"></app-badge-medal>&ndash;&gt;-->
+<!--                <app-medal-view [medal]="currMedal"-->
+<!--                                *ngFor="let currMedal of userDataByResources[database]['medal']"></app-medal-view>-->
+<!--                &lt;!&ndash;               <app-badge-medal [badge]="medal" [color]="'#000000'" *ngFor="let medal of userDataByResources[database]['medal']"></app-badge-medal>&ndash;&gt;-->
+
+<!--                &lt;!&ndash;               <span class="badge badge-pill badge-medal mr-2 mb-2" [style]="{'background-color':badge['color_code']}"&ndash;&gt;-->
+<!--                &lt;!&ndash;                     > {{badge['name']}}</span>&ndash;&gt;-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+
+<!--  </div>-->
+<!--</div>-->
+<!--</div>-->
+

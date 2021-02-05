@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {InternalService} from '../services/internal.service';
 import {concat, BehaviorSubject, Observable, combineLatest} from 'rxjs';
 import {ProgressbarConfig} from 'ngx-bootstrap';
-import {HttpEvent, HttpClient, HttpRequest, HttpEventType} from '@angular/common/http';
+import {HttpEvent, HttpClient, HttpRequest, HttpEventType, HttpParams} from '@angular/common/http';
 
 export function getProgressbarConfig(): ProgressbarConfig {
   return Object.assign(new ProgressbarConfig(), {animate: true, striped: true, max: 100});
@@ -10,6 +10,7 @@ export function getProgressbarConfig(): ProgressbarConfig {
 
 import {environment} from '../../environments/environment';
 import {AuthService} from '../services/auth.service';
+import {FormControl, FormGroup} from '@angular/forms';
 
 @Component({
   selector: 'app-profile',
@@ -36,7 +37,7 @@ export class ProfileComponent implements OnInit {
   map_resources = {};
   userDataByResources = {};
 
- orcidID = null;
+  orcidID = null;
   map_all_badges = {};
 
   employment = [];
@@ -46,7 +47,9 @@ export class ProfileComponent implements OnInit {
   selectedResourceData = new BehaviorSubject<object>({});
   imgURL: any;
 
-  @ViewChild('file', { static: true }) file;
+  badgesAndMedals = [];
+
+  @ViewChild('file', {static: true}) file;
 
   constructor(public authService: AuthService,
               private internalService: InternalService) {
@@ -69,57 +72,58 @@ export class ProfileComponent implements OnInit {
 
       this.logedIn = orcid_id === authData['orcid_id'];
 
-      this.internalService.GetSearch2({
+      this.internalService.GetStatistics({
         curator_orcid: orcid_id
       }).subscribe((browseData) => {
-        this.profileData.next(browseData.biocurators[0]);
-        browseData.list_resources.forEach(currResource => {
-          this.map_resources[currResource.resource_uri.substr(42)] = currResource;
+        this.profileData.next(browseData[0]);
+        this.internalService.GetStat().subscribe((statData) => {
+          statData['resources'].forEach(currResource => {
+            this.map_resources[currResource.resource_uri] = currResource;
+          });
+
+        }, (err) => {
+        }, () => {
+          console.log('this.map_resources', this.map_resources);
+
+          this.internalService.getAchievements(new HttpParams()
+            .set('curator_orcid', orcid_id)
+            .set('filter_priority', 'true')).subscribe((badgesAndMedals) => {
+            this.badgesAndMedals = badgesAndMedals;
+
+          }, (err) => {
+          }, () => {
+            console.log('this.badgesAndMedals', this.badgesAndMedals);
+          });
+
+
+
         });
 
       }, (err) => {
       }, () => {
+        this.internalService.GetORCIDprofile(orcid_id).subscribe(currORCIDdata => {
+          this.orcidData = currORCIDdata;
+          if (currORCIDdata.hasOwnProperty('activities-summary') && currORCIDdata['activities-summary'].hasOwnProperty('employments') && currORCIDdata['activities-summary']['employments'].hasOwnProperty('affiliation-group')) {
+            this.employment = currORCIDdata['activities-summary']['employments']['affiliation-group'];
+          }
+          console.log('employment', this.employment);
 
-          this.internalService.GetORCIDprofile(orcid_id).subscribe(currORCIDdata => {
+        });
 
 
-            this.orcidData = currORCIDdata;
-            if (currORCIDdata.hasOwnProperty('activities-summary') && currORCIDdata['activities-summary'].hasOwnProperty('employments') && currORCIDdata['activities-summary']['employments'].hasOwnProperty('affiliation-group') ) {
-              this.employment = currORCIDdata['activities-summary']['employments']['affiliation-group'];
-            }
-            console.log('employment', this.employment);
-
-          });
-
-        // console.log(this.profileData.value.hasOwnProperty('generation_terms'));
-        if (this.profileData.value.hasOwnProperty('generation_terms')) {
-          this.profileData.value['generation_terms'].forEach(currReport => {
-            if (currReport.resource_uri) {
-              this.resourcesList.add(currReport.resource_uri.substr(42));
-            }
-          });
-
-        }
-        if (this.profileData.value.hasOwnProperty('revision_terms')) {
-          this.profileData.value['revision_terms'].forEach(currReport => {
+        if (this.profileData.value.hasOwnProperty('statistics')) {
+          this.profileData.value['statistics'].forEach(currReport => {
             if (currReport.resource_uri) {
               this.resourcesList.add(currReport.resource_uri.substr(42));
             }
           });
         }
-        if (this.profileData.value.hasOwnProperty('invalidation_terms')) {
-          this.profileData.value['invalidation_terms'].forEach(currReport => {
-            if (currReport.resource_uri) {
-              this.resourcesList.add(currReport.resource_uri.substr(42));
-            }
-          });
-        }
+
         // console.log(this.resourcesList);
         Array.from(this.resourcesList).forEach(currResourceURI => {
           this.userDataByResources[String(currResourceURI)] = {
             name: currResourceURI
           };
-
 
 
           if (this.profileData.value.hasOwnProperty('badges')) {
@@ -135,17 +139,17 @@ export class ProfileComponent implements OnInit {
             // this.userDataByResources[String(currResourceURI)]['generation_reports_length']
             this.userDataByResources[String(currResourceURI)]['medal'] = this.profileData.value['medals'].filter(x => {
               return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
-            }).sort((a, b) =>  a.name > b.name  ? 1 : -1);
+            }).sort((a, b) => a.name > b.name ? 1 : -1);
           } else {
             // this.userDataByResources[String(currResourceURI)]['generation_reports_length']
             this.userDataByResources[String(currResourceURI)]['medal'] = [];
           }
 
           if (this.profileData.value.hasOwnProperty('generation_terms')) {
-            this.userDataByResources[String(currResourceURI)]['generation_terms'] =  this.profileData.value['generation_terms'].filter(x => {
+            this.userDataByResources[String(currResourceURI)]['generation_terms'] = this.profileData.value['generation_terms'].filter(x => {
               return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
             });
-            this.userDataByResources[String(currResourceURI)]['generation_counts'] =  this.profileData.value['generation_terms'].filter(x => {
+            this.userDataByResources[String(currResourceURI)]['generation_counts'] = this.profileData.value['generation_terms'].filter(x => {
               return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
             }).map(x => x.count).reduce((a, b) => a + b, 0);
           } else {
@@ -153,10 +157,10 @@ export class ProfileComponent implements OnInit {
             this.userDataByResources[String(currResourceURI)]['generation_counts'] = 0;
           }
           if (this.profileData.value.hasOwnProperty('revision_terms')) {
-            this.userDataByResources[String(currResourceURI)]['revision_terms'] =  this.profileData.value['revision_terms'].filter(x => {
+            this.userDataByResources[String(currResourceURI)]['revision_terms'] = this.profileData.value['revision_terms'].filter(x => {
               return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
             });
-            this.userDataByResources[String(currResourceURI)]['revision_counts'] =  this.profileData.value['revision_terms'].filter(x => {
+            this.userDataByResources[String(currResourceURI)]['revision_counts'] = this.profileData.value['revision_terms'].filter(x => {
               return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
             }).map(x => x.count).reduce((a, b) => a + b, 0);
           } else {
@@ -164,10 +168,10 @@ export class ProfileComponent implements OnInit {
             this.userDataByResources[String(currResourceURI)]['revision_counts'] = 0;
           }
           if (this.profileData.value.hasOwnProperty('invalidation_terms')) {
-            this.userDataByResources[String(currResourceURI)]['invalidation_terms'] =  this.profileData.value['invalidation_terms'].filter(x => {
+            this.userDataByResources[String(currResourceURI)]['invalidation_terms'] = this.profileData.value['invalidation_terms'].filter(x => {
               return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
             });
-            this.userDataByResources[String(currResourceURI)]['invalidation_counts'] =  this.profileData.value['invalidation_terms'].filter(x => {
+            this.userDataByResources[String(currResourceURI)]['invalidation_counts'] = this.profileData.value['invalidation_terms'].filter(x => {
               return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
             }).map(x => x.count).reduce((a, b) => a + b, 0);
           } else {
@@ -175,16 +179,7 @@ export class ProfileComponent implements OnInit {
             this.userDataByResources[String(currResourceURI)]['invalidation_counts'] = 0;
           }
 
-          this.internalService.GetLeaderboard(String(currResourceURI), {curator_orcid: orcid_id }).subscribe(data => {
-            // console.log(data[0]['curators'][0]['ranking']);
-            this.userDataByResources[String(currResourceURI)]['ranking'] = data[0]['biocurators'][0]['ranking'];
-          }, (err) => {
-          }, () => {
-            // this.loading_finished = true;
 
-
-
-          });
         });
 
         this.internalService.GetResearces({}).subscribe(data => {
@@ -211,9 +206,6 @@ export class ProfileComponent implements OnInit {
         }, (err) => {
         }, () => {
         });
-
-
-
 
 
         this.loading_finished = true;
@@ -325,13 +317,13 @@ export class ProfileComponent implements OnInit {
     if (date) {
 
       if (date['year'] && date['month'] && date['day']) {
-        if ( Date.UTC(date['year']['value'], date['month']['value'] - 1, date['day']['value']) >=  Date.now()) {
+        if (Date.UTC(date['year']['value'], date['month']['value'] - 1, date['day']['value']) >= Date.now()) {
 
 
           return true;
         }
       } else if (date['year'] && date['month']) {
-        if ( Date.UTC(date['year']['value'], date['month']['value'] - 1) >=  Date.now()) {
+        if (Date.UTC(date['year']['value'], date['month']['value'] - 1) >= Date.now()) {
           console.log('date_at', Date.now(), date, currPosition);
 
           return true;
@@ -365,7 +357,7 @@ export class ProfileComponent implements OnInit {
     console.log('file uploading');
 
 
-    this.internalService.PostProfilePicture(this.formData,    this.orcidID).subscribe((event: HttpEvent<any>) => {
+    this.internalService.PostProfilePicture(this.formData, this.orcidID).subscribe((event: HttpEvent<any>) => {
       switch (event.type) {
         case HttpEventType.Sent:
           console.log('Request has been made!');

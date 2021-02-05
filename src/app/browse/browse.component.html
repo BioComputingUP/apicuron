@@ -167,7 +167,7 @@
 
             <ng-container cdkColumnDef="generation_count">
               <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('generation_count')" style="text-align: center">
-                Number of entity generation
+                Generations
                 <span *ngIf="sortKey.value === 'generation_count'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
@@ -181,7 +181,7 @@
 
             <ng-container cdkColumnDef="revision_count">
               <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('revision_count')">
-                Number of entity revision
+                Revisions
                 <span *ngIf="sortKey.value === 'revision_count'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
@@ -196,7 +196,7 @@
 
             <ng-container cdkColumnDef="invalidation_count">
               <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('invalidation_count')">
-                Number of entity invalidation
+                Invalidations
                 <span *ngIf="sortKey.value === 'invalidation_count'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
@@ -210,7 +210,7 @@
 
             <ng-container cdkColumnDef="medals">
               <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('count_medals')">
-                Number of medals
+                Medals
                 <span *ngIf="sortKey.value === 'count_medals'">
                                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
                               </span>
@@ -229,7 +229,7 @@
 
             <ng-container cdkColumnDef="badges">
               <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('count_badges')">
-                Number of badges
+                Badges
                 <span *ngIf="sortKey.value === 'count_badges'">
                                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
                               </span>

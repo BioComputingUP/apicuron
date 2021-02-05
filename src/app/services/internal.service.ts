@@ -46,18 +46,13 @@ export class InternalService {
     // .pipe(catchError(err => of(console.error(err))));
   }
 
-
   constructor(private http: HttpClient) {
   }
-
-
-
 
   getReports(params: HttpParams): Observable<any> {
     const url = this.wsUrl + 'reports';
     return this.http.get(url, {params});
   }
-
 
   getReportsStats(params: HttpParams): Observable<any> {
     const url = this.wsUrl + 'reports/statistics';

@@ -205,7 +205,7 @@ export class BrowseComponent implements OnInit {
             });
 
             this.dataOnPage.next(biocuratorsData);
-            this.totalItems = browseData.headers.get('count');
+            this.totalItems = parseInt(browseData.headers.get('count'));
 
             // const keys = browseData.headers.keys();
             // console.log('browseData', browseData);
@@ -225,8 +225,12 @@ export class BrowseComponent implements OnInit {
 
           }, (err) => {
           }, () => {
+            console.log(redirect_homepage, this.totalItems, this.totalItems === 1);
+
             if (redirect_homepage && this.totalItems === 1) {
-              this.router.navigate(['orcid/' + this.dataOnPage.value[0].orcid]);
+              console.log('yeeeee', redirect_homepage, this.totalItems);
+
+              this.router.navigate(['orcid/' + this.dataOnPage.value[0].curator_orcid]);
             }
             redirect_homepage = false;
 
