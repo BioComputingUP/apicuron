@@ -2,7 +2,7 @@
 
   <div class="row pt-3">
 
-    <div class="col-lg-3 d-none d-lg-block d-xl-block">
+    <div class="col-lg-2 d-none d-lg-block d-xl-block">
       <div class="sticky sidebar">
             <div class="card">
               <div class="card-header">
@@ -10,15 +10,15 @@
               </div>
               <div class="card-body">
 
-<!--                <div (click)="scroll(gui)">Web interface</div>-->
-<!--                <br>-->
-<!--                <div (click)="scroll(public)">Public API</div>-->
+                <div (click)="scroll(gui)">Web interface</div>
+                <br>
+                <div (click)="scroll(public)">Public API</div>
 
-<!--                <ul>-->
-<!--                  <li (click)="scroll(reports)" ><a>Reports</a></li>-->
-<!--                  <li (click)="scroll(achievements)" ><a>Achievements</a></li>-->
-<!--                  <li (click)="scroll(ranking)" ><a>Ranking</a></li>-->
-<!--                </ul>-->
+                <ul>
+                  <li (click)="scroll(reports)" ><a>Reports</a></li>
+                  <li (click)="scroll(achievements)" ><a>Achievements</a></li>
+                  <li (click)="scroll(leaderboards)" ><a>Leaderboards</a></li>
+                </ul>
 
 
               </div>
@@ -27,412 +27,378 @@
         </div>
     </div>
 
-    <div class="col-lg-9 text-justify">
-    <h1 #top>Help</h1>
-    <hr>
-    <h2 class="pt-3 mb-3 mt-5" id="gui" #gui>Web interface</h2>
 
-    <p class="mb-3">
-      This page describes APICURON website use. For information about
-      <strong  (click)="scroll(public)">API endpoints</strong>
-      and the output format see the next section.
-    </p>
-    <p>
-      The APICURON graphical user interface allows easy access to the biocuration activities of our partner databases in
-      a graphical way. Biocurators can be searched from the <a routerLink="/browse">Curators page</a> or from the search box
-      on the <a routerLink="/">Home page</a>.
-    </p>
+    <div class="col-lg-10 text-justify">
 
+      <!-- web interface-->
+      <h1 #top>Help</h1>
+      <hr>
+      <h2 class="pt-3 mb-3 mt-5" id="gui" #gui>Web interface</h2>
 
-    <h4 class="mt-2" #browse id="browse">Curators page</h4>
-    The <a routerLink="/browse">Curators page</a> is composed of a result table, a sidebar and a search bar.
-    <ul>
-      <li>
-        <strong>Table</strong>
-        By default it shows the first entries of the database
-        sorted alphabetically. You can change the table sorting by clicking on column headers.
-      </li>
-
-      <li>
-        <strong>Search box</strong>
-        It offers a free text search against all entry values.
-        Alternatively, it allows users to specify the field to search against, e.g. biocurator name,
-        resource identifier, ORCID, etc.
-      </li>
-    </ul>
-    <h4 class="mt-2" #biocurator id="biocurator">Profile page</h4>
-    By clicking on a row of the table, you get redirected to the profile page of a biocurator. The profile
-    of a biocurator features different sections.
-    <ol>
-      <li>
-        <strong>Personal information</strong> name and ORCID
-       </li>
-      <li>
-        <strong>Biocuration statistics</strong> number of generated/revised/invalidated entitities
-      </li>
-      <li>
-        <strong>Achievements</strong>
-        Badges and medals earned
-
-      </li>
-      <li>
-        <strong>Biocuration events</strong>
-        This section include a search bar (above) and a table (below) listing all the
-        entity identifiers, activity terms and timestamps.
-      </li>
-    </ol>
+      <p class="mb-3">
+        This page describes APICURON website use. For information about
+        <strong  (click)="scroll(public)">API endpoints</strong>
+        and the output format see the next section.
+      </p>
+      <p>
+        The APICURON graphical user interface allows easy access to the biocuration activities of our partner databases in
+        a graphical way. Biocurators can be searched from the <a routerLink="/browse">Curators page</a> or from the search box
+        on the <a routerLink="/">Home page</a>.
+      </p>
 
 
+      <h4 class="mt-2" #browse id="browse">Curators page</h4>
+      The <a routerLink="/browse">Curators page</a> is composed of a result table, a sidebar and a search bar.
+      <ul>
+        <li>
+          <strong>Table</strong>
+          By default it shows the first entries of the database
+          sorted alphabetically. You can change the table sorting by clicking on column headers.
+        </li>
 
+        <li>
+          <strong>Search box</strong>
+          It offers a free text search against all entry values.
+          Alternatively, it allows users to specify the field to search against, e.g. biocurator name,
+          resource identifier, ORCID, etc.
+        </li>
+      </ul>
+      <h4 class="mt-2" #biocurator id="biocurator">Profile page</h4>
+      By clicking on a row of the table, you get redirected to the profile page of a biocurator. The profile
+      of a biocurator features different sections.
+      <ol>
+        <li>
+          <strong>Personal information</strong> name and ORCID
+         </li>
+        <li>
+          <strong>Biocuration statistics</strong> number of generated/revised/invalidated entitities
+        </li>
+        <li>
+          <strong>Achievements</strong>
+          Badges and medals earned
 
-
-
-    <h2 id="public" class="pt-3 pb-2" #public>Public API</h2>
-
-    <h4 class="pb-2" #reports>Reports (biocuration events)</h4>
-    <div class="btn-group">
-      <label class="btn btn-primary">GET</label>
-      <a href="{{wsname}}reports" class="btn btn-outline-primary-input mb-2">{{wsname}}<strong>reports</strong></a>
-    </div>
-
-    <dl>
-      <dt>Purpose</dt>
-      <dd>Retrieve biocuration events (or activities)</dd>
-      <dt>Return</dt>
-      <dd>A JSON list of objects representing the biocurators and their activities. One object per curator.</dd>
-      <dt>Examples</dt>
-      <dd>
-        <a href="{{wsname}}reports/orcid_id=0000-0002-0341-4888">{{wsname}}/reports/orcid_id=0000-0002-0341-4888</a>
-        <br>
-        <a href="{{wsname}}reports/resource_uri=disprot">{{wsname}}/reports/resource_uri=disprot</a>
-      </dd>
-    </dl>
-
-    <strong>Query parameters</strong>
-    <table class="table table-sm table-striped small">
-      <thead>
-      <tr>
-        <th>Field</th>
-        <th>Example value</th>
-        <th>Description</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-        <td>orcid_id</td>
-        <td>0000-0002-0341-4888</td>
-        <td>The biocurator ORCID</td>
-      </tr>
-      <tr>
-        <td>name</td>
-        <td>Federica</td>
-        <td>The biocurator name</td>
-      </tr>
-
-      <tr>
-        <td>resource_uri</td>
-        <td>disprot</td>
-        <td>The unique identifier of the resource</td>
-      </tr>
-      </tbody>
-    </table>
-    <strong>Output format</strong>
-    <pre class="style-code mb-5 mt-3">{{output["reports"] | json}}</pre>
+        </li>
+        <li>
+          <strong>Biocuration events</strong>
+          This section include a search bar (above) and a table (below) listing all the
+          entity identifiers, activity terms and timestamps.
+        </li>
+      </ol>
 
 
 
 
-    <h4 class="pb-2" #achievements>Achievements (medals and badges)</h4>
-    <div class="btn-group">
-      <label class="btn btn-primary">GET</label>
-      <a href="{{wsname}}achievements" class="btn btn-outline-primary-input mb-2">{{wsname}}<strong>achievements</strong></a>
-    </div>
 
-    <dl>
-      <dt>Purpose</dt>
-      <dd>Retrieve earned badges and medals</dd>
-      <dt>Return</dt>
-      <dd>A JSON list of objects representing the biocurators achievements (badges and medals). One object per achievement.</dd>
-      <dt>Examples</dt>
-      <dd>
-        <a href="{{wsname}}achievements/orcid_id=0000-0002-0341-4888">{{wsname}}/achievements/orcid_id=0000-0002-0341-4888</a>
-        <br>
-        <a href="{{wsname}}achievements/resource_uri=disprot">{{wsname}}/achievements/resource_uri=disprot</a>
-      </dd>
-    </dl>
+      <!-- API reports -->
+      <h2 id="public" class="pt-3 pb-2" #public>Public API</h2>
 
-    <strong>Query parameters</strong>
-    <pre>
-    </pre>
-    <table class="table table-sm table-striped small">
-      <thead>
-      <tr>
-        <th>Field</th>
-        <th>Example value</th>
-        <th>Description</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-        <td>orcid_id</td>
-        <td>0000-0002-0341-4888</td>
-        <td>The biocurator ORCID</td>
-      </tr>
-      <tr>
-        <td>name</td>
-        <td>Federica</td>
-        <td>The biocurator name</td>
-      </tr>
-
-      <tr>
-        <td>resource_uri</td>
-        <td>disprot</td>
-        <td>The unique identifier of the resource</td>
-      </tr>
-      </tbody>
-    </table>
-
-
-    <strong>Output format</strong>
-    <pre class="style-code mb-5 mt-3">{{output["reports"] | json}}</pre>
-    {{output["reports"] | json}}
-
-
-    <div class="pb-2 pt-3" id="achievements" #achievements>
-      <div>
-        <h3>Report biocuration activity</h3>
-        <div class="btn-group">
-          <label class="btn btn-danger">POST</label>
-          <label class="btn btn-outline-danger-input mb-2">{{wsname}}<strong>submit_activity</strong></label>
-        </div>
-        <dl>
-          <dt>Purpose</dt>
-          <dd>Report biocuration event.</dd>
-          <dt>Query</dt>
-          <dd>POST query with a singe JSON object.</dd>
-          <dt>Return</dt>
-          <dd>Return message</dd>
-        </dl>
-        <h4>Query Parameters</h4>
-        <table class="table table-sm table-striped small">
-          <thead>
-          <tr>
-            <th>Field</th>
-            <th>Example value</th>
-            <th>Availability</th>
-            <th>Description</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            <td><strong>curator_orcid</strong></td>
-            <td>0000-0002-0341-4888</td>
-            <td>Mandatory</td>
-            <td>ORCID of the data resource contributor</td>
-          </tr>
-          <tr>
-            <td><strong>resource_uri</strong></td>
-            <td>disprot</td>
-            <td>Mandatory</td>
-            <td>Identifier of the reporting resource</td>
-          </tr>
-          <tr>
-            <td><strong>timestamp</strong></td>
-            <td>2020-02-11T09:32:10.928Z</td>
-            <td>Mandatory</td>
-            <td>Time point of the biocuration event.</td>
-          </tr>
-          <tr>
-            <td><strong>entity_uri</strong></td>
-            <td>https://identifiers.org/disprot.region:DP02359r003</td>
-            <td>Mandatory</td>
-            <td>URI of the biocurated entity, preferable to use identifiers.org</td>
-          </tr>
-          <tr>
-            <td><strong>activity_term</strong></td>
-            <td>entry_cereated_by_homology</td>
-            <td>Mandatory</td>
-            <td>Description of the biocuration activity codified by resource specific controlled vocabulary under
-<!--                <a  (click)="scroll(registration)" href="javascript:void(0)">-->
-<!--                  /resource_registration-->
-<!--                </a>-->
-              endpoint .
-            </td>
-          </tr>
-          </tbody>
-        </table>
+      <h4 class="pb-2" #reports>Reports (biocuration events or activities)</h4>
+      <div class="btn-group">
+        <label class="btn btn-primary">GET</label>
+        <a href="{{wsname}}reports" class="btn btn-outline-primary-input mb-2">{{wsname}}<strong>reports</strong></a>
       </div>
-    </div>
 
-    <div id="ranking" class="pb-2" #ranking class="pt-3">
-      <div>
-        <h3>Update resource description (including gamification scoring matrix)</h3>
-        <div class="btn-group">
-          <label class="btn btn-danger">POST</label>
-          <label class="btn btn-outline-danger-input mb-2">{{wsname}}<strong>update_description</strong></label>
-        </div>
-        <dl>
-          <dt>Purpose</dt>
-          <dd>R</dd>
-          <dt>Return</dt>
-          <dd>R</dd>
-        </dl>
-        <h4>Query Parameters</h4>
+      <dl>
+        <dt>Purpose</dt>
+        <dd>Retrieve biocuration events (or activities)</dd>
+        <dt>Return</dt>
+        <dd>A JSON list of objects representing the biocurators and their activities. One object per event</dd>
+        <dt>Examples</dt>
+        <dd>
+          <a href="{{wsname}}reports?curator_orcid={{curator_orcid}}&limit=2">{{wsname}}reports?curator_orcid={{curator_orcid}}&limit=2</a>
+          <br>
+          <a href="{{wsname}}reports?resource_uri={{resource_uri}}&limit=2">{{wsname}}reports?resource_uri={{resource_uri}}&limit=2</a>
+        </dd>
+      </dl>
+
+      <strong>Query parameters</strong>
+      <table class="table table-sm table-striped small">
+        <thead>
+        <tr>
+          <th>Field</th>
+          <th>Example value</th>
+          <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>curator_orcid</td>
+          <td>{{curator_orcid}}</td>
+          <td>Biocurator ORCID</td>
+        </tr>
+        <tr>
+          <td>family_name</td>
+          <td>Quaglia</td>
+          <td>Biocurator family name</td>
+        </tr>
+        <tr>
+          <td>given_name</td>
+          <td>Federica</td>
+          <td>Biocurator given name</td>
+        </tr>
+
+        <tr>
+          <td>resource_uri</td>
+          <td>{{resource_uri}}</td>
+          <td>Resource unique identifier (URI)</td>
+        </tr>
+
+        <tr>
+          <td>date_from</td>
+          <td>2020-01-01</td>
+          <td>Event date from</td>
+        </tr>
+
+        <tr>
+          <td>date_to</td>
+          <td>2020-12-31</td>
+          <td>Event date to</td>
+        </tr>
+
+        </tbody>
+      </table>
+
+        <strong>Other parameters</strong>
         <table class="table table-sm table-striped small">
           <thead>
           <tr>
             <th>Field</th>
             <th>Example value</th>
-            <th>Availability</th>
-            <th>Description</th>
-          </tr>
-          </thead>
-          <tbody>
-
-          <tr>
-            <td><strong>resource_uri</strong></td>
-            <td>https://registry.identifiers.org/registry/disprot</td>
-            <td>Mandatory</td>
-            <td></td>
-          </tr>
-
-          <tr>
-            <td><strong>scoring_table</strong></td>
-            <td><a  (click)="scroll(scoring_table)" href="javascript:void(0)">See blow</a></td>
-            <td>Mandatory</td>
-            <td>A list of objects representing APICURON scoring table activity terms</td>
-          </tr>
-
-          <tr>
-            <td><strong>badge_table</strong></td>
-            <td><a   (click)="scroll(badges)" href="javascript:void(0)">See blow</a></td>
-            <td>Optionally</td>
-            <td>A list of objects representing APICURON badges description</td>
-          </tr>
-
-          </tbody>
-        </table>
-        <h5 id="scoring_table" #scoring_table>Scoring table</h5>
-        <table class="table table-sm table-striped small">
-          <thead>
-          <tr>
-            <th>Field</th>
-            <th>Example value</th>
-            <th>Availability</th>
             <th>Description</th>
           </tr>
           </thead>
           <tbody>
           <tr>
-            <td><strong>activity_category</strong></td>
-            <td></td>
-            <td>Mandatory</td>
-            <td>The category should be <a href="https://www.w3.org/TR/prov-o/#Generation" target="_blank">
-              <kbd>Generation</kbd>
-            </a>,
-              <a href="https://www.w3.org/TR/prov-o/#Revision" target="_blank">
-                <kbd>Revision</kbd>
-              </a> or
-              <a href="https://www.w3.org/TR/prov-o/#Invalidation" target="_blank">
-                <kbd>Invalidation</kbd>
-              </a> form PROV ontology
-            </td>
+            <td>limit</td>
+            <td>10</td>
+            <td>Number of items to return</td>
           </tr>
-
           <tr>
-            <td><strong>activity_term</strong></td>
-            <td></td>
-            <td>Mandatory</td>
-            <td></td>
+            <td>skip</td>
+            <td>20</td>
+            <td>NUmber of items to skip (useful for pagination)</td>
           </tr>
-
           <tr>
-            <td><strong>score</strong></td>
-            <td>80</td>
-            <td>Mandatory</td>
-            <td>Gamification score given by biocuration activity.</td>
-          </tr>
-
-
-          </tbody>
-        </table>
-        <h5 id="badges" #badges>Badges table</h5>
-        <table class="table table-sm table-striped small">
-          <thead>
-          <tr>
-            <th>Field</th>
-            <th>Example value</th>
-            <th>Availability</th>
-            <th>Description</th>
-          </tr>
-          </thead>
-          <tbody>
-
-          <tr>
-            <td><strong>count_threshold</strong></td>
-            <td></td>
-            <td>Optionally (One of optional field is mandatory)</td>
-            <td>Who reach the minimum threshold of the count of the selected activity terms earn the badge.</td>
-          </tr>
-
-          <tr>
-            <td><strong>score_threshold</strong></td>
-            <td></td>
-            <td>Optionally (One of optional field is mandatory)</td>
-            <td>Who reach the minimum threshold of the sum of the selected activity terms earn the badge.</td>
-          </tr>
-
-          <tr>
-            <td><strong>count_relative</strong></td>
-            <td></td>
-            <td>Optionally (One of optional field is mandatory)</td>
-            <td>The best biocurators (number as a percentage), calculated from the count of selected activity terms
-            </td>
-          </tr>
-
-          <tr>
-            <td><strong>score_relative</strong></td>
-            <td></td>
-            <td>Optionally (One of optional field is mandatory)</td>
-            <td>The best biocurators (number as a percentage), calculated from the sum of the selected activity
-              terms
-            </td>
-          </tr>
-
-          <tr>
-            <td><strong>list_terms</strong></td>
-            <td></td>
-            <td>Mandatory</td>
-            <td>The selected activity terms.</td>
-          </tr>
-
-          <tr>
-            <td><strong>badge_name</strong></td>
-            <td></td>
-            <td>Mandatory</td>
-            <td>The name of the badge.</td>
-          </tr>
-
-
-          <tr>
-            <td><strong>first_day</strong></td>
-            <td></td>
-            <td>Optional</td>
-            <td>The earliest day, which is considered by the calculation of the badge.</td>
-          </tr>
-
-
-          <tr>
-            <td><strong>last_day</strong></td>
-            <td></td>
-            <td>Optional</td>
-            <td>The latest day, which is considered by the calculation of the badge.</td>
+            <td>format</td>
+            <td>tsv</td>
+            <td>The output format. By default it returns a json stream. If explicitly format=json it returns a json file</td>
           </tr>
 
           </tbody>
         </table>
+
+      <strong>Output format</strong>
+      <pre class="style-code mb-5 mt-3">{{output["reports"] | json}}</pre>
+
+
+
+      <!-- API achievements -->
+      <h4 class="pb-2" #achievements>Achievements (badges and medals)</h4>
+      <div class="btn-group">
+        <label class="btn btn-primary">GET</label>
+        <a href="{{wsname}}achievements" class="btn btn-outline-primary-input mb-2">{{wsname}}<strong>achievements</strong></a>
       </div>
+
+      <dl>
+        <dt>Purpose</dt>
+        <dd>Retrieve biocurators achievements in terms of badges and medals</dd>
+        <dt>Return</dt>
+        <dd>A JSON list of objects representing biocurators badges or medals</dd>
+        <dt>Examples</dt>
+        <dd>
+          <a href="{{wsname}}achievements?curator_orcid={{curator_orcid}}&limit=2">{{wsname}}achievements?curator_orcid={{curator_orcid}}&limit=2</a>
+          <br>
+          <a href="{{wsname}}achievements?resource_uri={{resource_uri}}&limit=2">{{wsname}}achievements?resource_uri={{resource_uri}}&limit=2</a>
+        </dd>
+      </dl>
+
+      <strong>Query parameters</strong>
+      <table class="table table-sm table-striped small">
+        <thead>
+        <tr>
+          <th>Field</th>
+          <th>Example value</th>
+          <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>curator_orcid</td>
+          <td>{{curator_orcid}}</td>
+          <td>Biocurator ORCID</td>
+        </tr>
+        <tr>
+          <td>family_name</td>
+          <td>Quaglia</td>
+          <td>Biocurator family name</td>
+        </tr>
+        <tr>
+          <td>given_name</td>
+          <td>Federica</td>
+          <td>Biocurator given name</td>
+        </tr>
+
+        <tr>
+          <td>resource_uri</td>
+          <td>{{resource_uri}}</td>
+          <td>Resource unique identifier (URI)</td>
+        </tr>
+
+        <tr>
+          <td>type</td>
+          <td>badge</td>
+          <td>The type of achievement, either "badge" or "medal"</td>
+        </tr>
+
+        <tr>
+          <td>min_count</td>
+          <td>200</td>
+          <td>Minimum number of curation events</td>
+        </tr>
+
+        </tbody>
+      </table>
+
+      <strong>Other parameters</strong>
+      <table class="table table-sm table-striped small">
+        <thead>
+        <tr>
+          <th>Field</th>
+          <th>Example value</th>
+          <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>limit</td>
+          <td>10</td>
+          <td>Number of items to return</td>
+        </tr>
+        <tr>
+          <td>skip</td>
+          <td>20</td>
+          <td>Number of items to skip (useful for pagination)</td>
+        </tr>
+        <tr>
+          <td>format</td>
+          <td>tsv</td>
+          <td>Output format. By default it returns a json stream. If explicitly format=json it returns a json file</td>
+        </tr>
+
+        </tbody>
+      </table>
+
+      <strong>Output format</strong>
+      <pre class="style-code mb-5 mt-3">{{output["achievements"] | json}}</pre>
+
+
+
+      <!-- API leaderboards -->
+      <h4 class="pb-2" #leaderboards>Leaderboards (biocurators ranking and scores)</h4>
+      <div class="btn-group">
+        <label class="btn btn-primary">GET</label>
+        <a href="{{wsname}}leaderboards" class="btn btn-outline-primary-input mb-2">{{wsname}}<strong>leaderboards</strong></a>
+      </div>
+
+      <dl>
+        <dt>Purpose</dt>
+        <dd>Retrieve ranking and scores</dd>
+        <dt>Return</dt>
+        <dd>A JSON list of objects representing the biocurators ranking and scores. One object per biocurator and database</dd>
+        <dt>Examples</dt>
+        <dd>
+          <a href="{{wsname}}leaderboards?curator_orcid={{curator_orcid}}&limit=2">{{wsname}}leaderboards?curator_orcid={{curator_orcid}}&limit=2</a>
+          <br>
+          <a href="{{wsname}}leaderboards?resource_uri={{resource_uri}}&limit=2">{{wsname}}leaderboards?resource_uri={{resource_uri}}&limit=2</a>
+        </dd>
+      </dl>
+
+      <strong>Query parameters</strong>
+      <table class="table table-sm table-striped small">
+        <thead>
+        <tr>
+          <th>Field</th>
+          <th>Example value</th>
+          <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>curator_orcid</td>
+          <td>{{curator_orcid}}</td>
+          <td>Biocurator ORCID</td>
+        </tr>
+        <tr>
+          <td>family_name</td>
+          <td>Quaglia</td>
+          <td>Biocurator family name</td>
+        </tr>
+        <tr>
+          <td>given_name</td>
+          <td>Federica</td>
+          <td>Biocurator given name</td>
+        </tr>
+
+        <tr>
+          <td>resource_uri</td>
+          <td>{{resource_uri}}</td>
+          <td>Resource unique identifier (URI)</td>
+        </tr>
+
+        <tr>
+          <td>ranking</td>
+          <td>badge</td>
+          <td>Position in the global database ranking</td>
+        </tr>
+
+        <tr>
+          <td>min_total_score</td>
+          <td>2000</td>
+          <td>Minimum total score of a biocurator</td>
+        </tr>
+
+        </tbody>
+      </table>
+
+      <strong>Other parameters</strong>
+      <table class="table table-sm table-striped small">
+        <thead>
+        <tr>
+          <th>Field</th>
+          <th>Example value</th>
+          <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>limit</td>
+          <td>10</td>
+          <td>Number of items to return</td>
+        </tr>
+        <tr>
+          <td>skip</td>
+          <td>20</td>
+          <td>Number of items to skip (useful for pagination)</td>
+        </tr>
+        <tr>
+          <td>format</td>
+          <td>tsv</td>
+          <td>Output format. By default it returns a json stream. If explicitly format=json it returns a json file</td>
+        </tr>
+        <tr>
+          <td>sort</td>
+          <td>generation_score</td>
+          <td>Sorting field</td>
+        </tr>
+
+        </tbody>
+      </table>
+
+      <strong>Output format</strong>
+      <pre class="style-code mb-5 mt-3">{{output["leaderboards"] | json}}</pre>
+
     </div>
-  </div>
+
+
   </div>
 </div>
