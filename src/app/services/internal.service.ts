@@ -53,7 +53,10 @@ export class InternalService {
     const url = this.wsUrl + 'reports';
     return this.http.get(url, {params});
   }
-
+  getReportsWithCount(params): Observable<any> {
+    const url = this.wsUrl + 'reports';
+    return this.http.get(url, { observe: 'response', params: params});
+  }
   getReportsStats(params: HttpParams): Observable<any> {
     const url = this.wsUrl + 'reports/statistics';
     return this.http.get(url, {params});
@@ -68,6 +71,12 @@ export class InternalService {
     const url = this.wsUrl + 'leaderboards';
     return this.http.get(url, {params});
   }
+
+  getResources(params: HttpParams): Observable<any> {
+    const url = this.wsUrl + 'resources';
+    return this.http.get(url, {params});
+  }
+
 
 
 

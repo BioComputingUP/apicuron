@@ -44,3 +44,11 @@ dd {
   text-align: left;
 
 }
+.fixed-top {
+  top: 60px;
+  z-index: 10;
+  box-shadow: 0px 11px 8px -5px rgba(0,0,0,0.35);
+  background-color: white;
+  transition: 0.25s;
+
+}

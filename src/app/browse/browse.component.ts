@@ -200,7 +200,9 @@ export class BrowseComponent implements OnInit {
                 generation_score: currData.generation_score,
                 revision_score: currData.revision_score,
                 invalidation_score: currData.invalidation_score,
-                listResources: listResources
+                listResources: listResources,
+                medals_count: currData.medals_count,
+                badges_count: currData.badges_count,
               };
             });
 

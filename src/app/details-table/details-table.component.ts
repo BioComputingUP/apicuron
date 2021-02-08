@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {BehaviorSubject, combineLatest} from 'rxjs';
 import {FormControl, FormGroup, FormBuilder} from '@angular/forms';
 import {InternalService} from '../services/internal.service';
+import {HttpEvent, HttpClient, HttpRequest, HttpEventType, HttpParams} from '@angular/common/http';
 
 @Component({
   selector: 'app-details-table',
@@ -12,15 +13,16 @@ export class DetailsTableComponent implements OnInit {
   // declaration, data loading
   // @Input() dataArray: [];
   @Input() database;
-  @Input() profileData;
+  @Input() curator_orcid;
   tableDataSource_f = new BehaviorSubject<any[]>([]);
   tableDataSource = new BehaviorSubject<any[]>([]);
   totalItems = 0;
 
   displayedColumns = new BehaviorSubject<string[]>([
-    'entry',
-    'acc',
-    'name',
+    'entity_uri',
+    'activity_name',
+    'description',
+    'timestamp',
     // 'term_number'
   ]);
 
@@ -31,7 +33,7 @@ export class DetailsTableComponent implements OnInit {
 
   // declaration, search
   searchForm: FormGroup;
-  sortKey = new BehaviorSubject<string>('entry');
+  sortKey = new BehaviorSubject<string>('entity_uri');
   sortDirection = new BehaviorSubject<string>('asc');
 
   statArray = [];
@@ -40,6 +42,8 @@ export class DetailsTableComponent implements OnInit {
               private internalService: InternalService) { }
 
   ngOnInit() {
+
+    console.log( this.database);
 
     this.searchForm = this.fb.group({
       textSearch: null,
@@ -62,26 +66,40 @@ export class DetailsTableComponent implements OnInit {
                     currentPage,
                     pageSize
                   ]) => {
-        this.internalService.GetSearchDetails({
-          filter: searchTerm.textSearch,
-          curator_orcid: this.profileData.value['orcid'],
-          resource_id: this.database,
-          page_size: 10,
-          page: currentPage['page'] - 1,
-          first_day: searchTerm.firstDay,
-          last_day: searchTerm.lastDay
-        }).subscribe(currData => {
-           this.dataOnPage.next(currData.reports);
-           this.totalItems = currData.count_total_reports;
-           this.statArray = currData.stat.sort((a, b) => a.activity_name > b.activity_name ? 1 : -1);
+        this.internalService.getReportsWithCount(new HttpParams()
+          .set('sort_field', sortKey)
+          .set('sort_value', sortDirection)
+          .set('filter', searchTerm.textSearch)
+          .set('curator_orcid', this.curator_orcid)
+          .set('resource_uri', this.database)
+          .set('page_size', '10')
+          .set('page',  (currentPage['page'] - 1).toString())
+          .set('first_day', searchTerm.firstDay)
+          .set('last_day', searchTerm.lastDay)
+        ).subscribe(currData => {
+          this.dataOnPage.next(currData.body);
+          this.totalItems = parseInt(currData.headers.get('count'));
         });
+
+        this.internalService.getReportsStats(new HttpParams()
+          .set('filter', searchTerm.textSearch)
+          .set('curator_orcid', this.curator_orcid)
+          .set('resource_uri', this.database)
+          .set('page_size', '10')
+          .set('page',  (currentPage['page'] - 1).toString())
+          .set('first_day', searchTerm.firstDay)
+          .set('last_day', searchTerm.lastDay)
+        ).subscribe(currData => {
+          this.statArray = currData.sort((a, b) => a.activity_name > b.activity_name ? 1 : -1);
+        });
+
+
+
+
+
       });
-
     this.searchForm.get('textSearch').setValue('');
-
   }
-
-
 
   adjustSort(key: string) {
     if (this.sortKey.value === key) {

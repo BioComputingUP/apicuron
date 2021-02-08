@@ -209,9 +209,9 @@
             </ng-container>
 
             <ng-container cdkColumnDef="medals">
-              <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('count_medals')">
+              <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('medals_count')">
                 Medals
-                <span *ngIf="sortKey.value === 'count_medals'">
+                <span *ngIf="sortKey.value === 'medals_count'">
                                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
                               </span>
               </th>
@@ -221,16 +221,14 @@
                 <!--               >-->
                 <!--                <span [innerHTML]="calc_html_badges(row['badge'])"></span>-->
                 <!--            </a>-->
-                <span *ngIf="row['count_medals']">{{row['count_medals']}}</span>
-                <span *ngIf="!row['count_medals']">0</span>
-
+                <span>{{row['medals_count']}}</span>
               </td>
             </ng-container>
 
             <ng-container cdkColumnDef="badges">
-              <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('count_badges')">
+              <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('badges_count')">
                 Badges
-                <span *ngIf="sortKey.value === 'count_badges'">
+                <span *ngIf="sortKey.value === 'badges_count'">
                                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
                               </span>
               </th>
@@ -240,8 +238,7 @@
                 <!--               >-->
                 <!--                <span [innerHTML]="calc_html_badges(row['badge'])"></span>-->
                 <!--            </a>-->
-                <span *ngIf="row['count_badges']">{{row['count_badges']}}</span>
-                <span *ngIf="!row['count_badges']">0</span>
+                <span>{{row['badges_count']}}</span>
 
               </td>
             </ng-container>

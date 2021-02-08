@@ -3,10 +3,10 @@
 
   <div class="input-group mb-3" >
     <div class="input-group-prepend">
-      <span class="input-group-text text-center" style="min-width: 180px" id="basic-addon1" >Search in DisProt</span>
+      <span class="input-group-text text-center" style="min-width: 180px" id="basic-addon1" >Filter </span>
     </div>
     <!--<input type="text" class="form-control" formControlName="search_term" placeholder="e.g.: p53">-->
-    <input type="text" class="form-control" formControlName="textSearch" placeholder="write activity name or entity identifier">
+    <input type="text" class="form-control" formControlName="textSearch" placeholder="write entity identifier">
     <div class="input-group-prepend">
       <span class="input-group-text text-center" style="min-width: 180px"  >from</span>
     </div>
@@ -39,26 +39,33 @@
       <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value"></tr>
       <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
 
-      <ng-container cdkColumnDef="entry">
-        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('entry')"> Entity identifier
-          <span *ngIf="sortKey.value === 'entry'">
+      <ng-container cdkColumnDef="entity_uri">
+        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('entity_uri')"> Entity identifier
+          <span *ngIf="sortKey.value === 'entity_uri'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
         </th>
         <td cdk-cell *cdkCellDef="let row" >
           <a href="{{row.entity_uri}}" target="_blank">{{row.entity_uri.substr(row.entity_uri.indexOf(':', 6)+1)}}</a></td>
       </ng-container>
-      <ng-container cdkColumnDef="acc">
-        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('acc')"> Activity term
+      <ng-container cdkColumnDef="activity_name">
+        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('activity_name')"> Activity term
           <span *ngIf="sortKey.value === 'acc'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
         </th>
-        <td cdk-cell *cdkCellDef="let row" > {{row.activity_name}}</td>
+        <td cdk-cell *cdkCellDef="let row" > <strong>{{row.activity_name}}</strong></td>
       </ng-container>
-      <ng-container cdkColumnDef="name">
-        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('name')"> Timestamp
-          <span *ngIf="sortKey.value === 'name'">
+      <ng-container cdkColumnDef="description">
+        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('description')"> Activity description
+          <span *ngIf="sortKey.value === 'description'">
+                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
+              </span>
+        </th>
+        <td cdk-cell *cdkCellDef="let row" > {{row.description}}</td>
+      </ng-container><ng-container cdkColumnDef="timestamp">
+        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('timestamp')"> Timestamp
+          <span *ngIf="sortKey.value === 'timestamp'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
         </th>
