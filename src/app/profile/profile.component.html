@@ -14,8 +14,12 @@
         </h2>
       </div>
       <div class="col-auto">
-        <p class="mt-2"><a tooltip="Access to the ORCID profile page" href="https://orcid.org/{{curator_orcid}}"
-                           target="_blank">({{curator_orcid}})</a></p></div>
+        <p class="mt-2">
+          <a tooltip="Access to the ORCID profile page"
+             href="https://orcid.org/{{curator_orcid}}"
+             target="_blank">({{curator_orcid}})</a>
+        </p>
+      </div>
       <div class="col">
         <div *ngFor="let currPosition of employment" class="mt-2">
               <span
@@ -76,15 +80,15 @@
 
     <div class="col-lg-2">
       <div class="row">
-        <div class="col-9 text">Generation</div>
+        <div class="col-9 text"><strong>Generation</strong></div>
         <div class="col text-right">{{generalStat['generation_count']}}</div>
       </div>
       <div class="row">
-        <div class="col-9 text">Revision</div>
+        <div class="col-9 text"><strong>Revision</strong></div>
         <div class="col text-right">{{generalStat['revision_count']}}</div>
       </div>
       <div class="row">
-        <div class="col-9 text">Invalidation</div>
+        <div class="col-9 text"><strong>Invalidation</strong></div>
         <div class="col text-right">{{generalStat['invalidation_count']}}</div>
       </div>
     </div>
@@ -172,28 +176,31 @@
 
   </div>
   <div class="row" #databases id="databases">
-    <div [class.col]="selectedResource.value !== currStatData['resource_uri']"
+    <div [class.col-12]="selectedResource.value !== currStatData['resource_uri']"
          [class.d-none]="selectedResource.value === currStatData['resource_uri']"
          (click)="selectedResource.next(currStatData['resource_uri'])"
          *ngFor="let currStatData of statByResource">
       <div class="card card-body">
         <div class="row">
-          <div class="col mr-auto"><p><strong>Resource: </strong>
-            <span *ngIf="map_resources.hasOwnProperty(currStatData['resource_uri'])">
+          <div class="col-auto mr-auto">
+            <p><strong>Resource: </strong>
+              <!--                DisProt-->
+              <span *ngIf="map_resources.hasOwnProperty(currStatData['resource_uri'])">
                     {{map_resources[currStatData['resource_uri']]['resource_name']}}
                   </span>
-            <span *ngIf="!map_resources.hasOwnProperty(currStatData['resource_uri'])">
+              <span *ngIf="!map_resources.hasOwnProperty(currStatData['resource_uri'])">
                                       {{currStatData['resource_uri']}}
                   </span>
-          </p></div>
-          <div class="col-auto" *ngIf="currStatData.hasOwnProperty('ranking')">
-            <strong>Rank: </strong>
-            <a class="badge  badge-apicuron"
-               tooltip="see at Leaderboard"
-               routerLink="/databases/{{ map_resources[currStatData['resource_uri']]['resource_id']}}"
-               fragment="leaderboard">
-              {{currStatData['ranking']}}
-            </a>
+              <!--                  {{map_resources[selectedResource.value]['resource_name']}}-->
+              <!---->
+              <span class="ml-5" *ngIf="currStatData['ranking']">
+                <strong>Rank: </strong>
+                <a class="badge  badge-apicuron"
+                   tooltip="see at Leaderboard"
+                   routerLink="/databases/{{ map_resources[currStatData['resource_uri']]['resource_id']}}"
+                   fragment="leaderboard">{{currStatData['ranking']}}</a>
+              </span>
+            </p>
           </div>
           <div class="col">
             <span class="ml-3"><strong>Number of entity
@@ -202,6 +209,7 @@
               revision: </strong>{{currStatData['revision_count']}}</span>
             <span class="ml-3"><strong>Number of entity
               invalidation: </strong>{{currStatData['invalidation_count']}}</span></div>
+
           <div class="col-auto">
             <a class="badge badge-success mr-2 mb-2"> Expand <i
               class="material-icons" style="font-size: small">unfold_more</i></a>

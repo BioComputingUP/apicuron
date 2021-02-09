@@ -1,31 +1,44 @@
-<div class="col-12">
+<div class="col-12 px-0">
   <form [formGroup]="searchForm">
-
     <div class="input-group mb-3">
       <div class="input-group-prepend">
-        <span class="input-group-text text-center" style="min-width: 180px" id="basic-addon1">Filter </span>
+        <span class="input-group-text text-center" style="min-width: 100px" id="basic-addon1">Filter </span>
       </div>
-      <!--<input type="text" class="form-control" formControlName="search_term" placeholder="e.g.: p53">-->
-      <input type="text" class="form-control" formControlName="textSearch" placeholder="write entity identifier">
+      <input type="text" class="form-control" formControlName="textSearch"
+             placeholder="entity identifier or activity name">
+      <button class="form-control col-1"
+              style="color:#9A031E;"
+              (click)="searchForm.get('textSearch').setValue('')">
+        clear
+      </button>
       <div class="input-group-prepend">
-        <span class="input-group-text text-center" style="min-width: 180px">from</span>
+        <span class="input-group-text text-center" style="min-width: 80px;border-left-width: 0">from</span>
       </div>
+
       <input type="text"
              class="form-control"
              #dp="bsDatepicker"
              bsDatepicker
+             style="max-width: 200px"
              formControlName="firstDay"
              [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">
       <div class="input-group-prepend">
-        <span class="input-group-text text-center" style="min-width: 180px"> to </span>
+        <span class="input-group-text text-center" style="min-width: 80px;border-left-width: 0"> to </span>
       </div>
       <input type="text"
              class="form-control"
              #dp="bsDatepicker"
              bsDatepicker
+             style="max-width: 200px"
              formControlName="lastDay"
              [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">
-
+      <div class="input-group-prepend">
+        <button class="form-control"
+                style="color:#9A031E; border-left-width: 0; border-bottom-left-radius: 0; border-top-left-radius: 0;"
+                (click)="resetTime()">
+          reset
+        </button>
+      </div>
     </div>
   </form>
 </div>
@@ -33,8 +46,10 @@
 <div class="row">
   <div class="col">
     <table cdk-table [dataSource]="statArray" class="table table-sm">
-      <tr cdk-header-row *cdkHeaderRowDef="['category', 'activity_name', 'description', 'current_count', 'global_count']"></tr>
-      <tr cdk-row *cdkRowDef="let row; columns: ['category', 'activity_name', 'description', 'current_count', 'global_count']"></tr>
+      <tr cdk-header-row
+          *cdkHeaderRowDef="['category', 'activity_name', 'description', 'current_count', 'global_count']"></tr>
+      <tr cdk-row
+          *cdkRowDef="let row; columns: ['category', 'activity_name', 'description', 'current_count', 'global_count']"></tr>
 
       <ng-container cdkColumnDef="category">
         <th cdk-header-cell *cdkHeaderCellDef> Activity category
@@ -51,7 +66,7 @@
           {{row['activity_name']}}
         </td>
       </ng-container>
-     <ng-container cdkColumnDef="description">
+      <ng-container cdkColumnDef="description">
         <th cdk-header-cell *cdkHeaderCellDef> Activity description
         </th>
         <td cdk-cell *cdkCellDef="let row">

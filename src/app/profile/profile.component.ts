@@ -4,6 +4,7 @@ import {concat, BehaviorSubject, Observable, combineLatest} from 'rxjs';
 import {ProgressbarConfig} from 'ngx-bootstrap';
 import {HttpEvent, HttpClient, HttpRequest, HttpEventType, HttpParams} from '@angular/common/http';
 import {ScrollToConfigOptions, ScrollToService} from '@nicky-lenaers/ngx-scroll-to';
+import {ActivatedRoute} from '@angular/router';
 
 export function getProgressbarConfig(): ProgressbarConfig {
   return Object.assign(new ProgressbarConfig(), {animate: true, striped: true, max: 100});
@@ -39,7 +40,6 @@ export class ProfileComponent implements OnInit {
   profilePictureID = null;
 
 
-
   localAuth = new BehaviorSubject<object>({});
   logedIn = false;
   progress;
@@ -69,6 +69,8 @@ export class ProfileComponent implements OnInit {
   @ViewChild('file', {static: true}) file;
 
   constructor(public authService: AuthService,
+              private scrollToService: ScrollToService,
+              private route: ActivatedRoute,
               private internalService: InternalService) {
   }
 
@@ -89,7 +91,6 @@ export class ProfileComponent implements OnInit {
     });
 
 
-
     this.internalService.getResources(new HttpParams()).subscribe(resources => {
       if (Array.isArray(resources)) {
         resources.forEach(currResource => {
@@ -101,11 +102,11 @@ export class ProfileComponent implements OnInit {
             }
             this.mapBadgeCategories[currResource['resource_uri']][currBadge['category']].push(currBadge);
           });
-          console.log( Object.keys(this.mapBadgeCategories[currResource['resource_uri']]));
+          console.log(Object.keys(this.mapBadgeCategories[currResource['resource_uri']]));
 
 
           Object.keys(this.mapBadgeCategories[currResource['resource_uri']]).forEach(currCategory => {
-            this.mapBadgeCategories[currResource['resource_uri']][currCategory] = this.mapBadgeCategories[currResource['resource_uri']][currCategory].sort((a, b) => a.count_threshold > b.count_threshold ? 1 : -1)
+            this.mapBadgeCategories[currResource['resource_uri']][currCategory] = this.mapBadgeCategories[currResource['resource_uri']][currCategory].sort((a, b) => a.count_threshold > b.count_threshold ? 1 : -1);
           });
         });
       }
@@ -127,37 +128,52 @@ export class ProfileComponent implements OnInit {
       }, (err) => {
       }, () => {
         if (this.statByResource.length > 0) {
-          this.selectedResource.next(this.statByResource.sort((a, b) => a.medals_count < b.medals_count ? 1 : -1)[0]['resource_uri']);
+          console.log('this.route.snapshot.fragment',
+            this.route.snapshot.fragment,
+            this.statByResource.map(x => this.map_resources[x['resource_uri']]['resource_id']));
+          if (this.route.snapshot.fragment && this.statByResource.map(x => this.map_resources[x['resource_uri']]['resource_id']).includes(this.route.snapshot.fragment)) {
+            const config: ScrollToConfigOptions = {
+              target: 'selected',
+              offset: -150,
+              duration: 0.2,
+              // target: this.route.snapshot.fragment
+            };
+            this.selectedResource.next('https://registry.identifiers.org/registry/' + this.route.snapshot.fragment);
+            this.scrolTo(this.scrollToService, config);
+          } else {
+            this.selectedResource.next(this.statByResource.sort((a, b) => a.medals_count < b.medals_count ? 1 : -1)[0]['resource_uri']);
+          }
         }
       });
     });
 
-      this.internalService.getAchievements(new HttpParams()
-        .set('curator_orcid', this.curator_orcid).set('filter_priority', 'true')).subscribe(achievements => {
-          // console.log('achievements', achievements);
-        if (Array.isArray(achievements)) {
-          achievements.forEach( currAchievements => {
-            if (currAchievements.type === 'medal') {
-              // console.log('achievements', achievements);
+    this.internalService.getAchievements(new HttpParams()
+      .set('curator_orcid', this.curator_orcid).set('filter_priority', 'true')).subscribe(achievements => {
+      // console.log('achievements', achievements);
+      if (Array.isArray(achievements)) {
+        achievements.forEach(currAchievements => {
+          if (currAchievements.type === 'medal') {
+            // console.log('achievements', achievements);
 
-              if (!this.mapMedals.hasOwnProperty(currAchievements['resource_uri'])) {
-                this.mapMedals[currAchievements['resource_uri']] = [];
-              }
-              this.mapMedals[currAchievements['resource_uri']].push(currAchievements);
-            } else if (currAchievements.type === 'badge') {
-              if (!this.mapBadgeNames.hasOwnProperty(currAchievements['resource_uri'])) {
-                this.mapBadgeNames[currAchievements['resource_uri']] = [];
-              }
-              this.mapBadgeNames[currAchievements['resource_uri']].push(currAchievements.name);
+            if (!this.mapMedals.hasOwnProperty(currAchievements['resource_uri'])) {
+              this.mapMedals[currAchievements['resource_uri']] = [];
             }
-          });
-          Object.keys(this.mapMedals).forEach(currDatabase => {
-            this.mapMedals[currDatabase] = this.mapMedals[currDatabase].sort((a, b) => a.name > b.name ? 1 : -1);
-          });
+            this.mapMedals[currAchievements['resource_uri']].push(currAchievements);
+          } else if (currAchievements.type === 'badge') {
+            if (!this.mapBadgeNames.hasOwnProperty(currAchievements['resource_uri'])) {
+              this.mapBadgeNames[currAchievements['resource_uri']] = [];
+            }
+            this.mapBadgeNames[currAchievements['resource_uri']].push(currAchievements.name);
+          }
+        });
+        Object.keys(this.mapMedals).forEach(currDatabase => {
+          this.mapMedals[currDatabase] = this.mapMedals[currDatabase].sort((a, b) => a.name > b.name ? 1 : -1);
+        });
 
-        }
-      }, (err) => {}, () => {});
-
+      }
+    }, (err) => {
+    }, () => {
+    });
 
 
     this.internalService.GetORCIDprofile(this.curator_orcid).subscribe(currORCIDdata => {
@@ -167,16 +183,16 @@ export class ProfileComponent implements OnInit {
       }
     });
 
-    window.addEventListener("scroll", event => {
-      if (document.getElementById("second-nav-bar")) {
+    window.addEventListener('scroll', event => {
+      if (document.getElementById('second-nav-bar')) {
         if (document.body.scrollTop > 40 || document.documentElement.scrollTop > 40) {
-          document.getElementById("second-nav-bar").style['margin-top'] = '0px';
-          document.getElementById("second-nav-bar").style['padding-top'] = '10px';
+          document.getElementById('second-nav-bar').style['margin-top'] = '0px';
+          document.getElementById('second-nav-bar').style['padding-top'] = '10px';
           // document.getElementById("logo_nav").style['margin'] = '0rem 0rem';
 
         } else {
-          document.getElementById("second-nav-bar").style['margin-top'] = '75px';
-          document.getElementById("second-nav-bar").style['padding-top'] = '0px';
+          document.getElementById('second-nav-bar').style['margin-top'] = '75px';
+          document.getElementById('second-nav-bar').style['padding-top'] = '0px';
           // document.getElementById("logo_nav").style['margin'] = '3rem 0rem';
         }
       }
@@ -508,4 +524,12 @@ export class ProfileComponent implements OnInit {
 
     });
   }
+
+  scrolTo(newState, config) {
+    setTimeout(function () {
+      newState.scrollTo(config);
+    }, 800);
+  }
+
+
 }

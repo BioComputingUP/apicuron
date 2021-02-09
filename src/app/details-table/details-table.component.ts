@@ -118,4 +118,9 @@ export class DetailsTableComponent implements OnInit {
     this.sortKey.next(key);
     this.sortDirection.next('asc');
   }
+
+  resetTime() {
+    this.searchForm.get('firstDay').setValue(new Date(1990, 0, 1));
+    this.searchForm.get('lastDay').setValue(new Date());
+  }
 }
