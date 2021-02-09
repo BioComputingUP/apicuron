@@ -1,40 +1,92 @@
-<div class="col-12" >
+<div class="col-12">
   <form [formGroup]="searchForm">
 
-  <div class="input-group mb-3" >
-    <div class="input-group-prepend">
-      <span class="input-group-text text-center" style="min-width: 180px" id="basic-addon1" >Filter </span>
-    </div>
-    <!--<input type="text" class="form-control" formControlName="search_term" placeholder="e.g.: p53">-->
-    <input type="text" class="form-control" formControlName="textSearch" placeholder="write entity identifier">
-    <div class="input-group-prepend">
-      <span class="input-group-text text-center" style="min-width: 180px"  >from</span>
-    </div>
-    <input type="text"
-           class="form-control"
-           #dp="bsDatepicker"
-           bsDatepicker
-           formControlName="firstDay"
-           [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">
-    <div class="input-group-prepend">
-      <span class="input-group-text text-center" style="min-width: 180px" > to </span>
-    </div>
-    <input type="text"
-           class="form-control"
-           #dp="bsDatepicker"
-           bsDatepicker
-           formControlName="lastDay"
-           [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text text-center" style="min-width: 180px" id="basic-addon1">Filter </span>
+      </div>
+      <!--<input type="text" class="form-control" formControlName="search_term" placeholder="e.g.: p53">-->
+      <input type="text" class="form-control" formControlName="textSearch" placeholder="write entity identifier">
+      <div class="input-group-prepend">
+        <span class="input-group-text text-center" style="min-width: 180px">from</span>
+      </div>
+      <input type="text"
+             class="form-control"
+             #dp="bsDatepicker"
+             bsDatepicker
+             formControlName="firstDay"
+             [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">
+      <div class="input-group-prepend">
+        <span class="input-group-text text-center" style="min-width: 180px"> to </span>
+      </div>
+      <input type="text"
+             class="form-control"
+             #dp="bsDatepicker"
+             bsDatepicker
+             formControlName="lastDay"
+             [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">
 
-  </div>
+    </div>
   </form>
 </div>
+<h6>Statistics</h6>
+<div class="row">
+  <div class="col">
+    <table cdk-table [dataSource]="statArray" class="table table-sm">
+      <tr cdk-header-row *cdkHeaderRowDef="['category', 'activity_name', 'description', 'current_count', 'global_count']"></tr>
+      <tr cdk-row *cdkRowDef="let row; columns: ['category', 'activity_name', 'description', 'current_count', 'global_count']"></tr>
+
+      <ng-container cdkColumnDef="category">
+        <th cdk-header-cell *cdkHeaderCellDef> Activity category
+        </th>
+        <td cdk-cell *cdkCellDef="let row">
+          {{row['activity_category']}}
+        </td>
+      </ng-container>
+
+      <ng-container cdkColumnDef="activity_name">
+        <th cdk-header-cell *cdkHeaderCellDef> Activity term
+        </th>
+        <td cdk-cell *cdkCellDef="let row">
+          {{row['activity_name']}}
+        </td>
+      </ng-container>
+     <ng-container cdkColumnDef="description">
+        <th cdk-header-cell *cdkHeaderCellDef> Activity description
+        </th>
+        <td cdk-cell *cdkCellDef="let row">
+          {{row['description']}}
+        </td>
+      </ng-container>
 
 
-<div class="col-12">
-  <div class="col-12">
+      <ng-container cdkColumnDef="current_count">
+        <th cdk-header-cell *cdkHeaderCellDef> Selected
+        </th>
+        <td cdk-cell *cdkCellDef="let row">
+<span *ngIf="mapStat.hasOwnProperty(row['activity_term'])">
+          {{mapStat[row['activity_term']]['count']}}
+        </span>
+          <span *ngIf="!mapStat.hasOwnProperty(row['activity_term'])">0</span></td>
+      </ng-container>
+
+      <ng-container cdkColumnDef="global_count">
+        <th cdk-header-cell *cdkHeaderCellDef> Total
+        </th>
+        <td cdk-cell *cdkCellDef="let row">
+          {{row['count']}}
+        </td>
+      </ng-container>
+
+
+    </table>
+  </div>
+</div>
+<h6 class="mt-3">List of activities</h6>
+<div class="row">
+  <div class="col">
     <!--<div class="col-12"> {{dataOnPage_old | json}}</div>-->
-    <table cdk-table [dataSource]="dataOnPage" class="table">
+    <table cdk-table [dataSource]="dataOnPage" class="table table-sm">
 
       <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value"></tr>
       <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"></tr>
@@ -45,8 +97,9 @@
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
         </th>
-        <td cdk-cell *cdkCellDef="let row" >
-          <a href="{{row.entity_uri}}" target="_blank">{{row.entity_uri.substr(row.entity_uri.indexOf(':', 6)+1)}}</a></td>
+        <td cdk-cell *cdkCellDef="let row">
+          <a href="{{row.entity_uri}}" target="_blank">{{row.entity_uri.substr(row.entity_uri.indexOf(':', 6) + 1)}}</a>
+        </td>
       </ng-container>
       <ng-container cdkColumnDef="activity_name">
         <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('activity_name')"> Activity term
@@ -54,7 +107,7 @@
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
         </th>
-        <td cdk-cell *cdkCellDef="let row" > <strong>{{row.activity_name}}</strong></td>
+        <td cdk-cell *cdkCellDef="let row">{{row.activity_name}}</td>
       </ng-container>
       <ng-container cdkColumnDef="description">
         <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('description')"> Activity description
@@ -62,50 +115,37 @@
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
         </th>
-        <td cdk-cell *cdkCellDef="let row" > {{row.description}}</td>
-      </ng-container><ng-container cdkColumnDef="timestamp">
+        <td cdk-cell *cdkCellDef="let row"> {{row.description}}</td>
+      </ng-container>
+      <ng-container cdkColumnDef="timestamp">
         <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('timestamp')"> Timestamp
           <span *ngIf="sortKey.value === 'timestamp'">
                 {{ sortDirection.value === 'asc' ? '↥' : '↧' }}
               </span>
         </th>
-        <td cdk-cell *cdkCellDef="let row" > {{row.timestamp}}</td>
+        <td cdk-cell *cdkCellDef="let row"> {{row.timestamp}}</td>
       </ng-container>
-<!--      <ng-container cdkColumnDef="term_number">-->
-<!--        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('term_number')"> Number of terms-->
-<!--          <span *ngIf="sortKey.value === 'acterm_numberc'">-->
-<!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
-<!--              </span>-->
-<!--        </th>-->
-<!--        <td cdk-cell *cdkCellDef="let row" > {{row.term_number}}</td>-->
-<!--      </ng-container>-->
+      <!--      <ng-container cdkColumnDef="term_number">-->
+      <!--        <th cdk-header-cell *cdkHeaderCellDef (click)="adjustSort('term_number')"> Number of terms-->
+      <!--          <span *ngIf="sortKey.value === 'acterm_numberc'">-->
+      <!--                {{ sortDirection.value === 'asc' ? '↥' : '↧' }}-->
+      <!--              </span>-->
+      <!--        </th>-->
+      <!--        <td cdk-cell *cdkCellDef="let row" > {{row.term_number}}</td>-->
+      <!--      </ng-container>-->
     </table>
-<div class="row">
-  <div class="col-lx-4 mr-auto">
-    <pagination
-      [totalItems]="totalItems"
-      [itemsPerPage]="pageSize.value"
-      [maxSize]="5"
-      [boundaryLinks]="true"
-      (pageChanged)="currentPage.next($event)"
-    >
-    </pagination>
-  </div>
-  <div class="col-auto">
     <div class="row">
-      <div class="col-lg-auto">  <h6>Statistics based on you query:</h6>
-      </div>
-      <div class="col">
-        <div class="row" *ngFor="let currTerm of statArray">
-          <div class="col mr-auto"><strong>{{currTerm['activity_name']}}</strong> ({{currTerm['activity_category']}})</div>
-          <div class="col-auto"> {{currTerm['count']}}</div>
-        </div>
+      <div class="col-lx-4 mr-auto">
+        <pagination
+          [totalItems]="totalItems"
+          [itemsPerPage]="pageSize.value"
+          [maxSize]="5"
+          [boundaryLinks]="true"
+          (pageChanged)="currentPage.next($event)"
+        >
+        </pagination>
       </div>
     </div>
-  </div>
-
-
-</div>
 
   </div>
 </div>

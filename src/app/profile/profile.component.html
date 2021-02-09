@@ -4,16 +4,20 @@
        accept="image/*"
        (change)="onFilesAdded()">
 
-  <div id="second-nav-bar" class="fixed-top " style="margin-top: 75px; padding-top: 0px" *ngIf="orcidData['activities-summary']">
-    <div class="container-fluid container-wide  d-none d-sm-block">
-      <div class="row" style="  ">
-        <div class="col-auto ">
-          <h2 [ngxScrollTo]="general" [ngxScrollToOffset]="-180"><strong> {{orcidData['person']['name']['given-names']['value']}} {{orcidData['person']['name']['family-name']['value']}} </strong></h2>
-        </div>
-        <div class="col-auto">
-          <p class="mt-2"><a tooltip="Access to the ORCID profile page" href="https://orcid.org/{{curator_orcid}}" target="_blank">({{curator_orcid}})</a></p></div>
-        <div class="col">
-          <div *ngFor="let currPosition of employment" class="mt-2">
+<div id="second-nav-bar" class="fixed-top " style="margin-top: 75px; padding-top: 0px"
+     *ngIf="orcidData['activities-summary']">
+  <div class="container-fluid container-wide  d-none d-sm-block">
+    <div class="row" style="  ">
+      <div class="col-auto ">
+        <h2 [ngxScrollTo]="general" [ngxScrollToOffset]="-180">
+          <strong> {{orcidData['person']['name']['given-names']['value']}} {{orcidData['person']['name']['family-name']['value']}} </strong>
+        </h2>
+      </div>
+      <div class="col-auto">
+        <p class="mt-2"><a tooltip="Access to the ORCID profile page" href="https://orcid.org/{{curator_orcid}}"
+                           target="_blank">({{curator_orcid}})</a></p></div>
+      <div class="col">
+        <div *ngFor="let currPosition of employment" class="mt-2">
               <span
                 *ngIf="isCurrentPosition(currPosition['summaries'][0]['employment-summary']['end-date'], currPosition) && currPosition['summaries'][0]['employment-summary']['role-title']">
                 <strong>{{currPosition['summaries'][0]['employment-summary']['role-title']}}</strong>
@@ -27,234 +31,202 @@
                  at  {{currPosition['summaries'][0]['employment-summary']['organization']['name']}}
                  </span>
               </span>
-          </div>
-
         </div>
-        <div class="col-auto ml-auto">
-          <p [ngxScrollTo]="selected" [ngxScrollToOffset]="-180"> Resources: <span  class="badge badge-pill badge-apicuron ml-3" (click)="selectedResource.next(currStatData['resource_uri'])" *ngFor="let currStatData of statByResource">{{map_resources[currStatData['resource_uri']]['resource_name']}}</span></p>
 
-        </div>
+      </div>
+      <div class="col-auto ml-auto">
+        <p [ngxScrollTo]="selected" [ngxScrollToOffset]="-180"> Resources: <span
+          class="badge badge-pill badge-apicuron ml-3" (click)="selectedResource.next(currStatData['resource_uri'])"
+          *ngFor="let currStatData of statByResource">{{map_resources[currStatData['resource_uri']]['resource_name']}}</span>
+        </p>
+
       </div>
     </div>
   </div>
-
-
-<div class="container-fluid container-wide py-3" #top style="min-height: 60vh; " id="general" #general>
-  <div *ngIf="orcidData['activities-summary']">
-      <div class="row  align-items-start" style="padding-top: 80px">
-        <div class="col-xl-auto pb-1">
-          <div class="row">
-            <div class="col-auto">
-              <div class="row">
-                <div class="col">
-                  <div *ngIf="profileData.value['profile_picture']">
-                    <img
-                      src="{{env.ws}}getProfilePicture/{{profileData.value['profile_picture']}}"
-                      class="logoimg img-border">
-                  </div>
-                  <div *ngIf="!profileData.value['profile_picture']">
-                    <img class="logoimg" src="assets/user.png">
-                  </div>
-                </div>
-              </div>
-              <div class="row" *ngIf="logedIn">
-                <div class="col">
-                  <div *ngIf="profileData.value['profile_picture']">
-                    <button class="btn btn-danger btn-sm" (click)="addFiles()"> Select another profile picture </button>
-                  </div>
-                  <div *ngIf="!profileData.value['profile_picture']">
-                    <button class="btn btn-danger btn-sm" (click)="addFiles()"> Select profile picture </button>
-                  </div>
-                  <div *ngIf="imgURL">
-                    <button class="btn btn-success btn-sm" (click)="sendData()"> Upload </button>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-            <div class="col text-justify">
-              <p
-                *ngIf="orcidData['person'] && orcidData['person']['biography'] && orcidData['person']['biography']['content']">
-                <strong>Biography </strong>{{orcidData['person']['biography']['content']}}</p>
-              <!---->
-              <p *ngIf="orcidData['person']['keywords'] && orcidData['person']['keywords']['keyword'].length > 0">
-                <strong>Expertise </strong><span class="mx-1"
-                                                 *ngFor="let currKey of orcidData['person']['keywords']['keyword']">#{{currKey['content']}}</span>
-              </p>
-            </div>
-            <div class="col-auto">
-              <strong>Number of entity generation: </strong>{{generalStat['generation_count']}}<br>
-              <strong>Number of entity revision: </strong>{{generalStat['revision_count']}}<br>
-              <strong>Number of entity invalidation: </strong>{{generalStat['invalidation_count']}}<br>
-              <!--                <span class="badge badge-pill badge-success pl-1 text-center" *ngFor="let resource of resourcesList">-->
-              <!--                    {{resource}}-->
-              <!--                </span>-->
-
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-  </div>
-    <h5  #selected id="selected" >Contributed resources:</h5>
-    <div *ngFor="let currStatData of statByResource" >
-      <div class="row" *ngIf="currStatData['resource_uri'] === selectedResource.value">
+</div>
+<div class="container-fluid container-wide py-3" #top style="min-height: 60vh; ">
+  <div class="row" id="general" #general style="padding-top: 80px">
+    <div class="col-auto">
+      <div class="row">
         <div class="col">
-          <div class="card card-body">
-            <div class="row">
-              <div class="col-auto mr-auto">
-                <p><strong>Resource: </strong>
-                  <!--                DisProt-->
-                  <span *ngIf="map_resources.hasOwnProperty(currStatData['resource_uri'])">
+          <div *ngIf="profilePictureID">
+            <img
+              src="{{env.ws}}getProfilePicture/{{profilePictureID}}"
+              class="logoimg img-border">
+          </div>
+          <!--                  <div *ngIf="!profileData.value['profile_picture']">-->
+          <!--                    <img class="logoimg" src="assets/user.png">-->
+          <!--                  </div>-->
+        </div>
+      </div>
+      <div class="row" *ngIf="logedIn">
+        <div class="col">
+          <div *ngIf="profileData.value['profile_picture']">
+            <button class="btn btn-danger btn-sm" (click)="addFiles()"> Select another profile picture</button>
+          </div>
+          <div *ngIf="!profileData.value['profile_picture']">
+            <button class="btn btn-danger btn-sm" (click)="addFiles()"> Select profile picture</button>
+          </div>
+          <div *ngIf="imgURL">
+            <button class="btn btn-success btn-sm" (click)="sendData()"> Upload</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-2">
+      <div class="row">
+        <div class="col-9 text">Generation</div>
+        <div class="col text-right">{{generalStat['generation_count']}}</div>
+      </div>
+      <div class="row">
+        <div class="col-9 text">Revision</div>
+        <div class="col text-right">{{generalStat['revision_count']}}</div>
+      </div>
+      <div class="row">
+        <div class="col-9 text">Invalidation</div>
+        <div class="col text-right">{{generalStat['invalidation_count']}}</div>
+      </div>
+    </div>
+    <div class="col text-justify" *ngIf="orcidData['activities-summary']">
+      <p
+        *ngIf="orcidData['person'] && orcidData['person']['biography'] && orcidData['person']['biography']['content']">
+        <strong>Biography </strong>{{orcidData['person']['biography']['content']}}</p>
+      <!---->
+      <p *ngIf="orcidData['person']['keywords'] && orcidData['person']['keywords']['keyword'].length > 0">
+        <strong>Expertise </strong><span class="mx-1"
+                                         *ngFor="let currKey of orcidData['person']['keywords']['keyword']">#{{currKey['content']}}</span>
+      </p>
+    </div>
+  </div>
+  <h5 #selected id="selected">Contributed resources:</h5>
+  <div class="row" *ngFor="let currStatData of statByResource">
+    <div class="col" *ngIf="currStatData['resource_uri'] === selectedResource.value">
+      <div class="card card-body">
+
+        <div class="row">
+          <div class="col-auto mr-auto">
+            <p><strong>Resource: </strong>
+              <!--                DisProt-->
+              <span *ngIf="map_resources.hasOwnProperty(currStatData['resource_uri'])">
                     {{map_resources[currStatData['resource_uri']]['resource_name']}}
                   </span>
-                  <span *ngIf="!map_resources.hasOwnProperty(currStatData['resource_uri'])">
+              <span *ngIf="!map_resources.hasOwnProperty(currStatData['resource_uri'])">
                                       {{currStatData['resource_uri']}}
                   </span>
-<!--                  {{map_resources[selectedResource.value]['resource_name']}}-->
-                  <!---->
-                  <span class="ml-5" *ngIf="currStatData['ranking']">
+              <!--                  {{map_resources[selectedResource.value]['resource_name']}}-->
+              <!---->
+              <span class="ml-5" *ngIf="currStatData['ranking']">
                 <strong>Rank: </strong>
                 <a class="badge  badge-apicuron"
                    tooltip="see at Leaderboard"
                    routerLink="/databases/{{ map_resources[currStatData['resource_uri']]['resource_id']}}"
                    fragment="leaderboard">{{currStatData['ranking']}}</a>
               </span>
-                </p>
-              </div>
-              <div class="col-auto">
-                <a class="badge badge-danger mr-2 mb-2" (click)="selectedResource.next('')"> Collapse <i
-                  class="material-icons" style="font-size: small">unfold_less</i></a>
-              </div>
-            </div>
-                        <h5 class="mb-1">Biocuration activities:</h5>
-                        <div class="row">
-                          <div class="col-2">
-                            <i>Category</i>
-                          </div>
-            <!---->
-                          <div class="col">
-                            <div class="row">
-                              <div class="col-6"><i>Name</i></div>
-                              <div class="col"><i>Count</i></div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="row mb-2" *ngIf="currStatData['generation_terms'].length > 0">
-                          <div class="col-2">
-                            Generation
-                          </div>
-                          <div class="col">
-                            <div class="row"
-                                 *ngFor="let currTerm of currStatData['generation_terms']">
-                              <div class="col-6"><strong>{{currTerm['activity_name']}}</strong></div>
-                              <div class="col"> {{currTerm['count']}}</div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="row mb-2" *ngIf="currStatData['revision_terms'].length > 0">
-                          <div class="col-2">
-                            Revision
-                          </div>
-                          <div class="col">
-                            <div class="row" *ngFor="let currTerm of currStatData['revision_terms']">
-                              <div class="col-6"><strong>{{currTerm['activity_name']}}</strong></div>
-                              <div class="col"> {{currTerm['count']}}</div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="row mb-2" *ngIf="currStatData['invalidation_terms'].length > 0" >
-                          <div class="col-2">
-                            Invalidation
-                          </div>
-                          <div class="col">
-                            <div class="row"
-                                 *ngFor="let currTerm of currStatData['invalidation_terms']">
-                              <div class="col-6"><strong>{{currTerm['activity_name']}}</strong></div>
-                              <div class="col"> {{currTerm['count']}}</div>
-                            </div>
-                          </div>
-                        </div>
-                        <div *ngIf="mapMedals[currStatData['resource_uri']].length > 0">
-                          <h5>Medals:</h5>
-<!--            {{mapMedals | json}}-->
-                          <div class="row mb-4">
-                            <div class="col-auto mr-auto">
-                              <app-medal-view [medal]="currMedal"
-                                              *ngFor="let currMedal of mapMedals[currStatData['resource_uri']]"></app-medal-view>
-                            </div>
-                          </div>
-                        </div>
-                        <h5>Badges:</h5>
+            </p>
+          </div>
+          <div class="col">
+            <span class="ml-3"><strong>Number of entity
+            generation: </strong>{{currStatData['generation_count']}}</span>
+            <span class="ml-3"><strong>Number of entity
+              revision: </strong>{{currStatData['revision_count']}}</span>
+            <span class="ml-3"><strong>Number of entity
+              invalidation: </strong>{{currStatData['invalidation_count']}}</span></div>
 
-                        <div class="row"
-                             *ngFor="let currBadgeCategory of mapBadgeCategories[currStatData['resource_uri']]">
-<!--                          {{currBadgeCategory | json}}-->
-                          <div class="col">
-                            <app-badge-view [badge]="currBadge"
-                                            [active]="mapBadgeNames[currStatData['resource_uri']].includes(currBadge['name'])"
-                                            *ngFor="let currBadge of currBadgeCategory">
-                            </app-badge-view>
-                          </div>
-                        </div>
-                        <h5>Biocuration details: </h5>
-                        <app-details-table [curator_orcid]="curator_orcid" [database]="selectedResource.value"></app-details-table>
+          <div class="col-auto">
+            <a class="badge badge-danger mr-2 mb-2" (click)="selectedResource.next('')"> Collapse <i
+              class="material-icons" style="font-size: small">unfold_less</i></a>
           </div>
         </div>
-      </div>
 
+        <div *ngIf="mapMedals[currStatData['resource_uri']].length > 0">
+          <h5>Medals:</h5>
+          <!--            {{mapMedals | json}}-->
+          <div class="row mb-4">
+            <div class="col-auto mr-auto">
+              <app-medal-view [medal]="currMedal"
+                              *ngFor="let currMedal of mapMedals[currStatData['resource_uri']]"></app-medal-view>
+            </div>
+          </div>
+        </div>
+        <h5>Badges:</h5>
+        <div class="row">
+          <div class="col">
+
+  <span
+    *ngFor="let currBadgeCategory of mapBadgeCategories[currStatData['resource_uri']]">
+    <!--                          {{currBadgeCategory | json}}-->
+      <app-badge-view [badge]="currBadge"
+                      [active]="mapBadgeNames[currStatData['resource_uri']].includes(currBadge['name'])"
+                      *ngFor="let currBadge of currBadgeCategory">
+      </app-badge-view>
+    </span>
+          </div>
+
+        </div>
+        <h5 class="mb-1">Biocuration activities:</h5>
+        <app-details-table [currStatData]="currStatData" [curator_orcid]="curator_orcid"
+                           [database]="selectedResource.value"></app-details-table>
+      </div>
     </div>
-      <div class="row">
-        <div [class.col-xl-6]="selectedResource.value !== currStatData['resource_uri']"
-             [class.d-none]="selectedResource.value === currStatData['resource_uri']"
-             (click)="selectedResource.next(currStatData['resource_uri'])"
-             *ngFor="let currStatData of statByResource">
-          <div class="card card-body">
-            <div class="row">
-              <div class="col mr-auto"><p><strong>Resource: </strong>
-                <span *ngIf="map_resources.hasOwnProperty(currStatData['resource_uri'])">
-                    {{map_resources[currStatData['resource_uri']]['resource_name']}}
-                  </span>
-                <span *ngIf="!map_resources.hasOwnProperty(currStatData['resource_uri'])">
-                                      {{currStatData['resource_uri']}}
-                  </span>
-              </p></div>
-              <div class="col-auto">
-                <a class="badge badge-success mr-2 mb-2" > Expand <i
-                  class="material-icons" style="font-size: small">unfold_more</i></a>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col" *ngIf="currStatData.hasOwnProperty('ranking')">
-                <strong>Rank: </strong>
-              <a class="badge  badge-apicuron"
-                   tooltip="see at Leaderboard"
-                   routerLink="/databases/{{ map_resources[currStatData['resource_uri']]['resource_id']}}"
-                   fragment="leaderboard">
-                  {{currStatData['ranking']}}
-                </a>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col  mb-2">
-                <p class="mb-0"><strong>Number of entity
-                  generation: </strong>{{currStatData['generation_count']}}</p>
-                <p class="mb-0"><strong>Number of entity
-                  revision: </strong>{{currStatData['revision_count']}}</p>
-                <p class="mb-0"><strong>Number of entity
-                  invalidation: </strong>{{currStatData['invalidation_count']}}</p>
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-auto">
-                    <app-medal-view [medal]="currMedal"
-                                    *ngFor="let currMedal of mapMedals[currStatData['resource_uri']]"></app-medal-view>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
   </div>
+  <div class="row" #databases id="databases">
+    <div [class.col]="selectedResource.value !== currStatData['resource_uri']"
+         [class.d-none]="selectedResource.value === currStatData['resource_uri']"
+         (click)="selectedResource.next(currStatData['resource_uri'])"
+         *ngFor="let currStatData of statByResource">
+      <div class="card card-body">
+        <div class="row">
+          <div class="col mr-auto"><p><strong>Resource: </strong>
+            <span *ngIf="map_resources.hasOwnProperty(currStatData['resource_uri'])">
+                    {{map_resources[currStatData['resource_uri']]['resource_name']}}
+                  </span>
+            <span *ngIf="!map_resources.hasOwnProperty(currStatData['resource_uri'])">
+                                      {{currStatData['resource_uri']}}
+                  </span>
+          </p></div>
+          <div class="col-auto" *ngIf="currStatData.hasOwnProperty('ranking')">
+            <strong>Rank: </strong>
+            <a class="badge  badge-apicuron"
+               tooltip="see at Leaderboard"
+               routerLink="/databases/{{ map_resources[currStatData['resource_uri']]['resource_id']}}"
+               fragment="leaderboard">
+              {{currStatData['ranking']}}
+            </a>
+          </div>
+          <div class="col">
+            <span class="ml-3"><strong>Number of entity
+            generation: </strong>{{currStatData['generation_count']}}</span>
+            <span class="ml-3"><strong>Number of entity
+              revision: </strong>{{currStatData['revision_count']}}</span>
+            <span class="ml-3"><strong>Number of entity
+              invalidation: </strong>{{currStatData['invalidation_count']}}</span></div>
+          <div class="col-auto">
+            <a class="badge badge-success mr-2 mb-2"> Expand <i
+              class="material-icons" style="font-size: small">unfold_more</i></a>
+          </div>
+        </div>
+        <div class="row">
+
+        </div>
+
+        <div class="row">
+          <div class="col-auto">
+            <app-medal-view [medal]="currMedal"
+                            *ngFor="let currMedal of mapMedals[currStatData['resource_uri']]"></app-medal-view>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+

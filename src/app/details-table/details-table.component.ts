@@ -14,6 +14,7 @@ export class DetailsTableComponent implements OnInit {
   // @Input() dataArray: [];
   @Input() database;
   @Input() curator_orcid;
+  @Input() currStatData;
   tableDataSource_f = new BehaviorSubject<any[]>([]);
   tableDataSource = new BehaviorSubject<any[]>([]);
   totalItems = 0;
@@ -37,11 +38,16 @@ export class DetailsTableComponent implements OnInit {
   sortDirection = new BehaviorSubject<string>('asc');
 
   statArray = [];
+  mapStat = {};
 
   constructor(private fb: FormBuilder,
               private internalService: InternalService) { }
 
   ngOnInit() {
+
+    this.currStatData.generation_terms.forEach(currTerm => this.statArray.push(currTerm));
+    this.currStatData.revision_terms.forEach(currTerm => this.statArray.push(currTerm));
+    this.currStatData.invalidation_terms.forEach(currTerm => this.statArray.push(currTerm));
 
     console.log( this.database);
 
@@ -80,6 +86,7 @@ export class DetailsTableComponent implements OnInit {
           this.dataOnPage.next(currData.body);
           this.totalItems = parseInt(currData.headers.get('count'));
         });
+        this.mapStat = {};
 
         this.internalService.getReportsStats(new HttpParams()
           .set('filter', searchTerm.textSearch)
@@ -90,13 +97,10 @@ export class DetailsTableComponent implements OnInit {
           .set('first_day', searchTerm.firstDay)
           .set('last_day', searchTerm.lastDay)
         ).subscribe(currData => {
-          this.statArray = currData.sort((a, b) => a.activity_name > b.activity_name ? 1 : -1);
+          currData.forEach(currTerm => {
+            this.mapStat[currTerm.activity_term] = currTerm;
+          });
         });
-
-
-
-
-
       });
     this.searchForm.get('textSearch').setValue('');
   }

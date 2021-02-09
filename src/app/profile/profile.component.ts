@@ -36,7 +36,7 @@ export class ProfileComponent implements OnInit {
   mapMedals = {};
   mapBadgeNames = {};
   mapBadgeCategories = {};
-
+  profilePictureID = null;
 
 
 
@@ -82,6 +82,13 @@ export class ProfileComponent implements OnInit {
 
       }
     });
+    this.internalService.getProfilePictureID(this.curator_orcid).subscribe(result => {
+      if (result && result.hasOwnProperty('profile_picture')) {
+        this.profilePictureID = result.profile_picture;
+      }
+    });
+
+
 
     this.internalService.getResources(new HttpParams()).subscribe(resources => {
       if (Array.isArray(resources)) {

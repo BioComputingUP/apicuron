@@ -77,6 +77,11 @@ export class InternalService {
     return this.http.get(url, {params});
   }
 
+  getProfilePictureID(curator_orcid): Observable<any> {
+    const url = this.wsUrl + 'getProfilePictureID/' + curator_orcid;
+    return this.http.get(url);
+  }
+
 
 
 
