@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {InternalService} from '../services/internal.service';
 import {BehaviorSubject, combineLatest} from 'rxjs';
 import {FormControl, FormGroup, FormBuilder, FormArray} from '@angular/forms';
+import { HttpParams} from '@angular/common/http';
 
 @Component({
   selector: 'app-leaderboard-card',
@@ -38,27 +39,8 @@ export class LeaderboardCardComponent implements OnInit {
 
 
 
-    this.internalService.GetStatistics(search_params).subscribe(data => {
-      this.curatorsData = data.map(currBiocurator =>  {
-        const currData = currBiocurator.statistics.filter(currDataObj => {
-          return currDataObj.hasOwnProperty('resource_uri') && currDataObj.resource_uri === this.database['resource_uri'];
-        })[0];
-
-        console.log(currData );
-        return {
-          curator_orcid: currBiocurator.curator_orcid,
-          family_name: currBiocurator.family_name,
-          given_name: currBiocurator.given_name,
-          ranking: currData.ranking,
-          score_total: currData.total_score,
-          generation_count: currData.generation_count,
-          revision_count: currData.revision_count,
-          invalidation_count: currData.invalidation_count,
-          generation_score: currData.generation_score,
-          revision_score: currData.revision_score,
-          invalidation_score: currData.invalidation_score,
-        };
-      });
+    this.internalService.getLeaderboards(new HttpParams({fromObject: search_params})).subscribe(data => {
+      this.curatorsData = data;
     }, (err) => {
     }, () => {
       this.loading_finished = true;
@@ -85,6 +67,12 @@ export class LeaderboardCardComponent implements OnInit {
     this.selectedBadgesMedals.next(listBadgesMedals);
 
   }
+  reset() {
 
+    this.searchForm.get('key').setValue('');
+  }
 
+  submit() {
+
+  }
 }

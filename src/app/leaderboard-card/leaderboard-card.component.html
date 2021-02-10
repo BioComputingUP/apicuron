@@ -1,10 +1,15 @@
 <div class="card-body">
+
+
+
+
   <div class="row">
-    <div class="col">
+    <div class="col-md-2 text-right"><span>Filter leaderboard</span></div>
+    <div class="col-md-6">
+
       <form [formGroup]="searchForm">
 
-        <div class="float-right col">
-          <div class="input-group mb-3">
+          <div class="input-group input-group-sm mb-3">
 
 
             <select class="custom-select input-group-text text-left col-lg-3"
@@ -21,29 +26,23 @@
               <!--                    <option value="time_last">Last day (date)</option>-->
             </select>
 
-            <input type="text"
-                   *ngIf="['time_from', 'time_last'].includes(searchForm.value['area'])"
-                   class="form-control"
-                   #dp="bsDatepicker"
-                   bsDatepicker
-                   formControlName="key"
-                   [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">
-            <input type="text"
-                   *ngIf="!['time_from', 'time_last'].includes(searchForm.value['area'])"
-                   class="form-control col-lg-auto"
-                   formControlName="key"
-                   placeholder="e.g.: p53">
 
+            <input type="text"
+                   class="form-control col-lg-auto"
+                   formControlName="key">
+            <a type="text"
+                    class="form-control text-center"
+                    (click)="reset()"
+                    style="max-width: 4rem ">reset</a>
 
           </div>
-        </div>
       </form>
 
     </div>
   </div>
 <div class="row">
-  <div class="col-auto">
-    <strong>Selected badges or medals: </strong>
+  <div class="col-md-2 text-right">
+    Selected badges or medals
   </div>
   <div class="col-auto" *ngIf="selectedBadgesMedals.value.length > 0">
     <span *ngFor="let currBadgeMedal of selectedBadgesMedals.value; let index = index">
@@ -53,11 +52,11 @@
     </span>
   </div>
   <div class="col-auto" *ngIf="selectedBadgesMedals.value.length === 0">
-    <p><i>(Please select badge or medal to filter biocurators)</i></p>
+    <p><i>Select badge or medal to filter biocurators</i></p>
   </div>
-    <div class="col-auto ml-auto mr-3" *ngIf="selectedBadgesMedals.value.length > 0">
-      <button class="btn btn-danger btn-sm" (click)="selectedBadgesMedals.next([])"> clear all </button>
-    </div>
+<!--    <div class="col-auto ml-auto mr-3" *ngIf="selectedBadgesMedals.value.length > 0">-->
+<!--      <button class="btn btn-danger btn-sm" (click)="selectedBadgesMedals.next([])"> clear all </button>-->
+<!--    </div>-->
 
 </div>
 
@@ -121,7 +120,7 @@
           </th>
           <td cdk-cell *cdkCellDef="let row" class=" pr-0">
 
-            {{row.score_total | number:'1.0':'en-US'}}
+            {{row.total_score | number:'1.0':'en-US'}}
           </td>
         </ng-container>
 

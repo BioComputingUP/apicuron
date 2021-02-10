@@ -5,6 +5,7 @@ import {AuthService} from '../services/auth.service';
 import {FormControl, FormBuilder, FormGroup} from '@angular/forms';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {Router, ActivatedRoute} from '@angular/router';
+import { HttpParams} from '@angular/common/http';
 
 @Component({
   selector: 'app-browse',
@@ -150,11 +151,12 @@ export class BrowseComponent implements OnInit {
                      sortKey,
                      sortDirection,
                      currentPage]) => {
+
         const search_params = {
           sort_field: sortKey,
           sort_value: sortDirection,
-          page_size: pageSize,
-          page: currentPage['page'] - 1,
+          page_size: pageSize.toString(),
+          page: (currentPage['page'] - 1).toString(),
           // first_day: formData.firstDay.toISOString().slice(0, 10),
           // last_day: formData.lastDay.toISOString().slice(0, 10),
 
@@ -175,38 +177,38 @@ export class BrowseComponent implements OnInit {
         this.loading_new_table = true;
         this.router.navigate(['curators'], {queryParams: search_params});
         if (!this.loading_resources) {
-          this.internalService.GetStatistics2(search_params).subscribe((browseData) => {
+          this.internalService.getBrowseWithCount(new HttpParams({ fromObject: search_params})).subscribe((browseData) => {
 
 
-            const biocuratorsData = browseData.body.map(currBiocurator =>  {
-              const currData = currBiocurator.statistics.filter(currDataObj => {
-                return !currDataObj.hasOwnProperty('resource_uri');
-              })[0];
+            // const biocuratorsData = browseData.body.map(currBiocurator =>  {
+            //   const currData = currBiocurator.statistics.filter(currDataObj => {
+            //     return !currDataObj.hasOwnProperty('resource_uri');
+            //   })[0];
+            //
+            //   const listResources = currBiocurator.statistics.filter(currDataObj => {
+            //     return currDataObj.hasOwnProperty('resource_uri');
+            //   }).map(x => x.resource_uri);
+            //
+            //   // console.log(listResources );
+            //   return {
+            //     curator_orcid: currBiocurator.curator_orcid,
+            //     family_name: currBiocurator.family_name,
+            //     given_name: currBiocurator.given_name,
+            //     ranking: currData.ranking,
+            //     score_total: currData.total_score,
+            //     generation_count: currData.generation_count,
+            //     revision_count: currData.revision_count,
+            //     invalidation_count: currData.invalidation_count,
+            //     generation_score: currData.generation_score,
+            //     revision_score: currData.revision_score,
+            //     invalidation_score: currData.invalidation_score,
+            //     listResources: listResources,
+            //     medals_count: currData.medals_count,
+            //     badges_count: currData.badges_count,
+            //   };
+            // });
 
-              const listResources = currBiocurator.statistics.filter(currDataObj => {
-                return currDataObj.hasOwnProperty('resource_uri');
-              }).map(x => x.resource_uri);
-
-              // console.log(listResources );
-              return {
-                curator_orcid: currBiocurator.curator_orcid,
-                family_name: currBiocurator.family_name,
-                given_name: currBiocurator.given_name,
-                ranking: currData.ranking,
-                score_total: currData.total_score,
-                generation_count: currData.generation_count,
-                revision_count: currData.revision_count,
-                invalidation_count: currData.invalidation_count,
-                generation_score: currData.generation_score,
-                revision_score: currData.revision_score,
-                invalidation_score: currData.invalidation_score,
-                listResources: listResources,
-                medals_count: currData.medals_count,
-                badges_count: currData.badges_count,
-              };
-            });
-
-            this.dataOnPage.next(biocuratorsData);
+            this.dataOnPage.next( browseData.body);
             this.totalItems = parseInt(browseData.headers.get('count'));
 
             // const keys = browseData.headers.keys();

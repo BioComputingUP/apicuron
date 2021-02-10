@@ -40,7 +40,7 @@
 
   <!--<div class="badge  badge-badge-active  mr-2 mb-2"-->
   <!--     *ngIf="active" [class]="badge['color']">-->
-  <div class="badge badge-badge-active mr-2 mb-2 showhim" [tooltip]="tooltipHTML"
+  <div class="badge badge-badge-active mr-2 mb-2" [tooltip]="tooltipHTML"
        *ngIf="active" [style]="{background: badge['color_code'] + alpha_map[badge['count_threshold']]}">
     <div class="row  align-items-center">
       <div class="col-2">
@@ -68,7 +68,7 @@
 
       </div>
 
-      <div class="col" style="width: 8rem">
+      <div class="col " style="width: 8rem" [class.pr-0]="atLeaderboard">
         <div class=" ">
         <span class="align-content-center"
               style="white-space: normal; width: 7rem; text-align: left; color: white">
@@ -79,7 +79,7 @@
 
         </div>
       </div>
-      <div class="col-2 p-0 showme" *ngIf="atLeaderboard" >
+      <div class="col-2 pl-0" *ngIf="atLeaderboard" >
         <i class="material-icons" style="font-size: large; color: white">close</i>
       </div>
     </div>

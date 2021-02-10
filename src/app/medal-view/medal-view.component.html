@@ -28,7 +28,7 @@
 
     </div>
 
-    <div class="col-10" style="width: 8rem;">
+    <div class="col"  [class.pr-0]="atLeaderboard" style="width: 8rem;">
       <div class=" ">
         <span class="align-middle"
               style="white-space: normal; width: 7rem; text-align: left; color: white">
@@ -38,6 +38,9 @@
         </span>
 
       </div>
+    </div>
+    <div class="col-2 pl-0" *ngIf="atLeaderboard" >
+      <i class="material-icons" style="font-size: large; color: white">close</i>
     </div>
   </div>
 </div>

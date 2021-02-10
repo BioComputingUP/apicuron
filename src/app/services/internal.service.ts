@@ -72,6 +72,11 @@ export class InternalService {
     return this.http.get(url, {params});
   }
 
+  getBrowseWithCount(params: HttpParams): Observable<any> {
+    const url = this.wsUrl + 'browse';
+    return this.http.get(url, { observe: 'response', params: params});
+  }
+
   getResources(params: HttpParams): Observable<any> {
     const url = this.wsUrl + 'resources';
     return this.http.get(url, {params});

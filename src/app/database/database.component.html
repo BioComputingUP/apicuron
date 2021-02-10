@@ -1,16 +1,17 @@
 <div *ngIf="resourcesDescription">
   <div id="second-nav-bar" class="fixed-top " style="margin-top: 75px; padding-top: 0px">
-    <div class="container-fluid container-wide  d-none d-sm-block">
+    <div class="container-fluid container-wide">
       <div class="row" style="  ">
         <div class="col-1 ">
           <h2>{{resourcesDescription['resource_name']}}</h2>
         </div>
         <div class="col-auto pt-1 ml-3 offset-1 mr-auto">
-          <span class="ml-3"      [ngxScrollTo]="general" [ngxScrollToOffset]="-180">General description</span>
-          <span class="ml-3"      [ngxScrollTo]="terms" [ngxScrollToOffset]="-180">Biocuration activities</span>
-          <span class="ml-3"     [ngxScrollTo]="badges" [ngxScrollToOffset]="-180">Badges</span>
-          <span class="ml-3"     [ngxScrollTo]="medals" [ngxScrollToOffset]="-180">Medals</span>
-          <span class="ml-3"     [ngxScrollTo]="leaderboard" [ngxScrollToOffset]="-180 ">Leaderborad</span>
+          <span class="ml-4"      [ngxScrollTo]="general" [ngxScrollToOffset]="-180">General description</span>
+          <span class="ml-4"     [ngxScrollTo]="leaderboard" [ngxScrollToOffset]="-180 ">Leaderborad</span>
+          <span class="ml-4"     [ngxScrollTo]="badges" [ngxScrollToOffset]="-180">Badges</span>
+          <span class="ml-4"     [ngxScrollTo]="medals" [ngxScrollToOffset]="-180">Medals</span>
+          <span class="ml-4"      [ngxScrollTo]="terms" [ngxScrollToOffset]="-180">Biocuration activities</span>
+
         </div>
         <div class="col-2">
           <a class="badge badge-apicuron"
@@ -22,6 +23,7 @@
       </div>
     </div>
   </div>
+
 <div class="container-fluid container-wide  d-none d-sm-block" #top
      style="padding-top: 70px">
   <p class="mt-4" id="general" #general>
@@ -33,14 +35,14 @@
 
 <!--  <p>[basic stat]</p>-->
 
-  <h3 id="leaderboard" #leaderboard>Leaderboard</h3>
+  <h3 class="mt-5" id="leaderboard" #leaderboard>Leaderboard</h3>
   <app-leaderboard-card [database]="resourcesDescription" [selectedBadgesMedals]="selectedBadgesMedals"></app-leaderboard-card>
 
 
 
-  <h3 id="badges" #badges>Available badges</h3>
+  <h3 id="badges" class="mt-4" #badges>Badges</h3>
 
-  <div class="row">
+  <div class="row mb-4">
     <div class="col">
       <span  *ngFor="let currCategory of badge_categories">
               <app-badge-view [active]="true"
@@ -51,9 +53,9 @@
       </span>
     </div>
   </div>
-  <h3 id="medals" #medals>Available medals</h3>
+  <h3 id="medals" #medals>Medals</h3>
 
-  <div class="row" >
+  <div class="row mb-4" >
     <div class="col">
       <span  *ngFor="let currCategory of medal_categories">
               <app-medal-view [medal]="currMedal"
@@ -63,19 +65,19 @@
 
     </div>
   </div>
-  <h3 id="terms" #terms>Biocuration activity terms</h3>
+  <h3 id="terms" #terms>Biocuration activities</h3>
   <table cdk-table multiTemplateDataRows [dataSource]="resourcesDescription['terms']" class="table table-sm table-responsive-sm">
     <ng-container cdkColumnDef="name">
       <th cdk-header-cell *cdkHeaderCellDef>
-        Name
+        Activity name
 
       </th>
       <td cdk-cell *cdkCellDef="let row" class=" pr-0">
         <!--              <a class="badge badge-apicuron"-->
         <!--                 -->
-        <strong>
+<!--        <strong>-->
           {{row.activity_name}}
-        </strong>
+<!--        </strong>-->
         <!--              </a>-->
 
       </td>
@@ -84,7 +86,7 @@
 
     <ng-container cdkColumnDef="def">
       <th cdk-header-cell *cdkHeaderCellDef>
-        Name
+        Activity description
 
       </th>
       <td cdk-cell *cdkCellDef="let row" class=" pr-0">
@@ -99,7 +101,7 @@
 
     <ng-container cdkColumnDef="score">
       <th cdk-header-cell *cdkHeaderCellDef>
-        Name
+        Score
 
       </th>
       <td cdk-cell *cdkCellDef="let row" class=" pr-0">
@@ -114,7 +116,7 @@
 
     <ng-container cdkColumnDef="category">
       <th cdk-header-cell *cdkHeaderCellDef>
-        Name
+        Activity category
 
       </th>
       <td cdk-cell *cdkCellDef="let row" class=" pr-0">

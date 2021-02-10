@@ -14,7 +14,7 @@
         <p>
           <strong>APICURON</strong> is a database to credit and acknowledge the work of biocurators, it collects and
           aggregates biocuration events from third party resources and generates achievements and
-          leaderboards. Read <a routerLink="/about">more</a>
+          leaderboards. If you are a biocurator and want to appear here ask your database manager to contact us.  <a routerLink="/about"> Read more</a>
         </p>
         </div>
     </div>
@@ -28,10 +28,10 @@
     <div class="row justify-content-center pb-3">
       <div class="col-lg-6">
 
-        <p class="text-right">
-          Active biocurators <span class="badge badge-apicuron">{{statObj['count_biocurators']}}</span>
+        <p class="text-right mb-0">
+          <a routerLink="/curators">Active biocurators <span class="badge badge-apicuron">{{statObj['count_biocurators']}}</span></a>
           <br>
-          Registered resources <span class="badge badge-apicuron">{{statObj['resources'].length}}</span>
+          <a routerLink="/databases">Registered resources <span class="badge badge-apicuron">{{statObj['resources'].length}}</span></a>
         </p>
 
         <strong>
@@ -48,7 +48,7 @@
           </form>
         </div>
         <p style="color: gray">
-          ORCID, name, surname, database
+          ORCID, name, surname
         </p>
       </div>
     </div>
@@ -56,7 +56,7 @@
 
     <div class="row justify-content-center pb-5">
       <div class="col-lg-6">
-        <strong>Database leaderboards</strong>
+        <strong>Connected databases</strong>
         <div class="row mt-3">
 
           <div class="col">
@@ -87,7 +87,7 @@
         <p>
           <span class="font-weight-bold">APICURON: a database to credit and acknowledge the work of biocurators</span>
           <br>
-          Andras Hatos, Federica Quaglia, Damiano Piovesan, Silvio Tosatto
+          András Hatos, Federica Quaglia, Damiano Piovesan, Silvio Tosatto
           <br>
           <i>(2021) bioRxiv </i>
           <a href="https://www.biorxiv.org/content/10.1101/2021.02.03.429425v1" target="_blank" class="citation-font-color">

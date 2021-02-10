@@ -1,7 +1,5 @@
 <div class="col-lg-8 offset-lg-2 px-0">
-  <form [formGroup]="searchForm">
-
-
+  <form [formGroup]="searchForm" >
     <div class="input-group input-group-sm mb-3">
       <div class="input-group-prepend">
         <span class="input-group-text">Filter</span>
@@ -21,7 +19,7 @@
              style="max-width: 7rem"
              formControlName="firstDay"
              [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">
-      <div class="input-group-prepend">
+      <div  class="input-group-prepend">
         <span class="input-group-text"
               style="border-left-width: 0" >to</span>
       </div>
@@ -32,9 +30,12 @@
              style="max-width: 7rem"
              formControlName="lastDay"
              [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">
-      <button type="text"
+      <a type="text"
               class="form-control"
-              style="max-width: 4rem;color:#9A031E ">reset</button>
+              (click)="resetTime()"
+              style="max-width: 4rem;color:#9A031E ">reset</a>
+
+
     </div>
   </form>
 </div>
@@ -147,7 +148,7 @@
     </table>
     <div class="row">
 
-      <div class="col-auto ml-auto">
+      <div class="col-auto ml-auto btn-sm">
         <pagination
           [totalItems]="totalItems"
           [itemsPerPage]="pageSize.value"

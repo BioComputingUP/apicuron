@@ -49,18 +49,13 @@
   </div>
 </div>
 <div class="container-fluid container-wide py-3" #top style="min-height: 60vh; ">
-  <div class="row" id="general" #general style="padding-top: 80px">
-    <div class="col-auto">
+  <div class="row mb-4" id="general" #general style="padding-top: 80px">
+    <div class="col-auto"  *ngIf="profilePictureID">
       <div class="row">
         <div class="col">
-          <div *ngIf="profilePictureID">
             <img
               src="{{env.ws}}getProfilePicture/{{profilePictureID}}"
               class="logoimg img-border">
-          </div>
-          <!--                  <div *ngIf="!profileData.value['profile_picture']">-->
-          <!--                    <img class="logoimg" src="assets/user.png">-->
-          <!--                  </div>-->
         </div>
       </div>
       <div class="row" *ngIf="logedIn">
@@ -79,28 +74,35 @@
     </div>
 
     <div class="col-lg-2">
+      <h5>Total annotations</h5>
       <div class="row">
-        <div class="col-9 text"><strong>Generation</strong></div>
-        <div class="col text-right">{{generalStat['generation_count']}}</div>
+        <div class="col-auto"><strong>Generation</strong></div>
+        <div class="col text-right">{{generalStat['generation_count'] | number:'1.0':'en-US'}}</div>
       </div>
       <div class="row">
-        <div class="col-9 text"><strong>Revision</strong></div>
-        <div class="col text-right">{{generalStat['revision_count']}}</div>
+        <div class="col-auto"><strong>Revision</strong></div>
+        <div class="col text-right">{{generalStat['revision_count'] | number:'1.0':'en-US'}}</div>
       </div>
       <div class="row">
-        <div class="col-9 text"><strong>Invalidation</strong></div>
-        <div class="col text-right">{{generalStat['invalidation_count']}}</div>
+        <div class="col-auto"><strong>Invalidation</strong></div>
+        <div class="col text-right">{{generalStat['invalidation_count'] | number:'1.0':'en-US'}}</div>
       </div>
     </div>
-    <div class="col text-justify" *ngIf="orcidData['activities-summary']">
-      <p
-        *ngIf="orcidData['person'] && orcidData['person']['biography'] && orcidData['person']['biography']['content']">
-        <strong>Biography </strong>{{orcidData['person']['biography']['content']}}</p>
+    <div class="col ml-3 text-justify" *ngIf="orcidData['activities-summary']">
+      <div class="row" *ngIf="orcidData['person'] && orcidData['person']['biography'] && orcidData['person']['biography']['content']">
+        <div class="col">        <h5>Biography</h5>
+          <p>{{orcidData['person']['biography']['content']}}</p></div>
+
+      </div>
+      <div class="row" *ngIf="orcidData['person']['keywords'] && orcidData['person']['keywords']['keyword'].length > 0">
+        <div class="col"><h5>Expertise</h5>
+          <p><span class="mx-1"
+                        *ngFor="let currKey of orcidData['person']['keywords']['keyword']"># {{currKey['content']}}</span></p></div>
+      </div>
       <!---->
-      <p *ngIf="orcidData['person']['keywords'] && orcidData['person']['keywords']['keyword'].length > 0">
-        <strong>Expertise </strong><span class="mx-1"
-                                         *ngFor="let currKey of orcidData['person']['keywords']['keyword']">#{{currKey['content']}}</span>
-      </p>
+<!--      <p *ngIf="orcidData['person']['keywords'] && orcidData['person']['keywords']['keyword'].length > 0">-->
+<!--        <strong> </strong>-->
+<!--      </p>-->
     </div>
   </div>
   <h5 #selected id="selected">Contributed resources</h5>
@@ -110,37 +112,49 @@
 
         <div class="row">
           <div class="col-auto mr-auto">
-            <p><strong>Resource </strong>
-              <!--                DisProt-->
-              <span *ngIf="map_resources.hasOwnProperty(currStatData['resource_uri'])">
-                    {{map_resources[currStatData['resource_uri']]['resource_name']}}
-                  </span>
-              <span *ngIf="!map_resources.hasOwnProperty(currStatData['resource_uri'])">
+            <div class="row">
+              <div class="col-auto">
+                <h5><span  >Resource</span> </h5>
+              </div>
+              <div class="col">
+                <a href="{{map_resources[currStatData['resource_uri']]['resource_url']}}" class="badge badge-apicuron " *ngIf="map_resources.hasOwnProperty(currStatData['resource_uri'])">
+                    {{map_resources[currStatData['resource_uri']]['resource_name']}} <i class="material-icons">link</i>
+                  </a>
+                <span *ngIf="!map_resources.hasOwnProperty(currStatData['resource_uri'])">
                                       {{currStatData['resource_uri']}}
                   </span>
-              <!--                  {{map_resources[selectedResource.value]['resource_name']}}-->
-              <!---->
-              <span class="ml-5" *ngIf="currStatData['ranking']">
-                <strong>Ranking </strong>
-                <a class="badge  badge-apicuron"
-                   tooltip="see at Leaderboard"
-                   routerLink="/databases/{{ map_resources[currStatData['resource_uri']]['resource_id']}}"
-                   fragment="leaderboard">{{currStatData['ranking']}}</a>
-              </span>
-            </p>
+              </div>
+            </div>
           </div>
-          <div class="col">
-            <p class="ml-3">
-              <strong>Number of curation events</strong>
-              generation <span class="badge badge-apicuron">{{currStatData['generation_count']}}</span>,
-              revision <span class="badge badge-apicuron">{{currStatData['revision_count']}}</span>,
-              invalidation <span class="badge badge-apicuron">{{currStatData['invalidation_count']}}</span>
-            </p>
-          </div>
+
 
           <div class="col-auto">
             <a class="badge badge-collapse mr-2 mb-2" (click)="selectedResource.next('')"> Collapse <i
               class="material-icons" style="font-size: small">unfold_less</i></a>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-auto">
+            <h5><span  >Ranking</span> </h5>
+          </div>
+          <div class="col">
+            <p *ngIf="currStatData['ranking']">
+
+
+                <a class="badge  badge-apicuron"
+                   tooltip="see at Leaderboard"
+                   routerLink="/databases/{{ map_resources[currStatData['resource_uri']]['resource_id']}}"
+                   fragment="leaderboard">  # {{currStatData['ranking']}}  </a>
+              </p>
+          </div>
+          <div class="col-auto ml-auto">
+            <p class="ml-3">
+              <strong>Number of curation events</strong>
+              generation <span class="badge badge-apicuron"> # {{currStatData['generation_count']  | number:'1.0':'en-US'}}</span>,
+              revision <span class="badge badge-apicuron"> # {{currStatData['revision_count'] | number:'1.0':'en-US'}}</span>,
+              invalidation <span class="badge badge-apicuron"> # {{currStatData['invalidation_count'] | number:'1.0':'en-US'}}</span>
+            </p>
+
           </div>
         </div>
 
@@ -199,16 +213,16 @@
                 <a class="badge  badge-apicuron"
                    tooltip="see at Leaderboard"
                    routerLink="/databases/{{ map_resources[currStatData['resource_uri']]['resource_id']}}"
-                   fragment="leaderboard">{{currStatData['ranking']}}</a>
+                   fragment="leaderboard"># {{currStatData['ranking']}}</a>
               </span>
             </p>
           </div>
           <div class="col">
             <p class="ml-3">
               <strong>Number of curation events</strong>
-              generation <span class="badge badge-apicuron">{{currStatData['generation_count']}}</span>,
-              revision <span class="badge badge-apicuron">{{currStatData['revision_count']}}</span>,
-              invalidation <span class="badge badge-apicuron">{{currStatData['invalidation_count']}}</span>
+              generation <span class="badge badge-apicuron"># {{currStatData['generation_count']}}</span>,
+              revision <span class="badge badge-apicuron"># {{currStatData['revision_count']}}</span>,
+              invalidation <span class="badge badge-apicuron"># {{currStatData['invalidation_count']}}</span>
             </p>
           </div>
 
