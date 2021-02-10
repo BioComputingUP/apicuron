@@ -173,6 +173,7 @@
 
         <tr cdk-header-row *cdkHeaderRowDef="displayedColumns.value" style="border: none; text-align: center"></tr>
         <tr cdk-row *cdkRowDef="let row; columns: displayedColumns.value"
+            fragment="{{database['resource_id']}}"
             [routerLink]="['/orcid/' + row.curator_orcid]"
             style="box-shadow: 0px 0px 1px 0px gray; text-align: center"></tr>
 <!--        <tr cdk-row *cdkRowDef="let element;columns: ['expandedDetail']" class="d-sm-none"></tr>-->

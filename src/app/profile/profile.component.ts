@@ -128,20 +128,21 @@ export class ProfileComponent implements OnInit {
       }, (err) => {
       }, () => {
         if (this.statByResource.length > 0) {
-          console.log('this.route.snapshot.fragment',
-            this.route.snapshot.fragment,
-            this.statByResource.map(x => this.map_resources[x['resource_uri']]['resource_id']));
-          if (this.route.snapshot.fragment && this.statByResource.map(x => this.map_resources[x['resource_uri']]['resource_id']).includes(this.route.snapshot.fragment)) {
+          // console.log('this.route.snapshot.fragment',
+          //   this.route.snapshot.fragment,
+          //   this.statByResource.map(x => this.map_resources[x['resource_uri']]['resource_id']));
+
+          if (this.route.snapshot.fragment && this.statByResource.map(x => this.map_resources[x['resource_uri']]['resource_id']).includes(this.route.snapshot.fragment.toLowerCase())) {
             const config: ScrollToConfigOptions = {
               target: 'selected',
               offset: -150,
               duration: 0.2,
               // target: this.route.snapshot.fragment
             };
-            this.selectedResource.next('https://registry.identifiers.org/registry/' + this.route.snapshot.fragment);
+            this.selectedResource.next('https://registry.identifiers.org/registry/' + this.route.snapshot.fragment.toLowerCase());
             this.scrolTo(this.scrollToService, config);
           } else {
-            this.selectedResource.next(this.statByResource.sort((a, b) => a.medals_count < b.medals_count ? 1 : -1)[0]['resource_uri']);
+            // this.selectedResource.next(this.statByResource.sort((a, b) => a.medals_count < b.medals_count ? 1 : -1)[0]['resource_uri']);
           }
         }
       });

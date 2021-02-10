@@ -39,7 +39,7 @@
 
       </div>
       <div class="col-auto ml-auto">
-        <p [ngxScrollTo]="selected" [ngxScrollToOffset]="-180"> Resources: <span
+        <p [ngxScrollTo]="selected" [ngxScrollToOffset]="-180"> Resources <span
           class="badge badge-pill badge-apicuron ml-3" (click)="selectedResource.next(currStatData['resource_uri'])"
           *ngFor="let currStatData of statByResource">{{map_resources[currStatData['resource_uri']]['resource_name']}}</span>
         </p>
@@ -103,14 +103,14 @@
       </p>
     </div>
   </div>
-  <h5 #selected id="selected">Contributed resources:</h5>
+  <h5 #selected id="selected">Contributed resources</h5>
   <div class="row" *ngFor="let currStatData of statByResource">
     <div class="col" *ngIf="currStatData['resource_uri'] === selectedResource.value">
       <div class="card card-body">
 
         <div class="row">
           <div class="col-auto mr-auto">
-            <p><strong>Resource: </strong>
+            <p><strong>Resource </strong>
               <!--                DisProt-->
               <span *ngIf="map_resources.hasOwnProperty(currStatData['resource_uri'])">
                     {{map_resources[currStatData['resource_uri']]['resource_name']}}
@@ -121,7 +121,7 @@
               <!--                  {{map_resources[selectedResource.value]['resource_name']}}-->
               <!---->
               <span class="ml-5" *ngIf="currStatData['ranking']">
-                <strong>Rank: </strong>
+                <strong>Ranking </strong>
                 <a class="badge  badge-apicuron"
                    tooltip="see at Leaderboard"
                    routerLink="/databases/{{ map_resources[currStatData['resource_uri']]['resource_id']}}"
@@ -130,21 +130,22 @@
             </p>
           </div>
           <div class="col">
-            <span class="ml-3"><strong>Number of entity
-            generation: </strong>{{currStatData['generation_count']}}</span>
-            <span class="ml-3"><strong>Number of entity
-              revision: </strong>{{currStatData['revision_count']}}</span>
-            <span class="ml-3"><strong>Number of entity
-              invalidation: </strong>{{currStatData['invalidation_count']}}</span></div>
+            <p class="ml-3">
+              <strong>Number of curation events</strong>
+              generation <span class="badge badge-apicuron">{{currStatData['generation_count']}}</span>,
+              revision <span class="badge badge-apicuron">{{currStatData['revision_count']}}</span>,
+              invalidation <span class="badge badge-apicuron">{{currStatData['invalidation_count']}}</span>
+            </p>
+          </div>
 
           <div class="col-auto">
-            <a class="badge badge-danger mr-2 mb-2" (click)="selectedResource.next('')"> Collapse <i
+            <a class="badge badge-collapse mr-2 mb-2" (click)="selectedResource.next('')"> Collapse <i
               class="material-icons" style="font-size: small">unfold_less</i></a>
           </div>
         </div>
 
         <div *ngIf="mapMedals[currStatData['resource_uri']].length > 0">
-          <h5>Medals:</h5>
+          <h5>Medals</h5>
           <!--            {{mapMedals | json}}-->
           <div class="row mb-4">
             <div class="col-auto mr-auto">
@@ -153,8 +154,8 @@
             </div>
           </div>
         </div>
-        <h5>Badges:</h5>
-        <div class="row">
+        <h5>Badges</h5>
+        <div class="row mb-4">
           <div class="col">
 
   <span
@@ -168,7 +169,7 @@
           </div>
 
         </div>
-        <h5 class="mb-1">Biocuration activities:</h5>
+        <h5 class="mb-1">Biocuration activities</h5>
         <app-details-table [currStatData]="currStatData" [curator_orcid]="curator_orcid"
                            [database]="selectedResource.value"></app-details-table>
       </div>
@@ -183,7 +184,7 @@
       <div class="card card-body">
         <div class="row">
           <div class="col-auto mr-auto">
-            <p><strong>Resource: </strong>
+            <p><strong>Resource </strong>
               <!--                DisProt-->
               <span *ngIf="map_resources.hasOwnProperty(currStatData['resource_uri'])">
                     {{map_resources[currStatData['resource_uri']]['resource_name']}}
@@ -194,7 +195,7 @@
               <!--                  {{map_resources[selectedResource.value]['resource_name']}}-->
               <!---->
               <span class="ml-5" *ngIf="currStatData['ranking']">
-                <strong>Rank: </strong>
+                <strong>Ranking </strong>
                 <a class="badge  badge-apicuron"
                    tooltip="see at Leaderboard"
                    routerLink="/databases/{{ map_resources[currStatData['resource_uri']]['resource_id']}}"
@@ -203,15 +204,16 @@
             </p>
           </div>
           <div class="col">
-            <span class="ml-3"><strong>Number of entity
-            generation: </strong>{{currStatData['generation_count']}}</span>
-            <span class="ml-3"><strong>Number of entity
-              revision: </strong>{{currStatData['revision_count']}}</span>
-            <span class="ml-3"><strong>Number of entity
-              invalidation: </strong>{{currStatData['invalidation_count']}}</span></div>
+            <p class="ml-3">
+              <strong>Number of curation events</strong>
+              generation <span class="badge badge-apicuron">{{currStatData['generation_count']}}</span>,
+              revision <span class="badge badge-apicuron">{{currStatData['revision_count']}}</span>,
+              invalidation <span class="badge badge-apicuron">{{currStatData['invalidation_count']}}</span>
+            </p>
+          </div>
 
           <div class="col-auto">
-            <a class="badge badge-success mr-2 mb-2"> Expand <i
+            <a class="badge badge-download mr-2 mb-2"> Expand <i
               class="material-icons" style="font-size: small">unfold_more</i></a>
           </div>
         </div>

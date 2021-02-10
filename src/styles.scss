@@ -546,7 +546,7 @@ body {
   font-size: small
 }
 .badge-download {
-  background-color: #287F05 !important;
+  background-color: #13600f !important;
   color: white !important;
 }
 
@@ -560,6 +560,16 @@ body {
 
 .badge-danger:hover {
   text-decoration: none;
+  color: white;
+  transform: scale(1.1,1.1);
+  transition: 0.1s;
+}
+.badge-collapse {
+  color: white;
+  background-color: #9A031E
+}
+.badge-collapse:hover {
+    text-decoration: none;
   color: white;
   transform: scale(1.1,1.1);
   transition: 0.1s;

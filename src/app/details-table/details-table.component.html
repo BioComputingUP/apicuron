@@ -1,44 +1,40 @@
-<div class="col-12 px-0">
+<div class="col-lg-8 offset-lg-2 px-0">
   <form [formGroup]="searchForm">
-    <div class="input-group mb-3">
-      <div class="input-group-prepend">
-        <span class="input-group-text text-center" style="min-width: 100px" id="basic-addon1">Filter </span>
-      </div>
-      <input type="text" class="form-control" formControlName="textSearch"
-             placeholder="entity identifier or activity name">
-      <button class="form-control col-1"
-              style="color:#9A031E;"
-              (click)="searchForm.get('textSearch').setValue('')">
-        clear
-      </button>
-      <div class="input-group-prepend">
-        <span class="input-group-text text-center" style="min-width: 80px;border-left-width: 0">from</span>
-      </div>
 
+
+    <div class="input-group input-group-sm mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text">Filter</span>
+      </div>
+      <input type="text"
+             class="form-control"
+             formControlName="textSearch"
+             placeholder="entity identifier or activity name">
+      <div class="input-group-prepend">
+        <span class="input-group-text"
+              style="border-left-width: 0" >from</span>
+      </div>
       <input type="text"
              class="form-control"
              #dp="bsDatepicker"
              bsDatepicker
-             style="max-width: 200px"
+             style="max-width: 7rem"
              formControlName="firstDay"
              [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">
       <div class="input-group-prepend">
-        <span class="input-group-text text-center" style="min-width: 80px;border-left-width: 0"> to </span>
+        <span class="input-group-text"
+              style="border-left-width: 0" >to</span>
       </div>
       <input type="text"
              class="form-control"
              #dp="bsDatepicker"
              bsDatepicker
-             style="max-width: 200px"
+             style="max-width: 7rem"
              formControlName="lastDay"
              [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }">
-      <div class="input-group-prepend">
-        <button class="form-control"
-                style="color:#9A031E; border-left-width: 0; border-bottom-left-radius: 0; border-top-left-radius: 0;"
-                (click)="resetTime()">
-          reset
-        </button>
-      </div>
+      <button type="text"
+              class="form-control"
+              style="max-width: 4rem;color:#9A031E ">reset</button>
     </div>
   </form>
 </div>
@@ -150,7 +146,8 @@
       <!--      </ng-container>-->
     </table>
     <div class="row">
-      <div class="col-lx-4 mr-auto">
+
+      <div class="col-auto ml-auto">
         <pagination
           [totalItems]="totalItems"
           [itemsPerPage]="pageSize.value"

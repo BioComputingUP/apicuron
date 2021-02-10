@@ -122,5 +122,6 @@ export class DetailsTableComponent implements OnInit {
   resetTime() {
     this.searchForm.get('firstDay').setValue(new Date(1990, 0, 1));
     this.searchForm.get('lastDay').setValue(new Date());
+    this.searchForm.get('textSearch').setValue('')
   }
 }
