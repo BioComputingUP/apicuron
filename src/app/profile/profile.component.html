@@ -6,7 +6,7 @@
 
 <div id="second-nav-bar" class="fixed-top " style="margin-top: 75px; padding-top: 0px"
      *ngIf="orcidData['activities-summary']">
-  <div class="container-fluid container-wide  d-none d-sm-block">
+  <div class="container-fluid container-wide">
     <div class="row" style="  ">
       <div class="col-auto ">
         <h2 [ngxScrollTo]="general" [ngxScrollToOffset]="-180">
@@ -14,8 +14,9 @@
         </h2>
       </div>
       <div class="col-auto">
-        <p class="mt-2">
-          <a tooltip="Access to the ORCID profile page"
+        <p class="mt-2" >
+          <a
+            style="display: inline-block" [tooltip]="'Access to the ORCID profile page'"
              href="https://orcid.org/{{curator_orcid}}"
              target="_blank">({{curator_orcid}})</a>
         </p>
