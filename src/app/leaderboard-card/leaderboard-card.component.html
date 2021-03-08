@@ -40,7 +40,7 @@
 
     </div>
   </div>
-<div class="row">
+<div class="row align-items-center">
   <div class="col-md-2 text-right">
     Selected badges or medals
   </div>
@@ -49,6 +49,7 @@
       <app-badge-view (click)="removeBadgeMedal(index)"
                       [active]="true"
                       [atLeaderboard]="true"
+                      [databaseName]="database['resource_name']"
                       [badge]="currBadgeMedal"
                       *ngIf="currBadgeMedal['type'] === 'badge'">
       </app-badge-view>
