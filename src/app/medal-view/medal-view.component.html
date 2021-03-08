@@ -1,9 +1,7 @@
-<div class="badge  badge-badge-active  mr-2 mb-2"
+<div class="badge badge-pill  badge-badge-active  mr-2 mb-2"
      [class]="medal['color']">
   <div class="row  align-items-center">
     <div class="col-2">
-
-
       <svg width="1.8em"
            height="1.8em"
            viewBox="0 0 100 100"
@@ -28,15 +26,20 @@
 
     </div>
 
-    <div class="col"  [class.pr-0]="atLeaderboard" style="width: 8rem;">
-      <div class=" ">
-        <span class="align-middle"
-              style="white-space: normal; width: 7rem; text-align: left; color: white">
-<!--              style="white-space: normal; width: 7rem; text-align: left; color: white">-->
-          <!--          name-->
-          {{medal['name']}}
-        </span>
+    <div class="col"  [class.pr-0]="atLeaderboard" style="width: 10rem;">
+      <div class="row mt-2 mb-1">
+        <div class="col">
+                <span style="color: white">{{databaseName}}</span>
+        </div>
+      </div>
+      <div class="row mb-2">
+        <div class="col">
+          <span class="align-middle"
+                style="white-space: normal; width: 7rem; text-align: left; color: white">
 
+                    {{medal['name']}}
+        </span>
+        </div>
       </div>
     </div>
     <div class="col-2 pl-0" *ngIf="atLeaderboard" >

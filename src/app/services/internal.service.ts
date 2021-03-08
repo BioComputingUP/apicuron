@@ -87,7 +87,14 @@ export class InternalService {
     return this.http.get(url);
   }
 
-
+  getHideProfile(id): Observable<any> {
+    const url = this.wsUrl + 'hideProfile/' + id;
+    return this.http.get(url);
+  }
+  getShowProfile(id): Observable<any> {
+    const url = this.wsUrl + 'showProfile/' + id;
+    return this.http.get(url);
+  }
 
 
 

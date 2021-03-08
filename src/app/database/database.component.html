@@ -47,9 +47,9 @@
       <span  *ngFor="let currCategory of badge_categories">
               <app-badge-view [active]="true"
                               [badge]="currBadge"
+                              [databaseName]="resourcesDescription['resource_name']"
                               *ngFor="let currBadge of badgesData[currCategory]"
                               (click)="addBadgeMedalToSelectedList(currBadge)"></app-badge-view>
-
       </span>
     </div>
   </div>
@@ -60,6 +60,7 @@
       <span  *ngFor="let currCategory of medal_categories">
               <app-medal-view [medal]="currMedal"
                               *ngFor="let currMedal of medalsData[currCategory]"
+                              [databaseName]="resourcesDescription['resource_name']"
                               (click)="addBadgeMedalToSelectedList(currMedal)"></app-medal-view>
       </span>
 

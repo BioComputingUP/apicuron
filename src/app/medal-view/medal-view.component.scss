@@ -11,9 +11,10 @@
 }
 
 .badge-badge-active {
-  border-width: 1px;
-  border-style: solid;
-  border-color: transparent;
+  border-width: 0;
+  //border-width: 1px;
+  //border-style: solid;
+  //border-color: transparent;
   box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.3);
 }
 .badge-badge-disabled {

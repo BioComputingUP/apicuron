@@ -46,9 +46,18 @@
   </div>
   <div class="col-auto" *ngIf="selectedBadgesMedals.value.length > 0">
     <span *ngFor="let currBadgeMedal of selectedBadgesMedals.value; let index = index">
-      <app-badge-view (click)="removeBadgeMedal(index)" [active]="true" [atLeaderboard]="true" [badge]="currBadgeMedal" *ngIf="currBadgeMedal['type'] === 'badge'"></app-badge-view>
-      <app-medal-view (click)="removeBadgeMedal(index)" [medal]="currBadgeMedal"  [atLeaderboard]="true" *ngIf="currBadgeMedal['type'] === 'medal'"></app-medal-view>
-
+      <app-badge-view (click)="removeBadgeMedal(index)"
+                      [active]="true"
+                      [atLeaderboard]="true"
+                      [badge]="currBadgeMedal"
+                      *ngIf="currBadgeMedal['type'] === 'badge'">
+      </app-badge-view>
+      <app-medal-view (click)="removeBadgeMedal(index)"
+                      [medal]="currBadgeMedal"
+                      [atLeaderboard]="true"
+                      [databaseName]="database['resource_name']"
+                      *ngIf="currBadgeMedal['type'] === 'medal'">
+      </app-medal-view>
     </span>
   </div>
   <div class="col-auto" *ngIf="selectedBadgesMedals.value.length === 0">

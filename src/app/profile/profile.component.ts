@@ -23,6 +23,8 @@ import {FormControl, FormGroup} from '@angular/forms';
 
 export class ProfileComponent implements OnInit {
   curator_orcid = null;
+  exists_in_apicuron = false;
+
   statByResource = [];
   generalStat = {
     generation_count: 0,
@@ -75,6 +77,14 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.generalStat.generation_count += 0;
+    this.generalStat.revision_count += 0;
+    this.generalStat.invalidation_count += 0;
+    this.generalStat.badges_count += 0;
+    this.generalStat.medals_count += 0;
+    this.mapMedals = {}
+
+
     this.env = environment;
     this.curator_orcid = window.location.pathname.substring(7, 26);
     this.authService.loginData.subscribe(authData => {
@@ -115,7 +125,8 @@ export class ProfileComponent implements OnInit {
 
       this.internalService.getLeaderboards(new HttpParams()
         .set('curator_orcid', this.curator_orcid).set('with_terms', 'true')).subscribe(leaderBoardData => {
-        if (Array.isArray(leaderBoardData)) {
+        if (Array.isArray(leaderBoardData) && leaderBoardData.length > 0 ) {
+          this.exists_in_apicuron = true;
           this.statByResource = leaderBoardData;
           leaderBoardData.forEach(currStat => {
             this.generalStat.generation_count += currStat.generation_count;
@@ -124,14 +135,14 @@ export class ProfileComponent implements OnInit {
             this.generalStat.badges_count += currStat.badges_count;
             this.generalStat.medals_count += currStat.medals_count;
           });
+        } else {
+          console.log('This ORCID is not registered at APICURON!');
         }
       }, (err) => {
       }, () => {
-        if (this.statByResource.length > 0) {
-          // console.log('this.route.snapshot.fragment',
-          //   this.route.snapshot.fragment,
-          //   this.statByResource.map(x => this.map_resources[x['resource_uri']]['resource_id']));
+        this.loading_finished = true;
 
+        if (this.statByResource.length > 0) {
           if (this.route.snapshot.fragment && this.statByResource.map(x => this.map_resources[x['resource_uri']]['resource_id']).includes(this.route.snapshot.fragment.toLowerCase())) {
             const config: ScrollToConfigOptions = {
               target: 'selected',
@@ -198,187 +209,6 @@ export class ProfileComponent implements OnInit {
         }
       }
     });
-
-
-    // this.env = environment;
-    // const orcid_id = window.location.pathname.substring(7, 26);
-    // this.orcidID = orcid_id;
-    // this.authService.loginData.subscribe(authData => {
-    //   if (this.localAuth.value !== authData) {
-    //     this.localAuth.next(authData);
-    //   }
-    // });
-    //
-    // this.localAuth.subscribe(authData => {
-    //   // if (!authData.hasOwnProperty('initial')) {
-    //   // console.log('authData', authData);
-    //   console.log('orcid_id', orcid_id);
-    //
-    //   this.logedIn = orcid_id === authData['orcid_id'];
-    //
-    //   this.internalService.GetStatistics({
-    //     curator_orcid: orcid_id
-    //   }).subscribe((browseData) => {
-    //     this.profileData.next(browseData[0]);
-    //     this.internalService.GetStat().subscribe((statData) => {
-    //       statData['resources'].forEach(currResource => {
-    //         this.map_resources[currResource.resource_uri] = currResource;
-    //       });
-    //
-    //     }, (err) => {
-    //     }, () => {
-    //       console.log('this.map_resources', this.map_resources);
-    //
-    //       this.internalService.getAchievements(new HttpParams()
-    //         .set('curator_orcid', orcid_id)
-    //         .set('filter_priority', 'true')).subscribe((badgesAndMedals) => {
-    //         this.badgesAndMedals = badgesAndMedals;
-    //
-    //       }, (err) => {
-    //       }, () => {
-    //         console.log('this.badgesAndMedals', this.badgesAndMedals);
-    //       });
-    //
-    //
-    //
-    //     });
-    //
-    //   }, (err) => {
-    //   }, () => {
-    //     this.internalService.GetORCIDprofile(orcid_id).subscribe(currORCIDdata => {
-    //       this.orcidData = currORCIDdata;
-    //       if (currORCIDdata.hasOwnProperty('activities-summary') && currORCIDdata['activities-summary'].hasOwnProperty('employments') && currORCIDdata['activities-summary']['employments'].hasOwnProperty('affiliation-group')) {
-    //         this.employment = currORCIDdata['activities-summary']['employments']['affiliation-group'];
-    //       }
-    //       console.log('employment', this.employment);
-    //
-    //     });
-    //
-    //
-    //     if (this.profileData.value.hasOwnProperty('statistics')) {
-    //       this.profileData.value['statistics'].forEach(currReport => {
-    //         if (currReport.resource_uri) {
-    //           this.resourcesList.add(currReport.resource_uri.substr(42));
-    //         }
-    //       });
-    //     }
-    //
-    //     // console.log(this.resourcesList);
-    //     Array.from(this.resourcesList).forEach(currResourceURI => {
-    //       this.userDataByResources[String(currResourceURI)] = {
-    //         name: currResourceURI
-    //       };
-    //
-    //
-    //       if (this.profileData.value.hasOwnProperty('badges')) {
-    //         // this.userDataByResources[String(currResourceURI)]['generation_reports_length']
-    //         this.userDataByResources[String(currResourceURI)]['badge'] = this.profileData.value['badges'].filter(x => {
-    //           return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
-    //         }).map(x => x.name);
-    //       } else {
-    //         // this.userDataByResources[String(currResourceURI)]['generation_reports_length']
-    //         this.userDataByResources[String(currResourceURI)]['badge'] = [];
-    //       }
-    //       if (this.profileData.value.hasOwnProperty('medals')) {
-    //         // this.userDataByResources[String(currResourceURI)]['generation_reports_length']
-    //         this.userDataByResources[String(currResourceURI)]['medal'] = this.profileData.value['medals'].filter(x => {
-    //           return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
-    //         }).sort((a, b) => a.name > b.name ? 1 : -1);
-    //       } else {
-    //         // this.userDataByResources[String(currResourceURI)]['generation_reports_length']
-    //         this.userDataByResources[String(currResourceURI)]['medal'] = [];
-    //       }
-    //
-    //       if (this.profileData.value.hasOwnProperty('generation_terms')) {
-    //         this.userDataByResources[String(currResourceURI)]['generation_terms'] = this.profileData.value['generation_terms'].filter(x => {
-    //           return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
-    //         });
-    //         this.userDataByResources[String(currResourceURI)]['generation_counts'] = this.profileData.value['generation_terms'].filter(x => {
-    //           return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
-    //         }).map(x => x.count).reduce((a, b) => a + b, 0);
-    //       } else {
-    //         this.userDataByResources[String(currResourceURI)]['generation_terms'] = [];
-    //         this.userDataByResources[String(currResourceURI)]['generation_counts'] = 0;
-    //       }
-    //       if (this.profileData.value.hasOwnProperty('revision_terms')) {
-    //         this.userDataByResources[String(currResourceURI)]['revision_terms'] = this.profileData.value['revision_terms'].filter(x => {
-    //           return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
-    //         });
-    //         this.userDataByResources[String(currResourceURI)]['revision_counts'] = this.profileData.value['revision_terms'].filter(x => {
-    //           return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
-    //         }).map(x => x.count).reduce((a, b) => a + b, 0);
-    //       } else {
-    //         this.userDataByResources[String(currResourceURI)]['revision_terms'] = [];
-    //         this.userDataByResources[String(currResourceURI)]['revision_counts'] = 0;
-    //       }
-    //       if (this.profileData.value.hasOwnProperty('invalidation_terms')) {
-    //         this.userDataByResources[String(currResourceURI)]['invalidation_terms'] = this.profileData.value['invalidation_terms'].filter(x => {
-    //           return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
-    //         });
-    //         this.userDataByResources[String(currResourceURI)]['invalidation_counts'] = this.profileData.value['invalidation_terms'].filter(x => {
-    //           return x.resource_uri === this.map_resources[String(currResourceURI)].resource_uri;
-    //         }).map(x => x.count).reduce((a, b) => a + b, 0);
-    //       } else {
-    //         this.userDataByResources[String(currResourceURI)]['invalidation_terms'] = [];
-    //         this.userDataByResources[String(currResourceURI)]['invalidation_counts'] = 0;
-    //       }
-    //
-    //
-    //     });
-    //
-    //     this.internalService.GetResearces({}).subscribe(data => {
-    //       data.forEach(currResource => {
-    //         if (this.userDataByResources.hasOwnProperty(currResource['resource_id'])) {
-    //           this.userDataByResources[currResource['resource_id']]['possible_badges'] = {};
-    //           // = {'possible_badges': {}};
-    //           if (this.userDataByResources.hasOwnProperty(currResource['resource_id'])) {
-    //             currResource['badges'].forEach(currBadge => {
-    //
-    //               if (!this.userDataByResources[currResource['resource_id']]['possible_badges'].hasOwnProperty(currBadge['category'])) {
-    //                 this.userDataByResources[currResource['resource_id']]['possible_badges'][currBadge['category']] = [];
-    //               }
-    //               this.userDataByResources[currResource['resource_id']]['possible_badges'][currBadge['category']].push(currBadge);
-    //             });
-    //             console.log(this.userDataByResources[currResource['resource_id']]['possible_badges']);
-    //             this.userDataByResources[currResource['resource_id']]['badge_categories'] = Object.keys(this.userDataByResources[currResource['resource_id']]['possible_badges']);
-    //             this.userDataByResources[currResource['resource_id']]['badge_categories'].forEach(currCategory => {
-    //               this.userDataByResources[currResource['resource_id']]['possible_badges'][currCategory].sort((a, b) => a.count_threshold > b.count_threshold ? 1 : -1);
-    //             });
-    //           }
-    //         }
-    //       });
-    //     }, (err) => {
-    //     }, () => {
-    //     });
-    //
-    //
-    //     this.loading_finished = true;
-    //     console.log('finish');
-    //   });
-    //
-    //
-    //   // }
-    //
-    // });
-
-
-  }
-
-  numberOfEntries(resource) {
-    const entriesSet = new Set();
-    this.profileData['contribution'].forEach(currObj => {
-      if (currObj.resource === resource) {
-        entriesSet.add(currObj.resource_entry_id);
-      }
-    });
-    // console.log(entriesSet)
-    return Array.from(entriesSet).length;
-  }
-
-  numberOfActions(resource) {
-    return this.profileData.value['reports'].filter(currObj => {
-      return currObj.resource_name === resource;
-    }).length;
   }
 
   reportFilter(resource) {
@@ -429,47 +259,15 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  pubmedFilter() {
-    const pmidSet = new Set();
-    this.profileData['contribution'].forEach(currObj => {
-      pmidSet.add(currObj.pmid);
-    });
-
-    return Array.from(pmidSet).map(currPMID => {
-      const resourcesSet = new Set();
-      const accSet = new Set();
-      const term_number = this.profileData['contribution'].filter(currObj => {
-        if (currObj.pmid === currPMID) {
-          resourcesSet.add(currObj.resource);
-          accSet.add(currObj.acc);
-          return true;
-        }
-        return false;
-      }).length;
-      return {
-        pmid: currPMID,
-        title: '',
-        term_number: term_number,
-        resources: Array.from(resourcesSet),
-        acc: Array.from(accSet)
-      };
-    });
-  }
-
   isCurrentPosition(date, currPosition) {
-
     if (date) {
-
       if (date['year'] && date['month'] && date['day']) {
         if (Date.UTC(date['year']['value'], date['month']['value'] - 1, date['day']['value']) >= Date.now()) {
-
-
           return true;
         }
       } else if (date['year'] && date['month']) {
         if (Date.UTC(date['year']['value'], date['month']['value'] - 1) >= Date.now()) {
           console.log('date_at', Date.now(), date, currPosition);
-
           return true;
         }
       }
@@ -490,17 +288,11 @@ export class ProfileComponent implements OnInit {
   }
 
   addFiles() {
-
-    console.log('file select window');
-    console.log(this.file);
-
     this.file.nativeElement.click();
   }
 
   sendData() {
     console.log('file uploading');
-
-
     this.internalService.PostProfilePicture(this.formData, this.curator_orcid).subscribe((event: HttpEvent<any>) => {
       switch (event.type) {
         case HttpEventType.Sent:
@@ -519,10 +311,7 @@ export class ProfileComponent implements OnInit {
             this.progress = 0;
             this.ngOnInit();
           }, 500);
-
-
       }
-
     });
   }
 
@@ -532,5 +321,18 @@ export class ProfileComponent implements OnInit {
     }, 800);
   }
 
+  hideProfile() {
+    this.internalService.getHideProfile(this.curator_orcid).subscribe((res) => {
+      this.authService.authentication();
+      this.ngOnInit();
+    });
+  }
+
+  showProfile() {
+    this.internalService.getShowProfile(this.curator_orcid).subscribe((res) => {
+      this.authService.authentication();
+      this.ngOnInit();
+    });
+  }
 
 }

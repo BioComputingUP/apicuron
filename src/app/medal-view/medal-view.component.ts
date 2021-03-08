@@ -8,10 +8,12 @@ import { Component, Input, OnInit } from '@angular/core';
 export class MedalViewComponent implements OnInit {
   @Input() medal;
   @Input() atLeaderboard = false;
+  @Input() databaseName = '';
 
   constructor() { }
 
   ngOnInit(): void {
+    console.log(this.medal);
   }
 
 }

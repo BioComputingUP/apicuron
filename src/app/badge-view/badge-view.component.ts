@@ -9,6 +9,7 @@ export class BadgeViewComponent implements OnInit {
   @Input() active;
   @Input() atLeaderboard = false;
   @Input() badge;
+  @Input() databaseName = '';
 
   tooltipHTML;
 

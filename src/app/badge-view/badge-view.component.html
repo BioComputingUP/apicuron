@@ -1,51 +1,60 @@
 
 <!--<div  class="badge mr-2 mb-2" tooltip="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">-->
-  <div class="badge  badge-badge-disabled mr-2 mb-2" *ngIf="!active" [tooltip]="tooltipHTML">
-    <div class="row  align-items-center">
+  <div class="badge  badge-badge-disabled mr-1 mb-1" *ngIf="!active" [tooltip]="tooltipHTML">
+    <div class="row  align-items-center" style="min-height: 4rem">
       <div *ngIf="!active" class="col-2">
-        <svg width="1.8em"
-             height="1.8em"
+        <svg width="1em"
+             height="1em"
              viewBox="0 0 16 16"
              class="bi bi-award-fill disabled"
 
              xmlns="http://www.w3.org/2000/svg">
-          <!--        <style type="text/css">-->
-          <!--          path{fill:url(#MyGradient2)}-->
-          <!--        </style>-->
-          <!--        <defs>-->
-          <!--          <linearGradient id="MyGradient2" x1="0%" y1="0%" x2="50%" y2="100%">-->
-          <!--            <stop offset="0%" stop-color="hsl(34, 45%, 80%)" />-->
-          <!--            <stop offset="95%" stop-color="hsl(34, 45%, 50%)" />-->
-          <!--          </linearGradient>-->
-          <!--        </defs>-->
           <path class="st1"
                 d="M8 0l1.669.864 1.858.282.842 1.68 1.337 1.32L13.4 6l.306 1.854-1.337 1.32-.842 1.68-1.858.282L8 12l-1.669-.864-1.858-.282-.842-1.68-1.337-1.32L2.6 6l-.306-1.854 1.337-1.32.842-1.68L6.331.864 8 0z"/>
           <path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1 4 11.794z"/>
         </svg>
       </div>
 
-      <div class="col-10" style="width: 8rem">
-        <div class=" ">
-        <span class="align-middle"
-              style="white-space: normal; width: 7rem; text-align: left; color: darkgray">
-<!--              style="white-space: normal; width: 7rem; text-align: left; color: white">-->
-          <!--          name-->
-          {{badge['name']}}
-        </span>
-
+      <div class="col-10" style="width: 12rem">
+        <div class="row mt-1 mb-1">
+          <div class="col">
+            <span style="color: darkgray">{{databaseName}}</span>
+          </div>
         </div>
+        <div class="row mb-1">
+          <div class="col">
+          <span class="align-middle"
+                style="white-space: normal; width: 7rem; text-align: left; color: darkgray">
+
+                    {{badge['name']}}
+        </span>
+          </div>
+        </div>
+
+
+
+
+<!--        <div class=" ">-->
+<!--        <span class="align-middle"-->
+<!--              style="white-space: normal; width: 7rem; text-align: left; color: darkgray">-->
+<!--              style="white-space: normal; width: 7rem; text-align: left; color: white">-->
+<!--                    name-->
+<!--          {{badge['name']}}-->
+<!--        </span>-->
+<!--        </div>-->
       </div>
     </div>
   </div>
 
   <!--<div class="badge  badge-badge-active  mr-2 mb-2"-->
   <!--     *ngIf="active" [class]="badge['color']">-->
-  <div class="badge badge-badge-active mr-2 mb-2" [tooltip]="tooltipHTML"
+  <div class="badge badge-badge-active mr-1 mb-1"
+       [tooltip]="tooltipHTML"
        *ngIf="active" [style]="{background: badge['color_code'] + alpha_map[badge['count_threshold']]}">
-    <div class="row  align-items-center">
+    <div class="row mb-2">
       <div class="col-2">
-        <svg width="1.8em"
-             height="1.8em"
+        <svg width="1em"
+             height="1em"
              viewBox="0 0 16 16"
              class="bi bi-award-fill active"
              xmlns="http://www.w3.org/2000/svg">
@@ -64,23 +73,28 @@
                 d="M8 0l1.669.864 1.858.282.842 1.68 1.337 1.32L13.4 6l.306 1.854-1.337 1.32-.842 1.68-1.858.282L8 12l-1.669-.864-1.858-.282-.842-1.68-1.337-1.32L2.6 6l-.306-1.854 1.337-1.32.842-1.68L6.331.864 8 0z"/>
           <path class="st2" d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1 4 11.794z"/>
         </svg>
-
-
       </div>
 
-      <div class="col " style="width: 8rem" [class.pr-0]="atLeaderboard">
-        <div class=" ">
-        <span class="align-content-center"
-              style="white-space: normal; width: 7rem; text-align: left; color: white">
-<!--              style="white-space: normal; width: 7rem; text-align: left; color: white">-->
-          <!--          name-->
-          {{badge['name']}}
-        </span>
-
+      <div class="col"  [class.pr-0]="atLeaderboard">
+        <div class="row mt-1">
+          <div class="col text-center">
+            <span style="color: white">{{databaseName}}</span>
+          </div>
         </div>
       </div>
       <div class="col-2 pl-0" *ngIf="atLeaderboard" >
         <i class="material-icons" style="font-size: large; color: white">close</i>
+      </div>
+    </div>
+    <div class="row mb-1"
+         >
+      <div class="col">
+        <div class="container" style="height: 2.5rem;width: 9rem;">
+          <div class="row align-items-center">
+            <div class="col text-left">
+          <div style="white-space: normal; color: white">
+                    {{badge['name']}}
+          </div></div></div></div>
       </div>
     </div>
   </div>
