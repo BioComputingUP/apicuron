@@ -1,7 +1,7 @@
 
 <!--<div  class="badge mr-2 mb-2" tooltip="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">-->
   <div class="badge  badge-badge-disabled mr-1 mb-1" *ngIf="!active" [tooltip]="tooltipHTML">
-    <div class="row  align-items-center" style="min-height: 4rem">
+    <div class="row mb-2  " >
       <div *ngIf="!active" class="col-2">
         <svg width="1em"
              height="1em"
@@ -15,35 +15,25 @@
         </svg>
       </div>
 
-      <div class="col-10" style="width: 12rem">
-        <div class="row mt-1 mb-1">
+      <div class="col-10" >
+        <div class="row mt-1">
           <div class="col">
             <span style="color: darkgray">{{databaseName}}</span>
           </div>
         </div>
-        <div class="row mb-1">
-          <div class="col">
-          <span class="align-middle"
-                style="white-space: normal; width: 7rem; text-align: left; color: darkgray">
+      </div>
 
+    </div>
+        <div class="row mb-1" style="width: 9rem; ">
+          <div class="col" style="height: 2.5rem;   ">
+
+          <span style="white-space: normal;text-align: left;     color: darkgray">
                     {{badge['name']}}
-        </span>
+          </span>
           </div>
         </div>
 
 
-
-
-<!--        <div class=" ">-->
-<!--        <span class="align-middle"-->
-<!--              style="white-space: normal; width: 7rem; text-align: left; color: darkgray">-->
-<!--              style="white-space: normal; width: 7rem; text-align: left; color: white">-->
-<!--                    name-->
-<!--          {{badge['name']}}-->
-<!--        </span>-->
-<!--        </div>-->
-      </div>
-    </div>
   </div>
 
   <!--<div class="badge  badge-badge-active  mr-2 mb-2"-->
@@ -77,7 +67,7 @@
 
       <div class="col"  [class.pr-0]="atLeaderboard">
         <div class="row mt-1">
-          <div class="col text-center">
+          <div class="col text-left">
             <span style="color: white">{{databaseName}}</span>
           </div>
         </div>
@@ -86,15 +76,12 @@
         <i class="material-icons" style="font-size: large; color: white">close</i>
       </div>
     </div>
-    <div class="row mb-1"
-         >
-      <div class="col">
-        <div class="container" style="height: 2.5rem;width: 9rem;">
-          <div class="row align-items-center">
-            <div class="col text-left">
-          <div style="white-space: normal; color: white">
+    <div class="row mb-1" style="width: 9rem; ">
+      <div class="col" style="height: 2.5rem;   ">
+
+          <span style="white-space: normal;text-align: left;     color: white">
                     {{badge['name']}}
-          </div></div></div></div>
+          </span>
       </div>
     </div>
   </div>
