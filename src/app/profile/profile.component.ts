@@ -1,10 +1,11 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild, TemplateRef} from '@angular/core';
 import {InternalService} from '../services/internal.service';
 import {concat, BehaviorSubject, Observable, combineLatest} from 'rxjs';
 import {ProgressbarConfig} from 'ngx-bootstrap';
 import {HttpEvent, HttpClient, HttpRequest, HttpEventType, HttpParams} from '@angular/common/http';
 import {ScrollToConfigOptions, ScrollToService} from '@nicky-lenaers/ngx-scroll-to';
 import {ActivatedRoute} from '@angular/router';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 
 export function getProgressbarConfig(): ProgressbarConfig {
   return Object.assign(new ProgressbarConfig(), {animate: true, striped: true, max: 100});
@@ -24,6 +25,7 @@ import {FormControl, FormGroup} from '@angular/forms';
 export class ProfileComponent implements OnInit {
   curator_orcid = null;
   exists_in_apicuron = false;
+  modalRef: BsModalRef;
 
   statByResource = [];
   generalStat = {
@@ -71,18 +73,19 @@ export class ProfileComponent implements OnInit {
   @ViewChild('file', {static: true}) file;
 
   constructor(public authService: AuthService,
+              private modalService: BsModalService,
               private scrollToService: ScrollToService,
               private route: ActivatedRoute,
               private internalService: InternalService) {
   }
 
   ngOnInit() {
-    this.generalStat.generation_count += 0;
-    this.generalStat.revision_count += 0;
-    this.generalStat.invalidation_count += 0;
-    this.generalStat.badges_count += 0;
-    this.generalStat.medals_count += 0;
-    this.mapMedals = {}
+    this.generalStat.generation_count = 0;
+    this.generalStat.revision_count = 0;
+    this.generalStat.invalidation_count = 0;
+    this.generalStat.badges_count = 0;
+    this.generalStat.medals_count = 0;
+    this.mapMedals = {};
 
 
     this.env = environment;
@@ -333,6 +336,13 @@ export class ProfileComponent implements OnInit {
       this.authService.authentication();
       this.ngOnInit();
     });
+  }
+  openModal(template: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(
+      template,
+      Object.assign({}, { class: 'gray modal-lg' })
+    );
+
   }
 
 }

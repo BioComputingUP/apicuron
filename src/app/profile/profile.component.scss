@@ -52,3 +52,8 @@ dd {
   transition: 0.25s;
 
 }
+.custom-control-input:checked ~
+.custom-control-label::before {
+  border-color:  #4D194D !important;
+  background-color:  #4D194D !important;
+}

@@ -15,24 +15,60 @@
           </h2>
         </div>
         <div class="col-auto">
-          <p class="mt-2" >
+          <p class="mt-2">
             <a
               style="display: inline-block" [tooltip]="'Access to the ORCID profile page'"
               href="https://orcid.org/{{curator_orcid}}"
               target="_blank">({{curator_orcid}})</a>
           </p>
         </div>
-        <div class="col"  *ngIf="logedIn">
-        <span class="btn btn-sm btn-danger"
-              *ngIf="!localAuth.value.hasOwnProperty('hide')"
-              (click)="hideProfile()">
-          Hide your profile
+<!--        <div class="col">-->
+        <div class="col" *ngIf="logedIn">
+
+          <div class="custom-control custom-switch mt-2 "  *ngIf="!localAuth.value.hasOwnProperty('hide')" (click)="openModal(profile_visibility_settings)">
+            <input type="checkbox" class="custom-control-input " disabled checked id="customSwitch1">
+            <label class="custom-control-label" style="color: black" >Toggle profile visibility</label>
+          </div>
+          <div class="custom-control custom-switch mt-2"  *ngIf="localAuth.value.hasOwnProperty('hide')" (click)="openModal(profile_visibility_settings)">
+            <input type="checkbox" class="custom-control-input " disabled id="customSwitch2">
+            <label class="custom-control-label" style="color: black"  >Toggle profile visibility</label>
+          </div>
+
+<!--          <span class="badge badge-apicuron mt-2" (click)="openModal(profile_visibility_settings)"> <i class="material-icons">visibility</i> Profile visibility settings </span>-->
+
+          <ng-template id="profile_visibility_settings" #profile_visibility_settings>
+            <div class="modal-header">
+              <h4 class="modal-title pull-left">Profile visibility</h4>
+              <button type="button" class="close pull-right" aria-label="Close"
+                      (click)="modalRef.hide();">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body text-justify">
+              <p>By selecting this option you toggle your visibility.
+              <br>
+              When visibility is toggle off your profile information and curation work,
+              including achievements and leader board ranking, cannot be accessed
+              by any other user or API request.</p>
+              <p>Should you not agree into participating in APICURON, please inform us and your biological resource provider
+                and ask them to not submit your biocuration activities to APICURON.</p>
+              <p>
+                <span class="btn btn-sm btn-danger"
+                      *ngIf="!localAuth.value.hasOwnProperty('hide')"
+                      (click)="hideProfile()">
+          <i class="material-icons" style="font-size: large">visibility_off</i> Hide your profile
+          </span>
+                <span class="btn btn-sm btn-success"
+                      *ngIf="localAuth.value.hasOwnProperty('hide')"
+                      (click)="showProfile()">
+          <i class="material-icons" style="font-size: large">visibility</i> Show your profile again
         </span>
-          <span class="btn btn-sm btn-success"
-                *ngIf="localAuth.value.hasOwnProperty('hide')"
-                (click)="showProfile()">
-          Show your profile again
-        </span>
+              </p>
+
+            </div>
+          </ng-template>
+
+
         </div>
         <div class="col-auto ml-auto">
           <p [ngxScrollTo]="selected" [ngxScrollToOffset]="-180"> Resources <span
@@ -45,7 +81,7 @@
   </div>
   <div class="container-fluid container-wide py-3" #top style="min-height: 60vh; ">
     <div class="row mb-4" id="general" #general style="padding-top: 80px">
-      <div class="col-auto"  *ngIf="profilePictureID">
+      <div class="col-auto" *ngIf="profilePictureID">
         <div class="row">
           <div class="col">
             <img
@@ -58,14 +94,14 @@
             <div *ngIf="profileData.value['profile_picture']">
               <button class="btn btn-danger btn-sm" (click)="addFiles()"> Select another profile picture</button>
             </div>
-            <div *ngIf="!profileData.value['profile_picture']">
-              <button class="btn btn-danger btn-sm" (click)="addFiles()"> Select profile picture</button>
-            </div>
             <div *ngIf="imgURL">
               <button class="btn btn-success btn-sm" (click)="sendData()"> Upload</button>
             </div>
           </div>
         </div>
+      </div>
+      <div class="col-auto"  *ngIf="logedIn && !profilePictureID && !profileData.value['profile_picture']">
+        <button class="btn btn-danger btn-sm" (click)="addFiles()"> Select profile picture</button>
       </div>
 
       <div class="col-lg-2">
@@ -84,8 +120,9 @@
         </div>
       </div>
       <div class="col ml-3 text-justify" *ngIf="orcidData['activities-summary']">
-        <div class="row" *ngIf="orcidData['person'] && orcidData['person']['biography'] && orcidData['person']['biography']['content']">
-          <div class="col">        <h5>Biography</h5>
+        <div class="row"
+             *ngIf="orcidData['person'] && orcidData['person']['biography'] && orcidData['person']['biography']['content']">
+          <div class="col"><h5>Biography</h5>
             <div *ngFor="let currPosition of employment" class="mt-2">
               <span
                 *ngIf="isCurrentPosition(currPosition['summaries'][0]['employment-summary']['end-date'], currPosition) && currPosition['summaries'][0]['employment-summary']['role-title']">
@@ -105,10 +142,12 @@
             <p>{{orcidData['person']['biography']['content']}}</p></div>
 
         </div>
-        <div class="row" *ngIf="orcidData['person']['keywords'] && orcidData['person']['keywords']['keyword'].length > 0">
+        <div class="row"
+             *ngIf="orcidData['person']['keywords'] && orcidData['person']['keywords']['keyword'].length > 0">
           <div class="col"><h5>Expertise</h5>
             <p><span class="mx-1"
-                     *ngFor="let currKey of orcidData['person']['keywords']['keyword']"># {{currKey['content']}}</span></p></div>
+                     *ngFor="let currKey of orcidData['person']['keywords']['keyword']"># {{currKey['content']}}</span>
+            </p></div>
         </div>
         <!---->
         <!--      <p *ngIf="orcidData['person']['keywords'] && orcidData['person']['keywords']['keyword'].length > 0">-->
@@ -125,10 +164,11 @@
             <div class="col-auto mr-auto">
               <div class="row">
                 <div class="col-auto">
-                  <h5><span  >Resource</span> </h5>
+                  <h5><span>Resource</span></h5>
                 </div>
                 <div class="col">
-                  <a href="{{map_resources[currStatData['resource_uri']]['resource_url']}}" class="badge badge-apicuron " *ngIf="map_resources.hasOwnProperty(currStatData['resource_uri'])">
+                  <a href="{{map_resources[currStatData['resource_uri']]['resource_url']}}"
+                     class="badge badge-apicuron " *ngIf="map_resources.hasOwnProperty(currStatData['resource_uri'])">
                     {{map_resources[currStatData['resource_uri']]['resource_name']}} <i class="material-icons">link</i>
                   </a>
                   <span *ngIf="!map_resources.hasOwnProperty(currStatData['resource_uri'])">
@@ -146,7 +186,7 @@
           </div>
           <div class="row">
             <div class="col-auto">
-              <h5><span  >Ranking</span> </h5>
+              <h5><span>Ranking</span></h5>
             </div>
             <div class="col">
               <p *ngIf="currStatData['ranking']">
@@ -155,15 +195,18 @@
                 <a class="badge  badge-apicuron"
                    tooltip="see at Leaderboard"
                    routerLink="/databases/{{ map_resources[currStatData['resource_uri']]['resource_id']}}"
-                   fragment="leaderboard">  # {{currStatData['ranking']}}  </a>
+                   fragment="leaderboard"> # {{currStatData['ranking']}}  </a>
               </p>
             </div>
             <div class="col-auto ml-auto">
               <p class="ml-3">
                 <strong>Number of curation events</strong>
-                generation <span class="badge badge-apicuron"> # {{currStatData['generation_count']  | number:'1.0':'en-US'}}</span>,
-                revision <span class="badge badge-apicuron"> # {{currStatData['revision_count'] | number:'1.0':'en-US'}}</span>,
-                invalidation <span class="badge badge-apicuron"> # {{currStatData['invalidation_count'] | number:'1.0':'en-US'}}</span>
+                generation <span
+                class="badge badge-apicuron"> # {{currStatData['generation_count']  | number:'1.0':'en-US'}}</span>,
+                revision <span
+                class="badge badge-apicuron"> # {{currStatData['revision_count'] | number:'1.0':'en-US'}}</span>,
+                invalidation <span
+                class="badge badge-apicuron"> # {{currStatData['invalidation_count'] | number:'1.0':'en-US'}}</span>
               </p>
 
             </div>
@@ -240,7 +283,7 @@
             </div>
 
             <div class="col-auto">
-              <a class="badge badge-download mr-2 mb-2"> Expand <i
+              <a [ngxScrollTo]="selected" [ngxScrollToOffset]="-180" class="badge badge-download mr-2 mb-2"> Expand <i
                 class="material-icons" style="font-size: small">unfold_more</i></a>
             </div>
           </div>
