@@ -1,13 +1,78 @@
+@import '../../styles';
+
 th {
   border: transparent !important;
   border-top: none;
 
 }
 
-
-.badge-secondary:hover {
+.badge-hover:hover {
   text-decoration: none;
   color: white;
   transform: scale(1.1,1.1);
   transition: 0.1s;
+}
+
+
+
+::ng-deep .pagination {
+  display: -ms-flexbox;
+  display: flex;
+  padding-left: 0;
+  list-style: none;
+}
+
+::ng-deep .page-link {
+  position: relative;
+  display: block;
+  padding: 0.4rem;
+  margin-left: -1px;
+  line-height: 1.25;
+  color: theme-color("primary");
+  background-color: transparent;
+  border: 0;
+}
+
+::ng-deep .page-link:hover {
+  z-index: 2;
+  color: theme-color(light);
+  text-decoration: none;
+  background-color: transparent;
+  border-color: transparent;
+}
+
+::ng-deep .page-link:focus {
+  z-index: 2;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(theme-color("primary"), 0.25);
+}
+
+::ng-deep .page-link:not(:disabled):not(.disabled) {
+  cursor: pointer;
+}
+
+::ng-deep .page-item:first-child .page-link {
+  margin-left: 0;
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+}
+
+::ng-deep .page-item:last-child .page-link {
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+::ng-deep .page-item.active .page-link {
+  z-index: 1;
+  color: white;
+  background-color: transparent;
+  border-color: transparent;
+}
+
+::ng-deep .page-item.disabled .page-link {
+  color: rgba(theme-color("primary"), 0.5);
+  pointer-events: none;
+  cursor: auto;
+  background-color: transparent;
+  border-color: transparent;
 }

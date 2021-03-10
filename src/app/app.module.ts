@@ -9,7 +9,6 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { CarouselModule } from 'ngx-bootstrap/carousel';
 import {CollapseModule} from 'ngx-bootstrap/collapse';
 import {TabsModule} from 'ngx-bootstrap/tabs';
-import {ProgressbarModule} from 'ngx-bootstrap/progressbar';
 import {PaginationModule} from 'ngx-bootstrap/pagination';
 import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
 import {ButtonsModule} from 'ngx-bootstrap/buttons';
@@ -18,7 +17,7 @@ import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {AccordionModule} from 'ngx-bootstrap/accordion';
 import {AlertModule} from 'ngx-bootstrap/alert';
 import { ScrollToModule } from '@nicky-lenaers/ngx-scroll-to';
-
+import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {NavbarComponent} from './navbar/navbar.component';
@@ -131,13 +130,13 @@ const appRoutes: Routes = [
     TabsModule.forRoot(),
     AlertModule.forRoot(),
     CarouselModule.forRoot(),
-    ProgressbarModule.forRoot(),
     PaginationModule.forRoot(),
     BsDropdownModule.forRoot(),
     ButtonsModule.forRoot(),
     ModalModule.forRoot(),
     TooltipModule.forRoot(),
     AccordionModule.forRoot(),
+    ProgressbarModule.forRoot(),
   ],
   providers: [AuthService],
   bootstrap: [AppComponent]

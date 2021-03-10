@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild, TemplateRef} from '@angular/core';
 import {InternalService} from '../services/internal.service';
 import {concat, BehaviorSubject, Observable, combineLatest} from 'rxjs';
-import {ProgressbarConfig} from 'ngx-bootstrap';
+import {ProgressbarConfig} from 'ngx-bootstrap/progressbar';
 import {HttpEvent, HttpClient, HttpRequest, HttpEventType, HttpParams} from '@angular/common/http';
 import {ScrollToConfigOptions, ScrollToService} from '@nicky-lenaers/ngx-scroll-to';
 import {ActivatedRoute} from '@angular/router';

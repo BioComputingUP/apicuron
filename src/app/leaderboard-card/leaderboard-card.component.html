@@ -14,14 +14,17 @@
             <input type="text"
                    class="form-control col-lg-auto"
                    formControlName="key">
-            <a type="text"
-                    class="form-control text-center"
-                    (click)="reset()"
-                    style="max-width: 4rem ">reset</a>
-
           </div>
       </form>
     </div>
+    <div class="col-md-3 input-group-sm">
+      <a type="text"
+         class="badge badge-secondary p-2" [class.badge-apicuron]="selectedBadgesMedals.value.length > 0 || searchForm.get('key').value.length > 0"
+         (click)="reset()"
+         style="max-width: 4rem ">reset</a>
+
+    </div>
+
   </div>
 
 <div class="row align-items-center">
@@ -159,12 +162,55 @@
         [maxSize]="1"
         [boundaryLinks]="true"
         (pageChanged)="currentPage.next($event)"
+        [customFirstTemplate]="firstTemplate"
+        [customLastTemplate]="lastTemplate"
+        [customPreviousTemplate]="prevTemplate"
+        [customNextTemplate]="nextTemplate"
+        [customPageTemplate]="pageTemplate"
         previousText="&lsaquo;"
         nextText="&rsaquo;"
         firstText="&laquo;"
-        lastText="&raquo;"
-        class="border-left-0 small">
+        lastText="&raquo;">
       </pagination>
+      <ng-template #firstTemplate let-disabled="disabled" let-currentPage="currentPage">
+        <ng-container *ngIf="!disabled">
+          <span class="badge badge-apicuron">&laquo;</span>
+        </ng-container>
+        <ng-container *ngIf="disabled">
+          <span class="badge badge-secondary">&laquo;</span>
+        </ng-container>
+      </ng-template>
+
+      <ng-template #lastTemplate let-disabled="disabled" let-currentPage="currentPage">
+        <ng-container *ngIf="!disabled">
+          <span class="badge badge-apicuron">&raquo;</span>
+        </ng-container>
+        <ng-container *ngIf="disabled">
+          <span class="badge badge-secondary">&raquo;</span>
+        </ng-container>
+      </ng-template>
+
+      <ng-template #prevTemplate let-disabled="disabled" let-currentPage="currentPage">
+        <ng-container *ngIf="!disabled">
+          <span class="badge badge-apicuron">&lsaquo;</span>
+        </ng-container>
+        <ng-container *ngIf="disabled">
+          <span class="badge badge-secondary">&lsaquo;</span>
+        </ng-container>
+      </ng-template>
+
+      <ng-template #nextTemplate let-disabled="disabled" let-currentPage="currentPage">
+        <ng-container *ngIf="!disabled">
+          <span class="badge badge-apicuron">&rsaquo;</span>
+        </ng-container>
+        <ng-container *ngIf="disabled">
+          <span class="badge badge-secondary">&rsaquo;</span>
+        </ng-container>
+      </ng-template>
+
+      <ng-template #pageTemplate let-page let-disabled="disabled" let-currentPage="currentPage">
+        <span style="color: black"> page {{ page.number }} </span>
+      </ng-template>
 
     </div>
     <div class="col-auto">
@@ -173,14 +219,14 @@
     </div>
     <div class="col-auto">
       <p>Show
-        <span class="badge ml-2"
+        <span class="badge badge-hover ml-2"
               [class.badge-apicuron]="pageSize.value===10"
               [class.badge-secondary]="pageSize.value!==10" (click)="pageSize.next(10)">10</span>
-        <span class="badge ml-2"
+        <span class="badge badge-hover ml-2"
               [class.badge-apicuron]="pageSize.value===20"
               [class.badge-secondary]="pageSize.value !== 20"
               (click)="pageSize.next(20)">20</span>
-        <span class="badge ml-2"
+        <span class="badge badge-hover ml-2"
               [class.badge-apicuron]="pageSize.value===50"
               [class.badge-secondary]="pageSize.value!== 50"
               (click)="pageSize.next(50)">50</span>
