@@ -7,16 +7,17 @@
             <div class="card">
               <div class="card-header"><h5>Navigate</h5></div>
               <div class="card-body">
-                <h6   (click)="scroll(top)"><p>About</p></h6>
+                <h6 [ngxScrollTo]="top" [ngxScrollToOffset]="-180"><p>About</p></h6>
                 <ul>
-                  <li><a (click)="scroll(intro)">Introduction to the APICURON</a></li>
+                  <li><a [ngxScrollTo]="intro" [ngxScrollToOffset]="-180" >Introduction to the APICURON</a></li>
                   <ul>
-                    <li><a (click)="scroll(activities)">Biocuration activities</a></li>
+                    <li><a [ngxScrollTo]="activities" [ngxScrollToOffset]="-180">Biocuration activities</a></li>
 
-                  <li><a (click)="scroll(gamification)" >Badges and scores</a></li>
+                  <li><a [ngxScrollTo]="gamification" [ngxScrollToOffset]="-180">Badges and scores</a></li>
                   </ul>
-                  <li><a (click)="scroll(license)"  >License</a></li>
-                  <li><a (click)="scroll(privacy)"   >Privacy notice</a></li>
+                  <li><a [ngxScrollTo]="becomemember" [ngxScrollToOffset]="-180">Become a member</a></li>
+                  <li><a [ngxScrollTo]="license" [ngxScrollToOffset]="-180">License</a></li>
+                  <li><a [ngxScrollTo]="privacy" [ngxScrollToOffset]="-180">Privacy notice</a></li>
                 </ul>
 
               </div>
@@ -78,7 +79,8 @@
           <p class="text-justify">
             A list of the badges and scores applied by each one of our partner databases is available.
           </p>
-
+          <h2 class="pt-3 pb-2" #becomemember>Become a member</h2>
+          <p class="text-justify"></p>
 
         </div>
       </div>

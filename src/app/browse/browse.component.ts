@@ -38,7 +38,7 @@ export class BrowseComponent implements OnInit {
   expandedElement: any;
   selectedRow = '';
   localAuth = new BehaviorSubject<object>({});
-  displayedColumns = new BehaviorSubject<object>(['family_name', 'given_name', 'orcid', 'generation_count', 'revision_count', 'invalidation_count', 'medals', 'badges', 'resources']);
+  displayedColumns = new BehaviorSubject<object>(['family_name', 'given_name', 'orcid', 'medals', 'badges', 'resources']);
   currentPage = new BehaviorSubject<object>({
     'page': 1
   });

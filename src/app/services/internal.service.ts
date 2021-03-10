@@ -71,6 +71,10 @@ export class InternalService {
     const url = this.wsUrl + 'leaderboards';
     return this.http.get(url, {params});
   }
+  getLeaderboardsWithCount(params: HttpParams): Observable<any> {
+    const url = this.wsUrl + 'leaderboards';
+    return this.http.get(url, {observe: 'response', params: params});
+  }
 
   getBrowseWithCount(params: HttpParams): Observable<any> {
     const url = this.wsUrl + 'browse';

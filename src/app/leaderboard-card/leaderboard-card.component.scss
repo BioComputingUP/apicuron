@@ -3,3 +3,11 @@ th {
   border-top: none;
 
 }
+
+
+.badge-secondary:hover {
+  text-decoration: none;
+  color: white;
+  transform: scale(1.1,1.1);
+  transition: 0.1s;
+}

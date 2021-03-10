@@ -344,5 +344,16 @@ export class ProfileComponent implements OnInit {
     );
 
   }
-
+  scroll(elementName: string, resourceURI: string) {
+    const config: ScrollToConfigOptions = {
+      target: elementName,
+      offset: -150,
+      // duration: 0.1,
+      // target: this.route.snapshot.fragment
+    };
+    this.selectedResource.next(resourceURI);
+    // setTimeout(() => {
+      this.scrolTo(this.scrollToService, config);
+    // }, 50);
+  }
 }

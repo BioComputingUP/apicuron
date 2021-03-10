@@ -71,16 +71,20 @@
 
         </div>
         <div class="col-auto ml-auto">
-          <p [ngxScrollTo]="selected" [ngxScrollToOffset]="-180"> Resources <span
-            class="badge badge-pill badge-apicuron ml-3" (click)="selectedResource.next(currStatData['resource_uri'])"
-            *ngFor="let currStatData of statByResource">{{map_resources[currStatData['resource_uri']]['resource_name']}}</span>
+          <p> Resources
+            <span
+              class="badge badge-pill badge-apicuron ml-3"
+              (click)="selectedResource.next(currStatData['resource_uri']);scroll(map_resources[currStatData['resource_uri']]['resource_name'], currStatData['resource_uri'])"
+              *ngFor="let currStatData of statByResource">
+              {{map_resources[currStatData['resource_uri']]['resource_name']}}
+            </span>
           </p>
         </div>
       </div>
     </div>
   </div>
   <div class="container-fluid container-wide py-3" #top style="min-height: 60vh; ">
-    <div class="row mb-4" id="general" #general style="padding-top: 80px">
+    <div class="row mb-4 mr-2" id="general" #general style="padding-top: 80px">
       <div class="col-auto" *ngIf="profilePictureID">
         <div class="row">
           <div class="col">
@@ -100,26 +104,26 @@
           </div>
         </div>
       </div>
-      <div class="col-auto"  *ngIf="logedIn && !profilePictureID && !profileData.value['profile_picture']">
+      <div class="col-auto mr-2"  *ngIf="logedIn && !profilePictureID && !profileData.value['profile_picture']">
         <button class="btn btn-danger btn-sm" (click)="addFiles()"> Select profile picture</button>
       </div>
 
-      <div class="col-lg-2">
-        <h5>Total annotations</h5>
-        <div class="row">
-          <div class="col-auto"><strong>Generation</strong></div>
-          <div class="col text-right">{{generalStat['generation_count'] | number:'1.0':'en-US'}}</div>
-        </div>
-        <div class="row">
-          <div class="col-auto"><strong>Revision</strong></div>
-          <div class="col text-right">{{generalStat['revision_count'] | number:'1.0':'en-US'}}</div>
-        </div>
-        <div class="row">
-          <div class="col-auto"><strong>Invalidation</strong></div>
-          <div class="col text-right">{{generalStat['invalidation_count'] | number:'1.0':'en-US'}}</div>
-        </div>
-      </div>
-      <div class="col ml-3 text-justify" *ngIf="orcidData['activities-summary']">
+<!--      <div class="col-lg-2">-->
+<!--        <h5>Total annotations</h5>-->
+<!--        <div class="row">-->
+<!--          <div class="col-auto"><strong>Generation</strong></div>-->
+<!--          <div class="col text-right">{{generalStat['generation_count'] | number:'1.0':'en-US'}}</div>-->
+<!--        </div>-->
+<!--        <div class="row">-->
+<!--          <div class="col-auto"><strong>Revision</strong></div>-->
+<!--          <div class="col text-right">{{generalStat['revision_count'] | number:'1.0':'en-US'}}</div>-->
+<!--        </div>-->
+<!--        <div class="row">-->
+<!--          <div class="col-auto"><strong>Invalidation</strong></div>-->
+<!--          <div class="col text-right">{{generalStat['invalidation_count'] | number:'1.0':'en-US'}}</div>-->
+<!--        </div>-->
+<!--      </div>-->
+      <div class="col  text-justify" *ngIf="orcidData['activities-summary']">
         <div class="row"
              *ngIf="orcidData['person'] && orcidData['person']['biography'] && orcidData['person']['biography']['content']">
           <div class="col"><h5>Biography</h5>
@@ -149,16 +153,29 @@
                      *ngFor="let currKey of orcidData['person']['keywords']['keyword']"># {{currKey['content']}}</span>
             </p></div>
         </div>
+        <div class="row" *ngIf="logedIn">
+          <div class="col">
+            <h5>Total curation events</h5>
+            <p>generation <span
+              class="badge badge-apicuron"> # {{generalStat['generation_count']  | number:'1.0':'en-US'}}</span>,
+              revision <span
+                class="badge badge-apicuron"> # {{generalStat['revision_count'] | number:'1.0':'en-US'}}</span>,
+              invalidation <span
+                class="badge badge-apicuron"> # {{generalStat['invalidation_count'] | number:'1.0':'en-US'}}</span></p>
+          </div>
+
+        </div>
+
         <!---->
         <!--      <p *ngIf="orcidData['person']['keywords'] && orcidData['person']['keywords']['keyword'].length > 0">-->
         <!--        <strong> </strong>-->
         <!--      </p>-->
       </div>
     </div>
-    <h5 #selected id="selected">Contributed resources</h5>
-    <div class="row" *ngFor="let currStatData of statByResource">
+    <h5>Contributed resources</h5>
+    <div class="row" #databases id="databases" *ngFor="let currStatData of statByResource">
       <div class="col" *ngIf="currStatData['resource_uri'] === selectedResource.value">
-        <div class="card card-body">
+        <div class="card card-body" [id]="map_resources[currStatData['resource_uri']]['resource_name']">
 
           <div class="row">
             <div class="col-auto mr-auto">
@@ -244,13 +261,7 @@
                              [database]="selectedResource.value"></app-details-table>
         </div>
       </div>
-
-    </div>
-    <div class="row" #databases id="databases">
-      <div [class.col-12]="selectedResource.value !== currStatData['resource_uri']"
-           [class.d-none]="selectedResource.value === currStatData['resource_uri']"
-           (click)="selectedResource.next(currStatData['resource_uri'])"
-           *ngFor="let currStatData of statByResource">
+      <div class="col" *ngIf="currStatData['resource_uri'] !== selectedResource.value">
         <div class="card card-body">
           <div class="row">
             <div class="col-auto mr-auto">
@@ -276,14 +287,14 @@
             <div class="col">
               <p class="ml-3">
                 <strong>Number of curation events</strong>
-                generation <span class="badge badge-apicuron"># {{currStatData['generation_count']}}</span>,
-                revision <span class="badge badge-apicuron"># {{currStatData['revision_count']}}</span>,
-                invalidation <span class="badge badge-apicuron"># {{currStatData['invalidation_count']}}</span>
+                generation <span class="badge badge-apicuron"># {{currStatData['generation_count'] | number:'1.0':'en-US'}}</span>,
+                revision <span class="badge badge-apicuron"># {{currStatData['revision_count'] | number:'1.0':'en-US'}}</span>,
+                invalidation <span class="badge badge-apicuron"># {{currStatData['invalidation_count'] | number:'1.0':'en-US'}}</span>
               </p>
             </div>
 
             <div class="col-auto">
-              <a [ngxScrollTo]="selected" [ngxScrollToOffset]="-180" class="badge badge-download mr-2 mb-2"> Expand <i
+              <a (click)="scroll(map_resources[currStatData['resource_uri']]['resource_name'], currStatData['resource_uri'])" class="badge badge-download mr-2 mb-2"> Expand <i
                 class="material-icons" style="font-size: small">unfold_more</i></a>
             </div>
           </div>

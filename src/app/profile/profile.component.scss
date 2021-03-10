@@ -29,6 +29,7 @@ dl {
   //border: 3px double #ccc;
   //padding: 0.5em;
 }
+
 dt {
   float: left;
   clear: left;
@@ -44,16 +45,18 @@ dd {
   text-align: left;
 
 }
+
 .fixed-top {
   top: 60px;
   z-index: 10;
-  box-shadow: 0px 11px 8px -5px rgba(0,0,0,0.35);
+  box-shadow: 0px 11px 8px -5px rgba(0, 0, 0, 0.35);
   background-color: white;
   transition: 0.25s;
 
 }
+
 .custom-control-input:checked ~
 .custom-control-label::before {
-  border-color:  #4D194D !important;
-  background-color:  #4D194D !important;
+  border-color: #4D194D !important;
+  background-color: #4D194D !important;
 }
