@@ -13,7 +13,6 @@ export class MedalViewComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    console.log(this.medal);
   }
 
 }

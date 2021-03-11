@@ -115,7 +115,6 @@ export class ProfileComponent implements OnInit {
             }
             this.mapBadgeCategories[currResource['resource_uri']][currBadge['category']].push(currBadge);
           });
-          console.log(Object.keys(this.mapBadgeCategories[currResource['resource_uri']]));
 
 
           Object.keys(this.mapBadgeCategories[currResource['resource_uri']]).forEach(currCategory => {
