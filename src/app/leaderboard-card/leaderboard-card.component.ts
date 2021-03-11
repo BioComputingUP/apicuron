@@ -80,7 +80,7 @@ export class LeaderboardCardComponent implements OnInit {
 
   }
   reset() {
-
+    this.selectedBadgesMedals.next([]);
     this.searchForm.get('key').setValue('');
   }
 

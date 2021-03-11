@@ -176,10 +176,10 @@
               <p><strong>Resource </strong>
                 <span *ngIf="map_resources.hasOwnProperty(currStatData['resource_uri'])">
                     {{map_resources[currStatData['resource_uri']]['resource_name']}}
-                  </span>
+                </span>
                 <span *ngIf="!map_resources.hasOwnProperty(currStatData['resource_uri'])">
                                       {{currStatData['resource_uri']}}
-                  </span>
+                </span>
                 <span class="ml-5" *ngIf="currStatData['ranking']">
                 <strong>Ranking </strong>
                 <a class="badge  badge-apicuron"
