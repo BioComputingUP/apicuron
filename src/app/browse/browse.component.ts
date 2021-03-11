@@ -327,7 +327,7 @@ export class BrowseComponent implements OnInit {
       });
 
 
-    return '' + out_put.join('<br>') + '';
+    return '' + out_put.join(' ') + '';
   }
 
   calc_html_categories(row) {
