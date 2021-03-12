@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {InternalService} from '../services/internal.service';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {ScrollToConfigOptions, ScrollToService} from '@nicky-lenaers/ngx-scroll-to';
 import {BehaviorSubject} from 'rxjs';
 
@@ -11,7 +11,9 @@ import {BehaviorSubject} from 'rxjs';
 })
 export class DatabaseComponent implements OnInit {
  resourcesDescription = false;
-  constructor(private scrollToService: ScrollToService, private route: ActivatedRoute, private internalService: InternalService) { }
+  constructor(private scrollToService: ScrollToService,
+              private router: Router,
+              private route: ActivatedRoute, private internalService: InternalService) { }
 
   selectedBadgesMedals = new BehaviorSubject<object[]>([]);
   badge_categories = [];
@@ -29,7 +31,7 @@ export class DatabaseComponent implements OnInit {
     console.log('this.route.snapshot.fragment', this.route.snapshot.fragment);
     // console.log('window.location', window.location);
     // console.log(resource_uri, resource_uri.length > 1 );
-    if (resource_uri.length > 1) {
+    if (resource_uri?.length > 1) {
       this.internalService.GetResearces({
         resource_uri: resource_uri
       }).subscribe(data => {
@@ -85,6 +87,8 @@ export class DatabaseComponent implements OnInit {
         this.scrolTo(this.scrollToService, config);
 
       });
+    } else {
+      this.router.navigateByUrl('/databases');
     }
 // console.log(resource_id)
     window.addEventListener("scroll", event => {

@@ -9,10 +9,17 @@ export class MedalViewComponent implements OnInit {
   @Input() medal;
   @Input() atLeaderboard = false;
   @Input() databaseName = '';
+  color_class = '';
+  style_info = {};
 
   constructor() { }
 
   ngOnInit(): void {
+    if (this.medal?.color[0] === '#') {
+      this.style_info = {background: this.medal.color};
+    } else if (this.medal?.color?.length > 0){
+      this.color_class = this.medal.color;
+    }
   }
 
 }
