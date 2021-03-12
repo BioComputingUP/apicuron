@@ -28,7 +28,7 @@
                       <h2>{{currResource['resource_name']}} - {{currResource['resource_long_name']}}</h2>
                     </div>
                     <div class="col col-auto">
-                      <a class="btn btn-apicuron btn-sm" routerLink="/databases/{{currResource['resource_id']}}"> See details  <i
+                      <a class="btn btn-apicuron btn-sm" routerLink="/database" [queryParams]="{resource_uri: currResource['resource_uri']}" > See details  <i
                                                                                                                                 class="icon icon-common icon-analyse-graph"></i></a>
 
                     </div>

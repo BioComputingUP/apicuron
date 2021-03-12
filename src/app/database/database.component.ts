@@ -21,15 +21,17 @@ export class DatabaseComponent implements OnInit {
 
   ngOnInit(): void {
 
-    const resource_id = window.location.pathname.substring(11);
+   console.log(this.route.snapshot.queryParams);
+    const resource_uri = this.route.snapshot.queryParams.resource_uri;
+    // const resource_id = window.location.pathname.substring(11);
 
     // console.log('this.route.snapshot', this.route.snapshot);
     console.log('this.route.snapshot.fragment', this.route.snapshot.fragment);
     // console.log('window.location', window.location);
-    console.log(resource_id, resource_id.length > 1 );
-    if (resource_id.length > 1) {
+    // console.log(resource_uri, resource_uri.length > 1 );
+    if (resource_uri.length > 1) {
       this.internalService.GetResearces({
-        resource_id: resource_id
+        resource_uri: resource_uri
       }).subscribe(data => {
         if (data.length === 1) {
           this.resourcesDescription = data[0];

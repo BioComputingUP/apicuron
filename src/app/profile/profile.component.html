@@ -184,7 +184,7 @@
                 <strong>Ranking </strong>
                 <a class="badge  badge-apicuron"
                    tooltip="see at Leaderboard"
-                   routerLink="/databases/{{ map_resources[currStatData['resource_uri']]['resource_id']}}"
+                   routerLink="/database" [queryParams]="{resource_uri: currStatData['resource_uri']}"
                    fragment="leaderboard"># {{currStatData['ranking']}}</a>
               </span>
               </p>
@@ -253,7 +253,7 @@
                 <strong>Ranking </strong>
                 <a class="badge  badge-apicuron"
                    tooltip="see at Leaderboard"
-                   routerLink="/databases/{{ map_resources[currStatData['resource_uri']]['resource_id']}}"
+                   routerLink="/database" [queryParams]="{resource_uri: currStatData['resource_uri']}"
                    fragment="leaderboard"># {{currStatData['ranking']}}</a>
               </span>
               </p>

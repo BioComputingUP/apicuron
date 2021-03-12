@@ -26,6 +26,15 @@
 }
 
 
+.color-gradient {
+//  	#b88746
+//  background: linear-gradient(328deg, darken(#999999, 10) 2%, #999999 55%,  lighten(#999999, 30) 100%);
+  background: linear-gradient(328deg, hsla(34, 45%, 30%) 2%, hsla(34, 45%, 50%) 35%, hsla(34, 45%, 50%) 75%,  hsla(34, 85%, 70%) 100%);
+  //background: linear-gradient(328deg, darken(#b88746, 10) 2%, #b88746 55%,  lighten(#b88746, 30) 100%);
+
+}
+
+
 .gold {
   background: linear-gradient(328deg, rgba(159,117,61,1) 2%, rgba(184,135,70,1) 55%, rgba(245,196,94,1) 100%);
 
