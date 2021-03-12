@@ -1,7 +1,6 @@
 <div id="anchor1" class="container-fluid container-wide">
 
   <div class="row pt-3">
-
     <div class="col-lg-2 d-none d-lg-block d-xl-block">
       <div class="sticky sidebar">
             <div class="card">
@@ -20,7 +19,12 @@
                   <li (click)="scroll(leaderboards)" ><a>Leaderboards</a></li>
                 </ul>
 
-
+                <div (click)="scroll(private)">Private API</div>
+                <ul>
+                  <li (click)="scroll(submit_description)" ><a>Submit description</a></li>
+                 <li (click)="scroll(submit_activity)" ><a>Submit activity</a></li>
+                  <li (click)="scroll(delete_activity)" ><a>Delete activity</a></li>
+                </ul>
               </div>
             </div>
 
@@ -28,7 +32,7 @@
     </div>
 
 
-    <div class="col-lg-10 text-justify">
+    <div class="col-lg-10 text-justify mb-5">
 
       <!-- web interface-->
       <h1 #top>Help</h1>
@@ -40,16 +44,51 @@
         <strong  (click)="scroll(public)">API endpoints</strong>
         and the output format see the next section.
       </p>
-      <p>
+      <p class="mb-3">
         The APICURON graphical user interface allows easy access to the biocuration activities of our partner databases in
         a graphical way. Biocurators can be searched from the <a routerLink="/browse">Curators page</a> or from the search box
         on the <a routerLink="/">Home page</a>.
       </p>
 
 
+      <h4 class="mt-2" #databases id="databases">Databases page</h4>
+      <p class="mb-3">
+        The <a routerLink="/databases">Databases page</a>  lists all member databases registered to APICURON.
+        Member databases periodically push curation activities and APICURON synchronously
+        calculates achievements and leaderboards.
+      </p>
+
+      <h4 class="mt-2" #database id="database">Database specific page</h4>
+      By clicking on a card in the <a routerLink="/databases">Databases page</a>, you get redirected to a
+       page dedicated to a specific resource.
+      <ol class="mb-3">
+        <li>
+          <strong>Database description</strong>
+          as provided by the database project manager
+        </li>
+        <li>
+          <strong>Leaderboard</strong>
+          the ranking of curators based on the total amount of curation activities weighted by the corresponding
+          score
+        </li>
+        <li>
+          <strong>Available badges</strong>
+          and the corresponding definition
+        </li>
+        <li>
+          <strong>Available medals</strong>
+          and the corresponding definition
+        </li>
+        <li>
+          <strong>Curation activity records</strong>
+          the full list of curation activities submitted to APICURON
+        </li>
+      </ol>
+
+
       <h4 class="mt-2" #browse id="browse">Curators page</h4>
-      The <a routerLink="/browse">Curators page</a> is composed of a result table, a sidebar and a search bar.
-      <ul>
+      The <a routerLink="/curators">Curators page</a> is composed of a result table, a sidebar and a search bar.
+      <ul class="mb-3">
         <li>
           <strong>Table</strong>
           By default it shows the first entries of the database
@@ -63,10 +102,13 @@
           resource identifier, ORCID, etc.
         </li>
       </ul>
-      <h4 class="mt-2" #biocurator id="biocurator">Profile page</h4>
-      By clicking on a row of the table, you get redirected to the profile page of a biocurator. The profile
-      of a biocurator features different sections.
-      <ol>
+
+
+      <h4 class="mt-2" #biocurator id="biocurator">Personal profile page</h4>
+      By clicking on a row of the curators table in the <a routerLink="/curators">Curators page</a> or
+      from the search box in the <a routerLink="/">Home page</a>, you get redirected to the
+      personal profile page of a biocurator. The profile page features different sections.
+      <ol class="mb-5">
         <li>
           <strong>Personal information</strong> name and ORCID
          </li>
@@ -88,11 +130,10 @@
 
 
 
-
       <!-- API reports -->
-      <h2 id="public" class="pt-3 pb-2" #public>Public API</h2>
+      <h2 id="public" class="my-3" #public>Public API</h2>
 
-      <h4 class="pb-2" #reports>Reports (biocuration events or activities)</h4>
+      <h4 class="mb-2" #reports>Reports (biocuration events or activities)</h4>
       <div class="btn-group">
         <label class="btn btn-primary">GET</label>
         <a href="{{wsname}}reports" class="btn btn-outline-primary-input mb-2">{{wsname}}<strong>reports</strong></a>
@@ -377,6 +418,299 @@
 
       <strong>Output format</strong>
       <pre class="style-code mb-5 mt-3">{{output["leaderboards"] | json}}</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <h2 id="private" class="pt-3 pb-2" #private>Private API</h2>
+
+      All private endpoints are only available to registered organizations and intended to be used only for submitting
+      curation data. To become an APICURON member database and open an account to submit data please
+      <strong>contact us</strong> at
+      <a href="mailto:apicuron@ngp-net.bio.unipd.it?subject=Database membership request">apicuron@ngp-net.bio.unipd.it</a>
+
+
+      <!-- API submit_description -->
+      <h4 class="pb-2 mt-3" #submit_description>Submit description</h4>
+      <div class="btn-group">
+        <label class="btn btn-primary">POST</label>
+        <a href="{{wsname}}submit_description" class="btn btn-outline-primary-input mb-2">{{wsname}}<strong>submit_description</strong></a>
+      </div>
+
+      <dl>
+        <dt>Purpose</dt>
+        <dd>Submit resource setting and definition to APICURON. It takes the list and definition of activity terms and
+          the corresponding scores. Badges and medals definitions and rules and a short text describing the resource</dd>
+        <dt>Return</dt>
+        <dd>A confirmation JSON objects</dd>
+      </dl>
+
+      <strong>Request fields</strong>
+      <table class="table table-sm table-striped small">
+        <thead>
+        <tr>
+          <th>Field</th>
+          <th>Subfield</th>
+          <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr>
+          <td>resource_uri</td>
+          <td></td>
+          <td>This is the identifier used to identify the resource and activity terms (see submit activity)</td>
+        </tr>
+
+        <tr>
+          <td>resource_url</td>
+          <td></td>
+          <td>Resource URL</td>
+        </tr>
+
+        <tr>
+          <td>resource_name</td>
+          <td></td>
+          <td>Resource name</td>
+        </tr>
+
+        <tr>
+          <td>resource_long_name</td>
+          <td></td>
+          <td>Resource full name</td>
+        </tr>
+
+        <tr>
+          <td>resource_description</td>
+          <td></td>
+          <td>Text describing the resource shown in the APICURON database pages</td>
+        </tr>
+
+        <tr>
+          <td>terms_def</td>
+          <td></td>
+          <td>
+            The definition of an activity term. Each activity term has the following fields. See tables below
+          </td>
+        </tr>
+
+        <!-- activity terms subfields -->
+        <tr>
+          <td></td>
+          <td>activity_term</td>
+          <td>Activity term identifier</td>
+        </tr>
+
+        <tr>
+          <td></td>
+          <td>activity_name</td>
+          <td>Activity term name</td>
+        </tr>
+
+        <tr>
+          <td></td>
+          <td>activity_category</td>
+          <td>Activity term category. Either "generation", "revision" or "invalidation"</td>
+        </tr>
+
+        <tr>
+          <td></td>
+          <td>score</td>
+          <td>An interger number representing the effort or importance of the curation activity</td>
+        </tr>
+
+        <tr>
+          <td></td>
+          <td>description</td>
+          <td>A human readable description of the activity term</td>
+        </tr>
+
+
+        <tr>
+          <td>achievements_def</td>
+          <td></td>
+          <td>
+            The definition of achievements and parameters for their calculation. See tables below
+          </td>
+        </tr>
+
+        <!-- achievements subfields -->
+        <tr>
+          <td></td>
+          <td>type</td>
+          <td>Either "badge or "medal"</td>
+        </tr>
+
+        <tr>
+          <td></td>
+          <td>category</td>
+          <td>A number to identify a group of related badges/medals</td>
+        </tr>
+
+        <tr>
+          <td></td>
+          <td>name</td>
+          <td>Human readable name of the badge/medal</td>
+        </tr>
+
+        <tr>
+          <td></td>
+          <td>list_terms</td>
+          <td>The list of activity terms to be considered to assign the badge/medal</td>
+        </tr>
+
+        <tr>
+          <td></td>
+          <td>color</td>
+          <td>
+            The hexadecimal color code or color name used ot visualize the badge/medal.
+            You can se gold/silver/bronze for a metal effect
+          </td>
+        </tr>
+
+        <tr>
+          <td></td>
+          <td>count_threshold</td>
+          <td><strong>Only badges</strong>. The count threshold to assign the badge</td>
+        </tr>
+
+        <tr>
+          <td></td>
+          <td>score_relative</td>
+          <td>
+            <strong>Only medals</strong>. The ranking over other database curators to assign the medal. The ranking is calculated by multiplying the
+            activities listed in "list_terms" with the corresponding score
+          </td>
+        </tr>
+
+        <tr>
+          <td></td>
+          <td>first_day</td>
+          <td><strong>Only medals</strong>. Consider activity terms from this date</td>
+        </tr>
+
+        <tr>
+          <td></td>
+          <td>last_day</td>
+          <td><strong>Only medals</strong>. Consider activity terms to this date</td>
+        </tr>
+
+
+        </tbody>
+      </table>
+
+      <strong>Example</strong>
+      <pre class="style-code mb-5 mt-3">{{submit['description'] | json}}</pre>
+
+
+
+
+
+
+
+      <!-- API submit_description -->
+      <h4 class="pb-2 mt-3" #submit_activity>Submit activity</h4>
+      <div class="btn-group">
+        <label class="btn btn-primary">POST</label>
+        <a href="{{wsname}}submit_activity" class="btn btn-outline-primary-input mb-2">{{wsname}}<strong>submit_activity</strong></a>
+      </div>
+
+      <dl>
+        <dt>Purpose</dt>
+        <dd>Submit curation activities to APICURON</dd>
+        <dt>Return</dt>
+        <dd>A confirmation JSON objects</dd>
+      </dl>
+
+      <strong>Request fields</strong>
+      <table class="table table-sm table-striped small">
+        <thead>
+        <tr>
+          <th>Field</th>
+          <th></th>
+          <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr>
+          <td>resource_uri</td>
+          <td></td>
+          <td>Unique resource identifier</td>
+        </tr>
+
+        <tr>
+          <td>reports</td>
+          <td></td>
+          <td>The list of curation activity objects that are stored in APICURON</td>
+        </tr>
+          <tr>
+            <td></td>
+            <td>activity_term</td>
+            <td>The curation activity term identifier</td>
+          </tr>
+
+          <tr>
+            <td></td>
+            <td>resource_uri</td>
+            <td>The database identifier</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>timestamp</td>
+            <td>The date and time of the curation activity</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>curator_orcid</td>
+            <td>The <a href="https://orcid.org/" target="_blank">ORCID</a> identifier of the biocurator</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>entity_uri</td>
+            <td>The identifier of the curated object in the source database</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <strong>Example</strong>
+      <pre class="style-code mb-5 mt-3">{{submit['activity'] | json}}</pre>
+
+
+
+
+
+      <!-- API delete_activity -->
+      <h4 class="pb-2 mt-3" #delete_activity>Delete activity</h4>
+      <div class="btn-group">
+        <label class="btn btn-primary">POST</label>
+        <a href="{{wsname}}delete_activity" class="btn btn-outline-primary-input mb-2">{{wsname}}<strong>delete_activity</strong></a>
+      </div>
+
+      <dl>
+        <dt>Purpose</dt>
+        <dd>Delete curation activities to APICURON. Useful if some activities are submited by mistake or if the
+        member database changes the tracked curation activities</dd>
+        <dt>Return</dt>
+        <dd>A confirmation JSON objects</dd>
+      </dl>
+
+      <strong>Request fields</strong>
+      <p>
+        Same format of one object as defined in the "reports" field of the submit_activity endpoint
+      </p>
+
 
     </div>
 

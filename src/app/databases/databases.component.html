@@ -14,10 +14,71 @@
   </div>
 </div>
 
+
+
+
 <div class="container-fluid container-wide" #top style="padding-top: 70px">
   <div class="row mt-3">
     <div class="col">
-      <div class="row" *ngFor="let currResource of listResourcesDescriptions">
+      This page lists all <strong>member databases</strong> registered to APICURON. Member databases
+      periodically push curation activities and APICURON
+      By clicking on the "See details" button you can visit database pages where you can find the
+      <strong>leaderboard</strong>, the
+      <strong>achievements definition</strong>
+      (badges, medals) and the full list of <strong>curation records</strong>
+
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-1 text-right">
+      <span class="badge badge-pill badge-apicuron">Warning</span>
+    </div>
+    <div class="col">
+      <strong>A comparison across databases is meaningless </strong>.
+      Different curation databases evaluate and weight curation activities differently.
+      Each database defines <strong>curation activities</strong> at <strong>different granularity</strong>.
+      The <strong>scores</strong> assigned to curation activities may have <strong>different meanings</strong> in different databases.
+      For some databases scores are proportional to the curation effort, for other databases scores
+      represent the importance of an activity
+
+    </div>
+  </div>
+
+  <!--<div class="row py-2">
+    <div class="col-2 text-right"><strong>Curation activities</strong></div>
+    <div class="col">Each database defines curation activities with different granularity</div>
+  </div>
+  <div class="row py-2">
+    <div class="col-2 text-right"><strong>Activity scores</strong></div>
+    <div class="col">
+      The scores assigned to curation activities may have different meanings in different databases.
+      Some databases define scores proportional to the curation effort, other databases define scores
+      based on the importance of an activity
+    </div>
+  </div>
+  <div class="row py-2">
+    <div class="col-2 text-right"><strong>Badges</strong></div>
+    <div class="col">
+      Badges are accumulated based on the amount of a curation activities performed by a curator.
+      Each badge is assigned based on one activity or a group of activities
+    </div>
+  </div>
+  <div class="row py-2">
+    <div class="col-2 text-right"><strong>Medals</strong></div>
+
+    <div class="col">
+      Medals are earned based on ranking. The ranking is calculated between curators of a single database by
+      multiplying curation activities by the corresponding score.
+      Each medal represents one or more curation activities.
+    </div>
+  </div>-->
+
+
+
+  <div class="row mt-3">
+    <div class="col">
+      <div class="row mb-3" *ngFor="let currResource of listResourcesDescriptions">
         <div class="col">
           <div class="card">
             <div class="card-body card-database-body">

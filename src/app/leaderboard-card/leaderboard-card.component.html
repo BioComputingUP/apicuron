@@ -27,7 +27,7 @@
 
   </div>
 
-<div class="row align-items-center">
+<div class="row align-items-cente mb-4">
   <div class="col-md-8 offset-md-2 text-center" *ngIf="selectedBadgesMedals.value.length > 0">
     <span *ngFor="let currBadgeMedal of selectedBadgesMedals.value; let index = index">
       <app-badge-view (click)="removeBadgeMedal(index)"

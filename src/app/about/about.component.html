@@ -41,32 +41,62 @@
             concept of gamification, therefore relying on a system of badges and scores that are used to recognize the
             work of biocurators and at the same time encourage and motivate them.
           </p>
-          <p class="text-justify">
-            APICURON is highly flexible and allows partner databases to define their own list of badges and rules to
-            assign them.
+
+          <p>
+            APICURON serves as an external tracker of biocuration activities of each one of its partner resource,
+            playing a crucial role not only in well-known and established databases but also in smaller,
+            newer manually curated resources and, behind a firewall, also for non-academic institutions and research companies
+            where biocuration is required with the aim of properly crediting the work of biocurators,
+            raising awareness to the crucial role played by biocuration in scientific research and promoting good practices.
           </p>
-          <h4 class="mt-2" #activities id="activities">Biocuration activities</h4>
+
+          <p class="text-justify">
+            Registered resources (Member databases) submit biocuration events to the APICURON web server.
+            APICURON stores biocuration activities and calculates achievements (medals, badges) and leaderboards on the fly.
+            Results are served through a public API. APICURON can be cross-referenced by ORCID. Third-party databases
+            can use APICURON to monitor biocurators work and human users can visit the APICURON website to see
+            biocurators achievements and ranking.
+          </p>
+
+          <div class="row justify-content-center">
+            <div class="col-10">
+              <img class="img-fluid my-3" src="assets/apicuron workflow_transparent.png">
+
+            </div>
+          </div>
+
+
+          <h4 class="mt-4" #activities id="activities">Biocuration activities</h4>
           <p class="text-justify">The description of a curation event in APICURON is provided by four key components:
-            entity, activity, agent and timestamp. These key elements fulfill the recommendation of Thessen et al.</p>
+            entity, activity, agent and timestamp. These key elements fulfill the recommendations of
+            <a href="https://datascience.codata.org/articles/10.5334/dsj-2019-054/">Thessen et al.</a></p>
           <ul>
-            <li>Entity: it corresponds to the curated data object, which is identified by using the identifiers.org
+            <li>
+              <strong>Entity</strong>
+              it corresponds to the curated data object, which is identified by using the identifiers.org
               resolving system.
             </li>
-            <li>Activity: this is the actual curation activity, such as “entry_creation” or “evidence_update”. Although
+            <li>
+              <strong>Activity</strong>
+              this is the actual curation activity, such as “entry_creation” or “evidence_update”. Although
               different databases can define different activities, those need to be mapped to PROV term PROV is a W3C
               recommendation that provides a way to define the life cycle of an object. PROV terms are: generation,
               revision and invalidation.
             </li>
-            <li>Agent: the biocurator that has performed the biocuration activity. In APICURON biocurators are
+            <li>
+              <strong>Agent</strong>
+              the biocurator that has performed the biocuration activity. In APICURON biocurators are
               identified by their ORCID, allowing them to make their contributions citable.
             </li>
-            <li>Timestamp: it provides the information, i.e. the date and time of the day, of when a biocuration
+            <li>
+              <strong>Timestamp</strong>
+              it provides the information, i.e. the date and time of the day, of when a biocuration
               activity was performed. Each curation report is accessible by users via API.
             </li>
           </ul>
           A list of the entity and activity terms for each one of our partner databases is available.
 
-          <h4 class="mt-2" #gamification id="gamification">Badges and scores</h4>
+          <h4 class="mt-2" #gamification id="gamification">Gamification</h4>
           <p class="text-justify">
             Gamification is a trending topic that consists of providing motivational affordances and “gameful”
             experiences
@@ -80,7 +110,34 @@
             A list of the badges and scores applied by each one of our partner databases is available.
           </p>
           <h2 class="pt-3 pb-2" #becomemember>Become a member</h2>
-          <p class="text-justify"></p>
+          <p class="text-justify">
+
+            We welcome all manually curated resources or biocuration organizations, especially those relying on community curation, to become APICURON partners.
+            Becoming an APICURON partner is free of charge.
+            Each registered resource can directly
+            submit data through the APICURON API after receiving credentials.
+
+            We provide support for the definition of the
+            biocuration activities, associated scores, badges and medals.
+
+            We encourage the submission through the API but we are still open to include small or brand new resources
+            that do not have enough resources to implement a web server able to push data. In that case APICURON
+            developers will take care of collecting (pulling) curation activities manually directly from the connecting resource.
+
+
+
+
+
+
+
+
+          </p>
+
+          <p>
+            To become an APICURON member database and open an account to submit data please
+            <strong>contact us</strong> at
+            <a href="mailto:apicuron@ngp-net.bio.unipd.it?subject=Database membership request">apicuron@ngp-net.bio.unipd.it</a>
+          </p>
 
         </div>
       </div>
@@ -96,7 +153,7 @@
             This work is licensed under a
             <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
               Creative Commons Attribution 4.0 International License
-            </a>.
+            </a>
 
           </div>
 
@@ -118,7 +175,7 @@
           Viale G. Colombo 3<br>
           35131 Padua, Italy<br>
           <i class="fa fa-phone"></i> +39 049 827 6269<br>
-          <i class="fa fa-envelope"></i> ped@ngp-net.bio.unipd.it
+          <i class="fa fa-envelope"></i> apicuron@ngp-net.bio.unipd.it
         </div>
         <div class="col-6">
           <strong>Data protection officer</strong>'s contact details are:<br>
