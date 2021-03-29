@@ -145,5 +145,8 @@
       }
     }
   },
-  "defaultProject": "apicuron-ui"
+  "defaultProject": "apicuron-ui",
+  "cli": {
+    "analytics": false
+  }
 }

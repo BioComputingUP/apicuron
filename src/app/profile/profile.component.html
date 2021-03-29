@@ -44,12 +44,13 @@
             <div class="modal-body text-justify">
               <p>By selecting this option you toggle your visibility.
                 <br>
-                When visibility is toggle off your profile information and curation work,
-                including achievements and leader board ranking, cannot be accessed
-                by any other user or API request.</p>
-              <p>Should you not agree into participating in APICURON, please inform us and your biological resource
-                provider
-                and ask them to not submit your biocuration activities to APICURON.</p>
+                When visibility is switched off, your profile information and biocuration activities are not visible to
+                APICURON users and curators.
+                <br>
+                By switching the visibility on, your profile information and all biocuration activities - including
+                achievements and leaderboard rankings - will be visible to all APICURON users and available via API
+                requests.
+              <p>If you would like to opt out from APICURON, send us an email at apicuron@ngp-net.bio.unipd.it.</p>
               <p>
                 <span class="btn btn-sm btn-danger"
                       *ngIf="!localAuth.value.hasOwnProperty('hide')"
