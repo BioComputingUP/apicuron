@@ -54,6 +54,7 @@ import { LeaderboardPageComponent } from './leaderboard-page/leaderboard-page.co
 import { BadgeViewComponent } from './badge-view/badge-view.component';
 import { MedalViewComponent } from './medal-view/medal-view.component';
 import { DatabaseComponent } from './database/database.component';
+import { NotRegisteredComponent } from './not-registered/not-registered.component';
 
 const appRoutes: Routes = [
   {path: 'curators', component: BrowseComponent},
@@ -69,6 +70,7 @@ const appRoutes: Routes = [
   {path: 'setting', component: DashboardComponent},
   { path: 'orcid/:orcid', component: ProfileComponent},
   // { path: 'editprofile/:orcid', component: ProfileComponent},
+  {path: 'not_registered', component: NotRegisteredComponent},
   {path: '', component: HomeComponent},
   {path: '**', component: PageNotFoundComponent}
 ];
@@ -105,7 +107,8 @@ const appRoutes: Routes = [
     LeaderboardPageComponent,
     BadgeViewComponent,
     MedalViewComponent,
-    DatabaseComponent
+    DatabaseComponent,
+    NotRegisteredComponent
   ],
   imports: [
     RouterModule.forRoot(
