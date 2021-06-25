@@ -58,8 +58,6 @@ export class BrowseComponent implements OnInit {
   }
 
   ngOnInit() {
-
-
     let redirect_homepage = this.route.snapshot.queryParams.hasOwnProperty('from_homepage');
     this.searchForm = this.fb.group({
       area: null,

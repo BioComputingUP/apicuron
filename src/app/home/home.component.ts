@@ -41,7 +41,6 @@ private internalService: InternalService) { }
   }
 
   goTocuratorsPage() {
-
-    this.router.navigate(['curators'], {queryParams: {curator_name: this.searchFormControl.value, from_homepage: 'true'}})
+    this.router.navigate(['curators'], {queryParams: {curator_name: this.searchFormControl.value, from_homepage: 'true'}});
   }
 }
