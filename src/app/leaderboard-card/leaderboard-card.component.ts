@@ -43,7 +43,11 @@ export class LeaderboardCardComponent implements OnInit {
       const search_params = {};
       search_params[formData.area] = formData.key;
       search_params['achievements'] = selectedBadgesMedals.map(x => x['name']);
-      search_params['resource'] = this.database['resource_uri'].substr(42);
+      if (this.database['resource_uri'].indexOf('egistry.identifiers.o') > 0) {
+        search_params['resource'] = this.database['resource_uri'].substr(42);
+      } else {
+        search_params['resource'] = this.database['resource_uri'];
+      }
       search_params['page_size'] = pageSize.toString();
       search_params['page'] = (currentPage['page'] - 1).toString();
 

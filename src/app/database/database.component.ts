@@ -27,8 +27,8 @@ export class DatabaseComponent implements OnInit {
     const resource_uri = this.route.snapshot.queryParams.resource_uri;
     // const resource_id = window.location.pathname.substring(11);
 
-    // console.log('this.route.snapshot', this.route.snapshot);
-    console.log('this.route.snapshot.fragment', this.route.snapshot.fragment);
+    console.log('resource_uri', this.route.snapshot.queryParams.resource_uri);
+    // console.log('this.route.snapshot.fragment', this.route.snapshot.fragment);
     // console.log('window.location', window.location);
     // console.log(resource_uri, resource_uri.length > 1 );
     if (resource_uri?.length > 1) {

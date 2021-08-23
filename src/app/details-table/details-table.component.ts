@@ -53,7 +53,7 @@ export class DetailsTableComponent implements OnInit {
 
     this.searchForm = this.fb.group({
       textSearch: null,
-      firstDay:  new Date(1990, 0, 1),
+      firstDay:  new Date(1960, 0, 1),
       lastDay:  new Date()
     });
 

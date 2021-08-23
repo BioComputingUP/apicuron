@@ -16,10 +16,9 @@
         <div class="col pt-1 ">
           <span class="ml-4" [ngxScrollTo]="general" [ngxScrollToOffset]="-180">General description</span>
           <span class="ml-4" [ngxScrollTo]="leaderboard" [ngxScrollToOffset]="-180">Leaderboard</span>
-          <span class="ml-4" [ngxScrollTo]="badges" [ngxScrollToOffset]="-180">Badges</span>
-          <span class="ml-4" [ngxScrollTo]="medals" [ngxScrollToOffset]="-180">Medals</span>
+          <span class="ml-4" *ngIf="badge_categories.length > 0" [ngxScrollTo]="badges" [ngxScrollToOffset]="-180">Badges</span>
+          <span class="ml-4" *ngIf="medal_categories.length > 0" [ngxScrollTo]="medals" [ngxScrollToOffset]="-180">Medals</span>
           <span class="ml-4" [ngxScrollTo]="terms" [ngxScrollToOffset]="-180">Biocuration activities</span>
-
         </div>
       </div>
     </div>
@@ -42,7 +41,7 @@
                           [selectedBadgesMedals]="selectedBadgesMedals"></app-leaderboard-card>
 
 
-    <h3 id="badges" class="mt-4" #badges>Badges</h3>
+    <h3 id="badges" class="mt-4" #badges><span  *ngIf="badge_categories.length > 0">Badges</span></h3>
     <p>
       <!--    description-->
     </p>
@@ -60,7 +59,7 @@
       </div>
     </div>
 
-    <h3 id="medals" #medals>Medals</h3>
+    <h3 id="medals" #medals><span  *ngIf="medal_categories.length > 0">Medals</span></h3>
     <p>
       <!--    description-->
     </p>

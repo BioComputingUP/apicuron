@@ -86,7 +86,7 @@
                 <div class="col">
                   <div class="row">
                     <div class="col col-auto mr-auto ">
-                      <h2>{{currResource['resource_name']}} - {{currResource['resource_long_name']}}</h2>
+                      <h2>{{currResource['resource_name']}}<span *ngIf="currResource['resource_name'] !== currResource['resource_long_name']"> - {{currResource['resource_long_name']}}</span></h2>
                     </div>
                     <div class="col col-auto">
                       <a class="btn btn-apicuron btn-sm" routerLink="/database" [queryParams]="{resource_uri: currResource['resource_uri']}" > See details  <i

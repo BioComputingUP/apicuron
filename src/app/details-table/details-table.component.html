@@ -109,7 +109,14 @@
               </span>
         </th>
         <td cdk-cell *cdkCellDef="let row">
-          <a href="{{row.entity_uri}}" target="_blank">{{row.entity_uri.substr(row.entity_uri.indexOf(':', 6) + 1)}}</a>
+          <a *ngIf="row.resource_uri === 'https://biomappings.github.io/biomappings/'"
+          href="https://github.com/biomappings/biomappings/tree/master/src/biomappings/resources">
+            {{row.entity_uri}}
+          </a>
+          <a *ngIf="row.resource_uri !== 'https://biomappings.github.io/biomappings/'"
+             href="{{row.entity_uri}}" target="_blank">
+            {{row.entity_uri.substr(row.entity_uri.indexOf(':', 6) + 1)}}
+          </a>
         </td>
       </ng-container>
       <ng-container cdkColumnDef="activity_name">
