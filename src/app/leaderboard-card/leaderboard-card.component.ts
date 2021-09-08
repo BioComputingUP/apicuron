@@ -18,7 +18,7 @@ export class LeaderboardCardComponent implements OnInit {
   displayedColumns = new BehaviorSubject<object>(['rank', 'family_name', 'given_name', 'orcid', 'generation_count', 'revision_count', 'invalidation_count', 'score']);
   searchForm: FormGroup;
 
-  pageSize = new BehaviorSubject<number>(10);
+  pageSize = new BehaviorSubject<number>(50);
   totalItems = 0;
   currentPage = new BehaviorSubject<object>({
     'page': 1

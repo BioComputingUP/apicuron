@@ -3,7 +3,6 @@
 th {
   border: transparent !important;
   border-top: none;
-
 }
 
 .badge-hover:hover {
@@ -12,8 +11,6 @@ th {
   transform: scale(1.1,1.1);
   transition: 0.1s;
 }
-
-
 
 ::ng-deep .pagination {
   display: -ms-flexbox;

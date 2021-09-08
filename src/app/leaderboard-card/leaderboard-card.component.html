@@ -180,7 +180,6 @@
           <span class="badge badge-secondary">&laquo;</span>
         </ng-container>
       </ng-template>
-
       <ng-template #lastTemplate let-disabled="disabled" let-currentPage="currentPage">
         <ng-container *ngIf="!disabled">
           <span class="badge badge-apicuron">&raquo;</span>
@@ -189,7 +188,6 @@
           <span class="badge badge-secondary">&raquo;</span>
         </ng-container>
       </ng-template>
-
       <ng-template #prevTemplate let-disabled="disabled" let-currentPage="currentPage">
         <ng-container *ngIf="!disabled">
           <span class="badge badge-apicuron">&lsaquo;</span>
@@ -198,7 +196,6 @@
           <span class="badge badge-secondary">&lsaquo;</span>
         </ng-container>
       </ng-template>
-
       <ng-template #nextTemplate let-disabled="disabled" let-currentPage="currentPage">
         <ng-container *ngIf="!disabled">
           <span class="badge badge-apicuron">&rsaquo;</span>
@@ -207,7 +204,6 @@
           <span class="badge badge-secondary">&rsaquo;</span>
         </ng-container>
       </ng-template>
-
       <ng-template #pageTemplate let-page let-disabled="disabled" let-currentPage="currentPage">
         <span style="color: black"> page {{ page.number }} </span>
       </ng-template>
@@ -220,16 +216,16 @@
     <div class="col-auto">
       <p>Show
         <span class="badge badge-hover ml-2"
-              [class.badge-apicuron]="pageSize.value===10"
-              [class.badge-secondary]="pageSize.value!==10" (click)="pageSize.next(10)">10</span>
-        <span class="badge badge-hover ml-2"
               [class.badge-apicuron]="pageSize.value===20"
-              [class.badge-secondary]="pageSize.value !== 20"
-              (click)="pageSize.next(20)">20</span>
+              [class.badge-secondary]="pageSize.value!==20" (click)="pageSize.next(20)">20</span>
         <span class="badge badge-hover ml-2"
               [class.badge-apicuron]="pageSize.value===50"
-              [class.badge-secondary]="pageSize.value!== 50"
+              [class.badge-secondary]="pageSize.value !== 50"
               (click)="pageSize.next(50)">50</span>
+        <span class="badge badge-hover ml-2"
+              [class.badge-apicuron]="pageSize.value===100"
+              [class.badge-secondary]="pageSize.value!== 100"
+              (click)="pageSize.next(100)">100</span>
       </p>
     </div>
   </div>
