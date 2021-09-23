@@ -4,10 +4,11 @@
       <strong>Please log-in</strong> to edit your profile! <br>
       See <a routerLink="/about"><strong>About</strong></a> page for more information.
     </p>
-
-    <a href="{{env.ws}}auth/orcid" target="_blank" >
-      ORCID iD
-    </a>
+    <div class="row">
+      <div class="col-auto">
+        <a class="orcidWidget" href="{{env.ws}}auth/orcid" > <img class="orcidLogo" src="assets/logos/orcid_24x24.png">Connect your ORCID iD</a>
+      </div>
+    </div>
 
   </div>
 </div>

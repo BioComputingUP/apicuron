@@ -164,7 +164,10 @@ export class BrowseComponent implements OnInit {
         }
         const activeResources = [];
         Object.keys(this.searchForm.get('resources').value).forEach(currResource => {
-          // console.log(currResource);
+          // console.log('this.searchForm.get(\'resources\')', this.searchForm.get('resources'));
+          // console.log('currResource', currResource);
+          // console.log('this.searchForm.get(\'resources\').get(currResource)', this.searchForm.get('resources').get(currResource));
+
           if (this.searchForm.get('resources').get(currResource).value) {
             activeResources.push(currResource);
           }
@@ -255,6 +258,8 @@ export class BrowseComponent implements OnInit {
         statData['resources'].forEach(currResource => {
           this.map_resources[currResource.resource_uri] = currResource;
           const resources = this.searchForm.get('resources') as FormGroup;
+          // console.log(listPreResources);
+
           if (listPreResources.includes(currResource['resource_id']) || listPreResources.length === 0) {
             resources.addControl(currResource['resource_id'], new FormControl(true));
           } else {

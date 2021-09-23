@@ -1,0 +1,27 @@
+.orcidWidget{
+  display: block;
+  position: relative;
+  width: 100%;
+  border: 1px solid #d3d3d3;
+  border-radius: 5px;
+  background-color: #fff;
+  margin: 1em auto;
+  padding: .6em;
+  cursor: pointer;
+  color: #494A4C;
+  text-decoration: none;
+  font-family: Helvetica, Arial, sans-serif;
+  line-height: 22px;
+  white-space: nowrap;
+}
+.orcidWidget:hover{
+  background-color: #e0e0e0;
+  border: solid 1px #d3d3d3;
+}
+
+.orcidLogo {
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+  vertical-align: top;
+}

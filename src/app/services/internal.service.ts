@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {Observable, throwError, of} from 'rxjs';
 import {environment} from '../../environments/environment';
 
@@ -36,14 +36,16 @@ export class InternalService {
   private apicuronRegNewUser = environment.ws + 'registerUser';
   private apicuronDeteteUser = environment.ws + 'deleteUser/';
 
-
-
   // TODO make it external
   private getORCIDprofile = 'https://pub.orcid.org/v3.0/';
+
   GetORCIDprofile(id): Observable<any> {
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append('Accept', 'application/json');
+
+    console.log('getORCIDprofile', this.getORCIDprofile);
     return this.http.get(
-      this.getORCIDprofile + id, {responseType: 'json', headers: {Accept: 'application/json'}});
-    // .pipe(catchError(err => of(console.error(err))));
+      this.getORCIDprofile + id, {responseType: 'json', headers: headers});
   }
 
   constructor(private http: HttpClient) {

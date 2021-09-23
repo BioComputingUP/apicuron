@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  ws: 'https://apicuron.bio.unipd.it/api/'
+  ws: 'https://dev.apicuron.bio.unipd.it/api/'
+  // ws: 'https://apicuron.bio.unipd.it/api/'
   // ws: 'http://localhost:8098/'
 
 };
