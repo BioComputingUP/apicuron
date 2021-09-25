@@ -51,6 +51,11 @@ export class InternalService {
   constructor(private http: HttpClient) {
   }
 
+  getProfile(identifier): Observable<any> {
+    const url = this.wsUrl + 'getProfile/' + identifier;
+    return this.http.get(url);
+  }
+
   getReports(params: HttpParams): Observable<any> {
     const url = this.wsUrl + 'reports';
     return this.http.get(url, {params});

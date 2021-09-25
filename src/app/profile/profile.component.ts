@@ -190,11 +190,12 @@ export class ProfileComponent implements OnInit {
     });
 
 
-    this.internalService.GetORCIDprofile(this.curator_orcid).subscribe(currORCIDdata => {
+    this.internalService.getProfile(this.curator_orcid).subscribe(currORCIDdata => {
       this.orcidData = currORCIDdata;
-      if (currORCIDdata['activities-summary']?.['employments']?.hasOwnProperty('affiliation-group')) {
-        this.employment = currORCIDdata['activities-summary']['employments']['affiliation-group'];
-      }
+      console.log(this.orcidData);
+      // if (currORCIDdata['activities-summary']?.['employments']?.hasOwnProperty('affiliation-group')) {
+        this.employment = currORCIDdata['employment'];
+      // }
     });
 
     window.addEventListener('scroll', event => {
