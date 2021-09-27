@@ -31,6 +31,7 @@
               "./node_modules/bootstrap/dist/css/bootstrap.min.css",
               "./node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
               "./node_modules/EBI-Icon-fonts/fonts.css",
+              "./node_modules/swagger-ui/dist/swagger-ui.css",
               "src/styles.scss"
             ],
             "scripts": []

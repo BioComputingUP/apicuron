@@ -55,6 +55,7 @@ import { BadgeViewComponent } from './badge-view/badge-view.component';
 import { MedalViewComponent } from './medal-view/medal-view.component';
 import { DatabaseComponent } from './database/database.component';
 import { NotRegisteredComponent } from './not-registered/not-registered.component';
+import { SwaggerUiComponent } from './swagger-ui/swagger-ui.component';
 
 const appRoutes: Routes = [
   {path: 'curators', component: BrowseComponent},
@@ -65,9 +66,10 @@ const appRoutes: Routes = [
   {path: 'database', component: DatabaseComponent},
   // { path: 'leaderboard', component: LeaderboardPageComponent},
   // { path: 'api', component: ApiComponent},
-  // { path: 'statistics', component: StatisticsComponent},
+  { path: 'swagger-ui', component: SwaggerUiComponent},
   {path: 'about', component: AboutComponent},
   {path: 'setting', component: DashboardComponent},
+  {path: 'settings', component: DashboardComponent},
   { path: 'orcid/:orcid', component: ProfileComponent},
   // { path: 'editprofile/:orcid', component: ProfileComponent},
   {path: 'not_registered', component: NotRegisteredComponent},
@@ -108,7 +110,8 @@ const appRoutes: Routes = [
     BadgeViewComponent,
     MedalViewComponent,
     DatabaseComponent,
-    NotRegisteredComponent
+    NotRegisteredComponent,
+    SwaggerUiComponent
   ],
   imports: [
     RouterModule.forRoot(

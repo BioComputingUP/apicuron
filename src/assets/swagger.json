@@ -1,0 +1,38 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Application Programming Interface (API)",
+    "version": "1.0"
+  },
+  "host": "dev.apicuron.org",
+  "basePath": "/api",
+  "paths": {
+    "/reports": {
+      "get": {
+        "tags": ["Public API"],
+        "description": "Retrieve biocuration events (or activities)",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+          "name": "curator_orcid",
+          "in": "query",
+          "type": "string",
+          "description": "Biocurator ORCID"
+        },
+          {
+          "name": "curator_name",
+          "in": "query",
+          "type": "string",
+          "description": "Biocurator name"
+        }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    }
+  },
+  "schemes": ["https"]
+}
