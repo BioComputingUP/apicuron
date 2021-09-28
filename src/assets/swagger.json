@@ -9,72 +9,155 @@
   "paths": {
     "/reports": {
       "get": {
-        "tags": ["Public API"],
+        "tags": [
+          "Public API"
+        ],
         "description": "Retrieve biocuration events (or activities)",
-        "produces": ["application/json"],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
           {
-          "name": "curator_orcid",
-          "in": "query",
-          "type": "string",
-          "description": "Biocurator ORCID"
-        },
-          {
-          "name": "curator_name",
-          "in": "query",
-          "type": "string",
-          "description": "Biocurator name"
-        },
-          {
-          "name": "resource_uri",
-          "in": "query",
-          "type": "string",
-          "description": "Resource unique identifier (URI)"
-        },
-          {
-          "name": "date_from",
-          "in": "query",
-          "type": "string",
-          "description": "Event date from"
-        },
-          {
-          "name": "date_to",
-          "in": "query",
-          "type": "string",
-          "description": "Event date to"
-        },
-          {
-          "name": "limit",
-          "in": "query",
-          "type": "integer",
-          "description": "Number of items to return"
-        },
-          {
-          "name": "skip",
-          "in": "query",
-          "type": "integer",
-          "description": "Number of items to skip (useful for pagination)"
-        },
-          {
-          "name": "format",
-          "in": "query",
-          "description": "The output format. By default it returns a json stream. If explicitly format=json it returns a json file",
+            "name": "curator_orcid",
+            "in": "query",
             "type": "string",
-            "enum": ["json", "tsv"]
+            "description": "Biocurator ORCID"
+          },
+          {
+            "name": "curator_name",
+            "in": "query",
+            "type": "string",
+            "description": "Biocurator name"
+          },
+          {
+            "name": "resource_uri",
+            "in": "query",
+            "type": "string",
+            "description": "Resource unique identifier (URI)"
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "type": "string",
+            "description": "Event date from"
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "type": "string",
+            "description": "Event date to"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "description": "Number of items to return"
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "type": "integer",
+            "description": "Number of items to skip (useful for pagination)"
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "The output format. By default it returns a json stream. If explicitly format=json it returns a json file",
+            "type": "string",
+            "enum": [
+              "json",
+              "tsv"
+            ]
           }
         ],
         "responses": {
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/reports"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/reports"
+              }
             }
+          }
+        }
+      }
+    },
+    "/submit_activity": {
+      "post": {
+        "tags": [
+          "Private API"
+        ],
+        "description": "Report an biocuration activity",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "pattern": "^Bearer .*$"
+          },
+          {
+            "name": "reports",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resource_uri": {
+                  "type": "string",
+                  "example": "https://registry.identifiers.org/registry/devdisprot"
+                },
+                "reports": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "activity_term": {
+                        "type": "string",
+                        "example": "",
+                        "description": ""
+                      },
+                      "resource_uri": {
+                        "type": "string",
+                        "example": "https://registry.identifiers.org/registry/devdisprot"
+                      },
+                      "timestamp": {
+                        "type": "string",
+                        "example": "",
+                        "description": ""
+                      },
+                      "curator_orcid": {
+                        "type": "string",
+                        "example": "0000-0001-6859-3648",
+                        "description": "The ORCID iD of the biocurator"
+                      },
+                      "entity_uri": {
+                        "type": "string",
+                        "example": "",
+                        "description": ""
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
           }
         }
       }
     }
   },
-  "schemes": ["https"],
+  "schemes": [
+    "https"
+  ],
   "definitions": {
     "reports": {
       "type": "object",
@@ -83,7 +166,6 @@
           "type": "string",
           "example": "https://registry.identifiers.org/registry/devdisprot"
         },
-
         "activity_category": {
           "type": "string",
           "example": "",
@@ -124,8 +206,7 @@
           "example": "",
           "description": ""
         }
-
-      },
+      }
     }
   }
 }
