@@ -16,7 +16,7 @@ export class SwaggerUiComponent implements OnInit {
     SwaggerUI({
       domNode: document.getElementById('swagger-ui-item'),
       // url: 'https://petstore.swagger.io/v2/swagger.json'
-      // url: 'http://localhost:4200/assets/swagger.json'
+      // url: 'http://:4200/assets/swagger.json'
       url: '../assets/swagger.json'
     });
 

@@ -65,11 +65,67 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/reports"
+            }
           }
         }
       }
     }
   },
-  "schemes": ["https"]
+  "schemes": ["https"],
+  "definitions": {
+    "reports": {
+      "type": "object",
+      "properties": {
+        "resource_uri": {
+          "type": "string",
+          "example": "https://registry.identifiers.org/registry/devdisprot"
+        },
+
+        "activity_category": {
+          "type": "string",
+          "example": "",
+          "description": ""
+        },
+        "activity_name": {
+          "type": "string",
+          "example": "",
+          "description": ""
+        },
+        "activity_term": {
+          "type": "string",
+          "example": "",
+          "description": ""
+        },
+        "description": {
+          "type": "string",
+          "example": "",
+          "description": ""
+        },
+        "score": {
+          "type": "string",
+          "example": "",
+          "description": ""
+        },
+        "curator_orcid": {
+          "type": "string",
+          "example": "0000-0001-6859-3648",
+          "description": "The ORCID iD of the biocurator"
+        },
+        "entity_uri": {
+          "type": "string",
+          "example": "",
+          "description": ""
+        },
+        "timestamp": {
+          "type": "string",
+          "example": "",
+          "description": ""
+        }
+
+      },
+    }
+  }
 }
