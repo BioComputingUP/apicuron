@@ -67,6 +67,7 @@ const appRoutes: Routes = [
   // { path: 'leaderboard', component: LeaderboardPageComponent},
   // { path: 'api', component: ApiComponent},
   { path: 'swagger-ui', component: SwaggerUiComponent},
+  { path: 'api', component: SwaggerUiComponent},
   {path: 'about', component: AboutComponent},
   {path: 'setting', component: DashboardComponent},
   {path: 'settings', component: DashboardComponent},
