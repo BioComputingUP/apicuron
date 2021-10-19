@@ -153,6 +153,136 @@
           }
         }
       }
+    },
+    "/submit_description": {
+      "post": {
+        "tags": [
+          "Private API"
+        ],
+        "description": "Report an biocuration activity",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "pattern": "^Bearer .*$"
+          },
+          {
+            "name": "reports",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resource_uri": {
+                  "type": "string",
+                  "description": "This is the identifier used to identify the resource and activity terms (see submit activity)"
+                },
+                "resource_url": {
+                  "type": "string",
+                  "description": "Resource homepage URL"
+                },
+                "resource_name": {
+                  "type": "string",
+                  "description": "Resource name"
+                },
+                "resource_long_name": {
+                  "type": "string",
+                  "description": "Resource full name"
+                },
+                "resource_description": {
+                  "type": "string",
+                  "description": "Text describing the resource shown in the APICURON database pages"
+                },
+                "terms_def": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "activity_term": {
+                        "type": "string",
+                        "description": "Activity term identifier"
+                      },
+                      "activity_name": {
+                        "type": "string",
+                        "description": "Activity term name"
+                      },
+                      "activity_category": {
+                        "type": "string",
+                        "description": "Activity term category. Either \"generation\", \"revision\" or \"invalidation\"",
+                        "enum": [
+                          "Generation",
+                          "Revision",
+                          "Invalidation"
+                        ]
+                      },
+                      "score": {
+                        "type": "string",
+                        "description": "An interger number representing the effort or importance of the curation activity"
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "A human readable description of the activity term"
+                      }
+                    }}},
+                "achievements_def": {
+                  "type": "array",
+                  "description": "The definition of achievements and parameters for their calculation. See tables below\n",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Either \"badge\" or \"medal\""
+                      },
+                      "category": {
+                        "type": "string",
+                        "description": "A number to identify a group of related badges/medals"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Human readable name of the badge/medal"
+                      },
+                      "list_terms": {
+                        "type": "string",
+                        "description": "The list of activity terms to be considered to assign the badge/medal"
+                      },
+                      "color": {
+                        "type": "string",
+                        "description": "The hexadecimal color code or color name used ot visualize the badge/medal. You can se gold/silver/bronze for a metal effect"
+                      },
+                      "count_threshold": {
+                        "type": "string",
+                        "description": "Only badges. The count threshold to assign the badge"
+                      },
+                      "score_relative": {
+                        "type": "string",
+                        "description": "Only medals. The ranking over other database curators to assign the medal. The ranking is calculated by multiplying the activities listed in \"list_terms\" with the corresponding score"
+                      },
+                      "first_day": {
+                        "type": "string",
+                        "description": "Only medals. Consider activity terms from this date"
+                      },
+                      "last_day": {
+                        "type": "string",
+                        "description": "Only medals. Consider activity terms to this date"
+                      }
+
+                    }}}
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+          }
     }
   },
   "schemes": [
@@ -161,35 +291,42 @@
   "definitions": {
     "reports": {
       "type": "object",
+      "description": "The definition of an activity term. Each activity term has the following fields. See tables below\n",
       "properties": {
         "resource_uri": {
           "type": "string",
+          "description": "The database identifier",
           "example": "https://registry.identifiers.org/registry/devdisprot"
         },
         "activity_category": {
           "type": "string",
           "example": "",
-          "description": ""
+          "description": "Activity term category. Either \"generation\", \"revision\" or \"invalidation\"",
+          "enum": [
+            "Generation",
+            "Revision",
+            "Invalidation"
+          ]
         },
         "activity_name": {
           "type": "string",
           "example": "",
-          "description": ""
+          "description": "Activity term name"
         },
         "activity_term": {
           "type": "string",
           "example": "",
-          "description": ""
+          "description": "The curation activity term identifier"
         },
         "description": {
           "type": "string",
           "example": "",
-          "description": ""
+          "description": "A human readable description of the activity term"
         },
         "score": {
           "type": "string",
           "example": "",
-          "description": ""
+          "description": "An interger number representing the effort or importance of the curation activity"
         },
         "curator_orcid": {
           "type": "string",
@@ -199,12 +336,12 @@
         "entity_uri": {
           "type": "string",
           "example": "",
-          "description": ""
+          "description": "The identifier of the curated object in the source database\n"
         },
         "timestamp": {
           "type": "string",
           "example": "",
-          "description": ""
+          "description": "The date and time of the curation activity"
         }
       }
     }
