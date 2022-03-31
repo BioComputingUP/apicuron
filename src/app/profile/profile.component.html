@@ -21,6 +21,7 @@
               target="_blank">({{curator_orcid}})</a>
           </p>
         </div>
+        .
         <div class="col" *ngIf="logedIn">
           <div class="custom-control custom-switch mt-2 " *ngIf="!localAuth.value.hasOwnProperty('hide')"
                (click)="openModal(profile_visibility_settings)">
@@ -64,6 +65,12 @@
               </p>
             </div>
           </ng-template>
+
+
+          <span class="ml-3">
+            <a class="orcidWidget" href="{{env.ws}}auth/orcid_permission" >
+              <img class="orcidLogo" src="assets/logos/orcid_24x24.png">Add APICURON to your ORCID profile</a>
+          </span>
         </div>
         <div class="col-auto ml-auto">
           <p> Resources
