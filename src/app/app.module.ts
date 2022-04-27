@@ -113,10 +113,11 @@ const appRoutes: Routes = [
   imports: [
     RouterModule.forRoot(
       appRoutes, {
-        scrollPositionRestoration: 'enabled',
-        anchorScrolling: 'enabled',
-        scrollOffset: [0, 64]
-      }
+    scrollPositionRestoration: 'enabled',
+    anchorScrolling: 'enabled',
+    scrollOffset: [0, 64],
+    relativeLinkResolution: 'legacy'
+}
       // { enableTracing: true } // <-- debugging purposes only
     ),
     ScrollToModule.forRoot(),
