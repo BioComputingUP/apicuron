@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+type StatisticsTerms {
+  activity_category String
+  activity_name     String
+  activity_term     String
+  count             Float
+  curator_orcid     String
+  description       String
+  resource_uri      String
+  score             Int
+  sum               Float
+}
+
+type UsersResources {
+  id   String
+  name String
+}
+
+model achievements {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  category              String?
+  color                 String?
+  color_code            String?
+  count                 Float?
+  count_relative_index  Int?
+  count_relative_valid  Boolean?
+  count_threshold       Int?
+  count_threshold_valid Boolean?
+  count_total           Float?
+  curator_orcid         String
+  name                  String
+  resource_uri          String
+  score_relative        Int?
+  score_relative_index  Int?
+  score_relative_valid  Boolean?
+  score_threshold_valid Boolean?
+  score_total           Float?
+  type                  String
+}
+
+model achievements_def {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  category        String
+  color           String?
+  color_code      String?
+  count_threshold Int?
+  first_day       DateTime? @db.Date
+  last_day        DateTime? @db.Date
+  list_terms      String[]
+  name            String
+  resource_uri    String
+  score_relative  Int?
+  type            String?
+}
+
+model reports {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  activity_term String
+  curator_orcid String
+  entity_uri    String
+  resource_uri  String
+  timestamp     DateTime @db.Date
+}
+
+model resources_def {
+  id                   String @id @default(auto()) @map("_id") @db.ObjectId
+  resource_description String
+  resource_id          String
+  resource_long_name   String
+  resource_name        String
+  resource_uri         String
+  resource_url         String
+}
+
+model statistics {
+  id                 String                        @id @default(auto()) @map("_id") @db.ObjectId
+  badges_count       Int
+  curator_orcid      String
+  generation_count   Float
+  generation_score   Float
+  generation_terms   StatisticsTerms[]
+  /// Multiple data types found: Float: 28.1%, Int: 71.9% out of 89 sampled entries
+  invalidation_count Int
+  /// Multiple data types found: Float: 28.1%, Int: 71.9% out of 89 sampled entries
+  invalidation_score Int
+  invalidation_terms StatisticsTerms[]
+  medals_count       Int
+  ranking            Float
+  resource_uri       String
+  /// Multiple data types found: Float: 15.7%, Int: 84.3% out of 89 sampled entries
+  revision_count     Int
+  /// Multiple data types found: Float: 15.7%, Int: 84.3% out of 89 sampled entries
+  revision_score     Int
+  revision_terms     StatisticsTerms[]
+  total_score        Float
+}
+
+model terms_def {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  activity_category String
+  activity_name     String
+  activity_term     String
+  description       String
+  resource_uri      String
+  score             Int
+}
+
+model users {
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
+  biography       String?
+  cookie_token    String?       @unique
+  displayedName   String?
+  email           String?
+  /// Could not determine type: the field only had null or empty values in the sample set.
+  employment      Json?
+  family_name     String?
+  full_name       String?
+  given_name      String?
+  gmail           String?
+  institution     String?
+  jwt_token       String?
+  /// Could not determine type: the field only had null or empty values in the sample set.
+  keywords        Json?
+  last_update     String?
+  orcid_id        String         @unique
+  profile_picture String?
+  resources       UsersResources[]
+  role            String?
+  username        String?
+
+  @@index([full_name], map: "full_name_1")
+}
