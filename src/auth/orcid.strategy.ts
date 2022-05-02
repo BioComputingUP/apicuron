@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from 'src/auth/users/users.service';
 import { AuthService } from './auth.service';
 import { Strategy } from 'passport-orcid';
 // const Strategy = require('passport-orcid').Strategy;
@@ -39,6 +39,8 @@ export class OrcidStrategy extends PassportStrategy(Strategy) {
         }
 
         const token = authService.generate_cookie_token();
+
+        // TODO: check meaning and purpose of orcid_permission variable
         // const orcid_permission =
         //   params.scope === '/activities/update' ? params.access_token : null;
 

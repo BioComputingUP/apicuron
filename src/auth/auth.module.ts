@@ -1,20 +1,25 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { UsersModule } from 'src/users/users.module';
 import { AuthService } from './auth.service';
 import { OrcidStrategy } from './orcid.strategy';
 import { AuthController } from './auth.controller';
+import { UsersService } from './users/users.service';
+import { UsersController } from './users/users.controller';
+import { PrismaModule } from 'src/prisma/prisma.module';
+import { LocalAuthGuard } from './local-auth.guard';
 
 @Module({
-  providers: [AuthService, OrcidStrategy],
+  providers: [AuthService, OrcidStrategy, UsersService, LocalAuthGuard],
   imports: [
-    UsersModule,
+    PrismaModule,
     JwtModule.register({
       // TODO: figure out a way to get the secret from ENV
-      secret: 'Secret'
+      secret: 'Secret',
+      
     })],
-  controllers: [AuthController]
+  exports: [LocalAuthGuard],
+  controllers: [AuthController, UsersController]
 })
 export class AuthModule {
   constructor(configService: ConfigService) {

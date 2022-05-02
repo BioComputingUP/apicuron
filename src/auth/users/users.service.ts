@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { users } from '@prisma/client';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Prisma, users } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -63,5 +63,45 @@ export class UsersService {
           err,
         );
       });
+  }
+
+  create_user(user: Prisma.usersCreateInput) {
+    // TODO: Explore use cases and limit available fields to add
+    this.prisma.users
+      .create({
+        data: user,
+        select: {
+          username: true,
+          orcid_id: true,
+        },
+      })
+      .then(({ username, orcid_id }) => {
+        this.userLogger.log(
+          `created User with username: ${username} with orcid "${orcid_id}" `,
+        );
+        return true
+      })
+      .catch((err) => {
+        this.userLogger.error("Database Error, couldn't create user", err);
+      });
+  }
+
+  upsert_user(orcid_id: string, data: Prisma.usersCreateInput): Boolean {
+    // const createUser
+    this.prisma.users.upsert({
+      where: {
+        orcid_id,
+      },
+      update: data,
+      create: data
+    }).then(orcid => {
+      this.userLogger.log(`Upserted user with orcid ${orcid}`)
+      return true
+    })
+    .catch((err) => {
+      this.userLogger.error("Database Error, couldn't Upsert user", err);
+      return false;
+    });
+    return false;
   }
 }
