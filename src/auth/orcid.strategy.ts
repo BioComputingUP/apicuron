@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
-const Strategy = require('passport-orcid').Strategy;
-
+import { Strategy } from 'passport-orcid';
+// const Strategy = require('passport-orcid').Strategy;
 
 // let orcidStrategy = new OrcidStrategy({
 //     sandbox: config.get('ENV_NAME') === 'development',
@@ -14,34 +14,38 @@ const Strategy = require('passport-orcid').Strategy;
 // })
 @Injectable()
 export class OrcidStrategy extends PassportStrategy(Strategy) {
-    constructor(private authService: AuthService,
-        private configService: ConfigService,
-        private usersService: UsersService) {
-        super({
-            sandbox: configService.get<string>('ENV_NAME') === 'development',
-            callbackURL: configService.get<string>('ORCID_REDIRECT'),
-            clientID: configService.get<string>('ORCID_CLIENT_ID'),
-            clientSecret: configService.get<string>('ORCID_CLIENT_SECRET')
-        },
-            
-            async function (accessToken, refreshToken, params, profile, done) {
-                // Verify access params.id contains the orcid
-                const orcid_id:string = params.orcid
-                const user = await usersService.get_by_orcid(orcid_id)
-                
-                // constructing update object for user
-                const update_obj = {}
-                if (params.scope === '/activities/update') {
-                    update_obj['orcid_permission'] = params.access_token
-                }
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService,
+    private usersService: UsersService,
+  ) {
+    super(
+      {
+        sandbox: configService.get<string>('ENV_NAME') === 'development',
+        callbackURL: configService.get<string>('ORCID_REDIRECT'),
+        clientID: configService.get<string>('ORCID_CLIENT_ID'),
+        clientSecret: configService.get<string>('ORCID_CLIENT_SECRET'),
+      },
 
-                const token = authService.generate_cookie_token()
-                const orcid_permission = params.scope === '/activities/update' ? params.access_token : null
+      async function (accessToken, refreshToken, params, profile, done) {
+        // Verify access params.id contains the orcid
+        const orcid_id: string = params.orcid;
+        const user = await usersService.get_by_orcid(orcid_id);
 
-                usersService.update_user_token_by_orcid(orcid_id, token, orcid_permission)
+        // constructing update object for user
+        const update_obj = {};
+        if (params.scope === '/activities/update') {
+          update_obj['orcid_permission'] = params.access_token;
+        }
 
-                done();
-            }
-        )
-    }
+        const token = authService.generate_cookie_token();
+        // const orcid_permission =
+        //   params.scope === '/activities/update' ? params.access_token : null;
+
+        usersService.update_user_token_by_orcid(orcid_id, token);
+
+        done();
+      },
+    );
+  }
 }

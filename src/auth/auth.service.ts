@@ -5,13 +5,12 @@ import { uuid } from 'uuidv4';
 
 @Injectable()
 export class AuthService {
-    constructor(
-        private usersService: UsersService,
-        private jwtService: JwtService,
-        
-    ) {}
-    
-    generate_cookie_token(){
-        return uuid()
-    }
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+  ) {}
+
+  generate_cookie_token() {
+    return uuid();
+  }
 }
