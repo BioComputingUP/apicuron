@@ -56,6 +56,7 @@ import { MedalViewComponent } from './medal-view/medal-view.component';
 import { DatabaseComponent } from './database/database.component';
 import { NotRegisteredComponent } from './not-registered/not-registered.component';
 import { SwaggerUiComponent } from './swagger-ui/swagger-ui.component';
+import { NumbersBannerComponent } from './v2/numbers-banner/numbers-banner.component';
 
 const appRoutes: Routes = [
   {path: 'curators', component: BrowseComponent},
@@ -108,7 +109,8 @@ const appRoutes: Routes = [
     MedalViewComponent,
     DatabaseComponent,
     NotRegisteredComponent,
-    SwaggerUiComponent
+    SwaggerUiComponent,
+    NumbersBannerComponent
   ],
   imports: [
     RouterModule.forRoot(
