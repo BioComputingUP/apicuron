@@ -79,29 +79,54 @@ export class UsersService {
         this.userLogger.log(
           `created User with username: ${username} with orcid "${orcid_id}" `,
         );
-        return true
+        return true;
       })
       .catch((err) => {
         this.userLogger.error("Database Error, couldn't create user", err);
       });
   }
 
+  update_user(orcid_id: string, userData: Prisma.usersUpdateInput): Boolean {
+    userData.orcid_id = orcid_id;
+    this.prisma.users
+      .update({
+        where: {
+          orcid_id,
+        },
+        data: userData
+      })
+      .then((orcid) => {
+        this.userLogger.log(`Updated user with orcid ${orcid}`);
+        return true;
+      })
+      .catch((err) => {
+        this.userLogger.error("Database Error, couldn't Update user", err);
+        return false;
+      });
+    return false;
+  }
+
   upsert_user(orcid_id: string, data: Prisma.usersCreateInput): Boolean {
     // const createUser
-    this.prisma.users.upsert({
-      where: {
-        orcid_id,
-      },
-      update: data,
-      create: data
-    }).then(orcid => {
-      this.userLogger.log(`Upserted user with orcid ${orcid}`)
-      return true
-    })
-    .catch((err) => {
-      this.userLogger.error("Database Error, couldn't Upsert user", err);
-      return false;
-    });
+    this.prisma.users
+      .upsert({
+        where: {
+          orcid_id,
+        },
+        update: data,
+        create: {
+          ...data,
+          orcid_id,
+        },
+      })
+      .then((orcid) => {
+        this.userLogger.log(`Upserted user with orcid ${orcid}`);
+        return true;
+      })
+      .catch((err) => {
+        this.userLogger.error("Database Error, couldn't Upsert user", err);
+        return false;
+      });
     return false;
   }
 }

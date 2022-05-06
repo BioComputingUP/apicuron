@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
@@ -39,8 +40,9 @@ export class UsersController {
   }
   @Post('/registerUser')
   // @UseGuards(LocalAuthGuard)
-  create_or_update_user(@Param('orcid_id') orcid_id, @Param('data') userData: Prisma.usersCreateInput) {
-    if(this.usersService.upsert_user(orcid_id, userData)){
+  create_or_update_user(@Body('orcid_id') orcid_id: string, @Body('data') userData: Prisma.usersCreateInput) {
+    console.log(userData)
+    if(this.usersService.update_user(orcid_id, userData)){
       return `User with ${orcid_id} orcid successfully created`
     }else{
       return `Failed to create user ${orcid_id}`
