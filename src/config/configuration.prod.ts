@@ -8,6 +8,7 @@ export default () => ({
   JWT_SECRET: 'secret',
   PORT: 8298,
   HOST: 'localhost',
+  ORCID_API_URL:'https://pub.orcid.org/v3.0/'
   //   port: parseInt(process.env.PORT, 10) || 3000,
   //   database: {
   //     host: process.env.DATABASE_HOST,
