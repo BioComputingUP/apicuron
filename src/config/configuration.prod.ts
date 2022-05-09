@@ -7,7 +7,7 @@ export default () => ({
   ENV_NAME: 'development',
   JWT_SECRET: 'secret',
   PORT: 8298,
-  HOST: 'beta.apicuron.org',
+  HOST: 'localhost',
   //   port: parseInt(process.env.PORT, 10) || 3000,
   //   database: {
   //     host: process.env.DATABASE_HOST,

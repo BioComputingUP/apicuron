@@ -10,7 +10,6 @@ import { LocalAuthGuard } from './local-auth.guard';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './users/user.schema';
 
-console.log('JWT_SECRET: ' + process.env.JWT_SECRET)
 @Module({
   providers: [AuthService, OrcidStrategy, UsersService, LocalAuthGuard],
   imports: [
