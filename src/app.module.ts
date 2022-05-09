@@ -1,23 +1,31 @@
-import { Logger, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { PrismaModule } from './prisma/prisma.module';
+// import { PrismaModule } from './prisma/prisma.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import configuration from './config/configuration';
 
-const appModuleLogger = new Logger("MongooseLogger")
-const configService = new ConfigService()
-
-const db_url = configService.get<string>('DATABASE_URL')
 @Module({
-  imports: [AuthModule,
+  imports: [
+    AuthModule,
     // isGlobal loads Config Module globally, doesn't require imports
-    ConfigModule.forRoot({ isGlobal: true}),
-    PrismaModule,
-    MongooseModule.forRoot(db_url,() => {
-      appModuleLogger.log('Connected to ' + db_url)
-  }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      // ignoreEnvFile: true,
+      load: [configuration],
+    }),
+    // in here we use the forRootAsync https://docs.nestjs.com/techniques/mongodb#async-configuration
+    // to be able to access the configService asnchronously because it cannot be loaded sooner
+    // due to the fact that this is the appmodule
+    MongooseModule.forRootAsync({
+      imports: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('database_url'),
+      }),
+      inject: [ConfigService],
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

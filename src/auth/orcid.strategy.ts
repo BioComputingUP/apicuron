@@ -30,7 +30,7 @@ export class OrcidStrategy extends PassportStrategy(Strategy) {
       async function (accessToken, refreshToken, params, profile, done) {
         // Verify access params.id contains the orcid
         const orcid_id: string = params.orcid;
-        const user = await usersService.get_by_orcid(orcid_id);
+        // const user = await usersService.get_by_orcid(orcid_id);
 
         // constructing update object for user
         const update_obj = {};
@@ -44,7 +44,7 @@ export class OrcidStrategy extends PassportStrategy(Strategy) {
         // const orcid_permission =
         //   params.scope === '/activities/update' ? params.access_token : null;
 
-        usersService.update_user_token_by_orcid(orcid_id, token);
+        usersService.update_user(orcid_id, { cookie_token: token });
 
         done();
       },

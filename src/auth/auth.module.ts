@@ -6,7 +6,7 @@ import { OrcidStrategy } from './orcid.strategy';
 import { AuthController } from './auth.controller';
 import { UsersService } from './users/users.service';
 import { UsersController } from './users/users.controller';
-import { PrismaModule } from 'src/prisma/prisma.module';
+// import { PrismaModule } from 'src/prisma/prisma.module';
 import { LocalAuthGuard } from './local-auth.guard';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './users/user.schema';
@@ -14,23 +14,19 @@ import { User, UserSchema } from './users/user.schema';
 @Module({
   providers: [AuthService, OrcidStrategy, UsersService, LocalAuthGuard],
   imports: [
-    PrismaModule,
+    // PrismaModule,
     MongooseModule.forFeature([
       {
         name: User.name,
-        schema: UserSchema
-      }
+        schema: UserSchema,
+      },
     ]),
     JwtModule.register({
       // TODO: figure out a way to get the secret from ENV
       secret: 'Secret',
-      
-    })],
+    }),
+  ],
   exports: [LocalAuthGuard],
-  controllers: [AuthController, UsersController]
+  controllers: [AuthController, UsersController],
 })
-export class AuthModule {
-  constructor(configService: ConfigService) {
-
-  }
-}
+export class AuthModule {}
