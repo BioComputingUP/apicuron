@@ -20,7 +20,7 @@ import configuration from './config/configuration';
     // to be able to access the configService asnchronously because it cannot be loaded sooner
     // due to the fact that this is the appmodule
     MongooseModule.forRootAsync({
-      imports: [ConfigService],
+      // imports: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get<string>('database_url'),
       }),
