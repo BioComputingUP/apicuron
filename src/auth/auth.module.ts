@@ -9,9 +9,8 @@ import { UsersController } from './users/users.controller';
 import { LocalAuthGuard } from './local-auth.guard';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './users/user.schema';
-const configService = new ConfigService();
-const jwtSecret = configService.get<string>('JWT_SECRET');
-console.log('this is jwtsecret: ' + jwtSecret);
+
+console.log('JWT_SECRET: ' + process.env.JWT_SECRET)
 @Module({
   providers: [AuthService, OrcidStrategy, UsersService, LocalAuthGuard],
   imports: [
@@ -23,7 +22,8 @@ console.log('this is jwtsecret: ' + jwtSecret);
       },
     ]),
     JwtModule.register({
-      secret: jwtSecret,
+      // TODO: Figure a way to import this from config
+      secret: 'Secret',
     }),
   ],
   exports: [LocalAuthGuard],

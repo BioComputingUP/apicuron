@@ -5,7 +5,18 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 // import { PrismaModule } from './prisma/prisma.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import configuration from './config/configuration';
+import devConfig from './config/configuration.dev';
+import prodConfig from './config/configuration.prod';
+
+function getConfig() {
+  if (process.env.NODE_ENV === 'development') {
+    return devConfig;
+  }
+  if (process.env.NODE_ENV === 'production') {
+    return prodConfig;
+  }
+  return devConfig;
+}
 
 @Module({
   imports: [
@@ -14,7 +25,7 @@ import configuration from './config/configuration';
     ConfigModule.forRoot({
       isGlobal: true,
       // ignoreEnvFile: true,
-      load: [configuration],
+      load: [getConfig()],
     }),
     // in here we use the forRootAsync https://docs.nestjs.com/techniques/mongodb#async-configuration
     // to be able to access the configService asnchronously because it cannot be loaded sooner

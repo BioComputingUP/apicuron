@@ -2,14 +2,25 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 // import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
+  // App creation
   const app = await NestFactory.create(AppModule);
-  const port = 3000;
-  const appLogger = new Logger('appLogger');
+
+  // Logging and config setup
+  const appLogger = new Logger('APICURONApplicationLogger');
+  const configService = app.get(ConfigService);
+
+  // setup basic validation Pipes
   app.useGlobalPipes(new ValidationPipe());
-  appLogger.log(`Started Listening on Port ${port}`);
-  await app.listen(3000);
+  // retrieving port
+  const port = configService.get('PORT');
+  const host = configService.get('HOST');
+  const envConfig = configService.get<string>('environment');
+  appLogger.log(`Loaded ${envConfig} Configuration`)
+  appLogger.log(`Started Listening on ${host}:${port}`);
+  await app.listen(port, host);
 }
 
 bootstrap();
