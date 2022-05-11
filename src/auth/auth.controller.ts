@@ -2,17 +2,20 @@ import {
   Controller,
   Get,
   Logger,
-  Param,
+  Req,
   Redirect,
   UseGuards,
+  Res,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from 'src/auth/users/users.service';
 import { LocalAuthGuard } from './local-auth.guard';
 
 @Controller('')
 export class AuthController {
-  constructor(private usersService: UsersService) {}
+  constructor(private usersService: UsersService, private jwtService: JwtService, private configService:ConfigService) {}
 
   private authControllerLogger = new Logger(AuthController.name);
 
@@ -26,9 +29,7 @@ export class AuthController {
   // redirect to orcid
   @Get('auth/orcid')
   @UseGuards(AuthGuard('orcid'))
-  authenticate_orcid() {
-    console.log('authenticate orcid controller');
-  }
+  authenticate_orcid() {}
 
   @Get('/auth/orcid_permission')
   @UseGuards(AuthGuard('orcid'))
@@ -37,20 +38,18 @@ export class AuthController {
   @Get('/auth/orcid/redirect')
   @Redirect('/orcid/', 301)
   @UseGuards(AuthGuard('orcid'))
-  async orcid_redirect(@Param('user') user_cookie_token) {
-    try {
-      // method returns user based on cookie_token passed
-      const { orcid_id } = await this.usersService.get_by_cookie_token(
-        user_cookie_token,
-      );
-      this.authControllerLogger.log(
-        `user with orcid ${orcid_id} successfully authenticated and redirected`,
-      );
-      return { url: '/orcid/' + orcid_id, statusCode: 301 };
-    } catch (e) {
+  orcid_redirect(@Req() { user }, @Res() res) {
+    const jwtToken = this.jwtService.sign(user)
+    const header = this.configService.get<string>('JWT_HEADER')
+    const prefix = this.configService.get<string>('JWT_PREFIX')
+    res.cookie(header, prefix + ' ' + jwtToken)
+    res.set(header, prefix + ' ' +jwtToken)
+    return { url: '/orcid/' + user.orcid_id, statusCode: 301 }
+  }
 
-      this.authControllerLogger.error('Failed to Authenticate user ', e);
-      return { url: '/not_registered', statusCode: 301 };
-    }
+  @Get('/orcid/:orcid_id')
+  @UseGuards(LocalAuthGuard)
+  protected_page(){
+    return 'Can be accessed'
   }
 }

@@ -20,9 +20,11 @@ import { User, UserSchema } from './users/user.schema';
         schema: UserSchema,
       },
     ]),
-    JwtModule.register({
-      // TODO: Figure a way to import this from config
-      secret: 'Secret',
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+      }),
     }),
   ],
   exports: [LocalAuthGuard],

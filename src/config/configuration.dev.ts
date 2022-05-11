@@ -9,6 +9,8 @@ export default () => ({
   PORT: 3000,
   HOST: 'localhost',
   ORCID_API_URL: 'https://pub.sandbox.orcid.org/v3.0/',
+  JWT_HEADER: 'authorization',
+  JWT_PREFIX: 'bearer'
   //   port: parseInt(process.env.PORT, 10) || 3000,
   //   database: {
   //     host: process.env.DATABASE_HOST,

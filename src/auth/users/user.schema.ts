@@ -66,6 +66,9 @@ export class User {
   orcid_id: string;
 
   @Prop()
+  orcid_permission: string;
+
+  @Prop()
   resources: UserResource[];
 }
 

@@ -4,20 +4,13 @@ import { PassportStrategy } from '@nestjs/passport';
 import { UsersService } from 'src/auth/users/users.service';
 import { AuthService } from './auth.service';
 import { Strategy } from 'passport-orcid';
-// const Strategy = require('passport-orcid').Strategy;
-
-// let orcidStrategy = new OrcidStrategy({
-//     sandbox: config.get('ENV_NAME') === 'development',
-//     callbackURL: config.get('ORCID_REDIRECT'),
-//     clientID: config.get('ORCID_CLIENT_ID'),
-//     clientSecret: config.get('ORCID_CLIENT_SECRET'),
-// })
+import { JwtService } from '@nestjs/jwt';
 @Injectable()
-export class OrcidStrategy extends PassportStrategy(Strategy) {
+export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
-    private usersService: UsersService,
+    private usersService: UsersService
   ) {
     super(
       {
@@ -29,26 +22,20 @@ export class OrcidStrategy extends PassportStrategy(Strategy) {
 
       async function (accessToken, refreshToken, params, profile, done) {
         [accessToken, refreshToken, params, profile].forEach((x, i) => {
-          console.log(`[${i}] => `,x);
+          console.log(`[${i}] => `, x);
         });
         // Verify access params.id contains the orcid
         const orcid_id: string = params.orcid;
-        // const user = await usersService.get_by_orcid(orcid_id);
+        const user = { orcid_id, username: params.name }
 
-        // constructing update object for user
-        const update_obj = {};
-        if (params.scope === '/activities/update') {
-          update_obj['orcid_permission'] = params.access_token;
-        }
+        usersService.upsert_user(orcid_id, {
+          // displayed Name obtained from orcid
+          displayedName: params.name,
+          // orcid_permission authorization token for updating a user information (/works)
+          orcid_permission: params.scope === '/activities/update' ? params.access_token : undefined,
+        });
 
-        const token = authService.generate_cookie_token();
-
-        // TODO: check meaning and purpose of orcid_permission variable
-        // const orcid_permission =
-        //   params.scope === '/activities/update' ? params.access_token : null;
-        usersService.upsert_user(orcid_id, { cookie_token: token, displayedName: params.name });
-
-        done(null, token);
+        done(null, user);
       },
     );
   }
