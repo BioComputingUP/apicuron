@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 // import { PrismaModule } from './prisma/prisma.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ReportsModule } from './reports/reports.module';
 import devConfig from './config/configuration.dev';
 import prodConfig from './config/configuration.prod';
 
@@ -36,6 +37,7 @@ function getConfig() {
         uri: configService.get<string>('database_url'),
       }),
     }),
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

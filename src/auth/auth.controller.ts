@@ -7,24 +7,15 @@ import {
   UseGuards,
   Res,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import { UsersService } from 'src/auth/users/users.service';
+import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 
 @Controller('')
 export class AuthController {
-  constructor(private usersService: UsersService, private jwtService: JwtService, private configService:ConfigService) {}
+  constructor(private authService: AuthService) {}
 
   private authControllerLogger = new Logger(AuthController.name);
-
-  @Get('/token')
-  @UseGuards(LocalAuthGuard)
-  get_token() {
-    //   TODO: Update the function to retrieve the actual token
-    return 'the token';
-  }
 
   // redirect to orcid
   @Get('auth/orcid')
@@ -39,11 +30,9 @@ export class AuthController {
   @Redirect('/orcid/', 301)
   @UseGuards(AuthGuard('orcid'))
   orcid_redirect(@Req() { user }, @Res() res) {
-    const jwtToken = this.jwtService.sign(user)
-    const header = this.configService.get<string>('JWT_HEADER')
-    const prefix = this.configService.get<string>('JWT_PREFIX')
-    res.cookie(header, prefix + ' ' + jwtToken)
-    res.set(header, prefix + ' ' +jwtToken)
+    const { header, token} = this.authService.generate_jwt_token(user)
+    res.cookie(header, token)
+    res.set(header, token)
     return { url: '/orcid/' + user.orcid_id, statusCode: 301 }
   }
 

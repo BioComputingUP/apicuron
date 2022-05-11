@@ -9,8 +9,8 @@ export interface UserResource {
 
 @Schema({ collection: 'users' })
 export class User {
-  @Prop()
-  id: string;
+  // @Prop()
+  // id: string;
 
   @Prop()
   biography: string;
