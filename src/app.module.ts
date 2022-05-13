@@ -6,6 +6,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 // import { PrismaModule } from './prisma/prisma.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ReportsModule } from './reports/reports.module';
+import { PartnerResourcesController } from './partner-resources/partner-resources.controller';
+import { PartnerResourcesModule } from './partner-resources/partner-resources.module';
 import devConfig from './config/configuration.dev';
 import prodConfig from './config/configuration.prod';
 
@@ -38,6 +40,7 @@ function getConfig() {
       }),
     }),
     ReportsModule,
+    PartnerResourcesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

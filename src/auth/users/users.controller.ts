@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { LocalAuthGuard } from 'src/auth/local-auth.guard';
+import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { Logger } from '@nestjs/common';
@@ -23,7 +23,7 @@ export class UsersController {
   @Post('/registerUser')
   @UseGuards(LocalAuthGuard)
   create_or_update_user(@Body() userData: UpdateUserDto, @Res() res) {
-    console.log(`Received message: ${userData}`);
+    // console.log(`Received message: ${userData}`);
     this.usersService
       .upsert_user(userData.orcid_id, userData)
       .then((response) => {

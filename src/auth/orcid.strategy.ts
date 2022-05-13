@@ -21,9 +21,9 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
       },
 
       async function (accessToken, refreshToken, params, profile, done) {
-        [accessToken, refreshToken, params, profile].forEach((x, i) => {
-          console.log(`[${i}] => `, x);
-        });
+        // [accessToken, refreshToken, params, profile].forEach((x, i) => {
+        //   console.log(`[${i}] => `, x);
+        // });
         // Verify access params.id contains the orcid
         const orcid_id: string = params.orcid;
         const user = { orcid_id, username: params.name }

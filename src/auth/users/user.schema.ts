@@ -3,73 +3,73 @@ import { Document } from 'mongoose';
 
 export type UserDocument = User & Document;
 export interface UserResource {
-  id: string;
-  name: string;
+	id: string;
+	name: string;
 }
 
 @Schema({ collection: 'users' })
 export class User {
-  // @Prop()
-  // id: string;
+	// @Prop()
+	// id: string;
 
-  @Prop()
-  biography: string;
+	@Prop()
+	biography: string;
 
-  @Prop()
-  cookie_token: string;
+	@Prop()
+	cookie_token: string;
 
-  @Prop()
-  displayedName: string;
+	@Prop()
+	displayedName: string;
 
-  @Prop()
-  email: string;
+	@Prop()
+	email: string;
 
-  /// Could not determine type the field only had null or empty values in the sample set.
-  @Prop()
-  employment: string;
+	/// Could not determine type the field only had null or empty values in the sample set.
+	@Prop()
+	employment: string;
 
-  @Prop()
-  family_name: string;
+	@Prop()
+	family_name: string;
 
-  @Prop()
-  full_name: string;
+	@Prop()
+	full_name: string;
 
-  @Prop()
-  given_name: string;
+	@Prop()
+	given_name: string;
 
-  @Prop()
-  gmail: string;
+	@Prop()
+	gmail: string;
 
-  @Prop()
-  institution: string;
+	@Prop()
+	institution: string;
 
-  @Prop()
-  jwt_token: string;
+	@Prop()
+	jwt_token: string;
 
-  /// Could not determine type the field only had null or empty values in the sample set.
-  @Prop()
-  keywords: string;
+	/// Could not determine type the field only had null or empty values in the sample set.
+	@Prop()
+	keywords: string;
 
-  @Prop()
-  last_update: string;
+	@Prop()
+	last_update: string;
 
-  @Prop()
-  profile_picture: string;
+	@Prop()
+	profile_picture: string;
 
-  @Prop()
-  role: string;
+	@Prop({ required: true })
+	role: string;
 
-  @Prop()
-  username: string;
+	@Prop()
+	username: string;
 
-  @Prop({ required: true })
-  orcid_id: string;
+	@Prop({ required: true, unique: true })
+	orcid_id: string;
 
-  @Prop()
-  orcid_permission: string;
+	@Prop()
+	orcid_permission: string;
 
-  @Prop()
-  resources: UserResource[];
+	@Prop({ required: false })
+	resources: UserResource[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

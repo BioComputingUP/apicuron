@@ -6,12 +6,11 @@ import { OrcidStrategy } from './orcid.strategy';
 import { AuthController } from './auth.controller';
 import { UsersService } from './users/users.service';
 import { UsersController } from './users/users.controller';
-import { LocalAuthGuard } from './local-auth.guard';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './users/user.schema';
 
 @Module({
-  providers: [AuthService, OrcidStrategy, UsersService, LocalAuthGuard],
+  providers: [AuthService, OrcidStrategy, UsersService],
   imports: [
     // PrismaModule,
     MongooseModule.forFeature([
@@ -27,7 +26,7 @@ import { User, UserSchema } from './users/user.schema';
       }),
     }),
   ],
-  exports: [LocalAuthGuard],
+  exports: [UsersService],
   controllers: [AuthController, UsersController],
 })
 export class AuthModule {}
