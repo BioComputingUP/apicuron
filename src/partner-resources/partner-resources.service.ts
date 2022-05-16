@@ -8,6 +8,7 @@ import {
 	PartnerResourceDocument,
 	ResourceSummary,
 } from './schemas/partner-resources.schema';
+import { Term, TermDocument } from './schemas/terms.schema';
 
 @Injectable()
 export class PartnerResourcesService {
@@ -16,6 +17,7 @@ export class PartnerResourcesService {
 		private partnerResourceModel: Model<PartnerResourceDocument>,
 		@InjectModel('badge') private badgeModel: Model<BadgeDocument>,
 		@InjectModel('medal') private medalModel: Model<MedalDocument>,
+		@InjectModel(Term.name) private termDefModel: Model<TermDocument>,
 	) {}
 	async get_resources(): Promise<PartnerResource[]> {
 		return await this.partnerResourceModel.find();
@@ -33,14 +35,18 @@ export class PartnerResourcesService {
 				const badgesPromise = this.badgeModel.find({
 					resource_uri: element.resource_uri,
 				});
+				const termsDefPromise = this.termDefModel.find({
+					resource_uri: element.resource_uri
+				})
 				const medalsPromise = this.medalModel.find({
 					resource_uri: element.resource_uri,
 				});
-				const [badges, medals] = await Promise.all([
+				const [badges, medals, terms] = await Promise.all([
 					badgesPromise,
 					medalsPromise,
+					termsDefPromise
 				]);
-				return { ...element, badges, medals };
+				return { ...element, badges, medals, terms };
 			}),
 		);
 

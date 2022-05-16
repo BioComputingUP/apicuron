@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Badge } from './badges.schema';
 import { Medal } from './medals.schema';
+import { Term } from './terms.schema';
 
 export type PartnerResourceDocument = PartnerResource & Document;
 
@@ -31,6 +32,7 @@ export class PartnerResource {
 export class ResourceSummary extends PartnerResource {
 	badges: Badge[];
 	medals: Medal[];
+	terms: Term[];
 }
 
 export const PartnerResourceSchema =
