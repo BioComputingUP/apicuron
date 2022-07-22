@@ -26,7 +26,7 @@ async function bootstrap() {
 
   // Logging startup
   appLogger.log(`Loaded ${envConfig} Configuration`);
-  appLogger.log(`Started Listening on ${host}:${port}`);
+  appLogger.log(`Started Listening on http://${host}:${port}`);
 
   // starting to listen to requests
   await app.listen(port, host);

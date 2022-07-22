@@ -32,6 +32,7 @@ export class PartnerResourcesService {
 
 		const output = await Promise.all(
 			resources.map(async (element) => {
+				// console.log('Ressource', element.resource_uri)
 				const badgesPromise = this.badgeModel.find({
 					resource_uri: element.resource_uri,
 				});
@@ -46,6 +47,9 @@ export class PartnerResourcesService {
 					medalsPromise,
 					termsDefPromise
 				]);
+				if(element.resource_uri == 'https://registry.identifiers.org/registry/disprot'){
+					console.log(badges)
+				}
 				return { ...element, badges, medals, terms };
 			}),
 		);

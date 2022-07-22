@@ -7,8 +7,8 @@ export type PartnerResourceDocument = PartnerResource & Document;
 
 @Schema({ collection: 'resources_def' })
 export class PartnerResource {
-	@Prop({ required: true, unique: true })
-	id: string;
+	// @Prop({ required: true, unique: true })
+	// id: string;
 
 	@Prop()
 	resource_description: string;

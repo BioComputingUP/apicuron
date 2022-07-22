@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { achievements_v1_pipeline } from './aggregation-pipeline/achievements.pipeline';
+import { browse_v1_pipeline } from './aggregation-pipeline/browse.pipeline';
 import { User, UserDocument } from './user.schema';
 
 @Injectable()
@@ -51,5 +53,18 @@ export class UsersService {
 			{ ...data, $setOnInsert: { role: 'user' } },
 			{ upsert: true },
 		);
+	}
+
+
+	async get_users_with_stats(params){
+		const aggregation_pipeline = browse_v1_pipeline(params)
+
+		return await this.userModel.aggregate(aggregation_pipeline)
+	}
+
+	async get_achievements(params){
+		const pipeline = achievements_v1_pipeline(params)
+
+		return await this.userModel.aggregate(pipeline)
 	}
 }

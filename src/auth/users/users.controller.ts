@@ -2,11 +2,15 @@ import {
   Body,
   Controller,
   Get,
+  Header,
+  Headers,
   HttpStatus,
   Param,
   Post,
   Redirect,
+  Req,
   Res,
+  StreamableFile,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -14,6 +18,11 @@ import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { Logger } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { Roles } from '../decorators/roles.decorator';
+import { User } from '../decorators/applyUser.decorator';
+import { createReadStream } from 'fs';
+import { json_to_tsv } from './json-tsv';
 
 @Controller('')
 export class UsersController {
@@ -41,4 +50,41 @@ export class UsersController {
         });
       });
   }
+
+
+  @Get('/browse')
+  // @Roles('user')
+  @UseGuards(LocalAuthGuard)
+  async get_user_stats(@Param() params, @Res() res: Response, @Req() req){
+    // params['orcid_filter'] = 
+
+    const result = await this.usersService.get_users_with_stats(params)
+    
+    res.header('count',result[0]['biocurators_count']);
+    res.send(result[0]['biocurators'])
+  }
+
+  @Get('/achievements')
+  async get_user_achievements(@Param() params, @Req() req, @Headers('format') format, @Res() res) {
+    const result = await this.usersService.get_achievements({ ...params, user: !!req.user ? req.user.orcid_id : null})
+    if(!!format && format == 'tsv'){
+
+      res.set({
+        'Content-Type': 'text/tab-separated-values',
+        'Content-Disposition': 'attachment; filename="apicuron_achievements.tsv"',
+      });
+      res.send(json_to_tsv(result))
+    } else if(!format || !!format && format == 'json'){
+      res.set({
+        'Content-Type': 'application/json',
+        'Content-Disposition': 'attachment; filename="apicuron_achievements.json"',
+      });
+      
+      res.send(result)
+    }
+    
+  }
+
+  @Get('/statistics')
+  async get_user_statistics(){}
 }

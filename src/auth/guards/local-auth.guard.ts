@@ -26,12 +26,12 @@ export class LocalAuthGuard implements CanActivate {
 	private readonly localAuthGuardLogger = new Logger(LocalAuthGuard.name);
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const req = context.switchToHttp().getRequest();
-		const header = this.check_auth_header(req);
-		const token = this.get_token(header);
-		const payload = this.check_token(token);
-		req.user = await this.usersService.get_by_orcid(payload.orcid_id);
+		// const header = this.check_auth_header(req);
+		// const token = this.get_token(header);
+		// const payload = this.check_token(token);
+		// req.user = await this.usersService.get_by_orcid(payload.orcid_id);
 
-		return true;
+		return !!req.user;
 	}
 
 	check_token(token: string): JwtPayload {

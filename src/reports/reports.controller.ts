@@ -14,6 +14,12 @@ export class ReportsController {
 		return await this.reportService.getUserReports(orcid);
 	}
 
+	@Get('/reports')
+	async get_reports(@Param() params){
+		
+		return await this.reportService.get_reports(params);
+	}
+
 	// @Post('/submit_activity')
 	// @UseGuards()
 }

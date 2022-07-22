@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
@@ -8,6 +8,7 @@ import { UsersService } from './users/users.service';
 import { UsersController } from './users/users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './users/user.schema';
+import { AuthMiddleware } from './middlewares/auth.middleware';
 
 @Module({
   providers: [AuthService, OrcidStrategy, UsersService],
@@ -26,7 +27,13 @@ import { User, UserSchema } from './users/user.schema';
       }),
     }),
   ],
-  exports: [UsersService],
+  exports: [UsersService, MongooseModule],
   controllers: [AuthController, UsersController],
 })
-export class AuthModule {}
+export class AuthModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes('/*');
+  }
+}
