@@ -39,7 +39,7 @@ export class UsersController {
         this.usersControllerLogger.log(response);
         res.status(HttpStatus.ACCEPTED).send({
           statusCode: HttpStatus.ACCEPTED,
-          message: `Created or upserted used with ${userData.orcid_id}`,
+          message: `Created or upserted user orcid ${userData.orcid_id}`,
         });
       })
       .catch((err) => {

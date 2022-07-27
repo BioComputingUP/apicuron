@@ -31,8 +31,8 @@ export class AuthController {
 	@Get('/auth/orcid/redirect')
 	@Redirect('/orcid/', 301)
 	@UseGuards(AuthGuard('orcid'))
-	orcid_redirect(@Req() { user }, @Res() res) {
-		const { header, token } = this.authService.generate_jwt_token(user);
+	async orcid_redirect(@Req() { user }, @Res() res) {
+		const { header, token } = await this.authService.generate_jwt_token(user);
 		res.cookie(header, token);
 		res.set(header, token);
 		return { url: '/orcid/' + user.orcid_id, statusCode: 301 };
