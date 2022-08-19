@@ -1,127 +1,119 @@
-<div *ngIf="listResourcesDescriptions">
-  <div id="second-nav-bar" class="fixed-top " style="margin-top: 75px; padding-top: 0px">
-  <div class="container-fluid container-wide  d-none d-sm-block">
-    <div class="row" style="  ">
-      <div class="col-auto mr-auto ">
-        <h2>Databases</h2>
+<div>
+  <div>
+    <div class="tw-mx-auto tw-container tw-max-w-7xl tw-px-2 sm:tw-px-4 2xl:tw-px-0 tw-py-2 xl:tw-py-4 ">
+      <!-- <div class="tw-flex tw-flex-row tw-justify-between tw-flex-wrap"> -->
+        <div class="">
+          <h2 class="tw-text-3xl tw-font-dm-sans tw-font-bold">Partner Resources</h2>
+        </div>
+        <!-- <div>
+          <span class="badge badge-pill ml-3 badge-apicuron tw-cursor-pointer"
+            [ngxScrollTo]="currResource['resource_id']" [ngxScrollToOffset]="-160"
+            *ngFor="let currResource of listResourcesDescriptions">{{currResource['resource_name']}}</span>
+
+        </div> -->
+
+      <!-- </div> -->
+    </div>
+  </div>
+
+
+
+
+  <div class="tw-mx-auto tw-container tw-max-w-7xl tw-px-2 sm:tw-px-4 2xl:tw-px-0 tw-py-2 xl:tw-py-4 ">
+    <div class="tw-flex tw-flex-row">
+      <div class="tw-w-3/4">
+        <div class="tw-mt-3">
+          <p class="tw-leading-7 tw-text-base 2wl:tw-text-lg" style="text-indent:2rem;">
+            This page lists all <strong>member databases</strong> registered to APICURON. Member databases
+            periodically push curation activities in APICURON.
+            By clicking on the "See details" button you can visit database pages where you can find the
+            <strong>leaderboard</strong>, the
+            <strong>achievements definition</strong>
+            (badges, medals) and the full list of <strong>curation records</strong>.
+
+          </p>
+        </div>
+
+        <div class="mt-3 tw-bg-orange-100 tw-border-orange-500 tw-text-orange-700 tw-border-l-4 tw-p-2 lg:tw-p-4">
+          <span class="tw-block tw-font-bold tw-font-dm-sans">Warning</span>
+          <p class=" tw-leading-7">
+            <strong>A comparison across databases is meaningless </strong>.
+            Different curation databases evaluate and weight curation activities differently.
+            Each database defines <strong>curation activities</strong> at <strong>different granularity</strong>.
+            The <strong>scores</strong> assigned to curation activities may have <strong>different meanings</strong> in
+            different databases.
+            For some databases scores are proportional to the curation effort, for other databases scores
+            represent the importance of an activity.
+
+          </p>
+        </div>
       </div>
-      <div class="col-auto pt-1 ml-3">
-        <span class="badge badge-pill ml-3 badge-apicuron"  [ngxScrollTo]="currResource['resource_id']" [ngxScrollToOffset]="-160" *ngFor="let currResource of listResourcesDescriptions">{{currResource['resource_name']}}</span>
-
+      <div class="tw-w-1/4">
+        <div class="tw-bg-gray-200 tw-border-2 tw-border-gray-400 tw-rounded tw-px-2 md:tw-px-4 tw-pb-2 md:tw-pb-4">
+          <span class="tw-block tw-uppercase tw-text-xs tw-text-gray-400 tw-font-bold tw-pt-1">Resources</span>
+          <span class="badge badge-pill ml-3 badge-apicuron tw-cursor-pointer"
+            [ngxScrollTo]="currResource['resource_id']" [ngxScrollToOffset]="-160"
+            *ngFor="let currResource of listResourcesDescriptions">{{currResource['resource_name']}}</span>
+        </div>
       </div>
-
     </div>
-  </div>
-</div>
 
-
-
-
-<div class="container-fluid container-wide" #top style="padding-top: 70px">
-  <div class="row mt-3">
-    <div class="col">
-      This page lists all <strong>member databases</strong> registered to APICURON. Member databases
-      periodically push curation activities in APICURON.
-      By clicking on the "See details" button you can visit database pages where you can find the
-      <strong>leaderboard</strong>, the
-      <strong>achievements definition</strong>
-      (badges, medals) and the full list of <strong>curation records</strong>.
-
+    <div class="tw-flex tw-flex-row tw-flex-wrap tw-pt-2 tw-justify-center md:tw-pt-4">
+      <div class="tw-w-1/2 tw-p-2" [id]="currResource['resource_id']"
+        *ngFor="let currResource of listResourcesDescriptions">
+        <partner-resource [name]="currResource['resource_name']" [description]="currResource['resource_description']"
+          [short_description]="currResource['resource_long_name']" logo="assets/disprot-logo.svg"
+          [resource_uri]="currResource['resource_uri']" [resource_url]="currResource['resource_url']">
+        </partner-resource>
+      </div>
     </div>
-  </div>
+    <!-- <div class="row mt-3">
+      <div class="col">
+        <div class="row mb-3" *ngFor="let currResource of listResourcesDescriptions">
+          <div class="col">
+            <div class="card">
+              <div class="card-body card-database-body">
+                <div class="row mb-0" [id]="currResource['resource_id']">
+                  <div class="col">
+                    <div class="row">
+                      <div class="col col-auto mr-auto ">
+                        <h2>{{currResource['resource_name']}}<span
+                            *ngIf="currResource['resource_name'] !== currResource['resource_long_name']"> -
+                            {{currResource['resource_long_name']}}</span></h2>
+                      </div>
+                      <div class="col col-auto">
+                        <a class="btn btn-apicuron btn-sm" routerLink="/database"
+                          [queryParams]="{resource_uri: currResource['resource_uri']}"> See details <i
+                            class="icon icon-common icon-analyse-graph"></i></a>
 
-  <div class="row mt-3">
-    <div class="col-1 text-right">
-      <span class="badge badge-pill badge-apicuron">Warning</span>
-    </div>
-    <div class="col">
-      <strong>A comparison across databases is meaningless </strong>.
-      Different curation databases evaluate and weight curation activities differently.
-      Each database defines <strong>curation activities</strong> at <strong>different granularity</strong>.
-      The <strong>scores</strong> assigned to curation activities may have <strong>different meanings</strong> in different databases.
-      For some databases scores are proportional to the curation effort, for other databases scores
-      represent the importance of an activity.
-
-    </div>
-  </div>
-
-  <!--<div class="row py-2">
-    <div class="col-2 text-right"><strong>Curation activities</strong></div>
-    <div class="col">Each database defines curation activities with different granularity</div>
-  </div>
-  <div class="row py-2">
-    <div class="col-2 text-right"><strong>Activity scores</strong></div>
-    <div class="col">
-      The scores assigned to curation activities may have different meanings in different databases.
-      Some databases define scores proportional to the curation effort, other databases define scores
-      based on the importance of an activity
-    </div>
-  </div>
-  <div class="row py-2">
-    <div class="col-2 text-right"><strong>Badges</strong></div>
-    <div class="col">
-      Badges are accumulated based on the amount of a curation activities performed by a curator.
-      Each badge is assigned based on one activity or a group of activities
-    </div>
-  </div>
-  <div class="row py-2">
-    <div class="col-2 text-right"><strong>Medals</strong></div>
-
-    <div class="col">
-      Medals are earned based on ranking. The ranking is calculated between curators of a single database by
-      multiplying curation activities by the corresponding score.
-      Each medal represents one or more curation activities.
-    </div>
-  </div>-->
-
-
-
-  <div class="row mt-3">
-    <div class="col">
-      <div class="row mb-3" *ngFor="let currResource of listResourcesDescriptions">
-        <div class="col">
-          <div class="card">
-            <div class="card-body card-database-body">
-              <div class="row mb-0" [id]="currResource['resource_id']">
-                <div class="col">
-                  <div class="row">
-                    <div class="col col-auto mr-auto ">
-                      <h2>{{currResource['resource_name']}}<span *ngIf="currResource['resource_name'] !== currResource['resource_long_name']"> - {{currResource['resource_long_name']}}</span></h2>
-                    </div>
-                    <div class="col col-auto">
-                      <a class="btn btn-apicuron btn-sm" routerLink="/database" [queryParams]="{resource_uri: currResource['resource_uri']}" > See details  <i
-                                                                                                                                class="icon icon-common icon-analyse-graph"></i></a>
-
+                      </div>
                     </div>
                   </div>
-<!--                  <p>-->
-<!--                    <a class="badge badge-apicuron ml-3" routerLink="/curators" [queryParams]="{resource_uri: currResource['resource_id']}">Biocurators <i class="material-icons" style="font-size: small">search</i> </a>-->
-<!--                  </p>-->
                 </div>
-              </div>
-              <div class="row mb-2">
-                <div class="col">
-                  <a class="" href="{{currResource['resource_url']}}" target="_blank">{{currResource['resource_url']}} </a>
+                <div class="row mb-2">
+                  <div class="col">
+                    <a class="" href="{{currResource['resource_url']}}" target="_blank">{{currResource['resource_url']}}
+                    </a>
+                  </div>
                 </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <p class="text-justify">{{currResource['resource_description']}}</p>
+                <div class="row">
+                  <div class="col">
+                    <p class="text-justify">{{currResource['resource_description']}}</p>
+                  </div>
                 </div>
-              </div>
-              <div class="row">
+                <div class="row">
 
-                <div class="col mr-auto">                </div>
+                  <div class="col mr-auto"> </div>
 
-                <div class="col-auto ">
+                  <div class="col-auto ">
+                  </div>
                 </div>
-              </div>
 
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-    </div>
+      </div>
+    </div> -->
   </div>
-</div>

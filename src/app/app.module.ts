@@ -28,7 +28,7 @@ import {HelpComponent} from './help/help.component';
 import {TutorialComponent} from './tutorial/tutorial.component';
 import {ApiComponent} from './api/api.component';
 import {StatisticsComponent} from './statistics/statistics.component';
-import {AboutComponent} from './about/about.component';
+// import {AboutComponent} from './about/about.component';
 import {FeedbackComponent} from './feedback/feedback.component';
 import {LoginComponent} from './login/login.component';
 import {DashboardComponent} from './dashboard/dashboard.component';
@@ -56,7 +56,11 @@ import { MedalViewComponent } from './medal-view/medal-view.component';
 import { DatabaseComponent } from './database/database.component';
 import { NotRegisteredComponent } from './not-registered/not-registered.component';
 import { SwaggerUiComponent } from './swagger-ui/swagger-ui.component';
-import { NumbersBannerComponent } from './v2/numbers-banner/numbers-banner.component';
+import { AltNavbarComponent } from './alt-navbar/alt-navbar.component';
+import { IndexModule } from './index/index.module';
+// import { CuratorModule } from './curator/curator.module';
+// import { AboutModule } from './about/about.module';
+
 
 const appRoutes: Routes = [
   {path: 'curators', component: BrowseComponent},
@@ -66,12 +70,12 @@ const appRoutes: Routes = [
   {path: 'databases', component: DatabasesComponent},
   {path: 'database', component: DatabaseComponent},
   { path: 'api', component: SwaggerUiComponent},
-  {path: 'about', component: AboutComponent},
+  // {path: 'about', loadChildren: () => import('./about/about.module').then(m => m.AboutModule)},
   {path: 'setting', component: DashboardComponent},
   {path: 'settings', component: DashboardComponent},
   { path: 'orcid/:orcid', component: ProfileComponent},
   {path: 'not_registered', component: NotRegisteredComponent},
-  {path: '', component: HomeComponent},
+  {path: 'home', component: HomeComponent},
   {path: '**', component: PageNotFoundComponent}
 ];
 
@@ -82,11 +86,11 @@ const appRoutes: Routes = [
     HomeComponent,
     FootComponent,
     BrowseComponent,
-    HelpComponent,
+    // HelpComponent,
     TutorialComponent,
     ApiComponent,
     StatisticsComponent,
-    AboutComponent,
+    // AboutComponent,
     FeedbackComponent,
     LoginComponent,
     DashboardComponent,
@@ -110,7 +114,7 @@ const appRoutes: Routes = [
     DatabaseComponent,
     NotRegisteredComponent,
     SwaggerUiComponent,
-    NumbersBannerComponent
+    AltNavbarComponent
   ],
   imports: [
     RouterModule.forRoot(
@@ -118,12 +122,16 @@ const appRoutes: Routes = [
     scrollPositionRestoration: 'enabled',
     anchorScrolling: 'enabled',
     scrollOffset: [0, 64],
-    relativeLinkResolution: 'legacy'
+    relativeLinkResolution: 'legacy',
 }
       // { enableTracing: true } // <-- debugging purposes only
     ),
+    // AboutModule,
+
     ScrollToModule.forRoot(),
     BrowserModule,
+    IndexModule,
+    // CuratorModule,
     BrowserAnimationsModule,
     BsDatepickerModule.forRoot(),
     CollapseModule.forRoot(),
@@ -145,7 +153,10 @@ const appRoutes: Routes = [
     ProgressbarModule.forRoot(),
   ],
   providers: [AuthService],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  exports: [
+    RouterModule
+  ]
 })
 export class AppModule {
 }

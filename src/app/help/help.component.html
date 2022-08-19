@@ -2,25 +2,26 @@
   <div class="row pt-3">
     <div class="col-lg-2 d-none d-lg-block d-xl-block">
       <div class="sticky sidebar">
-            <div class="card">
-              <div class="card-header">
-                <h5>Navigate</h5>
-              </div>
-              <div class="card-body">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="tw-text-lg ">Navigate</h5>
+          </div>
+          <div class="card-body">
 
-                <div (click)="scroll(gui)">Web interface</div>
-                <div (click)="scroll(api)">API</div>
-                <div (click)="scroll(widget)">Widget</div>
+            <a class="tw-block" (click)="scroll(link.item)"
+              *ngFor="let link of [{text:'Web interface', item: gui}, {text:'API', item: api}, {text: 'Widget', item: widget}]">{{ link.text }}</a>
+            <!-- <a class="tw-" (click)="scroll(api)">API</a>
+                <a class="tw-" (click)="scroll(widget)">Widget</a> -->
 
-              </div>
-            </div>
-
+          </div>
         </div>
+
+      </div>
     </div>
 
 
     <div class="col-lg-10 text-justify mb-5">
-      <a routerLink="/about"> Read more</a>
+      <!-- <a routerLink="/about"> Read more</a> -->
 
 
       <!-- web interface-->
@@ -32,22 +33,24 @@
         This page describes APICURON website use.
       </p>
       <p class="mb-3">
-        The APICURON graphical user interface allows easy access to the biocuration activities of our partner databases in
-        a graphical way. Biocurators can be searched from the <a routerLink="/curators">Curators page</a> or from the search box
+        The APICURON graphical user interface allows easy access to the biocuration activities of our partner databases
+        in
+        a graphical way. Biocurators can be searched from the <a routerLink="/curators">Curators page</a> or from the
+        search box
         on the <a routerLink="/">Home page</a>.
       </p>
 
 
       <h4 class="mt-2" #databases id="databases">Databases page</h4>
       <p class="mb-3">
-        The  <a routerLink="/databases">Databases page</a>  lists all member databases registered to APICURON.
+        The <a routerLink="/databases">Databases page</a> lists all member databases registered to APICURON.
         Member databases periodically push curation activities and APICURON synchronously
         calculates achievements and leaderboards.
       </p>
 
       <h4 class="mt-2" #database id="database">Database specific page</h4>
       By clicking on a card in the <a routerLink="/databases">Databases page</a>, you get redirected to a
-       page dedicated to a specific resource.
+      page dedicated to a specific resource.
       <ol class="mb-3">
         <li>
           <strong>Database description</strong>
@@ -98,7 +101,7 @@
       <ol class="mb-5">
         <li>
           <strong>Personal information</strong> name and ORCID
-         </li>
+        </li>
         <li>
           <strong>Biocuration statistics</strong> number of generated/revised/invalidated entitities
         </li>
@@ -118,7 +121,8 @@
       and the output format see the <a routerLink="/api">API documentation</a> section.
 
       <h2 class="pt-3 mb-3 mt-5" id="widget" #widget>Widget</h2>
-      The connected resources can use the APICURON widget to acknowledge their biocurators on the resource homepage, using APICURON leaderboard.
+      The connected resources can use the APICURON widget to acknowledge their biocurators on the resource homepage,
+      using APICURON leaderboard.
       The widget is a web-component, you can simply add to you HTML codebase:
       <pre class="style-code mb-5 mt-3">{{codeWidget}}</pre>
 

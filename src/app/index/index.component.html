@@ -1,0 +1,59 @@
+<div class="container-fluid tw-bg-gray-200 tw-py-4 tw-px-0">
+  <div class="tw-flex tw-flex-row tw-justify-between tw-flex-wrap world-map lg:tw-h-80 tw-mx-auto tw-max-w-7xl tw-px-2 sm:tw-px-8 2xl:tw-px-0 tw-py-4 2xl:tw-py-8">
+    <div class="tw-w-full tw-pb-4">
+      <img class="img-fluid tw-align-baseline" src="../assets/APICURON.svg">
+    </div>
+    <div class="lg:tw-w-1/3 xl:tw-1/4 tw-w-full">
+      <p class="tw-font-dm-sans tw-leading-6 tw-text-lg tw-text-black">
+        The database to credit and acknowledge the work of biocurators.<br><br>
+
+        <strong class="font-bold">APICURON</strong> collects and aggregates biocuration events from third party
+        resources and generates <strong class="font-bold">achievements</strong> and <strong
+          class="font-bold">leaderboards !</strong><br><br>
+
+        If you are a biocurator and want to appear here ask your database manager to contact us. <a routerLink="/about"
+          class="underline italic"> Read more</a>
+
+      </p>
+    </div>
+
+    <div class="lg:tw-w-1/3 xl:tw-1/4 tw-w-full tw-flex tw-justify-end lg:tw-tw-justify-start tw-mt-6 md:tw-mt-0">
+
+      <div>
+        <label class="tw-font-dm-sans tw-text-black" for="">Search Biocurators</label>
+        <div class="tw-flex tw-flex-row tw-items-stretch">
+          <input
+            class="tw-p-2 tw-font-dm-sans tw-text-gray-600 tw-text-lg xl:tw-w-64 tw-w-48 tw-outline-none tw-border tw-rounded-tl-md tw-rounded-bl-md tw-border-apicuron-purple"
+            placeholder="Search" type="text" name="" id="search-biocurators">
+          <button class="tw-bg-apicuron-purple tw-rounded-tr-md tw-rounded-br-md tw-text-white p-2">
+            <svg class="tw-w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <index-numbers-banner></index-numbers-banner>
+  <div class="tw-p-2 tw-pb-2 md:tw-pb-4">
+    <h2 class="tw-text-4xl tw-font-dm-sans tw-py-2 tw-font-bold tw-text-center">Partner databases</h2>
+    <div class="tw-mx-auto tw-max-w-7xl tw-flex tw-flex-row tw-flex-wrap">
+      <div class="tw-w-full md:tw-w-1/2 tw-p-1 md:tw-p-2 xl:tw-p-4">
+        <partner-resource 
+          name="DisProt"
+          description="DisProt is a database of intrinsically disordered proteins. Disordered regions are manually curated from literature. DisProt annotations cover both structural and functional aspects of disorder detected by specific experimental methods."
+          short_description="The database of intrinsically disordered proteins" 
+          logo="assets/disprot-logo.svg">
+        </partner-resource>
+
+      </div>
+      <!-- <div class="tw-w-full md:tw-w-1/2 2xl:tw-w-1/3 tw-p-1 md:tw-p-2 xl:tw-p-4">
+        <partner-resource></partner-resource>
+
+      </div> -->
+    </div>
+  </div>
+  <app-credit></app-credit>
+</div>
