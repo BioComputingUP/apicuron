@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-export type MedalDocument = Medal & Document;
+export type MedalDefDocument = MedalDef & Document;
 
 @Schema({ collection: 'achievements_def' })
-export class Medal {
+export class MedalDef {
 	// fields from Achievement
 
 	@Prop()
@@ -37,4 +37,4 @@ export class Medal {
 
 }
 
-export const MedalSchema = SchemaFactory.createForClass(Medal);
+export const MedalDefSchema = SchemaFactory.createForClass(MedalDef);

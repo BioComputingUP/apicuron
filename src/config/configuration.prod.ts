@@ -8,7 +8,11 @@ export default () => ({
   JWT_SECRET: 'secret',
   PORT: 8298,
   HOST: 'localhost',
-  ORCID_API_URL:'https://pub.orcid.org/v3.0/'
+  ORCID_API_URL:'https://pub.orcid.org/v3.0/',
+  PUBLIC_FILES_PATH: 'public',
+  JWT_HEADER: 'authorization',
+  JWT_PREFIX: 'bearer',
+  V1_HOST: 'http://localhost:8198/', // Apicuron first version host location
   //   port: parseInt(process.env.PORT, 10) || 3000,
   //   database: {
   //     host: process.env.DATABASE_HOST,

@@ -1,6 +1,6 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
-import { Term } from 'src/partner-resources/schemas/terms.schema';
+import { Term } from '../resources/schemas/terms.schema';
 
 export type ReportDocument = Report & Document;
 @Schema({

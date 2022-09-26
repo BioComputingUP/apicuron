@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { UsersService } from 'src/auth/users/users.service';
 import { AuthService } from './auth.service';
 import { Strategy } from 'passport-orcid';
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from './users/users.service';
 @Injectable()
 export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
   constructor(

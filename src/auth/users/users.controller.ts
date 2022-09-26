@@ -14,7 +14,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { Logger } from '@nestjs/common';
@@ -23,6 +22,7 @@ import { Roles } from '../decorators/roles.decorator';
 import { User } from '../decorators/applyUser.decorator';
 import { createReadStream } from 'fs';
 import { json_to_tsv } from './json-tsv';
+import { LocalAuthGuard } from '../guards/local-auth.guard';
 
 @Controller('')
 export class UsersController {
@@ -84,7 +84,18 @@ export class UsersController {
     }
     
   }
+}
 
-  @Get('/statistics')
-  async get_user_statistics(){}
+
+@Controller({
+	version: '2',
+	path: 'users'
+})
+export class UserControllerV2 {
+  constructor(private usersService: UsersService){}
+
+  @Get(':orcid_id')
+  async get_curator(@Param('orcid_id') orcid_id: string){
+    return await this.usersService.get_by_orcid(orcid_id)
+  }
 }

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-export type BadgeDocument = Badge & Document;
+export type BadgeDefDocument = BadgeDef & Document;
 
 @Schema({
 	collection: 'achievements_def',
@@ -11,7 +11,7 @@ export type BadgeDocument = Badge & Document;
 	// 	},
 	// },
 })
-export class Badge {
+export class BadgeDef {
 	// fields from Achievement
 	// id: string;
 
@@ -39,4 +39,4 @@ export class Badge {
 	color_code: string;
 }
 
-export const BadgeSchema = SchemaFactory.createForClass(Badge);
+export const BadgeDefSchema = SchemaFactory.createForClass(BadgeDef);

@@ -7,10 +7,12 @@ export default () => ({
   ENV_NAME: 'development',
   JWT_SECRET: 'secret',
   PORT: 3000,
-  HOST: 'localhost',
+  HOST: '0.0.0.0',
   ORCID_API_URL: 'https://pub.sandbox.orcid.org/v3.0/',
   JWT_HEADER: 'authorization',
-  JWT_PREFIX: 'bearer'
+  JWT_PREFIX: 'bearer',
+  V1_HOST: 'http://localhost:8198/', // Apicuron first version host location
+  PUBLIC_FILES_PATH: 'public'
   //   port: parseInt(process.env.PORT, 10) || 3000,
   //   database: {
   //     host: process.env.DATABASE_HOST,

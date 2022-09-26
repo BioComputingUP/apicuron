@@ -5,9 +5,9 @@ import {
 	UnauthorizedException,
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { UsersService } from 'src/auth/users/users.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from '../users/users.service';
 
 export interface JwtPayload {
 	orcid_id: string;
@@ -27,11 +27,16 @@ export class AuthMiddleware implements NestMiddleware {
 	async use(req, res: Response, next: NextFunction) {
 		try {
 			const header = this.check_auth_header(req);
+			if(!header){
+				req.user = null
+				next();
+				return
+			}
 			const token = this.get_token(header);
 			const payload = this.check_token(token);
 			req.user = await this.usersService.get_by_orcid(payload.orcid_id);
 		} catch (e) {
-			// this.authMiddlewareLogger.error(e.message);
+			this.authMiddlewareLogger.error(e.message);
 			req.user = null;
 		}
 		next();
@@ -72,15 +77,16 @@ export class AuthMiddleware implements NestMiddleware {
 		} else if (req.cookies[tokenKey]) {
 			return req.cookies[tokenKey];
 		} else {
-			// this.authMiddlewareLogger.error('Absent Authorization header');
-			this.unauthorized_exception('authorization header non-existent');
+			this.authMiddlewareLogger.log('Absent Authorization header');
+			return null
+			// this.unauthorized_exception('authorization header non-existent');
 		}
 	}
 
 	unauthorized_exception(reason: string) {
 		throw new UnauthorizedException({
 			statusCode: 403,
-			message: 'Forbidden resource',
+			message: 'Forbidden resource: ' + reason,
 			reason,
 			error: 'Forbidden',
 		});

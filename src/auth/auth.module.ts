@@ -5,35 +5,34 @@ import { AuthService } from './auth.service';
 import { OrcidStrategy } from './orcid.strategy';
 import { AuthController } from './auth.controller';
 import { UsersService } from './users/users.service';
-import { UsersController } from './users/users.controller';
+import { UsersController, UserControllerV2 } from './users/users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './users/user.schema';
 import { AuthMiddleware } from './middlewares/auth.middleware';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  providers: [AuthService, OrcidStrategy, UsersService],
-  imports: [
-    // PrismaModule,
-    MongooseModule.forFeature([
-      {
-        name: User.name,
-        schema: UserSchema,
-      },
-    ]),
-    JwtModule.registerAsync({
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
-      }),
-    }),
-  ],
-  exports: [UsersService, MongooseModule],
-  controllers: [AuthController, UsersController],
+	providers: [AuthService, OrcidStrategy, UsersService],
+	imports: [
+		HttpModule,
+		MongooseModule.forFeature([
+			{
+				name: User.name,
+				schema: UserSchema,
+			},
+		]),
+		JwtModule.registerAsync({
+			inject: [ConfigService],
+			useFactory: async (configService: ConfigService) => ({
+				secret: configService.get('JWT_SECRET'),
+			}),
+		}),
+	],
+	exports: [UsersService, MongooseModule],
+	controllers: [AuthController, UsersController, UserControllerV2],
 })
 export class AuthModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(AuthMiddleware)
-      .forRoutes('/*');
-  }
+	configure(consumer: MiddlewareConsumer) {
+		consumer.apply(AuthMiddleware).forRoutes('/*');
+	}
 }

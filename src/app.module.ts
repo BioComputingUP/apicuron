@@ -6,43 +6,63 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 // import { PrismaModule } from './prisma/prisma.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ReportsModule } from './reports/reports.module';
-import { PartnerResourcesController } from './partner-resources/partner-resources.controller';
-import { PartnerResourcesModule } from './partner-resources/partner-resources.module';
+import { ResourcesModule } from './resources/resources.module';
+import { StatisticsModule } from './statistics/statistics.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import devConfig from './config/configuration.dev';
 import prodConfig from './config/configuration.prod';
+import { join, resolve } from 'path';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MulterModule } from '@nestjs/platform-express';
+import { TransformerModule } from './global/transformer/transformer.module';
+import { AchievementsModule } from './achievements/achievements.module';
 
 function getConfig() {
-  if (process.env.NODE_ENV === 'development') {
-    return devConfig;
-  }
-  if (process.env.NODE_ENV === 'production') {
-    return prodConfig;
-  }
-  return devConfig;
+	if (process.env.NODE_ENV === 'development') {
+		return devConfig;
+	}
+	if (process.env.NODE_ENV === 'production') {
+		return prodConfig;
+	}
+	return devConfig;
 }
 
+
 @Module({
-  imports: [
-    AuthModule,
-    // isGlobal loads Config Module globally, doesn't require imports
-    ConfigModule.forRoot({
-      isGlobal: true,
-      // ignoreEnvFile: true,
-      load: [getConfig()],
-    }),
-    // in here we use the forRootAsync https://docs.nestjs.com/techniques/mongodb#async-configuration
-    // to be able to access the configService asnchronously because it cannot be loaded sooner
-    // due to the fact that this is the appmodule
-    MongooseModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('database_url'),
-      }),
-    }),
-    ReportsModule,
-    PartnerResourcesModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+	imports: [
+		ScheduleModule.forRoot(),
+		AuthModule,
+		MulterModule.register(),
+		// isGlobal loads Config Module globally, doesn't require imports
+		ConfigModule.forRoot({
+			isGlobal: true,
+			// ignoreEnvFile: true,
+			load: [getConfig()],
+		}),
+		// in here we use the forRootAsync https://docs.nestjs.com/techniques/mongodb#async-configuration
+		// to be able to access the configService asnchronously because it cannot be loaded sooner
+		// due to the fact that this is the appmodule
+		MongooseModule.forRootAsync({
+			inject: [ConfigService],
+			useFactory: async (configService: ConfigService) => ({
+				uri: configService.get<string>('database_url'),
+			}),
+		}),
+		// in here we load the Serve static module to serve static files
+		ServeStaticModule.forRootAsync({
+			inject: [ConfigService],
+			useFactory: async (configService: ConfigService) => ([{
+				rootPath: resolve(configService.get('PUBLIC_FILES_PATH')),
+				serveRoot: '/files',
+			}]),
+		}),
+		ReportsModule,
+		ResourcesModule,
+		StatisticsModule,
+		TransformerModule,
+		AchievementsModule
+	],
+	controllers: [AppController],
+	providers: [AppService],
 })
 export class AppModule {}

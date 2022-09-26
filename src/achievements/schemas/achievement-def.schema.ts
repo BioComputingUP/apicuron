@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
-export type AchievementDocument = Achievement & Document;
+export type AchievementDocument = AchievementDef & Document;
 
 
 @Schema({ collection: 'achievements_def', discriminatorKey: 'type' })
-export class Achievement {
+export class AchievementDef {
 	id: string;
 	category: string;
 	color: string;
@@ -23,7 +23,7 @@ export class Achievement {
 	type: string;
 }
 
-export const AchievementSchema = SchemaFactory.createForClass(Achievement);
+export const AchievementDefSchema = SchemaFactory.createForClass(AchievementDef);
 
 
 

@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
-import { UsersService } from 'src/auth/users/users.service';
+import { UsersService } from '../users/users.service';
 
 export interface JwtPayload {
 	orcid_id: string;

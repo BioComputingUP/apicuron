@@ -67,4 +67,8 @@ export class UsersService {
 
 		return await this.userModel.aggregate(pipeline)
 	}
+
+	async count(){
+		return await this.userModel.count()
+	}
 }

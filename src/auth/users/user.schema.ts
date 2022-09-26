@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type UserDocument = User & Document;
 export interface UserResource {
@@ -7,15 +7,39 @@ export interface UserResource {
 	name: string;
 }
 
-@Schema({ collection: 'users' })
+export interface UserStat {
+	resource_uri: string;
+	resource_id: string;
+	generation_count: number;
+	revision_count: number;
+	invalidation_count: number;
+	generation_score: number;
+	revision_score: number;
+	invalidation_score: number;
+	total_score: number;
+	ranking: number;
+	badges_count: number;
+	medals_count: number;
+}
+
+@Schema({
+	collection: 'users',
+	toJSON: {
+		virtuals: true,
+	},
+})
 export class User {
-	// @Prop()
-	// id: string;
+	@Prop({
+		select: false,
+	})
+	id: Types.ObjectId;
 
 	@Prop()
 	biography: string;
 
-	@Prop()
+	@Prop({
+		select: false,
+	})
 	cookie_token: string;
 
 	@Prop()
@@ -43,15 +67,18 @@ export class User {
 	@Prop()
 	institution: string;
 
-	@Prop()
+	@Prop({ select: false })
 	jwt_token: string;
 
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop()
 	keywords: string;
 
-	@Prop()
-	last_update: string;
+	@Prop({
+		default: Date.now(),
+		type: Date
+	})
+	last_update: Date;
 
 	@Prop()
 	profile_picture: string;
@@ -65,11 +92,22 @@ export class User {
 	@Prop({ required: true, unique: true })
 	orcid_id: string;
 
-	@Prop()
+	@Prop({
+		select: false,
+	})
 	orcid_permission: string;
 
-	@Prop({ required: false })
+	@Prop({ required: false, select: false })
 	resources: UserResource[];
+
+	@Prop({ required: false })
+	stats: UserStat[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.virtual('statistics', {
+	ref: 'Statistics',
+	localField: 'orcid_id',
+	foreignField: 'curator_orcid',
+});

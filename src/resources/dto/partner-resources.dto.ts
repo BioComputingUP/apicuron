@@ -1,7 +1,6 @@
 import { IsNotEmpty, IsUrl } from 'class-validator';
-import { BadgeDocument } from '../schemas/badges.schema';
-import { BadgeDto } from './badge.dto';
-import { MedalDto } from './medal.dto';
+import { BadgeDto } from '../../achievements/dto/badge.dto';
+import { MedalDto } from '../../achievements/dto/medal.dto';
 import { TermDto } from './term.dto';
 export class PartnerResourceDto {
 
@@ -16,9 +15,11 @@ export class PartnerResourceDto {
 	resource_name: string;
 
     @IsNotEmpty()
+    @IsUrl()
 	resource_uri: string;
 
     @IsNotEmpty()
+    @IsUrl()
 	resource_url: string;
 
 }
