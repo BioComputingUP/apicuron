@@ -9,7 +9,7 @@ export default () => ({
   PORT: 8298,
   HOST: 'localhost',
   ORCID_API_URL:'https://pub.orcid.org/v3.0/',
-  PUBLIC_FILES_PATH: 'public',
+  PUBLIC_FILES_PATH: '/var/local/webservers/apps/apicuron2/public',
   JWT_HEADER: 'authorization',
   JWT_PREFIX: 'bearer',
   V1_HOST: 'http://localhost:8198/', // Apicuron first version host location
