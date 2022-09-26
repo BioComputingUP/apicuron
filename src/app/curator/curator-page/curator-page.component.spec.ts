@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PartnerResourceComponent } from './partner-resource.component';
+import { CuratorPageComponent } from './curator-page.component';
 
-describe('PartnerResourceComponent', () => {
-  let component: PartnerResourceComponent;
-  let fixture: ComponentFixture<PartnerResourceComponent>;
+describe('CuratorPageComponent', () => {
+  let component: CuratorPageComponent;
+  let fixture: ComponentFixture<CuratorPageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PartnerResourceComponent ]
+      declarations: [ CuratorPageComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PartnerResourceComponent);
+    fixture = TestBed.createComponent(CuratorPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

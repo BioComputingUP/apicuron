@@ -1,28 +1,32 @@
-<div formGroup="biocuratorSearchForm" class="tw-flex tw-flex-row tw-flex-wrap lg:tw-flex-nowrap tw-justify-between tw-bg-white tw-items-stretch tw-mx-auto tw-divide-y tw-divide-apicuron-purple sm:tw-divide-y-0 tw-rounded-xl tw-border tw-border-apicuron-purple sm:tw-border-0 md:tw-rounded-none">
-    <div class="tw-w-full tw-flex tw-my-1 tw-flex-col tw-pb-2 tw-px-2 tw-pt-1 tw-bg-white tw-overflow-y-visible md:tw-border-r tw-border-apicuron-purple lg:tw-w-min sm:tw-rounded-l-xl">
+<form [formGroup]="biocuratorSearchForm" (ngSubmit)="onSubmit()"
+    class="tw-flex tw-flex-row tw-flex-wrap lg:tw-flex-nowrap tw-justify-between tw-bg-white tw-items-stretch tw-mx-auto tw-divide-y tw-divide-apicuron-purple sm:tw-divide-y-0 tw-rounded-xl tw-border tw-border-apicuron-purple sm:tw-border-0 md:tw-rounded-none">
+    <div
+        class="tw-w-full tw-flex tw-my-1 tw-flex-col tw-pb-2 tw-px-2 tw-pt-1 tw-bg-white tw-overflow-y-visible md:tw-border-r tw-border-apicuron-purple lg:tw-w-min sm:tw-rounded-l-xl">
         <span class="tw-text-gray-400 tw-uppercase" style="font-size: 0.60rem;">Resources</span>
         <div class="tw-flex tw-flex-row tw-items-center">
 
             <input (input)="search_resource($event)" (focus)="search_resource($event)"
-                (keyup.enter)="add_resource($event.target.value)" class="tw-outline-none tw-flex-initial" type="text" name=""
-                id="" placeholder="Filter by resource">
-            <div *ngFor="let resource of selected_resources"
+                (keyup.enter)="add_resource($event.target.value)" class="tw-outline-none sm:tw-border-b tw-border-apicuron-purple tw-flex-initial" type="text"
+                name="" id="" placeholder="Filter by resource">
+            <div *ngFor="let resource of resources.selected_resources"
                 class="tw-flex tw-flex-row tw-text-sm tw-py-1 tw-px-2 tw-text-gray-100 tw-bg-apicuron-purple tw-rounded-2xl tw-mr-1">
-                <span class="tw-block">{{resource}}</span>
+                <span class="tw-block tw-pr-1">{{resource}}</span>
                 <button class="focus:tw-outline-none tw-align-middle" (click)="remove_selection(resource)">
-                    <svg class="tw-w-3 tw-h-3"viewBox="0 0 69 69" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
+                    <svg class="tw-w-3 tw-h-3" viewBox="0 0 69 69" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M62.604 1.16134L34.468 29.2973L6.33735 1.16134C4.88949 -0.286527 2.54562 -0.286527 1.09255 1.16134C-0.355314 2.60921 -0.355314 4.95307 1.09255 6.40614L29.2232 34.5368L1.09255 62.6515C-0.355314 64.0993 -0.355314 66.4432 1.09255 67.8963C2.54042 69.3441 4.88429 69.3441 6.33735 67.8963L34.468 39.7656L62.5987 67.8963C64.0466 69.3441 66.3904 69.3441 67.8435 67.8963C69.2914 66.4484 69.2914 64.1045 67.8435 62.6515L39.7128 34.5368L67.8435 6.40614C69.2914 4.95827 69.2914 2.61441 67.8435 1.16134C66.3956 -0.286527 64.0518 -0.286527 62.5987 1.16134H62.604Z"
                             fill="white" />
                     </svg>
                 </button>
             </div>
+            
         </div>
-        
+        <div *ngIf="selected_resources.invalid">
+            Name is required.
+        </div>
         <div class="tw-z-10 tw-relative"
-            [ngClass]="{'tw-inline-block': display_resource_suggesion, 'tw-hidden': !display_resource_suggesion}"
-            (focusout)="display_resource_suggesion = false">
+            [ngClass]="{'tw-inline-block': resources.display_resource_suggesion, 'tw-hidden': !resources.display_resource_suggesion}"
+            (focusout)="resources.display_resource_suggesion = false">
             <div
                 class="tw-block tw-absolute tw-top-2 tw-left-0 tw-right-0 tw-rounded-md tw-border tw-border-gray-700 tw-bg-white tw-py-1 tw-shadow-lg">
                 <div *ngFor="let resource of filtered_resources"
@@ -32,14 +36,19 @@
         </div>
 
     </div>
-    <div class="tw-bg-white tw-my-1 tw-pb-2 tw-px-2 tw-pt-1 tw-border-0 sm:tw-border-r tw-border-apicuron-purple tw-items-stretch tw-flex-auto tw-flex tw-flex-col">
+    <div
+        class="tw-bg-white tw-my-1 tw-pb-2 tw-px-2 tw-pt-1 tw-border-0 sm:tw-border-r tw-border-apicuron-purple tw-items-stretch tw-flex-auto tw-flex tw-flex-col">
         <span class="tw-text-gray-400 tw-uppercase" style="font-size: 0.60rem;">Search Field</span>
-        <select formControlName="search_field" class="tw-bg-white tw-text-apicuron-purple focus:tw-outline-none tw-pr-2 lg:tw-pr-4" name="" id="">
-            <option *ngFor="let item of search_fields;let i = index" [selected]="i == 0" [ngValue]="item.field">{{item.text}}</option>
+        <select formControlName="search_field"
+            class="tw-bg-white tw-text-apicuron-purple focus:tw-outline-none tw-pr-2 lg:tw-pr-4 sm:tw-border-b tw-border-apicuron-purple" name="" id="">
+            <option *ngFor="let item of search_fields" [ngValue]="item.field">
+                {{item.text}}</option>
         </select>
     </div>
 
-    <input class="tw-outline-none tw-my-1 tw-p-2 tw-flex-auto" type="search"
-        name="search" id="" placeholder="Search ...">
-    <input class="tw-w-full sm:tw-w-auto tw-py-2 tw-bg-apicuron-purple tw-text-gray-100 sm:tw-rounded-r-xl tw-px-2" [(ngModel)]="search_text" type="submit" name="" id="">
-</div>
+    <input class="tw-outline-none tw-my-2 tw-p-2 tw-flex-auto" type="search" name="search" id=""
+        placeholder="Search ..." formControlName="search_text">
+        
+    <button class="tw-w-full sm:tw-w-auto tw-py-2 sm:tw-px-4 tw-bg-apicuron-purple focus:tw-outline-none focus:tw-shadow-inner tw-text-gray-100 sm:tw-rounded-r-xl tw-px-2"
+        type="submit" name="" id="">Submit</button>
+</form>

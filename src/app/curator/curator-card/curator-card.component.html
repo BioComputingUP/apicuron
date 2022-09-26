@@ -1,8 +1,9 @@
 <div [ngClass]="{'tw-flex-row': !vertical, 'tw-flex-col': vertical}"
-    class="tw-flex tw-items-center tw-flex-wrap tw-bg-white tw-border tw-border-gray-500 tw-rounded-lg tw-shadow-lg tw-pt-2">
+    class="tw-flex tw-items-center tw-flex-wrap tw-bg-white tw-border tw-border-gray-500 tw-rounded-lg tw-shadow-lg tw-pt-2 tw-h-full">
     <div [ngClass]="{'tw-p-2': !vertical}">
-        <svg class="tw-w-24 tw-h-24 tw-rounded-full tw-text-gray-800" viewBox="0 0 886 886" fill="currentColor"
-            xmlns="http://www.w3.org/2000/svg">
+        <!-- <svg class=" tw-rounded-full tw-text-gray-800"
+            [ngClass]="" viewBox="0 0 886 886"
+            fill="currentColor" xmlns="http://www.w3.org/2000/svg">
             <g clip-path="url(#clip0_234_224)">
                 <path fill-rule="evenodd" clip-rule="evenodd"
                     d="M443 -0.34668C198.48 -0.34668 -0.359985 198.48 -0.359985 443.013C-0.359985 687.533 198.48 886.373 443 886.373C563.036 886.373 671.693 838.123 751.587 760.42C834.431 679.841 886.36 567.5 886.36 443.02C886.36 198.5 687.533 -0.340007 443 -0.340007V-0.34668ZM438.594 194.253C486.807 192.545 516.515 202.233 545.968 237.393C583.25 281.519 585.114 342.065 575.886 388.847C573.792 398.675 582.214 409.325 592.26 409.316C599.182 422.087 596.245 449.452 591 464.732C584.281 465.284 578.146 470.242 576.197 476.696C569.114 498.914 549.009 520.893 518.572 544.393C514.39 547.731 511.999 553.221 512.275 558.56L515.426 626.576C524.832 657.122 705.68 696.628 719.786 744.341C646.869 811.429 549.946 852.658 442.999 852.658C336.603 852.658 239.639 811.762 166.853 745.284C169.894 704.716 288.926 675.314 342.239 641.69C346.656 638.862 349.422 634.013 349.797 628.779L354.833 554.779C355.047 549.945 353 544.873 349.479 541.555C329.058 521.867 318.506 502.956 306.026 474.487C303.385 468.362 296.953 463.971 290.28 464.096C285.4 444.383 286.166 424.779 289.65 408.68C299.963 408.951 309.02 397.935 306.656 387.899C296.327 332.451 305.504 288.295 333.421 245.885C358.535 209.489 398.65 196.088 438.593 194.245L438.594 194.253Z"
@@ -13,41 +14,65 @@
                     <rect width="886" height="886" fill="currentColor" />
                 </clipPath>
             </defs>
-        </svg>
+        </svg> -->
+        <svg-avatar [ngClass]="{'tw-w-24 tw-h-24': vertical, 'tw-w-20 tw-h-20': !vertical, 'tw-rounded-full tw-text-gray-800': true}"></svg-avatar>
     </div>
-    <div class="tw-flex tw-flex-col tw-ml-2" [ngClass]="{'tw-items-center': vertical}">
-        <span class="tw-text-xl tw-font-dm-sans tw-text-gray-900 tw-font-bold">Bouhraoua Kamel Eddine Adel</span>
-        <a
+    <div class="tw-flex tw-flex-col" [ngClass]="{'tw-items-center': vertical, 'tw-ml-2': !vertical}">
+        <a [routerLink]="['/curators', orcid_id]" class="tw-text-xl tw-font-dm-sans tw-text-gray-900 hover:tw-text-gray-900 tw-font-bold hover:tw-underline">{{ displayedName
+            }}</a>
+        <a [href]="'http://orcid.org/'+orcid_id" target="_blank"
             class="tw-text-blue-600 tw-font-light tw-text-sm hover:tw-underline hover:tw-text-blue-700 tw-cursor-pointer">
-            0000-0001-6859-3648
+            {{ orcid_id }}
             <img class="tw-inline tw-h-3 tw-w-3" src="assets/link.svg" alt="">
         </a>
-        <div class="tw-pt-2" [ngClass]="{'tw-max-w-lg': vertical}">
-            <span *ngIf="!vertical" class="tw-text-gray-400 tw-font-bold tw-uppercase tw-text-sm tw-mr-2">resources</span>
-            <a
-                class="tw-bg-apicuron-purple tw-text-gray-100 tw-cursor-pointer hover:tw-text-white tw-font-bold tw-text-xs tw-rounded-2xl tw-p-1 tw-mr-1">Disprot</a>
-            <a
-                class="tw-bg-apicuron-purple tw-text-gray-100 tw-cursor-pointer hover:tw-text-white tw-font-bold tw-text-xs tw-rounded-2xl tw-p-1 tw-mr-1">Disprot</a>
+        <div *ngIf="single_resource()" class="tw-pt-1 tw-pb-2 tw-flex tw-flex-row tw-items-center tw-text-gray-400">
+            <svg class="tw-h-4 tw-w-4" viewBox="0 0 13 17" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M0.0759903 0.656951C-0.108186 0.387653 0.0640529 0 0.360782 0H4.02044C4.24681 0.0028959 4.457 0.118565 4.58149 0.30875L5.75988 2.02403L3.38946 5.48889L0.0759903 0.656951ZM6.5 16.4667C2.24568 16.4667 0.11588 11.2934 3.12377 8.26798C6.13167 5.24256 11.2749 7.38477 11.2749 11.6639C11.2749 14.3164 9.13713 16.4667 6.5 16.4667ZM6.5 5.65184C7.39947 5.65079 8.28747 5.85488 9.09723 6.24876L12.924 0.656951C13.1082 0.387653 12.9359 0 12.6392 0H8.97956C8.75319 0.0028959 8.543 0.118565 8.41851 0.30875L4.53375 5.98632C5.16582 5.76449 5.83055 5.65141 6.5 5.65184Z"
+                    fill="currentColor" />
+            </svg>
+            <span>{{ biocurator['stats']['medals_count'] }}</span>
+            <svg class="tw-h-4 tw-w-4 tw-ml-2" viewBox="0 0 14 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M9.59756 13.6969L10.3615 13.7392V19L6.99637 17.0513L3.63127 19V13.7392L4.39519 13.6969C4.65627 13.6827 4.91252 13.7627 5.11559 13.9249L5.87709 14.529C6.20103 14.7852 6.59991 14.9145 6.99637 14.9145C7.39284 14.9145 7.79172 14.7852 8.11566 14.529L8.87716 13.9249C9.08022 13.765 9.33164 13.6827 9.59756 13.6969ZM6.99637 3.36089C4.87384 3.36089 3.14778 5.03928 3.14778 7.10318C3.14778 9.16708 4.87384 10.8455 6.99637 10.8455C9.1189 10.8455 10.845 9.16708 10.845 7.10318C10.845 5.03928 9.1189 3.36089 6.99637 3.36089ZM13.9296 8.61702C14.1085 9.066 13.9369 9.57845 13.5211 9.83938L12.6943 10.3565C12.322 10.5892 12.0537 10.9466 11.9425 11.365L11.6911 12.2888C11.5654 12.7542 11.1157 13.0716 10.6226 13.0434L9.64108 12.9893C9.19626 12.9658 8.76595 13.1021 8.42268 13.3748L7.66118 13.9789C7.27922 14.2822 6.7232 14.2822 6.33882 13.9789L5.57732 13.3748C5.26064 13.1233 4.86659 12.9869 4.45804 12.9869C4.4242 12.9869 4.39035 12.9869 4.35892 12.9893L3.37744 13.0434C2.88186 13.0716 2.43463 12.7519 2.30892 12.2888L2.0575 11.365C1.94388 10.9489 1.67796 10.5916 1.30567 10.3565L0.478902 9.83938C0.0630989 9.57845 -0.108541 9.066 0.0703511 8.61702L0.425718 7.72611C0.58527 7.32415 0.58527 6.88222 0.425718 6.48025L0.0703511 5.58934C-0.108541 5.14036 0.0630989 4.62791 0.478902 4.36699L1.30567 3.84983C1.67796 3.61712 1.9463 3.25981 2.0575 2.84139L2.30892 1.91757C2.43463 1.45214 2.88186 1.13479 3.37744 1.163L4.35892 1.21707C4.7989 1.24057 5.23405 1.10423 5.57732 0.831555L6.33882 0.227429C6.72078 -0.0758096 7.2768 -0.0758096 7.66118 0.227429L8.42268 0.831555C8.76595 1.10423 9.19868 1.24057 9.64108 1.21707L10.6226 1.163C11.1157 1.13714 11.5654 1.45449 11.6911 1.91757L11.9425 2.84139C12.0561 3.25746 12.322 3.61477 12.6943 3.84983L13.5211 4.36699C13.9369 4.62791 14.1085 5.14036 13.9296 5.58934L13.5743 6.48025C13.4147 6.88222 13.4147 7.32415 13.5743 7.72611L13.9296 8.61702ZM11.5702 7.10318C11.5702 4.65142 9.51778 2.65569 6.99637 2.65569C4.47496 2.65569 2.42254 4.65142 2.42254 7.10318C2.42254 9.55495 4.47496 11.5507 6.99637 11.5507C9.51778 11.5507 11.5702 9.55495 11.5702 7.10318Z"
+                    fill="#9CA3AF" />
+            </svg>
+            <span>{{ biocurator['stats']['badges_count'] }}</span>
+
+
+        </div>
+        <div *ngIf="display_resources" class="tw-pt-1 tw-pb-2" [ngClass]="{'tw-max-w-lg': vertical}">
+            <span *ngIf="!vertical"
+                class="tw-text-gray-400 tw-font-bold tw-uppercase tw-text-sm tw-mr-2">resources</span>
+            <a *ngFor="let resource of resources"
+                class="tw-bg-apicuron-purple tw-text-gray-100 tw-cursor-pointer hover:tw-text-white tw-font-bold tw-text-xs tw-rounded-2xl tw-p-1 tw-mr-1">{{
+                resource }}</a>
+            <!-- <a
+                class="tw-bg-apicuron-purple tw-text-gray-100 tw-cursor-pointer hover:tw-text-white tw-font-bold tw-text-xs tw-rounded-2xl tw-p-1 tw-mr-1">Disprot</a> -->
         </div>
     </div>
-    <div class="tw-w-full tw-flex tw-flex-row tw-flex-wrap tw-border-t tw-justify-center tw-border-gray-500 tw-mt-2 md:tw-mt-4">
-        <div class="tw-w-1/2 sm:tw-w-1/3 tw-border-r sm:tw-border-b-0 tw-border-b tw-border-gray-500 tw-p-1 md:tw-p-2">
+    <div *ngIf="display_scores"
+        class="tw-w-full tw-flex tw-flex-row tw-flex-wrap tw-border-t tw-justify-center tw-border-gray-500 tw-mt-2 md:tw-mt-auto">
+        <div
+            class="tw-w-1/2 sm:tw-w-1/3 tw-border-r sm:tw-border-b-0 tw-border-b tw-border-gray-500 tw-p-1 md:tw-p-1 tw-justify-se">
             <span class="tw-text-xs tw-uppercase tw-font-bold tw-text-gray-400">
                 generation
             </span>
-            <span class="tw-block tw-text-lg tw-font-bold tw-text-gray-800 tw-text-right">800</span>
+            <span class="tw-block tw-text-lg tw-font-bold tw-text-gray-800 tw-text-right">{{ generation_score }}</span>
         </div>
-        <div class="tw-w-1/2 sm:tw-w-1/3 sm:tw-border-r sm:tw-border-b-0 tw-border-b tw-border-gray-500 tw-p-1 md:tw-p-2">
+        <div
+            class="tw-w-1/2 sm:tw-w-1/3 sm:tw-border-r sm:tw-border-b-0 tw-border-b tw-border-gray-500 tw-p-1 md:tw-p-1">
             <span class="tw-text-xs tw-uppercase tw-font-bold tw-text-gray-400">
                 revision
             </span>
-            <span class="tw-block tw-text-lg tw-font-bold tw-text-gray-800 tw-text-right">800</span>
+            <span class="tw-block tw-text-lg tw-font-bold tw-text-gray-800 tw-text-right">{{ revision_score }}</span>
         </div>
-        <div class="tw-w-1/2 sm:tw-w-1/3 tw-p-1 md:tw-p-2 sm:tw-border-0">
+        <div class="tw-w-1/2 sm:tw-w-1/3 tw-p-1 md:tw-p-1 sm:tw-border-0">
             <span class="tw-text-xs tw-uppercase tw-font-bold tw-text-gray-400">
                 invalidation
             </span>
-            <span class="tw-block tw-text-lg tw-font-bold tw-text-gray-800 tw-text-right">800</span>
+            <span class="tw-block tw-text-lg tw-font-bold tw-text-gray-800 tw-text-right">{{ invalidation_score
+                }}</span>
         </div>
     </div>
 

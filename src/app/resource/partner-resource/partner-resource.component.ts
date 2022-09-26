@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-
+import { environment } from '../../../environments/environment';
 @Component({
   selector: 'partner-resource',
   templateUrl: './partner-resource.component.html',
@@ -8,12 +8,25 @@ import { Component, Input, OnInit } from '@angular/core';
 export class PartnerResourceComponent implements OnInit {
 
   @Input() name;
-  @Input() description;
+  @Input() resource_id: string;
+  @Input() description: string;
   @Input() short_description;
-  @Input() logo;
+  @Input() logo: string;
   @Input() resource_uri;
   @Input() resource_url;
   
+  get description_formatted (){
+    return this.description.slice(0, 315).concat('...')
+  }
+
+  get logo_src(){
+    if(this.logo.startsWith('assets')){
+      return this.logo
+    }else{
+      let link = new URL(environment.resource_logo_path, environment.public_file_url)
+      return new URL(this.logo, link).href
+    }
+  }
 
   constructor() { }
 

@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DatabasesComponent } from './databases.component';
+import { InvalidationIconComponent } from './invalidation-icon.component';
 
-describe('DatabasesComponent', () => {
-  let component: DatabasesComponent;
-  let fixture: ComponentFixture<DatabasesComponent>;
+describe('InvalidationIconComponent', () => {
+  let component: InvalidationIconComponent;
+  let fixture: ComponentFixture<InvalidationIconComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DatabasesComponent ]
+      declarations: [ InvalidationIconComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DatabasesComponent);
+    fixture = TestBed.createComponent(InvalidationIconComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

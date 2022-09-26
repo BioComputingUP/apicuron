@@ -1,5 +1,6 @@
 <div class="container-fluid tw-bg-gray-200 tw-py-4 tw-px-0">
-  <div class="tw-flex tw-flex-row tw-justify-between tw-flex-wrap world-map lg:tw-h-80 tw-mx-auto tw-max-w-7xl tw-px-2 sm:tw-px-8 2xl:tw-px-0 tw-py-4 2xl:tw-py-8">
+  <div
+    class="tw-flex tw-flex-row tw-justify-between tw-flex-wrap world-map lg:tw-h-80 tw-mx-auto tw-max-w-7xl tw-px-2 sm:tw-px-8 2xl:tw-px-0 tw-py-4 2xl:tw-py-8">
     <div class="tw-w-full tw-pb-4">
       <img class="img-fluid tw-align-baseline" src="../assets/APICURON.svg">
     </div>
@@ -40,12 +41,16 @@
   <div class="tw-p-2 tw-pb-2 md:tw-pb-4">
     <h2 class="tw-text-4xl tw-font-dm-sans tw-py-2 tw-font-bold tw-text-center">Partner databases</h2>
     <div class="tw-mx-auto tw-max-w-7xl tw-flex tw-flex-row tw-flex-wrap">
-      <div class="tw-w-full md:tw-w-1/2 tw-p-1 md:tw-p-2 xl:tw-p-4">
-        <partner-resource 
+      <div *ngFor="let database of database_list" class="tw-w-full md:tw-w-1/2 tw-p-1 md:tw-p-2 xl:tw-p-4">
+        <!-- <partner-resource 
           name="DisProt"
           description="DisProt is a database of intrinsically disordered proteins. Disordered regions are manually curated from literature. DisProt annotations cover both structural and functional aspects of disorder detected by specific experimental methods."
           short_description="The database of intrinsically disordered proteins" 
           logo="assets/disprot-logo.svg">
+        </partner-resource> -->
+        <partner-resource [name]="database['resource_name']" [description]="database['resource_description']"
+          [short_description]="database['resource_long_name']" [logo]="database['logo'] || 'assets/disprot-logo.svg'"
+          [resource_uri]="database['resource_uri']" [resource_url]="database['resource_url']">
         </partner-resource>
 
       </div>

@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CuratorComponent } from './curator.component';
+import { CuratorsPageComponent } from './curator.component';
 
 describe('CuratorComponent', () => {
-  let component: CuratorComponent;
-  let fixture: ComponentFixture<CuratorComponent>;
+  let component: CuratorsPageComponent;
+  let fixture: ComponentFixture<CuratorsPageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CuratorComponent ]
+      declarations: [ CuratorsPageComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CuratorComponent);
+    fixture = TestBed.createComponent(CuratorsPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

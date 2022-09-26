@@ -1,54 +1,13 @@
-<div class="row footer justify-content-md-between justify-content-center d-flex flex-wrap align-items-center py-2" >
-  <div class="col-lg-6 col-12 text-center text-lg-left">
-    <small>
-      BioComputing UP - Department of Biomedical Sciences - University of Padua, Italy - 2019.
-      <a routerLink="/about" class="footer-link">License & disclaimer</a>.
-    </small>
+<div class="tw-flex tw-flex-row tw-justify-between tw-bg-black tw-py-2 tw-items-center tw-h-12">
+  <span class="tw-text-xs tw-text-white tw-font-light">
+    BioComputing UP - Department of Biomedical Sciences - University of Padua, Italy - 2019. <a
+      routerLink="/about">License & disclaimer</a>.
+  </span>
+
+  <div class="tw-w-1/4 tw-flex tw-flex-row tw-justify-around tw-items-center">
+    <a *ngFor="let item of link_list" target="_blank" [href]="item.link">
+      <img class="tw-h-8" [src]="item.image" alt="">
+    </a>
   </div>
 
-  <div class="col-lg-auto col-12 mt-lg-0 mt-2">
-
-    <div class="row justify-content-lg-end justify-content-center" >
-
-      <!--First logo (double column)-->
-      <div class="col-3">
-        <a href="https://www.unipd.it/en/">
-          <img class="img-fluid" src="assets/logos/UniPD-800_logo_white.svg" alt="UniPD logo">
-        </a>
-      </div>
-
-      <!--Other logos (small)-->
-      <div class="col">
-        <div class="row justify-content-around d-flex flex-wrap align-items-center">
-          <div class="col-2">
-            <a href="http://protein.bio.unipd.it">
-              <img class="img-fluid" src="assets/logos/BioComputingUP_white.svg" alt="Biocomputing UP logo">
-            </a>
-          </div>
-          <div class="col-2">
-            <a href="https://elixir-europe.org">
-              <img class="img-fluid" src="assets/logos/ELIXIR_ITALY_colour_background.svg" alt="ELIXIR Europe logo">
-            </a>
-          </div>
-          <div class="col-2">
-            <a href="https://idpfun.eu">
-              <img class="img-fluid" src="assets/logos/IDPfun.svg" alt="IDPfun logo">
-            </a>
-          </div>
-          <div class="col-2">
-            <a href="https://ngp-net.bio.unipd.it">
-              <img class="img-fluid" src="assets/logos/NGP-net_curves_white_outline.svg" alt="NGP-net logo">
-            </a>
-          </div>
-          <div class="col-2">
-            <a href="https://europa.eu/">
-              <img class="img-fluid logoimg20" src="assets/logos/EU_black.svg" alt="EU logo">
-            </a>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-  </div>
 </div>

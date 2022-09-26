@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { DatabasesService } from '../databases/services/databases.service';
 
 @Component({
   selector: 'app-index',
@@ -6,10 +7,15 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./index.component.scss']
 })
 export class IndexComponent implements OnInit {
+  database_list: Object;
+  
 
-  constructor() { }
+  constructor(protected databaseService: DatabasesService) { }
 
   ngOnInit(): void {
+    this.databaseService.GetResources().subscribe((response) => {
+      this.database_list = response['data']
+    })
   }
 
 }

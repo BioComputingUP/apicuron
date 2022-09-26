@@ -4,7 +4,11 @@
 
 export const environment = {
   production: false,
-  ws: 'https://dev.apicuron.bio.unipd.it/api/'
+  // ws: 'https://dev.apicuron.bio.unipd.it/api/'
+  ws: 'http://dione:3000',
+  public_file_url: 'http://dione:3000/files',
+  resource_logo_path: 'resources',
+  orcid_url: 'https://pub.orcid.org/v3.0/'
   // ws: 'https://apicuron.bio.unipd.it/api/'
   // ws: 'http://localhost:8098/'
 

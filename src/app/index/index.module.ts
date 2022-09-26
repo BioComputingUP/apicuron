@@ -7,6 +7,8 @@ import { NumbersBannerComponent } from './numbers-banner/numbers-banner.componen
 import { NumberElementComponent } from './numbers-banner/number-element/number-element.component';
 import { CreditComponent } from './credit/credit.component';
 import { ResourceModule } from '../resource/resource.module';
+import { RouterModule } from '@angular/router';
+import { DatabasesModule } from '../databases/databases.module';
 
 
 @NgModule({
@@ -14,12 +16,17 @@ import { ResourceModule } from '../resource/resource.module';
     NumbersBannerComponent,
     IndexComponent,
     NumberElementComponent,
-    CreditComponent
+    CreditComponent,
   ],
   imports: [
+    DatabasesModule,
     CommonModule,
     IndexRoutingModule,
+    RouterModule,
     ResourceModule
+  ],
+  exports: [
+    IndexComponent,
   ]
 })
 export class IndexModule { }

@@ -2,10 +2,10 @@
   <div>
     <div class="tw-mx-auto tw-container tw-max-w-7xl tw-px-2 sm:tw-px-4 2xl:tw-px-0 tw-py-2 xl:tw-py-4 ">
       <!-- <div class="tw-flex tw-flex-row tw-justify-between tw-flex-wrap"> -->
-        <div class="">
-          <h2 class="tw-text-3xl tw-font-dm-sans tw-font-bold">Partner Resources</h2>
-        </div>
-        <!-- <div>
+      <div class="">
+        <h2 class="tw-text-3xl tw-font-dm-sans tw-font-bold">Partner Resources</h2>
+      </div>
+      <!-- <div>
           <span class="badge badge-pill ml-3 badge-apicuron tw-cursor-pointer"
             [ngxScrollTo]="currResource['resource_id']" [ngxScrollToOffset]="-160"
             *ngFor="let currResource of listResourcesDescriptions">{{currResource['resource_name']}}</span>
@@ -26,7 +26,7 @@
           <p class="tw-leading-7 tw-text-base 2wl:tw-text-lg" style="text-indent:2rem;">
             This page lists all <strong>member databases</strong> registered to APICURON. Member databases
             periodically push curation activities in APICURON.
-            By clicking on the "See details" button you can visit database pages where you can find the
+            By clicking on the "View details" button you can visit database pages where you can find the
             <strong>leaderboard</strong>, the
             <strong>achievements definition</strong>
             (badges, medals) and the full list of <strong>curation records</strong>.
@@ -35,7 +35,7 @@
         </div>
 
         <div class="mt-3 tw-bg-orange-100 tw-border-orange-500 tw-text-orange-700 tw-border-l-4 tw-p-2 lg:tw-p-4">
-          <span class="tw-block tw-font-bold tw-font-dm-sans">Warning</span>
+          <span class="tw-block tw-font-bold tw-font-dm-sans">Disclaimer</span>
           <p class=" tw-leading-7">
             <strong>A comparison across databases is meaningless </strong>.
             Different curation databases evaluate and weight curation activities differently.
@@ -51,7 +51,7 @@
       <div class="tw-w-1/4">
         <div class="tw-bg-gray-200 tw-border-2 tw-border-gray-400 tw-rounded tw-px-2 md:tw-px-4 tw-pb-2 md:tw-pb-4">
           <span class="tw-block tw-uppercase tw-text-xs tw-text-gray-400 tw-font-bold tw-pt-1">Resources</span>
-          <span class="badge badge-pill ml-3 badge-apicuron tw-cursor-pointer"
+          <span class="tw-bg-apicuron-purple tw-text-white tw-px-2 tw-py-1 tw-rounded-full tw-mr-1 tw-cursor-pointer hover:tw-underline tw-text-sm"
             [ngxScrollTo]="currResource['resource_id']" [ngxScrollToOffset]="-160"
             *ngFor="let currResource of listResourcesDescriptions">{{currResource['resource_name']}}</span>
         </div>
@@ -62,58 +62,9 @@
       <div class="tw-w-1/2 tw-p-2" [id]="currResource['resource_id']"
         *ngFor="let currResource of listResourcesDescriptions">
         <partner-resource [name]="currResource['resource_name']" [description]="currResource['resource_description']"
-          [short_description]="currResource['resource_long_name']" logo="assets/disprot-logo.svg"
-          [resource_uri]="currResource['resource_uri']" [resource_url]="currResource['resource_url']">
+          [short_description]="currResource['resource_long_name']" [logo]="currResource['logo'] || 'assets/disprot-logo.svg'"
+          [resource_uri]="currResource['resource_uri']" [resource_url]="currResource['resource_url']" [resource_id]="currResource['resource_id']">
         </partner-resource>
       </div>
     </div>
-    <!-- <div class="row mt-3">
-      <div class="col">
-        <div class="row mb-3" *ngFor="let currResource of listResourcesDescriptions">
-          <div class="col">
-            <div class="card">
-              <div class="card-body card-database-body">
-                <div class="row mb-0" [id]="currResource['resource_id']">
-                  <div class="col">
-                    <div class="row">
-                      <div class="col col-auto mr-auto ">
-                        <h2>{{currResource['resource_name']}}<span
-                            *ngIf="currResource['resource_name'] !== currResource['resource_long_name']"> -
-                            {{currResource['resource_long_name']}}</span></h2>
-                      </div>
-                      <div class="col col-auto">
-                        <a class="btn btn-apicuron btn-sm" routerLink="/database"
-                          [queryParams]="{resource_uri: currResource['resource_uri']}"> See details <i
-                            class="icon icon-common icon-analyse-graph"></i></a>
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="row mb-2">
-                  <div class="col">
-                    <a class="" href="{{currResource['resource_url']}}" target="_blank">{{currResource['resource_url']}}
-                    </a>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col">
-                    <p class="text-justify">{{currResource['resource_description']}}</p>
-                  </div>
-                </div>
-                <div class="row">
-
-                  <div class="col mr-auto"> </div>
-
-                  <div class="col-auto ">
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div> -->
-  </div>
+</div>

@@ -1,79 +1,112 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { search_field_validator } from './validators/search_field.directive';
-
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { search_field_validator } from "./validators/search_field.directive";
+import { HttpParams } from "@angular/common/http";
+import { CuratorService } from "../curator.service";
+import { DatabasesService } from "src/app/databases/services/databases.service";
 @Component({
-  selector: 'curator-search',
-  templateUrl: './curator-search.component.html',
-  styleUrls: ['./curator-search.component.scss']
+  selector: "curator-search",
+  templateUrl: "./curator-search.component.html",
+  styleUrls: ["./curator-search.component.scss"],
 })
 export class CuratorSearchComponent implements OnInit {
-
-
-  constructor() {}
-
+  constructor(protected databaseService: DatabasesService) {}
   biocuratorSearchForm: FormGroup;
 
   // filter by resource
-  selected_resources = new Set();
-  display_resource_suggesion = false;
-
-  @Input() resources =["DOME", "Disprot", "PED"];
+  resources = {
+    selected_resources: new Set(),
+    display_resource_suggesion: false,
+  };
+  
+  all_resources = ["dome", "disprot", "ped"];
 
   filtered_resources = new Set();
-  
+
   search_fields = [
     {
-      field: 'full_name',
-      text: 'Biocurator name'
+      field: "full_name",
+      text: "Biocurator name",
     },
     {
-      field: 'orcid_id',
-      text: 'ORCID'
-    } 
-  ]
+      field: "orcid_id",
+      text: "ORCID",
+    },
+  ];
 
   // search field selection
-  search_field :string;
+  search_field: string = "full_name";
 
   // search text field
-  search_text: string;
+  @Input()
+  search_text: string = "";
+
+  // parent event to send the data
+  @Output() urlStringEvent = new EventEmitter<any>();
+
   search_resource(event) {
     let value = event.target.value;
     if (value == "") {
-      this.filtered_resources = new Set(this.resources);
-    } else {      
-      this.filtered_resources = new Set(this.resources.filter((name) =>
-        name.toUpperCase().includes(value.toUpperCase()))
+      this.filtered_resources = new Set(this.all_resources);
+    } else {
+      this.filtered_resources = new Set(
+        this.all_resources.filter((name) =>
+          name.toUpperCase().includes(value.toUpperCase())
+        )
       );
     }
-    this.display_resource_suggesion = this.filtered_resources.size > 0;
+    this.resources.display_resource_suggesion =
+      this.filtered_resources.size > 0;
   }
 
   add_resource(resource: string) {
-    
-    let filtered =this.resources.filter(x => x.toUpperCase() == resource.toUpperCase())
+    let filtered = this.all_resources.filter(
+      (x) => x.toUpperCase() == resource.toUpperCase()
+    );
 
-    if(filtered.length == 1){
-      let [res] = filtered
-      this.selected_resources.add(res)
+    if (filtered.length == 1) {
+      let [res] = filtered;
+      this.resources.selected_resources.add(res);
     }
-    this.display_resource_suggesion = false;
+    this.resources.display_resource_suggesion = false;
   }
 
   remove_selection(resource: string) {
-    this.selected_resources.delete(resource)
+    this.resources.selected_resources.delete(resource);
   }
-
-
 
   ngOnInit(): void {
     this.biocuratorSearchForm = new FormGroup({
       search_field: new FormControl(this.search_field, [
         Validators.required,
-        search_field_validator(this.search_fields.map(x => x.field))
+        search_field_validator(this.search_fields.map((x) => x.field)),
+      ]),
+      search_text: new FormControl(this.search_text),
+      selected_resources: new FormControl(this.resources.selected_resources, [
+        Validators.required,
+      ]),
+    });
 
-      ])
+    this.databaseService.GetResources().subscribe((response: Object & { data: Array<{ resource_id: string}>}) => {
+      this.all_resources = response.data.map(resource => resource.resource_id)
     })
+  }
+
+  get selected_resources() {
+    return this.biocuratorSearchForm.get("selected_resources");
+  }
+
+  onSubmit() {
+
+    const search_field = this.biocuratorSearchForm.value.search_field;
+    const search_text = this.biocuratorSearchForm.value.search_text || "";
+    const resources = Array.from(
+      this.biocuratorSearchForm.value.selected_resources
+    );
+
+    const params = {search_field, search_text, 'resources[]': resources}
+
+    this.urlStringEvent.emit(params);
+
   }
 }
