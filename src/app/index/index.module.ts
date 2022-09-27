@@ -9,6 +9,7 @@ import { CreditComponent } from './credit/credit.component';
 import { ResourceModule } from '../resource/resource.module';
 import { RouterModule } from '@angular/router';
 import { DatabasesModule } from '../databases/databases.module';
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -20,6 +21,7 @@ import { DatabasesModule } from '../databases/databases.module';
   ],
   imports: [
     DatabasesModule,
+    FormsModule,
     CommonModule,
     IndexRoutingModule,
     RouterModule,
