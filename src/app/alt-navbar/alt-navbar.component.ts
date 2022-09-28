@@ -12,6 +12,7 @@ export class AltNavbarComponent implements OnInit {
   closed_mobile_menu = true;
   expanded_nav = false;
   loginData;
+  show_login = false;
   isCollapsed = new BehaviorSubject<boolean>(true);
   constructor(private authService: AuthService) {}
 

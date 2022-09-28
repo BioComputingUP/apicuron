@@ -10,7 +10,7 @@ import { SwaggerUiComponent } from "./swagger-ui/swagger-ui.component";
 
 const routes: Routes = [
   // {path: 'curators', component: BrowseComponent},
-  {path: 'login', component: LoginComponent},
+  // {path: 'login', component: LoginComponent},
   // {path: 'feedback', component: FeedbackComponent},
   // { path: 'help', component: HelpComponent},
   // {path: 'database', component: DatabaseComponent},

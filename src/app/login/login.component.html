@@ -1,15 +1,43 @@
-<div class="container-fluid container-wide">
-  <div class="jumbotron">
-    <p>
-      <strong>Please log-in</strong> to edit your profile! <br>
-      See <a routerLink="/about"><strong>About</strong></a> page for more information.
-    </p>
-    <div class="row">
-      <div class="col-auto">
-        <a class="orcidWidget" href="{{env.ws}}auth/orcid" > <img class="orcidLogo" src="assets/logos/orcid_24x24.png">Connect your ORCID iD</a>
+<!-- This example requires Tailwind CSS v2.0+ -->
+<button [ngClass]="button_class" (click)="show_login = true">Login</button>
+<div *ngIf="show_login" class="tw-relative tw-z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <!--
+    Background backdrop, show/hide based on modal state.
+
+    Entering: "ease-out duration-300"
+      From: "opacity-0"
+      To: "opacity-100"
+    Leaving: "ease-in duration-200"
+      From: "opacity-100"
+      To: "opacity-0"
+  -->
+  <div class="tw-fixed tw-inset-0 tw-bg-gray-500 tw-bg-opacity-75 tw-transition-opacity"
+    [ngClass]="{'tw-block':show_login, 'tw-hidden': !show_login}"></div>
+
+  <div class="tw-fixed tw-inset-0 tw-z-10 tw-overflow-y-auto">
+    <div
+      class="tw-flex tw-min-h-full tw-items-center tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0">
+      <!--
+        Modal panel, show/hide based on modal state.
+
+        Entering: "ease-out duration-300"
+          From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          To: "opacity-100 translate-y-0 sm:scale-100"
+        Leaving: "ease-in duration-200"
+          From: "opacity-100 translate-y-0 sm:scale-100"
+          To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+      -->
+      <div [ngClass]="{'tw-block':show_login, 'tw-hidden': !show_login}"
+        class="tw-relative tw-transform tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 sm:tw-max-h-screen ">
+        <div class="tw-bg-white tw-grid tw-grid-flow-row tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4">
+          <img class="tw-justify-self-center" src="../assets/APICURON.svg">
+          <h2 class="tw-text-xl tw-text-gray-900 tw-font-bold tw-text-center tw-w-full tw-mb-8">Login</h2>
+          <a style="background-color: #A6CE39;" [href]="login_link" class="tw-w-full tw-cursor-pointer hover:tw-text-white tw-text-center tw-py-2 tw-text-white tw-font-bold">Continue with
+            ORCID</a>
+          <button class="tw-w-full tw-py-2 tw-text-gray-700 tw-font-bold tw-bg-gray-300"
+            (click)="show_login = false">Cancel</button>
+        </div>
       </div>
     </div>
-
   </div>
 </div>
-
