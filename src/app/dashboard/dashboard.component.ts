@@ -2,7 +2,7 @@ import {Component, OnInit, OnDestroy, TemplateRef} from '@angular/core';
 import {BehaviorSubject, combineLatest, concat} from 'rxjs';
 import {AuthService} from '../services/auth.service';
 import {InternalService} from '../services/internal.service';
-import {FormBuilder, FormControl, Validators} from '@angular/forms';
+import {FormBuilder, UntypedFormControl, Validators} from '@angular/forms';
 import {BsModalService, BsModalRef} from 'ngx-bootstrap/modal';
 
 @Component({
@@ -34,7 +34,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   });
   pageSize = new BehaviorSubject<number>(10);
   dataOnPage = new BehaviorSubject<any[]>([]);
-  searchFormControl = new FormControl();
+  searchFormControl = new UntypedFormControl();
   sortKey = new BehaviorSubject<string>('disprot_id');
   sortDirection = new BehaviorSubject<string>('asc');
 

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import {FormGroup, FormBuilder, Validators, AbstractControl, FormControl} from '@angular/forms';
+import {UntypedFormGroup, UntypedFormBuilder, Validators, AbstractControl, FormControl} from '@angular/forms';
 import {InternalService} from '../services/internal.service';
 import { Router } from '@angular/router';
 import {logger} from 'codelyzer/util/logger';
@@ -12,7 +12,7 @@ import {concat} from 'rxjs';
   styleUrls: ['./edit-profile.component.scss']
 })
 export class EditProfileComponent implements OnInit {
-  public pubmedForm: FormGroup;
+  public pubmedForm: UntypedFormGroup;
   formData = new FormData();
   // profile_picture_text = "add new profile picture";
   env;
@@ -21,7 +21,7 @@ export class EditProfileComponent implements OnInit {
   @Input()profile_obj;
   @ViewChild('file', { static: true }) file;
 
-  constructor(private fb: FormBuilder,
+  constructor(private fb: UntypedFormBuilder,
               private router: Router,
               private internalService: InternalService) { }
 

@@ -1,7 +1,7 @@
 import {Component, OnInit, AfterViewInit} from '@angular/core';
 import {
-  FormGroup,
-  FormBuilder,
+  UntypedFormGroup,
+  UntypedFormBuilder,
   Validators,
   FormArray, } from '@angular/forms';
 
@@ -12,12 +12,12 @@ import {InternalService} from '../services/internal.service';
   styleUrls: ['./feedback.component.scss']
 })
 export class FeedbackComponent implements OnInit {
-  public feedbackForm: FormGroup;
-  form: FormGroup;
+  public feedbackForm: UntypedFormGroup;
+  form: UntypedFormGroup;
   feedback_sent = false;
 
   errors = [];
-  constructor(private fb: FormBuilder,
+  constructor(private fb: UntypedFormBuilder,
               private internalService: InternalService) { }
 
   ngOnInit() {

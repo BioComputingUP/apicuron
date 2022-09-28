@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {InternalService} from '../services/internal.service';
 import {BehaviorSubject, combineLatest} from 'rxjs';
-import {FormControl, FormGroup, FormBuilder, FormArray} from '@angular/forms';
+import {FormControl, UntypedFormGroup, UntypedFormBuilder, FormArray} from '@angular/forms';
 import { HttpParams} from '@angular/common/http';
 
 @Component({
@@ -16,14 +16,14 @@ export class LeaderboardCardComponent implements OnInit {
   loading_finished = false;
   curatorsData;
   displayedColumns = new BehaviorSubject<object>(['rank', 'family_name', 'given_name', 'orcid', 'generation_count', 'revision_count', 'invalidation_count', 'score']);
-  searchForm: FormGroup;
+  searchForm: UntypedFormGroup;
 
   pageSize = new BehaviorSubject<number>(50);
   totalItems = 0;
   currentPage = new BehaviorSubject<object>({
     'page': 1
   });
-  constructor(private internalService: InternalService, private fb: FormBuilder) {
+  constructor(private internalService: InternalService, private fb: UntypedFormBuilder) {
   }
 
 

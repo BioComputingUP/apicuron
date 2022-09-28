@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {ValidatorFn, FormGroup, FormArray, FormBuilder, Validators, AbstractControl, FormControl} from '@angular/forms';
+import {ValidatorFn, FormGroup, UntypedFormArray, UntypedFormBuilder, Validators, AbstractControl, FormControl} from '@angular/forms';
 import {InternalService} from '../services/internal.service';
 
 @Component({
@@ -16,7 +16,7 @@ export class DashboardUserformComponent implements OnInit {
   @Input()
   modalRef;
 
-  constructor(private fb: FormBuilder,
+  constructor(private fb: UntypedFormBuilder,
               private internalService: InternalService) {
   }
 
@@ -39,12 +39,12 @@ export class DashboardUserformComponent implements OnInit {
       );
 
     if (this.user_obj.hasOwnProperty('resources') ? this.user_obj['resources'].length > 0 : false) {
-      const resources = this.newUserRegForm.get('resources') as FormArray;
+      const resources = this.newUserRegForm.get('resources') as UntypedFormArray;
       this.user_obj['resources'].forEach(condition => {
         resources.push(this.fb.group(condition));
       });
     } else {
-      const resources = this.newUserRegForm.get('resources') as FormArray;
+      const resources = this.newUserRegForm.get('resources') as UntypedFormArray;
       resources.push(this.fb.group({
         name: [null],
         id: [null]
@@ -66,7 +66,7 @@ export class DashboardUserformComponent implements OnInit {
   }
 
   addFormArrayElement() {
-    const rows = this.newUserRegForm.get('resources') as FormArray;
+    const rows = this.newUserRegForm.get('resources') as UntypedFormArray;
     rows.push(this.fb.group({
       name: [null, Validators.required],
       id: [null, Validators.required]
@@ -74,7 +74,7 @@ export class DashboardUserformComponent implements OnInit {
   }
 
   removeFormArrayElement(index) {
-    const rows = this.newUserRegForm.get('resources') as FormArray;
+    const rows = this.newUserRegForm.get('resources') as UntypedFormArray;
     rows.removeAt(index);
     if (rows.length === 0) {
       rows.push(this.fb.group({

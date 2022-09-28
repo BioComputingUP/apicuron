@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {BehaviorSubject, combineLatest} from 'rxjs';
 import {InternalService} from '../services/internal.service';
 import {AuthService} from '../services/auth.service';
-import {FormControl, FormBuilder, FormGroup} from '@angular/forms';
+import {UntypedFormControl, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {Router, ActivatedRoute} from '@angular/router';
 import { HttpParams} from '@angular/common/http';
@@ -28,7 +28,7 @@ export class BrowseComponent implements OnInit {
   columnsFormNew;
   currentPageModel = 1;
   collapseColumns = true;
-  searchForm: FormGroup;
+  searchForm: UntypedFormGroup;
   loading_finished = false;
   loading_new_table = true;
   loading_resources = true;
@@ -52,7 +52,7 @@ export class BrowseComponent implements OnInit {
 
   constructor(public authService: AuthService,
               private route: ActivatedRoute,
-              private fb: FormBuilder,
+              private fb: UntypedFormBuilder,
               private router: Router,
               private internalService: InternalService) {
   }
@@ -257,13 +257,13 @@ export class BrowseComponent implements OnInit {
 
         statData['resources'].forEach(currResource => {
           this.map_resources[currResource.resource_uri] = currResource;
-          const resources = this.searchForm.get('resources') as FormGroup;
+          const resources = this.searchForm.get('resources') as UntypedFormGroup;
           // console.log(listPreResources);
 
           if (listPreResources.includes(currResource['resource_id']) || listPreResources.length === 0) {
-            resources.addControl(currResource['resource_id'], new FormControl(true));
+            resources.addControl(currResource['resource_id'], new UntypedFormControl(true));
           } else {
-            resources.addControl(currResource['resource_id'], new FormControl(false));
+            resources.addControl(currResource['resource_id'], new UntypedFormControl(false));
 
           }
         });

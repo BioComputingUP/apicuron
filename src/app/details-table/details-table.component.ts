@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {BehaviorSubject, combineLatest} from 'rxjs';
-import {FormControl, FormGroup, FormBuilder} from '@angular/forms';
+import {FormControl, UntypedFormGroup, UntypedFormBuilder} from '@angular/forms';
 import {InternalService} from '../services/internal.service';
 import {HttpEvent, HttpClient, HttpRequest, HttpEventType, HttpParams} from '@angular/common/http';
 
@@ -33,14 +33,14 @@ export class DetailsTableComponent implements OnInit {
   dataOnPage = new BehaviorSubject<any[]>([]);
 
   // declaration, search
-  searchForm: FormGroup;
+  searchForm: UntypedFormGroup;
   sortKey = new BehaviorSubject<string>('entity_uri');
   sortDirection = new BehaviorSubject<string>('asc');
 
   statArray = [];
   mapStat = {};
 
-  constructor(private fb: FormBuilder,
+  constructor(private fb: UntypedFormBuilder,
               private internalService: InternalService) { }
 
   ngOnInit() {

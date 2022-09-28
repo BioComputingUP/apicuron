@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormControl, UntypedFormGroup, Validators } from "@angular/forms";
 import { search_field_validator } from "./validators/search_field.directive";
 import { HttpParams } from "@angular/common/http";
 import { CuratorService } from "../curator.service";
@@ -11,7 +11,7 @@ import { DatabasesService } from "src/app/databases/services/databases.service";
 })
 export class CuratorSearchComponent implements OnInit {
   constructor(protected databaseService: DatabasesService) {}
-  biocuratorSearchForm: FormGroup;
+  biocuratorSearchForm: UntypedFormGroup;
 
   // filter by resource
   resources = {
@@ -76,13 +76,13 @@ export class CuratorSearchComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.biocuratorSearchForm = new FormGroup({
-      search_field: new FormControl(this.search_field, [
+    this.biocuratorSearchForm = new UntypedFormGroup({
+      search_field: new UntypedFormControl(this.search_field, [
         Validators.required,
         search_field_validator(this.search_fields.map((x) => x.field)),
       ]),
-      search_text: new FormControl(this.search_text),
-      selected_resources: new FormControl(this.resources.selected_resources, [
+      search_text: new UntypedFormControl(this.search_text),
+      selected_resources: new UntypedFormControl(this.resources.selected_resources, [
         Validators.required,
       ]),
     });

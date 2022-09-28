@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {BehaviorSubject, combineLatest} from 'rxjs';
-import {FormControl} from '@angular/forms';
+import {UntypedFormControl} from '@angular/forms';
 
 @Component({
   selector: 'app-proteins-detail-table',
@@ -26,7 +26,7 @@ export class ProteinsDetailTableComponent implements OnInit {
   dataOnPage = new BehaviorSubject<any[]>([]);
 
   // declaration, search
-  searchFormControl = new FormControl();
+  searchFormControl = new UntypedFormControl();
   sortKey = new BehaviorSubject<string>('acc');
   sortDirection = new BehaviorSubject<string>('asc');
   constructor() { }
