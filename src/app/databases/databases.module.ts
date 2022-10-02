@@ -8,8 +8,10 @@ import { DatabasePageComponent } from "./database-page/database-page.component";
 import { CuratorModule } from "../curator/curator.module";
 import { SvgModule } from "../svg/svg.module";
 import { ScrollToModule } from "@nicky-lenaers/ngx-scroll-to";
+import { DatabaseCreateComponent } from './database-create/database-create.component';
+import { ReactiveFormsModule } from "@angular/forms";
 @NgModule({
-  declarations: [DatabasesPageComponent, DatabasePageComponent],
+  declarations: [DatabasesPageComponent, DatabasePageComponent, DatabaseCreateComponent],
   imports: [
     ScrollToModule,
     SvgModule,
@@ -18,6 +20,7 @@ import { ScrollToModule } from "@nicky-lenaers/ngx-scroll-to";
     RouterModule,
     DatabasesRoutingModule,
     CuratorModule,
+    ReactiveFormsModule
   ],
   exports: [DatabasesPageComponent],
 })

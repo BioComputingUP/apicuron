@@ -1,0 +1,38 @@
+<div class="tw-mx-auto tw-container tw-max-w-7xl tw-px-2 sm:tw-px-4 2xl:tw-px-0 tw-py-2 xl:tw-py-4">
+    <h2 class="tw-text-3xl tw-font-dm-sans tw-font-bold tw-my-2">Create Partner Resource</h2>
+
+    <form [formGroup]="createDatabaseForm">
+        <div class="tw-flex tw-flex-row tw-flex-wrap tw-mb-2">
+                <div class="form-control-element tw-w-1/2">
+                    <label for="resource_id">Resource Id</label>
+                    <input type="text" formControlName="resource_id">
+                    <small class="tw-text-red-500 tw-text-sm tw-font-light" *ngIf="resource_id.touched && resource_id.invalid" >The resource Id must be unique</small>
+                </div>
+                <div class="form-control-element tw-w-1/2">
+                    <label for="resource_name">Resource Name</label>
+                    <input type="text" formControlName="resource_name">
+                </div>
+                <div class="form-control-element tw-w-1/2">
+                    <label for="resource_uri">Resource URI</label>
+                    <input type="text" formControlName="resource_uri">
+                </div>
+                <div class="form-control-element tw-w-1/2">
+                    <label for="resource_url">Resource URL</label>
+                    <input type="text" formControlName="resource_url">
+                </div>
+                <div class="form-control-element tw-w-1/2">
+                    <label for="resource_long_name">Resource Long Name</label>
+                    <input type="text" formControlName="resource_long_name">
+                </div>
+                <div class="form-control-element tw-w-1/2">
+                    <label for="resource_description">Resource Description</label>
+                    <textarea class="text-input" name="resource_description" formControlName="resource_description"  id="resource_description_textarea" cols="30" rows="10"></textarea>
+                </div>
+        </div>
+
+        <div class="tw-flex tw-justify-center">
+            <button class="tw-bg-apicuron-purple tw-text-white tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded tw-shadow-md">Create Partner Resource</button>
+        </div>
+        
+    </form>
+</div>
