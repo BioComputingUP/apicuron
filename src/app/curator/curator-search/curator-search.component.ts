@@ -87,7 +87,7 @@ export class CuratorSearchComponent implements OnInit {
       ]),
     });
 
-    this.databaseService.GetResources().subscribe((response: Object & { data: Array<{ resource_id: string}>}) => {
+    this.databaseService.get_resources().subscribe((response: Object & { data: Array<{ resource_id: string}>}) => {
       this.all_resources = response.data.map(resource => resource.resource_id)
     })
   }

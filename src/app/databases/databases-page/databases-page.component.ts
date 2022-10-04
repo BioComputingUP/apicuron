@@ -20,7 +20,7 @@ export class DatabasesPageComponent implements OnInit {
     //   (err) => {},
     //   () => {}
     // );
-    this.databaseService.GetResources().subscribe((response: Object & { data: object}) => {
+    this.databaseService.get_resources().subscribe((response: Object & { data: object}) => {
       this.listResourcesDescriptions = response.data
     })
   }

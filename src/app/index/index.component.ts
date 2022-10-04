@@ -19,7 +19,7 @@ export class IndexComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.databaseService.GetResources().subscribe((response) => {
+    this.databaseService.get_resources().subscribe((response) => {
       this.database_list = response['data']
     })
   }

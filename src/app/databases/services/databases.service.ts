@@ -10,10 +10,11 @@ import { map } from "rxjs/operators";
 })
 export class DatabasesService {
   constructor(private http: HttpClient) {}
-  private apicuronResources = environment.ws + "/partner-resources";
+  private partnerResourcesPath = environment.ws + "/partner-resources";
+  private resourcesPath = environment.ws + "/resources";
 
-  GetResources() {
-    const data = this.http.get(this.apicuronResources, {
+  get_resources() {
+    const data = this.http.get(this.partnerResourcesPath, {
       responseType: "json",
       headers: {
         version: "2",
@@ -23,30 +24,46 @@ export class DatabasesService {
     // .pipe(catchError(err => of(console.error(err))));
   }
 
-
-  get_resource_details(resource_id: string){
-    const response = this.http.get(`${this.apicuronResources}/${resource_id}`, {
-      responseType: 'json',
-      headers: {
-        version: '2'
-      },
-      
-    })
-    return response
+  create_resource(resource_data: Object) {
+    const data = this.http.put(
+      this.resourcesPath,
+      resource_data,
+      {
+        responseType: "json",
+        headers: {
+          version: "2",
+        },
+      }
+    );
+    return data
   }
 
-  get_resource_leaderboard(resource_id: string){
-    
-
-    const response = this.http.get(`${environment.ws}/statistics/leaderboard/${resource_id}`, {
-      responseType: 'json',
-      headers: {
-        version: '2'
-      },
-      params: {
-        page_size: '20'
+  get_resource_details(resource_id: string) {
+    const response = this.http.get(
+      `${this.partnerResourcesPath}/${resource_id}`,
+      {
+        responseType: "json",
+        headers: {
+          version: "2",
+        },
       }
-    })
-    return response
+    );
+    return response;
+  }
+
+  get_resource_leaderboard(resource_id: string) {
+    const response = this.http.get(
+      `${environment.ws}/statistics/leaderboard/${resource_id}`,
+      {
+        responseType: "json",
+        headers: {
+          version: "2",
+        },
+        params: {
+          page_size: "20",
+        },
+      }
+    );
+    return response;
   }
 }

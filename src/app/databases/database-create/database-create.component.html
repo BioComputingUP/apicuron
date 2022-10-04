@@ -1,38 +1,90 @@
 <div class="tw-mx-auto tw-container tw-max-w-7xl tw-px-2 sm:tw-px-4 2xl:tw-px-0 tw-py-2 xl:tw-py-4">
     <h2 class="tw-text-3xl tw-font-dm-sans tw-font-bold tw-my-2">Create Partner Resource</h2>
-
-    <form [formGroup]="createDatabaseForm">
+    <div *ngIf="form_response$ | async as response_data" class="tw-bg-green-500 tw-p-2 tw-text-white tw-font-bold">
+    <!-- <div class="tw-bg-green-500 tw-p-2 tw-text-white tw-font-bold"> -->
+        
+        Successful creation of the 
+        <span class="tw-underline">{{ response_data.resource_name }}</span>
+        Resource !
+        <br>
+        We will take a look at the submitted resource and approve it if valid. You'll then be able to use APICURON
+    </div>
+    <div *ngIf="error_response$ | async as error_response" class="tw-bg-red-500 tw-p-2 tw-text-white tw-font-bold">
+            An error has occured: {{ error_response }}
+        </div>
+    <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="data$ | async">
         <div class="tw-flex tw-flex-row tw-flex-wrap tw-mb-2">
-                <div class="form-control-element tw-w-1/2">
-                    <label for="resource_id">Resource Id</label>
-                    <input type="text" formControlName="resource_id">
-                    <small class="tw-text-red-500 tw-text-sm tw-font-light" *ngIf="resource_id.touched && resource_id.invalid" >The resource Id must be unique</small>
-                </div>
-                <div class="form-control-element tw-w-1/2">
-                    <label for="resource_name">Resource Name</label>
-                    <input type="text" formControlName="resource_name">
-                </div>
-                <div class="form-control-element tw-w-1/2">
-                    <label for="resource_uri">Resource URI</label>
-                    <input type="text" formControlName="resource_uri">
-                </div>
-                <div class="form-control-element tw-w-1/2">
-                    <label for="resource_url">Resource URL</label>
-                    <input type="text" formControlName="resource_url">
-                </div>
-                <div class="form-control-element tw-w-1/2">
-                    <label for="resource_long_name">Resource Long Name</label>
-                    <input type="text" formControlName="resource_long_name">
-                </div>
-                <div class="form-control-element tw-w-1/2">
-                    <label for="resource_description">Resource Description</label>
-                    <textarea class="text-input" name="resource_description" formControlName="resource_description"  id="resource_description_textarea" cols="30" rows="10"></textarea>
-                </div>
+            <div class="form-control-element tw-w-1/2">
+                <label for="resource_id">Resource Id</label>
+                <input type="text" formControlName="resource_id">
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_id.invalid && resource_id.hasError('resourceIdAlreadyExists')">The resource Id must
+                    be unique</small>
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_id.invalid && resource_id.hasError('onlyLowerCaseUnderscoreDash')">The resource Id
+                    must
+                    only contain lower-case letters or underscores</small>
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_id.hasError('required') && resource_id.touched">
+                    The Resource Id is required
+                </small>
+            </div>
+            <div class="form-control-element tw-w-1/2">
+                <label for="resource_name">Resource Name</label>
+                <input type="text" formControlName="resource_name">
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_name.hasError('required') && resource_name.touched">
+                    The Resource Name is required
+                </small>
+
+            </div>
+            <div class="form-control-element tw-w-1/2">
+                <label for="resource_uri">Resource URI</label>
+                <input type="text" formControlName="resource_uri">
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_uri.hasError('required') && resource_uri.touched">
+                    The Resource URI is required
+                </small>
+
+            </div>
+            <div class="form-control-element tw-w-1/2">
+                <label for="resource_url">Resource URL</label>
+                <input type="text" formControlName="resource_url">
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_url.hasError('required') && resource_url.touched">
+                    The Resource URL is required
+                </small>
+            </div>
+            <div class="form-control-element tw-w-1/2">
+                <label for="resource_long_name">Resource Long Name</label>
+                <input type="text" formControlName="resource_long_name">
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_long_name.hasError('required') && resource_long_name.touched">
+                    The Resource Long Name is required
+                </small>
+            </div>
+            <div class="form-control-element tw-w-1/2">
+
+                <label>Upload Resource Logo</label>
+                <input id="file_input" type="file" (change)="onFileSelected($event)">
+
+            </div>
+            <div class="form-control-element tw-w-1/2">
+                <label for="resource_description">Resource Description</label>
+                <textarea class="text-input" name="resource_description" formControlName="resource_description"
+                    id="resource_description_textarea" cols="30" rows="10"></textarea>
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_description.hasError('required') && resource_description.touched">
+                    The Resource Description is required
+                </small>
+            </div>
         </div>
 
         <div class="tw-flex tw-justify-center">
-            <button class="tw-bg-apicuron-purple tw-text-white tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded tw-shadow-md">Create Partner Resource</button>
+            <input type="submit" value="Create Partner Resource" [disabled]="form.invalid"
+                [ngClass]="{'tw-bg-gray-300 tw-text-gray-600':form.invalid, 'tw-bg-apicuron-purple tw-text-white tw-shadow-md': !form.invalid}"
+                class=" tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded" />
         </div>
-        
+
     </form>
 </div>
