@@ -12,7 +12,8 @@ export default () => ({
   JWT_HEADER: 'authorization',
   JWT_PREFIX: 'bearer',
   V1_HOST: 'http://localhost:8198/', // Apicuron first version host location
-  PUBLIC_FILES_PATH: 'public'
+  PUBLIC_FILES_PATH: 'public',
+  FRONTEND_HOST: 'http://localhost:4200/'
   //   port: parseInt(process.env.PORT, 10) || 3000,
   //   database: {
   //     host: process.env.DATABASE_HOST,

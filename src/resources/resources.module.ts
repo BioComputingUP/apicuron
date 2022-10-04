@@ -20,9 +20,11 @@ import {
 	SubmittedResource,
 	SubmittedResourceSchema,
 } from './schemas/submitted-resource.schema';
-import { TransformerModule } from '../global/transformer/transformer.module';
+import { TransformerModule } from '../shared/transformer/transformer.module';
 import { AchievementsModule } from '../achievements/achievements.module';
 import { TermsService } from './terms/terms.service';
+import { UniqueResourceIdRule } from './submitted-resources/validators/unique-resource-id';
+import { UniqueResourceURIRule } from './submitted-resources/validators/unique-resource-uri';
 
 @Module({
 	controllers: [
@@ -31,12 +33,12 @@ import { TermsService } from './terms/terms.service';
 		TermsController,
 		SubmittedResourcesController,
 	],
-	providers: [PartnerResourcesService, SubmittedResourcesService, TermsService],
+	providers: [UniqueResourceIdRule, UniqueResourceURIRule, PartnerResourcesService, SubmittedResourcesService, TermsService],
 	exports: [PartnerResourcesService, MongooseModule, TermsService],
-	// providers: [ResourcesService],
 	imports: [
 		AuthModule,
 		AchievementsModule,
+		// SharedValidatorsModule,
 		MongooseModule.forFeature([
 			{
 				name: Resource.name,

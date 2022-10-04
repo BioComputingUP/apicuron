@@ -77,7 +77,6 @@ export class AuthMiddleware implements NestMiddleware {
 		} else if (req.cookies[tokenKey]) {
 			return req.cookies[tokenKey];
 		} else {
-			this.authMiddlewareLogger.log('Absent Authorization header');
 			return null
 			// this.unauthorized_exception('authorization header non-existent');
 		}

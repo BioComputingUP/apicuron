@@ -7,6 +7,7 @@ import {
 	UseGuards,
 	Res,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { Roles } from './decorators/roles.decorator';
@@ -15,7 +16,7 @@ import { RoleGuard } from './guards/role.guard';
 
 @Controller('')
 export class AuthController {
-	constructor(private authService: AuthService) {}
+	constructor(private authService: AuthService, private configService: ConfigService) {}
 
 	private authControllerLogger = new Logger(AuthController.name);
 
@@ -37,14 +38,14 @@ export class AuthController {
 		const { header, token } = await this.authService.generate_jwt_token(user);
 		res.cookie(header, token);
 		res.set(header, token);
-		return { url: '/orcid/' + user.orcid_id, statusCode: 301 };
+		return { url: this.configService.get('FRONTEND_HOST') + '/curator/' + user.orcid_id, statusCode: 301 };
 	}
 
-	// @Get('/orcid/:orcid_id')
-	// @Roles('user', 'admin')
-	// @UseGuards(LocalAuthGuard, RoleGuard)
-	// protected_page(@Req() request) {
-	// 	this.authControllerLogger.log('user prop', request.user);
-	// 	return 'Can be accessed';
-	// }
+	@Get('/orcid/:orcid_id')
+	@Roles('user', 'admin')
+	@UseGuards(LocalAuthGuard, RoleGuard)
+	protected_page(@Req() request) {
+		// this.authControllerLogger.log('user prop', request.user);
+		return 'Can be accessed';
+	}
 }

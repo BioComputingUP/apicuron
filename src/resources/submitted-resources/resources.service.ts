@@ -1,10 +1,17 @@
-import { Injectable, NotImplementedException } from '@nestjs/common';
+import {
+	Injectable,
+	NotImplementedException,
+	BadRequestException,
+	InternalServerErrorException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { rename } from 'fs';
 import { Model } from 'mongoose';
-import { TransformerService } from '../../global/transformer/transformer.service';
+import path from 'path';
+import { TransformerService } from '../../shared/transformer/transformer.service';
 import { createResourceDto } from '../dto/createResource.dto';
-import { Resource, ResourceDocument } from '../schemas/resource.schema';
 import {
 	SubmittedResource,
 	SubmittedResourceDocument,
@@ -16,24 +23,22 @@ export class SubmittedResourcesService {
 		@InjectModel(SubmittedResource.name)
 		private resourceModel: Model<SubmittedResourceDocument>,
 		private transformerService: TransformerService,
+		private configService: ConfigService,
 	) {}
 
-	create_resource(resource_obj: createResourceDto & { logo: string }) {
+	async create_resource(
+		resource_obj: createResourceDto & { logo: string },
+		logo: Express.Multer.File,
+	) {
 		const res = new this.resourceModel(resource_obj);
-		const resource = this.resourceModel.findOne({
-			resource_id: resource_obj.resource_id,
-		});
-		if (!!resource) {
-			this.transformerService.warn(
-				'resource',
-				"This resource_id exists already can can't be overwritten. Please contact the developer",
-			);
-			return resource;
-		}
+		
 		res.save();
-		return res;
+		return res.toObject();
 	}
 
+	async resource_id_taken(resource_id: string): Promise<Boolean> {
+		return await !! this.resourceModel.exists({ resource_id });
+	}
 
 	@Cron(CronExpression.EVERY_WEEK)
 	delete_old_resources() {

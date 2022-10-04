@@ -10,7 +10,7 @@ import { Term, TermDocument } from '../schemas/terms.schema';
 import { User, UserDocument } from '../../auth/users/user.schema';
 import { Report, ReportDocument } from '../../reports/reports.schema';
 import { AchievementsDefService } from '../../achievements/achievements-def.service';
-import { TransformerService } from '../../global/transformer/transformer.service';
+import { TransformerService } from '../../shared/transformer/transformer.service';
 
 @Injectable()
 export class PartnerResourcesService {

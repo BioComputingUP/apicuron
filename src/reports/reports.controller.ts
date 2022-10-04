@@ -2,7 +2,7 @@ import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
-import { ParseUnsignedIntPipe } from '../global/pipes/unsigned-int-validation.pipe';
+import { ParseUnsignedIntPipe } from '../shared/pipes/unsigned-int-validation.pipe';
 import { ReportsService } from './reports.service';
 
 @Controller()

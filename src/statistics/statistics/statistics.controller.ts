@@ -7,9 +7,9 @@ import {
 	UseInterceptors,
 } from '@nestjs/common';
 import { AchievementsService } from '../../achievements/achievements.service';
-import { ParseUnsignedIntPipe } from '../../global/pipes/unsigned-int-validation.pipe';
-import { TransformInterceptor } from '../../global/transformer/transform.interceptor';
-import { TransformerService } from '../../global/transformer/transformer.service';
+import { ParseUnsignedIntPipe } from '../../shared/pipes/unsigned-int-validation.pipe';
+import { TransformInterceptor } from '../../shared/transformer/transform.interceptor';
+import { TransformerService } from '../../shared/transformer/transformer.service';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { GetStatisticsDto } from '../dto/get-statistics.dto';
 import { StatisticsService } from '../statistics.service';

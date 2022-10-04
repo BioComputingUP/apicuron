@@ -5,9 +5,9 @@ import { StatisticsController } from './statistics/statistics.controller';
 import { StatisticsService } from './statistics.service';
 import { AuthModule } from '../auth/auth.module';
 import { ResourcesModule } from '../resources/resources.module';
-import { TransformerModule } from '../global/transformer/transformer.module';
+import { TransformerModule } from '../shared/transformer/transformer.module';
 import { APP_INTERCEPTOR } from '@nestjs/core'
-import { TransformInterceptor } from '..//global/transformer/transform.interceptor';
+import { TransformInterceptor } from '../shared/transformer/transform.interceptor';
 import { AchievementsModule } from '../achievements/achievements.module';
 @Module({
     imports:[

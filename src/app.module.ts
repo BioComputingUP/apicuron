@@ -14,9 +14,8 @@ import prodConfig from './config/configuration.prod';
 import { join, resolve } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MulterModule } from '@nestjs/platform-express';
-import { TransformerModule } from './global/transformer/transformer.module';
+import { TransformerModule } from './shared/transformer/transformer.module';
 import { AchievementsModule } from './achievements/achievements.module';
-
 function getConfig() {
 	if (process.env.NODE_ENV === 'development') {
 		return devConfig;
@@ -32,7 +31,9 @@ function getConfig() {
 	imports: [
 		ScheduleModule.forRoot(),
 		AuthModule,
-		MulterModule.register(),
+		MulterModule.register({
+			dest: '/tmp/apicuron',
+		}),
 		// isGlobal loads Config Module globally, doesn't require imports
 		ConfigModule.forRoot({
 			isGlobal: true,
@@ -60,7 +61,8 @@ function getConfig() {
 		ResourcesModule,
 		StatisticsModule,
 		TransformerModule,
-		AchievementsModule
+		AchievementsModule,
+		// SharedValidatorsModule
 	],
 	controllers: [AppController],
 	providers: [AppService],

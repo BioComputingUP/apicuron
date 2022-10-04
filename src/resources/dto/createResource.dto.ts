@@ -1,4 +1,6 @@
-import { IsNotEmpty, IsOptional, IsString, IsUrl, Max, MaxLength, MinLength } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, IsUrl, Max, MaxLength, MinLength, Validate } from "class-validator";
+import { UniqueResourceIdRule } from "../submitted-resources/validators/unique-resource-id"
+import { UniqueResourceURIRule } from "../submitted-resources/validators/unique-resource-uri"
 
 
 export class createResourceDto {
@@ -9,6 +11,7 @@ export class createResourceDto {
 
     @IsString()
     @IsNotEmpty()
+    @Validate(UniqueResourceIdRule)
 	resource_id: string;
 
     @IsString()
@@ -25,6 +28,7 @@ export class createResourceDto {
     @IsString()
     @IsUrl()
     @IsNotEmpty()
+    @Validate(UniqueResourceURIRule)
 	resource_uri: string;
     
     @IsString()

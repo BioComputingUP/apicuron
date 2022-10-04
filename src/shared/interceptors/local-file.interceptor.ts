@@ -6,7 +6,7 @@ import { diskStorage } from 'multer';
 import { join } from 'path';
 
 interface LocalFilesInterceptorOptions {
-	path?: string;
+	path: string;
 	public?: Boolean
 }
 
@@ -30,7 +30,11 @@ function LocalFilesInterceptor(
 
 			const multerOptions: MulterOptions = {
 				storage: diskStorage({
-					destination,
+					destination: '/tmp/apicuron',
+					filename (req, file: Express.Multer.File, cb: Function) {
+						const ext = file.mimetype.split("/")[1];
+						cb(null, `logo-${Date.now()}.${ext}`)
+					}
 				}),
 			};
 

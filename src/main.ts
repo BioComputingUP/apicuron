@@ -3,7 +3,8 @@ import { AppModule } from './app.module';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
-import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
+import { createProxyMiddleware, fixRequestBody, responseInterceptor } from 'http-proxy-middleware';
+import { useContainer } from 'class-validator';
 
 async function bootstrap() {
 	// App creation
@@ -15,6 +16,8 @@ async function bootstrap() {
 	// Logging and config setup
 	const appLogger = new Logger('APICURONApplicationLogger');
 	const configService = app.get(ConfigService);
+
+	useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
 	app.use(
 		[
@@ -38,6 +41,13 @@ async function bootstrap() {
 		createProxyMiddleware({
 			target: configService.get('V1_HOST'),
 			changeOrigin: true,
+			// selfHandleResponse: true,
+			// onProxyRes: responseInterceptor(
+			// 	async (responseBuffer, proxyRes, req, res) => {
+			// 		handle(req)
+			// 		return responseBuffer.toString()
+			// 	}
+			// )
 		}),
 	);
 
