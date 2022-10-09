@@ -25,6 +25,9 @@ export class Report {
 	resource_uri: string;
 
 	@Prop({ required: true })
+	resource_id: string;
+
+	@Prop({ required: true })
 	timestamp: Date;
 }
 

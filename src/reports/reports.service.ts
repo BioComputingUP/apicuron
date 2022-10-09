@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { User, UserDocument } from '../auth/users/user.schema';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import { TermsService } from '../resources/terms/terms.service';
@@ -155,14 +155,16 @@ export class ReportsService {
 		page = 1,
 	) {
 		const skip = (page - 1) * page_size;
-		let query_obj = {};
+		let query_obj: FilterQuery<ReportDocument> = {
+			'$or': [{ resource_id: resource_id }],
+		};
 
 		if (!!resource_id) {
 			const resource_uri = await this.partnerResourceService.retrieve_uri(
 				resource_id,
 			);
 			if (!!resource_uri) {
-				query_obj['resource_uri'] = resource_uri;
+				query_obj['$or'].concat([{ resource_uri: resource_uri }]);
 			}
 		}
 
@@ -178,7 +180,9 @@ export class ReportsService {
 		page = 1,
 		page_size = 10,
 	) {
-		const resource_uri = await this.partnerResourceService.retrieve_uri(resource_id)
+		const resource_uri = await this.partnerResourceService.retrieve_uri(
+			resource_id,
+		);
 
 		const skip = (page - 1) * page_size;
 		const reports_promise = this.reportModel
@@ -187,24 +191,31 @@ export class ReportsService {
 			.skip(skip)
 			.limit(page_size)
 			.lean();
-		
-		const reports_count_promise = this.reportModel.count({ curator_orcid: orcid_id, resource_uri })
-		const [ reports, reports_count ] = await Promise.all([reports_promise, reports_count_promise])
+
+		const reports_count_promise = this.reportModel.count({
+			curator_orcid: orcid_id,
+			resource_uri,
+		});
+		const [reports, reports_count] = await Promise.all([
+			reports_promise,
+			reports_count_promise,
+		]);
 		// the string constructor is used to convert from mongoose string type to regular typescript string (I know, it's just nonesense)
 		const report_terms = reports.map((report) => String(report.activity_term));
-
 
 		const terms = await this.termsService.get_terms(report_terms, resource_uri);
 		const user_reports = reports.map((report) => {
 			return {
 				...report,
-				term: terms.find((term) => term.activity_term == String(report.activity_term)),
+				term: terms.find(
+					(term) => term.activity_term == String(report.activity_term),
+				),
 			};
 		});
 
 		return {
 			data: user_reports,
-			count: reports_count
+			count: reports_count,
 		};
 	}
 

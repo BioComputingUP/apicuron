@@ -16,6 +16,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { MulterModule } from '@nestjs/platform-express';
 import { TransformerModule } from './shared/transformer/transformer.module';
 import { AchievementsModule } from './achievements/achievements.module';
+import { NotificationsModule } from './notifications/notifications.module';
 function getConfig() {
 	if (process.env.NODE_ENV === 'development') {
 		return devConfig;
@@ -62,6 +63,7 @@ function getConfig() {
 		StatisticsModule,
 		TransformerModule,
 		AchievementsModule,
+		NotificationsModule,
 		// SharedValidatorsModule
 	],
 	controllers: [AppController],

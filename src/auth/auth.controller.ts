@@ -14,22 +14,24 @@ import { Roles } from './decorators/roles.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { RoleGuard } from './guards/role.guard';
 
-@Controller('')
+@Controller({
+	path: 'auth'
+})
 export class AuthController {
 	constructor(private authService: AuthService, private configService: ConfigService) {}
 
 	private authControllerLogger = new Logger(AuthController.name);
 
 	// redirect to orcid
-	@Get('auth/orcid')
+	@Get('orcid')
 	@UseGuards(AuthGuard('orcid'))
 	authenticate_orcid() {}
 
-	@Get('/auth/orcid_permission')
+	@Get('orcid_permission')
 	@UseGuards(AuthGuard('orcid'))
 	orcid_permission() {}
 
-	@Get('/auth/orcid/redirect')
+	@Get('orcid/redirect')
 	@Redirect('/orcid/', 301)
 	@UseGuards(AuthGuard('orcid'))
 	async orcid_redirect(@Req() req, @Res() res) {
@@ -38,7 +40,7 @@ export class AuthController {
 		const { header, token } = await this.authService.generate_jwt_token(user);
 		res.cookie(header, token);
 		res.set(header, token);
-		return { url: this.configService.get('FRONTEND_HOST') + '/curator/' + user.orcid_id, statusCode: 301 };
+		return { url: this.configService.get('FRONTEND_HOST') + 'curator/' + user.orcid_id, statusCode: 301 };
 	}
 
 	@Get('/orcid/:orcid_id')
