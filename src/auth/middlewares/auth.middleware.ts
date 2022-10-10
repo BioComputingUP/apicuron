@@ -36,7 +36,7 @@ export class AuthMiddleware implements NestMiddleware {
 			const payload = this.check_token(token);
 			req.user = await this.usersService.get_by_orcid(payload.orcid_id);
 		} catch (e) {
-			this.authMiddlewareLogger.error(e.message);
+			// this.authMiddlewareLogger.error(e.message);
 			req.user = null;
 		}
 		next();
@@ -72,7 +72,7 @@ export class AuthMiddleware implements NestMiddleware {
 	check_auth_header(req: Request): string {
 		const tokenKey = this.configService.get<string>('JWT_HEADER');
 		if (req.header(tokenKey)) {
-			this.authMiddlewareLogger.log('user has header');
+			// this.authMiddlewareLogger.log('user has header');
 			return req.header(tokenKey);
 		} else if (req.cookies[tokenKey]) {
 			return req.cookies[tokenKey];

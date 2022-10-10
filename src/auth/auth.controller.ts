@@ -35,12 +35,12 @@ export class AuthController {
 	@Redirect('/orcid/', 301)
 	@UseGuards(AuthGuard('orcid'))
 	async orcid_redirect(@Req() req, @Res() res) {
-		console.log('redirect request', req)
+		// console.log('redirect request', req)
 		const user = req.user
 		const { header, token } = await this.authService.generate_jwt_token(user);
 		res.cookie(header, token);
 		res.set(header, token);
-		return { url: this.configService.get('FRONTEND_HOST') + 'curator/' + user.orcid_id, statusCode: 301 };
+		return { url: this.configService.get('FRONTEND_HOST') + 'curators/' + user.orcid_id, statusCode: 301 };
 	}
 
 	@Get('/orcid/:orcid_id')
@@ -49,5 +49,11 @@ export class AuthController {
 	protected_page(@Req() request) {
 		// this.authControllerLogger.log('user prop', request.user);
 		return 'Can be accessed';
+	}
+
+	@Get('profile')
+	@UseGuards(LocalAuthGuard)
+	get_user_profile(@Req() request){
+		return request.user
 	}
 }
