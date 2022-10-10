@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {BehaviorSubject, combineLatest} from 'rxjs';
 import {InternalService} from '../services/internal.service';
-import {AuthService} from '../services/auth.service';
+import {AuthService} from '../auth/auth.service';
 import {UntypedFormControl, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {Router, ActivatedRoute} from '@angular/router';

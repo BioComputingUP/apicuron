@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {environment} from '../../environments/environment';
-import {AuthService} from '../services/auth.service';
+import {AuthService} from '../auth/auth.service';
 import {BehaviorSubject} from 'rxjs';
 
 @Component({

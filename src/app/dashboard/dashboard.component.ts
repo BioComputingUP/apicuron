@@ -1,6 +1,6 @@
 import {Component, OnInit, OnDestroy, TemplateRef} from '@angular/core';
 import {BehaviorSubject, combineLatest, concat} from 'rxjs';
-import {AuthService} from '../services/auth.service';
+import {AuthService} from '../auth/auth.service';
 import {InternalService} from '../services/internal.service';
 import {FormBuilder, UntypedFormControl, Validators} from '@angular/forms';
 import {BsModalService, BsModalRef} from 'ngx-bootstrap/modal';

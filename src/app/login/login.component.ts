@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import {AuthService} from '../services/auth.service';
 import {environment} from '../../environments/environment';
 
 @Component({
@@ -14,7 +13,7 @@ export class LoginComponent implements OnInit {
   show_login = false;
   login_link: string;
 
-  constructor(private authService: AuthService) {
+  constructor() {
     this.login_link = environment.ws + '/auth/orcid'
     // this.env = environment;
   }

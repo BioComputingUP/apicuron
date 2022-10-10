@@ -37,7 +37,7 @@ import { ApiComponent } from "./api/api.component";
 import { LoginComponent } from "./login/login.component";
 import { DashboardComponent } from "./dashboard/dashboard.component";
 import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
-import { AuthService } from "./services/auth.service";
+import { AuthService } from "./auth/auth.service";
 // import { ProfileComponent } from "./profile/profile.component";
 import { DetailsTableComponent } from "./details-table/details-table.component";
 import { AlarmBannerComponent } from "./alarm-banner/alarm-banner.component";
@@ -62,6 +62,7 @@ import { AltNavbarComponent } from "./alt-navbar/alt-navbar.component";
 import { IndexModule } from "./index/index.module";
 import { CuratorPageComponent } from "./curator/curator-page/curator-page.component";
 import { CuratorModule } from "./curator/curator.module";
+import { AuthModule } from "./auth/auth.module";
 // import { CuratorModule } from './curator/curator.module';
 // import { AboutModule } from './about/about.module';
 
@@ -93,6 +94,7 @@ import { CuratorModule } from "./curator/curator.module";
   ],
   imports: [
     AppRoutingModule,
+    AuthModule,
     CuratorModule,
     IndexModule,
     ScrollToModule.forRoot(),
@@ -109,7 +111,7 @@ import { CuratorModule } from "./curator/curator.module";
     PaginationModule.forRoot(),
     ProgressbarModule.forRoot(),
   ],
-  providers: [AuthService],
+  providers: [],
   bootstrap: [AppComponent],
   exports: [RouterModule],
 })

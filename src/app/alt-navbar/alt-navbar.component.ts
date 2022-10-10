@@ -1,6 +1,6 @@
 import { Component, HostListener, OnInit } from "@angular/core";
-import { AuthService } from "../services/auth.service";
-import { BehaviorSubject } from "rxjs";
+import { AuthService } from "../auth/auth.service";
+import { BehaviorSubject, Observable } from "rxjs";
 
 @Component({
   selector: "app-alt-navbar",
@@ -11,39 +11,30 @@ export class AltNavbarComponent implements OnInit {
   
   closed_mobile_menu = true;
   expanded_nav = false;
-  loginData;
   show_login = false;
   isCollapsed = new BehaviorSubject<boolean>(true);
-  constructor(private authService: AuthService) {}
+  user$: Observable<any>;
+  
+  constructor(private authService: AuthService) {
+    if(this.authService.loggedIn){
+      this.user$ = this.authService.user$;
+    }
+  }
+
+  get loggedIn(){
+    return this.authService.loggedIn
+  }
+
+
+
 
   ngOnInit() {
-    this.authService.authentication();
-    // this.isCollapsed.subscribe((isCollapsed) => {
-    //   if (isCollapsed) {
-    //     document.getElementById("navbarButtons").style["min-height"] = "10px";
-    //   } else {
-    //     document.getElementById("navbarButtons").style["min-height"] = "300px";
-    //   }
-    // });
+    // this.authService.authentication();
     
 
-    this.authService.loginData.subscribe(
-      (displayedName) => (this.loginData = displayedName)
-    );
-    // window.addEventListener("scroll", (event) => {
-    //   if (this.isCollapsed) {
-    //     if (
-    //       document.body.scrollTop > 40 ||
-    //       document.documentElement.scrollTop > 40
-    //     ) {
-    //       document.getElementById("navbar").style["min-height"] = "60px";
-    //       // document.getElementById("logo_nav").style['margin'] = '0rem 0rem';
-    //     } else {
-    //       document.getElementById("navbar").style["min-height"] = "120px";
-    //       // document.getElementById("logo_nav").style['margin'] = '3rem 0rem';
-    //     }
-    //   }
-    // });
+    // this.authService.loginData.subscribe(
+    //   (displayedName) => (this.loginData = displayedName)
+    // );
   }
 
   @HostListener('window:scroll', [ '$event'])

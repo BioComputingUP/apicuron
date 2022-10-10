@@ -12,7 +12,7 @@ export function getProgressbarConfig(): ProgressbarConfig {
 }
 
 import {environment} from '../../environments/environment';
-import {AuthService} from '../services/auth.service';
+import {AuthService} from '../auth/auth.service';
 import {FormControl, FormGroup} from '@angular/forms';
 
 @Component({

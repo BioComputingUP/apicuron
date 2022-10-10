@@ -69,13 +69,14 @@
           routerLink="/about">About</a>
         <app-login
           [button-class]="'tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium tw-cursor-pointer hover:tw-underline'"
-          *ngIf="!loginData['authorized']"></app-login>
+          *ngIf="!loggedIn">
+        </app-login>
 
         <a class="tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium"
-          *ngIf="loginData['authorized'] && loginData['list_resources'] && loginData['list_resources'].length > 0"
-          routerLink="/setting">Settings</a>
+          *ngIf="loggedIn" routerLink="/setting">Settings</a>
         <a class="tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium"
-          routerLink="/about" *ngIf="loginData['authorized']" (click)="logout()">{{loginData['full_name']}} - Log
+          routerLink="/about" *ngIf="loggedIn && user$ | async as user" (click)="logout()">{{ user.displayedName }} -
+          Log
           out</a>
       </div>
     </div>
@@ -95,12 +96,17 @@
         routerLink="/about">About</a>
       <app-login
         [button-class]="'tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium tw-cursor-pointer hover:tw-underline'"
-        *ngIf="!loginData['authorized']"></app-login>
-      <a class="tw-block tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium"
-        *ngIf="loginData['authorized'] && loginData['list_resources'] && loginData['list_resources'].length > 0"
-        routerLink="/setting">Settings</a>
-      <a class="tw-block tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium"
-        routerLink="/about" *ngIf="loginData['authorized']" (click)="logout()">{{loginData['full_name']}} - Log out</a>
+        *ngIf="!loggedIn"></app-login>
+
+      <ng-container *ngIf="loggedIn && user$ | async as user">
+        <a class="tw-block tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium"
+          [routerLink]="'/dashboard/' + user.role">Dashboard</a>
+          <a class="tw-block tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium"
+        routerLink="/about" (click)="logout()">{{user.displayedName}} - Log
+        out</a>
+      </ng-container>
+
+      
     </div>
   </div>
 </nav>
