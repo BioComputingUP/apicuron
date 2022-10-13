@@ -61,8 +61,10 @@ export class CuratorPageComponent implements OnInit {
             return fragment;
           }
         }
-        // otherwise we return the first resource_id in the list of stats
-        return curator.stats[0].resource_id;
+        if(curator.stats.length > 0){
+          // otherwise we return the first resource_id in the list of stats
+          return curator.stats[0].resource_id;
+        }
       })
     );
 

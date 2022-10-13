@@ -22,6 +22,10 @@ button:focus {
   outline: none;
 }
 
+.main-content {
+  @apply tw-mx-auto tw-container tw-max-w-7xl tw-px-2 sm:tw-px-4 2xl:tw-px-0 tw-py-2 xl:tw-py-4
+}
+
 // a {
 //   color: #0F4C5C;
 //   //@media (prefers-color-scheme: dark) {

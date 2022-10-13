@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
+import { AuthGuard } from "./auth/auth.guard";
 import { CuratorPageComponent } from "./curator/curator-page/curator-page.component";
-import { DashboardComponent } from "./dashboard/dashboard.component";
 import { IndexComponent } from "./index/index.component";
 import { LoginComponent } from "./login/login.component";
 import { NotRegisteredComponent } from "./not-registered/not-registered.component";
@@ -16,8 +16,8 @@ const routes: Routes = [
   // {path: 'database', component: DatabaseComponent},
   { path: 'api', component: SwaggerUiComponent},
   // {path: 'about', loadChildren: () => import('./about/about.module').then(m => m.AboutModule)},
-  {path: 'setting', component: DashboardComponent},
-  {path: 'settings', component: DashboardComponent},
+  // {path: 'setting', component: DashboardComponent},
+  // {path: 'settings', component: DashboardComponent},
   // { path: 'orcid/:orcid', component: ProfileComponent},
   {path: 'not_registered', component: NotRegisteredComponent},
   // {path: 'home', component: HomeComponent},
@@ -29,6 +29,7 @@ const routes: Routes = [
   {
     path: "help",
     loadChildren: () => import("./help/help.module").then((m) => m.HelpModule),
+    canActivate: [AuthGuard]
   },
   {
     path: "curators",

@@ -25,68 +25,31 @@ import { ScrollToModule } from "@nicky-lenaers/ngx-scroll-to";
 import { ProgressbarModule } from "ngx-bootstrap/progressbar";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
-// import {NavbarComponent} from './navbar/navbar.component';
-// import {HomeComponent} from './home/home.component';
 import { FootComponent } from "./foot/foot.component";
-// import {BrowseComponent} from './browse/browse.component';
-// import { TutorialComponent } from "./tutorial/tutorial.component";
 import { ApiComponent } from "./api/api.component";
-// import {StatisticsComponent} from './statistics/statistics.component';
-// import {AboutComponent} from './about/about.component';
-// import {FeedbackComponent} from './feedback/feedback.component';
 import { LoginComponent } from "./login/login.component";
-import { DashboardComponent } from "./dashboard/dashboard.component";
 import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
-import { AuthService } from "./auth/auth.service";
-// import { ProfileComponent } from "./profile/profile.component";
 import { DetailsTableComponent } from "./details-table/details-table.component";
 import { AlarmBannerComponent } from "./alarm-banner/alarm-banner.component";
-// import { ProteinsDetailTableComponent } from "./proteins-detail-table/proteins-detail-table.component";
-// import { PubmedDetailTableComponent } from "./pubmed-detail-table/pubmed-detail-table.component";
 import { EditProfileComponent } from "./edit-profile/edit-profile.component";
-import { DashboardUserformComponent } from "./dashboard-userform/dashboard-userform.component";
 import { DocumentationComponent } from "./documentation/documentation.component";
-
-// import { MatTableModule } from "@angular/material/table";
-// import { BrowseTestComponent } from './browse-test/browse-test.component';
-// import { BrowseRibbonComponent } from './browse-ribbon/browse-ribbon.component';
-// import { BadgeMedalComponent } from "./badge-medal/badge-medal.component";
-// import { LeaderboardCardComponent } from "./leaderboard-card/leaderboard-card.component";
-// import { LeaderboardPageComponent } from "./leaderboard-page/leaderboard-page.component";
-// import { BadgeViewComponent } from "./badge-view/badge-view.component";
-// import { MedalViewComponent } from "./medal-view/medal-view.component";
-// import { DatabaseComponent } from './database/database.component';
 import { NotRegisteredComponent } from "./not-registered/not-registered.component";
 import { SwaggerUiComponent } from "./swagger-ui/swagger-ui.component";
 import { AltNavbarComponent } from "./alt-navbar/alt-navbar.component";
 import { IndexModule } from "./index/index.module";
-import { CuratorPageComponent } from "./curator/curator-page/curator-page.component";
 import { CuratorModule } from "./curator/curator.module";
 import { AuthModule } from "./auth/auth.module";
-// import { CuratorModule } from './curator/curator.module';
-// import { AboutModule } from './about/about.module';
 
 @NgModule({
   declarations: [
     AppComponent,
-    // NavbarComponent,
-    // HomeComponent,
     FootComponent,
-    // BrowseComponent,
-    // HelpComponent,
-    // TutorialComponent,
     ApiComponent,
-    // StatisticsComponent,
-    // AboutComponent,
-    // FeedbackComponent,
     LoginComponent,
-    DashboardComponent,
     PageNotFoundComponent,
-    // ProfileComponent,
     DetailsTableComponent,
     AlarmBannerComponent,
     EditProfileComponent,
-    DashboardUserformComponent,
     DocumentationComponent,
     NotRegisteredComponent,
     SwaggerUiComponent,

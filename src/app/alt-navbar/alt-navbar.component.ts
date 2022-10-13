@@ -1,5 +1,4 @@
 import { Component, HostListener, OnInit } from "@angular/core";
-import { AuthService } from "../auth/auth.service";
 import { BehaviorSubject, Observable } from "rxjs";
 
 @Component({
@@ -13,18 +12,9 @@ export class AltNavbarComponent implements OnInit {
   expanded_nav = false;
   show_login = false;
   isCollapsed = new BehaviorSubject<boolean>(true);
-  user$: Observable<any>;
   
-  constructor(private authService: AuthService) {
-    if(this.authService.loggedIn){
-      this.user$ = this.authService.user$;
-    }
+  constructor() {
   }
-
-  get loggedIn(){
-    return this.authService.loggedIn
-  }
-
 
 
 
@@ -47,7 +37,4 @@ export class AltNavbarComponent implements OnInit {
     }
   }
 
-  logout() {
-    this.authService.logout();
-  }
 }

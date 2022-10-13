@@ -10,8 +10,9 @@ import { SvgModule } from "../svg/svg.module";
 import { ScrollToModule } from "@nicky-lenaers/ngx-scroll-to";
 import { DatabaseCreateComponent } from './database-create/database-create.component';
 import { ReactiveFormsModule } from "@angular/forms";
+import { DatabaseDashboardComponent } from './database-dashboard/database-dashboard.component';
 @NgModule({
-  declarations: [DatabasesPageComponent, DatabasePageComponent, DatabaseCreateComponent],
+  declarations: [DatabasesPageComponent, DatabasePageComponent, DatabaseCreateComponent, DatabaseDashboardComponent],
   imports: [
     ScrollToModule,
     SvgModule,

@@ -1,0 +1,79 @@
+<div *ngIf="(loggedIn$ | async) && user$ | async as user" class="tw-relative tw-inline-block tw-text-left">
+    <div>
+        <button (mouseover)="auth_dropdown = true"
+            class="tw-text-gray-100 tw-flex tw-flex-row tw-items-center tw-bg-apicuron-red hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-shadow-md tw-text-sm tw-font-medium tw-cursor-pointer ">
+            <img class="tw-inline tw-w-4 tw-mr-1" src="/assets/user.svg" alt="">
+            <span class="tw-font-bold">{{ user.displayedName }}</span>
+        </button>
+    </div>
+    <div (mouseleave)="auth_dropdown = false" [ngClass]="{'tw-block': auth_dropdown, 'tw-hidden': !auth_dropdown}"
+        class="tw-absolute tw-right-0 tw-z-10 tw-mt-2 tw-w-56 tw-origin-top-right tw-rounded-md tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none"
+        role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+        <div class="tw-py-1" role="none">
+            <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
+            <a [routerLink]="['/curators', user.orcid_id]" class="dropdown-element">Biocurator Profile</a>
+            <ng-container *ngFor="let resource of user.resources">
+                <a [routerLink]="['/databases', resource.resource_id, 'dashboard']" class="dropdown-element">Manage
+                    {{ resource.name }}</a>
+            </ng-container>
+
+            <button class="dropdown-element" (click)="logout()">Sign out
+                <svg class="tw-inline tw-w-4 tw-h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                    </path>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<ng-container *ngIf="!(loggedIn$ | async)">
+    <!-- This example requires Tailwind CSS v2.0+ -->
+    <button [ngClass]="button_class" (click)="show_login= true">Login</button>
+    <div *ngIf="show_login" class="tw-relative tw-z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!--
+    Background backdrop, show/hide based on modal state.
+
+    Entering: "ease-out duration-300"
+        From: "opacity-0"
+        To: "opacity-100"
+    Leaving: "ease-in duration-200"
+        From: "opacity-100"
+        To: "opacity-0"
+    -->
+        <div class="tw-fixed tw-inset-0 tw-bg-gray-500 tw-bg-opacity-75 tw-transition-opacity"
+            [ngClass]="{'tw-block':show_login, 'tw-hidden': !show_login}"></div>
+
+        <div class="tw-fixed tw-inset-0 tw-z-10 tw-overflow-y-auto">
+            <div
+                class="tw-flex tw-min-h-full tw-items-center tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0">
+                <!--
+        Modal panel, show/hide based on modal state.
+
+        Entering: "ease-out duration-300"
+            From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            To: "opacity-100 translate-y-0 sm:scale-100"
+        Leaving: "ease-in duration-200"
+            From: "opacity-100 translate-y-0 sm:scale-100"
+            To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+        -->
+                <div [ngClass]="{'tw-block':show_login, 'tw-hidden': !show_login}"
+                    class="tw-relative tw-transform tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 sm:tw-max-h-screen ">
+                    <div
+                        class="tw-bg-white tw-grid tw-grid-flow-row tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4">
+                        <img class="tw-justify-self-center" src="../assets/APICURON.svg">
+                        <h2 class="tw-text-xl tw-text-gray-900 tw-font-bold tw-text-center tw-w-full tw-mb-8">Login</h2>
+                        <a style="background-color: #A6CE39;" [href]="login_link"
+                            class="tw-w-full tw-cursor-pointer hover:tw-text-white tw-text-center tw-py-2 tw-text-white tw-font-bold">Continue
+                            with
+                            ORCID</a>
+                        <button class="tw-w-full tw-py-2 tw-text-gray-700 tw-font-bold tw-bg-gray-300"
+                            (click)="show_login = false">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-container>
