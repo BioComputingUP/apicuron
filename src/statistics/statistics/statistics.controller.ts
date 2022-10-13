@@ -48,6 +48,11 @@ export class StatisticsController {
 			page_size,
 		);
 	}
+	
+	@Get(':resource_id')
+	async get_resource_statistics(@Param('resource_id') resource_id: string, @Query('from') from_date: 'year' | '6 months' | 'month' | 'week'){
+		
+	}
 
 	@Get('achievements/:orcid_id/:resource_id')
 	async get_user_achievements(@Param('orcid_id') orcid_id: string, @Param('resource_id') resource_id: string){

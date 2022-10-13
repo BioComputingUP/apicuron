@@ -5,6 +5,7 @@ export type UserDocument = User & Document;
 export interface UserResource {
 	id: string;
 	name: string;
+	resource_id: string;	
 }
 
 export interface UserStat {
@@ -80,8 +81,8 @@ export class User {
 	})
 	last_update: Date;
 
-	@Prop()
-	profile_picture: string;
+	@Prop({ required: false })
+	profile_picture?: string;
 
 	@Prop({ required: true })
 	role: string;
@@ -97,7 +98,7 @@ export class User {
 	})
 	orcid_permission: string;
 
-	@Prop({ required: false, select: false })
+	@Prop({ required: false, select: true })
 	resources: UserResource[];
 
 	@Prop({ required: false })

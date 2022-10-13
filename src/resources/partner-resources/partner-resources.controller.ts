@@ -46,6 +46,11 @@ export class PartnerResourcesController {
 			page_size: page_size,
 		};
 	}
+
+	@Get([':resource_id', 'statistics'])
+	async get_resource_statistics(@Param('resource_id') resource_id: string ){
+		return 'hi'
+	}
 }
 
 @Controller()

@@ -45,6 +45,7 @@ export class ReportsService {
 		sort_value = '',
 		resource_id = '',
 		curator_orcid = '',
+		page = 1
 	}) {
 		let aggregation_pipeline = [];
 
@@ -62,18 +63,21 @@ export class ReportsService {
 			aggregation_pipeline.push(match_obj);
 		}
 
-		// Sorting and sort fields
-		const sort = this.validate_sort_fields(sort_value);
+		// Validating sort field
+		const sort_field_valid = this.validate_sort_fields(sort_value);
 
-		if (!!sort_field && this.sort_fields.includes(sort_field) && !!sort) {
+		if (!!sort_field && this.sort_fields.includes(sort_field) && !!sort_field_valid) {
 			let sort_obj = {
 				$sort: {},
 			};
-			sort_obj.$sort[sort_field] = sort;
+			sort_obj.$sort[sort_field] = sort_field_valid;
 			aggregation_pipeline.push(sort_obj);
 		}
 
 		aggregation_pipeline = aggregation_pipeline.concat([
+			{
+				$skip: page
+			},
 			{
 				$limit: this.page_size,
 			},

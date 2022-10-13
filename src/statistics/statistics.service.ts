@@ -74,17 +74,20 @@ export class StatisticsService {
 		}
 		const skip = (page - 1) * page_size;
 
-		const leaderboard = await this.userModel.aggregate([
+		const leaderboardPromise = this.userModel.aggregate([
+			// get the user stats in separate documents
 			{
 				$unwind: {
 					path: '$stats',
 				},
 			},
+			// get the users with the corresponding resource_id
 			{
 				$match: {
 					'stats.resource_id': resource_id,
 				},
 			},
+			// sort by the total score
 			{
 				$sort: {
 					'stats.total_score': -1,
@@ -98,9 +101,10 @@ export class StatisticsService {
 			},
 		]);
 
-		const query = { 'stats.resource_id': resource_id };
-		const count = await this.userModel.count(query);
 
+		const query = { 'stats.resource_id': resource_id };
+		const countPromise = this.userModel.count(query);
+		const [leaderboard, count] = await Promise.all([leaderboardPromise, countPromise])
 		return { data:leaderboard, page, count };
 	}
 }

@@ -13,12 +13,13 @@ import { AuthService } from './auth.service';
 import { Roles } from './decorators/roles.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { RoleGuard } from './guards/role.guard';
+import { UsersService } from './users/users.service';
 
 @Controller({
 	path: 'auth'
 })
 export class AuthController {
-	constructor(private authService: AuthService, private configService: ConfigService) {}
+	constructor(private authService: AuthService, private configService: ConfigService, private userService: UsersService) {}
 
 	private authControllerLogger = new Logger(AuthController.name);
 
@@ -47,13 +48,13 @@ export class AuthController {
 	@Roles('user', 'admin')
 	@UseGuards(LocalAuthGuard, RoleGuard)
 	protected_page(@Req() request) {
-		// this.authControllerLogger.log('user prop', request.user);
 		return 'Can be accessed';
 	}
 
 	@Get('profile')
 	@UseGuards(LocalAuthGuard)
-	get_user_profile(@Req() request){
-		return request.user
+	async get_user_profile(@Req() request){
+		const user = await this.userService.get_by_orcid(request.user.orcid_id);
+		return user
 	}
 }

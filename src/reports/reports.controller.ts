@@ -1,5 +1,18 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import {
+	Controller,
+	Post,
+	Get,
+	Param,
+	Query,
+	UseInterceptors,
+	UseGuards,
+	UploadedFile,
+	Logger
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+
 import { Roles } from '../auth/decorators/roles.decorator';
+import { BelongsToResourceGuard } from '../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
 import { ParseUnsignedIntPipe } from '../shared/pipes/unsigned-int-validation.pipe';
@@ -25,6 +38,8 @@ export class ReportsController {
 export class ReportsControllerV2 {
 	constructor(private reportService: ReportsService) {}
 
+	logger = new Logger(ReportsControllerV2.name)
+
 	@Get()
 	async get_reports(
 		@Query('orcid_id') orcid_id: string,
@@ -47,6 +62,18 @@ export class ReportsControllerV2 {
 		@Query('page', ParseUnsignedIntPipe) page = 1,
 		@Query('page_size', ParseUnsignedIntPipe) page_size = 10,
 	) {
-		return await this.reportService.get_user_reports(orcid_id, resource_id, page, page_size);
+		return await this.reportService.get_user_reports(
+			orcid_id,
+			resource_id,
+			page,
+			page_size,
+		);
+	}
+
+	@Post('')
+	@UseGuards(LocalAuthGuard, BelongsToResourceGuard)
+	@UseInterceptors(FileInterceptor('reports'))
+	async submit_reports(@UploadedFile() reports: Express.Multer.File) {
+		this.logger.log('file: ', reports)
 	}
 }
