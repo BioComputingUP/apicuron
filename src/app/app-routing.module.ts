@@ -28,8 +28,7 @@ const routes: Routes = [
   },
   {
     path: "help",
-    loadChildren: () => import("./help/help.module").then((m) => m.HelpModule),
-    canActivate: [AuthGuard]
+    loadChildren: () => import("./help/help.module").then((m) => m.HelpModule)
   },
   {
     path: "curators",
