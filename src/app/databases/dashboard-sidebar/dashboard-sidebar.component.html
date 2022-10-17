@@ -1,0 +1,9 @@
+<div class="tw-block tw-w-72 tw-bg-apicuron-purple tw-text-gray-300 tw-h-screen" *ngIf="resource$ | async as resource">
+    <h2 class="tw-text-xl tw-font-bold tw-font-dm-sans tw-text-white tw-text-center tw-py-2">{{
+        resource.resource_name }} Dashboard</h2>
+    <ul class="tw-ml-2" *ngIf="links$ | async as links">
+        <li class="tw-p-2" *ngFor="let link of links">
+            <a class="hover:tw-text-white tw-border-l-2 tw-border-gray-300 tw-gray-300 tw-px-2" [routerLinkActive]="' tw-text-lg tw-border-white tw-font-bold tw-text-white'" [routerLink]="link.href">{{ link.name }}</a>
+        </li>
+    </ul>
+</div>

@@ -1,7 +1,6 @@
 <div class="main-content">
     <h2 class="tw-text-3xl tw-font-dm-sans tw-font-bold tw-my-2">Create Partner Resource</h2>
-    <div *ngIf="form_response$ | async as response_data" class="tw-bg-green-500 tw-p-2 tw-text-white tw-font-bold">
-    <!-- <div class="tw-bg-green-500 tw-p-2 tw-text-white tw-font-bold"> -->
+    <!-- <div *ngIf="form_response$ | async as response_data" class="tw-bg-green-500 tw-p-2 tw-text-white tw-font-bold">
         
         Successful creation of the 
         <span class="tw-underline">{{ response_data.resource_name }}</span>
@@ -11,7 +10,7 @@
     </div>
     <div *ngIf="error_response$ | async as error_response" class="tw-bg-red-500 tw-p-2 tw-text-white tw-font-bold">
             An error has occured: {{ error_response }}
-        </div>
+        </div> -->
     <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="data$ | async">
         <div class="tw-flex tw-flex-row tw-flex-wrap tw-mb-2">
             <div class="form-control-element tw-w-1/2">
@@ -81,8 +80,8 @@
         </div>
 
         <div class="tw-flex tw-justify-center">
-            <input type="submit" value="Create Partner Resource" [disabled]="form.invalid"
-                [ngClass]="{'tw-bg-gray-300 tw-text-gray-600':form.invalid, 'tw-bg-apicuron-purple tw-text-white tw-shadow-md': !form.invalid}"
+            <input type="submit" value="Create Partner Resource" [disabled]="form.invalid || clicked"
+                [ngClass]="{'tw-bg-gray-300 tw-text-gray-600':form.invalid || clicked, 'tw-bg-apicuron-purple tw-text-white tw-shadow-md': !form.invalid || clicked}"
                 class=" tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded" />
         </div>
 

@@ -1,5 +1,7 @@
+import { HttpErrorResponse } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { ToastrService } from "ngx-toastr";
 import { combineLatest, Observable, of } from "rxjs";
 import { catchError, map, pluck, shareReplay, tap } from "rxjs/operators";
 import { toFormData } from "../../directives/toFormData";
@@ -13,18 +15,16 @@ import { ResourceIdValidator } from "../validators/resource-id.validator";
 })
 export class DatabaseCreateComponent implements OnInit {
   data$: Observable<any>;
-
-  form_response$: Observable<any>;
+  clicked = false;
 
   JSON = JSON;
 
   form: FormGroup;
-  formData: FormData;
-  error_response$: Observable<any>;
 
   constructor(
     private formBuilder: FormBuilder,
-    protected databasesService: DatabasesService
+    protected databasesService: DatabasesService,
+    protected toaster: ToastrService
   ) {
     this.data$ = this.databasesService.get_resources().pipe(
       pluck("data"),
@@ -69,7 +69,7 @@ export class DatabaseCreateComponent implements OnInit {
       { validators: Validators.required, updateOn: "change" }
     );
 
-    this.formData = this.form.value
+
   }
 
   onFileSelected(event){
@@ -79,14 +79,23 @@ export class DatabaseCreateComponent implements OnInit {
 
 
   submit() {
+
     const formValue = toFormData(this.form.value);
 
-    this.form_response$ = this.databasesService
-      .create_resource(formValue)
+    this.databasesService
+      .create_resource(formValue).subscribe((response) => {
+      this.toaster.success('Resource submitted successfullly', 'Success')
+    }, ({ error }: HttpErrorResponse) => {
+      if(error.message && error.statusCode == 400){
+        let errors = Array.isArray(error.message) ? error.message.join('\n') : error.message
+        this.toaster.warning(errors, 'Validation Error')
+      }else{
+        this.toaster.error('An error occured while sending the form, please contact the developers', 'Error');
+      }
+      return of(error.message)
+    })
     
-    this.error_response$ = this.form_response$.pipe(
-      catchError((err:Error) => of(err.message))
-    )
+    
   }
 
   ngOnInit(): void {}

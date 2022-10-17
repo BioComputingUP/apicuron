@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../auth.service';
 
@@ -21,6 +22,7 @@ export class AuthDropdownComponent implements OnInit {
     this.login_link = environment.ws + '/auth/orcid'
     this.loggedIn$ = this.authService.loggedIn$
     this.user$ = this.authService.user$
+
   }
 
   logout(){

@@ -11,15 +11,8 @@ import { ReactiveFormsModule, FormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { BsDatepickerModule } from "ngx-bootstrap/datepicker";
-// import { CarouselModule } from "ngx-bootstrap/carousel";
-// import { CollapseModule } from "ngx-bootstrap/collapse";
 import { TabsModule } from "ngx-bootstrap/tabs";
 import { PaginationModule } from "ngx-bootstrap/pagination";
-// import { BsDropdownModule } from "ngx-bootstrap/dropdown";
-// import { ButtonsModule } from "ngx-bootstrap/buttons";
-// import { ModalModule } from "ngx-bootstrap/modal";
-// import { TooltipModule } from "ngx-bootstrap/tooltip";
-// import { AccordionModule } from "ngx-bootstrap/accordion";
 import { AlertModule } from "ngx-bootstrap/alert";
 import { ScrollToModule } from "@nicky-lenaers/ngx-scroll-to";
 import { ProgressbarModule } from "ngx-bootstrap/progressbar";
@@ -39,6 +32,7 @@ import { AltNavbarComponent } from "./alt-navbar/alt-navbar.component";
 import { IndexModule } from "./index/index.module";
 import { CuratorModule } from "./curator/curator.module";
 import { AuthModule } from "./auth/auth.module";
+import { ToastrModule } from "ngx-toastr";
 
 @NgModule({
   declarations: [
@@ -58,6 +52,7 @@ import { AuthModule } from "./auth/auth.module";
   imports: [
     AppRoutingModule,
     AuthModule,
+    ToastrModule.forRoot(),
     CuratorModule,
     IndexModule,
     ScrollToModule.forRoot(),

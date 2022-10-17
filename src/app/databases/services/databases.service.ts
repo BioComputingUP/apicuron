@@ -3,13 +3,13 @@ import { Observable } from "rxjs";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 
 import { environment } from "../../../environments/environment";
-import { map } from "rxjs/operators";
+import { AuthService } from "../../auth/auth.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class DatabasesService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private auth: AuthService) {}
   private partnerResourcesPath = environment.ws + "/partner-resources";
   private resourcesPath = environment.ws + "/resources";
 
@@ -35,6 +35,22 @@ export class DatabasesService {
         },
       }
     );
+    return data
+  }
+
+  update_resource(resource_data: Object){
+    const data = this.http.put(
+      this.partnerResourcesPath + '/update',
+      resource_data,
+      {
+        responseType: 'json',
+        headers: {
+          version: '2',
+          authorization: this.auth.token_value
+        }
+      }
+    )
+
     return data
   }
 

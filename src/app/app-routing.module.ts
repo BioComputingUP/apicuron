@@ -26,6 +26,12 @@ const routes: Routes = [
     loadChildren: () =>
       import("./about/about.module").then((m) => m.AboutModule),
   },
+  // {
+  //   path: "notifications",
+  //   loadChildren: () =>
+  //     import("./notifications/notifications.module").then((m) => m.NotificationsModule),
+  //   canActivate: [AuthGuard]
+  // },
   {
     path: "help",
     loadChildren: () => import("./help/help.module").then((m) => m.HelpModule)

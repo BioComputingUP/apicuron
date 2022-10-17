@@ -10,10 +10,13 @@ import { SvgModule } from "../svg/svg.module";
 import { ScrollToModule } from "@nicky-lenaers/ngx-scroll-to";
 import { DatabaseCreateComponent } from './database-create/database-create.component';
 import { ReactiveFormsModule } from "@angular/forms";
-import { DatabaseDashboardComponent } from './database-dashboard/database-dashboard.component';
+import { AuthModule } from "../auth/auth.module";
+import { DatabaseUpdateComponent } from './database-update/database-update.component';
+import { DashboardSidebarComponent } from './dashboard-sidebar/dashboard-sidebar.component';
 @NgModule({
-  declarations: [DatabasesPageComponent, DatabasePageComponent, DatabaseCreateComponent, DatabaseDashboardComponent],
+  declarations: [DatabasesPageComponent, DatabasePageComponent, DatabaseCreateComponent, DatabaseUpdateComponent, DashboardSidebarComponent],
   imports: [
+    AuthModule,
     ScrollToModule,
     SvgModule,
     CommonModule,
