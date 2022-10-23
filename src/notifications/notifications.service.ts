@@ -11,13 +11,13 @@ export class NotificationsService {
 	) {}
 
 	async get_new_user_notification(orcid_id: string){
-        const data = await this.notificationModel.find({ orcid_id: orcid_id, seen: false })
+        const data = await this.notificationModel.find({ orcid_id: orcid_id, seen: false }).sort({ created_at: -1 })
     
         return data
     }
 
     async get_user_notifications(orcid_id: string){
-        const data = await this.notificationModel.find({ orcid_id: orcid_id, seen: false })
+        const data = await this.notificationModel.find({ orcid_id: orcid_id })
         return data
     }
 
@@ -30,10 +30,10 @@ export class NotificationsService {
     }
 
     async get_new_notification_count(orcid_id: string){
-        return await this.notificationModel.count({ orcid_id })
+        return await this.notificationModel.count({ orcid_id, seen: false })
     }
 
-    async set_notification_as_seen(id: mongoose.Types.ObjectId){
-        return await this.notificationModel.updateOne({ _id: id}, { seen: true })
+    async set_notification_as_seen(id: mongoose.Types.ObjectId, orcid_id: string){
+        return await this.notificationModel.updateOne({ _id: id, orcid_id}, { seen: true })
     }
 }

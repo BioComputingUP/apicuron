@@ -7,8 +7,8 @@ export class Term {
 	// fields from Achievement
 	
 	// https://mongoosejs.com/docs/schematypes.html#schematype-options
-	@Prop()
-	id: string;
+	// @Prop()
+	// id: string;
 	
 	@Prop()
 	activity_category: string;
@@ -24,6 +24,9 @@ export class Term {
 	
 	@Prop()
 	resource_uri: string;
+	
+	@Prop()
+	resource_id: string;
 	
 	@Prop()
 	score: number;

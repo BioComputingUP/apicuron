@@ -6,26 +6,19 @@ import {
 	Put,
 	UploadedFile,
 	UseInterceptors,
-	UnprocessableEntityException,
-} from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import multer, { MulterError } from 'multer';
-import {
 	ParseFilePipe,
 	MaxFileSizeValidator,
 	FileTypeValidator,
 	Logger,
 	InternalServerErrorException
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { createResourceDto } from '../dto/createResource.dto';
 import { SubmittedResourcesService } from './resources.service';
-import * as DOMPurify from 'isomorphic-dompurify';
-import path, { join, extname } from 'path';
+import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
-import { uuid } from 'uuidv4';
-import LocalFilesInterceptor from '../../shared/interceptors/local-file.interceptor';
 import { SvgSanitationValidationPipe } from '../../shared/pipes/svg-sanitation.pipe';
-import { rename, writeFile } from 'fs';
+import { writeFile } from 'fs';
 import * as mime from 'mime-types'
 
 const resource_image_validation_pipe = new ParseFilePipe({
@@ -49,13 +42,6 @@ export class SubmittedResourcesController {
 	{}
 
 	private readonly logger = new Logger(SubmittedResourcesController.name)
-
-	// @UseInterceptors(
-	// 	LocalFilesInterceptor('logo', {
-	// 		public: true,
-	// 		path: 'resources',
-	// 	}),
-	// )
 
 	@Put()
 	@UseInterceptors(FileInterceptor('logo'))

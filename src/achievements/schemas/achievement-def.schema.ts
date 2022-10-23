@@ -12,6 +12,9 @@ export class AchievementDef {
 	
 	name: string;
 	resource_uri: string;
+
+	resource_id: string;
+
 	list_terms: string[];
 	
 	// Added to define the discriminatory field
@@ -21,6 +24,21 @@ export class AchievementDef {
 		enum: ['badge', 'medal']
 	})
 	type: string;
+
+	// badge field
+	@Prop()
+	color_code?: string;
+
+
+	// medal fields
+	@Prop()
+	score_relative?: number;
+
+	@Prop()
+	first_day?: Date;
+	
+	@Prop()
+	last_day?: Date;
 }
 
 export const AchievementDefSchema = SchemaFactory.createForClass(AchievementDef);

@@ -1,6 +1,8 @@
 export default () => ({
   environment: 'development',
-  database_url: 'mongodb://moros:27017/apicuron_test',
+  db_host: 'moros',
+  database: 'apicuron_test',
+  port: 27017,
   ORCID_REDIRECT: 'http://localhost:3000/auth/orcid/redirect',
   ORCID_CLIENT_ID: 'APP-IU0CU8PQW4VDZA84',
   ORCID_CLIENT_SECRET: 'YOUR-ORCID-CLIENT-SECRET',

@@ -6,8 +6,11 @@ import * as mime from 'mime-types'
 @Injectable()
 export class SvgSanitationValidationPipe implements PipeTransform {
   transform(file: Express.Multer.File, metadata: ArgumentMetadata) {
-    if(mime.extension(file.mimetype) == 'svg'){
-      const clean = DOMPurify.sanitize(file.buffer.toString())
+    if(file && mime.extension(file.mimetype) == 'svg'){
+
+      const fileContent = file.buffer ? file.buffer.toString() : readFileSync(file.path).toString()
+
+      const clean = DOMPurify.sanitize(fileContent)
       if(clean == ''){
           throw new ImATeapotException()
       }else{

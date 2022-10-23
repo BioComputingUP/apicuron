@@ -2,15 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type BadgeDefDocument = BadgeDef & Document;
 
-@Schema({
-	collection: 'achievements_def',
-	// toJSON: {
-	// 	transform: function (doc, ret) {
-	// 		delete ret._id;
-	// 		return ret
-	// 	},
-	// },
-})
+@Schema()
 export class BadgeDef {
 	// fields from Achievement
 	// id: string;
@@ -29,6 +21,9 @@ export class BadgeDef {
 
 	@Prop()
 	resource_uri: string;
+
+	@Prop()
+	resource_id: string;
 
 	@Prop()
 	list_terms: string[];

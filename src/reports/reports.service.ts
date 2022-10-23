@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
-import { User, UserDocument } from '../auth/users/user.schema';
+import { User, UserDocument } from '../auth/users/schemas/user.schema';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import { TermsService } from '../resources/terms/terms.service';
 import { ReportDto } from './dto/report.dto';
@@ -233,5 +233,18 @@ export class ReportsService {
 
 	async count() {
 		return await this.reportModel.count();
+	}
+
+
+	async delete_all_resource_reports(resource_id: string){
+		const resource_uri = await this.partnerResourceService.retrieve_uri(resource_id);
+
+		return await this.reportModel.deleteMany({
+			'$or': [
+				{ resource_uri },
+				{ resource_id }
+			]
+		})
+
 	}
 }

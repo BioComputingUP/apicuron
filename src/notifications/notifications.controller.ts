@@ -14,7 +14,13 @@ export class NotificationsController {
     @Get()
     @UseGuards(LocalAuthGuard)
     async get_user_notification(@Req() request) {
-        return await this.notificationService.get_user_notifications(request.user.orcid_id)
+        return await this.notificationService.get_new_user_notification(request.user.orcid_id)
+    }
+
+    @Get('count')
+    @UseGuards(LocalAuthGuard)
+    async get_new_notification_count(@Req() request){
+        return await this.notificationService.get_new_notification_count(request.user.orcid_id)
     }
 
     @Delete()
@@ -26,7 +32,7 @@ export class NotificationsController {
     @Delete(':notification_id')
     @UseGuards(LocalAuthGuard)
     async delete_notification(@Req() request, @Param('notification_id') notification_id: mongoose.Types.ObjectId){
-        return await this.notificationService.delete_notification(notification_id  ,request.user.orcid_id)
+        return await this.notificationService.set_notification_as_seen(notification_id  ,request.user.orcid_id)
     }
 
 

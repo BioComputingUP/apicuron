@@ -11,27 +11,36 @@ import { MedalDefDocument } from './schemas/medals_def.schema';
 @Injectable()
 export class AchievementsDefService {
 	constructor(
-		@InjectModel('badge') private badgeModel: Model<BadgeDefDocument>,
-		@InjectModel('medal') private medalModel: Model<MedalDefDocument>,
+		// @InjectModel('badge') private badgeModel: Model<BadgeDefDocument>,
+		// @InjectModel('medal') private medalModel: Model<MedalDefDocument>,
 		@InjectModel(AchievementDef.name)
 		private achievementModel: Model<AchievementDocument>,
 	) {}
-	async get_medals(resource_uri?: string) {
-		if (resource_uri) {
-			return await this.medalModel.find({
-				resource_uri,
+	async get_medals(resource_id?: string, resource_uri?: string) {
+		if (resource_uri || resource_id) {
+			const result =  await this.achievementModel.find({
+				'$or': [
+					{ resource_uri },
+					{ resource_id },
+				],
+				type:'medal'
 			});
+			return result;
 		}
-		return await this.medalModel.find();
+		return await this.achievementModel.find({ type: 'medal' });
 	}
 
-	async get_badges(resource_uri?: string) {
-		if (resource_uri) {
-			return await this.badgeModel.find({
-				resource_uri,
+	async get_badges(resource_id?: string, resource_uri?: string) {
+		if (resource_uri || resource_id) {
+			return await this.achievementModel.find({
+				'$or': [
+					{ resource_uri },
+					{ resource_id }
+				],
+				type:'badge'
 			});
 		}
-		return await this.badgeModel.find();
+		return await this.achievementModel.find({ type: 'badge'});
 	}
 
 	async count() {
@@ -39,9 +48,9 @@ export class AchievementsDefService {
 	}
 
 	async medal_count() {
-		return await this.medalModel.count();
+		return await this.achievementModel.count({ type: 'medal' });
 	}
 	async badges_count() {
-		return await this.badgeModel.count();
+		return await this.achievementModel.count({ type: 'badge' });
 	}
 }

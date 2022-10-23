@@ -3,14 +3,52 @@ import {
 	Get,
 	Param,
 	Query,
+	Req,
+	UploadedFile,
 	NotFoundException,
+	ParseFilePipe,
+	UseGuards,
+	Body,
+	Put,
+	UnauthorizedException,
+	MaxFileSizeValidator,
+	FileTypeValidator,
+	UseInterceptors,
+	InternalServerErrorException,
+	Logger
 } from '@nestjs/common';
-import { StatisticsService } from '../../statistics/statistics.service';
-import { PartnerResourceSummaryDto } from '../dto/partner-resources.dto';
+import { SvgSanitationValidationPipe } from '../../shared/pipes/svg-sanitation.pipe';
+
 import { PartnerResourcesService } from './partner-resources.service';
+import { UpdatePartnerResourceDto } from '../dto/updateResource.dto';
+import { UsersService } from '../../auth/users/users.service';
+import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
+import { HasAResourceGuard } from '../../auth/guards/belongs-to-resource.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { rename } from 'fs';
+import { ConfigService } from '@nestjs/config';
+import { join } from 'path';
+import * as mime from 'mime-types';
+
+const resource_image_validation_pipe = new ParseFilePipe({
+	validators: [
+		new MaxFileSizeValidator({ maxSize: 1000000 }),
+		new FileTypeValidator({
+			fileType: /(^image)(\/)(jpeg|png|svg\+xml|webp)*/gm,
+		}),
+	],
+	fileIsRequired: false,
+});
+
 @Controller({ path: 'partner-resources', version: '2' })
 export class PartnerResourcesController {
-	constructor(private partnerResourceService: PartnerResourcesService) {}
+	constructor(
+		private partnerResourceService: PartnerResourcesService,
+		private userService: UsersService,
+		private configService: ConfigService,
+	) {}
+
+	logger = new Logger(PartnerResourcesController.name)
 	// @Get('details')
 	// async get_resources(): Promise<PartnerResourceSummaryDto[]> {
 	// 	return await this.partnerResourceService.resources_details();
@@ -47,9 +85,63 @@ export class PartnerResourcesController {
 		};
 	}
 
-	@Get([':resource_id', 'statistics'])
-	async get_resource_statistics(@Param('resource_id') resource_id: string ){
-		return 'hi'
+	// @Get([':resource_id', 'statistics'])
+	// async get_resource_statistics(@Param('resource_id') resource_id: string ){
+	// 	return 'hi'
+	// }
+
+	@Put('update')
+	@UseGuards(LocalAuthGuard, HasAResourceGuard)
+	@UseInterceptors(
+		FileInterceptor('logo', {
+			dest: '/tmp/apicuron/resources',
+		}),
+	)
+	async update_resource_values(
+		@Body() update_resource: UpdatePartnerResourceDto,
+		@Req() request,
+		@UploadedFile(resource_image_validation_pipe, SvgSanitationValidationPipe)
+		logo: Express.Multer.File,
+	) {
+		const user = await this.userService.get_by_orcid(request.user.orcid_id);
+
+		const user_resource = user.resources.find(
+			(resource) => resource.resource_id == update_resource.resource_id,
+		);
+		if (!user_resource) {
+			throw new UnauthorizedException('Cannot update this resource');
+		}
+
+		const { resource_id } = update_resource;
+
+		if (logo) {
+			var mv = require('mv');
+			const ext = mime.extension(logo.mimetype);
+			const public_path = join(
+					this.configService.get('PUBLIC_FILES_PATH'),
+					'resources',
+					`${logo.filename}.${ext}`,
+				);
+
+			mv(
+				logo.path,
+				public_path,
+				{ mkdirp: true },
+				function (err) {
+					if(err){
+						console.error(PartnerResourcesController.name, err)
+						throw new InternalServerErrorException();	
+					}
+				},
+			);
+
+			await this.partnerResourceService.update_resource({...update_resource, logo: public_path });
+		}else{
+			await this.partnerResourceService.update_resource(update_resource);
+		}
+
+
+		return await this.partnerResourceService.get_resource(resource_id);
 	}
 }
 

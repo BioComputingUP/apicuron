@@ -33,7 +33,7 @@ function getConfig() {
 		ScheduleModule.forRoot(),
 		AuthModule,
 		MulterModule.register({
-			dest: '/tmp/apicuron',
+			dest: '/tmp/apicuron/',
 		}),
 		// isGlobal loads Config Module globally, doesn't require imports
 		ConfigModule.forRoot({
@@ -46,20 +46,26 @@ function getConfig() {
 		// due to the fact that this is the appmodule
 		MongooseModule.forRootAsync({
 			inject: [ConfigService],
-			useFactory: async (configService: ConfigService) => ({
-				uri: configService.get<string>('database_url'),
-			}),
+			useFactory: async (configService: ConfigService) => {
+				const db_host = configService.get<string>('db_host')
+				const database = configService.get<string>('database')
+				const port = configService.get<number>('port')
+				return ({
+					uri: `mongodb://${db_host}:${port}/${database}`,
+				})
+			},
 		}),
 		// in here we load the Serve static module to serve static files
 		ServeStaticModule.forRootAsync({
 			inject: [ConfigService],
 			useFactory: async (configService: ConfigService) => ([{
 				rootPath: resolve(configService.get('PUBLIC_FILES_PATH')),
-				serveRoot: '/files',
+				serveRoot: '/public',
 			}]),
 		}),
-		ReportsModule,
+		
 		ResourcesModule,
+		ReportsModule,
 		StatisticsModule,
 		TransformerModule,
 		AchievementsModule,

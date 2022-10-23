@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { FilterQuery, ProjectionType, QueryOptions } from 'mongoose';
+import { AchievementDef } from '../../achievements/schemas/achievement-def.schema';
 import { BadgeDef } from '../../achievements/schemas/badges_def.schema';
 import { MedalDef } from '../../achievements/schemas/medals_def.schema';
 // import { BadgeDef } from './badges.schema';
@@ -43,9 +44,10 @@ export class PartnerResource {
 	// state= 'valid';
 }
 
+
 export class ResourceSummary extends PartnerResource {
-	badges: BadgeDef[];
-	medals: MedalDef[];
+	badges: AchievementDef[];
+	medals: AchievementDef[];
 	terms: Term[];
 }
 

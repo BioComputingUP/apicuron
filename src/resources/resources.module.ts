@@ -25,6 +25,9 @@ import { AchievementsModule } from '../achievements/achievements.module';
 import { TermsService } from './terms/terms.service';
 import { UniqueResourceIdRule } from './submitted-resources/validators/unique-resource-id';
 import { UniqueResourceURIRule } from './submitted-resources/validators/unique-resource-uri';
+import { JwtModule } from '@nestjs/jwt';
+import { ResourceIdExists } from './partner-resources/validators/resource-id-exists';
+import { ActivityTermExists } from './terms/validators/activity-term-exists';
 
 @Module({
 	controllers: [
@@ -33,10 +36,11 @@ import { UniqueResourceURIRule } from './submitted-resources/validators/unique-r
 		TermsController,
 		SubmittedResourcesController,
 	],
-	providers: [UniqueResourceIdRule, UniqueResourceURIRule, PartnerResourcesService, SubmittedResourcesService, TermsService],
-	exports: [PartnerResourcesService, MongooseModule, TermsService],
+	providers: [UniqueResourceIdRule, UniqueResourceURIRule, ResourceIdExists, PartnerResourcesService, SubmittedResourcesService, TermsService, ActivityTermExists],
+	exports: [PartnerResourcesService, MongooseModule, TermsService, ResourceIdExists, ActivityTermExists],
 	imports: [
 		AuthModule,
+		JwtModule,
 		AchievementsModule,
 		// SharedValidatorsModule,
 		MongooseModule.forFeature([

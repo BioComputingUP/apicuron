@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { achievements_v1_pipeline } from './aggregation-pipeline/achievements.pipeline';
 import { browse_v1_pipeline } from './aggregation-pipeline/browse.pipeline';
-import { User, UserDocument } from './user.schema';
+import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UsersService {
@@ -11,9 +11,11 @@ export class UsersService {
 	constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
 	async get_by_orcid(orcid_id: string): Promise<User> {
-		return await this.userModel.findOne({
+		const user_promise = this.userModel.findOne({
 			orcid_id,
 		});
+		
+		return await user_promise
 	}
 
 	async get_by_cookie_token(cookie_token: string): Promise<User> {

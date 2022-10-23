@@ -19,10 +19,10 @@ import { AchievementsService } from './achievements.service';
 			{
 				name: AchievementDef.name,
 				schema: AchievementDefSchema,
-				discriminators: [
-					{ name: 'badge', schema: BadgeDefSchema },
-					{ name: 'medal', schema: MedalDefSchema },
-				],
+				// discriminators: [
+				// 	{ name: 'badge', schema: BadgeDefSchema },
+				// 	{ name: 'medal', schema: MedalDefSchema },
+				// ],
 			},
 			{
 				name: Achievement.name,

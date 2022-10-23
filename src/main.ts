@@ -9,6 +9,8 @@ import { useContainer } from 'class-validator';
 async function bootstrap() {
 	// App creation
 	const app = await NestFactory.create(AppModule);
+	useContainer(app.select(AppModule), { fallbackOnErrors: true });
+
 
 	// setup express middlewares
 	app.use(cookieParser());
@@ -17,7 +19,6 @@ async function bootstrap() {
 	const appLogger = new Logger('APICURONApplicationLogger');
 	const configService = app.get(ConfigService);
 
-	useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
 	app.use(
 		[

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
@@ -7,10 +7,11 @@ import {
 	ResourceSummary,
 } from '../schemas/partner-resources.schema';
 import { Term, TermDocument } from '../schemas/terms.schema';
-import { User, UserDocument } from '../../auth/users/user.schema';
+import { User, UserDocument } from '../../auth/users/schemas/user.schema';
 import { Report, ReportDocument } from '../../reports/reports.schema';
 import { AchievementsDefService } from '../../achievements/achievements-def.service';
 import { TransformerService } from '../../shared/transformer/transformer.service';
+import { UpdatePartnerResourceDto } from '../dto/updateResource.dto';
 
 @Injectable()
 export class PartnerResourcesService {
@@ -76,8 +77,8 @@ export class PartnerResourcesService {
 			return null;
 		}
 		const { resource_uri } = resource;
-		const badgesPromise = this.achievementService.get_badges(resource_uri);
-		const medalsPromise = this.achievementService.get_medals(resource_uri);
+		const badgesPromise = this.achievementService.get_badges(resource_id, resource_uri);
+		const medalsPromise = this.achievementService.get_medals(resource_id, resource_uri);
 
 		const termsPromise = this.termDefModel.find({
 			resource_uri,
@@ -118,5 +119,16 @@ export class PartnerResourcesService {
 
 	async get_resource(resource_id: string){
 		return await this.partnerResourceModel.findOne({ resource_id })
+	}
+
+	async exists(resource_id: string): Promise<Boolean> {
+		return !! await this.partnerResourceModel.exists({ resource_id })
+	}
+
+	async update_resource(resource_update: UpdatePartnerResourceDto & { logo?: string }){
+		const { resource_id } = resource_update
+
+		return await this.partnerResourceModel.updateOne({ resource_id }, resource_update);
+
 	}
 }

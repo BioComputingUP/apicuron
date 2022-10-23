@@ -2,12 +2,13 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type MedalDefDocument = MedalDef & Document;
 
-@Schema({ collection: 'achievements_def' })
+@Schema()
 export class MedalDef {
 	// fields from Achievement
 
 	@Prop()
 	id: string;
+
 	@Prop()
 	category: string;
 
@@ -19,8 +20,13 @@ export class MedalDef {
 
 	@Prop()
 	name: string;
+	
 	@Prop()
 	resource_uri: string;
+
+	@Prop()
+	resource_id: string;
+
 	@Prop()
 	list_terms: string[];
 

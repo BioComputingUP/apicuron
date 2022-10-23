@@ -7,7 +7,7 @@ import { AuthController } from './auth.controller';
 import { UsersService } from './users/users.service';
 import { UsersController, UserControllerV2 } from './users/users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './users/user.schema';
+import { User, UserSchema } from './users/schemas/user.schema';
 import { AuthMiddleware } from './middlewares/auth.middleware';
 import { HttpModule } from '@nestjs/axios';
 
@@ -19,7 +19,7 @@ import { HttpModule } from '@nestjs/axios';
 			{
 				name: User.name,
 				schema: UserSchema,
-			},
+			}
 		]),
 		JwtModule.registerAsync({
 			inject: [ConfigService],
