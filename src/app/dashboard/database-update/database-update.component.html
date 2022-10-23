@@ -7,8 +7,8 @@
             <li><a class="hover:tw-" [routerLink]="['/databases', resource.resource_id, 'dashboard', 'edit']">Update Database</a></li>
         </ul>
     </div> -->
-    <app-dashboard-sidebar [resource]="resource$"></app-dashboard-sidebar>
-    <div class="tw-p-2" *ngIf="resource$ | async as resource">
+    <dashboard-sidebar [resource]="resource$"></dashboard-sidebar>
+    <div class="tw-p-2 tw-flex-auto" *ngIf="resource$ | async as resource">
 
         <div class=" tw-p-2">
             <span class="tw-text-xl tw-font-bold">Update {{ resource.resource_name }}</span>

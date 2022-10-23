@@ -8,13 +8,21 @@ import { DatabasePageComponent } from "./database-page/database-page.component";
 import { CuratorModule } from "../curator/curator.module";
 import { SvgModule } from "../svg/svg.module";
 import { ScrollToModule } from "@nicky-lenaers/ngx-scroll-to";
-import { DatabaseCreateComponent } from './database-create/database-create.component';
+import { DatabaseCreateComponent } from "./database-create/database-create.component";
 import { ReactiveFormsModule } from "@angular/forms";
 import { AuthModule } from "../auth/auth.module";
-import { DatabaseUpdateComponent } from './database-update/database-update.component';
-import { DashboardSidebarComponent } from './dashboard-sidebar/dashboard-sidebar.component';
+// import { DatabaseUpdateComponent } from './database-update/database-update.component';
+// import { DashboardSidebarComponent } from './dashboard-sidebar/dashboard-sidebar.component';
+// import { SubmitReportComponent } from './submit-report/submit-report.component';
 @NgModule({
-  declarations: [DatabasesPageComponent, DatabasePageComponent, DatabaseCreateComponent, DatabaseUpdateComponent, DashboardSidebarComponent],
+  declarations: [
+    DatabasesPageComponent,
+    DatabasePageComponent,
+    DatabaseCreateComponent,
+    // DatabaseUpdateComponent,
+    // DashboardSidebarComponent,
+    // SubmitReportComponent,
+  ],
   imports: [
     AuthModule,
     ScrollToModule,
@@ -24,7 +32,7 @@ import { DashboardSidebarComponent } from './dashboard-sidebar/dashboard-sidebar
     RouterModule,
     DatabasesRoutingModule,
     CuratorModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
   exports: [DatabasesPageComponent],
 })

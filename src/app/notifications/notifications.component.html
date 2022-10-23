@@ -1,0 +1,22 @@
+<div class="main-content" *ngIf="notifications$ | async as notifications">
+    <h2 class="tw-text-2xl tw-font-bold">Notifications</h2>
+    <div class="tw-flex tw-flex-row tw-flex-wrap tw-w-full">
+
+        <div class="tw-w-full tw-p-2" *ngFor="let notification of notifications">
+            <div class="tw-border tw-border-gray-500 tw-shadow-md tw-rounded-lg tw-px-2 tw-h-full tw-flex tw-flex-col tw-justify-items">
+                <div class="tw-flex tw-flex-row tw-justify-between tw-items-center  tw-mb-1">
+                    <h2 class="tw-py-1 tw-text-lg tw-text-gray-600 tw-font-bold">{{ notification.title }}</h2>
+                    <span class="tw-text-sm tw-text-gray-600 tw-font-light">{{format_date(notification.created_at)}}</span>
+                </div>
+                <pre class="tw-whitespace-pre-line tw-p-1 tw-mb-2 tw-bg-gray-200 tw-text-gray-700">
+                    {{ notification.body }}
+                </pre>
+                <div class="tw-flex tw-flex-row tw-justify-end tw-my-1 tw-justify-self-end">
+                    <button (click)="set_notification_as_seen(notification._id)" *ngIf="!notification.seen" class="tw-bg-gray-300 tw-text-gray-800 tw-font-bold tw-p-1 tw-rounded">Mark as seen</button>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>

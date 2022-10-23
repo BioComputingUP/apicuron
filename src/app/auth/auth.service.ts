@@ -1,5 +1,5 @@
 import { Router } from "@angular/router";
-import { defaultIfEmpty, filter, map, pluck, switchMap } from "rxjs/operators";
+import { defaultIfEmpty, filter, map, pluck, shareReplay, switchMap } from "rxjs/operators";
 import { environment } from "../../environments/environment";
 import {
   BehaviorSubject,
@@ -21,7 +21,6 @@ import { Component, OnInit, Injectable } from "@angular/core";
 @Injectable({
   providedIn: "root",
 })
-@Injectable()
 export class AuthService implements HttpInterceptor {
   private disprotLogOut = environment.ws + "logout";
   private disprotAuth = environment.ws + "profile";
@@ -57,7 +56,7 @@ export class AuthService implements HttpInterceptor {
           authorization: this.token_value,
         },
       }
-    );
+    ).pipe(shareReplay())
 
     // request to get the user current notifications
     const user_notifications$: Observable<Array<any>> = this.http
@@ -67,7 +66,7 @@ export class AuthService implements HttpInterceptor {
           version: "2",
         },
       })
-      .pipe(pluck("data"));
+      .pipe(shareReplay(), pluck("data"));
 
     // combine the two data into one and push it to the user subject
     return combineLatest([user_data$, user_notifications$]).pipe(

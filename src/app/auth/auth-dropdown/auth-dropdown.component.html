@@ -7,14 +7,14 @@
             <span *ngIf="user.notifications.length > 0" class="tw-absolute tw-bg-apicuron-purple tw-text-white tw-font-bold tw-px-1.5 tw-py-0.5 tw-text-xs -tw-top-2 -tw-right-1 tw-shadow-md tw-rounded-full ">{{ user.notifications.length }}</span>
         </button>
     </div>
-    <div (mouseleave)="auth_dropdown = false" [ngClass]="{'tw-block': auth_dropdown, 'tw-hidden': !auth_dropdown}"
-        class="tw-absolute tw-right-0 tw-z-10 tw-mt-2 tw-w-56 tw-origin-top-right tw-rounded-md tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none"
+    <div (mouseleave)="auth_dropdown = false" [ngClass]="{'tw-visible tw-opacity-100': auth_dropdown, 'tw-invisible tw-opacity-0': !auth_dropdown}"
+        class="tw-absolute tw-right-0 tw-z-10 tw-mt-2 tw-w-56 tw-origin-top-right tw-rounded-md tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none tw-transition-opacity tw-duration-200"
         role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
         <div class="tw-py-1" role="none">
             <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
             <a [routerLink]="['/curators', user.orcid_id]" class="dropdown-element">Biocurator Profile</a>
             <ng-container *ngFor="let resource of user.resources">
-                <a [routerLink]="['/databases', resource.resource_id, 'dashboard']" class="dropdown-element">Manage
+                <a [routerLink]="['/dashboard', 'database', resource.resource_id, 'edit']" class="dropdown-element">Manage
                     {{ resource.name }}</a>
             </ng-container>
 

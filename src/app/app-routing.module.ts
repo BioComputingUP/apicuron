@@ -49,6 +49,8 @@ const routes: Routes = [
   // { path: 'curators/:orcid_id', component:CuratorPageComponent},
 
   {path: '', component: IndexComponent},
+  { path: 'notifications', loadChildren: () => import('./notifications/notifications.module').then(m => m.NotificationsModule) },
+  { path: 'dashboard', loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule) },
   {path: '**', component: PageNotFoundComponent},
 
 ];

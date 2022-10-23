@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-dashboard-sidebar',
+  selector: 'dashboard-sidebar',
   templateUrl: './dashboard-sidebar.component.html',
   styleUrls: ['./dashboard-sidebar.component.scss']
 })
@@ -23,12 +23,12 @@ export class DashboardSidebarComponent implements OnInit {
 
         return [
           {
-            href: ['/databases', resource.resource_id, 'dashboard', 'edit'],
-            name: 'Update Resource'
+            href: ['/dashboard', 'database', resource.resource_id, 'edit'],
+            name: 'Resource Update'
           },
           {
-            href: ['/databases', resource.resource_id, ''],
-            name: 'test'
+            href: ['/dashboard', 'database', resource.resource_id, 'reports'],
+            name: 'Report Submission'
           }
         ]
 

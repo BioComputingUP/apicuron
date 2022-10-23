@@ -4,12 +4,12 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, of } from 'rxjs';
-import { first, map, pluck, switchMap, tap } from 'rxjs/operators';
+import { map, pluck, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { toFormData } from '../../directives/toFormData';
-import { DatabasesService } from '../services/databases.service';
+import { DatabasesService } from '../../databases/services/databases.service';
 
 @Component({
-  selector: 'app-database-update',
+  selector: 'database-update',
   templateUrl: './database-update.component.html',
   styleUrls: ['./database-update.component.scss']
 })
@@ -35,12 +35,14 @@ export class DatabaseUpdateComponent implements OnInit {
     this.resource_data$ = this.resource_id$.pipe(
       switchMap((resource_id: string) => {
         return this.databaseService.get_resource_details(resource_id);
-      })
+      }),
+      shareReplay()
     );
     
     this.resource$ = this.resource_data$.pipe(pluck("data"));
 
-    this.resource$.pipe(first()).subscribe((resource: any) => {
+    this.resource$.subscribe((resource: any) => {
+      console.log('reosurce', resource)
       this.form = this.formBuilder.group(
         {
           resource_uri: [

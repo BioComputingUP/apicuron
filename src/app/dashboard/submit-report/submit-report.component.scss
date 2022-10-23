@@ -1,0 +1,11 @@
+label {
+    @apply tw-font-bold tw-text-lg
+}
+
+input[type=text], input[type=date], input[type=time], .text-input, select{
+    @apply tw-border-gray-300 tw-text-gray-900 tw-border tw-shadow-md tw-px-1 tw-py-2 tw-rounded focus:tw-outline-none focus:tw-ring-1 tw-ring-apicuron-purple
+}
+
+.form-control-element {
+    @apply tw-flex tw-flex-col tw-my-2 tw-px-2 tw-py-1
+}

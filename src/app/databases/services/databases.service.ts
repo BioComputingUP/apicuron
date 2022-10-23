@@ -9,7 +9,7 @@ import { AuthService } from "../../auth/auth.service";
   providedIn: "root",
 })
 export class DatabasesService {
-  constructor(private http: HttpClient, private auth: AuthService) {}
+  constructor(private http: HttpClient) {}
   private partnerResourcesPath = environment.ws + "/partner-resources";
   private resourcesPath = environment.ws + "/resources";
 
@@ -46,7 +46,6 @@ export class DatabasesService {
         responseType: 'json',
         headers: {
           version: '2',
-          authorization: this.auth.token_value
         }
       }
     )
