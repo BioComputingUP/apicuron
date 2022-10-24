@@ -19,15 +19,19 @@ export class DashboardSidebarComponent implements OnInit {
   ngOnInit(): void {
 
     this.links$ = this.resource$.pipe(
-      map((resource) => {
+      map(({ resource_name, resource_id}) => {
 
         return [
           {
-            href: ['/dashboard', 'database', resource.resource_id, 'edit'],
-            name: 'Resource Update'
+            href: ['/dashboard', 'database', resource_id, 'edit'],
+            name: `Update ${resource_name}`
           },
           {
-            href: ['/dashboard', 'database', resource.resource_id, 'reports'],
+            href: ['/dashboard', 'database', resource_id, 'terms'],
+            name: `Manage ${resource_name} Terms`
+          },
+          {
+            href: ['/dashboard', 'database', resource_id, 'reports'],
             name: 'Report Submission'
           }
         ]

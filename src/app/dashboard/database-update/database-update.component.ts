@@ -28,8 +28,7 @@ export class DatabaseUpdateComponent implements OnInit {
     this.resource_id$ = this.route.paramMap.pipe(
       map((params: ParamMap) => {
         return params.get("resource_id");
-      }),
-      tap(console.log)
+      })
     );
 
     this.resource_data$ = this.resource_id$.pipe(

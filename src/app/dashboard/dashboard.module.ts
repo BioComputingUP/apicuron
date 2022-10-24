@@ -11,6 +11,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { DashboardService } from './services/dashboard.service';
 import { SubmitSingleComponent } from './submit-report/submit-single/submit-single.component';
 import { SubmitBulkComponent } from './submit-report/submit-bulk/submit-bulk.component';
+import { ManageTermsComponent } from './manage-terms/manage-terms.component';
+import { TermsService } from './services/terms.service';
 
 
 @NgModule({
@@ -21,9 +23,11 @@ import { SubmitBulkComponent } from './submit-report/submit-bulk/submit-bulk.com
     SubmitReportComponent,
     SubmitSingleComponent,
     SubmitBulkComponent,
+    ManageTermsComponent,
   ],
   providers: [
-    DashboardService
+    DashboardService,
+    TermsService
   ],
   imports: [
     CommonModule,
