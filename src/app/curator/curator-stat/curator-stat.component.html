@@ -1,26 +1,29 @@
 <div class="tw-text-sm tw-font-medium tw-text-center tw-text-gray-500 tw-border-b tw-border-gray-200 tw-mt-4">
     <ul class="tw-flex tw-flex-wrap tw--mb-px">
         <ng-container *ngIf="curator$ | async as curator">
-            <li *ngFor="let stat of curator.stats" class="tw-mr-2">
-                <ng-container *ngIf="current_stat$ | async as current_stat">
-                    <a [routerLink]="['/curators', curator.orcid_id ]" [fragment]="stat['resource_id']"
-                        class="tw-inline-block tw-p-4 tw-rounded-t-lg tw-border-b-2 tw-border-transparent"
-                        [ngClass]="{'tw-font-bold tw-text-apicuron-purple tw-border-apicuron-purple hover:tw-text-apicuron-purple': current_stat.resource_id == stat.resource_id, 'hover:tw-text-gray-600 hover:tw-border-gray-300': current_stat.resource_id != stat.resource_id }">{{
-                        stat['resource_id'] }}
-                    </a>
-                </ng-container>
-            </li>
+            <ng-container *ngIf="user_resources$| async as user_resources">
+                <li *ngFor="let resource of user_resources" class="tw-mr-2">
+                    <ng-container *ngIf="current_stat$ | async as current_stat">
+                        <a [routerLink]="['/curators', curator.orcid_id ]" [fragment]="resource['resource_id']"
+                            class="tw-inline-block tw-text-lg tw-px-4 tw-pb-2 tw-pt-4 tw-rounded-t-lg tw-border-b-2"
+                            [ngClass]="{'tw-font-bold tw-text-apicuron-purple tw-border-apicuron-purple hover:tw-text-apicuron-purple': resource.resource_id == current_stat.resource_id, 'hover:tw-text-gray-600 tw-border-gray-300': current_stat.resource_id != resource.resource_id }">{{
+                                resource['resource_name'] }}
+                        </a>
+                    </ng-container>
+                </li>
+            </ng-container>
         </ng-container>
     </ul>
 </div>
 <div>
 
-    <div class="tw-flex tw-flex-row tw-flex-wrap">
+    <div class="tw-flex tw-flex-row tw-flex-wrap" >
         <ng-container *ngIf="current_stat$ | async as current_stat">
+            <ng-container *ngIf="resource$ | async as resource" >
             <div class="tw-w-1/4 tw-p-2">
                 <div
                     class="tw-bg-white tw-h-full tw-border-gray-400 tw-border tw-drop-shadow-md tw-rounded-lg tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-2">
-                    <svg-generation-icon ngClass="tw-w-16 tw-h-16 tw-mr-4"></svg-generation-icon>
+                    <svg-generation-icon ngClass="tw-w-16 tw-h-16 tw-mr-4" [accent_color]="resource.color"></svg-generation-icon>
                     <div class="tw-flex tw-flex-col">
                         <span class="tw-text-3xl tw-font-bold">
                             {{ current_stat.generation_count }}
@@ -31,8 +34,9 @@
             </div>
             <div class="tw-w-1/4 tw-p-2">
                 <div
+                    
                     class="tw-bg-white tw-h-full tw-border-gray-400 tw-border tw-drop-shadow-md tw-rounded-lg tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-2">
-                    <svg-revision-icon ngClass="tw-w-16 tw-h-16 tw-mr-4"></svg-revision-icon>
+                    <svg-revision-icon ngClass="tw-w-16 tw-h-16 tw-mr-4" [accent_color]="resource.color"></svg-revision-icon>
                     <div class="tw-flex tw-flex-col">
                         <span class="tw-text-3xl tw-font-bold">
                             {{ current_stat.revision_count }}
@@ -44,7 +48,7 @@
             <div class="tw-w-1/4 tw-p-2">
                 <div
                     class="tw-bg-white tw-h-full tw-border-gray-400 tw-border tw-drop-shadow-md tw-rounded-lg tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-2">
-                    <svg-invalidation-icon ngClass="tw-w-16 tw-h-16 tw-mr-4"></svg-invalidation-icon>
+                    <svg-invalidation-icon ngClass="tw-w-16 tw-h-16 tw-mr-4" [accent_color]="resource.color"></svg-invalidation-icon>
                     <div class="tw-flex tw-flex-col">
                         <span class="tw-text-3xl tw-font-bold">
                             {{ current_stat.invalidation_count }}
@@ -56,7 +60,7 @@
             <div class="tw-w-1/4 tw-p-2 tw-grid tw-grid-cols-1 tw-gap-4">
                 <div class="tw-flex tw-flex-row tw-items-center tw-justify-between">
                     <div class="tw-flex tw-flex-row">
-                        <svg-badge-icon ngClass="tw-w-10 tw-h-10 tw-mr-2" color="#5A1001"></svg-badge-icon>
+                        <svg-badge-icon ngClass="tw-w-10 tw-h-10 tw-mr-2" [color]="resource.color"></svg-badge-icon>
                         <span class="tw-text-3xl tw-font-bold">
                             {{ current_stat.badges_count }}
                         </span>
@@ -65,7 +69,7 @@
                 </div>
                 <div class="tw-flex tw-flex-row tw-items-center tw-justify-between">
                     <div class="tw-flex tw-flex-row">
-                        <svg-medal-icon ngClass="tw-w-10 tw-h-10 tw-mr-2" color="#5A1001"></svg-medal-icon>
+                        <svg-medal-icon ngClass="tw-w-10 tw-h-10 tw-mr-2" [color]="resource.color"></svg-medal-icon>
                         <span class="tw-text-3xl tw-font-bold">
                             {{ current_stat.medals_count }}
                         </span>
@@ -73,7 +77,7 @@
                     <span class="tw-text-sm tw-font-bold tw-text-gray-400">Medals Earned</span>
                 </div>
             </div>
-
+        </ng-container>
             <ng-container *ngIf="achievements$ | async as achievements">
                 <div class="tw-w-3/4">
                     <div class="tw-my-2 sm:tw-my-4">
@@ -88,18 +92,18 @@
                         </div>
                         <div class="tw-flex tw-flex-row tw-flex-wrap">
                             <div *ngFor="let badge of achievements.badges.slice(0,8)" class="tw-p-2 tw-w-1/4">
-                                <div class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2">
-                                    <svg-badge class="tw-w-4/6 tw-mx-auto" [database]="resource_name$ | async"
-                                        [title]="badge.name">
+                                <div class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2" *ngIf="resource$ | async as resource">
+                                    <svg-badge class="tw-w-4/6 tw-mx-auto" [database]="resource.resource_name"
+                                        [title]="badge.name" [main_color]="badge.color_code">
                                     </svg-badge>
                                 </div>
                             </div>
                             <ng-container *ngIf="more_badges">
                                 <div *ngFor="let badge of achievements.badges.slice(8)" class="tw-p-2 tw-w-1/4">
                                     <div
-                                        class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2">
-                                        <svg-badge class="tw-w-4/6 tw-mx-auto" [database]="resource_name$ | async"
-                                            [title]="badge.name">
+                                        class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2" *ngIf="resource$ | async as resource">
+                                        <svg-badge class="tw-w-4/6 tw-mx-auto" [database]="resource.resource_name"
+                                            [title]="badge.name" [main_color]="badge.color_code">
                                         </svg-badge>
                                     </div>
                                 </div>
@@ -119,18 +123,18 @@
                         </div>
                         <div class="tw-flex tw-flex-row tw-flex-wrap">
                             <div *ngFor="let medal of achievements.medals.slice(0,8)" class="tw-p-2 tw-w-1/4">
-                                <div class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2">
-                                    <svg-medal class="tw-w-4/6 tw-mx-auto" [database]="current_stat.resource_name"
-                                        [title]="medal.name">
+                                <div class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2" *ngIf="resource$ | async as resource">
+                                    <svg-medal class="tw-w-4/6 tw-mx-auto" [database]="resource.resource_name"
+                                        [title]="medal.name" [main_color]="medal.color">
                                     </svg-medal>
                                 </div>
                             </div>
                             <ng-container *ngIf="more_medals">
                                 <div *ngFor="let medal of achievements.medals.slice(8)" class="tw-p-2 tw-w-1/4">
                                     <div
-                                        class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2">
-                                        <svg-medal class="tw-w-4/6 tw-mx-auto" [database]="current_stat.resource_name"
-                                            [title]="medal.name">
+                                        class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2" *ngIf="resource$ | async as resource">
+                                        <svg-medal class="tw-w-4/6 tw-mx-auto" [database]="resource.resource_name"
+                                            [title]="medal.name" [main_color]="medal.color">
                                         </svg-medal>
                                     </div>
                                 </div>

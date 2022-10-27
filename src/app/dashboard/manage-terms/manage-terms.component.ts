@@ -2,10 +2,10 @@ import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
-import { Observable } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 import { map, pluck, shareReplay, switchMap } from "rxjs/operators";
 import { DatabasesService } from "../../databases/services/databases.service";
-import { UpdateTerm, TermsService, CreateTerm } from "../services/terms.service";
+import { UpdateTerm, TermsService, CreateTerm, DeleteTerm } from "../services/terms.service";
 
 @Component({
   selector: "app-manage-terms",
@@ -15,7 +15,7 @@ import { UpdateTerm, TermsService, CreateTerm } from "../services/terms.service"
 export class ManageTermsComponent implements OnInit {
   resourceId$: Observable<string>;
   resource$: Observable<Object>;
-  terms$: Observable<Array<any>>;
+  terms$ = new BehaviorSubject<Array<any>>([]);
   show_form: "update" | "create" | false = false;
   form: FormGroup;
   activity_categories = ['generation', 'invalidation', 'revision']
@@ -27,12 +27,15 @@ export class ManageTermsComponent implements OnInit {
     protected toast: ToastrService,
     protected termsService: TermsService
   ) {
+
+    // retreive the resourceId from the paramMap
     this.resourceId$ = this.route.paramMap.pipe(
       map((params: ParamMap) => {
         return params.get("resource_id");
       })
     );
 
+    // retrieve the resource from the API
     this.resource$ = this.resourceId$.pipe(
       switchMap((resource_id: string) => {
         return this.databaseService.get_resource_details(resource_id);
@@ -40,8 +43,8 @@ export class ManageTermsComponent implements OnInit {
       shareReplay(),
       pluck("data")
     );
-
-    this.terms$ = this.resource$.pipe(pluck("terms"));
+    
+    this.resource$.pipe(pluck("terms")).subscribe((terms: Array<any>) => this.terms$.next(terms))
   }
 
   ngOnInit(): void {}
@@ -79,8 +82,12 @@ export class ManageTermsComponent implements OnInit {
         const term: CreateTerm = this.form.value
 
         this.termsService.create_term(term).subscribe(
-          (response) => {
+          ({ data } :{ data: CreateTerm }) => {
+            // if the term is successfully added
             this.toast.success("Term Sucessfully Created");
+
+            // we append the value to the terms array and then push it to the behavior subject 
+            this.terms$.next(this.terms$.getValue().concat(data));
           },
           (err) => {
             if (err.error && err.error.message && err.error.statusCode == 400) {
@@ -101,8 +108,19 @@ export class ManageTermsComponent implements OnInit {
         const term: UpdateTerm = this.form.value;
 
         this.termsService.update_term(term).subscribe(
-          (response) => {
+          ({ data }: { data: CreateTerm }) => {
             this.toast.success("Term Sucessfully Updated");
+            
+            // get the list of terms
+            const terms = this.terms$.getValue();
+            // get the index of the updated element in the list
+            const updated_index = terms.findIndex((term) => data['activity_term'] == term['activity_term'])
+            // if that index is found
+            if(updated_index != -1){
+              // we update the term using the index and push a new value to the behaviorSubject
+              terms[updated_index] = data
+              this.terms$.next(terms);
+            }
           },
           (error) => {
             if (error.message && error.statusCode == 400) {
@@ -122,8 +140,28 @@ export class ManageTermsComponent implements OnInit {
     }
   }
 
-  delete_term({ activity_term }) {
-    console.log("Delete term");
-    console.log({ activity_term });
+  delete_term(term: DeleteTerm) {
+    this.termsService.delete_term(term).subscribe(
+      (response) => {
+        this.toast.success(`Term ${term.activity_term} Sucessfully Deleted`);
+        
+        const terms = this.terms$.getValue();
+        const updated_terms = terms.filter(x => x.activity_term != term.activity_term)
+        this.terms$.next(updated_terms);
+      },
+      (error) => {
+        if (error.message && error.statusCode == 400) {
+          let errors = Array.isArray(error.message)
+            ? error.message.join("\n")
+            : error.message;
+          this.toast.warning(errors, "Validation Error");
+        } else {
+          this.toast.error(
+            "An error occured while sending the form, please contact the developers",
+            "Error"
+          );
+        }
+      }
+    )
   }
 }

@@ -8,8 +8,9 @@ import {
 } from "@angular/router";
 import * as moment from "moment";
 import { BehaviorSubject, combineLatest, Observable } from "rxjs";
-import { map, shareReplay, switchMap } from "rxjs/operators";
+import { map, pluck, shareReplay, switchMap } from "rxjs/operators";
 import { environment } from "../../../environments/environment";
+import { DatabasesService } from "../../databases/services/databases.service";
 import {
   Curator,
   CuratorAchievements,
@@ -33,6 +34,9 @@ export class CuratorPageComponent implements OnInit {
   // private wsUrl = environment.ws;
   // private orcid_url = environment.orcid_url;
   orcidData$: Observable<OrcidData>;
+  user_stats$: Observable<any>;
+  resource$: Observable<Object>;
+  user_resources$: Observable<any[]>;
   // user_reports$: Observable<
   //   { activity_name: any; description: any; timestamp: string }[]
   // >;
@@ -40,7 +44,8 @@ export class CuratorPageComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private curatorPageService: CuratorPageService
+    private curatorPageService: CuratorPageService,
+    private databaseService: DatabasesService
   ) {
     this.orcidId$ = this.route.paramMap.pipe(
       map((params: ParamMap) => {
@@ -53,20 +58,45 @@ export class CuratorPageComponent implements OnInit {
       shareReplay()
     );
 
-    this.resourceId$ = combineLatest([this.route.fragment, this.curator$]).pipe(
-      map(([fragment, curator]) => {
+    this.user_stats$ = this.orcidId$.pipe(
+      switchMap((orcid_id: string) => {
+        return this.curatorPageService.curator_statistics(orcid_id)
+      }),
+      shareReplay(),
+      pluck('data')
+    )
+
+    this.resourceId$ = combineLatest([this.route.fragment, this.user_stats$]).pipe(
+      map(([fragment, stats]) => {
         if (!!fragment) {
           // if the fragment is in the curator stats array, we return it
-          if (curator.stats.find((stat) => stat.resource_id == fragment)) {
+          if (stats.find((stat) => stat.resource_id == fragment)) {
             return fragment;
           }
         }
-        if(curator.stats.length > 0){
+        if(stats.length > 0){
           // otherwise we return the first resource_id in the list of stats
-          return curator.stats[0].resource_id;
+          return stats[0].resource_id;
         }
       })
     );
+    
+    this.user_resources$ = this.user_stats$.pipe(
+      switchMap((user_stats) => {
+        const resource_ids = user_stats.map(stat => stat.resource_id)
+        const resources$: Array<Observable<any>> = resource_ids.map(resource_id => {
+          return this.databaseService.get_resource(resource_id).pipe(pluck('data'))
+        })
+        return combineLatest(resources$)
+      }),
+      shareReplay()
+    )
+
+    this.resource$ = combineLatest([this.resourceId$, this.user_resources$]).pipe(
+      map(([resource_id, resources]) => {
+        return resources.find(resource => resource.resource_id == resource_id)
+      })
+    )
 
     this.orcidData$ = this.orcidId$.pipe(
       switchMap((orcid_id) =>
@@ -74,40 +104,6 @@ export class CuratorPageComponent implements OnInit {
       )
     );
 
-    // this.user_reports$ = combineLatest([this.resourceId$, this.orcidId$]).pipe(
-    //   switchMap(([resource_id, orcid_id]) => {
-    //     const params = new HttpParams({
-    //       fromObject: {
-    //         page: "1",
-    //         page_size: "10",
-    //       },
-    //     });
-    //     return this.curatorPageService.get_reports(
-    //       orcid_id,
-    //       resource_id,
-    //       params
-    //     );
-    //   }),
-    //   map((reports: Array<Object>) => {
-    //     const formatted_reports = reports.map((report) => {
-    //       const relativeDate = moment(report["timestamp"]).fromNow();
-    //       return {
-    //         activity_name: report["term"]["activity_name"],
-    //         description: report["term"]["description"],
-    //         timestamp: relativeDate,
-    //       };
-    //     });
-
-    //     return formatted_reports;
-    //   })
-    // );
-
-    // this.achievements$ = combineLatest([this.resourceId$, this.orcidId$]).pipe(
-    //   switchMap(([resourceId, orcidId]) => {
-    //     return this.curatorPageService.get_achievements(orcidId, resourceId);
-    //   }),
-    //   shareReplay()
-    // );
   }
 
   ngOnInit() {}

@@ -22,6 +22,7 @@ import {
   CuratorStat,
 } from "../curator-page/curator-page.service";
 import * as moment from "moment";
+import { DatabasesService } from "../../databases/services/databases.service";
 @Component({
   selector: "curator-stat",
   templateUrl: "./curator-stat.component.html",
@@ -30,11 +31,13 @@ import * as moment from "moment";
 export class CuratorStatComponent implements OnInit, AfterViewInit {
   max_page$: Observable<number>;
 
-  constructor(protected curatorPageService: CuratorPageService) {}
+  constructor(protected curatorPageService: CuratorPageService, protected databaseService: DatabasesService) {}
 
   // Component Inputs
   @Input() curator$: Observable<Curator>;
-  @Input() resource_id$: Observable<string>;
+  @Input() resource$: Observable<any>;
+  @Input() user_stats$: Observable<any>;
+  @Input() user_resources$: Observable<any[]>;
 
   // Achievements and stats
   achievements$: Observable<any>;
@@ -60,8 +63,8 @@ export class CuratorStatComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.achievements$ = combineLatest([this.curator$, this.resource_id$]).pipe(
-      switchMap(([curator, resource_id]) => {
+    this.achievements$ = combineLatest([this.curator$, this.resource$]).pipe(
+      switchMap(([curator, { resource_id }]) => {
         return this.curatorPageService.get_achievements(
           curator.orcid_id,
           resource_id
@@ -72,19 +75,19 @@ export class CuratorStatComponent implements OnInit, AfterViewInit {
 
     const report_data$ = combineLatest([
       this.curator$,
-      this.resource_id$,
+      this.resource$,
       this.current_report_page$,
     ]).pipe(
-      switchMap(([curator, resource_id, page]) => {
+      switchMap(([curator, { resource_id }, page]) => {
         const params = new HttpParams({
           fromObject: {
             page: page.toString(),
             page_size: this.page_size.toString(),
+            resource_id,
+            orcid_id: curator.orcid_id
           },
         });
         return this.curatorPageService.get_reports(
-          curator.orcid_id,
-          resource_id,
           params
         );
       }),
@@ -116,11 +119,13 @@ export class CuratorStatComponent implements OnInit, AfterViewInit {
       })
     );
 
-    this.current_stat$ = combineLatest([this.curator$, this.resource_id$]).pipe(
-      map(([curator, resource_id]) => {
-        return curator.stats.find((stat) => stat.resource_id == resource_id);
+    this.current_stat$ = combineLatest([this.user_stats$, this.resource$]).pipe(
+      map(([stats, { resource_id }]) => {
+        return stats.find((stat) => stat.resource_id == resource_id);
       })
     );
+
+    
   }
 
   ngAfterViewInit() {

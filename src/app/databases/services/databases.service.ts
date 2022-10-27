@@ -54,6 +54,18 @@ export class DatabasesService {
   }
 
   get_resource_details(resource_id: string) {
+    return this.http.get(
+      `${this.partnerResourcesPath}/details/${resource_id}`,
+      {
+        responseType: "json",
+        headers: {
+          version: "2",
+        },
+      }
+    );
+  }
+
+  get_resource(resource_id:string){
     const response = this.http.get(
       `${this.partnerResourcesPath}/${resource_id}`,
       {

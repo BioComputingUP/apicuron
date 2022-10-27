@@ -7,6 +7,13 @@ button:focus {
   @apply tw-mx-auto tw-container tw-max-w-7xl tw-px-2 sm:tw-px-4 2xl:tw-px-0 tw-py-2 xl:tw-py-4
 }
 
+:root {
+  --bronze: #967444;
+  --gold: #D1B000;
+  --silver: #A9A9A9;
+}
+
+
 @import 'ngx-toastr/toastr';
 
 @tailwind base;

@@ -99,12 +99,20 @@ export class CuratorPageService {
       .pipe(pluck("data"));
   }
 
-  get_reports(orcid_id: string, resource_id: string, httpParams: HttpParams) {
-    return this.http.get(this.wsUrl + `/reports/${orcid_id}/${resource_id}`, {
+  get_reports(httpParams: HttpParams) {
+    return this.http.get(this.wsUrl + `/reports`, {
       headers: {
         version: '2'
       },
       params: httpParams
+    })
+  }
+
+  curator_statistics(orcid_id: string){
+    return this.http.get(this.wsUrl + '/statistics/user/' + orcid_id, {
+      headers: {
+        version: '2'
+      }
     })
   }
 }

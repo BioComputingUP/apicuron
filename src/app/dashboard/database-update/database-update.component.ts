@@ -41,7 +41,6 @@ export class DatabaseUpdateComponent implements OnInit {
     this.resource$ = this.resource_data$.pipe(pluck("data"));
 
     this.resource$.subscribe((resource: any) => {
-      console.log('reosurce', resource)
       this.form = this.formBuilder.group(
         {
           resource_uri: [
@@ -74,7 +73,7 @@ export class DatabaseUpdateComponent implements OnInit {
               ),
             ],
           ],
-          logo: null,
+          logo: [null],
         },
         { validators: Validators.required, updateOn: "change" }
       );
@@ -89,7 +88,7 @@ export class DatabaseUpdateComponent implements OnInit {
     this.databaseService.update_resource(formValue).subscribe(
       (response: any) => {
         this.toaster.success(
-          response.data.resource_name.value + " updated successfullly",
+          response.data.resource_name + " updated successfullly",
           "Success"
         );
       },
@@ -108,6 +107,11 @@ export class DatabaseUpdateComponent implements OnInit {
         return of(error.message);
       }
     );
+  }
+
+  onFileSelected(event){
+    const file:File = event.target.files[0]
+    this.form.controls['logo'].setValue(file)
   }
 
   get resource_uri() {

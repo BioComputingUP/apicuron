@@ -9,36 +9,36 @@ import { Component, Input, OnInit } from "@angular/core";
         <g clip-path="url(#b)">
           <path
             d="m280.443 261.368 91.113 157.814-57.14-7.951-21.684 53.46-91.114-157.814 78.825-45.509Z"
-            [attr.fill]="main_color"
+            fill="currentColor" [style]="main_color_style"
           />
           <path
             d="m374.245 421.017-58.942-8.251-22.326 55.171-93.284-161.572 81.268-46.92 93.284 161.572Zm-60.746-11.374 55.315 7.733-88.943-154.054-76.275 44.037 88.943 154.055 20.96-51.771Z"
-            [attr.fill]="accent_color"
+            fill="currentColor" [style]="accent_color_style"
           />
         </g>
         <g clip-path="url(#c)">
           <path
             d="M198.955 307.816 107.842 465.63l-21.685-53.46-57.14 7.95 91.114-157.813 78.824 45.509Z"
-            [attr.fill]="main_color"
+            fill="currentColor" [style]="main_color_style"
           />
           <path
             d="m107.596 468.876-22.325-55.171-58.942 8.251 93.283-161.572 81.268 46.92-93.284 161.572Zm-20.522-58.294 20.96 51.771 88.944-154.055-76.275-44.037-88.944 154.054 55.315-7.733Z"
-            [attr.fill]="accent_color"
+            fill="currentColor" [style]="accent_color_style"
           />
         </g>
         <path
           d="M399.174 199.592v-.002C399.174 89.364 309.816 0 199.585 0 89.355 0 0 89.364 0 199.59v.002h399.174Z"
-          [attr.fill]="accent_color"
+          fill="currentColor" [style]="accent_color_style"
         />
         <g filter="url(#d)">
           <path
             d="M0 199.592C.002 309.823 89.355 399.18 199.585 399.18c110.231 0 199.587-89.357 199.589-199.588H0Z"
-            [attr.fill]="accent_color"
+            fill="currentColor" [style]="accent_color_style"
           />
         </g>
         <path
           d="M200.365 380.766c-100.064.1-181.252-80.915-181.365-180.979C18.901 99.718 99.915 18.53 199.981 18.418c100.065-.099 181.271 80.915 181.368 180.98.104 100.07-80.919 181.261-180.984 181.368Z"
-          [attr.fill]="main_color"
+          fill="currentColor" [style]="main_color_style"
         />
         <g clip-path="url(#e)" fill="#fff">
           <path
@@ -85,7 +85,7 @@ import { Component, Input, OnInit } from "@angular/core";
             fill="#fff"
             transform="rotate(30 -425.775 354.086)"
             d="M0 0h92v184H0z"
-          />
+          />main_color
         </clipPath>
         <clipPath id="e">
           <path fill="#fff" transform="translate(33 118)" d="M0 0h335v335H0z" />
@@ -137,13 +137,31 @@ export class BadgeComponent implements OnInit {
   main_color = "#5A1001";
 
   @Input()
-  accent_color = "#741501";
+  accent_color?;
 
   @Input()
   class: string
 
   get title_words() {
     return this.title.split(" ").map((x) => x.toUpperCase());
+  }
+
+  get main_color_style(){
+    // if the main color is a word, we return it as a css variable
+    if(this.main_color.match(/^[a-zA-Z]+$/gm))
+    {
+      return { color: `var(--${this.main_color})` }
+    }else{
+      return { color: this.main_color}
+    }
+  }
+
+  get accent_color_style(){
+    if(!this.accent_color ){
+      return { color: this.main_color, filter: 'brightness(0.7)'}
+    }else{
+      return { color: this.accent_color }
+    }
   }
 
   ngOnInit(): void {}

@@ -132,7 +132,7 @@ export class AuthService implements HttpInterceptor {
     // if we have the token_value
     // we add the authorization JWT token to the request headers
 
-    if (this.token_value) {
+    if (this.token_value && req.url.startsWith(environment.ws)) {
       // cloning the request and getting the headers
       const cloned = req.clone({
         headers: req.headers.set(this.token_key, this.token_value),

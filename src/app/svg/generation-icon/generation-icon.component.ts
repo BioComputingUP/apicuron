@@ -13,7 +13,7 @@ import { Component, Input, OnInit } from "@angular/core";
       <circle cx="28.5" cy="28.5" r="28.5" [attr.fill]="background_color" />
       <path
         d="M47.078 26.578H30.422V9.922a1.921 1.921 0 1 0-3.844 0v16.656H9.922a1.921 1.921 0 1 0 0 3.844h16.656v16.656a1.921 1.921 0 1 0 3.844 0V30.422h16.656a1.921 1.921 0 1 0 0-3.844Z"
-        [attr.fill]="accent_color"
+        fill="currentColor" [style]="accent_color_style"
       />
       <defs>
         <filter
@@ -58,6 +58,10 @@ export class GenerationIconComponent implements OnInit {
 
   @Input()
   background_color= '#CCC';
+
+  get accent_color_style (){
+    return { color: this.accent_color }
+  }
 
   @Input()
   ngClass: any;

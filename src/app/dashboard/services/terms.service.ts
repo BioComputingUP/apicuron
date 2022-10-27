@@ -12,12 +12,16 @@ export type UpdateTerm = {
 
 export type CreateTerm = Required<UpdateTerm>
 
+export type DeleteTerm = Omit<UpdateTerm, 'activity_category' | 'score' | 'description'>
+
 @Injectable()
 export class TermsService {
   constructor(private http: HttpClient) {}
 
+  ws = environment.ws
+
   update_term(term: UpdateTerm) {
-    return this.http.put(environment.ws + "/terms/edit", term, {
+    return this.http.put(this.ws + "/terms/edit", term, {
       headers: {
         version: "2",
       },
@@ -25,7 +29,15 @@ export class TermsService {
   }
 
   create_term(term: CreateTerm) {
-    return this.http.post(environment.ws + '/terms', term, {
+    return this.http.post(this.ws + '/terms', term, {
+      headers: {
+        version: '2'
+      }
+    })
+  }
+
+  delete_term({ activity_term, resource_id }: DeleteTerm){
+    return this.http.delete(`${this.ws}/terms/${activity_term}/partner-resource/${resource_id}`, {
       headers: {
         version: '2'
       }

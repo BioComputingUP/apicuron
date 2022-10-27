@@ -13,6 +13,7 @@ import { SubmitSingleComponent } from './submit-report/submit-single/submit-sing
 import { SubmitBulkComponent } from './submit-report/submit-bulk/submit-bulk.component';
 import { ManageTermsComponent } from './manage-terms/manage-terms.component';
 import { TermsService } from './services/terms.service';
+import { ManageAchievementsComponent } from './manage-achievements/manage-achievements.component';
 
 
 @NgModule({
@@ -24,6 +25,7 @@ import { TermsService } from './services/terms.service';
     SubmitSingleComponent,
     SubmitBulkComponent,
     ManageTermsComponent,
+    ManageAchievementsComponent,
   ],
   providers: [
     DashboardService,

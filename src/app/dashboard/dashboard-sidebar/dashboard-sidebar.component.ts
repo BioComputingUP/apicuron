@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'dashboard-sidebar',
@@ -14,7 +15,14 @@ export class DashboardSidebarComponent implements OnInit {
 
   @Input('resource') resource$: Observable<any>;
 
-  
+  logo_src(logo: string){
+    if(logo.startsWith('assets')){
+      return logo
+    }else{
+      let link = new URL(environment.resource_logo_path, environment.public_file_url)
+      return new URL(logo, link).href
+    }
+  }
 
   ngOnInit(): void {
 
@@ -32,7 +40,11 @@ export class DashboardSidebarComponent implements OnInit {
           },
           {
             href: ['/dashboard', 'database', resource_id, 'reports'],
-            name: 'Report Submission'
+            name: 'Submit Reports'
+          },
+          {
+            href: ['/dashboard', 'database', resource_id, 'achievements'],
+            name: 'Manage Achievements'
           }
         ]
 
