@@ -33,7 +33,7 @@ export class DatabaseUpdateComponent implements OnInit {
 
     this.resource_data$ = this.resource_id$.pipe(
       switchMap((resource_id: string) => {
-        return this.databaseService.get_resource_details(resource_id);
+        return this.databaseService.get_resource(resource_id);
       }),
       shareReplay()
     );

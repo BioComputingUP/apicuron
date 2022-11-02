@@ -31,17 +31,18 @@ export class NumbersBannerComponent implements OnInit {
       text: "Achievements",
     },
   ];
+  
 
   ngOnInit(): void {
     const route = environment.ws + "/home";
     this.httpClient.get(route).subscribe((response) => {
       // {"data":{"resource_count":3,"user_count":88,"report_count":45810,"achievement_count":133}}
-      const data = response["data"];
+      // const data = response["data"];
       const count_list = [
-        data["user_count"],
-        data["resource_count"],
-        data["report_count"],
-        data["achievement_count"],
+        response["user_count"],
+        response["resource_count"],
+        response["report_count"],
+        response["achievement_count"],
       ];
       this.numberElements = this.numberElements.map((el, index) => {
         return {...el, count:count_list[index]}

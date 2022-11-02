@@ -14,6 +14,11 @@ import { SubmitBulkComponent } from './submit-report/submit-bulk/submit-bulk.com
 import { ManageTermsComponent } from './manage-terms/manage-terms.component';
 import { TermsService } from './services/terms.service';
 import { ManageAchievementsComponent } from './manage-achievements/manage-achievements.component';
+import { AchievmentsDefService } from './manage-achievements/achievements.service';
+import { SvgModule } from '../svg/svg.module';
+import { ManageBadgesComponent } from './manage-achievements/manage-badges/manage-badges.component';
+import { SelectTermsComponent } from './manage-achievements/select-terms.component';
+import { ManageMedalsComponent } from './manage-achievements/manage-medals/manage-medals.component';
 
 
 @NgModule({
@@ -26,16 +31,21 @@ import { ManageAchievementsComponent } from './manage-achievements/manage-achiev
     SubmitBulkComponent,
     ManageTermsComponent,
     ManageAchievementsComponent,
+    ManageBadgesComponent,
+    ManageMedalsComponent,
+    SelectTermsComponent
   ],
   providers: [
     DashboardService,
-    TermsService
+    TermsService,
+    AchievmentsDefService
   ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     DatabasesModule,
-    DashboardRoutingModule
+    DashboardRoutingModule,
+    SvgModule
   ]
 })
 export class DashboardModule { }

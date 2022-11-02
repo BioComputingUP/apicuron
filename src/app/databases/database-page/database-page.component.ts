@@ -11,7 +11,6 @@ import { Observable } from "rxjs";
 export class DatabasePageComponent implements OnInit {
   resourceId$: Observable<string>;
   leaderboard$: Observable<Object>;
-  resource_details$;
   badges$: any;
   medals$: any;
   terms$: any;
@@ -45,16 +44,13 @@ export class DatabasePageComponent implements OnInit {
       pluck('data')
     )
     
-    this.resource_details$ = this.resourceId$.pipe(
+    this.resource$ = this.resourceId$.pipe(
       switchMap(
         (resource_id: string) => {
         return this.databaseService.get_resource_details(resource_id)
       }),
       shareReplay()
     )
-
-    this.resource$ = this.resource_details$.pipe(pluck('data'))
-    
 
     this.badges$ = this.resource$.pipe(
       pluck('badges')
@@ -66,16 +62,6 @@ export class DatabasePageComponent implements OnInit {
 
     this.terms$ = this.resource$.pipe(
       pluck('terms')
-    )
-
-    this.reports$ = this.resource_details$.pipe(
-      map((response) => {
-        return {
-          data: response['data']['reports'],
-          page_size: response['reports_page'],
-          page:response['reports_page']
-        }
-      })
     )
 
 

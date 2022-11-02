@@ -1,0 +1,177 @@
+<section class="tw-bg-white tw-border tw-border-gray-500 tw-shadow-md tw-rounded tw-p-2"
+    *ngIf="resource$ | async as resource">
+    <h3 class="tw-text-xl tw-font-bold">Manage Badges</h3>
+
+    <div class="tw-flex tw-flex-row tw-justify-end">
+        <button class="tw-bg-apicuron-purple tw-text-white tw-rounded tw-font-bold tw-shadow-md tw-p-1" (click)="open_create_modal()">Create
+            Badge</button>
+    </div>
+
+    <div class="tw-flex tw-flex-row tw-flex-wrap tw-py-1" *ngIf="badges$ | async as badges">
+        <div *ngFor="let badge of badges" class="tw-p-1 tw-w-1/2 sm:tw-w-1/4">
+            <div class="tw-bg-white tw-relative tw-rounded-lg tw-border tw-border-gray-400 tw-p-1 tw-pt-3">
+                <!-- <div class="tw-absolute tw-z-10 tw-top-0 tw-right-0 tw-pt-1 tw-pr-1">
+                    <button>
+                        <svg class="tw-w-4 tw-h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+                    </button>
+
+                </div> -->
+                <svg-badge class="tw-w-full tw-mx-auto" [database]="resource.resource_name" [title]="badge.name"
+                    [main_color]="badge.color_code">
+                </svg-badge>
+                <div class="tw-flex tw-flex-row tw-justify-between">
+                    <div class="tw-w-1/2 tw-p-1">
+                        <button (click)="open_edit_modal(badge)"
+                            class="tw-bg-green-500 tw-text-white tw-font-bold tw-w-full tw-rounded tw-shadow-md">Edit</button>
+                    </div>
+                    <div class="tw-w-1/2 tw-p-1">
+                        <button (click)="delete_badge(badge)"
+                            class="tw-bg-red-500 tw-text-white tw-font-bold tw-w-full tw-rounded tw-shadow-md">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+<div *ngIf="show_edit_form" class="tw-relative tw-z-50 tw-overflow-y-scroll" aria-labelledby="modal-title" role="dialog"
+    aria-modal="true">
+
+    <div class="tw-fixed tw-inset-0 tw-bg-gray-500 tw-bg-opacity-75 tw-transition-opacity tw-duration-200"
+        [ngClass]="{'tw-block':show_edit_form, 'tw-hidden': !show_edit_form}" (click)="show_edit_form = false">
+    </div>
+
+    <div class="tw-fixed tw-inset-0 tw-z-10 tw-overflow-y-auto">
+        <div
+            class="tw-flex tw-min-h-full tw-items-center tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0">
+
+            <div [ngClass]="{'tw-block':show_edit_form, 'tw-hidden': !show_edit_form}"
+                class="tw-relative tw-transform tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 ">
+                <form action="" [formGroup]="edit_form" (submit)="edit_form_submit()">
+                    <div
+                        class="tw-bg-white tw-grid tw-grid-flow-row tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4">
+
+                        <!-- for the update term form -->
+                        <h2 class="tw-text-xl tw-text-center tw-font-bold">update
+                            Badge "{{
+                            this.edit_form.get('name').value
+                            }}"</h2>
+
+
+                        <div *ngIf="terms$ | async as terms" class="form-control-element">
+                            <label for="list_terms">List of Terms</label>
+                            <select-terms [terms_list]="terms" formControlName="list_terms"></select-terms>
+                        </div>
+
+                        <div class="form-control-element">
+                            <label for="activity_name">Color Code</label>
+                            <input type="text" name="" id="" formControlName="color_code">
+                            <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                                *ngIf="edit_form_color_code.hasError('pattern') && edit_form_color_code.touched">
+                                Color Code should be either a hex code (eg #333), "bronze", "silver" or "gold"
+                            </small>
+                        </div>
+
+
+
+                        <div class="form-control-element">
+                            <label for="score">Count Threshold</label>
+                            <input type="number" min="1" name="score" formControlName="count_threshold" id="">
+                            <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                                *ngIf="edit_form.get('count_threshold').hasError('min') && edit_form.get('count_threshold').touched">
+                                Minimum value of a count threshold is 1
+                            </small>
+                        </div>
+
+                        <div class="form-control-element">
+                            <label for="description">Category</label>
+                            <input type="text" name="" id="" formControlName="category">
+                        </div>
+
+                        <input type="submit" class="tw-w-full tw-p-2 tw-mx-1 tw-bg-green-500 tw-text-white"
+                            value="submit">
+
+
+                    </div>
+                </form>
+                <button class="tw-w-full tw-mx-auto tw-p-2 tw-bg-gray-400 tw-text-white"
+                    (click)="show_edit_form = false">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div *ngIf="show_create_form" class="tw-relative tw-z-50 tw-overflow-y-scroll" aria-labelledby="modal-title" role="dialog"
+    aria-modal="true">
+
+    <div class="tw-fixed tw-inset-0 tw-bg-gray-500 tw-bg-opacity-75 tw-transition-opacity tw-duration-200"
+        [ngClass]="{'tw-block':show_create_form, 'tw-hidden': !show_create_form}" (click)="show_create_form = false">
+    </div>
+
+    <div class="tw-fixed tw-inset-0 tw-z-10 tw-overflow-y-auto">
+        <div
+            class="tw-flex tw-min-h-full tw-items-center tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0">
+
+            <div [ngClass]="{'tw-block':show_create_form, 'tw-hidden': !show_create_form}"
+                class="tw-relative tw-transform tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 ">
+                <form action="" [formGroup]="create_form" (submit)="create_form_submit()">
+                    <div
+                        class="tw-bg-white tw-grid tw-grid-flow-row tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4">
+
+                        <!-- for the update term form -->
+                        <h2 class="tw-text-xl tw-text-center tw-font-bold">update
+                            Badge "{{
+                            this.create_form.get('name').value
+                            }}"</h2>
+                        
+                        <div class="form-control-element">
+                            <label for="name">Badge Name</label>
+                            <input type="text" name="" id="" formControlName="name">
+                        </div>
+
+                        <div *ngIf="terms$ | async as terms" class="form-control-element">
+                            <label for="list_terms">List of Terms</label>
+                            <select-terms [terms_list]="terms" formControlName="list_terms"></select-terms>
+                        </div>
+
+                        <div class="form-control-element">
+                            <label for="color_code">Color Code</label>
+                            <input type="text" name="" id="" formControlName="color_code">
+                            <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                                *ngIf="create_form_color_code.hasError('pattern') && create_form_color_code.touched">
+                                Color Code should be either a hex code (eg #333), "bronze", "silver" or "gold"
+                            </small>
+                        </div>
+
+
+
+                        <div class="form-control-element">
+                            <label for="score">Count Threshold</label>
+                            <input type="number" min="1" name="score" formControlName="count_threshold" id="">
+                            <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                                *ngIf="create_form.get('count_threshold').hasError('min') && create_form.get('count_threshold').touched">
+                                Minimum value of a count threshold is 1
+                            </small>
+                        </div>
+
+                        <div class="form-control-element">
+                            <label for="description">Category</label>
+                            <input type="text" name="" id="" formControlName="category">
+                        </div>
+
+                        <input type="submit" class="tw-w-full tw-p-2 tw-mx-1 tw-bg-green-500 tw-text-white"
+                            value="submit">
+
+
+                    </div>
+                </form>
+                <button class="tw-w-full tw-mx-auto tw-p-2 tw-bg-gray-400 tw-text-white"
+                    (click)="show_create_form = false">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

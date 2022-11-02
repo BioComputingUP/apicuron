@@ -38,13 +38,21 @@ export class ManageTermsComponent implements OnInit {
     // retrieve the resource from the API
     this.resource$ = this.resourceId$.pipe(
       switchMap((resource_id: string) => {
-        return this.databaseService.get_resource_details(resource_id);
+        return this.databaseService.get_resource(resource_id);
       }),
       shareReplay(),
       pluck("data")
     );
     
-    this.resource$.pipe(pluck("terms")).subscribe((terms: Array<any>) => this.terms$.next(terms))
+    this.resourceId$.pipe(
+      switchMap((resource_id: string) => {
+        return this.termsService.get_resource_terms(resource_id)
+      }),
+      shareReplay(),
+      pluck('data')
+    ).subscribe((terms: Array<any>) => {
+      this.terms$.next(terms)
+    })
   }
 
   ngOnInit(): void {}

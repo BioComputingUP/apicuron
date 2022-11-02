@@ -1,9 +1,10 @@
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
+import { combineLatest, Observable } from "rxjs";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 
 import { environment } from "../../../environments/environment";
 import { AuthService } from "../../auth/auth.service";
+import { map, pluck, switchMap } from "rxjs/operators";
 
 @Injectable({
   providedIn: "root",
@@ -12,6 +13,7 @@ export class DatabasesService {
   constructor(private http: HttpClient) {}
   private partnerResourcesPath = environment.ws + "/partner-resources";
   private resourcesPath = environment.ws + "/resources";
+  private termsPath = environment.ws + '/terms'
 
   get_resources() {
     const data = this.http.get(this.partnerResourcesPath, {
@@ -54,15 +56,57 @@ export class DatabasesService {
   }
 
   get_resource_details(resource_id: string) {
-    return this.http.get(
-      `${this.partnerResourcesPath}/details/${resource_id}`,
+    const resource$: Observable<Object> = this.http.get(
+      `${this.partnerResourcesPath}/${resource_id}`,
       {
         responseType: "json",
         headers: {
           version: "2",
         },
       }
-    );
+    ).pipe(pluck('data'))
+    const terms$: Observable<Object> = this.http.get(this.termsPath, {
+      headers: {
+        version: '2'
+      },
+      params:{
+        resource_id
+      }
+    }).pipe(pluck('data'))
+    const medals$: Observable<Object> = this.http.get(
+      environment.ws + '/achievements-def/medals',
+      {
+        headers: {
+          version: '2'
+        },
+        params: {
+          resource_id
+        }
+      }
+    ).pipe(pluck('data'))
+
+    const badges$: Observable<Object> = this.http.get(
+      environment.ws + '/achievements-def/badges',
+      {
+        headers: {
+          version: '2'
+        },
+        params: {
+          resource_id
+        }
+      }
+    ).pipe(pluck('data'))
+
+    return combineLatest([badges$, medals$, terms$, resource$]).pipe(
+      map(([badges, medals, terms, resource]) => {
+        return {
+          badges,
+          medals,
+          terms,
+          ...resource
+        }
+      })
+    )
   }
 
   get_resource(resource_id:string){

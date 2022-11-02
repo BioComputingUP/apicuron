@@ -20,6 +20,17 @@ export class TermsService {
 
   ws = environment.ws
 
+  get_resource_terms(resource_id: string){
+    return this.http.get(this.ws + '/terms', {
+      headers: {
+        version: '2'
+      },
+      params: {
+        resource_id
+      }
+    })
+  }
+
   update_term(term: UpdateTerm) {
     return this.http.put(this.ws + "/terms/edit", term, {
       headers: {
