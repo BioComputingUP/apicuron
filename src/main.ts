@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { createProxyMiddleware, fixRequestBody, responseInterceptor } from 'http-proxy-middleware';
 import { useContainer } from 'class-validator';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
 	// App creation
@@ -18,6 +19,18 @@ async function bootstrap() {
 	// Logging and config setup
 	const appLogger = new Logger('APICURONApplicationLogger');
 	const configService = app.get(ConfigService);
+
+	// setup for swagger docs generation
+	const config = new DocumentBuilder()
+		.setTitle('APICURON V2')
+		.setDescription('The APICURON V2 API Documentation')
+		.setVersion('2.0')
+		.addTag('curation')
+		.build()
+	
+	
+	const document = SwaggerModule.createDocument(app, config)
+	SwaggerModule.setup('api', app, document)
 
 
 	app.use(

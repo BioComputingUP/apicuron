@@ -36,3 +36,4 @@ lerna-debug.log*
 
 # static files
 /public/*
+/dist-old/*
