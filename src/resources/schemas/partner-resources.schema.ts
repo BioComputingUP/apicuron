@@ -35,6 +35,10 @@ export class PartnerResource {
 
 	@Prop({ required: false })
 	logo: string;
+
+	@Prop()
+	color: string
+
 	// @Prop({
 	// 	type: String,
 	// 	required: false,

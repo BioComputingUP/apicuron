@@ -13,6 +13,8 @@ export class UsersService {
 	async get_by_orcid(orcid_id: string): Promise<User> {
 		const user_promise = this.userModel.findOne({
 			orcid_id,
+		}, {
+			stats: 0
 		});
 		
 		return await user_promise

@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { TransformerService } from '../shared/transformer/transformer.service';
 import { User, UserDocument, UserSchema } from '../auth/users/schemas/user.schema';
 import { Statistics, StatisticsDocument } from './schemas/statistics.schema';
@@ -18,8 +18,10 @@ export class StatisticsService {
 
 	logger = new Logger(StatisticsService.name);
 
-	async get_one() {
-		return await this.statisticsModel.findOne().populate('user');
+	async get_user_statistics(curator_orcid: string) {
+		return await this.statisticsModel.find({
+			curator_orcid
+		})
 	}
 
 	async get_all_statistics(

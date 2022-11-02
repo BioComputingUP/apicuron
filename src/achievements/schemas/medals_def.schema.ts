@@ -2,7 +2,11 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type MedalDefDocument = MedalDef & Document;
 
-@Schema()
+@Schema({
+	toJSON: {
+		transform: true
+	}
+})
 export class MedalDef {
 	// fields from Achievement
 
@@ -12,8 +16,7 @@ export class MedalDef {
 	@Prop()
 	category: string;
 
-	@Prop()
-	color: string;
+	
 	
 	@Prop()
 	count_threshold: number;
@@ -31,11 +34,20 @@ export class MedalDef {
 	list_terms: string[];
 
 	// Fields specific to Medal
+	
+	@Prop()
+	color: string;
 
 	@Prop()
 	score_relative: number;
 
-	@Prop()
+	@Prop({
+		transform (value: any) {
+			const date = new Date(value)
+			console.log({value})
+			return date.toLocaleDateString()
+		}
+	})
 	first_day: Date;
 	
 	@Prop()

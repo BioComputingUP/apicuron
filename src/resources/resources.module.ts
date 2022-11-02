@@ -41,7 +41,7 @@ import { ActivityTermExists } from './terms/validators/activity-term-exists';
 	imports: [
 		AuthModule,
 		JwtModule,
-		AchievementsModule,
+		// AchievementsModule,
 		// SharedValidatorsModule,
 		MongooseModule.forFeature([
 			{

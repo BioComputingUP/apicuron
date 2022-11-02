@@ -16,6 +16,9 @@ import { PartnerResourceDocument } from 'src/resources/schemas/partner-resources
 
 // create custom validator according to class-validator standards
 // marking the class as injectable to add it to nestjs DI
+/**
+ * @description Valdiator that checks if the resource_id exists in the database
+ */
 @Injectable()
 @ValidatorConstraint({ name: 'ResourceIdExists', async: true })
 export class ResourceIdExists implements ValidatorConstraintInterface {
@@ -27,6 +30,9 @@ export class ResourceIdExists implements ValidatorConstraintInterface {
 	private logger = new Logger(ResourceIdExists.name);
 
 	async validate(value: string) {
+		if(!value){
+			return true;
+		}
 		try {
 			return !! await this.partnerResourceModel.exists({ resource_id: value })
 		} catch (e) {

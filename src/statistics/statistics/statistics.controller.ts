@@ -49,16 +49,23 @@ export class StatisticsController {
 		);
 	}
 	
-	@Get(':resource_id')
+	@Get('partner-resource/:resource_id')
 	async get_resource_statistics(@Param('resource_id') resource_id: string, @Query('from') from_date: 'year' | '6 months' | 'month' | 'week'){
 		
 	}
+
+
 
 	@Get('achievements/:orcid_id/:resource_id')
 	async get_user_achievements(@Param('orcid_id') orcid_id: string, @Param('resource_id') resource_id: string){
 		const { resource_uri } = await this.partnerResourceService.get_resource(resource_id)
 		
 		return this.achievementsService.user_achievements(orcid_id, resource_uri)
+	}
+
+	@Get('user/:orcid_id')
+	async get_user_statistics(@Param('orcid_id') orcid_id:string){
+		return this.statService.get_user_statistics(orcid_id)
 	}
 
 	@Get()

@@ -54,9 +54,7 @@ async function bootstrap() {
 
 	// setup basic validation Pipes
 	app.useGlobalPipes(
-		new ValidationPipe({
-			disableErrorMessages: configService.get('environment') != 'development',
-		}),
+		new ValidationPipe(),
 	);
 
 	// retrieving port, host and other configurations

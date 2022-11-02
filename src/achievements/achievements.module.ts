@@ -7,22 +7,23 @@ import {
 } from './schemas/achievement-def.schema';
 import { Achievement, AchievementSchema } from './schemas/achievements.schema';
 import { BadgeSchema } from './schemas/badges.schema';
-import { BadgeDefSchema } from './schemas/badges_def.schema';
 import { MedalSchema } from './schemas/medals.schema';
-import { MedalDefSchema } from './schemas/medals_def.schema';
 import { AchievementsService } from './achievements.service';
+import { AchievementsController } from './controllers/achievements.controller';
+import { AchievementsDefController, BadgesDefController, MedalsDefController } from './controllers/achievements-def.controller';
+import { BadgeUnique, MedalUnique } from './validators/achievement-exists'
+import { AuthModule } from '../auth/auth.module';
+import { ResourcesModule } from '../resources/resources.module';
 
 @Module({
-	providers: [AchievementsDefService, AchievementsService],
+	providers: [AchievementsDefService, AchievementsService, BadgeUnique, MedalUnique],
 	imports: [
+		AuthModule,
+		ResourcesModule,
 		MongooseModule.forFeature([
 			{
 				name: AchievementDef.name,
 				schema: AchievementDefSchema,
-				// discriminators: [
-				// 	{ name: 'badge', schema: BadgeDefSchema },
-				// 	{ name: 'medal', schema: MedalDefSchema },
-				// ],
 			},
 			{
 				name: Achievement.name,
@@ -35,5 +36,6 @@ import { AchievementsService } from './achievements.service';
 		]),
 	],
 	exports: [AchievementsDefService, AchievementsService],
+	controllers: [AchievementsController, AchievementsDefController, BadgesDefController, MedalsDefController],
 })
 export class AchievementsModule {}

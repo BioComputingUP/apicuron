@@ -13,7 +13,7 @@ export class Report {
 	@Prop({
 		required: true,
 	})
-	activity_term: MongooseSchema.Types.String;
+	activity_term: string;
 
 	@Prop({ required: true })
 	curator_orcid: string;

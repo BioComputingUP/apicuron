@@ -10,9 +10,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './users/schemas/user.schema';
 import { AuthMiddleware } from './middlewares/auth.middleware';
 import { HttpModule } from '@nestjs/axios';
+import { OrcidExists } from './validators/orcidExists.dto';
+// import { OrcidExists } from './validators/orcidExists.dto';
 
 @Module({
-	providers: [AuthService, OrcidStrategy, UsersService],
+	providers: [AuthService, OrcidStrategy, UsersService, OrcidExists],
 	imports: [
 		HttpModule,
 		MongooseModule.forFeature([
@@ -28,7 +30,7 @@ import { HttpModule } from '@nestjs/axios';
 			}),
 		}),
 	],
-	exports: [UsersService, MongooseModule],
+	exports: [UsersService, MongooseModule, JwtModule, OrcidExists],
 	controllers: [AuthController, UsersController, UserControllerV2],
 })
 export class AuthModule {

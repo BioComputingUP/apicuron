@@ -11,9 +11,6 @@ export class BadgeDef {
 	category: string;
 
 	@Prop()
-	color: string;
-
-	@Prop()
 	count_threshold: number;
 
 	@Prop()

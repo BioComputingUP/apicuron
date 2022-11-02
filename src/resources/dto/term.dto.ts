@@ -1,4 +1,5 @@
-import { IsIn, IsNotEmpty, IsNumber, IsOptional, IsUrl, Min } from "class-validator";
+import { IsIn, IsNotEmpty, IsNumber, IsOptional, IsUrl, Min, Validate } from "class-validator";
+import { ActivityTermExists } from "../terms/validators/activity-term-exists";
 
 
 export class TermDto {
@@ -27,6 +28,28 @@ export class TermDto {
 	resource_id: string;
 
 	@IsNotEmpty()
+	@IsNumber({
+		allowNaN: false,
+		allowInfinity: false,
+		maxDecimalPlaces: 0
+	})
+	@Min(1)
+	score: number;
+}
+
+export class TermFilterDto {
+	
+	@IsOptional()
+	resource_id: string;
+
+	@IsOptional()
+	@IsIn(['generation', 'invalidation', 'revision'])
+	activity_category: string;
+
+	@IsOptional()
+	activity_name: string;
+
+	@IsOptional()
 	@IsNumber({
 		allowNaN: false,
 		allowInfinity: false,

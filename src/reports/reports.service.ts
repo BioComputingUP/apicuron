@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, Schema } from 'mongoose';
 import { User, UserDocument } from '../auth/users/schemas/user.schema';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import { TermsService } from '../resources/terms/terms.service';
 import { ReportDto } from './dto/report.dto';
 import { Report, ReportDocument } from './reports.schema';
+
 
 @Injectable()
 export class ReportsService {
@@ -175,7 +176,24 @@ export class ReportsService {
 		if (!!orcid_id) {
 			query_obj['curator_orcid'] = orcid_id;
 		}
-		return await this.reportModel.find(query_obj).skip(skip).limit(page_size);
+		const reports = await this.reportModel.find(query_obj).skip(skip).limit(page_size).lean();
+		
+		const activity_term_list = [...new Set(reports.map(report => report.activity_term))]
+		
+		const terms_list = await this.termsService.get_terms(activity_term_list, resource_id);
+
+
+
+		const reports_with_terms = reports.map((report) => {
+			report['term'] = terms_list.find(term => term.activity_term == report.activity_term)
+			return report;
+		})
+		const reports_count = await this.reportModel.count(query_obj);
+		
+		return {
+			data: reports_with_terms,
+			count: reports_count
+		}
 	}
 
 	async get_user_reports(
@@ -207,7 +225,7 @@ export class ReportsService {
 		// the string constructor is used to convert from mongoose string type to regular typescript string (I know, it's just nonesense)
 		const report_terms = reports.map((report) => String(report.activity_term));
 
-		const terms = await this.termsService.get_terms(report_terms, resource_uri);
+		const terms = await this.termsService.get_terms(report_terms, resource_id);
 		const user_reports = reports.map((report) => {
 			return {
 				...report,

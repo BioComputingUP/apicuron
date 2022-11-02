@@ -59,36 +59,36 @@ export class PartnerResourcesController {
 		return await this.partnerResourceService.get_resources();
 	}
 
-	@Get(':resource_id')
-	async get_resource_details(
-		@Param('resource_id') resource_id,
-		@Query('page') page = 1,
-		@Query('page_size') page_size = 10,
-	) {
-		const resource_obj = await this.partnerResourceService.get_resource_details(
-			resource_id,
-			page,
-			page_size,
-		);
-		if (!resource_obj) {
-			throw new NotFoundException('Invalid resource_id');
-		}
-		const { resource, ...other } = resource_obj;
+	// @Get('details/:resource_id')
+	// async get_resource_details(
+	// 	@Param('resource_id') resource_id,
+	// 	@Query('page') page = 1,
+	// 	@Query('page_size') page_size = 10,
+	// ) {
+	// 	const resource_obj = await this.partnerResourceService.get_resource_details(
+	// 		resource_id,
+	// 		page,
+	// 		page_size,
+	// 	);
+	// 	if (!resource_obj) {
+	// 		throw new NotFoundException('Invalid resource_id');
+	// 	}
+	// 	const { resource, ...other } = resource_obj;
 
-		return {
-			data: {
-				...resource,
-				...other,
-			},
-			reports_page: page,
-			page_size: page_size,
-		};
-	}
-
-	// @Get([':resource_id', 'statistics'])
-	// async get_resource_statistics(@Param('resource_id') resource_id: string ){
-	// 	return 'hi'
+	// 	return {
+	// 		data: {
+	// 			...resource,
+	// 			...other,
+	// 		},
+	// 		reports_page: page,
+	// 		page_size: page_size,
+	// 	};
 	// }
+
+	@Get(':resource_id')
+	async get_resource(@Param('resource_id') resource_id){
+		return this.partnerResourceService.get_resource(resource_id);
+	}
 
 	@Put('update')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
@@ -122,7 +122,6 @@ export class PartnerResourcesController {
 					'resources',
 					`${logo.filename}.${ext}`,
 				);
-
 			mv(
 				logo.path,
 				public_path,
@@ -150,14 +149,14 @@ export class PartnerResourcesControllerOld {
 	constructor(private partnerResourceService: PartnerResourcesService) {}
 	@Get(['/stat', '/homepage_statistics'])
 	async get_statistics() {
-		const resources = await this.partnerResourceService.get_resources();
-		const [achievement_count, count_biocurators, contributions_count] =
-			await this.partnerResourceService.get_counts();
-		return {
-			achievement_count,
-			count_biocurators,
-			contributions_count,
-			resources,
-		};
+		// const resources = await this.partnerResourceService.get_resources();
+		// const [achievement_count, count_biocurators, contributions_count] =
+		// 	await this.partnerResourceService.get_counts();
+		// return {
+		// 	achievement_count,
+		// 	count_biocurators,
+		// 	contributions_count,
+		// 	resources,
+		// };
 	}
 }
