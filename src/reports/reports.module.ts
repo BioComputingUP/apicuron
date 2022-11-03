@@ -8,7 +8,7 @@ import { ReportsService } from './reports.service';
 import { ConfigService } from '@nestjs/config';
 import { ResourcesModule } from '../resources/resources.module';
 import { HttpModule } from '@nestjs/axios';
-import { Term, TermSchema } from '../resources/schemas/terms.schema';
+import { TermsModule } from '../terms/terms.module';
 
 @Module({
 	controllers: [ReportsControllerV2, ReportsController],
@@ -17,6 +17,7 @@ import { Term, TermSchema } from '../resources/schemas/terms.schema';
 		HttpModule,
 		AuthModule,
 		ResourcesModule,
+		TermsModule,
 		MongooseModule.forFeature([
 			{
 				name: Report.name,

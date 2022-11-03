@@ -12,8 +12,7 @@ import {
 	PartnerResourceSchema,
 	PartnerResource,
 } from './schemas/partner-resources.schema';
-import { Term, TermSchema } from './schemas/terms.schema';
-import { TermsController } from './terms/terms.controller';
+import { Term, TermSchema } from '../terms/schemas/terms.schema';
 import { SubmittedResourcesService } from './submitted-resources/resources.service';
 import { Resource, ResourceSchema } from './schemas/resource.schema';
 import {
@@ -21,23 +20,19 @@ import {
 	SubmittedResourceSchema,
 } from './schemas/submitted-resource.schema';
 import { TransformerModule } from '../shared/transformer/transformer.module';
-import { AchievementsModule } from '../achievements/achievements.module';
-import { TermsService } from './terms/terms.service';
 import { UniqueResourceIdRule } from './submitted-resources/validators/unique-resource-id';
 import { UniqueResourceURIRule } from './submitted-resources/validators/unique-resource-uri';
 import { JwtModule } from '@nestjs/jwt';
 import { ResourceIdExists } from './partner-resources/validators/resource-id-exists';
-import { ActivityTermExists } from './terms/validators/activity-term-exists';
 
 @Module({
 	controllers: [
 		PartnerResourcesController,
 		PartnerResourcesControllerOld,
-		TermsController,
 		SubmittedResourcesController,
 	],
-	providers: [UniqueResourceIdRule, UniqueResourceURIRule, ResourceIdExists, PartnerResourcesService, SubmittedResourcesService, TermsService, ActivityTermExists],
-	exports: [PartnerResourcesService, MongooseModule, TermsService, ResourceIdExists, ActivityTermExists],
+	providers: [UniqueResourceIdRule, UniqueResourceURIRule, ResourceIdExists, PartnerResourcesService, SubmittedResourcesService],
+	exports: [PartnerResourcesService, MongooseModule, ResourceIdExists],
 	imports: [
 		AuthModule,
 		JwtModule,
@@ -58,10 +53,7 @@ import { ActivityTermExists } from './terms/validators/activity-term-exists';
 					},
 				],
 			},
-			{
-				name: Term.name,
-				schema: TermSchema,
-			},
+			
 			{
 				name: Report.name,
 				schema: ReportSchema,

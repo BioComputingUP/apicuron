@@ -13,7 +13,7 @@ import {
 	InternalServerErrorException
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createResourceDto } from '../dto/createResource.dto';
+import { CreateResourceDto } from '../dto/createResource.dto';
 import { SubmittedResourcesService } from './resources.service';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
@@ -48,13 +48,13 @@ export class SubmittedResourcesController {
 	@ApiCreatedResponse({
 		status: 201,
 		description: 'Returns a confirmation value of the created resource',
-		type: createResourceDto
+		type: CreateResourceDto
 	})
 	@Put()
 	@HttpCode(201)
 	@UseInterceptors(FileInterceptor('logo'))
 	async create_resource(
-		@Body() createResource: createResourceDto,
+		@Body() createResource: CreateResourceDto,
 		@UploadedFile(resource_image_validation_pipe, SvgSanitationValidationPipe)
 		logo: Express.Multer.File,
 	) {

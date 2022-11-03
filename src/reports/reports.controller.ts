@@ -15,19 +15,15 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 
-import { Blob } from 'buffer';
 import { createReadStream } from 'fs';
-import { tap } from 'rxjs';
-import { Readable } from 'stream';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { HasAResourceGuard } from '../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
 import { ParseUnsignedIntPipe } from '../shared/pipes/unsigned-int-validation.pipe';
-import { ReportDto } from './dto/report.dto';
-import { SubmitReportDto } from './dto/submit-report.dto';
+import { SubmitBulkDto, SubmitReportDto } from './dto/submit-report.dto';
 import { ReportsService } from './reports.service';
 
 @ApiTags('First Version')
@@ -51,7 +47,10 @@ export class ReportsController {
 @ApiTags('Reports')
 @Controller({ path: 'reports', version: '2' })
 export class ReportsControllerV2 {
-	constructor(private reportService: ReportsService, private httpService: HttpService, private config:ConfigService) {}
+	constructor(
+		private reportService: ReportsService,
+		private httpService: HttpService,
+		private config:ConfigService) {}
 
 	logger = new Logger(ReportsControllerV2.name)
 
@@ -85,12 +84,13 @@ export class ReportsControllerV2 {
 		);
 	}
 
+	@ApiConsumes('multipart/form-data')
 	@Post('')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	@UseInterceptors(FileInterceptor('reports', {
 		dest: '/tmp/apicuron/reports/'
 	}))
-	async submit_reports(@UploadedFile() reports: Express.Multer.File, @Request() req, @Body("delete-all") delete_all: Array<string> | undefined) {
+	async submit_reports(@UploadedFile() reports: Express.Multer.File, @Request() req, @Body() body: SubmitBulkDto) {
 
 		// importing the formData package
 		var FormData = require("form-data")
@@ -108,8 +108,8 @@ export class ReportsControllerV2 {
 		formData.append('database', database)
 		
 		// if the delete_all exists we add it to the arguments otherwise we only send the orcid
-		if(delete_all){
-			formData.append('task_arguments', `${req.user.orcid_id} ${delete_all.join(',')}`)
+		if(body.delete_all){
+			formData.append('task_arguments', `${req.user.orcid_id} ${body.delete_all.join(',')}`)
 		}else{
 			formData.append('task_arguments', req.user.orcid_id)
 		}

@@ -9,11 +9,13 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
+import { ApiExcludeEndpoint, ApiHeader, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { AuthorizationHeader } from '../config/swagger';
 import { AuthService } from './auth.service';
 import { Roles } from './decorators/roles.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { RoleGuard } from './guards/role.guard';
+import { User } from './users/schemas/user.schema';
 import { UsersService } from './users/users.service';
 
 @Controller({
@@ -56,7 +58,14 @@ export class AuthController {
 		return 'Can be accessed';
 	}
 
+	// swagger documentation decorators
 	@ApiTags('Users')
+	@ApiHeader(AuthorizationHeader)
+	// TODO: finish implementation of the docs
+	@ApiOkResponse({
+		description: 'An Object describing the current User and his information',
+	})
+	// nestjs logic decorators
 	@Get('profile')
 	@UseGuards(LocalAuthGuard)
 	async get_user_profile(@Req() request){

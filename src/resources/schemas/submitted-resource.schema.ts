@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Term } from './terms.schema';
+import { Term } from '../../terms/schemas/terms.schema';
 
 export type SubmittedResourceDocument = SubmittedResource & Document;
 

@@ -1,7 +1,8 @@
-import { IsEmail, IsNotEmpty, IsOptional, Validate } from 'class-validator';
-import { ActivityTermExists } from '../../resources/terms/validators/activity-term-exists';
+import { IsArray, IsEmail, IsEmpty, IsNotEmpty, IsOptional, Validate } from 'class-validator';
+import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
 import { ResourceIdExists } from '../../resources/partner-resources/validators/resource-id-exists';
 import { OrcidChecksum } from '../validators/orcid-checksum';
+import { ApiProperty } from '@nestjs/swagger';
 export class SubmitReportDto {
 
     @IsNotEmpty()
@@ -22,4 +23,17 @@ export class SubmitReportDto {
     @IsNotEmpty()
 	timestamp: Date;
 
+}
+
+export class SubmitBulkDto {
+    
+    @IsOptional()
+    @ApiProperty({ type: 'string[]', format: 'String', description: 'A list of Resource Ids where the database manager can delete all the entries from the specified resourceIds', required:false })
+    @IsArray()
+    delete_all: Array<string>
+
+    // swagger docs entry
+    @ApiProperty({ type: 'File', format: 'JSON', description:'A JSON document containing a list named "reports" that contains reports for a curation' })
+    @IsEmpty()
+    reports: string
 }

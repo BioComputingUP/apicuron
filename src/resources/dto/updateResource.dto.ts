@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsOptional, IsString, IsUrl, Max, MaxLength, MinLength, Validate } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsEmpty, IsNotEmpty, IsOptional, IsString, IsUrl, Max, MaxLength, MinLength, Validate } from "class-validator";
 
 
 export class UpdatePartnerResourceDto {
@@ -7,11 +8,6 @@ export class UpdatePartnerResourceDto {
     @IsNotEmpty()
 	resource_id: string;
 
-    // @IsString()
-    // @IsUrl()
-    // @IsNotEmpty()
-	// resource_uri: string;
-    
     @IsOptional()
     @IsString()
 	resource_description: string;  
@@ -31,4 +27,8 @@ export class UpdatePartnerResourceDto {
     @IsString()
     @IsUrl()
 	resource_url: string;
+
+    @IsEmpty()
+    @ApiProperty({ type: 'string', format: 'binary' })
+    logo: string
 }

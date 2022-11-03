@@ -4,28 +4,20 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 // import { PrismaModule } from './prisma/prisma.module';
+import { loadConfig } from './config/load'
 import { MongooseModule } from '@nestjs/mongoose';
 import { ReportsModule } from './reports/reports.module';
 import { ResourcesModule } from './resources/resources.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import devConfig from './config/configuration.dev';
-import prodConfig from './config/configuration.prod';
 import { join, resolve } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MulterModule } from '@nestjs/platform-express';
 import { TransformerModule } from './shared/transformer/transformer.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { NotificationsModule } from './notifications/notifications.module';
-function getConfig() {
-	if (process.env.NODE_ENV === 'development') {
-		return devConfig;
-	}
-	if (process.env.NODE_ENV === 'production') {
-		return prodConfig;
-	}
-	return devConfig;
-}
+import { TermsModule } from './terms/terms.module';
+import { SchedulerModule } from './scheduler/scheduler.module';
 
 
 @Module({
@@ -39,7 +31,7 @@ function getConfig() {
 		ConfigModule.forRoot({
 			isGlobal: true,
 			// ignoreEnvFile: true,
-			load: [getConfig()],
+			load: [loadConfig()],
 		}),
 		// in here we use the forRootAsync https://docs.nestjs.com/techniques/mongodb#async-configuration
 		// to be able to access the configService asnchronously because it cannot be loaded sooner
@@ -65,11 +57,13 @@ function getConfig() {
 		}),
 		
 		ResourcesModule,
+		TermsModule,
 		ReportsModule,
 		StatisticsModule,
 		TransformerModule,
 		AchievementsModule,
 		NotificationsModule,
+		SchedulerModule,
 		// SharedValidatorsModule
 	],
 	controllers: [AppController],

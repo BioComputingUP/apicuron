@@ -2,7 +2,7 @@ import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface 
 import { Injectable, Inject, Logger, InternalServerErrorException } from '@nestjs/common'
 import { TermsService } from "../terms.service";
 import { Model } from "mongoose";
-import { Term, TermDocument } from "../../schemas/terms.schema";
+import { Term, TermDocument } from "../schemas/terms.schema";
 import { InjectModel } from "@nestjs/mongoose";
 
 /**

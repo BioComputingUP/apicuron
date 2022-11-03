@@ -5,7 +5,7 @@ import { BadgeDef } from '../../achievements/schemas/badges_def.schema';
 import { MedalDef } from '../../achievements/schemas/medals_def.schema';
 // import { BadgeDef } from './badges.schema';
 // import { MedalDef } from './medals.schema';
-import { Term } from './terms.schema';
+import { Term } from '../../terms/schemas/terms.schema';
 
 export type PartnerResourceDocument = PartnerResource & Document;
 

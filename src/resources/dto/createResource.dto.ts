@@ -3,7 +3,7 @@ import { UniqueResourceIdRule } from "../submitted-resources/validators/unique-r
 import { UniqueResourceURIRule } from "../submitted-resources/validators/unique-resource-uri"
 
 
-export class createResourceDto {
+export class CreateResourceDto {
     
     @IsString()
     @IsNotEmpty()

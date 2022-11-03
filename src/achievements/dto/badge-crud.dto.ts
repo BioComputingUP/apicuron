@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional, Matches, Min, Validate } from "class-validator";
 import { ResourceIdExists } from "../../resources/partner-resources/validators/resource-id-exists";
-import { ActivityTermExists } from "../../resources/terms/validators/activity-term-exists";
+import { ActivityTermExists } from "../../terms/validators/activity-term-exists";
 import { BadgeUnique } from "../validators/achievement-exists";
 
 

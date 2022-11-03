@@ -11,7 +11,7 @@ import { rename } from 'fs';
 import { Model } from 'mongoose';
 import path from 'path';
 import { TransformerService } from '../../shared/transformer/transformer.service';
-import { createResourceDto } from '../dto/createResource.dto';
+import { CreateResourceDto } from '../dto/createResource.dto';
 import {
 	SubmittedResource,
 	SubmittedResourceDocument,
@@ -27,7 +27,7 @@ export class SubmittedResourcesService {
 	) {}
 
 	async create_resource(
-		resource_obj: createResourceDto & { logo: string },
+		resource_obj: CreateResourceDto & { logo: string },
 		logo: Express.Multer.File,
 	) {
 		const res = new this.resourceModel(resource_obj);

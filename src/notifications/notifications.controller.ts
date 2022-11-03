@@ -2,7 +2,7 @@ import { Controller, Get, UseGuards, Req, Delete, Param } from '@nestjs/common';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import mongoose from 'mongoose';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
-import { AuthorizationHeader, VersionHeader } from '../swagger/configuration';
+import { AuthorizationHeader, VersionHeader } from '../config/swagger';
 import { NotificationsService } from './notifications.service';
 
 @ApiTags('Notifications')

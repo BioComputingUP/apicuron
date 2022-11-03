@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Schema } from 'mongoose';
 import { User, UserDocument } from '../auth/users/schemas/user.schema';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
-import { TermsService } from '../resources/terms/terms.service';
+import { TermsService } from '../terms/terms.service';
 import { ReportDto } from './dto/report.dto';
 import { Report, ReportDocument } from './reports.schema';
 

@@ -1,16 +1,22 @@
 import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
 import { BadgeDto } from '../../achievements/dto/badge.dto';
 import { MedalDto } from '../../achievements/dto/medal.dto';
-import { TermDto } from './term.dto';
-export class PartnerResourceDto {
+import { TermDto } from '../../terms/dto/term.dto';
+
+export class SelectPartnerResourceDto {
+    @IsNotEmpty()
+    @IsString()
+	resource_id: string;
+}
+export class PartnerResourceDto extends SelectPartnerResourceDto {
 
     @IsNotEmpty()
     @IsString()
 	resource_description: string;
 
-    @IsNotEmpty()
-    @IsString()
-	resource_id: string;
+    // @IsNotEmpty()
+    // @IsString()
+	// resource_id: string;
 
     @IsNotEmpty()
     @IsString()
@@ -28,6 +34,10 @@ export class PartnerResourceDto {
     @IsString()
     @IsUrl()
 	resource_url: string;
+
+    @IsNotEmpty()
+    @IsString()
+	logo: string;
 
 }
 

@@ -1,6 +1,6 @@
 import { IsNotEmpty, Validate } from "class-validator"
-import { ResourceIdExists } from "../partner-resources/validators/resource-id-exists"
-import { ActivityTermExists } from "../terms/validators/activity-term-exists"
+import { ResourceIdExists } from "../../resources/partner-resources/validators/resource-id-exists"
+import { ActivityTermExists } from "../validators/activity-term-exists"
 
 
 export class DeleteTermDto {

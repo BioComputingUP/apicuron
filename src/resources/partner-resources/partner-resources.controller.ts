@@ -30,9 +30,9 @@ import { rename } from 'fs';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import * as mime from 'mime-types';
-import { ApiCreatedResponse, ApiHeader, ApiOkResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { VersionHeader } from '../../swagger/configuration';
-import { PartnerResourceDto } from '../dto/partner-resources.dto';
+import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiHeader, ApiNotFoundResponse, ApiOkResponse, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { VersionHeader } from '../../config/swagger';
+import { PartnerResourceDto, SelectPartnerResourceDto } from '../dto/partner-resources.dto';
 
 const resource_image_validation_pipe = new ParseFilePipe({
 	validators: [
@@ -43,6 +43,7 @@ const resource_image_validation_pipe = new ParseFilePipe({
 	],
 	fileIsRequired: false,
 });
+
 
 @ApiTags('Partner Resources')
 @ApiHeader(VersionHeader)
@@ -66,12 +67,37 @@ export class PartnerResourcesController {
 		return await this.partnerResourceService.get_resources();
 	}
 
-
+	// swagger documentation decorators
+	@ApiOkResponse({
+		description: 'The specified resource',
+		type: PartnerResourceDto
+	})
+	@ApiNotFoundResponse({
+		description: 'A 404 Not Found Response and Error Message'
+	})
 	@Get(':resource_id')
-	async get_resource(@Param('resource_id') resource_id){
-		return this.partnerResourceService.get_resource(resource_id);
+	async get_resource(@Param() resourceSelector: SelectPartnerResourceDto){
+		const { resource_id } = resourceSelector
+		const resource = await this.partnerResourceService.get_resource(resource_id);
+		if(resource){
+			return resource
+		}else{
+			throw new NotFoundException(`Resource (${resource_id}) Not Found`)
+		}
 	}
 
+	
+	// swagger documentation decorators
+	@ApiConsumes('multipart/form-data')
+	@ApiBody({
+		description: 'A Partner Resource Update Object',
+		type: UpdatePartnerResourceDto
+	})
+	@ApiOkResponse({
+		description: 'Returns an update confirmation Object',
+		type: PartnerResourceDto
+	})
+	// nestjs logic decorators
 	@Put('edit')
 	@Patch('edit')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
@@ -86,6 +112,7 @@ export class PartnerResourcesController {
 		@UploadedFile(resource_image_validation_pipe, SvgSanitationValidationPipe)
 		logo: Express.Multer.File,
 	) {
+		// check if the user has a permission to edit the PartnerResource
 		const user = await this.userService.get_by_orcid(request.user.orcid_id);
 
 		const user_resource = user.resources.find(
@@ -97,6 +124,7 @@ export class PartnerResourcesController {
 
 		const { resource_id } = update_resource;
 
+		// if there's an uploaded file
 		if (logo) {
 			var mv = require('mv');
 			const ext = mime.extension(logo.mimetype);

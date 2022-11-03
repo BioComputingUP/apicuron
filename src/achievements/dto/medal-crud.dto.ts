@@ -1,6 +1,6 @@
 import { IsDate, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, MaxDate, Min, MinDate, Validate } from "class-validator";
 import { ResourceIdExists } from "../../resources/partner-resources/validators/resource-id-exists";
-import { ActivityTermExists } from "../../resources/terms/validators/activity-term-exists";
+import { ActivityTermExists } from "../../terms/validators/activity-term-exists";
 import { MedalUnique } from "../validators/achievement-exists";
 import { MaxDateField, MinDateField } from "../validators/date-comparison";
 

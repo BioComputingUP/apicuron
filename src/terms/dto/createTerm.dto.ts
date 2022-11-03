@@ -1,27 +1,27 @@
 import { IsIn, IsNotEmpty, IsNumber, IsOptional, IsUrl, Min, Validate } from "class-validator";
-import { ActivityTermExists } from "../terms/validators/activity-term-exists";
+import { ActivityTermExists } from "../validators/activity-term-exists";
 
 
-export class UpdateTermDto {
+export class CreateTermDto {
 	// fields from Achievement
 	
 	// https://mongoosejs.com/docs/schematypes.html#schematype-options
 	
-    @IsOptional()
+	@IsNotEmpty()
 	@IsIn(['generation', 'invalidation', 'revision'])
 	activity_category: string;
 	
-	@IsOptional()
+	@IsNotEmpty()
 	activity_name: string;
 	
 	@IsNotEmpty()
     // the second parameter is responsible for reversing the validator
     // when the first parameter of the validator constraint is true, the Activity term 
     // is only valid when the ActivityTerm doesn't exist in the database
-	@Validate(ActivityTermExists)
+	@Validate(ActivityTermExists, [{ reverse: true}])
 	activity_term: string;
 	
-	@IsOptional()
+	@IsNotEmpty()
 	description: string;
 	
 	@IsOptional()
@@ -31,7 +31,7 @@ export class UpdateTermDto {
 	@IsNotEmpty()
 	resource_id: string;
 
-	@IsOptional()
+	@IsNotEmpty()
 	@IsNumber({
 		allowNaN: false,
 		allowInfinity: false,

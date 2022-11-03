@@ -14,7 +14,7 @@ import { PartnerResourcesService } from '../../resources/partner-resources/partn
 import { GetStatisticsDto } from '../dto/get-statistics.dto';
 import { StatisticsService } from '../statistics.service';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
-import { VersionHeader } from '../../swagger/configuration';
+import { VersionHeader } from '../../config/swagger';
 
 @ApiTags('Statistics')
 @ApiHeader(VersionHeader)
@@ -60,12 +60,12 @@ export class StatisticsController {
 
 
 
-	@Get('achievements/:orcid_id/:resource_id')
-	async get_user_achievements(@Param('orcid_id') orcid_id: string, @Param('resource_id') resource_id: string){
-		const { resource_uri } = await this.partnerResourceService.get_resource(resource_id)
+	// @Get('achievements/:orcid_id/:resource_id')
+	// async get_user_achievements(@Param('orcid_id') orcid_id: string, @Param('resource_id') resource_id: string){
+	// 	const { resource_uri } = await this.partnerResourceService.get_resource(resource_id)
 		
-		return this.achievementsService.user_achievements(orcid_id, resource_uri)
-	}
+	// 	return this.achievementsService.user_achievements(orcid_id, resource_uri)
+	// }
 
 	@Get('user/:orcid_id')
 	async get_user_statistics(@Param('orcid_id') orcid_id:string){

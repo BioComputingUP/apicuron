@@ -2,7 +2,7 @@ import { Controller, Delete, Req, Put, ForbiddenException, Get, Param, Body, Pos
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
 import { HasAResourceGuard } from '../../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
-import { VersionHeader } from '../../swagger/configuration';
+import { VersionHeader } from '../../config/swagger';
 import { AchievementsDefService } from '../achievements-def.service';
 import { UpdateBadgeDto, DeleteBadgeDto, CreateBadgeDto, BadgeFilter } from '../dto/badge-crud.dto';
 import { CreateMedalDto, DeleteMedalDto, MedalsFilter, UpdateMedalDto } from '../dto/medal-crud.dto';
