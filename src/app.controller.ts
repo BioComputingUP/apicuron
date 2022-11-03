@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { AchievementsDefService } from './achievements/achievements-def.service';
 import { AppService } from './app.service';
 import { UsersService } from './auth/users/users.service';
@@ -15,11 +16,11 @@ export class AppController {
 		protected achievementsService: AchievementsDefService,
 	) {}
 
-	@Get()
-	getHello(): string {
-		return this.appService.getHello();
-	}
-
+	// @Get()
+	// getHello(): string {
+	// 	return this.appService.getHello();
+	// }
+	@ApiExcludeEndpoint()
 	@Get('/home')
 	async get_home_data() {
 		const resource_count_promise = this.partnerResourceService.count();

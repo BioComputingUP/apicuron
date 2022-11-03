@@ -23,14 +23,18 @@ import { User } from '../decorators/applyUser.decorator';
 import { createReadStream } from 'fs';
 import { json_to_tsv } from './json-tsv';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
+import { RoleGuard } from '../guards/role.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('First Version')
 @Controller('')
 export class UsersController {
   constructor(private usersService: UsersService) {}
   private usersControllerLogger = new Logger(UsersController.name);
  
   @Post('/registerUser')
-  @UseGuards(LocalAuthGuard)
+  @Roles('admin')
+  @UseGuards(LocalAuthGuard, RoleGuard)
   create_or_update_user(@Body() userData: UpdateUserDto, @Res() res) {
     // console.log(`Received message: ${userData}`);
     this.usersService
@@ -86,7 +90,7 @@ export class UsersController {
   }
 }
 
-
+@ApiTags('Users')
 @Controller({
 	version: '2',
 	path: 'users'

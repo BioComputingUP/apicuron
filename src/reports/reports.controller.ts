@@ -15,6 +15,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
 
 import { Blob } from 'buffer';
 import { createReadStream } from 'fs';
@@ -29,22 +30,25 @@ import { ReportDto } from './dto/report.dto';
 import { SubmitReportDto } from './dto/submit-report.dto';
 import { ReportsService } from './reports.service';
 
-@Controller()
+@ApiTags('First Version')
+@Controller('reports')
 export class ReportsController {
 	constructor(private reportService: ReportsService) {}
 
-	@Get('reports/:orcid')
+	@Get(':orcid')
 	@Roles('admin')
 	@UseGuards(LocalAuthGuard, RoleGuard)
 	async get_user_reports(@Param('orcid') orcid: string) {
 		return await this.reportService.getUserReports(orcid);
 	}
 
-	@Get('reports')
+	@Get('')
 	async get_reports(@Param() params) {
 		return await this.reportService.get_reports(params);Request
 	}
 }
+
+@ApiTags('Reports')
 @Controller({ path: 'reports', version: '2' })
 export class ReportsControllerV2 {
 	constructor(private reportService: ReportsService, private httpService: HttpService, private config:ConfigService) {}

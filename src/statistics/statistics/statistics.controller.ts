@@ -13,7 +13,11 @@ import { TransformerService } from '../../shared/transformer/transformer.service
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { GetStatisticsDto } from '../dto/get-statistics.dto';
 import { StatisticsService } from '../statistics.service';
+import { ApiHeader, ApiTags } from '@nestjs/swagger';
+import { VersionHeader } from '../../swagger/configuration';
 
+@ApiTags('Statistics')
+@ApiHeader(VersionHeader)
 @Controller({
 	version: '2',
 	path: 'statistics',

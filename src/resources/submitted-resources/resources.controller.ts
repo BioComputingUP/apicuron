@@ -2,7 +2,7 @@ import {
 	Body,
 	Controller,
 	Get,
-	Post,
+	HttpCode,
 	Put,
 	UploadedFile,
 	UseInterceptors,
@@ -20,6 +20,7 @@ import { ConfigService } from '@nestjs/config';
 import { SvgSanitationValidationPipe } from '../../shared/pipes/svg-sanitation.pipe';
 import { writeFile } from 'fs';
 import * as mime from 'mime-types'
+import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 const resource_image_validation_pipe = new ParseFilePipe({
 	validators: [
@@ -30,6 +31,7 @@ const resource_image_validation_pipe = new ParseFilePipe({
 	],
 });
 
+@ApiTags('Resources')
 @Controller({
 	version: '2',
 	path: 'resources',
@@ -42,8 +44,14 @@ export class SubmittedResourcesController {
 	{}
 
 	private readonly logger = new Logger(SubmittedResourcesController.name)
-
+	
+	@ApiCreatedResponse({
+		status: 201,
+		description: 'Returns a confirmation value of the created resource',
+		type: createResourceDto
+	})
 	@Put()
+	@HttpCode(201)
 	@UseInterceptors(FileInterceptor('logo'))
 	async create_resource(
 		@Body() createResource: createResourceDto,

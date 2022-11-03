@@ -1,4 +1,5 @@
 import { Query, Controller, Get, Post, Param, Put, Delete, Body, UseGuards, Req, ForbiddenException, ValidationPipe } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { HasAResourceGuard } from '../../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
@@ -7,7 +8,7 @@ import { DeleteTermDto } from '../dto/deleteTerm.dto';
 import { TermDto, TermFilterDto } from '../dto/term.dto';
 import { UpdateTermDto } from '../dto/updateTerm.dto';
 import { TermsService } from './terms.service';
-
+@ApiTags('Curation Terms')
 @Controller({
     path: 'terms',
     version: '2'

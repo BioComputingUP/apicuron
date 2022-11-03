@@ -2,9 +2,10 @@ import {
 	Controller,
 	Get,
 	Param,
-	Query,
+	HttpCode,
 	Req,
 	UploadedFile,
+	Patch,
 	NotFoundException,
 	ParseFilePipe,
 	UseGuards,
@@ -29,6 +30,9 @@ import { rename } from 'fs';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import * as mime from 'mime-types';
+import { ApiCreatedResponse, ApiHeader, ApiOkResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { VersionHeader } from '../../swagger/configuration';
+import { PartnerResourceDto } from '../dto/partner-resources.dto';
 
 const resource_image_validation_pipe = new ParseFilePipe({
 	validators: [
@@ -40,6 +44,8 @@ const resource_image_validation_pipe = new ParseFilePipe({
 	fileIsRequired: false,
 });
 
+@ApiTags('Partner Resources')
+@ApiHeader(VersionHeader)
 @Controller({ path: 'partner-resources', version: '2' })
 export class PartnerResourcesController {
 	constructor(
@@ -49,48 +55,25 @@ export class PartnerResourcesController {
 	) {}
 
 	logger = new Logger(PartnerResourcesController.name)
-	// @Get('details')
-	// async get_resources(): Promise<PartnerResourceSummaryDto[]> {
-	// 	return await this.partnerResourceService.resources_details();
-	// }
 
+	@ApiOkResponse({
+		status: 200,
+		description: 'Returns a list of all the partner resources of APICURON',
+		type: Array<PartnerResourceDto>
+	})
 	@Get()
-	async list_resources() {
+	async list_resources(): Promise<Array<PartnerResourceDto>> {
 		return await this.partnerResourceService.get_resources();
 	}
 
-	// @Get('details/:resource_id')
-	// async get_resource_details(
-	// 	@Param('resource_id') resource_id,
-	// 	@Query('page') page = 1,
-	// 	@Query('page_size') page_size = 10,
-	// ) {
-	// 	const resource_obj = await this.partnerResourceService.get_resource_details(
-	// 		resource_id,
-	// 		page,
-	// 		page_size,
-	// 	);
-	// 	if (!resource_obj) {
-	// 		throw new NotFoundException('Invalid resource_id');
-	// 	}
-	// 	const { resource, ...other } = resource_obj;
-
-	// 	return {
-	// 		data: {
-	// 			...resource,
-	// 			...other,
-	// 		},
-	// 		reports_page: page,
-	// 		page_size: page_size,
-	// 	};
-	// }
 
 	@Get(':resource_id')
 	async get_resource(@Param('resource_id') resource_id){
 		return this.partnerResourceService.get_resource(resource_id);
 	}
 
-	@Put('update')
+	@Put('edit')
+	@Patch('edit')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	@UseInterceptors(
 		FileInterceptor('logo', {
@@ -144,6 +127,7 @@ export class PartnerResourcesController {
 	}
 }
 
+@ApiTags('First Version')
 @Controller()
 export class PartnerResourcesControllerOld {
 	constructor(private partnerResourceService: PartnerResourcesService) {}

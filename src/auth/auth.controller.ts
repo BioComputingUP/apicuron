@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { Roles } from './decorators/roles.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -24,14 +25,17 @@ export class AuthController {
 	private authControllerLogger = new Logger(AuthController.name);
 
 	// redirect to orcid
+	@ApiExcludeEndpoint()
 	@Get('orcid')
 	@UseGuards(AuthGuard('orcid'))
 	authenticate_orcid() {}
 
+	@ApiExcludeEndpoint()
 	@Get('orcid_permission')
 	@UseGuards(AuthGuard('orcid'))
 	orcid_permission() {}
 
+	@ApiExcludeEndpoint()
 	@Get('orcid/redirect')
 	@Redirect('/orcid/', 301)
 	@UseGuards(AuthGuard('orcid'))
@@ -44,6 +48,7 @@ export class AuthController {
 		return { url: this.configService.get('FRONTEND_HOST') + 'curators/' + user.orcid_id, statusCode: 301 };
 	}
 
+	@ApiExcludeEndpoint()
 	@Get('/orcid/:orcid_id')
 	@Roles('user', 'admin')
 	@UseGuards(LocalAuthGuard, RoleGuard)
@@ -51,6 +56,7 @@ export class AuthController {
 		return 'Can be accessed';
 	}
 
+	@ApiTags('Users')
 	@Get('profile')
 	@UseGuards(LocalAuthGuard)
 	async get_user_profile(@Req() request){

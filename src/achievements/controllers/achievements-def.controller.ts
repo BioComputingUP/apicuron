@@ -1,10 +1,13 @@
 import { Controller, Delete, Req, Put, ForbiddenException, Get, Param, Body, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiHeader, ApiTags } from '@nestjs/swagger';
 import { HasAResourceGuard } from '../../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
+import { VersionHeader } from '../../swagger/configuration';
 import { AchievementsDefService } from '../achievements-def.service';
 import { UpdateBadgeDto, DeleteBadgeDto, CreateBadgeDto, BadgeFilter } from '../dto/badge-crud.dto';
 import { CreateMedalDto, DeleteMedalDto, MedalsFilter, UpdateMedalDto } from '../dto/medal-crud.dto';
 
+@ApiTags('Achievements Definition')
 @Controller({
 	path: 'achievements-def',
 	version: '2',
@@ -27,6 +30,7 @@ export class AchievementsDefController {
 
 }
 
+@ApiTags('Achievements Definition')
 @Controller({
 	path: 'achievements-def/badges',
 	version: '2',
@@ -79,6 +83,8 @@ export class BadgesDefController {
 }
 
 
+@ApiTags('Achievements Definition')
+@ApiHeader(VersionHeader)
 @Controller({
 	path: 'achievements-def/medals',
 	version: '2',

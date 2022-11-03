@@ -25,12 +25,16 @@ async function bootstrap() {
 		.setTitle('APICURON V2')
 		.setDescription('The APICURON V2 API Documentation')
 		.setVersion('2.0')
-		.addTag('curation')
+		.addTag('Resources')
+		.addTag('Partner Resources')
+		.addTag('Users')
+		.addTag('Curation Terms')
+		.addTag('Achievements Definition')
 		.build()
 	
 	
 	const document = SwaggerModule.createDocument(app, config)
-	SwaggerModule.setup('api', app, document)
+	SwaggerModule.setup('/', app, document)
 
 
 	app.use(
