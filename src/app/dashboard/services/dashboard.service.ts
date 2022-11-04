@@ -24,7 +24,7 @@ export class DashboardService {
   }
 
   submit_reports_bulk(form_data: FormData) {
-    return this.http.post(environment.ws + "/reports", form_data, {
+    return this.http.post(environment.ws + "/reports/bulk", form_data, {
       headers: {
         version: "2",
       },
