@@ -28,12 +28,12 @@ export class SubmitReportDto {
 export class SubmitBulkDto {
     
     @IsOptional()
-    @ApiProperty({ type: 'string[]', format: 'String', description: 'A list of Resource Ids where the database manager can delete all the entries from the specified resourceIds', required:false })
+    @ApiProperty({ type: 'string[]', format: 'String', description: 'A list of Resource Ids where the database manager specifies which resources he wishes to delete all the previous reports (effectively resubmitting everything through this bulk update) ', required:false })
     @IsArray()
     delete_all: Array<string>
 
     // swagger docs entry
-    @ApiProperty({ type: 'File', format: 'JSON', description:'A JSON document containing a list named "reports" that contains reports for a curation' })
+    @ApiProperty({ type: 'file', format: 'JSON', description:'A JSON document containing a list named "reports" that contains reports for a curation' })
     @IsEmpty()
     reports: string
 }

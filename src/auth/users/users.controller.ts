@@ -24,7 +24,8 @@ import { createReadStream } from 'fs';
 import { json_to_tsv } from './json-tsv';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { RoleGuard } from '../guards/role.guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiHeader, ApiTags } from '@nestjs/swagger';
+import { AuthorizationHeader, VersionHeader } from '../../config/swagger';
 
 @ApiTags('First Version')
 @Controller('')
@@ -91,6 +92,7 @@ export class UsersController {
 }
 
 @ApiTags('Users')
+@ApiHeader(VersionHeader)
 @Controller({
 	version: '2',
 	path: 'users'

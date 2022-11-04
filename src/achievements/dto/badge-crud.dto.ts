@@ -12,7 +12,7 @@ export class BadgeFilter {
 
     @IsOptional()
     @Validate(BadgeUnique, [{ reverse: true }])
-    name: string
+    name?: string
 }
 
 export class DeleteBadgeDto {

@@ -40,14 +40,14 @@ export class TermDto {
 export class TermFilterDto {
 	
 	@IsOptional()
-	resource_id: string;
+	resource_id?: string;
 
 	@IsOptional()
 	@IsIn(['generation', 'invalidation', 'revision'])
-	activity_category: string;
+	activity_category?: string;
 
 	@IsOptional()
-	activity_name: string;
+	activity_name?: string;
 
 	@IsOptional()
 	@IsNumber({
@@ -56,5 +56,5 @@ export class TermFilterDto {
 		maxDecimalPlaces: 0
 	})
 	@Min(1)
-	score: number;
+	score?: number;
 }

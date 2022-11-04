@@ -31,7 +31,7 @@ import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import * as mime from 'mime-types';
 import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiHeader, ApiNotFoundResponse, ApiOkResponse, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { VersionHeader } from '../../config/swagger';
+import { AuthorizationHeader, VersionHeader } from '../../config/swagger';
 import { PartnerResourceDto, SelectPartnerResourceDto } from '../dto/partner-resources.dto';
 
 const resource_image_validation_pipe = new ParseFilePipe({
@@ -89,6 +89,7 @@ export class PartnerResourcesController {
 	
 	// swagger documentation decorators
 	@ApiConsumes('multipart/form-data')
+	@ApiHeader(AuthorizationHeader)
 	@ApiBody({
 		description: 'A Partner Resource Update Object',
 		type: UpdatePartnerResourceDto

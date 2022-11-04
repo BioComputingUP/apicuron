@@ -11,18 +11,22 @@ import {
 	UseGuards,
 	UploadedFile,
 	Logger,
+	ForbiddenException,
 	InternalServerErrorException
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiHeader, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { createReadStream } from 'fs';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { HasAResourceGuard } from '../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
+import { AuthorizationHeader, VersionHeader } from '../config/swagger';
+import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import { ParseUnsignedIntPipe } from '../shared/pipes/unsigned-int-validation.pipe';
+import { ReportDto } from './dto/report.dto';
 import { SubmitBulkDto, SubmitReportDto } from './dto/submit-report.dto';
 import { ReportsService } from './reports.service';
 
@@ -45,14 +49,27 @@ export class ReportsController {
 }
 
 @ApiTags('Reports')
+@ApiHeader(VersionHeader)
 @Controller({ path: 'reports', version: '2' })
 export class ReportsControllerV2 {
 	constructor(
 		private reportService: ReportsService,
+		private partnerResourceService: PartnerResourcesService,
 		private httpService: HttpService,
 		private config:ConfigService) {}
 
 	logger = new Logger(ReportsControllerV2.name)
+
+	private can_edit_resource(user, resource_id){
+        // get the resources list that belong to the current user
+        const user_resources: Array<{ resource_id: string}> = user.resources
+        // check if the resource belongs to the user
+        const resource_found = user_resources.find(resource => resource.resource_id == resource_id)
+        // if it doesn't, we respond with  a 403 exception
+        if(!resource_found){
+            throw new ForbiddenException(`You either do not have the authorization to update the terms of the (${resource_id}) resource or the resource does not exist`);
+        }
+    }
 
 	@Get()
 	async get_reports(
@@ -84,8 +101,15 @@ export class ReportsControllerV2 {
 		);
 	}
 
+	@ApiOperation({
+        summary: 'Submit reports in bulk as a JSON file'
+    })
+    @ApiOkResponse({
+        description: 'Return message confirming the reception of the reports',
+    })
+	@ApiHeader(AuthorizationHeader)
 	@ApiConsumes('multipart/form-data')
-	@Post('')
+	@Post('bulk')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	@UseInterceptors(FileInterceptor('reports', {
 		dest: '/tmp/apicuron/reports/'
@@ -135,10 +159,20 @@ export class ReportsControllerV2 {
 
 	}
 
-
+	@ApiOperation({
+        summary: 'Submit a single report'
+    })
+    @ApiOkResponse({
+        description: 'Confirmation Object of the created report',
+		type: ReportDto
+    })
+	@ApiHeader(AuthorizationHeader)
 	@Post('single')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
-	async submit_report(@Body() report: SubmitReportDto) {
-		return report;
+	async submit_report(@Body() report: SubmitReportDto, @Request() req) {
+		this.can_edit_resource(req.user, report.resource_id);
+
+		const resource_uri = await this.partnerResourceService.retrieve_uri(report.resource_id)
+		return this.reportService.insertReport({...report, resource_uri })
 	}
 }

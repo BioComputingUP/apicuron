@@ -27,6 +27,10 @@ export interface UserStat {
 	collection: 'users',
 	toJSON: {
 		virtuals: true,
+		transform(_, ret){
+			delete ret.resources;
+			return ret
+		}
 	},
 })
 export class User {

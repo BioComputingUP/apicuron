@@ -29,6 +29,6 @@ export class UpdatePartnerResourceDto {
 	resource_url: string;
 
     @IsEmpty()
-    @ApiProperty({ type: 'string', format: 'binary' })
+    @ApiProperty({ type: 'file', format: 'jpeg/png/svg' })
     logo: string
 }
