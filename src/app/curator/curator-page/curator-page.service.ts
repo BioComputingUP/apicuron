@@ -91,7 +91,7 @@ export class CuratorPageService {
 
   get_achievements(orcid_id: string, resource_id: string) {
     return this.http
-      .get(this.wsUrl + `/statistics/achievements/${orcid_id}/${resource_id}`, {
+      .get(this.wsUrl + `/achievements/${orcid_id}/${resource_id}`, {
         headers: {
           version: "2",
         },

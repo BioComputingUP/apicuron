@@ -42,7 +42,7 @@ export class DatabasesService {
 
   update_resource(resource_data: Object){
     const data = this.http.put(
-      this.partnerResourcesPath + '/update',
+      this.partnerResourcesPath + '/edit',
       resource_data,
       {
         responseType: 'json',
