@@ -41,7 +41,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
 			useFactory: async (configService: ConfigService) => {
 				const db_host = configService.get<string>('db_host')
 				const database = configService.get<string>('database')
-				const port = configService.get<number>('port')
+				const port = configService.get<number>('db_port')
 				return ({
 					uri: `mongodb://${db_host}:${port}/${database}`,
 				})

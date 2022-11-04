@@ -2,7 +2,7 @@ export default () => ({
   environment: 'production',
   db_host: 'moros',
   database: 'apicuron_test',
-  port: 27017,
+  db_port: 27017,
   ORCID_REDIRECT: 'https://beta.apicuron.org/api/auth/orcid/redirect',
   ORCID_CLIENT_ID: 'APP-IU0CU8PQW4VDZA84',
   ORCID_CLIENT_SECRET: 'YOUR-ORCID-CLIENT-SECRET',
