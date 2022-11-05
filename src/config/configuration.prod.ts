@@ -3,18 +3,18 @@ export default () => ({
   db_host: 'moros',
   database: 'apicuron_test',
   db_port: 27017,
-  ORCID_REDIRECT: 'https://beta.apicuron.org/api/auth/orcid/redirect',
-  ORCID_CLIENT_ID: 'APP-IU0CU8PQW4VDZA84',
+  ORCID_REDIRECT: 'https://dev.apicuron.org/api/auth/orcid/redirect',
+  ORCID_CLIENT_ID: 'APP-TTBI2EX11P70SRD6',
   ORCID_CLIENT_SECRET: 'YOUR-ORCID-CLIENT-SECRET',
   ENV_NAME: 'production',
   JWT_SECRET: 'secret',
-  PORT: 8298,
-  HOST: 'localhost',
+  PORT: 8198,
+  HOST: 'dev.apicuron.org',
   ORCID_API_URL: 'https://pub.sandbox.orcid.org/v3.0/',
   PUBLIC_FILES_PATH: '/var/local/webservers/apps/apicuron2/public',
   JWT_HEADER: 'authorization',
   JWT_PREFIX: 'bearer',
-  V1_HOST: 'http://localhost:8198/', // Apicuron first version host location
+  V1_HOST: 'http://localhost:8298/', // Apicuron first version host location
   //   port: parseInt(process.env.PORT, 10) || 3000,
   //   database: {
   //     host: process.env.DATABASE_HOST,
