@@ -19,7 +19,6 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { TermsModule } from './terms/terms.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 
-
 @Module({
 	imports: [
 		ScheduleModule.forRoot(),
