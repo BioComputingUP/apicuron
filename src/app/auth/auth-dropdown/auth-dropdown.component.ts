@@ -19,7 +19,7 @@ export class AuthDropdownComponent implements OnInit {
   loggedIn$: Observable<any>;
 
   constructor(protected authService: AuthService) {
-    this.login_link = environment.ws + '/auth/orcid'
+    this.login_link = environment.auth_ws + '/auth/orcid'
     this.loggedIn$ = this.authService.loggedIn$
     this.user$ = this.authService.user$
 

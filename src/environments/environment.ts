@@ -6,6 +6,7 @@ export const environment = {
   production: false,
   // ws: 'https://dev.apicuron.bio.unipd.it/api/'
   ws: 'http://dione:3000',
+  auth_ws: 'http://dione:3000',
   public_file_url: 'http://dione:3000/files',
   resource_logo_path: 'resources',
   orcid_url: 'https://pub.orcid.org/v3.0/'
