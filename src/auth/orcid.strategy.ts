@@ -14,7 +14,7 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
   ) {
     super(
       {
-        sandbox: configService.get<string>('ENV_NAME') != 'production',
+        sandbox: true,
         callbackURL: configService.get<string>('ORCID_REDIRECT'),
         clientID: configService.get<string>('ORCID_CLIENT_ID'),
         clientSecret: configService.get<string>('ORCID_CLIENT_SECRET'),

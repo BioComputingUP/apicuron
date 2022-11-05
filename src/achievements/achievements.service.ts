@@ -14,7 +14,7 @@ export class AchievementsService {
 	) {}
 
     async user_achievements(curator_orcid: string, resource_id: string){
-        const resource_uri = this.partnerResourceService.retrieve_uri(resource_id)
+        const resource_uri = await this.partnerResourceService.retrieve_uri(resource_id)
         const badgesPromise = this.badgeModel.find({
             curator_orcid,
             '$or': [
