@@ -19,6 +19,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiHeader, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { createReadStream } from 'fs';
+import { SchedulerService } from '../scheduler/services/scheduler.service';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { HasAResourceGuard } from '../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
@@ -56,6 +57,7 @@ export class ReportsControllerV2 {
 		private reportService: ReportsService,
 		private partnerResourceService: PartnerResourcesService,
 		private httpService: HttpService,
+		private schedulerService: SchedulerService,
 		private config:ConfigService) {}
 
 	logger = new Logger(ReportsControllerV2.name)
@@ -155,6 +157,14 @@ export class ReportsControllerV2 {
 			}
 		})
 
+		
+		if(body.delete_all){
+			body.delete_all.forEach(async (resource_id) => {
+				await this.schedulerService.compute_achievements(resource_id)
+				this.schedulerService.compute_statistics(resource_id)
+			})
+		}
+
 		return { status: 'reports submitted successfully. You will receive a notification containing the submission report'}
 
 	}
@@ -173,6 +183,9 @@ export class ReportsControllerV2 {
 		this.can_edit_resource(req.user, report.resource_id);
 
 		const resource_uri = await this.partnerResourceService.retrieve_uri(report.resource_id)
-		return this.reportService.insertReport({...report, resource_uri })
+		const report_confirmation = await this.reportService.insertReport({...report, resource_uri });
+		await this.schedulerService.compute_achievements(report.resource_id, report.curator_orcid);
+		this.schedulerService.compute_statistics(report.resource_id, report.curator_orcid);
+		return report_confirmation;
 	}
 }

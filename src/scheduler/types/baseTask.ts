@@ -1,17 +1,13 @@
 
 
-export type TaskFile = {
-    path: string,
-    meta: {
-        filename: string,
-        contentType: string,
-        knownLength: number,    
-    }
-}
+// export type TaskFile = {
+//     path: string,
+//     filename: string
+// }
 
 
 export type TaskSubmit = {
     task: string,
     task_arguments?: string,
-    file?: TaskFile,
+    file?: Express.Multer.File,
 }

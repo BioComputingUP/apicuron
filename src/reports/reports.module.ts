@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { ResourcesModule } from '../resources/resources.module';
 import { HttpModule } from '@nestjs/axios';
 import { TermsModule } from '../terms/terms.module';
+import { SchedulerModule } from '../scheduler/scheduler.module';
 
 @Module({
 	controllers: [ReportsControllerV2, ReportsController],
@@ -30,6 +31,7 @@ import { TermsModule } from '../terms/terms.module';
 			  secret: configService.get('JWT_SECRET'),
 			}),
 		  }),
+		SchedulerModule
 	],
 	exports: [ReportsService]
 })

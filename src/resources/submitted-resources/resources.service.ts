@@ -40,7 +40,6 @@ export class SubmittedResourcesService {
 		return await !! this.resourceModel.exists({ resource_id });
 	}
 
-	@Cron(CronExpression.EVERY_WEEK)
 	delete_old_resources() {
 		throw new NotImplementedException();
 	}

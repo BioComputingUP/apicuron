@@ -9,7 +9,12 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiExcludeEndpoint, ApiHeader, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+	ApiExcludeEndpoint,
+	ApiHeader,
+	ApiOkResponse,
+	ApiTags,
+} from '@nestjs/swagger';
 import { AuthorizationHeader } from '../config/swagger';
 import { AuthService } from './auth.service';
 import { Roles } from './decorators/roles.decorator';
@@ -19,10 +24,14 @@ import { User } from './users/schemas/user.schema';
 import { UsersService } from './users/users.service';
 
 @Controller({
-	path: 'auth'
+	path: 'auth',
 })
 export class AuthController {
-	constructor(private authService: AuthService, private configService: ConfigService, private userService: UsersService) {}
+	constructor(
+		private authService: AuthService,
+		private configService: ConfigService,
+		private userService: UsersService,
+	) {}
 
 	private authControllerLogger = new Logger(AuthController.name);
 
@@ -43,11 +52,15 @@ export class AuthController {
 	@UseGuards(AuthGuard('orcid'))
 	async orcid_redirect(@Req() req, @Res() res) {
 		// console.log('redirect request', req)
-		const user = req.user
+		const user = req.user;
 		const { header, token } = await this.authService.generate_jwt_token(user);
 		res.cookie(header, token);
 		res.set(header, token);
-		return { url: this.configService.get('FRONTEND_HOST') + 'curators/' + user.orcid_id, statusCode: 301 };
+		return {
+			url:
+				this.configService.get('FRONTEND_HOST') + 'curators/' + user.orcid_id,
+			statusCode: 301,
+		};
 	}
 
 	@ApiExcludeEndpoint()
@@ -68,8 +81,8 @@ export class AuthController {
 	// nestjs logic decorators
 	@Get('profile')
 	@UseGuards(LocalAuthGuard)
-	async get_user_profile(@Req() request){
+	async get_user_profile(@Req() request) {
 		const user = await this.userService.get_by_orcid(request.user.orcid_id);
-		return user
+		return user;
 	}
 }

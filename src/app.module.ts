@@ -18,6 +18,7 @@ import { AchievementsModule } from './achievements/achievements.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { TermsModule } from './terms/terms.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
+import { SchedulerController } from './src/scheduler/scheduler.controller';
 
 @Module({
 	imports: [
@@ -65,7 +66,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
 		SchedulerModule,
 		// SharedValidatorsModule
 	],
-	controllers: [AppController],
+	controllers: [AppController, SchedulerController],
 	providers: [AppService],
 })
 export class AppModule {}
