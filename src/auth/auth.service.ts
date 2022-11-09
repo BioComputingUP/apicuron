@@ -23,8 +23,13 @@ export class AuthService {
   }
 
   async generate_jwt_token(user: userJWT) {
-    const { jwt_token } =  await this.userService.get_by_orcid(user.orcid_id)
-    const jwtToken = this.jwtService.sign({ ...user, jwt_token });
+    const db_user =  await this.userService.get_by_orcid(user.orcid_id)
+
+    let jwt_input = { ...user }
+    if(!!db_user.jwt_token){
+      jwt_input['jwt_token']= db_user.jwt_token
+    }
+    const jwtToken = this.jwtService.sign(jwt_input);
     const prefix = this.configService.get<string>('JWT_PREFIX');
     const header = this.configService.get<string>('JWT_HEADER');
     return { header, token: prefix + ' ' + jwtToken };
