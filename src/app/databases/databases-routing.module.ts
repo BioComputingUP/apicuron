@@ -9,14 +9,6 @@ import { DatabasesPageComponent } from "./databases-page/databases-page.componen
 const routes: Routes = [
   { path: "", component: DatabasesPageComponent },
   { path: "create", component: DatabaseCreateComponent },
-  // {
-  //   path: ":resource_id/dashboard/edit",
-  //   component: DatabaseUpdateComponent
-  // },
-  // {
-  //   path: ":resource_id/dashboard/reports",
-  //   component: SubmitReportComponent
-  // },
   { path: ":resource_id", component: DatabasePageComponent },
 ];
 

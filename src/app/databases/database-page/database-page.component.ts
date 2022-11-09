@@ -2,7 +2,8 @@ import { Component, OnInit } from "@angular/core";
 import { DatabasesService } from "../services/databases.service";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { map, pluck, share, shareReplay, switchMap } from "rxjs/operators";
-import { Observable } from "rxjs";
+import { combineLatest, Observable } from "rxjs";
+import { CuratorPageService } from "src/app/curator/curator-page/curator-page.service";
 @Component({
   selector: "app-database-page",
   templateUrl: "./database-page.component.html",
@@ -16,10 +17,13 @@ export class DatabasePageComponent implements OnInit {
   terms$: any;
   reports$: any;
   resource$: Observable<Object>;
+  stats$: Observable<unknown>;
+  users$: Observable<unknown>;
 
 
   constructor(
     private databaseService: DatabasesService,
+    private curatorpageService: CuratorPageService,
     private route: ActivatedRoute
   ) {}
 
@@ -36,13 +40,33 @@ export class DatabasePageComponent implements OnInit {
       })
     )
 
-    this.leaderboard$ = this.resourceId$.pipe(
+
+    this.stats$ = this.resourceId$.pipe(
       switchMap((resource_id: string) => {
         return this.databaseService.get_resource_leaderboard(resource_id)
       }),
       shareReplay(),
-      pluck('data')
+      // pluck('data')
     )
+
+    this.leaderboard$ = this.stats$.pipe(
+      switchMap(({ data }: any) => {
+        const users_stats$: Array<Observable<any>> = data.map(
+          (stat) => {
+            return this.curatorpageService.get_curator(stat.curator_orcid).pipe(
+              map((curator) => {
+                return { ...curator, stats: stat}
+              })
+            )
+          }
+        )
+        return combineLatest(users_stats$);
+      }),
+      shareReplay(),
+      // pluck('data')
+    )
+
+    // this.leaderboard$ = combineLatest([this.users$, this.stats$])
     
     this.resource$ = this.resourceId$.pipe(
       switchMap(
