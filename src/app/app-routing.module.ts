@@ -29,11 +29,11 @@ const routes: Routes = [
     loadChildren: () =>
       import("./databases/databases.module").then((m) => m.DatabasesModule),
   },
-  // {
-  //   path: "curators",
-  //   loadChildren: () =>
-  //     import("./curator/curator.module").then((m) => m.CuratorModule),
-  // },
+  {
+    path: "curators",
+    loadChildren: () =>
+      import("./curator/curator.module").then((m) => m.CuratorModule),
+  },
   
   // { path: 'curators/:orcid_id', component:CuratorPageComponent},
 

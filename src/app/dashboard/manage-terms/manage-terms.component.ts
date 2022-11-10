@@ -117,6 +117,7 @@ export class ManageTermsComponent implements OnInit {
 
         this.termsService.update_term(term).subscribe(
           ({ data }: { data: CreateTerm }) => {
+
             this.toast.success("Term Sucessfully Updated");
             
             // get the list of terms

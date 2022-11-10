@@ -131,7 +131,7 @@
 
                                 <div class="form-control-element">
                                     <label for="activity_category">Activity Category</label>
-                                    <select class="text-input" >
+                                    <select class="text-input" formControlName="activity_category" >
                                         <option class="tw-p-2 tw-bg-white tw-shadow-md tw-text-gray-900"
                                             *ngFor="let category of activity_categories"
                                             [value]="category">
