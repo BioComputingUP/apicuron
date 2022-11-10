@@ -33,7 +33,7 @@ export class TermsService {
     async update_term(term: UpdateTermDto) {
         const { resource_id, activity_term } = term
         const result = await this.termModel.updateOne({ resource_id, activity_term }, term)
-        console.log(result)
+        return await this.termModel.findOne({ resource_id, activity_term });
     }
 
     async create_term(term: TermDto) {

@@ -72,10 +72,10 @@ export class TermsController {
     // nestjs decorators
     @Put('edit')
     @UseGuards(LocalAuthGuard, HasAResourceGuard)
-    update_term(@Body() term: UpdateTermDto, @Req() req){
+    async update_term(@Body() term: UpdateTermDto, @Req() req){
         this.can_edit_resource(req.user, term.resource_id)
 
-        return this.termsService.update_term(term)
+        return await this.termsService.update_term(term)
     }
 
     @ApiOperation({
