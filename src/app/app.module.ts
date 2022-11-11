@@ -8,7 +8,7 @@ import {
 } from "@angular/router";
 import { CdkTableModule } from "@angular/cdk/table";
 import { ReactiveFormsModule, FormsModule } from "@angular/forms";
-import { HttpClientModule } from "@angular/common/http";
+import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { BsDatepickerModule } from "ngx-bootstrap/datepicker";
 import { TabsModule } from "ngx-bootstrap/tabs";
@@ -25,7 +25,6 @@ import { PageNotFoundComponent } from "./page-not-found/page-not-found.component
 import { DetailsTableComponent } from "./details-table/details-table.component";
 import { AlarmBannerComponent } from "./alarm-banner/alarm-banner.component";
 import { EditProfileComponent } from "./edit-profile/edit-profile.component";
-import { DocumentationComponent } from "./documentation/documentation.component";
 import { NotRegisteredComponent } from "./not-registered/not-registered.component";
 import { SwaggerUiComponent } from "./swagger-ui/swagger-ui.component";
 import { AltNavbarComponent } from "./alt-navbar/alt-navbar.component";
@@ -33,6 +32,7 @@ import { IndexModule } from "./index/index.module";
 import { CuratorModule } from "./curator/curator.module";
 import { AuthModule } from "./auth/auth.module";
 import { ToastrModule } from "ngx-toastr";
+import { MarkdownModule } from "ngx-markdown";
 
 @NgModule({
   declarations: [
@@ -44,7 +44,6 @@ import { ToastrModule } from "ngx-toastr";
     DetailsTableComponent,
     AlarmBannerComponent,
     EditProfileComponent,
-    DocumentationComponent,
     NotRegisteredComponent,
     SwaggerUiComponent,
     AltNavbarComponent,
@@ -62,6 +61,7 @@ import { ToastrModule } from "ngx-toastr";
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule,
+    MarkdownModule.forRoot({ loader: HttpClient }),
     AppRoutingModule,
     CdkTableModule,
     TabsModule.forRoot(),
