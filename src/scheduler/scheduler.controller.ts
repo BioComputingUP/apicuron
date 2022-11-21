@@ -1,5 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common'
-import { SchedulerService } from './services/scheduler.service';
+import { SchedulerClientService } from './services/scheduler-client.service';
 
 class SubmitReportsBulk {
     orcid_id: string;
@@ -13,7 +13,7 @@ class SubmitReportsBulk {
 })
 export class SchedulerController {
 
-    constructor(private schedulerService: SchedulerService) {}
+    constructor(private schedulerService: SchedulerClientService) {}
 
     @Get()
     async test_task(){

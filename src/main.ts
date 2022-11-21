@@ -10,6 +10,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
 	// App creation
 	const app = await NestFactory.create(AppModule);
+
+	// class-validator setup
 	useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
 

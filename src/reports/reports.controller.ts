@@ -19,7 +19,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiHeader, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { createReadStream } from 'fs';
-import { SchedulerService } from '../scheduler/services/scheduler.service';
+import { SchedulerClientService } from '../scheduler/services/scheduler-client.service';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { HasAResourceGuard } from '../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
@@ -57,7 +57,7 @@ export class ReportsControllerV2 {
 		private reportService: ReportsService,
 		private partnerResourceService: PartnerResourcesService,
 		private httpService: HttpService,
-		private schedulerService: SchedulerService,
+		private schedulerService: SchedulerClientService,
 		private config:ConfigService) {}
 
 	logger = new Logger(ReportsControllerV2.name)
