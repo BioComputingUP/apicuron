@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  // ws: 'https://dev.apicuron.bio.unipd.it/api/'
+  host: 'http://localhost:4200',
   ws: 'http://localhost:3000',
   auth_ws: 'http://localhost:3000',
   public_file_url: 'http://dione:3000/files',

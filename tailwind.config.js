@@ -1,6 +1,7 @@
 module.exports = {
   prefix: 'tw-',
   content: ["./src/**/*.{html,ts}", "./src/app/**/*.{html,ts}"],
+  darkMode: 'class',
   // darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
@@ -30,5 +31,7 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography')
+  ],
 };

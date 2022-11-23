@@ -40,6 +40,7 @@ const routes: Routes = [
   {path: '', component: IndexComponent},
   { path: 'notifications', loadChildren: () => import('./notifications/notifications.module').then(m => m.NotificationsModule) },
   { path: 'dashboard', loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule) },
+  { path: 'docs', loadChildren: () => import('./documentation/documentation.module').then(m => m.DocumentationModule) },
   {path: '**', component: PageNotFoundComponent},
 
 ];
