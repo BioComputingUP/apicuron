@@ -23,11 +23,11 @@ export class SubmitBulkComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.formBuilder.group({
       reports: [null, [Validators.required]],
+      'delete-all': [false, []]
     });
   }
 
   submit() {
-    console.log(this.form);
     const formData = new FormData();
     formData.append('reports', this.reports.value)
 

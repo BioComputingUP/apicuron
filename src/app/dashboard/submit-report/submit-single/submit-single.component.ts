@@ -3,7 +3,9 @@ import { FormBuilder, Validators } from "@angular/forms";
 import { ToastrModule, ToastrService } from "ngx-toastr";
 import { Observable } from "rxjs";
 import { pluck, switchMap } from "rxjs/operators";
+import { DatabasesService } from "../../../databases/services/databases.service";
 import { DashboardService, Report } from "../../services/dashboard.service";
+import { TermsService } from "../../services/terms.service";
 import { dateTimeValidator } from "../validators/date-time.validator";
 import { orcidIdValidator } from "../validators/orcid-id.validator";
 
@@ -21,8 +23,10 @@ export class SubmitSingleComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private toast: ToastrService,
-    private dashboardService: DashboardService
-  ) {}
+    private dashboardService: DashboardService,
+    private termsService: TermsService
+  ) {
+  }
 
   ngOnInit(): void {
     this.resource$.subscribe((resource) => {
@@ -55,7 +59,12 @@ export class SubmitSingleComponent implements OnInit {
       );
     });
 
-    this.terms$ = this.resource$.pipe(pluck("terms"));
+    this.terms$ = this.resource$.pipe(
+      switchMap((resource) => {
+        return this.termsService.get_resource_terms(resource.resource_id)
+      }),
+      pluck('data')
+    );
   }
   submit() {
     // const data = {
