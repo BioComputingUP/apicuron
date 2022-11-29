@@ -33,6 +33,7 @@ import * as mime from 'mime-types';
 import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiHeader, ApiNotFoundResponse, ApiOkResponse, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthorizationHeader, VersionHeader } from '../../config/swagger';
 import { PartnerResourceDto, SelectPartnerResourceDto } from '../dto/partner-resources.dto';
+import { AuthService } from '../../auth/auth.service';
 
 const resource_image_validation_pipe = new ParseFilePipe({
 	validators: [
@@ -53,6 +54,7 @@ export class PartnerResourcesController {
 		private partnerResourceService: PartnerResourcesService,
 		private userService: UsersService,
 		private configService: ConfigService,
+		private authService: AuthService
 	) {}
 
 	logger = new Logger(PartnerResourcesController.name)
@@ -113,17 +115,11 @@ export class PartnerResourcesController {
 		@UploadedFile(resource_image_validation_pipe, SvgSanitationValidationPipe)
 		logo: Express.Multer.File,
 	) {
-		// check if the user has a permission to edit the PartnerResource
-		const user = await this.userService.get_by_orcid(request.user.orcid_id);
-
-		const user_resource = user.resources.find(
-			(resource) => resource.resource_id == update_resource.resource_id,
-		);
-		if (!user_resource) {
-			throw new UnauthorizedException('Cannot update this resource');
-		}
-
 		const { resource_id } = update_resource;
+		
+		// check if the user has a permission to edit the PartnerResource
+		this.authService.user_has_resource(request.user, resource_id)
+
 
 		// if there's an uploaded file
 		if (logo) {
@@ -134,6 +130,7 @@ export class PartnerResourcesController {
 					'resources',
 					`${logo.filename}.${ext}`,
 				);
+			
 			mv(
 				logo.path,
 				public_path,
