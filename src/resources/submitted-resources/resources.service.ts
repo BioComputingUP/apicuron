@@ -1,5 +1,6 @@
 import {
 	Injectable,
+	Logger,
 	NotImplementedException,
 	BadRequestException,
 	InternalServerErrorException,
@@ -7,11 +8,13 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { rename } from 'fs';
+import { rename, mkdir } from 'fs';
 import { Model } from 'mongoose';
-import path from 'path';
+import path, { basename, join } from 'path';
 import { TransformerService } from '../../shared/transformer/transformer.service';
 import { CreateResourceDto } from '../dto/createResource.dto';
+import { PartnerResource, PartnerResourceDocument } from '../schemas/partner-resources.schema';
+import { Resource, ResourceDocument } from '../schemas/resource.schema';
 import {
 	SubmittedResource,
 	SubmittedResourceDocument,
@@ -21,23 +24,65 @@ import {
 export class SubmittedResourcesService {
 	constructor(
 		@InjectModel(SubmittedResource.name)
-		private resourceModel: Model<SubmittedResourceDocument>,
+		private submittedResourceModel: Model<SubmittedResourceDocument>,
+		@InjectModel(Resource.name)
+		private resourceModel: Model<ResourceDocument>,
+		@InjectModel(PartnerResource.name)
+		private partnerResourceModel: Model<PartnerResourceDocument>,
 		private transformerService: TransformerService,
-		private configService: ConfigService,
-	) {}
+		protected configService: ConfigService,
+	) { }
+
+	private logger = new Logger(SubmittedResourcesService.name)
+
+	private_logo_dir: string
+	public_logo_dir: string
 
 	async create_resource(
 		resource_obj: CreateResourceDto & { logo: string },
 		logo: Express.Multer.File,
 	) {
-		const res = new this.resourceModel(resource_obj);
-		
+		const res = new this.submittedResourceModel(resource_obj);
+
 		res.save();
 		return res.toObject();
 	}
 
 	async resource_id_taken(resource_id: string): Promise<Boolean> {
-		return await !! this.resourceModel.exists({ resource_id });
+		return await !!this.submittedResourceModel.exists({ resource_id });
+	}
+
+
+
+	async make_partner(resource_id: string) {
+
+
+		// retrieve the resource object
+		const resource = await this.resourceModel.findOne({ resource_id })
+
+		// move the logo from the private files folder to the public files folder
+		const logo_path = join(
+			join(this.configService.get('PRIVATE_FILES_PATH'), 'resources'),
+			resource.logo
+		)
+
+		rename(logo_path,
+			join(this.configService.get('PUBLIC_FILES_PATH'), 'resources', basename(logo_path)),
+			(err: Error) => {
+				if (err) {
+					this.logger.error('Error moving logo file from private to public folder', err.stack, err.message)
+				}
+			}
+		)
+
+		await this.resourceModel.replaceOne({
+			resource_id
+		}, {
+			...resource.toObject(),
+			state: PartnerResource.name
+		})
+
+
 	}
 
 	delete_old_resources() {

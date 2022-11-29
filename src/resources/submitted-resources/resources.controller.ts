@@ -1,9 +1,10 @@
 import {
 	Body,
 	Controller,
-	Get,
+	Post,
 	HttpCode,
 	Put,
+	Param,
 	UploadedFile,
 	UseInterceptors,
 	ParseFilePipe,
@@ -18,7 +19,7 @@ import { SubmittedResourcesService } from './resources.service';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 import { SvgSanitationValidationPipe } from '../../shared/pipes/svg-sanitation.pipe';
-import { writeFile } from 'fs';
+import { writeFile, rename } from 'fs';
 import * as mime from 'mime-types'
 import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -52,7 +53,9 @@ export class SubmittedResourcesController {
 	})
 	@Put()
 	@HttpCode(201)
-	@UseInterceptors(FileInterceptor('logo'))
+	@UseInterceptors(FileInterceptor('logo', {
+		dest: '/tmp/apicuron/submitted_resources/',
+	}))
 	async create_resource(
 		@Body() createResource: CreateResourceDto,
 		@UploadedFile(resource_image_validation_pipe, SvgSanitationValidationPipe)
@@ -60,14 +63,11 @@ export class SubmittedResourcesController {
 	) {
 		const ext = mime.extension(logo.mimetype)
 		const filename = `logo-${createResource.resource_id}.${ext}`;
-		const file_path = join(this.configService.get('PUBLIC_FILES_PATH'), 'resources',filename)
-
-		writeFile(file_path, logo.buffer, (err) => {
-			if (err) {
-				this.logger.error(err, err.stack)
-				throw new InternalServerErrorException('Internal Server Error')	
-			}else{
-				this.logger.log(`Resource File ${file_path} Saved successfully`)
+		const file_path = join(this.configService.get('PRIVATE_FILES_PATH'), 'resources',filename)
+		
+		rename(logo.path, file_path, (err) => {
+			if(err){
+				this.logger.error(err)
 			}
 		})
 
@@ -76,4 +76,5 @@ export class SubmittedResourcesController {
 			logo: filename,
 		}, logo);
 	}
+
 }

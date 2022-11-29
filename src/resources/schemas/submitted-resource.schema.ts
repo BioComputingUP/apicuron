@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
 import { Term } from '../../terms/schemas/terms.schema';
 
-export type SubmittedResourceDocument = SubmittedResource & Document;
+export type SubmittedResourceDocument = HydratedDocument<SubmittedResource>;
 
 // this class defines a partnerSubmittedResource that has been validated and has the ability to have Models, Badges and so on
 @Schema({})
@@ -33,14 +34,11 @@ export class SubmittedResource {
 	@Prop({ type: String, required: true })
 	logo: string;
 
-	// state = 'invalid';
+	@Prop({ type: String, required: true })
+	color: string;
+
+	state: string;
 }
 
-export const SubmittedResourceSchema =
-	SchemaFactory.createForClass(SubmittedResource);
 
-// function get_valid_resources_only(next) {
-// 	this.where('valid').equals(true);
-// }
-
-// SubmittedResourceSchema.pre('find', get_valid_resources_only);
+export const SubmittedResourceSchema = SchemaFactory.createForClass(SubmittedResource);
