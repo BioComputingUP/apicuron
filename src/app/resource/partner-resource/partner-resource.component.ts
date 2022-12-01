@@ -23,8 +23,7 @@ export class PartnerResourceComponent implements OnInit {
     if(this.logo.startsWith('assets')){
       return this.logo
     }else{
-      let link = new URL(environment.resource_logo_path, environment.public_file_url)
-      return new URL(this.logo, link).href
+      return new URL(this.logo, environment.ws);
     }
   }
 
