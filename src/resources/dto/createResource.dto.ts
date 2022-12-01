@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, IsUrl, Max, MaxLength, MinLength, Validate } from "class-validator";
+import { IsEmpty, IsNotEmpty, IsOptional, IsString, IsUrl, Matches, Max, MaxLength, MinLength, Validate } from "class-validator";
 import { UniqueResourceIdRule } from "../submitted-resources/validators/unique-resource-id"
 import { UniqueResourceURIRule } from "../submitted-resources/validators/unique-resource-uri"
 
@@ -35,4 +35,14 @@ export class CreateResourceDto {
     @IsUrl()
     @IsNotEmpty()
 	resource_url: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @Matches(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, {
+        message: 'The resource color has to be a color hexcode'
+    })
+    color: string;
+
+    @IsEmpty()
+    logo: string;
 }

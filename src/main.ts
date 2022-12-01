@@ -25,6 +25,7 @@ async function bootstrap() {
 	// setup for swagger docs generation
 	const config = new DocumentBuilder()
 		.setTitle('APICURON V2')
+		.setBasePath('/api')
 		.setDescription('The APICURON V2 API Documentation')
 		.setVersion('2.0')
 		.addTag('Resources')

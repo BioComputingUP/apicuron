@@ -1,13 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { FilterQuery, ProjectionType, QueryOptions } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 import { AchievementDef } from '../../achievements/schemas/achievement-def.schema';
-import { BadgeDef } from '../../achievements/schemas/badges_def.schema';
-import { MedalDef } from '../../achievements/schemas/medals_def.schema';
-// import { BadgeDef } from './badges.schema';
-// import { MedalDef } from './medals.schema';
 import { Term } from '../../terms/schemas/terms.schema';
 
-export type PartnerResourceDocument = PartnerResource & Document;
+export type PartnerResourceDocument = HydratedDocument<PartnerResource>;
 
 // this class defines a partnerResource that has been validated and has the ability to have Models, Badges and so on
 @Schema()
@@ -39,13 +35,8 @@ export class PartnerResource {
 	@Prop()
 	color: string
 
-	// @Prop({
-	// 	type: String,
-	// 	required: false,
-	// 	default: 'valid',
-	// 	enum: ['validated']
-	// })
-	// state= 'valid';
+
+	state: string;
 }
 
 

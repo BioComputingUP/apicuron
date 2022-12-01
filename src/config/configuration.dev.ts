@@ -1,3 +1,4 @@
+import { resolve } from 'path'
 export default () => ({
   environment: 'development',
   db_host: 'moros',
@@ -14,11 +15,8 @@ export default () => ({
   JWT_HEADER: 'authorization',
   JWT_PREFIX: 'bearer',
   V1_HOST: 'http://localhost:8198/', // Apicuron first version host location
-  PUBLIC_FILES_PATH: 'public',
+  PUBLIC_FILES_URL_PATH: '/public',
+  PUBLIC_FILES_PATH: resolve('public'),
+  PRIVATE_FILES_PATH: resolve('private'),
   FRONTEND_HOST: 'http://localhost:4200/'
-  //   port: parseInt(process.env.PORT, 10) || 3000,
-  //   database: {
-  //     host: process.env.DATABASE_HOST,
-  //     port: parseInt(process.env.DATABASE_PORT, 10) || 5432,
-  //   },
 });

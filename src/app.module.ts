@@ -52,10 +52,10 @@ import { SchedulerController } from './src/scheduler/scheduler.controller';
 			inject: [ConfigService],
 			useFactory: async (configService: ConfigService) => ([{
 				rootPath: resolve(configService.get('PUBLIC_FILES_PATH')),
-				serveRoot: '/public',
+				serveRoot: configService.get('PUBLIC_FILES_URL_PATH'),
 			}]),
 		}),
-		
+
 		ResourcesModule,
 		TermsModule,
 		ReportsModule,
@@ -69,4 +69,4 @@ import { SchedulerController } from './src/scheduler/scheduler.controller';
 	controllers: [AppController, SchedulerController],
 	providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
