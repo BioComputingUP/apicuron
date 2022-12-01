@@ -71,9 +71,11 @@ export class SubmittedResourcesController {
 			}
 		})
 
+		const logo_link = file_path.replace(this.configService.get('PUBLIC_FILES_PATH'), this.configService.get('PUBLIC_FILES_URL_PATH'))
+
 		return this.resourcesService.create_resource({
 			...createResource,
-			logo: filename,
+			logo: logo_link,
 		}, logo);
 	}
 }

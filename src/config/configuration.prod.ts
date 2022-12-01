@@ -12,6 +12,7 @@ export default () => ({
   HOST: '0.0.0.0',
   ORCID_API_URL: 'https://pub.sandbox.orcid.org/v3.0/',
   PUBLIC_FILES_PATH: '/var/local/webservers/apps/apicuron2/public',
+  PUBLIC_FILES_URL_PATH: '/public',
   JWT_HEADER: 'authorization',
   JWT_PREFIX: 'bearer',
   V1_HOST: 'http://localhost:8298/', // Apicuron first version host location

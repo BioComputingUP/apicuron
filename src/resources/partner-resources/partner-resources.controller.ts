@@ -146,7 +146,9 @@ export class PartnerResourcesController {
 				},
 			);
 
-			await this.partnerResourceService.update_resource({...update_resource, logo: `${logo.filename}.${ext}` });
+			const logo_link = public_path.replace(this.configService.get('PUBLIC_FILES_PATH'), this.configService.get('PUBLIC_FILES_URL_PATH'))
+
+			await this.partnerResourceService.update_resource({...update_resource, logo: logo_link });
 		}else{
 			await this.partnerResourceService.update_resource(update_resource);
 		}
