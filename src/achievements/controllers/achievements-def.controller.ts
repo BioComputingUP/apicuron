@@ -1,5 +1,6 @@
 import { Controller, Delete, Req, Put, ForbiddenException, Get, Param, Body, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiHeader, ApiOperation, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { AuthService } from '../../auth/auth.service';
 import { HasAResourceGuard } from '../../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
 import { AuthorizationHeader, VersionHeader } from '../../config/swagger';
@@ -132,17 +133,10 @@ export class BadgesDefController {
 })
 export class MedalsDefController {
 
-	constructor(protected achievementsDefService: AchievementsDefService) {}
+	constructor(protected achievementsDefService: AchievementsDefService, protected authService: AuthService) {}
 
 	private can_edit_resource(user, resource_id){
-        // get the resources list that belong to the current user
-        const user_resources: Array<{ resource_id: string}> = user.resources
-        // check if the resource belongs to the user
-        const resource_found = user_resources.find(resource => resource.resource_id == resource_id)
-        // if it doesn't, we respond with  a 403 exception
-        if(!resource_found){
-            throw new ForbiddenException(`You either do not have the authorization to update the terms of the (${resource_id}) resource or the resource does not exist`);
-        }
+		return this.authService.user_has_resource(user, resource_id);
     }
 	
 	@ApiOperation({

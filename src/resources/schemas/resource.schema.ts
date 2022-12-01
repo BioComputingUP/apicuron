@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
 import { PartnerResource } from './partner-resources.schema';
 import { SubmittedResource } from './submitted-resource.schema';
 
-export type ResourceDocument = Resource & Document;
+export type ResourceDocument = HydratedDocument<Resource>;
 
 // this class defines a partnerResource that has been validated and has the ability to have Models, Badges and so on
 @Schema({ collection: 'resources_def', discriminatorKey:'state' })

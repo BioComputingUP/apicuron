@@ -30,7 +30,7 @@ import { OrcidExists } from './validators/orcidExists.dto';
 			}),
 		}),
 	],
-	exports: [UsersService, MongooseModule, JwtModule, OrcidExists],
+	exports: [UsersService, MongooseModule, JwtModule, OrcidExists, AuthService],
 	controllers: [AuthController, UsersController, UserControllerV2],
 })
 export class AuthModule {

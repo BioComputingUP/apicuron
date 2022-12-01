@@ -55,7 +55,7 @@ import { SchedulerController } from './src/scheduler/scheduler.controller';
 				serveRoot: configService.get('PUBLIC_FILES_URL_PATH'),
 			}]),
 		}),
-		
+
 		ResourcesModule,
 		TermsModule,
 		ReportsModule,
@@ -69,4 +69,4 @@ import { SchedulerController } from './src/scheduler/scheduler.controller';
 	controllers: [AppController, SchedulerController],
 	providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

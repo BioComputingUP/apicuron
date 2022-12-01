@@ -6,10 +6,6 @@ import {
 	PartnerResourceDocument,
 	ResourceSummary,
 } from '../schemas/partner-resources.schema';
-import { Term, TermDocument } from '../../terms/schemas/terms.schema';
-import { User, UserDocument } from '../../auth/users/schemas/user.schema';
-import { Report, ReportDocument } from '../../reports/reports.schema';
-import { AchievementsDefService } from '../../achievements/achievements-def.service';
 import { TransformerService } from '../../shared/transformer/transformer.service';
 import { UpdatePartnerResourceDto } from '../dto/updateResource.dto';
 
