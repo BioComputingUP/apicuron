@@ -143,7 +143,7 @@ export class PartnerResourcesController {
 				},
 			);
 
-			await this.partnerResourceService.update_resource({...update_resource, logo: public_path });
+			await this.partnerResourceService.update_resource({...update_resource, logo: `${logo.filename}.${ext}` });
 		}else{
 			await this.partnerResourceService.update_resource(update_resource);
 		}
