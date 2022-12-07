@@ -1,17 +1,14 @@
 import devConfig from './configuration.dev';
 import prodConfig from './configuration.prod';
-import prodTemp from './configuration.temp'
 
 export function loadConfig () {
-	if (process.env.NODE_ENV === 'development') {
+	if (['development', 'dev'].includes(process.env.NODE_ENV)) {
 		return devConfig;
 	}
-	if (process.env.NODE_ENV === 'production') {
+	if (['production', 'prod'].includes(process.env.NODE_ENV)) {
 		return prodConfig;
 	}
 
-	if (process.env.NODE_ENV === 'prod_temp') {
-		return prodTemp;
-	}
+	process.env.NODE_ENV= 'development'
 	return devConfig;
 }

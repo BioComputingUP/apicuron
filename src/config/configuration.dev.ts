@@ -1,9 +1,9 @@
 import { resolve } from 'path'
 export default () => ({
   environment: 'development',
-  db_host: 'moros',
-  database: 'apicuron_test',
-  db_port: 27017,
+  db_host: process.env.DB_HOST || 'moros',
+  database: process.env.DB || 'apicuron_test',
+  db_port: process.env.DB_PORT || 27017,
   ORCID_REDIRECT: 'http://localhost:3000/auth/orcid/redirect',
   ORCID_CLIENT_ID: 'APP-IU0CU8PQW4VDZA84',
   ORCID_CLIENT_SECRET: 'YOUR-ORCID-CLIENT-SECRET',

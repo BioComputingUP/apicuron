@@ -1,8 +1,8 @@
 export default () => ({
   environment: 'production',
-  db_host: 'moros',
-  database: 'apicuron_test',
-  db_port: 27017,
+  db_host: process.env.DB_HOST || 'moros',
+  database: process.env.DB || 'apicuron_test',
+  db_port: process.env.DB_PORT || 27017,
   ORCID_REDIRECT: 'https://dev.apicuron.org/api/auth/orcid/redirect',
   ORCID_CLIENT_ID: 'APP-TTBI2EX11P70SRD6',
   ORCID_CLIENT_SECRET: 'YOUR-ORCID-CLIENT-SECRET',
