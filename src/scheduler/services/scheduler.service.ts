@@ -20,7 +20,7 @@ export class SchedulerService {
     private task_name = 'apicuron_tasks'
     private database_host = this.config.get('db_host')
     private database = this.config.get('database')
-
+    
     async submit_task(task: TaskSubmit){
         const form = this.base_form();
 
@@ -52,8 +52,6 @@ export class SchedulerService {
             }
         )
 
-        // const config = { headers: { 'Content-Type': 'multipart/form-data' } };
-        // return await this.http.axiosRef.post(this.url, form, config)
         
     }
 
