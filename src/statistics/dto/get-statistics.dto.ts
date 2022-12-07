@@ -9,7 +9,7 @@ import {
 	ValidateIf,
 } from 'class-validator';
 export enum FilterField {
-	full_name = 'full_name',
+	displayedName = 'displayedName',
 	orcid_id = 'orcid_id',
 }
 
