@@ -1,9 +1,15 @@
 <!-- <div class="tw-block tw-pr-4 tw-from-apicuron-purple tw-to-apicuron-red tw-bg-gradient-to-b tw-text-gray-300 tw-h-full tw-min-h-screen" *ngIf="resource$ | async as resource"> -->
-<div class="tw-hidden sm:tw-block tw-pr-4 tw-bg-apicuron-purple tw-text-gray-300 tw-h-full tw-min-h-screen tw-max-w-lg" *ngIf="resource$ | async as resource">
+<div class="sm:tw-w-64 sm:tw-block tw-pr-4 tw-bg-apicuron-purple tw-text-gray-300 tw-h-full tw-min-h-screen tw-max-w-lg" *ngIf="resource$ | async as resource">
     <img [src]="logo_src(resource.logo)" class="tw-w-36 tw-fill-white tw-mx-auto tw-py-2" style="filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(183deg) brightness(115%) contrast(101%)" alt="">
     <h2 class="tw-text-2xl tw-font-bold tw-font-dm-sans tw-text-white tw-text-center tw-p-2 tw-whitespace-nowrap">{{
         resource.resource_name }} Dashboard</h2>
-    <div class="tw-flex tw-flex-col tw-items-start" *ngIf="links$ | async as links">
-            <a *ngFor="let link of links" class=" tw-w-full tw-py-2 hover:tw-text-white tw-text-gray-300 tw-px-1 tw-ml-4 tw-my-1 tw-text-sm sm:tw-text-base" [routerLinkActive]="'sm:tw-text-lg tw-border-white tw-font-bold tw-text-white tw-bg-apicuron-bright-purple tw-rounded'" [routerLink]="link.href">{{ link.name }}</a>
+    <div class="tw-flex tw-flex-col tw-items-start tw-ml-4" *ngIf="links$ | async as links">
+            <div *ngFor="let link of links" >
+                <a class="tw-block tw-w-full tw-py-2 hover:tw-text-white tw-text-gray-300 tw-px-1 tw-my-1 tw-text-sm sm:tw-text-base" 
+                routerLinkActive="sm:tw-text-base tw-border-white tw-font-bold tw-text-white tw-bg-apicuron-bright-purple tw-rounded"
+                [routerLink]="link.href">
+                    {{ link.name }}
+                 </a>
+            </div>
     </div>
 </div>

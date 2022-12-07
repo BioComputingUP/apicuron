@@ -19,8 +19,7 @@ export class DashboardSidebarComponent implements OnInit {
     if(logo.startsWith('assets')){
       return logo
     }else{
-      let link = new URL(environment.resource_logo_path, environment.public_file_url)
-      return new URL(logo, link).href
+      return new URL(logo, environment.ws + '/');
     }
   }
 

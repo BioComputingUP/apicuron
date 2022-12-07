@@ -25,7 +25,7 @@ export class CuratorSearchComponent implements OnInit {
 
   search_fields = [
     {
-      field: "full_name",
+      field: "displayedName",
       text: "Biocurator name",
     },
     {
@@ -98,13 +98,13 @@ export class CuratorSearchComponent implements OnInit {
 
   onSubmit() {
 
-    const search_field = this.biocuratorSearchForm.value.search_field;
-    const search_text = this.biocuratorSearchForm.value.search_text || "";
+    const filter_field = this.biocuratorSearchForm.value.search_field;
+    const query = this.biocuratorSearchForm.value.search_text || "";
     const resources = Array.from(
       this.biocuratorSearchForm.value.selected_resources
     );
 
-    const params = {search_field, search_text, 'resources[]': resources}
+    const params = {filter_field, query, 'resources[]': resources}
 
     this.urlStringEvent.emit(params);
 

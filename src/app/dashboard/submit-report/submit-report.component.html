@@ -1,75 +1,13 @@
 <div class="tw-flex tw-flex-row tw-justify-start">
     <dashboard-sidebar [resource]="resource$"></dashboard-sidebar>
     <div class="tw-p-2 tw-flex-auto">
-        <h2 class="tw-text-2xl tw-font-bold">Submit Curation Reports</h2>
+        <h2 class="tw-text-2xl tw-px-2 tw-font-bold">Submit Curation Reports</h2>
 
         <div class="tw-my-2 tw-flex tw-flex-row" *ngIf="resource$ | async as resource">
             <div class="tw-w-1/2 tw-p-2">
-                <!-- <div class="tw-border-gray-500 tw-bg-white tw-shadow-lg tw-border tw-rounded tw-p-1 tw-flex tw-flex-col">
-                    <h2 class="tw-text-xl tw-font-bold tw-text-gray-800">Submit Report</h2>
-                    <form [formGroup]="form" (ngSubmit)="submit()">
-                    <div class="form-control-element">
-                        <label for="activity_term">Activity Term</label>
-                        <select *ngIf="terms$ | async as terms" formControlName="activity_term" name="activity_term">
-                            <option *ngFor="let term of terms" [value]="term.activity_term">{{ term.activity_name }}</option>
-                        </select>
-                    </div>
-
-                    <div class="form-control-element">
-                        <label for="activity_term">Curator Orcid</label>
-                        <input type="text" name="curator_orcid" formControlName="curator_orcid" id="">
-                        <small class="tw-text-red-500 tw-text-sm tw-font-light"
-                            *ngIf="curator_orcid.hasError('required') && curator_orcid.touched">
-                            The Orcid Id is required
-                        </small>
-                        <small class="tw-text-red-500 tw-text-sm tw-font-light"
-                            *ngIf="curator_orcid.hasError('pattern')">
-                            The Orcid Id doesn't match the pattern of an orcid Identifier
-                        </small>
-                        <small class="tw-text-red-500 tw-text-sm tw-font-light"
-                            *ngIf="curator_orcid.hasError('checksum') && curator_orcid.touched && !curator_orcid.hasError('pattern')">
-                            Invalid Orcid Id, checksum failed
-                        </small>
-                        
-                    </div>
-                    <div class="form-control-element">
-                        <label for="activity_term">Entity Uri</label>
-                        <input type="text" name="entity_uri" formControlName="entity_uri" id="">
-                        <small class="tw-text-red-500 tw-text-sm tw-font-light"
-                            *ngIf="entity_uri.hasError('required') && entity_uri.touched">
-                            The Entity URI is required
-                        </small>
-                        <small class="tw-text-red-500 tw-text-sm tw-font-light"
-                            *ngIf="entity_uri.hasError('pattern')">
-                            The Entity URI has to be a link
-                        </small>
-                    </div>
-                    <div class="form-control-element">
-                        <label for="activity_term">Time and Date</label>
-                        <div class="tw-flex tw-flex-row tw-justify-evenly">
-                            <input type="date" formControlName="date" name="" id="">
-                            <input type="time" formControlName="time" id="">
-                        </div>
-                        <small class="tw-text-red-500 tw-text-sm tw-font-light"
-                            *ngIf="form.hasError('future-date')">
-                            The date cannot be a future date
-                        </small>
-                        
-                    </div>
-                    <div class="tw-flex tw-flex-row tw-justify-center">
-                        <input type="submit" value="Submit report" [disabled]="form.invalid"
-                            [ngClass]="{'tw-bg-gray-300 tw-text-gray-600':form.invalid, 'tw-bg-apicuron-purple tw-text-white tw-shadow-md': !form.invalid}"
-                            class=" tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded" />
-                    </div>
-                </form>
-                </div> -->
                 <submit-single [resource]="resource$"></submit-single>
             </div>
             <div class="tw-w-1/2 tw-p-2">
-                <!-- <div class="tw-border-gray-500 tw-bg-white tw-shadow-lg tw-border tw-rounded tw-p-1 tw-flex tw-flex-col">
-                    <h2 class="tw-text-lg tw-font-bold tw-text-gray-800">Submit Report</h2>
-                    
-                </div> -->
                 <submit-bulk [resource]="resource$"></submit-bulk>
             </div>
         </div>

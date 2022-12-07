@@ -7,8 +7,8 @@
             <li><a class="hover:tw-" [routerLink]="['/databases', resource.resource_id, 'dashboard', 'edit']">Update Database</a></li>
         </ul>
     </div> -->
-    <dashboard-sidebar class="lg:tw-w-1/5 2xl:tw-w-1/6" [resource]="resource$"></dashboard-sidebar>
-    <div class="tw-p-2 tw-w-full lg:tw-w-4/5 2xl:tw-w-5/6">
+    <dashboard-sidebar [resource]="resource$"></dashboard-sidebar>
+    <div class="tw-p-2 ">
         <h2 class="tw-font-bold tw-text-2xl tw-font-dm-sans tw-capitalize">Manage {{ resource.resource_name }} Achievements</h2>
         <div class="tw-flex tw-flex-row tw-w-full tw-flex-wrap">
             <div class="tw-w-full md:tw-w-1/2 tw-p-1">
