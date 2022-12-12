@@ -35,7 +35,7 @@ export class CuratorSearchComponent implements OnInit {
   ];
 
   // search field selection
-  search_field: string = "full_name";
+  search_field: string = "displayedName";
 
   // search text field
   @Input()
