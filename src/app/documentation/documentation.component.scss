@@ -1,3 +1,15 @@
 h1 {
     @apply tw-text-xl tw-font-bold
 }
+
+html {
+    scroll-behavior: smooth;
+}
+
+:target::before {
+    content: "";
+    display: block;
+    margin-top: -5rem;
+    height: 5rem;
+    width: 1px;
+  }

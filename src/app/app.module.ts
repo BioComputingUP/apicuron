@@ -1,5 +1,5 @@
 import { BrowserModule } from "@angular/platform-browser";
-import { NgModule } from "@angular/core";
+import { NgModule, SecurityContext } from "@angular/core";
 import {
   RouterModule,
   Routes,
@@ -32,7 +32,7 @@ import { IndexModule } from "./index/index.module";
 import { CuratorModule } from "./curator/curator.module";
 import { AuthModule } from "./auth/auth.module";
 import { ToastrModule } from "ngx-toastr";
-import { MarkdownModule } from "ngx-markdown";
+import { MarkdownModule, MarkedOptions } from "ngx-markdown";
 
 @NgModule({
   declarations: [
@@ -61,7 +61,10 @@ import { MarkdownModule } from "ngx-markdown";
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule,
-    MarkdownModule.forRoot({ loader: HttpClient }),
+    MarkdownModule.forRoot({ 
+      loader: HttpClient, 
+      sanitize: SecurityContext.NONE
+    }),
     AppRoutingModule,
     CdkTableModule,
     TabsModule.forRoot(),
