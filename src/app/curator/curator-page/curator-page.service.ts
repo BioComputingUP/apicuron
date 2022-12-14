@@ -45,9 +45,7 @@ export interface OrcidData {
   social_urls?: [[string, string]];
 }
 
-@Injectable({
-  providedIn: "root",
-})
+@Injectable()
 export class CuratorPageService {
   private wsUrl = environment.ws;
   private orcid_url = environment.orcid_url;

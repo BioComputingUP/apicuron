@@ -5,10 +5,12 @@ import { CuratorRoutingModule } from './curator-routing.module';
 import { CuratorsPageComponent } from './curators-page.component';
 import { CuratorSearchComponent } from './curator-search/curator-search.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { CuratorPageComponent } from './curator-page/curator-page.component';
 import { SvgModule } from '../svg/svg.module';
 import { CuratorStatComponent } from './curator-stat/curator-stat.component';
+import { PaginationComponent } from '../pagination/pagination.component';
+import { CuratorService } from './curator.service';
+import { CuratorPageService } from './curator-page/curator-page.service';
 
 @NgModule({
   declarations: [
@@ -16,16 +18,17 @@ import { CuratorStatComponent } from './curator-stat/curator-stat.component';
     CuratorsPageComponent,
     CuratorSearchComponent,
     CuratorPageComponent,
-    CuratorStatComponent
+    CuratorStatComponent,
+    PaginationComponent
   ],
   imports: [
-    PaginationModule.forRoot(),
     SvgModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    CuratorRoutingModule
+    CuratorRoutingModule,
   ],
+  providers:[CuratorService, CuratorPageService],
   exports: [
     CuratorCardComponent
   ]

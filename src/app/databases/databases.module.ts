@@ -11,6 +11,7 @@ import { ScrollToModule } from "@nicky-lenaers/ngx-scroll-to";
 import { DatabaseCreateComponent } from "./database-create/database-create.component";
 import { ReactiveFormsModule } from "@angular/forms";
 import { AuthModule } from "../auth/auth.module";
+import { DatabasesService } from "./services/databases.service";
 @NgModule({
   declarations: [
     DatabasesPageComponent,
@@ -28,6 +29,7 @@ import { AuthModule } from "../auth/auth.module";
     CuratorModule,
     ReactiveFormsModule,
   ],
+  providers:[DatabasesService],
   exports: [DatabasesPageComponent],
 })
 export class DatabasesModule {}

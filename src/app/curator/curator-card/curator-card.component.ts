@@ -1,4 +1,7 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { Observable } from "rxjs";
+import { map, pluck } from "rxjs/operators";
+import { DatabasesService } from "../../databases/services/databases.service";
 
 type StatData = {
   resource_id: string;
@@ -13,7 +16,22 @@ type StatData = {
   styleUrls: ["./curator-card.component.scss"],
 })
 export class CuratorCardComponent implements OnInit {
-  constructor() {}
+  resources$: Observable<any>;
+
+  constructor(protected databaseService: DatabasesService) {
+    this.resources$ = this.databaseService.get_resources().pipe(
+      pluck('data'),
+      map((resources: Array<any>) => {
+        let result = {};
+        resources.map(
+          ({resource_id, resource_name}) => {
+            result[resource_id] = resource_name
+          }
+        )
+        return result;
+      })
+    )
+  }
 
   @Input()
   vertical = true;

@@ -51,20 +51,24 @@
       <div class="tw-w-1/4">
         <div class="tw-bg-gray-200 tw-border-2 tw-border-gray-400 tw-rounded tw-px-2 md:tw-px-4 tw-pb-2 md:tw-pb-4">
           <span class="tw-block tw-uppercase tw-text-xs tw-text-gray-400 tw-font-bold tw-pt-1">Resources</span>
-          <span class="tw-bg-apicuron-purple tw-text-white tw-px-2 tw-py-1 tw-rounded-full tw-mr-1 tw-cursor-pointer hover:tw-underline tw-text-sm"
-            [ngxScrollTo]="currResource['resource_id']" [ngxScrollToOffset]="-160"
-            *ngFor="let currResource of listResourcesDescriptions">{{currResource['resource_name']}}</span>
+          <div class="tw-flex tw-flex-row tw-flex-wrap tw-gap-1">
+            <a
+              class="database-pill"
+              [href]="'#resource-' + currResource['resource_id']"
+              *ngFor="let currResource of listResourcesDescriptions">{{currResource['resource_name']}}</a>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="tw-flex tw-flex-row tw-flex-wrap tw-pt-2 tw-justify-center md:tw-pt-4">
-      <div class="tw-w-1/2 tw-p-2" [id]="currResource['resource_id']"
+      <div class="tw-w-1/2 tw-p-2" [id]="'resource-' + currResource['resource_id']"
         *ngFor="let currResource of listResourcesDescriptions">
         <partner-resource [name]="currResource['resource_name']" [description]="currResource['resource_description']"
-          [short_description]="currResource['resource_long_name']" [logo]="currResource['logo'] || 'assets/disprot-logo.svg'"
-          [resource_uri]="currResource['resource_uri']" [resource_url]="currResource['resource_url']" [resource_id]="currResource['resource_id']">
+          [short_description]="currResource['resource_long_name']"
+          [logo]="currResource['logo'] || 'assets/disprot-logo.svg'" [resource_uri]="currResource['resource_uri']"
+          [resource_url]="currResource['resource_url']" [resource_id]="currResource['resource_id']">
         </partner-resource>
       </div>
     </div>
-</div>
+  </div>

@@ -44,9 +44,13 @@
         <div *ngIf="display_resources" class="tw-pt-1 tw-pb-2" [ngClass]="{'tw-max-w-lg': vertical}">
             <span *ngIf="!vertical"
                 class="tw-text-gray-400 tw-font-bold tw-uppercase tw-text-sm tw-mr-2">resources</span>
-            <a *ngFor="let resource of resources"
+            <ng-container *ngIf="resources$ | async as converter">
+                <a *ngFor="let resource of resources"
+                [routerLink]="['/databases', resource ]"
                 class="tw-bg-apicuron-purple tw-text-gray-100 tw-cursor-pointer hover:tw-text-white tw-font-bold tw-text-xs tw-rounded-2xl tw-p-1 tw-mr-1">{{
-                resource }}</a>
+                converter[resource] }}</a>
+
+            </ng-container>
             <!-- <a
                 class="tw-bg-apicuron-purple tw-text-gray-100 tw-cursor-pointer hover:tw-text-white tw-font-bold tw-text-xs tw-rounded-2xl tw-p-1 tw-mr-1">Disprot</a> -->
         </div>

@@ -3,9 +3,7 @@ import { Injectable } from "@angular/core";
 import { map } from "rxjs/operators";
 import { environment } from "src/environments/environment";
 
-@Injectable({
-  providedIn: "root",
-})
+@Injectable()
 export class CuratorService {
   private wsUrl = environment.ws;
   private orcid_url = environment.orcid_url;

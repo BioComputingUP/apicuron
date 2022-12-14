@@ -1,16 +1,76 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { AfterContentInit, AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from "@angular/core";
 import { UntypedFormControl, UntypedFormGroup, Validators } from "@angular/forms";
 import { search_field_validator } from "./validators/search_field.directive";
 import { HttpParams } from "@angular/common/http";
 import { CuratorService } from "../curator.service";
 import { DatabasesService } from "src/app/databases/services/databases.service";
+import { map, pluck, shareReplay, tap, withLatestFrom } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, fromEvent, merge, Observable } from "rxjs";
 @Component({
   selector: "curator-search",
   templateUrl: "./curator-search.component.html",
   styleUrls: ["./curator-search.component.scss"],
 })
-export class CuratorSearchComponent implements OnInit {
-  constructor(protected databaseService: DatabasesService) {}
+export class CuratorSearchComponent implements AfterViewInit {
+  @ViewChild('resourcesearch') resource_search_field: ElementRef<HTMLInputElement>;
+
+  all_resources_list$: Observable<any[]>;
+  resource_search_Event$: Observable<any>;
+  suggested_resources$: Observable<any[]>;
+  selected_resources$ = new BehaviorSubject<any[]>([]);
+  display_suggestion$= new BehaviorSubject<Boolean>(false);
+  
+
+  constructor(protected databaseService: DatabasesService) {
+    
+    this.all_resources_list$ = this.databaseService.get_resources().pipe(
+      pluck('data'),
+    )
+  }
+  
+  set_suggestion(value: Boolean){
+    console.log('set suggestion,', value)
+    this.display_suggestion$.next(value);
+  }
+
+  ngAfterViewInit(): void {
+    this.resource_search_Event$ = merge(
+      fromEvent(this.resource_search_field.nativeElement ,'click'),
+      fromEvent(this.resource_search_field.nativeElement, 'focus'),
+      fromEvent(this.resource_search_field.nativeElement, 'change')
+    ).pipe(
+      tap(console.log),
+      shareReplay(1)
+    )
+    this.resource_search_Event$.subscribe((event) => {
+      this.set_suggestion(true);
+    })
+
+    this.suggested_resources$ = combineLatest([this.selected_resources$, this.resource_search_Event$]).pipe(
+      withLatestFrom(this.all_resources_list$),
+      shareReplay(1),
+      map(([clicks, resource_list]) => {
+        // search term from the input field in uppercase
+        const search_term = this.resource_search_field.nativeElement.value.toUpperCase()
+        // extract the resource_id and name from the resource object to filter 
+        return resource_list.filter(({resource_id, resource_name}) => {
+          // check if resource already selected, if true return false
+          const already_selected = this.selected_resources$.value.find((selected) => {
+            return selected.resource_id == resource_id;
+          })
+          if(already_selected) {return false;}
+
+          // compute if the resource_id or resource_name include the search_term
+          const found_booleans = [resource_id, resource_name].map((value: string) => {
+            return value.toUpperCase().includes(search_term)
+          })
+
+          // return the logical OR of "if found in resource_id" and "if found in resource_name"
+          return found_booleans.some((x) => x)
+        })
+      })
+    )
+  }
   biocuratorSearchForm: UntypedFormGroup;
 
   // filter by resource
@@ -21,7 +81,7 @@ export class CuratorSearchComponent implements OnInit {
   
   all_resources = ["dome", "disprot", "ped"];
 
-  filtered_resources = new Set();
+  // filtered_resources = new Set();
 
   search_fields = [
     {
@@ -44,65 +104,19 @@ export class CuratorSearchComponent implements OnInit {
   // parent event to send the data
   @Output() urlStringEvent = new EventEmitter<any>();
 
-  search_resource(event) {
-    let value = event.target.value;
-    if (value == "") {
-      this.filtered_resources = new Set(this.all_resources);
-    } else {
-      this.filtered_resources = new Set(
-        this.all_resources.filter((name) =>
-          name.toUpperCase().includes(value.toUpperCase())
-        )
-      );
-    }
-    this.resources.display_resource_suggesion =
-      this.filtered_resources.size > 0;
-  }
-
   add_resource(resource: string) {
-    let filtered = this.all_resources.filter(
-      (x) => x.toUpperCase() == resource.toUpperCase()
-    );
-
-    if (filtered.length == 1) {
-      let [res] = filtered;
-      this.resources.selected_resources.add(res);
-    }
-    this.resources.display_resource_suggesion = false;
+    this.selected_resources$.next([...this.selected_resources$.value, resource])
   }
 
-  remove_selection(resource: string) {
-    this.resources.selected_resources.delete(resource);
-  }
-
-  ngOnInit(): void {
-    this.biocuratorSearchForm = new UntypedFormGroup({
-      search_field: new UntypedFormControl(this.search_field, [
-        Validators.required,
-        search_field_validator(this.search_fields.map((x) => x.field)),
-      ]),
-      search_text: new UntypedFormControl(this.search_text),
-      selected_resources: new UntypedFormControl(this.resources.selected_resources, [
-        Validators.required,
-      ]),
-    });
-
-    this.databaseService.get_resources().subscribe((response: Object & { data: Array<{ resource_id: string}>}) => {
-      this.all_resources = response.data.map(resource => resource.resource_id)
-    })
-  }
-
-  get selected_resources() {
-    return this.biocuratorSearchForm.get("selected_resources");
+  remove_selection(resource) {
+    this.selected_resources$.next(this.selected_resources$.value.filter((res) => resource.resource_id != res.resource_id))
   }
 
   onSubmit() {
 
-    const filter_field = this.biocuratorSearchForm.value.search_field;
-    const query = this.biocuratorSearchForm.value.search_text || "";
-    const resources = Array.from(
-      this.biocuratorSearchForm.value.selected_resources
-    );
+    const filter_field = this.search_field;
+    const query = this.search_text;
+    const resources = this.selected_resources$.value.map(({resource_id}) => resource_id)
 
     const params = {filter_field, query, 'resources[]': resources}
 

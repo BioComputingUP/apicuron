@@ -4,26 +4,43 @@ import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 
 import { environment } from "../../../environments/environment";
 import { AuthService } from "../../auth/auth.service";
-import { map, pluck, switchMap } from "rxjs/operators";
+import { map, pluck, shareReplay, switchMap } from "rxjs/operators";
 
-@Injectable({
-  providedIn: "root",
-})
+
+class Resource {
+  resource_name: string
+  resource_id: string
+  resource_description: string
+  logo: string
+  resource_uri: string
+  resource_url: string
+}
+
+type ResourceList =  {
+  data: Array<Resource>;
+  warning?: Array<string> | string;
+  count?: number;
+}
+
+@Injectable()
 export class DatabasesService {
-  constructor(private http: HttpClient) {}
+  resources_list$: Observable<ResourceList>;
+  constructor(private http: HttpClient) {
+    this.resources_list$ = this.http.get<ResourceList>(this.partnerResourcesPath, {
+      responseType: "json",
+      headers: {
+        version: "2",
+      },
+    }).pipe(
+      shareReplay()
+    );
+  }
   private partnerResourcesPath = environment.ws + "/partner-resources";
   private resourcesPath = environment.ws + "/resources";
   private termsPath = environment.ws + '/terms'
 
   get_resources() {
-    const data = this.http.get(this.partnerResourcesPath, {
-      responseType: "json",
-      headers: {
-        version: "2",
-      },
-    });
-    return data;
-    // .pipe(catchError(err => of(console.error(err))));
+    return this.resources_list$;
   }
 
   create_resource(resource_data: Object) {

@@ -1,6 +1,8 @@
 import { HttpParams } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
+import { BehaviorSubject, Observable } from "rxjs";
+import { map, pluck, shareReplay, switchMap } from "rxjs/operators";
 import { CuratorService } from "./curator.service";
 
 @Component({
@@ -9,47 +11,60 @@ import { CuratorService } from "./curator.service";
   styleUrls: ["./curators-page.component.scss"],
 })
 export class CuratorsPageComponent implements OnInit {
-  total_items: number;
   current_page = 1;
   page_size = 9;
 
   biocurators = [];
   private last_query_params = {};
 
+  biocurators$: Observable<any[]>;
+
+  biocurators_list$: Observable<Array<any>>;
+  biocurators_count$: Observable<number>;
+
+
+  query_params$ = new BehaviorSubject<any>({});
+
   constructor(
     private curatorService: CuratorService,
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute,
+  ) {
+
+  }
 
   update_curator_list(query_params: any) {
-    this.last_query_params = query_params;
-    this.curatorService
-      .search_curators(
-        new HttpParams({
-          fromObject: { ...query_params, page_size: this.page_size },
-        })
-      )
-      .subscribe((response) => {
-        this.biocurators = response["data"];
-        // this.current_page = response['page']
-        this.total_items = response["count"];
-      });
+    this.query_params$.next(query_params)
   }
 
   update_page(page: number) {
-    this.update_curator_list({ ...this.last_query_params, page });
+    this.query_params$.next({ ...this.query_params$.value, page })
   }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
       let query_params = {};
-      
+
       if (!!params["search"]) {
         query_params = {
           query: params["search"],
         };
       }
-      this.update_curator_list(query_params);
+      this.query_params$.next(query_params)
     });
+
+    const users_list_response$ = this.query_params$.pipe(
+      switchMap((query_params) => {
+        return this.curatorService
+          .search_curators(
+            new HttpParams({
+              fromObject: { ...query_params, page_size: this.page_size },
+            })
+          )
+      }),
+      shareReplay()
+    )
+
+    this.biocurators_list$ = users_list_response$.pipe(pluck('data'));
+    this.biocurators_count$ = users_list_response$.pipe(pluck('count'))
   }
 }

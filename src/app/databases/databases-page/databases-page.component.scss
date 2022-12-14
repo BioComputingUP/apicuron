@@ -36,3 +36,7 @@
   transition: 0.25s;
 
 }
+
+.database-pill {
+  @apply tw-bg-apicuron-purple tw-block tw-whitespace-pre tw-text-white tw-px-2 tw-py-1 tw-rounded-full tw-mr-1 tw-cursor-pointer hover:tw-text-white hover:tw-underline tw-text-sm
+}
