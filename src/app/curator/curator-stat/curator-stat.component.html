@@ -80,7 +80,7 @@
         </ng-container>
             <ng-container *ngIf="achievements$ | async as achievements">
                 <div class="tw-w-3/4">
-                    <div class="tw-my-2 sm:tw-my-4">
+                    <div class="tw-my-2 sm:tw-my-4" *ngIf="achievements.badges.length > 0">
                         <div class="tw-flex tw-flex-row tw-justify-between tw-pr-2">
                             <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold ">Badges </h4>
 
@@ -111,7 +111,7 @@
                         </div>
                     </div>
 
-                    <div class="tw-my-2 sm:tw-my-4">
+                    <div class="tw-my-2 sm:tw-my-4" *ngIf="achievements.medals.length > 0">
                         <div class="tw-flex tw-flex-row tw-justify-between tw-pr-2">
                             <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold ">Medals </h4>
 

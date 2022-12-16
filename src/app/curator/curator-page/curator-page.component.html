@@ -15,33 +15,34 @@
             </div>
         </ng-container>
     </div>
-    <ng-container *ngIf="orcidData$ | async as orcid_data">
+    <ng-container>
         <div class="tw-grid tw-grid-cols-1 tw-gap-4 tw-mb-2">
-            <div *ngIf="orcid_data.biography" class="tw-w-full tw-flex tw-flex-row">
-                <div class="tw-w-1/6 tw-font-bold tw-text-lg">Biography</div>
-                <div class="tw-w-5/6">
-                    <p class="tw-leading-relaxed tw-tracking-wider tw-text-justify tw-text-base">
-                        {{ orcid_data.biography }}
-                    </p>
-                </div>
-            </div>
-            <div *ngIf="orcid_data.keywords" class="tw-w-full tw-flex tw-flex-row">
+            
+            <div *ngIf="keywords$ | async as keywords" class="tw-w-full tw-flex tw-flex-row">
                 <div class="tw-w-1/6 tw-font-bold tw-text-lg">Keywords</div>
-                <div class="tw-w-5/6">
-                    <span *ngFor="let keyword of orcid_data.keywords"
-                        class="tw-px-2 tw-mr-2 tw-py-1 hover:tw-underline hover:tw-text-white tw-text-sm tw-bg-apicuron-purple tw-text-white tw-font-bold tw-font-dm-sans tw-rounded-full">
+                <div class="tw-w-5/6 tw-flex tw-flex-row tw-items-center">
+                    <span *ngFor="let keyword of keywords"
+                        class="tw-px-2 tw-mr-2 tw-py-1 tw-cursor-default tw-text-sm tw-bg-apicuron-purple tw-text-white tw-font-bold tw-font-dm-sans tw-rounded-full">
                         {{ keyword }}
                     </span>
                 </div>
             </div>
-            <div *ngIf="orcid_data.social_urls" class="tw-w-full tw-flex tw-flex-row">
+            <div *ngIf="orcid_links$ | async as orcid_links" class="tw-w-full tw-flex tw-flex-row">
                 <div class="tw-w-1/6 tw-font-bold tw-text-lg">Social Links</div>
                 <div class="tw-w-5/6">
-                    <a *ngFor="let url of orcid_data.social_urls"
+                    <a *ngFor="let url of orcid_links"
                         class="tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer hover:tw-underline"
-                        [href]="url[1]">
-                        {{ url[0] }}
+                        [href]="url.value">
+                        {{ url.name }}
                     </a>
+                </div>
+            </div>
+            <div *ngIf="biography$ | async as biography" class="tw-w-full tw-flex tw-flex-row">
+                <div class="tw-w-1/6 tw-font-bold tw-text-lg">Biography</div>
+                <div class="tw-w-5/6">
+                    <p class="tw-leading-relaxed tw-tracking-wider tw-text-justify tw-text-base">
+                        {{ biography }}
+                    </p>
                 </div>
             </div>
         </div>

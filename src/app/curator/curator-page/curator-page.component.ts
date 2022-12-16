@@ -1,22 +1,13 @@
-import { HttpClient, HttpParams } from "@angular/common/http";
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import {
   ActivatedRoute,
-  NavigationEnd,
   ParamMap,
-  Router,
 } from "@angular/router";
-import * as moment from "moment";
-import { BehaviorSubject, combineLatest, Observable } from "rxjs";
+import { combineLatest, Observable } from "rxjs";
 import { map, pluck, shareReplay, switchMap } from "rxjs/operators";
-import { environment } from "../../../environments/environment";
 import { DatabasesService } from "../../databases/services/databases.service";
 import {
-  Curator,
-  CuratorAchievements,
   CuratorPageService,
-  CuratorStat,
-  OrcidData,
 } from "./curator-page.service";
 
 @Component({
@@ -25,22 +16,17 @@ import {
   styleUrls: ["./curator-page.component.scss"],
 })
 export class CuratorPageComponent implements OnInit {
-  // curator$ = this.curatorPageService.curator$;
   curator$: Observable<any>;
   orcidId$: Observable<string>;
 
   resourceId$: Observable<string>;
 
-  // private wsUrl = environment.ws;
-  // private orcid_url = environment.orcid_url;
-  orcidData$: Observable<OrcidData>;
   user_stats$: Observable<any>;
   resource$: Observable<Object>;
   user_resources$: Observable<any[]>;
-  // user_reports$: Observable<
-  //   { activity_name: any; description: any; timestamp: string }[]
-  // >;
-  // achievements$: Observable<unknown>;
+  keywords$: Observable<string[]>;
+  biography$: Observable<string>;
+  orcid_links$: Observable<any>;
 
   constructor(
     private route: ActivatedRoute,
@@ -74,13 +60,13 @@ export class CuratorPageComponent implements OnInit {
             return fragment;
           }
         }
-        if(stats.length > 0){
+        if (stats.length > 0) {
           // otherwise we return the first resource_id in the list of stats
           return stats[0].resource_id;
         }
       })
     );
-    
+
     this.user_resources$ = this.user_stats$.pipe(
       switchMap((user_stats) => {
         const resource_ids = user_stats.map(stat => stat.resource_id)
@@ -98,13 +84,25 @@ export class CuratorPageComponent implements OnInit {
       })
     )
 
-    this.orcidData$ = this.orcidId$.pipe(
-      switchMap((orcid_id) =>
-        this.curatorPageService.get_curator_orcid_details(orcid_id)
-      )
-    );
+    this.keywords$ = this.orcidId$.pipe(
+      switchMap((orcid_id: string) => {
+        return this.curatorPageService.get_orcid_keywords(orcid_id)
+      })
+    )
+
+    this.biography$ = this.orcidId$.pipe(
+      switchMap((orcid_id: string) => {
+        return this.curatorPageService.get_orcid_biography(orcid_id);
+      })
+    )
+
+    this.orcid_links$ = this.orcidId$.pipe(
+      switchMap((orcid_id: string) => {
+        return this.curatorPageService.get_orcid_links(orcid_id);
+      })
+    )
 
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 }

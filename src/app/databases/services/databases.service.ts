@@ -22,7 +22,9 @@ type ResourceList =  {
   count?: number;
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class DatabasesService {
   resources_list$: Observable<ResourceList>;
   constructor(private http: HttpClient) {

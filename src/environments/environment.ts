@@ -9,7 +9,7 @@ export const environment = {
   auth_ws: 'http://localhost:3000',
   public_file_url: 'http://dione:3000/files',
   resource_logo_path: 'resources',
-  orcid_url: 'https://pub.orcid.org/v3.0/'
+  orcid_url: 'https://pub.sandbox.orcid.org/v3.0/'
   // ws: 'https://apicuron.bio.unipd.it/api/'
   // ws: 'http://localhost:8098/'
 

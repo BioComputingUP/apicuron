@@ -50,7 +50,7 @@ export class CuratorPageService {
   private wsUrl = environment.ws;
   private orcid_url = environment.orcid_url;
 
-  constructor(private http: HttpClient, private route: ActivatedRoute) {}
+  constructor(private http: HttpClient, private route: ActivatedRoute) { }
 
   get_curator(orcid_id: string) {
     return this.http
@@ -87,6 +87,52 @@ export class CuratorPageService {
       );
   }
 
+  get_orcid_biography(orcid_id: string): Observable<string> {
+    const url = new URL(`${orcid_id}/biography`, this.orcid_url)
+    return this.http.get(url.href, {
+      headers: {
+        Accept: "application/json",
+      }
+    }).pipe(
+      filter((response) => !!response['content']),
+      pluck('content')
+    )
+  }
+
+  get_orcid_links(orcid_id: string) {
+    const url = new URL(`${orcid_id}/researcher-urls`, this.orcid_url)
+
+    return this.http.get(url.href, {
+      headers: {
+        Accept: "application/json",
+      }
+    }).pipe(
+      filter(({'researcher-url': urls}: any) => !!urls && urls),
+      pluck('researcher-url'),
+      map((url_list) => {
+        // for each url in the url_list, build object containing "name" and "url" attributes
+        return url_list.map(({'url-name': name, url }) => {
+          return { name, value: url }
+        })
+      }) 
+    )
+  }
+
+  get_orcid_keywords(orcid_id: string) {
+    const url = new URL(`${orcid_id}/keywords`, this.orcid_url)
+    return this.http.get(url.href, {
+      headers: {
+        Accept: "application/json",
+      }
+    }).pipe(
+      filter((response: any) => !!response.keyword && response.keyword.length > 0),
+      pluck('keyword'),
+      map((keyword_list: any[]): string[] => {
+        return keyword_list.map((keyword) => keyword.content)
+      })
+    )
+  }
+
   get_achievements(orcid_id: string, resource_id: string) {
     return this.http
       .get(this.wsUrl + `/achievements/${orcid_id}/${resource_id}`, {
@@ -106,7 +152,7 @@ export class CuratorPageService {
     })
   }
 
-  curator_statistics(orcid_id: string){
+  curator_statistics(orcid_id: string) {
     return this.http.get(this.wsUrl + '/statistics/user/' + orcid_id, {
       headers: {
         version: '2'

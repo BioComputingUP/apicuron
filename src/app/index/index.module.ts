@@ -8,7 +8,7 @@ import { NumberElementComponent } from './numbers-banner/number-element/number-e
 import { CreditComponent } from './credit/credit.component';
 import { ResourceModule } from '../resource/resource.module';
 import { RouterModule } from '@angular/router';
-import { DatabasesModule } from '../databases/databases.module';
+// import { DatabasesModule } from '../databases/databases.module';
 import { FormsModule } from '@angular/forms';
 
 
@@ -20,7 +20,7 @@ import { FormsModule } from '@angular/forms';
     CreditComponent,
   ],
   imports: [
-    DatabasesModule,
+    // DatabasesModule,
     FormsModule,
     CommonModule,
     IndexRoutingModule,
