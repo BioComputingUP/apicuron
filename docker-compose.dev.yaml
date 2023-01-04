@@ -4,7 +4,10 @@ services:
     container_name: apicuron_webserver
     build:
       context: "."
-    image: "apicuron-ws:dev"  
+      target: development
+      tags:
+       - "apicuron-ws:dev"
+    image: "apicuron-ws" 
     ports:
       - "3000:3000"
     
