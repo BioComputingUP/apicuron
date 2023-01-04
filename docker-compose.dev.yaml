@@ -2,8 +2,9 @@ version: '3'
 services:
   apicuron-ws:
     container_name: apicuron_webserver
-    build: .
-    user: "${UID}:${GID}"
+    build:
+      context: "."
+    image: "apicuron-ws:dev"  
     ports:
       - "3000:3000"
     
