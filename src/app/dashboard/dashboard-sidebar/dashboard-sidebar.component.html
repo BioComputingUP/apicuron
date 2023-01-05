@@ -18,7 +18,9 @@
 
 
 <div
-    class="tw-min-h-screen tw-top-0  tw-bottom-0 lg:tw-left-0 tw-p-2 tw-w-[300px] tw-overflow-y-auto tw-text-center tw-bg-apicuron-purple">
+    class="tw-h-full tw-min-h-screen tw-top-16 sm:tw-top-0 tw-bottom-0 lg:tw-left-0 tw-p-2 tw-w-80 tw-overflow-x-visible tw-text-center tw-bg-apicuron-purple md:tw-block tw-fixed md:tw-relative tw-transition-transform tw-duration-300 tw-ease-in sm:tw-translate-x-0"
+    [class]="{'tw-translate-x-0': mobile_toggle, '-tw-translate-x-full': !mobile_toggle}"
+    >
     <div class="tw-text-gray-100 tw-text-xl">
         <div *ngIf="resource$ | async as resource" class="tw-p-2.5 tw-mt-1 tw-flex tw-flex-col tw-items-center">
             <img [src]="logo_src(resource.logo)"
@@ -30,18 +32,29 @@
         </div>
         <div class="tw-my-2 tw-bg-gray-300 tw-h-[1px]"></div>
     </div>
+    <span class="tw-block tw-uppercase tw-text-gray-300 tw-text-left tw-text-sm tw-font-bold">Database Information</span>
     <ng-container *ngIf="links$ | async as links">
-        <div *ngFor="let link of links"
-            class="tw-p-2.5 tw-mt-3 tw-flex tw-items-center tw-rounded-md tw-px-4 tw-duration-300 tw-cursor-pointer hover:tw-bg-apicuron-bright-purple tw-text-white">
-            <svg-icon svgClass="tw-h-6 tw-w-6 tw-text-gray-200" [src]="link.icon || ''" alt=""></svg-icon>
-            <a class="tw-text-[15px] tw-ml-4 tw-text-gray-200 tw-font-bold" [routerLink]="link.href" >{{ link.name}}</a>
-        </div>
+        <a *ngFor="let link of links" [routerLink]="link.href" 
+            routerLinkActive="tw-bg-apicuron-bright-purple tw-text-white"
+            class="tw-p-2.5 tw-mt-2 tw-flex tw-items-center tw-rounded-md tw-px-4 tw-duration-300 tw-cursor-pointer hover:tw-bg-apicuron-bright-purple tw-text-gray-200 hover:tw-text-white">
+            <svg-icon svgClass="tw-h-6 tw-w-6 tw-text-inherit" [src]="link.icon" alt=""></svg-icon>
+            <span class="tw-text-[15px] tw-ml-4 tw-text-inherit tw-font-bold"  >{{ link.name }}</span>
+        </a>
 
     </ng-container>
     <div class="tw-my-4 tw-bg-gray-300 tw-h-[1px]"></div>
-    <div
+    
+    <!-- additionnal options place -->
+    <!-- <div
         class="tw-p-2.5 tw-mt-3 tw-flex tw-items-center tw-rounded-md tw-px-4 tw-duration-300 tw-cursor-pointer hover:tw-bg-apicuron-bright-purple tw-text-white">
         <i class="tw-bi tw-bi-box-arrow-in-right"></i>
         <span class="tw-text-[15px] tw-ml-4 tw-text-gray-200 tw-font-bold">Logout</span>
-    </div>
+    </div> -->
+    <button class="tw-block sm:tw-hidden tw-absolute tw-transform tw-top-1/2 tw-translate-x-full -tw-translate-y-1/2 tw-right-0" (click)="mobile_toggle = !mobile_toggle">
+        <div [class]="{'tw-rotate-180': mobile_toggle}">
+            <svg-icon src="assets/svg/chevron-right.svg" svgClass="tw-w-6 tw-h-6 tw-rounded tw-bg-apicuron-purple tw-text-white tw-mx-1"></svg-icon>
+        </div>
+    </button>
+    
 </div>
+

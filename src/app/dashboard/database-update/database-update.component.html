@@ -15,7 +15,7 @@
     
             <form class="tw-flex tw-flex-row tw-flex-wrap" (ngSubmit)="submit()" [formGroup]="form">
     
-                <div class="form-control-element tw-w-1/2">
+                <div class="form-control-element tw-w-full sm:tw-w-1/2">
                     <label for="resource_name">Resource Name</label>
                     <input type="text" formControlName="resource_name">
                     <small class="tw-text-red-500 tw-text-sm tw-font-light"
@@ -24,7 +24,7 @@
                     </small>
     
                 </div>
-                <div class="form-control-element tw-w-1/2">
+                <div class="form-control-element tw-w-full sm:tw-w-1/2">
                     <label for="resource_url">Resource URL</label>
                     <input type="text" formControlName="resource_url">
                     <small class="tw-text-red-500 tw-text-sm tw-font-light"
@@ -32,7 +32,7 @@
                         The Resource URL is required
                     </small>
                 </div>
-                <div class="form-control-element tw-w-1/2">
+                <div class="form-control-element tw-w-full sm:tw-w-1/2">
                     <label for="resource_long_name">Resource Long Name</label>
                     <input type="text" formControlName="resource_long_name">
                     <small class="tw-text-red-500 tw-text-sm tw-font-light"
@@ -40,13 +40,13 @@
                         The Resource Long Name is required
                     </small>
                 </div>
-                <div class="form-control-element tw-w-1/2">
+                <div class="form-control-element tw-w-full sm:tw-w-1/2">
     
                     <label>Upload Resource Logo</label>
                     <input id="file_input" type="file" (change)="onFileSelected($event)">
     
                 </div>
-                <div class="form-control-element tw-w-1/2">
+                <div class="form-control-element tw-w-full sm:tw-w-1/2">
                     <label for="resource_description">Resource Description</label>
                     <textarea class="text-input" name="resource_description" formControlName="resource_description"
                         id="resource_description_textarea" cols="30" rows="10"></textarea>

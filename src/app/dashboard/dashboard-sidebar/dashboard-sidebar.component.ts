@@ -14,6 +14,7 @@ export class DashboardSidebarComponent implements OnInit {
   constructor() { }
 
   @Input('resource') resource$: Observable<any>;
+  mobile_toggle = false;
 
   logo_src(logo: string){
     if(logo.startsWith('assets')){

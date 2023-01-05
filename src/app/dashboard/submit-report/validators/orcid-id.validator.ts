@@ -11,7 +11,7 @@ export function orcidIdValidator(): ValidatorFn {
   
       let sum = digits.reduce((prev, curr) => (prev + curr) * 2, 0);
   
-      let check_value: number = (sum % 11) - (2 % 11);
+      let check_value: number = (12 -(sum % 11)) % 11;
       const check: string = check_value == 10 ? "X" : String(check_value);
       
       return check == checksum
