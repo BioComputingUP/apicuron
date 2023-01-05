@@ -16,6 +16,7 @@ import { AltNavbarComponent } from "./alt-navbar/alt-navbar.component";
 import { IndexModule } from "./index/index.module";
 import { AuthModule } from "./auth/auth.module";
 import { ToastrModule } from "ngx-toastr";
+import { AngularSvgIconModule } from "angular-svg-icon"
 @NgModule({
   declarations: [
     AppComponent,
@@ -35,6 +36,7 @@ import { ToastrModule } from "ngx-toastr";
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule,
+    AngularSvgIconModule.forRoot(),
     AppRoutingModule,
   ],
   providers: [],

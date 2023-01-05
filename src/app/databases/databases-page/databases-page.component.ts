@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { DatabasesService } from "../services/databases.service";
 
 @Component({
+  standalone: true,
   selector: "app-databases",
   templateUrl: "./databases-page.component.html",
   styleUrls: ["./databases-page.component.scss"],

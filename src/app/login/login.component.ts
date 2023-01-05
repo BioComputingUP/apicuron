@@ -18,7 +18,9 @@ export class LoginComponent implements OnInit {
     // this.env = environment;
   }
 
-
+  test() {
+    console.log('blank click test')
+  }
   ngOnInit() {
     
   }

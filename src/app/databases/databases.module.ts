@@ -2,7 +2,7 @@ import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { ResourceModule } from "../resource/resource.module";
-import { DatabasesPageComponent } from "./databases-page/databases-page.component";
+// import { DatabasesPageComponent } from "./databases-page/databases-page.component";
 import { DatabasesRoutingModule } from "./databases-routing.module";
 import { DatabasePageComponent } from "./database-page/database-page.component";
 import { CuratorModule } from "../curator/curator.module";
@@ -14,7 +14,7 @@ import { AuthModule } from "../auth/auth.module";
 import { DatabasesService } from "./services/databases.service";
 @NgModule({
   declarations: [
-    DatabasesPageComponent,
+    // DatabasesPageComponent,
     DatabasePageComponent,
     DatabaseCreateComponent,
   ],
@@ -30,6 +30,6 @@ import { DatabasesService } from "./services/databases.service";
     ReactiveFormsModule,
   ],
   providers:[DatabasesService],
-  exports: [DatabasesPageComponent],
+  // exports: [DatabasesPageComponent],
 })
 export class DatabasesModule {}

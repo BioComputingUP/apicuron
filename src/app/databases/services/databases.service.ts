@@ -4,7 +4,7 @@ import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 
 import { environment } from "../../../environments/environment";
 import { AuthService } from "../../auth/auth.service";
-import { map, pluck, shareReplay, switchMap } from "rxjs/operators";
+import { catchError, map, pluck, shareReplay, switchMap } from "rxjs/operators";
 
 
 class Resource {
@@ -16,7 +16,7 @@ class Resource {
   resource_url: string
 }
 
-type ResourceList =  {
+type ResourceList = {
   data: Array<Resource>;
   warning?: Array<string> | string;
   count?: number;
@@ -59,7 +59,7 @@ export class DatabasesService {
     return data
   }
 
-  update_resource(resource_data: Object){
+  update_resource(resource_data: Object) {
     const data = this.http.put(
       this.partnerResourcesPath + '/edit',
       resource_data,
@@ -88,7 +88,7 @@ export class DatabasesService {
       headers: {
         version: '2'
       },
-      params:{
+      params: {
         resource_id
       }
     }).pipe(pluck('data'))
@@ -114,7 +114,8 @@ export class DatabasesService {
           resource_id
         }
       }
-    ).pipe(pluck('data'))
+    ).pipe(
+      pluck('data'))
 
     return combineLatest([badges$, medals$, terms$, resource$]).pipe(
       map(([badges, medals, terms, resource]) => {
@@ -128,7 +129,7 @@ export class DatabasesService {
     )
   }
 
-  get_resource(resource_id:string){
+  get_resource(resource_id: string) {
     const response = this.http.get(
       `${this.partnerResourcesPath}/${resource_id}`,
       {

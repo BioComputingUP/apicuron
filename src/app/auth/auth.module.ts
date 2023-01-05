@@ -5,7 +5,7 @@ import { AuthDropdownComponent } from './auth-dropdown/auth-dropdown.component';
 import { AuthGuard } from './auth.guard';
 import { RouterModule } from '@angular/router';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-
+import { AngularSvgIconModule } from "angular-svg-icon"
 
 
 @NgModule({
@@ -17,6 +17,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
     AuthGuard],
   imports: [
     CommonModule,
+    AngularSvgIconModule,
     RouterModule
   ],
   exports: [

@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { DatabasesService } from "../services/databases.service";
 import { ActivatedRoute, ParamMap } from "@angular/router";
-import { map, pluck, share, shareReplay, switchMap } from "rxjs/operators";
+import { catchError, map, pluck, share, shareReplay, switchMap } from "rxjs/operators";
 import { combineLatest, Observable } from "rxjs";
 import { CuratorPageService } from "src/app/curator/curator-page/curator-page.service";
 @Component({
@@ -12,10 +12,9 @@ import { CuratorPageService } from "src/app/curator/curator-page/curator-page.se
 export class DatabasePageComponent implements OnInit {
   resourceId$: Observable<string>;
   leaderboard$: Observable<Object>;
-  badges$: any;
-  medals$: any;
-  terms$: any;
-  reports$: any;
+  badges$: Observable<any>;
+  medals$: Observable<any>;
+  terms$: Observable<any>;
   resource$: Observable<Object>;
   stats$: Observable<unknown>;
   users$: Observable<unknown>;

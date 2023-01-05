@@ -54,7 +54,8 @@
           <div class="tw-flex tw-flex-row tw-flex-wrap tw-gap-1">
             <a
               class="database-pill"
-              [href]="'#resource-' + currResource['resource_id']"
+              routerLink="."
+              [fragment]="'resource_' + currResource['resource_id']"
               *ngFor="let currResource of listResourcesDescriptions">{{currResource['resource_name']}}</a>
           </div>
         </div>
@@ -62,7 +63,7 @@
     </div>
 
     <div class="tw-flex tw-flex-row tw-flex-wrap tw-pt-2 tw-justify-center md:tw-pt-4">
-      <div class="tw-w-1/2 tw-p-2" [id]="'resource-' + currResource['resource_id']"
+      <div class="tw-w-1/2 tw-p-2" [id]="'resource_' + currResource['resource_id']"
         *ngFor="let currResource of listResourcesDescriptions">
         <partner-resource [name]="currResource['resource_name']" [description]="currResource['resource_description']"
           [short_description]="currResource['resource_long_name']"

@@ -31,19 +31,24 @@ export class DashboardSidebarComponent implements OnInit {
         return [
           {
             href: ['/dashboard', 'database', resource_id, 'edit'],
-            name: `Update ${resource_name}`
+            name: `Edit ${resource_name}`,
+            icon: 'assets/svg/pencil.svg'
           },
           {
             href: ['/dashboard', 'database', resource_id, 'terms'],
-            name: `Manage ${resource_name} Terms`
+            name: `Manage ${resource_name} Terms`,
+            icon: 'assets/svg/settings.svg'
           },
           {
             href: ['/dashboard', 'database', resource_id, 'reports'],
-            name: 'Submit Reports'
+            name: 'Submit Reports',
+            icon: 'assets/svg/document-text.svg'
           },
           {
             href: ['/dashboard', 'database', resource_id, 'achievements'],
-            name: 'Manage Achievements'
+            name: 'Manage Achievements',
+            icon: 'assets/medal_icon.svg'
+
           }
         ]
 
