@@ -10,6 +10,7 @@ import { ResourceModule } from '../resource/resource.module';
 import { RouterModule } from '@angular/router';
 // import { DatabasesModule } from '../databases/databases.module';
 import { FormsModule } from '@angular/forms';
+import { AngularSvgIconModule } from 'angular-svg-icon';
 
 
 @NgModule({
@@ -25,6 +26,7 @@ import { FormsModule } from '@angular/forms';
     CommonModule,
     IndexRoutingModule,
     RouterModule,
+    AngularSvgIconModule,
     ResourceModule
   ],
   exports: [
