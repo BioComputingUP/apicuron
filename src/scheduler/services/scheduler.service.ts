@@ -1,12 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { IncomingMessage, request } from 'http';
+import { IncomingMessage } from 'http';
 import * as FormData from 'form-data';
 import { TaskSubmit } from '../types/baseTask';
 import { ConfigService } from '@nestjs/config';
-import { createReadStream, fstatSync } from 'fs';
-import { HttpModule, HttpService } from '@nestjs/axios';
+import { createReadStream } from 'fs';
+import { HttpService } from '@nestjs/axios';
 import { Cron } from '@nestjs/schedule';
-
 // const FormData = require('form-data')
 @Injectable()
 export class SchedulerService {
