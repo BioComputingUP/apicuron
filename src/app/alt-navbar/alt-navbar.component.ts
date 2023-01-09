@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable } from "rxjs";
 @Component({
   selector: "app-alt-navbar",
   templateUrl: "./alt-navbar.component.html",
-  styleUrls: ["./alt-navbar.component.scss"],
+  styleUrls: ["./alt-navbar.component.scss", "../scss/underline-hover.scss"],
 })
 export class AltNavbarComponent implements OnInit {
   

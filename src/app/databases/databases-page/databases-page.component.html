@@ -20,9 +20,9 @@
 
 
   <div class="main-content">
-    <div class="tw-flex tw-flex-row">
-      <div class="tw-w-3/4">
-        <div class="tw-mt-3">
+    <div class="tw-flex tw-flex-row tw-flex-wrap">
+      <div class="tw-w-full lg:tw-w-3/4">
+        <div class="lg:tw-mt-3">
           <p class="tw-leading-7 tw-text-base 2wl:tw-text-lg" style="text-indent:2rem;">
             This page lists all <strong>member databases</strong> registered to APICURON. Member databases
             periodically push curation activities in APICURON.
@@ -34,7 +34,7 @@
           </p>
         </div>
 
-        <div class="mt-3 tw-bg-orange-100 tw-border-orange-500 tw-text-orange-700 tw-border-l-4 tw-p-2 lg:tw-p-4">
+        <div class="tw-mt-2 lg:tw-mt-4 tw-bg-orange-100 tw-border-orange-500 tw-text-orange-700 tw-border-l-4 tw-p-2 lg:tw-p-4">
           <span class="tw-block tw-font-bold tw-font-dm-sans">Disclaimer</span>
           <p class=" tw-leading-7">
             <strong>A comparison across databases is meaningless </strong>.
@@ -48,22 +48,21 @@
           </p>
         </div>
       </div>
-      <div class="tw-w-1/4">
+      <div class="tw-w-full lg:tw-w-1/4 tw-py-4">
         <div class="tw-bg-gray-200 tw-border-2 tw-border-gray-400 tw-rounded tw-px-2 md:tw-px-4 tw-pb-2 md:tw-pb-4">
           <span class="tw-block tw-uppercase tw-text-xs tw-text-gray-400 tw-font-bold tw-pt-1">Resources</span>
           <div class="tw-flex tw-flex-row tw-flex-wrap tw-gap-1">
-            <a
-              class="database-pill"
-              routerLink="."
-              [fragment]="'resource_' + currResource['resource_id']"
-              *ngFor="let currResource of listResourcesDescriptions">{{currResource['resource_name']}}</a>
+            <a class="database-pill" routerLink="." [fragment]="'resource_' + currResource['resource_id']"
+              *ngFor="let currResource of listResourcesDescriptions">
+              {{currResource['resource_name']}}
+            </a>
           </div>
         </div>
       </div>
     </div>
 
     <div class="tw-flex tw-flex-row tw-flex-wrap tw-pt-2 tw-justify-center md:tw-pt-4">
-      <div class="tw-w-1/2 tw-p-2" [id]="'resource_' + currResource['resource_id']"
+      <div class="tw-w-full lg:tw-w-1/2 tw-p-2" [id]="'resource_' + currResource['resource_id']"
         *ngFor="let currResource of listResourcesDescriptions">
         <partner-resource [name]="currResource['resource_name']" [description]="currResource['resource_description']"
           [short_description]="currResource['resource_long_name']"

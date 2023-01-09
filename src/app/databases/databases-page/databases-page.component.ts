@@ -2,7 +2,6 @@ import { Component, OnInit } from "@angular/core";
 import { DatabasesService } from "../services/databases.service";
 
 @Component({
-  standalone: true,
   selector: "app-databases",
   templateUrl: "./databases-page.component.html",
   styleUrls: ["./databases-page.component.scss"],
@@ -10,7 +9,7 @@ import { DatabasesService } from "../services/databases.service";
 export class DatabasesPageComponent implements OnInit {
   listResourcesDescriptions;
 
-  constructor(private databaseService: DatabasesService) {}
+  constructor(private databaseService: DatabasesService) { }
 
   ngOnInit(): void {
     // this.databaseService.GetResources({}).subscribe(
@@ -21,7 +20,7 @@ export class DatabasesPageComponent implements OnInit {
     //   (err) => {},
     //   () => {}
     // );
-    this.databaseService.get_resources().subscribe((response: Object & { data: object}) => {
+    this.databaseService.get_resources().subscribe((response: Object & { data: object }) => {
       this.listResourcesDescriptions = response.data
     })
   }

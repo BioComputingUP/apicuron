@@ -42,33 +42,20 @@
             <img alt="APICURON Logo" class="tw-hidden lg:tw-block tw-h-8 tw-w-auto" src="assets/APICURON_white.svg" />
           </a>
         </div>
-        <div class="tw-hidden sm:tw-block sm:tw-ml-6">
-          <!-- <div class="tw-flex tw-space-x-4">
-            <a aria-current="page" class=" tw-text-gray-300 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium"
-              routerLink="/databases">Databases</a>ashboard/database/disprot/terms
-            <a class="tw-text-gray-300 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium"
-              routerLink="/curators">Curators</a>
-            <a class="tw-text-gray-300 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium"
-              routerLink="/help">Help</a>
-            <a class="tw-text-gray-300 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium"
-              routerLink="/about">About</a>
-          </div> -->
-          <!-- left aligned content -->
-        </div>
       </div>
       <div
         class="tw-absolute tw-inset-y-0 tw-right-0 tw-hidden sm:tw-flex tw-items-center tw-pr-2 sm:tw-static sm:tw-inset-auto sm:tw-ml-6 sm:tw-pr-0">
         <a aria-current="page"
-          class=" tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium"
-          routerLink="/databases">Databases</a>
-        <a class="tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium"
-          routerLink="/curators">Curators</a>
-        <a class="tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium"
-          routerLink="/help">Help</a>
-        <a class="tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium"
-          routerLink="/about">About</a>
+          class="nav-item tw-relative before:tw-bg-white hover-underline-animation"
+          routerLinkActive="active-underline-animation" routerLink="/databases">Databases</a>
+        <a class="nav-item tw-relative before:tw-bg-white hover-underline-animation"
+          routerLinkActive="active-underline-animation" routerLink="/curators">Curators</a>
+        <a class="nav-item tw-relative before:tw-bg-white hover-underline-animation"
+          routerLinkActive="active-underline-animation" routerLink="/docs">Docs</a>
+        <a class="nav-item tw-relative before:tw-bg-white hover-underline-animation"
+          routerLinkActive="active-underline-animation" routerLink="/about">About</a>
 
-          <auth-dropdown
+        <auth-dropdown
           button-class="tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium tw-cursor-pointer hover:tw-underline">
 
         </auth-dropdown>
@@ -80,13 +67,13 @@
     id="mobile-menu">
     <div class="tw-px-2 tw-pt-2 tw-pb-3 tw-space-y-1">
       <a aria-current="page"
-        class="tw-block tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium"
+        class="tw-block nav-item"
         routerLink="/databases">Databases</a>
-      <a class="tw-block tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium"
+      <a class="tw-block nav-item"
         routerLink="/curators">Curators</a>
-      <a class="tw-block tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium"
+      <a class="tw-block nav-item"
         routerLink="/docs">Docs</a>
-      <a class="tw-block tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-base tw-font-medium"
+      <a class="tw-block nav-item"
         routerLink="/about">About</a>
 
       <auth-dropdown

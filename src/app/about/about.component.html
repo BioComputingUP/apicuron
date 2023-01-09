@@ -1,23 +1,23 @@
-<div class="container-fluid container-wide">
-  <div class="row pt-3">
-    <div class="col-lg-3 d-none d-lg-block d-xl-block">
-      <div class="sticky sidebar">
-        <div class="row">
-          <div class="col">
-            <div class="card">
-              <div class="card-header"><h5>Navigate</h5></div>
-              <div class="card-body">
-                <h6 [ngxScrollTo]="top" [ngxScrollToOffset]="-180"><p>About</p></h6>
+<div class="tw-container tw-mx-auto sm:tw-px-4 tw-max-w-full tw-container-wide">
+  <div class="tw-flex tw-flex-wrap tw-pt-3">
+    <div class="lg:tw-w-1/4 tw-pr-4 tw-pl-4 tw-hidden lg:tw-block xl:tw-block">
+      <div class="tw-sticky tw-sidebar">
+        <div class="tw-flex tw-flex-wrap">
+          <div class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1 tw-px-4">
+            <div class="tw-relative tw-flex tw-flex-col tw-min-w-0 tw-rounded tw-break-words tw-border tw-bg-white tw-border-1 tw-border-gray-300">
+              <div class="tw-py-3 tw-px-6 tw-mb-0 tw-bg-gray-200 tw-border-b-1 tw-border-gray-300 tw-text-gray-900"><h5>Navigate</h5></div>
+              <div class="tw-flex-auto tw-p-6">
+                <h6> <a routerLink="." fragment="top">About</a></h6>
                 <ul>
-                  <li><a [ngxScrollTo]="intro" [ngxScrollToOffset]="-180" >Introduction to the APICURON</a></li>
+                  <li><a routerLink="." fragment="intro">Introduction to APICURON</a></li>
                   <ul>
-                    <li><a [ngxScrollTo]="activities" [ngxScrollToOffset]="-180">Biocuration activities</a></li>
+                    <li><a routerLink="." fragment="activities" >Biocuration activities</a></li>
 
-                  <li><a [ngxScrollTo]="gamification" [ngxScrollToOffset]="-180">Badges and scores</a></li>
+                  <li><a routerLink="." fragment="gamification">Badges and scores</a></li>
                   </ul>
-                  <li><a [ngxScrollTo]="becomemember" [ngxScrollToOffset]="-180">Become a member</a></li>
-                  <li><a [ngxScrollTo]="license" [ngxScrollToOffset]="-180">License</a></li>
-                  <li><a [ngxScrollTo]="privacy" [ngxScrollToOffset]="-180">Privacy notice</a></li>
+                  <li><a routerLink="." fragment="becomemember" >Become a member</a></li>
+                  <li><a routerLink="." fragment="license">License</a></li>
+                  <li><a routerLink="." fragment="privacy">Privacy notice</a></li>
                 </ul>
 
               </div>
@@ -26,26 +26,24 @@
         </div>
       </div>
     </div>
-    <div class="col-lg-9">
-      <h1 id='top' #top>About APICURON</h1>
-      <div class="row">
-        <div class="col">
-          <h2 class="pt-3 pb-2" #intro>How to cite</h2>
-          <p class="text-justify">
-            <span class="font-weight-bold">APICURON: a database to credit and acknowledge the work of biocurators</span>
+    <div class="lg:tw-w-3/4 tw-pr-4 tw-pl-4">
+      <h1 id="top" >About APICURON</h1>
+      <div class="tw-flex tw-flex-wrap">
+        <div class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1 tw-px-4">
+          <h2 class="tw-pt-3 tw-pb-2" id="intro">How to cite</h2>
+          <p class="tw-text-justify">
+            <span class="tw-font-bold">APICURON: a database to credit and acknowledge the work of biocurators</span>
             <br>
             András Hatos, Federica Quaglia, Damiano Piovesan, Silvio Tosatto
             <br>
             <i>Database</i> 2021;
-            PubMed: <a href="https://pubmed.ncbi.nlm.nih.gov/33882120/"
-                       target="_blank">PMID: 33882120</a>
-            DOI: <a href="https://doi.org/10.1093/database/baab019"
-                    target="_blank">10.1093/database/baab019</a>
+            PubMed: <a href="https://pubmed.ncbi.nlm.nih.gov/33882120/" target="_blank">PMID: 33882120</a>
+            DOI: <a href="https://doi.org/10.1093/database/baab019" target="_blank">10.1093/database/baab019</a>
 
           </p>
 
-          <h2 class="pt-3 pb-2" #intro>Introduction</h2>
-          <p class="text-justify">
+          <h2 class="tw-pt-3 tw-pb-2" #intro="">Introduction</h2>
+          <p class="tw-text-justify">
             Biocuration plays an essential role in making research data available to the scientific community and
             shareable, therefore increasing their intrinsic value. However, the contribution and effort of biocurators
             are extremely difficult to quantify and to acknowledge. This is relevant not only in the case of
@@ -64,7 +62,7 @@
             raising awareness to the crucial role played by biocuration in scientific research and promoting good practices.
           </p>
 
-          <p class="text-justify">
+          <p class="tw-text-justify">
             Registered resources (Member databases) submit biocuration events to the APICURON web server.
             APICURON stores biocuration activities and calculates achievements (medals, badges) and leaderboards on the fly.
             Results are served through a public API. APICURON can be cross-referenced by ORCID. Third-party databases
@@ -72,16 +70,16 @@
             biocurators achievements and ranking.
           </p>
 
-          <div class="row justify-content-center">
-            <div class="col-10">
-              <img class="img-fluid my-3" src="assets/apicuron workflow_transparent.png">
+          <div class="tw-flex tw-flex-wrap tw-justify-center">
+            <div class="tw-w-4/5">
+              <img class="tw-max-w-full tw-h-auto tw-my-3" src="assets/apicuron workflow_transparent.png">
 
             </div>
           </div>
 
 
-          <h4 class="mt-4" #activities id="activities">Biocuration activities</h4>
-          <p class="text-justify">The description of a curation event in APICURON is provided by four key components:
+          <h4 class="tw-mt-4" id="activities">Biocuration activities</h4>
+          <p class="tw-text-justify">The description of a curation event in APICURON is provided by four key components:
             entity, activity, agent and timestamp. These key elements fulfill the recommendations of
             <a href="https://datascience.codata.org/articles/10.5334/dsj-2019-054/">Thessen et al.</a></p>
           <ul>
@@ -110,8 +108,8 @@
           </ul>
           A list of the entity and activity terms for each one of our partner databases is available.
 
-          <h4 class="mt-2" #gamification id="gamification">Gamification</h4>
-          <p class="text-justify">
+          <h4 class="tw-mt-2" id="gamification">Gamification</h4>
+          <p class="tw-text-justify">
             Gamification is a trending topic that consists of providing motivational affordances and “gameful”
             experiences
             in non-game related settings. In APICURON it is used to support biocurators’ engagement by acknowledging
@@ -120,11 +118,11 @@
             positive
             feedback mechanism that keeps users engaged and motivated and increases their competitiveness.
           </p>
-          <p class="text-justify">
+          <p class="tw-text-justify">
             A list of the badges and scores applied by each one of our partner databases is available.
           </p>
-          <h2 class="pt-3 pb-2" #becomemember>Become a member</h2>
-          <p class="text-justify">
+          <h2 class="tw-pt-3 tw-pb-2" id="becomemember">Become a member</h2>
+          <p class="tw-text-justify">
 
             We welcome all manually curated resources or biocuration organizations, especially those relying on community curation, to become APICURON partners.
             Becoming an APICURON partner is free of charge.
@@ -147,14 +145,12 @@
 
         </div>
       </div>
-      <div class="row" #license>
-        <div class="col">
-          <h2 class="pt-3 pb-2">License</h2>
-          <div class="align-self-center">
+      <div class="tw-flex tw-flex-wrap" id="license">
+        <div class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1 tw-px-4">
+          <h2 class="tw-pt-3 tw-pb-2">License</h2>
+          <div class="tw-self-center">
             <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
-              <img alt="Creative Commons License"
-                   style="border-width:0"
-                   src="https://i.creativecommons.org/l/by/4.0/88x31.png"/>
+              <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png">
             </a>
             This work is licensed under a
             <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
@@ -166,47 +162,47 @@
         </div>
       </div>
 
-      <h2 id="privacy" #privacy class="pt-3 pb-2">Privacy notice</h2>
+      <h2 id="privacy" class="tw-pt-3 tw-pb-2">Privacy notice</h2>
       <p>
         This privacy notice explains what personal data is collected by PED, for what purposes, how it is processed,
         and how we keep it secure.
       </p>
-      <h5 class="pt-2"><strong>Who controls your personal data and how to contact us?</strong></h5>
+      <h5 class="tw-pt-2"><strong>Who controls your personal data and how to contact us?</strong></h5>
 
-      <div class="row">
-        <div class="col-6">
+      <div class="tw-flex tw-flex-wrap">
+        <div class="tw-w-1/2">
           <strong>Data controller</strong>'s contact details are:<br>
           Damiano Piovesan<br>
           University of Padua, Department of Biomedical Sciences<br>
           Viale G. Colombo 3<br>
           35131 Padua, Italy<br>
-          <i class="fa fa-phone"></i> +39 049 827 6269<br>
-          <i class="fa fa-envelope"></i> apicuron@ngp-net.bio.unipd.it
+          <i class="tw-fa tw-fa-phone"></i> +39 049 827 6269<br>
+          <i class="tw-fa tw-fa-envelope"></i> apicuron@ngp-net.bio.unipd.it
         </div>
-        <div class="col-6">
+        <div class="tw-w-1/2">
           <strong>Data protection officer</strong>'s contact details are:<br>
           Director of the Department of Biomedical Sciences, University of Padua<br>
           University of Padua, Department of Biomedical Sciences<br>
           Viale G. Colombo 3<br>
           35131 Padua, Italy<br>
-          <i class="fa fa-phone"></i> +39 049 827 6047<br>
-          <i class="fa fa-envelope"></i> direzione.biomed@unipd.it
+          <i class="tw-fa tw-fa-phone"></i> +39 049 827 6047<br>
+          <i class="tw-fa tw-fa-envelope"></i> direzione.biomed@unipd.it
         </div>
       </div>
-      <h5 class="pt-2"><strong>What is our lawful basis for processing your personal data?</strong></h5>
+      <h5 class="tw-pt-2"><strong>What is our lawful basis for processing your personal data?</strong></h5>
       <p>
         Processing your personal data is necessary for our legitimate interest of allowing the day-to-day management,
         operation and functioning of PED.
       </p>
-      <h5 class="pt-2"><strong>How will your personal data be used?</strong></h5>
+      <h5 class="tw-pt-2"><strong>How will your personal data be used?</strong></h5>
       <p>We will use the personal data to:</p>
       <ul>
         <li>provide user access to the service</li>
         <li>create anonymous usage statistics</li>
       </ul>
-      <h5 class="pt-2"><strong>Who will have access to your personal data?</strong></h5>
+      <h5 class="tw-pt-2"><strong>Who will have access to your personal data?</strong></h5>
       <p>The personal data will be disclosed to authorized APICURON staff.</p>
-      <h5 class="pt-2"><strong>Will your personal data be transferred to third countries (i.e. countries not part of
+      <h5 class="tw-pt-2"><strong>Will your personal data be transferred to third countries (i.e. countries not part of
         EU/EAA) and/or
         international organisations?</strong></h5>
       <p>Personal data is transferred to the following service provider based in a third country which APICURON relies on
@@ -215,13 +211,13 @@
         <li>Google Analytics</li>
       </ul>
       <p>There are no personal data transfers to international organisations.</p>
-      <h5 class="pt-2"><strong>How long do we keep your personal data?</strong></h5>
+      <h5 class="tw-pt-2"><strong>How long do we keep your personal data?</strong></h5>
       <p>Any personal data directly obtained from you will be retained as long as the service is live, even if you stop
         using the service. We will keep the personal data for the minimum amount of time possible to ensure legal
         compliance and to facilitate internal and external audits if they arise. Access to the web and security logs
         containing personal data are restricted to relevant APICURON staff.
       </p>
-      <h5 class="pt-2"><strong>Your rights regarding your personal data</strong></h5>
+      <h5 class="tw-pt-2"><strong>Your rights regarding your personal data</strong></h5>
       <p>You have the right to:</p>
       <ol type="1">
         <li>
