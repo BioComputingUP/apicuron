@@ -38,37 +38,37 @@ async function bootstrap() {
 	SwaggerModule.setup('/', app, document)
 
 
-	app.use(
-		[
-			'/leaderboards',
-			'/profile',
-			// '/reports',
-			// '/stat',
-			// '/homepage_statistics',
-			'/getProfilePictureID/',
-			'/getProfilePicture/',
-			'/postProfilePicture',
-			'/hideProfile',
-			'/showProfile',
-			'/getProfile',
-			'/orcid_update',
-			'/resubmit_activity',
-			'/submit_activity',
-			'/delete_activity',
-			// '/resources',
-		],
-		createProxyMiddleware({
-			target: configService.get('V1_HOST'),
-			changeOrigin: true,
-			// selfHandleResponse: true,
-			// onProxyRes: responseInterceptor(
-			// 	async (responseBuffer, proxyRes, req, res) => {
-			// 		handle(req)
-			// 		return responseBuffer.toString()
-			// 	}
-			// )
-		}),
-	);
+	// app.use(
+	// 	[
+	// 		'/leaderboards',
+	// 		'/profile',
+	// 		// '/reports',
+	// 		// '/stat',
+	// 		// '/homepage_statistics',
+	// 		'/getProfilePictureID/',
+	// 		'/getProfilePicture/',
+	// 		'/postProfilePicture',
+	// 		'/hideProfile',
+	// 		'/showProfile',
+	// 		'/getProfile',
+	// 		'/orcid_update',
+	// 		'/resubmit_activity',
+	// 		'/submit_activity',
+	// 		'/delete_activity',
+	// 		// '/resources',
+	// 	],
+	// 	createProxyMiddleware({
+	// 		target: configService.get('V1_HOST'),
+	// 		changeOrigin: true,
+	// 		// selfHandleResponse: true,
+	// 		// onProxyRes: responseInterceptor(
+	// 		// 	async (responseBuffer, proxyRes, req, res) => {
+	// 		// 		handle(req)
+	// 		// 		return responseBuffer.toString()
+	// 		// 	}
+	// 		// )
+	// 	}),
+	// );
 
 	// setup basic validation Pipes
 	app.useGlobalPipes(
