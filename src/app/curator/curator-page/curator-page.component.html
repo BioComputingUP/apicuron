@@ -20,9 +20,9 @@
             
             <div *ngIf="keywords$ | async as keywords" class="tw-w-full tw-flex tw-flex-row">
                 <div class="tw-w-1/6 tw-font-bold tw-text-lg">Keywords</div>
-                <div class="tw-w-5/6 tw-flex tw-flex-row tw-items-center">
+                <div class="tw-w-5/6 tw-flex tw-flex-row tw-flex-wrap tw-gap-3 tw-items-center">
                     <span *ngFor="let keyword of keywords"
-                        class="tw-px-2 tw-mr-2 tw-py-1 tw-cursor-default tw-text-sm tw-bg-apicuron-purple tw-text-white tw-font-bold tw-font-dm-sans tw-rounded-full">
+                        class="tw-px-2 tw-py-1 tw-whitespace-nowrap tw-cursor-default tw-text-sm tw-bg-apicuron-purple tw-text-white tw-font-bold tw-font-dm-sans tw-rounded-full">
                         {{ keyword }}
                     </span>
                 </div>
@@ -31,7 +31,7 @@
                 <div class="tw-w-1/6 tw-font-bold tw-text-lg">Social Links</div>
                 <div class="tw-w-5/6">
                     <a *ngFor="let url of orcid_links"
-                        class="tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer hover:tw-underline"
+                        class="tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer hover:tw-underline tw-mr-3"
                         [href]="url.value">
                         {{ url.name }}
                     </a>
