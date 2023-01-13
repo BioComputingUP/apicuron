@@ -1,7 +1,7 @@
 # Global Arguments for all build stages
 ARG APP_DIR=/home/node/app
-
-
+ARG UID=1002
+ARG GID=1002
 ###################
 # BUILD FOR LOCAL DEVELOPMENT
 ###################
@@ -9,6 +9,12 @@ ARG APP_DIR=/home/node/app
 FROM node:16.14.2-buster-slim As development
 
 ARG APP_DIR
+ARG UID=1002
+ARG GID=1002
+
+# change node uid and gid to the defined one
+RUN groupmod -g ${GID} node && \
+    usermod -u ${UID} -g ${GID} node
 
 # Use the node user from the image (instead of the root user)
 USER node
@@ -41,6 +47,10 @@ FROM node:16.14.2-buster-slim As build
 
 ARG APP_DIR
 
+# change node uid and gid to the defined one
+RUN groupmod -g ${GID} node && \
+    usermod -u ${UID} -g ${GID} node
+
 USER node
 
 
@@ -70,6 +80,10 @@ RUN npm ci --only=production && npm cache clean --force
 FROM node:16.14.2-buster-slim As production
 
 ARG APP_DIR
+
+# change node uid and gid to the defined one
+RUN groupmod -g ${GID} node && \
+    usermod -u ${UID} -g ${GID} node
 
 USER node
 
