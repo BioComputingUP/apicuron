@@ -1,8 +1,11 @@
 import devConfig from './configuration.dev';
 import prodConfig from './configuration.prod';
-import prodTemp from './configuration.temp'
+import localConfig from './configuration.local'
 
 export function loadConfig () {
+	if (process.env.NODE_ENV === 'local') {
+		return localConfig;
+	}
 	if (process.env.NODE_ENV === 'development') {
 		return devConfig;
 	}
@@ -10,8 +13,5 @@ export function loadConfig () {
 		return prodConfig;
 	}
 
-	if (process.env.NODE_ENV === 'prod_temp') {
-		return prodTemp;
-	}
-	return devConfig;
+	return localConfig;
 }

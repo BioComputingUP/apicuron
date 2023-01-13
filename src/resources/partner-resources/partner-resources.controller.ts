@@ -101,8 +101,8 @@ export class PartnerResourcesController {
 		type: PartnerResourceDto
 	})
 	// nestjs logic decorators
-	@Put('edit')
-	@Patch('edit')
+	@Put('')
+	@Patch('')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	@UseInterceptors(
 		FileInterceptor('logo', {
