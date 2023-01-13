@@ -176,7 +176,8 @@ export class ReportsService {
 		if (!!orcid_id) {
 			query_obj['curator_orcid'] = orcid_id;
 		}
-		const reports = await this.reportModel.find(query_obj).skip(skip).limit(page_size).lean();
+
+		const reports = await this.reportModel.find(query_obj).sort({'timestamp': -1 }).skip(skip).limit(page_size).lean();
 		
 		const activity_term_list = [...new Set(reports.map(report => report.activity_term))]
 		
