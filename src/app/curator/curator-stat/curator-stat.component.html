@@ -7,7 +7,7 @@
                         <a [routerLink]="['/curators', curator.orcid_id ]" [fragment]="resource['resource_id']"
                             class="tw-inline-block tw-text-lg tw-px-4 tw-pb-2 tw-pt-4 tw-rounded-t-lg tw-border-b-2"
                             [ngClass]="{'tw-font-bold tw-text-apicuron-purple tw-border-apicuron-purple hover:tw-text-apicuron-purple': resource.resource_id == current_stat.resource_id, 'hover:tw-text-gray-600 tw-border-gray-300': current_stat.resource_id != resource.resource_id }">{{
-                                resource['resource_name'] }}
+                            resource['resource_name'] }}
                         </a>
                     </ng-container>
                 </li>
@@ -17,67 +17,69 @@
 </div>
 <div>
 
-    <div class="tw-flex tw-flex-row tw-flex-wrap" >
+    <div class="tw-flex tw-flex-row tw-flex-wrap">
         <ng-container *ngIf="current_stat$ | async as current_stat">
-            <ng-container *ngIf="resource$ | async as resource" >
-            <div class="tw-w-1/4 tw-p-2">
-                <div
-                    class="tw-bg-white tw-h-full tw-border-gray-400 tw-border tw-drop-shadow-md tw-rounded-lg tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-2">
-                    <svg-generation-icon ngClass="tw-w-16 tw-h-16 tw-mr-4" [accent_color]="resource.color"></svg-generation-icon>
-                    <div class="tw-flex tw-flex-col">
-                        <span class="tw-text-3xl tw-font-bold">
-                            {{ current_stat.generation_count }}
-                        </span>
-                        <span class="tw-text-sm tw-font-bold tw-text-gray-400">Generation Events</span>
+            <ng-container *ngIf="resource$ | async as resource">
+                <div class="tw-w-1/4 tw-p-2">
+                    <div
+                        class="tw-bg-white tw-h-full tw-border-gray-400 tw-border tw-drop-shadow-md tw-rounded-lg tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-2">
+                        <svg-generation-icon ngClass="tw-w-16 tw-h-16 tw-mr-4"
+                            [accent_color]="resource.color"></svg-generation-icon>
+                        <div class="tw-flex tw-flex-col">
+                            <span class="tw-text-3xl tw-font-bold">
+                                {{ current_stat.generation_count }}
+                            </span>
+                            <span class="tw-text-sm tw-font-bold tw-text-gray-400">Generation Events</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="tw-w-1/4 tw-p-2">
-                <div
-                    
-                    class="tw-bg-white tw-h-full tw-border-gray-400 tw-border tw-drop-shadow-md tw-rounded-lg tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-2">
-                    <svg-revision-icon ngClass="tw-w-16 tw-h-16 tw-mr-4" [accent_color]="resource.color"></svg-revision-icon>
-                    <div class="tw-flex tw-flex-col">
-                        <span class="tw-text-3xl tw-font-bold">
-                            {{ current_stat.revision_count }}
-                        </span>
-                        <span class="tw-text-sm tw-font-bold tw-text-gray-400">Revision Events</span>
+                <div class="tw-w-1/4 tw-p-2">
+                    <div
+                        class="tw-bg-white tw-h-full tw-border-gray-400 tw-border tw-drop-shadow-md tw-rounded-lg tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-2">
+                        <svg-revision-icon ngClass="tw-w-16 tw-h-16 tw-mr-4"
+                            [accent_color]="resource.color"></svg-revision-icon>
+                        <div class="tw-flex tw-flex-col">
+                            <span class="tw-text-3xl tw-font-bold">
+                                {{ current_stat.revision_count }}
+                            </span>
+                            <span class="tw-text-sm tw-font-bold tw-text-gray-400">Revision Events</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="tw-w-1/4 tw-p-2">
-                <div
-                    class="tw-bg-white tw-h-full tw-border-gray-400 tw-border tw-drop-shadow-md tw-rounded-lg tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-2">
-                    <svg-invalidation-icon ngClass="tw-w-16 tw-h-16 tw-mr-4" [accent_color]="resource.color"></svg-invalidation-icon>
-                    <div class="tw-flex tw-flex-col">
-                        <span class="tw-text-3xl tw-font-bold">
-                            {{ current_stat.invalidation_count }}
-                        </span>
-                        <span class="tw-text-sm tw-font-bold tw-text-gray-400">Invalidation Events</span>
+                <div class="tw-w-1/4 tw-p-2">
+                    <div
+                        class="tw-bg-white tw-h-full tw-border-gray-400 tw-border tw-drop-shadow-md tw-rounded-lg tw-flex tw-flex-row tw-justify-center tw-items-center tw-py-2">
+                        <svg-invalidation-icon ngClass="tw-w-16 tw-h-16 tw-mr-4"
+                            [accent_color]="resource.color"></svg-invalidation-icon>
+                        <div class="tw-flex tw-flex-col">
+                            <span class="tw-text-3xl tw-font-bold">
+                                {{ current_stat.invalidation_count }}
+                            </span>
+                            <span class="tw-text-sm tw-font-bold tw-text-gray-400">Invalidation Events</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="tw-w-1/4 tw-p-2 tw-grid tw-grid-cols-1 tw-gap-4">
-                <div class="tw-flex tw-flex-row tw-items-center tw-justify-between">
-                    <div class="tw-flex tw-flex-row">
-                        <svg-badge-icon ngClass="tw-w-10 tw-h-10 tw-mr-2" [color]="resource.color"></svg-badge-icon>
-                        <span class="tw-text-3xl tw-font-bold">
-                            {{ current_stat.badges_count }}
-                        </span>
+                <div class="tw-w-1/4 tw-p-2 tw-grid tw-grid-cols-1 tw-gap-4">
+                    <div class="tw-flex tw-flex-row tw-items-center tw-justify-between">
+                        <div class="tw-flex tw-flex-row">
+                            <svg-badge-icon ngClass="tw-w-10 tw-h-10 tw-mr-2" [color]="resource.color"></svg-badge-icon>
+                            <span class="tw-text-3xl tw-font-bold">
+                                {{ current_stat.badges_count }}
+                            </span>
+                        </div>
+                        <span class="tw-text-sm tw-font-bold tw-text-gray-400">Badges Earned</span>
                     </div>
-                    <span class="tw-text-sm tw-font-bold tw-text-gray-400">Badges Earned</span>
-                </div>
-                <div class="tw-flex tw-flex-row tw-items-center tw-justify-between">
-                    <div class="tw-flex tw-flex-row">
-                        <svg-medal-icon ngClass="tw-w-10 tw-h-10 tw-mr-2" [color]="resource.color"></svg-medal-icon>
-                        <span class="tw-text-3xl tw-font-bold">
-                            {{ current_stat.medals_count }}
-                        </span>
+                    <div class="tw-flex tw-flex-row tw-items-center tw-justify-between">
+                        <div class="tw-flex tw-flex-row">
+                            <svg-medal-icon ngClass="tw-w-10 tw-h-10 tw-mr-2" [color]="resource.color"></svg-medal-icon>
+                            <span class="tw-text-3xl tw-font-bold">
+                                {{ current_stat.medals_count }}
+                            </span>
+                        </div>
+                        <span class="tw-text-sm tw-font-bold tw-text-gray-400">Medals Earned</span>
                     </div>
-                    <span class="tw-text-sm tw-font-bold tw-text-gray-400">Medals Earned</span>
                 </div>
-            </div>
-        </ng-container>
+            </ng-container>
             <ng-container *ngIf="achievements$ | async as achievements">
                 <div class="tw-w-3/4">
                     <div class="tw-my-2 sm:tw-my-4" *ngIf="achievements.badges.length > 0">
@@ -92,7 +94,8 @@
                         </div>
                         <div class="tw-flex tw-flex-row tw-flex-wrap">
                             <div *ngFor="let badge of achievements.badges.slice(0,8)" class="tw-p-2 tw-w-1/4">
-                                <div class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2" *ngIf="resource$ | async as resource">
+                                <div class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2"
+                                    *ngIf="resource$ | async as resource">
                                     <svg-badge class="tw-w-4/6 tw-mx-auto" [database]="resource.resource_name"
                                         [title]="badge.name" [main_color]="badge.color_code">
                                     </svg-badge>
@@ -100,8 +103,8 @@
                             </div>
                             <ng-container *ngIf="more_badges">
                                 <div *ngFor="let badge of achievements.badges.slice(8)" class="tw-p-2 tw-w-1/4">
-                                    <div
-                                        class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2" *ngIf="resource$ | async as resource">
+                                    <div class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2"
+                                        *ngIf="resource$ | async as resource">
                                         <svg-badge class="tw-w-4/6 tw-mx-auto" [database]="resource.resource_name"
                                             [title]="badge.name" [main_color]="badge.color_code">
                                         </svg-badge>
@@ -123,7 +126,8 @@
                         </div>
                         <div class="tw-flex tw-flex-row tw-flex-wrap">
                             <div *ngFor="let medal of achievements.medals.slice(0,8)" class="tw-p-2 tw-w-1/4">
-                                <div class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2" *ngIf="resource$ | async as resource">
+                                <div class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2"
+                                    *ngIf="resource$ | async as resource">
                                     <svg-medal class="tw-w-4/6 tw-mx-auto" [database]="resource.resource_name"
                                         [title]="medal.name" [main_color]="medal.color">
                                     </svg-medal>
@@ -131,8 +135,8 @@
                             </div>
                             <ng-container *ngIf="more_medals">
                                 <div *ngFor="let medal of achievements.medals.slice(8)" class="tw-p-2 tw-w-1/4">
-                                    <div
-                                        class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2" *ngIf="resource$ | async as resource">
+                                    <div class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2"
+                                        *ngIf="resource$ | async as resource">
                                         <svg-medal class="tw-w-4/6 tw-mx-auto" [database]="resource.resource_name"
                                             [title]="medal.name" [main_color]="medal.color">
                                         </svg-medal>
@@ -145,35 +149,46 @@
             </ng-container>
         </ng-container>
 
-            <div class="tw-w-1/4 sm:tw-my-4 ">
-                <!-- Header And Title -->
-                <div class="tw-flex tw-flex-row tw-justify-between tw-px-1">
-                    <div>
-                        <h4 class="tw-inline tw-capitalize tw-font-bold tw-text-lg tw-text-gray-900 tw-mr-1">Biocuration reports</h4>
-                        <span class="tw-text-xs tw-text-gray-500" *ngIf="report_count$ | async as report_count">
-                            ({{ report_count }})
-                        </span>
-                    </div>
-                    <div>
-                        <button class="tw-text-xs tw-text-gray-500 tw-font-bold focus:tw-outline-none tw-mr-1" (click)="previous_page()">&#60;</button>
-                        <span class="tw-text-xs tw-text-gray-500 tw-font-bold" *ngIf="current_report_page$ | async as report_page">{{ report_page }}</span>
-                        <button class="tw-text-xs tw-text-gray-500 tw-font-bold focus:tw-outline-none tw-ml-1" #btnId >&#62;</button>
-                    </div>
+        <div class="tw-w-1/4 sm:tw-my-4 ">
+            <!-- Header And Title -->
+            <div class="tw-flex tw-flex-row tw-justify-between tw-px-1">
+                <div>
+                    <h4 class="tw-inline tw-capitalize tw-font-bold tw-text-lg tw-text-gray-900 tw-mr-1">Biocuration
+                        reports</h4>
+                    <span class="tw-text-xs tw-text-gray-500" *ngIf="report_count$ | async as report_count">
+                        ({{ report_count }})
+                    </span>
                 </div>
-                <!-- List of reports -->
-                <div class="tw-grid tw-grid-flow-row tw-gap-2 tw-py-2" *ngIf="user_reports$ | async as user_reports">
-                    <div *ngFor="let report of user_reports"
-                        class="tw-w-full tw-bg-white tw-border tw-border-gray-400 tw-px-2 tw-py-1 tw-shadow-lg tw-truncate">
-                        <span class="tw-block tw-text-lg tw-font-semibold tw-font-dm-sans tw-text-gray-900">{{
-                            report.activity_name }}</span>
-                        <span class="tw-block tw-text-xs tw-ml-2 tw-text-gray-500">{{ report.timestamp }}</span>
-                        <span class="tw-block tw-text-sm tw-ml-2 tw-text-gray-800 tw-truncate">{{ report.description
-                            }}</span>
-                        <span class="tw-block tw-text-right tw-text-sm tw-text-gray-500">{{ report.activity_category
-                            }}</span>
-                    </div>
-
+                <div>
+                    <button
+                        class="tw-text-xs tw-text-white tw-font-bold focus:tw-outline-none tw-mr-1 tw-bg-apicuron-purple tw-rounded tw-p-1 tw-align-middle"
+                        (click)="previous_page()">
+                        <svg-icon src="assets/svg/chevron-left.svg" svgClass="tw-w-4 tw-h-4"></svg-icon>
+                    </button>
+                    <span class="tw-text-xs tw-text-gray-500 tw-font-bold"
+                        *ngIf="current_report_page$ | async as report_page">{{ report_page }}</span>
+                    <button
+                        class="tw-text-xs tw-text-white tw-font-bold focus:tw-outline-none tw-ml-1 tw-bg-apicuron-purple tw-rounded tw-p-1 tw-align-middle"
+                        #btnId>
+                        <svg-icon src="assets/svg/chevron-left.svg" class=""
+                            svgClass="tw-w-4 tw-h-4 tw-transform tw-rotate-180"></svg-icon>
+                    </button>
                 </div>
             </div>
+            <!-- List of reports -->
+            <div class="tw-grid tw-grid-flow-row tw-gap-2 tw-py-2" *ngIf="user_reports$ | async as user_reports">
+                <div *ngFor="let report of user_reports"
+                    class="tw-w-full tw-bg-white tw-border tw-border-gray-400 tw-px-2 tw-py-1 tw-shadow-lg tw-truncate">
+                    <span class="tw-block tw-text-lg tw-font-semibold tw-font-dm-sans tw-text-gray-900">{{
+                        report.activity_name }}</span>
+                    <span class="tw-block tw-text-xs tw-ml-2 tw-text-gray-500">{{ report.timestamp }}</span>
+                    <span class="tw-block tw-text-sm tw-ml-2 tw-text-gray-800 tw-truncate">{{ report.description
+                        }}</span>
+                    <span class="tw-block tw-text-right tw-text-sm tw-text-gray-500">{{ report.activity_category
+                        }}</span>
+                </div>
+
+            </div>
+        </div>
     </div>
 </div>

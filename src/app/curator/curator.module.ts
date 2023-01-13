@@ -11,6 +11,7 @@ import { CuratorStatComponent } from './curator-stat/curator-stat.component';
 import { PaginationComponent } from '../pagination/pagination.component';
 import { CuratorService } from './curator.service';
 import { CuratorPageService } from './curator-page/curator-page.service';
+import { AngularSvgIconModule } from 'angular-svg-icon';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { CuratorPageService } from './curator-page/curator-page.service';
     SvgModule,
     CommonModule,
     FormsModule,
+    AngularSvgIconModule,
     ReactiveFormsModule,
     CuratorRoutingModule,
   ],

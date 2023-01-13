@@ -61,7 +61,7 @@ export class DatabasesService {
 
   update_resource(resource_data: Object) {
     const data = this.http.put(
-      this.partnerResourcesPath + '/edit',
+      this.partnerResourcesPath,
       resource_data,
       {
         responseType: 'json',

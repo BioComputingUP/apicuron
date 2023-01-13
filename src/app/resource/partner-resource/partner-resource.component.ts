@@ -30,7 +30,6 @@ export class PartnerResourceComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    console.log("Logo: ", this.logo)
   }
 
 }
