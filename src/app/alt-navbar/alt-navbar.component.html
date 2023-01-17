@@ -13,9 +13,6 @@
           <span class="tw-sr-only">Open main menu</span>
           <!--
               Icon when menu is closed.
-  
-              Heroicon name: outline/menu
-  
               Menu open: "hidden", Menu closed: "block"
             -->
           <svg aria-hidden="true" class="tw-block tw-h-6 tw-w-6" fill="none" stroke="currentColor" stroke-width="2"
@@ -24,9 +21,6 @@
           </svg>
           <!--
               Icon when menu is open.
-  
-              Heroicon name: outline/x
-  
               Menu open: "block", Menu closed: "hidden"
             -->
           <svg aria-hidden="true" class="tw-hidden tw-h-6 tw-w-6" fill="none" stroke="currentColor" stroke-width="2"
@@ -45,8 +39,7 @@
       </div>
       <div
         class="tw-absolute tw-inset-y-0 tw-right-0 tw-hidden sm:tw-flex tw-items-center tw-pr-2 sm:tw-static sm:tw-inset-auto sm:tw-ml-6 sm:tw-pr-0">
-        <a aria-current="page"
-          class="nav-item tw-relative before:tw-bg-white hover-underline-animation"
+        <a aria-current="page" class="nav-item tw-relative before:tw-bg-white hover-underline-animation"
           routerLinkActive="active-underline-animation" routerLink="/databases">Databases</a>
         <a class="nav-item tw-relative before:tw-bg-white hover-underline-animation"
           routerLinkActive="active-underline-animation" routerLink="/curators">Curators</a>
@@ -54,10 +47,8 @@
           routerLinkActive="active-underline-animation" routerLink="/docs">Docs</a>
         <a class="nav-item tw-relative before:tw-bg-white hover-underline-animation"
           routerLinkActive="active-underline-animation" routerLink="/about">About</a>
-
-        <auth-dropdown
-          button-class="tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium tw-cursor-pointer hover:tw-underline">
-
+        
+        <auth-dropdown>
         </auth-dropdown>
       </div>
     </div>
@@ -66,18 +57,12 @@
   <div class="sm:tw-hidden" [ngClass]="{'tw-hidden': closed_mobile_menu, 'tw-block':!closed_mobile_menu}"
     id="mobile-menu">
     <div class="tw-px-2 tw-pt-2 tw-pb-3 tw-space-y-1">
-      <a aria-current="page"
-        class="tw-block nav-item"
-        routerLink="/databases">Databases</a>
-      <a class="tw-block nav-item"
-        routerLink="/curators">Curators</a>
-      <a class="tw-block nav-item"
-        routerLink="/docs">Docs</a>
-      <a class="tw-block nav-item"
-        routerLink="/about">About</a>
+      <a aria-current="page" class="tw-block nav-item" routerLink="/databases">Databases</a>
+      <a class="tw-block nav-item" routerLink="/curators">Curators</a>
+      <a class="tw-block nav-item" routerLink="/docs">Docs</a>
+      <a class="tw-block nav-item" routerLink="/about">About</a>
 
-      <auth-dropdown
-        button-class="tw-text-gray-100 hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium tw-cursor-pointer hover:tw-underline">
+      <auth-dropdown>
 
       </auth-dropdown>
 

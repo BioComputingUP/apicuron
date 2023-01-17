@@ -1,7 +1,7 @@
 <div class="tw-px-2 tw-mx-auto tw-max-w-7xl sm:tw-px-8 2xl:tw-px-0">
     <div class="tw-py-2 sm:tw-py-4">
         <ng-container *ngIf="curator$ | async as curator">
-            <svg-avatar [ngClass]="'tw-w-24 tw-h-24 tw-mx-auto tw-text-gray-800'"></svg-avatar>
+            <img [src]="generate_avatar(curator.displayedName)" class="tw-w-24 tw-h-24 tw-mx-auto tw-rounded-full tw-bg-gray-50 tw-border-2 tw-border-gray-150" alt="">
             <h2 class="tw-text-center tw-font-bold tw-font-dm-sans tw-text-2xl">{{ curator.displayedName }}
             </h2>
             <a [href]="'http://orcid.org/' + curator.orcid_id"

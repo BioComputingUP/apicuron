@@ -6,7 +6,6 @@
 
 # Guides
 - [Defining a Resource](/docs#defining-your-resource)
-- [Creating an Account]()
 - [Defining Terms](/docs#defining-your-terms)
 - [Submitting Curation Data](/docs#submitting-curation-data-reports)
   - [Real time Submission](/docs#real-time-submission)

@@ -104,5 +104,11 @@ export class CuratorPageComponent implements OnInit {
 
   }
 
+  generate_avatar(name: string){
+    const emailHash = encodeURIComponent(name);
+    const defaultImage = encodeURIComponent(`https://api.dicebear.com/5.x/identicon/png/seed=${emailHash}&scale=80&radius=50`);
+    return `https://www.gravatar.com/avatar/${emailHash}?d=${defaultImage}`;
+  }
+
   ngOnInit() { }
 }

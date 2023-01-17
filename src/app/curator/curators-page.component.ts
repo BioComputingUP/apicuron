@@ -12,7 +12,7 @@ import { CuratorService } from "./curator.service";
 })
 export class CuratorsPageComponent implements OnInit {
   current_page = 1;
-  page_size = 9;
+  page_size = 15;
 
   biocurators = [];
   private last_query_params = {};

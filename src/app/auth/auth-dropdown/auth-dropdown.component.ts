@@ -1,7 +1,7 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { AfterContentInit, AfterViewInit, Component, ContentChild, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { Observable } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Observable, fromEvent } from 'rxjs';
+import { filter, map, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../auth.service';
 
@@ -9,9 +9,8 @@ import { AuthService } from '../auth.service';
   selector: 'auth-dropdown',
   templateUrl: './auth-dropdown.component.html',
   styleUrls: ['./auth-dropdown.component.scss'],
-  encapsulation: ViewEncapsulation.Emulated
 })
-export class AuthDropdownComponent implements OnInit {
+export class AuthDropdownComponent {
   user$: Observable<any>;
 
   @Input('button-class') button_class = '';
@@ -26,30 +25,30 @@ export class AuthDropdownComponent implements OnInit {
     this.user$ = this.authService.user$
     this.user_has_resource$ = this.user$.pipe(
       map((user) => {
-        if(user && user.resources && user.resources.length > 0){
+        if (user && user.resources && user.resources.length > 0) {
           return true
         }
         return false;
       })
     )
+
   }
 
-  copy_key(){
+  copy_key() {
     navigator.clipboard.writeText(this.authService.token_value)
     this.toastr.show('API Key Sucessfully copied', 'API KEY', {
-      positionClass:'toast-bottom-right'
+      positionClass: 'toast-bottom-right'
     })
   }
 
-  logout(){
+  logout() {
     this.authService.logout()
   }
 
-  has_a_resource(){
-    
-  }
-
-  ngOnInit(): void {
+  generate_avatar(name: string) {
+    const hash = encodeURIComponent(name);
+    const defaultImage = encodeURIComponent(`https://api.dicebear.com/5.x/identicon/png/seed=${hash}&scale=80&radius=50`);
+    return `https://www.gravatar.com/avatar/${hash}?d=${defaultImage}`;
   }
 
 }

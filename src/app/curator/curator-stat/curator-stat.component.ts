@@ -99,10 +99,12 @@ export class CuratorStatComponent implements OnInit, AfterViewInit {
         const formatted_reports = reports.map((report) => {
           const relativeDate = moment(report["timestamp"]).fromNow();
           return {
+            ...report,
             activity_name: report["term"]["activity_name"],
             description: report["term"]["description"],
             activity_category: report["term"]["activity_category"],
             timestamp: relativeDate,
+
           };
         });
 

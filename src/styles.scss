@@ -18,6 +18,24 @@ html {
   scroll-behavior: smooth;
 }
 
+// Navbar Styles Section
+// ------------------------------------
+.nav-item {
+  @apply tw-text-gray-100 hover:tw-text-white tw-px-2 tw-mx-1 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium
+}
+.hover-underline-animation {
+  @apply before:tw-absolute before:tw-h-[4px] before:tw-left-1/2 before:tw-right-1/2 before:tw-content-[""] before:tw-bottom-0 before:tw-transition-all before:tw-duration-200 before:tw-ease-in;
+}
+
+.hover-underline-animation {
+  @apply hover:before:tw-right-0 hover:before:tw-left-0
+}
+
+.active-underline-animation {
+    @apply before:tw-right-0 before:tw-left-0 tw-delay-500
+}
+// ------------------------------------
+
 
 @import 'ngx-toastr/toastr';
 

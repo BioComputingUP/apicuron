@@ -86,5 +86,11 @@ export class CuratorCardComponent implements OnInit {
   get orcid_id() {
     return this.biocurator.orcid_id;
   }
+
+  generate_avatar(){
+    const emailHash = encodeURIComponent(this.displayedName);
+    const defaultImage = encodeURIComponent(`https://api.dicebear.com/5.x/identicon/png/seed=${emailHash}&scale=75&radius=50`);
+    return `https://www.gravatar.com/avatar/${emailHash}?d=${defaultImage}`;
+  }
   ngOnInit(): void {}
 }

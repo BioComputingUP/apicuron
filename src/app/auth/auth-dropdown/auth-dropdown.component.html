@@ -1,8 +1,8 @@
 <div *ngIf="(loggedIn$ | async) && user$ | async as user" class="tw-relative tw-inline-block tw-text-left">
     <div>
         <button (mouseover)="auth_dropdown = true"
-            class="tw-text-gray-100 tw-flex tw-flex-row tw-items-center tw-bg-apicuron-red hover:tw-text-white tw-px-3 tw-py-2 tw-rounded-md tw-shadow-md tw-text-sm tw-font-medium tw-cursor-pointer ">
-            <svg-icon svgClass="tw-inline tw-w-6 tw-h-6 tw-mr-1" src="assets/user.svg" ></svg-icon>
+            class="tw-text-gray-100 tw-flex tw-flex-row tw-items-center hover:tw-text-white  nav-item tw-relative before:tw-bg-white hover-underline-animation">
+            <img [src]="generate_avatar()" class="tw-inline tw-w-6 tw-h-6 tw-mr-1 tw-bg-white tw-rounded-full" alt="">
             <span class="tw-font-bold">{{ user.displayedName }}</span>
             <span *ngIf="user.notifications.length > 0"
                 class="tw-absolute tw-bg-apicuron-purple tw-text-white tw-font-bold tw-px-1.5 tw-py-0.5 tw-text-xs -tw-top-2 -tw-right-1 tw-shadow-md tw-rounded-full ">{{
@@ -11,19 +11,19 @@
     </div>
     <div (mouseleave)="auth_dropdown = false"
         [ngClass]="{'tw-visible tw-opacity-100': auth_dropdown, 'tw-invisible tw-opacity-0': !auth_dropdown}"
-        class="tw-absolute tw-right-0 tw-z-10 tw-mt-2 tw-w-56 tw-origin-top-right tw-rounded-md tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none tw-transition-opacity tw-duration-200"
+        class="tw-absolute tw-left-0 sm:tw-left-auto sm:tw-right-0 tw-z-10 tw-mt-2 tw-w-full tw-min-w-max tw-origin-top-right tw-rounded-md tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none tw-transition-opacity tw-duration-200"
         role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
         <div class="tw-py-1" role="none">
             <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
             <a [routerLink]="['/curators', user.orcid_id]" class="dropdown-element">
                 <svg-icon src="assets/user.svg" svgClass="tw-inline tw-w-4 tw-h-4 tw-text-gray-900"></svg-icon>
-                Biocurator Profile
-            
+                <!-- <img [src]="generate_avatar()" class="tw-inline tw-w-4 tw-h-4 tw-bg-gray-100 tw-border tw-border-gray-200" alt=""> -->
+                My Biocuration Profile
+
             </a>
             <ng-container *ngFor="let resource of user.resources">
-                <a [routerLink]="['/dashboard', 'database', resource.resource_id, 'edit']"
-                    class="dropdown-element">
-                    <svg-icon src="assets/svg/settings.svg" svgClass="tw-inline tw-w-4 tw-h-4" ></svg-icon>
+                <a [routerLink]="['/dashboard', 'database', resource.resource_id, 'edit']" class="dropdown-element">
+                    <svg-icon src="assets/svg/settings.svg" svgClass="tw-inline tw-w-4 tw-h-4"></svg-icon>
                     Manage {{ resource.name }}
                 </a>
             </ng-container>
@@ -32,7 +32,7 @@
                 <svg-icon src="assets/svg/key.svg" svgClass="tw-inline tw-w-4 tw-h-4"></svg-icon>
                 Copy API Key to clipboard
             </button>
-            
+
             <a [routerLink]="['/notifications']" class="dropdown-element">
                 <svg-icon src="assets/svg/bell.svg" svgClass="tw-inline tw-w-4 tw-h-4"></svg-icon>
                 Notifications
@@ -50,8 +50,8 @@
 </div>
 
 <ng-container *ngIf="!(loggedIn$ | async)">
-    <!-- This example requires Tailwind CSS v2.0+ -->
-    <button [ngClass]="button_class" (click)="show_login= true">Login</button>
+
+    <button class="nav-item tw-relative before:tw-bg-white hover-underline-animation" (click)="show_login = true">Login</button>
 
     <div [ngClass]="{'tw-visible': show_login, 'tw-invisible': !show_login}" class="tw-relative tw-z-10"
         aria-labelledby="modal-title" role="dialog" aria-modal="true">

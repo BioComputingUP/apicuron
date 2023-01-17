@@ -1,8 +1,8 @@
 <form
-    class="tw-flex tw-flex-row tw-flex-wrap lg:tw-flex-nowrap tw-justify-between tw-bg-white tw-items-stretch tw-mx-auto tw-divide-y tw-divide-apicuron-purple 
-    tw-rounded-l-lg sm:tw-divide-y-0 tw-rounded-xl tw-border tw-border-apicuron-purple sm:tw-border-0 md:tw-rounded-none">
+    class="tw-flex tw-flex-row tw-flex-wrap lg:tw-flex-nowrap tw-justify-between tw-bg-white tw-rounded-md tw-items-stretch tw-mx-auto tw-divide-y tw-divide-apicuron-purple 
+    tw-rounded-l-lg sm:tw-divide-y-0 tw-border tw-border-apicuron-purple sm:tw-border-0">
     <div
-        class="tw-w-full tw-flex tw-my-1 tw-flex-col tw-pb-2 tw-px-2 tw-pt-1 tw-bg-white tw-overflow-y-visible md:tw-border-r tw-border-apicuron-purple lg:tw-w-min sm:tw-rounded-l-xl">
+        class="tw-w-full tw-flex tw-my-1 tw-flex-col tw-pb-2 tw-px-2 tw-pt-1 tw-bg-white tw-overflow-y-visible md:tw-border-r tw-border-apicuron-purple lg:tw-w-min sm:tw-rounded-l-md">
         <span class="tw-text-gray-400 tw-uppercase" style="font-size: 0.60rem;">Resources</span>
         <div *ngIf="selected_resources$ | async as selected_resources" class="tw-flex tw-flex-row tw-items-center">
 
@@ -56,6 +56,6 @@
         (keyup.enter)="onSubmit()">
 
     <button
-        class="tw-w-full sm:tw-w-auto tw-py-2 sm:tw-px-4 tw-bg-apicuron-purple focus:tw-outline-none focus:tw-shadow-inner tw-text-gray-100 sm:tw-rounded-r-xl tw-px-2"
+        class="tw-w-full sm:tw-w-auto tw-py-2 sm:tw-px-4 tw-bg-apicuron-bright-purple focus:tw-outline-none focus:tw-shadow-inner tw-text-gray-100 tw-rounded-b-md sm:tw-rounded-b-none sm:tw-rounded-r-md tw-px-2"
         type="submit" (click)="onSubmit()">Submit</button>
 </form>
