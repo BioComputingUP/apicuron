@@ -52,19 +52,8 @@ export class StatisticsController {
 		);
 	}
 	
-	// @Get('partner-resource/:resource_id')
-	// async get_resource_statistics(@Param('resource_id') resource_id: string, @Query('from') from_date: 'year' | '6 months' | 'month' | 'week'){
-		
-	// }
 
-
-
-	// @Get('achievements/:orcid_id/:resource_id')
-	// async get_user_achievements(@Param('orcid_id') orcid_id: string, @Param('resource_id') resource_id: string){
-	// 	const { resource_uri } = await this.partnerResourceService.get_resource(resource_id)
-		
-	// 	return this.achievementsService.user_achievements(orcid_id, resource_uri)
-	// }
+	
 	@ApiOkResponse({
 		description: 'List of aggregated user statistics regarding each Partner Resource they contributed in',
 	})
@@ -94,4 +83,25 @@ export class StatisticsController {
 	}
 
 	
+}
+
+@ApiTags('First Version')
+@Controller()
+export class OldStatisticsController {
+
+	constructor(protected statService: StatisticsService) {}
+
+	@Get('/leaderboards')
+	async leaderboard(
+		@Query('resource') resource_id: string,
+		@Query('page', ParseUnsignedIntPipe) page: number,
+		@Query('page_size', ParseUnsignedIntPipe) page_size: number,
+	){
+		return await this.statService.get_resource_leaderboard(
+			resource_id,
+			// in the old version, the pages are 0 indexed
+			page + 1,
+			page_size,
+		);	
+	}
 }
