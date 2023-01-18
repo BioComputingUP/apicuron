@@ -1,17 +1,24 @@
 <div [ngClass]="{'tw-flex-row': !vertical, 'tw-flex-col': vertical}"
-    class="tw-flex tw-items-center tw-flex-wrap tw-bg-white tw-border tw-border-gray-500 tw-rounded-lg tw-shadow-lg tw-pt-2 tw-h-full">
+    class="tw-flex tw-items-center tw-flex-wrap tw-bg-white tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-pt-2 tw-h-full">
     <div [ngClass]="{'tw-p-2': !vertical}">
         <!-- <img [ngClass]="{'tw-w-24 tw-h-24': vertical, 'tw-w-20 tw-h-20': !vertical, 'tw-rounded-full tw-bg-gray-50 tw-border-2 tw-border-gray-100 tw-text-gray-800': true}" [src]="'https://api.dicebear.com/5.x/identicon/svg?scale=80&radius=50&seed=' + displayedName" alt=""> -->
-        <img [ngClass]="{'tw-w-24 tw-h-24': vertical, 'tw-w-20 tw-h-20': !vertical, 'tw-rounded-full tw-bg-gray-50 tw-border-2 tw-border-gray-100 tw-text-gray-800': true}" [src]="generate_avatar()" alt="">
+        <img [ngClass]="{'tw-w-24 tw-h-24': vertical, 'tw-w-20 tw-h-20': !vertical, 'tw-rounded-full tw-bg-gray-50 tw-border-2 tw-border-gray-100 tw-text-gray-800': true}"
+            [src]="generate_avatar()" alt="">
     </div>
     <div class="tw-flex tw-flex-col" [ngClass]="{'tw-items-center': vertical, 'tw-ml-2': !vertical}">
-        <a [routerLink]="['/curators', orcid_id]" class="tw-text-xl tw-font-dm-sans tw-text-gray-900 hover:tw-text-gray-900 tw-font-bold hover:tw-underline">{{ displayedName
-            }}</a>
-        <a [href]="'http://orcid.org/'+orcid_id" target="_blank"
-            class="tw-text-blue-600 tw-font-light tw-text-sm hover:tw-underline hover:tw-text-blue-700 tw-cursor-pointer">
-            {{ orcid_id }}
-            <img class="tw-inline tw-h-3 tw-w-3" src="assets/link.svg" alt="">
-        </a>
+        <div class="tw-gap-2">
+            <a [routerLink]="['/curators', orcid_id]"
+                class="tw-text-xl tw-font-dm-sans tw-text-gray-900 hover:tw-text-gray-900 tw-font-bold hover:tw-underline tw-truncate">{{
+                displayedName
+                }}
+            </a>
+            <a [href]="'http://orcid.org/'+orcid_id" target="_blank"
+                class="tw-cursor-pointer tw-align-top">
+                <!-- {{ orcid_id }} -->
+                <img class="tw-inline tw-h-6 tw-w-6" src="https://orcid.org/assets/vectors/orcid.logo.icon.svg" alt="" role="tooltip">
+            </a>
+
+        </div>
         <div *ngIf="single_resource()" class="tw-pt-1 tw-pb-2 tw-flex tw-flex-row tw-items-center tw-text-gray-400">
             <svg class="tw-h-4 tw-w-4" viewBox="0 0 13 17" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -34,9 +41,9 @@
             <ng-container *ngIf="resources$ | async as converter">
                 <!-- if the element is the last, output empty string otherwise, output a comma -->
 
-                <a *ngFor="let resource of resources; let last= last"
-                [routerLink]="['/databases', resource ]"
-                class="tw-text-gray-700 tw-cursor-pointer hover:tw-text-gray-800 tw-font-bold tw-text-sm tw-rounded-2xl tw-mr-1 hover:tw-underline">{{ converter[resource] }}{{ last ? '' : ',' }}</a>
+                <a *ngFor="let resource of resources; let last= last" [routerLink]="['/databases', resource ]"
+                    class="tw-text-gray-700 tw-cursor-pointer hover:tw-text-gray-800 tw-font-bold tw-text-sm tw-rounded-2xl tw-mr-1 hover:tw-underline">{{
+                    converter[resource] }}{{ last ? '' : ',' }}</a>
 
             </ng-container>
             <!-- <a
@@ -45,15 +52,13 @@
     </div>
     <div *ngIf="display_scores"
         class="tw-w-full tw-flex tw-flex-row tw-flex-wrap tw-justify-center tw-border-t-2 tw-border-gray-100 tw-mt-2 md:tw-mt-auto">
-        <div
-            class="tw-w-1/2 sm:tw-w-1/3 tw-text-center tw-border-gray-500 tw-p-1 md:tw-p-1 tw-justify-se">
+        <div class="tw-w-1/2 sm:tw-w-1/3 tw-text-center tw-border-gray-500 tw-p-1 md:tw-p-1 tw-justify-se">
             <span class="tw-text-xs tw-uppercase tw-font-bold tw-text-gray-400">
                 generation
             </span>
             <span class="tw-block tw-text-lg tw-font-bold tw-text-gray-800">{{ generation_score }}</span>
         </div>
-        <div
-            class="tw-w-1/2 sm:tw-w-1/3 tw-text-center sm tw-border-gray-500 tw-p-1 md:tw-p-1">
+        <div class="tw-w-1/2 sm:tw-w-1/3 tw-text-center sm tw-border-gray-500 tw-p-1 md:tw-p-1">
             <span class="tw-text-xs tw-uppercase tw-font-bold tw-text-gray-400">
                 revision
             </span>
