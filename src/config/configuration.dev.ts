@@ -1,4 +1,4 @@
-import { resolve } from "path";
+import { resolve, join } from "path";
 
 export default () => ({
   environment: 'development',
@@ -13,8 +13,8 @@ export default () => ({
   PORT: parseInt(process.env.PORT) || 8198,
   HOST: process.env.HOST || '0.0.0.0',
   ORCID_API_URL: 'https://pub.sandbox.orcid.org/v3.0/',
-  PUBLIC_FILES_PATH: resolve('public'),
-  PRIVATE_FILES_PATH: resolve('private'),
+  PUBLIC_FILES_PATH: resolve(join(__dirname, 'public')),
+  PRIVATE_FILES_PATH: resolve(join(__dirname, 'private')),
   PUBLIC_FILES_URL_PATH: '/public',
   JWT_HEADER: 'authorization',
   JWT_PREFIX: 'bearer',
