@@ -1,3 +1,5 @@
+import { resolve } from "path";
+
 export default () => ({
   environment: 'production',
   db_host: 'moros',
@@ -11,7 +13,8 @@ export default () => ({
   PORT: 8098,
   HOST: '0.0.0.0',
   ORCID_API_URL: 'https://pub.orcid.org/v3.0/',
-  PUBLIC_FILES_PATH: '/var/local/webservers/apps/apicuron/public',
+  PUBLIC_FILES_PATH: resolve('public'),
+  PRIVATE_FILES_PATH: resolve('private'),
   PUBLIC_FILES_URL_PATH: '/public',
   JWT_HEADER: 'authorization',
   JWT_PREFIX: 'bearer',
