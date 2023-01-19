@@ -9,10 +9,20 @@ import { ManageTermsComponent } from './manage-terms/manage-terms.component';
 import { ManageAchievementsComponent } from './manage-achievements/manage-achievements.component';
 
 const routes: Routes = [
-  { path: 'database/:resource_id/edit', component: DatabaseUpdateComponent, canActivate:[AuthGuard] },
-  { path: 'database/:resource_id/reports', component: SubmitReportComponent, canActivate: [AuthGuard] },
-  { path: 'database/:resource_id/terms', component: ManageTermsComponent, canActivate: [AuthGuard] },
-  { path: 'database/:resource_id/achievements', component: ManageAchievementsComponent, canActivate: [AuthGuard] }
+  {
+    path: '',
+    // pathMatch: 'full',
+    component: DashboardComponent,
+    canActivate: [AuthGuard],
+    children: [
+      { path: '**', redirectTo: '/', }, // redirects to the home page
+      { path: 'database/:resource_id/edit', component: DatabaseUpdateComponent },
+      { path: 'database/:resource_id/reports', component: SubmitReportComponent },
+      { path: 'database/:resource_id/terms', component: ManageTermsComponent },
+      { path: 'database/:resource_id/achievements', component: ManageAchievementsComponent }
+
+    ]
+  }
 ];
 
 @NgModule({

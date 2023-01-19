@@ -54,6 +54,7 @@ export class DatabaseCreateComponent implements OnInit {
         resource_id: ["", [Validators.required]],
         resource_long_name: ["", [Validators.required]],
         resource_name: ["", [Validators.required]],
+        color: ["", [Validators.required]],
         resource_url: [
           "",
           [
@@ -121,5 +122,9 @@ export class DatabaseCreateComponent implements OnInit {
 
   get resource_url() {
     return this.form.get("resource_url");
+  }
+
+  get color (){
+    return this.form.get("color");
   }
 }

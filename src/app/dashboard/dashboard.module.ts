@@ -42,9 +42,9 @@ import { AngularSvgIconModule } from 'angular-svg-icon'
   ],
   imports: [
     CommonModule,
+    DashboardRoutingModule,
     ReactiveFormsModule,
     DatabasesModule,
-    DashboardRoutingModule,
     AngularSvgIconModule,
     SvgModule
   ]

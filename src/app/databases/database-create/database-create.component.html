@@ -77,6 +77,17 @@
                     The Resource Description is required
                 </small>
             </div>
+            <div class="form-control-element tw-w-1/2">
+                <label for="color">Resource Color</label>
+                <div class="tw-flex tw-items-center tw-flex-row">
+                    <span>Select Color: </span>
+                    <input type="color" name="color" formControlName="color">
+                </div>
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="color.hasError('required') && color.touched">
+                    The Resource Color is required
+                </small>
+            </div>
         </div>
 
         <div class="tw-flex tw-justify-center">
