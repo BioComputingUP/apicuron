@@ -8,7 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { rename, mkdir } from 'fs';
+import { rename, mkdir } from 'fs/promises';
 import { Model } from 'mongoose';
 import path, { basename, join } from 'path';
 import { TransformerService } from '../../shared/transformer/transformer.service';
@@ -27,9 +27,6 @@ export class SubmittedResourcesService {
 		private submittedResourceModel: Model<SubmittedResourceDocument>,
 		@InjectModel(Resource.name)
 		private resourceModel: Model<ResourceDocument>,
-		@InjectModel(PartnerResource.name)
-		private partnerResourceModel: Model<PartnerResourceDocument>,
-		private transformerService: TransformerService,
 		protected configService: ConfigService,
 	) { }
 
@@ -58,22 +55,19 @@ export class SubmittedResourcesService {
 
 
 		// retrieve the resource object
-		const resource = await this.resourceModel.findOne({ resource_id })
+		const resource = await this.submittedResourceModel.findOne({ resource_id })
 
-		// move the logo from the private files folder to the public files folder
-		const logo_path = join(
-			join(this.configService.get('PRIVATE_FILES_PATH'), 'resources'),
-			resource.logo
-		)
+		// get the current logo path
+		const logo_path = resource.logo.replace(this.configService.get('PUBLIC_FILES_URL_PATH'), this.configService.get('PRIVATE_FILES_PATH'))
 
-		rename(logo_path,
-			join(this.configService.get('PUBLIC_FILES_PATH'), 'resources', basename(logo_path)),
-			(err: Error) => {
-				if (err) {
-					this.logger.error('Error moving logo file from private to public folder', err.stack, err.message)
-				}
-			}
-		)
+		// move the logo from the PRIVATE_FILES_PATH to the PUBLIC_FILES_PATH
+		try {
+			rename(logo_path,
+				join(this.configService.get('PUBLIC_FILES_PATH'), 'resources', basename(logo_path)),
+			)
+		} catch (err) {
+			this.logger.error('Error moving logo file from private to public folder', err.stack, err.message)
+		}
 
 		await this.resourceModel.replaceOne({
 			resource_id

@@ -14,7 +14,7 @@ export class StatisticsService {
 		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 		protected partnerResourceService: PartnerResourcesService,
 		protected transformerService: TransformerService,
-	) {}
+	) { }
 
 	logger = new Logger(StatisticsService.name);
 
@@ -34,7 +34,8 @@ export class StatisticsService {
 		const skip = (page - 1) * page_size;
 		let query = {};
 		if (user_query) {
-			const field = !!user_filter_field ? user_filter_field : 'full_name';
+			console.log('here')
+			const field = !!user_filter_field ? user_filter_field : 'displayedName';
 			query[field] = { $regex: user_query, $options: 'i' };
 		}
 
@@ -46,8 +47,7 @@ export class StatisticsService {
 				// warning some resource_ids were wrong
 				this.transformerService.warn(
 					'resources',
-					`requested these resource_ids [${resource_ids}] but ${
-						resource_ids.length - resource_ids.length
+					`requested these resource_ids [${resource_ids}] but ${resource_ids.length - resource_ids.length
 					} of them are wrong`,
 				);
 			}
@@ -56,17 +56,54 @@ export class StatisticsService {
 			}
 		}
 
-		const dataPromise = this.userModel.find(query).skip(skip).limit(page_size);
-		const countPromise = this.userModel.count(query);
 
-		const [data, count] = await Promise.all([dataPromise, countPromise]);
+		const userStatsAggregation = [
+			{
+				$project: {
+					role: 0,
+					__v: 0,
+					last_update: 0
+				}
+			},
+			{
+				"$lookup": {
+					from: "statistics",
+					localField: "orcid_id",
+					foreignField: "curator_orcid",
+					as: "stats"
+				}
+			},
+			{
+				"$match": query
+			},
+
+		]
+		const paginationAggregation = [
+			{
+				"$skip": skip
+			},
+			{
+				'$limit': +page_size
+			}
+		]
+
+		const dataPromise = this.userModel.aggregate([...userStatsAggregation, ...paginationAggregation])
+
+		const countPromise = this.userModel.aggregate([...userStatsAggregation, { $count: 'total_count' }])
+
+		const [data, aggregation_count] = await Promise.all([dataPromise, countPromise]);
+
+		// aggregation returns array containing object with attribute 'total_count', 
+		// extracting the count if available, otherwise it's an empty list and therefore 0
+		const count = aggregation_count?.[0]?.total_count || 0
+
 		return { data, count, page, page_size };
 	}
 
 	async get_resource_leaderboard(
 		resource_id: string,
 		page: number = 1,
-		page_size:number = 10,
+		page_size: number = 10,
 	) {
 		const resource = await this.partnerResourceService.get_resource(
 			resource_id,
@@ -101,6 +138,6 @@ export class StatisticsService {
 		const query = { resource_id };
 		const countPromise = this.statisticsModel.count(query);
 		const [leaderboard, count] = await Promise.all([leaderboardPromise, countPromise])
-		return { data:leaderboard, page, count };
+		return { data: leaderboard, page, count };
 	}
 }

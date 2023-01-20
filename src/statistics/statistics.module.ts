@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Statistics, StatisticsSchema } from './schemas/statistics.schema';
-import { StatisticsController } from './statistics/statistics.controller';
+import { OldStatisticsController, StatisticsController } from './statistics/statistics.controller';
 import { StatisticsService } from './statistics.service';
 import { AuthModule } from '../auth/auth.module';
 import { ResourcesModule } from '../resources/resources.module';
@@ -22,7 +22,7 @@ import { AchievementsModule } from '../achievements/achievements.module';
 		]),
         TransformerModule
     ],
-    controllers: [StatisticsController],
+    controllers: [StatisticsController, OldStatisticsController],
     providers: [StatisticsService, {
         provide: APP_INTERCEPTOR,
         useClass: TransformInterceptor,

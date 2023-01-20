@@ -19,6 +19,8 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { TermsModule } from './terms/terms.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { SchedulerController } from './src/scheduler/scheduler.controller';
+import { UniqueRule } from './shared/validators/unique.validator';
+import { EntryExistsRule } from './shared/validators/entry-exists.validator';
 
 @Module({
 	imports: [
@@ -67,6 +69,6 @@ import { SchedulerController } from './src/scheduler/scheduler.controller';
 		// SharedValidatorsModule
 	],
 	controllers: [AppController, SchedulerController],
-	providers: [AppService],
+	providers: [AppService, UniqueRule, EntryExistsRule],
 })
 export class AppModule { }

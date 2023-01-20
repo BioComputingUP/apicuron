@@ -1,4 +1,7 @@
 import { IsEmpty, IsNotEmpty, IsOptional, IsString, IsUrl, Matches, Max, MaxLength, MinLength, Validate } from "class-validator";
+import { UniqueRule } from "../../shared/validators/unique.validator";
+import { Resource } from "../schemas/resource.schema";
+import { SubmittedResource } from "../schemas/submitted-resource.schema";
 import { UniqueResourceIdRule } from "../submitted-resources/validators/unique-resource-id"
 import { UniqueResourceURIRule } from "../submitted-resources/validators/unique-resource-uri"
 
@@ -17,12 +20,28 @@ export class CreateResourceDto {
     @IsString()
     @MaxLength(60)
     @IsNotEmpty()
+    @Validate(UniqueRule, [
+        Resource.name,
+        (resource_long_name) => {
+            return {
+                resource_long_name
+            }
+        } 
+    ])
 	resource_long_name: string;
 
 
     @IsString()
     @MaxLength(20)
     @IsNotEmpty()
+    @Validate(UniqueRule, [
+        Resource.name,
+        (resource_name) => {
+            return {
+                resource_name
+            }
+        }
+    ])
 	resource_name: string;
 
     @IsString()
@@ -34,6 +53,14 @@ export class CreateResourceDto {
     @IsString()
     @IsUrl()
     @IsNotEmpty()
+    @Validate(UniqueRule, [
+        Resource.name,
+        (resource_url) => {
+            return {
+                resource_url
+            }
+        } 
+    ])
 	resource_url: string;
 
     @IsString()

@@ -35,5 +35,5 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 # static files
-/public/*
-/dist-old/*
+public/*
+private/*

@@ -26,7 +26,7 @@ export class AuthService {
     const db_user =  await this.userService.get_by_orcid(user.orcid_id)
 
     let jwt_input = { ...user }
-    if(!!db_user.jwt_token){
+    if(!!db_user && !!db_user.jwt_token){
       jwt_input['jwt_token']= db_user.jwt_token
     }
     const jwtToken = this.jwtService.sign(jwt_input);

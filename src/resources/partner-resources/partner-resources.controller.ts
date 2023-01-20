@@ -30,7 +30,7 @@ import { rename } from 'fs';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import * as mime from 'mime-types';
-import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiHeader, ApiNotFoundResponse, ApiOkResponse, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiHeader, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthorizationHeader, VersionHeader } from '../../config/swagger';
 import { PartnerResourceDto, SelectPartnerResourceDto } from '../dto/partner-resources.dto';
 import { AuthService } from '../../auth/auth.service';
@@ -64,6 +64,9 @@ export class PartnerResourcesController {
 		description: 'Returns a list of all the partner resources of APICURON',
 		type: Array<PartnerResourceDto>
 	})
+	@ApiOperation({
+        summary: 'Get the list of all resources on APICURON'
+    })
 	@Get()
 	async list_resources(): Promise<Array<PartnerResourceDto>> {
 		return await this.partnerResourceService.get_resources();
@@ -74,6 +77,9 @@ export class PartnerResourcesController {
 		description: 'The specified resource',
 		type: PartnerResourceDto
 	})
+	@ApiOperation({
+        summary: 'Get information about a single resource'
+    })
 	@ApiNotFoundResponse({
 		description: 'A 404 Not Found Response and Error Message'
 	})
@@ -92,6 +98,9 @@ export class PartnerResourcesController {
 	// swagger documentation decorators
 	@ApiConsumes('multipart/form-data')
 	@ApiHeader(AuthorizationHeader)
+	@ApiOperation({
+        summary: 'Update the information about a partner resource'
+    })
 	@ApiBody({
 		description: 'A Partner Resource Update Object',
 		type: UpdatePartnerResourceDto
@@ -101,8 +110,8 @@ export class PartnerResourcesController {
 		type: PartnerResourceDto
 	})
 	// nestjs logic decorators
-	@Put('edit')
-	@Patch('edit')
+	@Put('')
+	@Patch('')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	@UseInterceptors(
 		FileInterceptor('logo', {

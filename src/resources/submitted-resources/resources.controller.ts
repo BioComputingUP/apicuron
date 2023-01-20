@@ -11,6 +11,8 @@ import {
 	MaxFileSizeValidator,
 	FileTypeValidator,
 	Logger,
+	UseGuards,
+	SetMetadata,
 	InternalServerErrorException
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -19,9 +21,12 @@ import { SubmittedResourcesService } from './resources.service';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 import { SvgSanitationValidationPipe } from '../../shared/pipes/svg-sanitation.pipe';
-import { writeFile, rename } from 'fs';
 import * as mime from 'mime-types'
 import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { mkdir, rename } from 'fs/promises';
+import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
+import { RoleGuard } from '../../auth/guards/role.guard';
+import { MakePartner } from '../dto/make-partner.dto';
 
 const resource_image_validation_pipe = new ParseFilePipe({
 	validators: [
@@ -41,11 +46,13 @@ export class SubmittedResourcesController {
 	constructor(
 		private resourcesService: SubmittedResourcesService,
 		private configService: ConfigService,
-	) 
-	{}
+	) {
+		mkdir(this.resources_folder, { recursive: true })
+	}
 
 	private readonly logger = new Logger(SubmittedResourcesController.name)
-	
+	private resources_folder = join(this.configService.get('PRIVATE_FILES_PATH'), 'resources');
+
 	@ApiCreatedResponse({
 		status: 201,
 		description: 'Returns a confirmation value of the created resource',
@@ -63,20 +70,39 @@ export class SubmittedResourcesController {
 	) {
 		const ext = mime.extension(logo.mimetype)
 		const filename = `logo-${createResource.resource_id}.${ext}`;
-		const file_path = join(this.configService.get('PRIVATE_FILES_PATH'), 'resources',filename)
-		
-		rename(logo.path, file_path, (err) => {
-			if(err){
-				this.logger.error(err)
-			}
-		})
+		const file_path = join(this.resources_folder, filename)
 
-		const logo_link = file_path.replace(this.configService.get('PUBLIC_FILES_PATH'), this.configService.get('PUBLIC_FILES_URL_PATH'))
+
+		try {
+			await rename(logo.path, file_path);
+		} catch (err) {
+			this.logger.error(`Error moving logo file from ${logo.path} to private folder: "${file_path}"`, err.stack, err.message)
+		}
+
+
+		const logo_link = file_path.replace(this.configService.get('PRIVATE_FILES_PATH'), this.configService.get('PUBLIC_FILES_URL_PATH'))
 
 		return this.resourcesService.create_resource({
 			...createResource,
 			logo: logo_link,
 		}, logo);
+	}
+
+
+	@Post('make_partner')
+	@SetMetadata('roles', ['admin'])
+	@UseGuards(LocalAuthGuard, RoleGuard)
+	async make_resource_partner_resource(
+		@Body() resource_id_obj: MakePartner
+	){
+		const { resource_id } = resource_id_obj
+		try {
+			this.resourcesService.make_partner(resource_id)
+			return "true"
+		} catch(e) {
+			this.logger.error(`Failed making ${resource_id} a partner-resource`, e.stack, e.message)
+			return 'false'
+		}
 	}
 
 }
