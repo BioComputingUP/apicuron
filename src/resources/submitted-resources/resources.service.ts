@@ -11,6 +11,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { rename, mkdir } from 'fs/promises';
 import { Model } from 'mongoose';
 import path, { basename, join } from 'path';
+import { User, UserDocument } from '../../auth/users/schemas/user.schema';
 import { TransformerService } from '../../shared/transformer/transformer.service';
 import { CreateResourceDto } from '../dto/createResource.dto';
 import { PartnerResource, PartnerResourceDocument } from '../schemas/partner-resources.schema';
@@ -27,6 +28,8 @@ export class SubmittedResourcesService {
 		private submittedResourceModel: Model<SubmittedResourceDocument>,
 		@InjectModel(Resource.name)
 		private resourceModel: Model<ResourceDocument>,
+		@InjectModel(User.name)
+		private userModel: Model<UserDocument>,
 		protected configService: ConfigService,
 	) { }
 
@@ -37,9 +40,9 @@ export class SubmittedResourcesService {
 
 	async create_resource(
 		resource_obj: CreateResourceDto & { logo: string },
-		logo: Express.Multer.File,
+		creator: string
 	) {
-		const res = new this.submittedResourceModel(resource_obj);
+		const res = new this.submittedResourceModel({ ...resource_obj, creator });
 
 		res.save();
 		return res.toObject();
@@ -67,6 +70,23 @@ export class SubmittedResourcesService {
 			)
 		} catch (err) {
 			this.logger.error('Error moving logo file from private to public folder', err.stack, err.message)
+		}
+
+
+		// if the submitted resource has a creator, we set it as an owner of the resource
+		const { creator, resource_name } = resource
+		if (creator) {
+			console.log(creator)
+			await this.userModel.updateOne({
+				orcid_id: creator
+			}, {
+				"$push": {
+					resources: {
+						resource_id,
+						name: resource_name
+					}
+				}
+			})
 		}
 
 		await this.resourceModel.replaceOne({

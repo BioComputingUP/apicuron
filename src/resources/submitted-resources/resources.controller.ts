@@ -9,6 +9,7 @@ import {
 	Logger,
 	UseGuards,
 	SetMetadata,
+	Req,
 	InternalServerErrorException
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -19,7 +20,6 @@ import { ConfigService } from '@nestjs/config';
 import { SvgSanitationValidationPipe } from '../../shared/pipes/svg-sanitation.pipe';
 import * as mime from 'mime-types'
 import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { mkdir, rename } from 'fs/promises';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
 import { RoleGuard } from '../../auth/guards/role.guard';
 import { MakePartner } from '../dto/make-partner.dto';
@@ -37,7 +37,6 @@ export class SubmittedResourcesController {
 		private resourcesService: SubmittedResourcesService,
 		private configService: ConfigService,
 	) {
-		mkdir(this.resources_folder, { recursive: true })
 	}
 
 	private readonly logger = new Logger(SubmittedResourcesController.name)
@@ -49,11 +48,13 @@ export class SubmittedResourcesController {
 		type: CreateResourceDto
 	})
 	@Put()
+	@UseGuards(LocalAuthGuard)
 	@HttpCode(201)
 	@UseInterceptors(FileInterceptor('logo', {
 		dest: '/tmp/apicuron/submitted_resources/',
 	}))
 	async create_resource(
+		@Req() req,
 		@Body() createResource: CreateResourceDto,
 		@UploadedFile(ResourceLogoValidationPipe(true), SvgSanitationValidationPipe)
 		logo: Express.Multer.File,
@@ -69,9 +70,9 @@ export class SubmittedResourcesController {
 				file_path,
 				{ mkdirp: true },
 				function (err) {
-					if(err){
+					if (err) {
 						this.logger.error(err.message, err.stack, err.name)
-						throw new InternalServerErrorException();	
+						throw new InternalServerErrorException();
 					}
 				},
 			);
@@ -85,7 +86,10 @@ export class SubmittedResourcesController {
 		return this.resourcesService.create_resource({
 			...createResource,
 			logo: logo_link,
-		}, logo);
+		},
+			req.user.orcid_id,
+
+		);
 	}
 
 
@@ -94,12 +98,12 @@ export class SubmittedResourcesController {
 	@UseGuards(LocalAuthGuard, RoleGuard)
 	async make_resource_partner_resource(
 		@Body() resource_id_obj: MakePartner
-	){
+	) {
 		const { resource_id } = resource_id_obj
 		try {
 			this.resourcesService.make_partner(resource_id)
 			return "true"
-		} catch(e) {
+		} catch (e) {
 			this.logger.error(`Failed making ${resource_id} a partner-resource`, e.stack, e.message)
 			return 'false'
 		}
