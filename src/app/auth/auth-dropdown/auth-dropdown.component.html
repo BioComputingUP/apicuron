@@ -41,9 +41,12 @@
                     user.notifications.length }}</span>
             </a>
 
+            <a routerLink="/databases/create" class="dropdown-element">
+                <svg-icon src="assets/svg/create_icon.svg" svgClass="tw-inline tw-w-4 tw-h-4"></svg-icon> Create Resource
+            </a>
+
             <button class="dropdown-element" (click)="logout()">
-                <svg-icon src="assets/svg/logout.svg" svgClass="tw-inline tw-w-4 tw-h-4"></svg-icon>
-                Sign out
+                <svg-icon src="assets/svg/logout.svg" svgClass="tw-inline tw-w-4 tw-h-4"></svg-icon> Sign out
             </button>
         </div>
     </div>

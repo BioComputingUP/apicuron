@@ -11,6 +11,8 @@ module.exports = {
       colors: {
         "apicuron-purple": "#4D194D",
         "apicuron-bright-purple": "#742574",
+        "apicuron-purple-100": "hsl(300, 51%, 89%)",
+        "apicuron-purple-500": "hsl(300, 51%, 40%)",
         "apicuron-red": "#9A031E",
         // orange: {
         //   50: '#fff7ed',

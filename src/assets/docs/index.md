@@ -8,10 +8,11 @@ The **APICURON  main documentation**, this section will contain all the necessar
 
 In the process of integrating APICURON into your system you will go through the following Steps.
 
-1. Define your **Resource** by filling the following *[form](/databases/create)*
-2. Your submission will then go through an *approval process*
-3. After your Approval we will link your APICURON Account with the Created **Resource**
-4. Then you will Have access to all the *features* APICURON has to offer.
+1. Create an account on APICURON by [logging-in](/api/auth/orcid) 
+2. while logged-in, define your **Resource** by filling the following *[form](/databases/create)*
+3. Your submission will then go through an *approval process*
+4. After your Approval we will link your APICURON Account with the Created **Resource**
+5. Then you will Have access to all the *features* APICURON has to offer.
 
 
 ### Defining your Resource
@@ -46,7 +47,8 @@ Terms Are what you consider the atomic aspect of contribution for your resource,
  - *Score*: the numerical value describing how the resource estimates the Activity
  - *Description*: A short text describing the in and outs of the Term
 
-![Term Fields](/assets/docs/images/screenshot_term_fields.png)
+<img src="/assets/docs/images/screenshot_term_fields.png" class="tw-mx-auto">
+<!-- ![Term Fields]() -->
 
 
 ## Submitting Curation Data (Reports)
