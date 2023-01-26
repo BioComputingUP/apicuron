@@ -2,10 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../auth/auth.module';
 import { Report, ReportSchema } from '../reports/reports.schema';
-import {
-	PartnerResourcesController,
-	PartnerResourcesControllerOld,
-} from './partner-resources/partner-resources.controller';
+import { PartnerResourcesController } from './partner-resources/partner-resources.controller';
 import { PartnerResourcesService } from './partner-resources/partner-resources.service';
 import { SubmittedResourcesController } from './submitted-resources/resources.controller';
 import {
@@ -20,15 +17,14 @@ import {
 	SubmittedResourceSchema,
 } from './schemas/submitted-resource.schema';
 import { TransformerModule } from '../shared/transformer/transformer.module';
-import { UniqueResourceIdRule } from './submitted-resources/validators/unique-resource-id';
-import { UniqueResourceURIRule } from './submitted-resources/validators/unique-resource-uri';
+import { UniqueResourceIdRule } from './validators/unique-resource-id';
+import { UniqueResourceURIRule } from './validators/unique-resource-uri';
 import { JwtModule } from '@nestjs/jwt';
 import { ResourceIdExists } from './partner-resources/validators/resource-id-exists';
 
 @Module({
 	controllers: [
 		PartnerResourcesController,
-		PartnerResourcesControllerOld,
 		SubmittedResourcesController,
 	],
 	providers: [UniqueResourceIdRule, UniqueResourceURIRule, ResourceIdExists, PartnerResourcesService, SubmittedResourcesService],
@@ -52,7 +48,7 @@ import { ResourceIdExists } from './partner-resources/validators/resource-id-exi
 					},
 				],
 			},
-			
+
 			{
 				name: Report.name,
 				schema: ReportSchema,
@@ -61,4 +57,4 @@ import { ResourceIdExists } from './partner-resources/validators/resource-id-exi
 		TransformerModule,
 	],
 })
-export class ResourcesModule {}
+export class ResourcesModule { }

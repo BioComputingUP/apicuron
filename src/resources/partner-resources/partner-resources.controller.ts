@@ -7,13 +7,10 @@ import {
 	UploadedFile,
 	Patch,
 	NotFoundException,
-	ParseFilePipe,
 	UseGuards,
 	Body,
 	Put,
-	UnauthorizedException,
-	MaxFileSizeValidator,
-	FileTypeValidator,
+
 	UseInterceptors,
 	InternalServerErrorException,
 	Logger
@@ -34,16 +31,8 @@ import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiHeader, ApiNotFoundRespons
 import { AuthorizationHeader, VersionHeader } from '../../config/swagger';
 import { PartnerResourceDto, SelectPartnerResourceDto } from '../dto/partner-resources.dto';
 import { AuthService } from '../../auth/auth.service';
-
-const resource_image_validation_pipe = new ParseFilePipe({
-	validators: [
-		new MaxFileSizeValidator({ maxSize: 1000000 }),
-		new FileTypeValidator({
-			fileType: /(^image)(\/)(jpeg|png|svg\+xml|webp)*/gm,
-		}),
-	],
-	fileIsRequired: false,
-});
+import * as mv from 'mv'
+import { ResourceLogoValidationPipe } from '../validators/logo-validation.pipe'
 
 
 @ApiTags('Partner Resources')
@@ -121,7 +110,7 @@ export class PartnerResourcesController {
 	async update_resource_values(
 		@Body() update_resource: UpdatePartnerResourceDto,
 		@Req() request,
-		@UploadedFile(resource_image_validation_pipe, SvgSanitationValidationPipe)
+		@UploadedFile(ResourceLogoValidationPipe(), SvgSanitationValidationPipe)
 		logo: Express.Multer.File,
 	) {
 		const { resource_id } = update_resource;
@@ -132,7 +121,6 @@ export class PartnerResourcesController {
 
 		// if there's an uploaded file
 		if (logo) {
-			var mv = require('mv');
 			const ext = mime.extension(logo.mimetype);
 			const public_path = join(
 					this.configService.get('PUBLIC_FILES_PATH'),
@@ -144,9 +132,9 @@ export class PartnerResourcesController {
 				logo.path,
 				public_path,
 				{ mkdirp: true },
-				function (err) {
+				(err:Error) => {
 					if(err){
-						console.error(PartnerResourcesController.name, err)
+						this.logger.error(err.message, err.stack, err.name)
 						throw new InternalServerErrorException();	
 					}
 				},
@@ -164,20 +152,3 @@ export class PartnerResourcesController {
 	}
 }
 
-@ApiTags('First Version')
-@Controller()
-export class PartnerResourcesControllerOld {
-	constructor(private partnerResourceService: PartnerResourcesService) {}
-	@Get(['/stat', '/homepage_statistics'])
-	async get_statistics() {
-		// const resources = await this.partnerResourceService.get_resources();
-		// const [achievement_count, count_biocurators, contributions_count] =
-		// 	await this.partnerResourceService.get_counts();
-		// return {
-		// 	achievement_count,
-		// 	count_biocurators,
-		// 	contributions_count,
-		// 	resources,
-		// };
-	}
-}

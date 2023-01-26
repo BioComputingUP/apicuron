@@ -11,27 +11,27 @@ import {
 } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
-import { SubmittedResource } from '../../schemas/submitted-resource.schema';
+import { SubmittedResource } from '../schemas/submitted-resource.schema';
 
 
 // create custom validator according to class-validator standards
 // marking the class as injectable to add it to nestjs DI
 @Injectable()
-@ValidatorConstraint({ name: 'UniqueResourceURI', async: true })
-export class UniqueResourceURIRule implements ValidatorConstraintInterface {
+@ValidatorConstraint({ name: 'UniqueResourceId', async: true })
+export class UniqueResourceIdRule implements ValidatorConstraintInterface {
 
 	// the class does not populate the SubmittedResourcesService for some reason
 	// The mongodb connection is used to overcome that issue
 	constructor(@InjectConnection() private readonly connection: Connection) {}
 
-	private logger = new Logger(UniqueResourceURIRule.name);
+	private logger = new Logger(UniqueResourceIdRule.name);
 
 	async validate(value: string) {
 		try {
-			return ! await this.connection.models[SubmittedResource.name].exists({ resource_uri: value })
+			return ! await this.connection.models[SubmittedResource.name].exists({ resource_id: value })
 		} catch (e) {
 			this.logger.error(
-				'Error at the UniqueResourceURIRule validator',
+				'Error at the UniqueResourceIdRule validator',
 				e.stack,
 				e,
 			);

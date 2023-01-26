@@ -37,6 +37,9 @@ export class SubmittedResource {
 	@Prop({ type: String, required: true })
 	color: string;
 
+	@Prop({ type: String })
+	creator: string;
+
 	state: string;
 }
 
