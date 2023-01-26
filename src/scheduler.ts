@@ -6,11 +6,15 @@ import { hideBin } from 'yargs/helpers'
 import { ConfigService } from '@nestjs/config';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { ArgumentParser } from 'argparse'
+import { useContainer } from 'class-validator';
+import { MongooseModule } from '@nestjs/mongoose';
 
 async function bootstrap() {
     const app = await NestFactory.createApplicationContext(AppModule)
-
-    const schedulerService = await app.select(SchedulerModule).get(SchedulerService)
+    
+    useContainer(app.select(AppModule), { fallbackOnErrors: true });
+    
+    const schedulerService = await app.get(SchedulerService)
     const configService = await app.get(ConfigService)
 
 
@@ -38,21 +42,7 @@ async function bootstrap() {
         args
     })
 
-    // program
-    //     .addOption(new Option('--host <string>', 'hostname of the database').default(configService.get('db_host')))
-    //     .addOption(new Option('-db --database <string>', 'database name').default(configService.get('database')))
-    //     .addOption(new Option('-p --port <number>', 'Port of the database').default(configService.get('db_port')))
-    //     .addOption(new Option('-t --task <string>', 'Name of task to run').makeOptionMandatory().choices(schedulerService.tasks))
-    //     .addOption(new Option('-a --arguments <string>', 'The arguments destined to the task, separated by commas').argParser(splitter))
-    //     .addOption(new Option('-f --file <File>', 'file argument for task'))
-
-   
-    // program.parse()
-    
-    // const options = program.opts()
-    
-    // await schedulerService.run_task(options.task, options.file, ...options.arguments)
-
+    await schedulerService.run_task(args.task, args.file, args.arguments)
 
 
     await app.close();

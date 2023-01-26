@@ -1,23 +1,28 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../../auth/auth.service';
 import { UsersService } from '../../auth/users/users.service';
-import * as StreamArray from 'stream-json/streamers/StreamArray';
-import * as StreamObject from 'stream-json/streamers/StreamObject';
-import { pick } from 'stream-json/filters/Pick';
-import { filter } from 'stream-json/filters/Filter';
-import { parser } from 'stream-json';
-import { createReadStream, existsSync } from 'fs';
-
+import { existsSync } from 'fs';
+import { InjectModel } from '@nestjs/mongoose';
+import { Report } from '../../reports/reports.schema';
+import { Model } from 'mongoose';
+import { ReportsParser } from '../reports.parser';
 @Injectable()
 export class SchedulerService {
 
-    constructor(public authService: AuthService, public userService: UsersService) { }
-
+    constructor(public authService: AuthService,
+        public userService: UsersService,
+        @InjectModel(Report.name) protected reportModel: Model<Report>,
+        protected reportParser: ReportsParser)
+        {
+            this.tasks = ['test_task', 'submit_bulk']
+        }
     tasks = ['test_task', 'submit_bulk']
+    
 
 
     async run_task(task: string, file: string | null, ...args) {
-        if (!this.tasks.includes(task)) {
+        let tasks = ['test_task', 'submit_bulk']
+        if (!tasks.includes(task)) {
             throw new Error(`Task ${task} does not exist`)
         }
         await this[task](file, ...args)
@@ -35,10 +40,10 @@ export class SchedulerService {
 
     private async submit_bulk(file: string, ...args) {
 
-        
+
         const [orcid_id, delete_all] = args;
-        
-        if(!orcid_id){
+
+        if (!orcid_id) {
             throw new Error("orcid id required for the submission")
         }
 
@@ -49,33 +54,16 @@ export class SchedulerService {
         // }
 
         // const user_resource_ids = user.resources.map(({ resource_id }) => { return resource_id })
-        
-        if(!file || !existsSync(file)){
+
+        if (!file || !existsSync(file)) {
             throw new Error("File is either unset or path is invalid");
         }
-        
-        const objectStream = new StreamObject()
-        const defaultsStream = createReadStream(file)
-            .pipe(parser())
-            .pipe(filter({filter: /^(?!reports).*$/ }))
-            .pipe(objectStream)
-        
-        const defaultReport = await new Promise(
-            (resolve, reject) => {
-                const defaultReport = {}
-                defaultsStream.on('data', ({key, value}) => {
-                    defaultReport[key] = value;
-                })
 
-                defaultsStream.on('end', () => {
-                    resolve(defaultReport)
-                })
-            }
-        )
+        // const defaultReport = await this.reportParser.parse_default_report(file)
 
-        console.log({
-            defaultReport
-        })
 
+        // const execution_report = await this.reportParser.process_reports(file, defaultReport)
+
+        // console.log(execution_report)
     }
 }

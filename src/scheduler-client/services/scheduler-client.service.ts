@@ -11,7 +11,7 @@ import { Cron } from '@nestjs/schedule';
 @Injectable()
 export class SchedulerClientService {
 
-    constructor(protected config: ConfigService, protected http: HttpService) {}
+    constructor(protected config: ConfigService, protected http: HttpService) { }
 
     private url = 'https://scheduler.biocomputingup.it/task/'
 
@@ -21,14 +21,14 @@ export class SchedulerClientService {
     private database_host = this.config.get('db_host')
     private database = this.config.get('database')
 
-    async submit_task(task: TaskSubmit){
+    async submit_task(task: TaskSubmit) {
         const form = this.base_form();
 
         form.append('task', task.task)
-        if(task.task_arguments) {
+        if (task.task_arguments) {
             form.append('task_arguments', task.task_arguments)
         }
-        if(task.file){
+        if (task.file) {
             form.append('task_file_argument', createReadStream(task.file.path), {
                 filename: task.file.originalname,
                 contentType: task.file.mimetype,
@@ -43,9 +43,9 @@ export class SchedulerClientService {
                 // in this part we will use the form.submit function to call the API
                 // and call the reject/resolve methods accordingly in the callback Function
                 form.submit(this.url, (err: Error, response: IncomingMessage) => {
-                    if(err){
+                    if (err) {
                         reject(err)
-                    }else{
+                    } else {
                         resolve(response)
                     }
                 })
@@ -54,7 +54,7 @@ export class SchedulerClientService {
 
         // const config = { headers: { 'Content-Type': 'multipart/form-data' } };
         // return await this.http.axiosRef.post(this.url, form, config)
-        
+
     }
 
     private base_form(): FormData {
@@ -89,7 +89,7 @@ export class SchedulerClientService {
      * @returns 
      */
 
-    async submit_reports(reports: Express.Multer.File, orcid_id: string, delete_all: string[]){
+    async submit_reports(reports: Express.Multer.File, orcid_id: string, delete_all: string[]) {
         const response = await this.submit_task({
             task: 'submit_report',
             task_arguments: `${orcid_id} ${delete_all.join(',')}`,
@@ -106,8 +106,8 @@ export class SchedulerClientService {
      * @param resource_id resource id of the resource to compute the statistics
      * @param orcid_id optional orcid_id if this triggers a re-compute of the orcid_id
      */
-    async compute_statistics(resource_id: string, orcid_id= ''){
-        
+    async compute_statistics(resource_id: string, orcid_id = '') {
+
         const response = await this.submit_task({
             task: 'compute_statistics',
             task_arguments: `${resource_id} ${orcid_id}`,
@@ -123,7 +123,7 @@ export class SchedulerClientService {
      * @param resource_id resource id of the resource to compute the statistics
      * @param orcid_id optional orcid_id if this triggers a re-compute of the orcid_id
      */
-    async compute_achievements(resource_id: string, orcid_id= ''){
+    async compute_achievements(resource_id: string, orcid_id = '') {
         const response = await this.submit_task({
             task: 'compute_achievements',
             task_arguments: `${resource_id} ${orcid_id}`,
@@ -135,13 +135,16 @@ export class SchedulerClientService {
     }
 
     @Cron('0 */30 * * * *')
-    async add_resource_id(){
-        const response = await this.submit_task({
-            task: 'add_resource_id'
-        }).catch((err) => {
-            this.schedulerLogger.error(err);
-        })
+    async add_resource_id() {
+        if (this.config.get('environment') != 'local') {
+            const response = await this.submit_task({
+                task: 'add_resource_id'
+            }).catch((err) => {
+                this.schedulerLogger.error(err);
+            })
 
-        return response['data']
+            return response['data']
+        }
+
     }
 }

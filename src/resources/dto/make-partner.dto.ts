@@ -8,7 +8,7 @@ export class MakePartner {
     @IsString()
     @Validate(EntryExistsRule, [
         SubmittedResource.name,
-        (resource_id) => {
+        ({ resource_id }) => {
             return {
                 resource_id
             }

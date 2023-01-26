@@ -11,7 +11,7 @@ export class ReportDto {
 	entity_uri: string;
 
     @IsNotEmpty()
-	resource_uri: string;
+    resource_id: string;
 
     @IsNotEmpty()
 	timestamp: Date;

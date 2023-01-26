@@ -19,7 +19,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiHeader, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { createReadStream } from 'fs';
-import { SchedulerClientService } from '../scheduler/services/scheduler-client.service';
+import { SchedulerClientService } from '../scheduler-client/services/scheduler-client.service';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { HasAResourceGuard } from '../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
@@ -182,8 +182,8 @@ export class ReportsControllerV2 {
 	async submit_report(@Body() report: SubmitReportDto, @Request() req) {
 		this.can_edit_resource(req.user, report.resource_id);
 
-		const resource_uri = await this.partnerResourceService.retrieve_uri(report.resource_id)
-		const report_confirmation = await this.reportService.insertReport({...report, resource_uri });
+		// const resource_uri = await this.partnerResourceService.retrieve_uri(report.resource_id)
+		const report_confirmation = await this.reportService.insertReport(report);
 		await this.schedulerService.compute_achievements(report.resource_id, report.curator_orcid);
 		this.schedulerService.compute_statistics(report.resource_id, report.curator_orcid);
 		return report_confirmation;

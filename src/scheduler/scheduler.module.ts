@@ -1,13 +1,14 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
+import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../auth/auth.module';
-import { SchedulerClientService } from './services/scheduler-client.service';
+import { ReportsModule } from '../reports/reports.module';
+import { ReportsParser } from './reports.parser';
 import { SchedulerService } from './services/scheduler.service';
 
 @Module({
-  imports: [HttpModule, AuthModule],
-  providers: [SchedulerClientService, SchedulerService],
+  imports: [HttpModule, AuthModule, MongooseModule, ReportsModule],
+  providers: [SchedulerService, ReportsParser],
   controllers: [],
-  exports: [SchedulerClientService]
 })
 export class SchedulerModule {}

@@ -37,7 +37,6 @@ import { ResourceIdExists } from './partner-resources/validators/resource-id-exi
 		AuthModule,
 		JwtModule,
 		// AchievementsModule,
-		// SharedValidatorsModule,
 		MongooseModule.forFeature([
 			{
 				name: Resource.name,
