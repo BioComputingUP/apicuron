@@ -11,7 +11,10 @@ import { DatabasesService } from '../../databases/services/databases.service';
 @Component({
   selector: 'database-update',
   templateUrl: './database-update.component.html',
-  styleUrls: ['./database-update.component.scss']
+  styleUrls: ['./database-update.component.scss'],
+  host: {
+    class: 'tw-flex-auto'
+  }
 })
 export class DatabaseUpdateComponent implements OnInit {
   resource_id$: Observable<string>;

@@ -16,14 +16,14 @@ import { AltNavbarComponent } from "./alt-navbar/alt-navbar.component";
 import { IndexModule } from "./index/index.module";
 import { AuthModule } from "./auth/auth.module";
 import { ToastrModule } from "ngx-toastr";
-import { AngularSvgIconModule } from "angular-svg-icon"
+import { AngularSvgIconModule } from "angular-svg-icon";
 @NgModule({
   declarations: [
     AppComponent,
     FootComponent,
     ApiComponent,
     PageNotFoundComponent,
-    AltNavbarComponent
+    AltNavbarComponent,
   ],
   imports: [
     AppRoutingModule,
@@ -37,7 +37,6 @@ import { AngularSvgIconModule } from "angular-svg-icon"
     FormsModule,
     HttpClientModule,
     AngularSvgIconModule.forRoot(),
-    AppRoutingModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

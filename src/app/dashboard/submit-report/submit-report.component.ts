@@ -24,6 +24,9 @@ import { orcidIdValidator } from "./validators/orcid-id.validator";
   selector: "app-submit-report",
   templateUrl: "./submit-report.component.html",
   styleUrls: ["./submit-report.component.scss"],
+  host: {
+    class: 'tw-flex-auto'
+  }
 })
 export class SubmitReportComponent implements OnInit {
   resource_id$: Observable<string>;
@@ -51,7 +54,7 @@ export class SubmitReportComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    
+
   }
 
 }

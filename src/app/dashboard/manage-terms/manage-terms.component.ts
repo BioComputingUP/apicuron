@@ -11,6 +11,9 @@ import { UpdateTerm, TermsService, CreateTerm, DeleteTerm } from "../services/te
   selector: "app-manage-terms",
   templateUrl: "./manage-terms.component.html",
   styleUrls: ["./manage-terms.component.scss"],
+  host: {
+    class: 'tw-flex-auto'
+  }
 })
 export class ManageTermsComponent implements OnInit {
   resourceId$: Observable<string>;

@@ -99,13 +99,13 @@
                             <input type="text" name="" id="" formControlName="category">
                         </div>
 
-                        <input type="submit" class="tw-w-full tw-p-2 tw-mx-1 tw-bg-green-500 tw-text-white"
+                        <input type="submit" class="tw-w-full tw-p-2 tw-mx-1 tw-bg-green-500 tw-text-white tw-capitalize"
                             value="submit">
 
 
                     </div>
                 </form>
-                <button class="tw-w-full tw-mx-auto tw-p-2 tw-bg-gray-400 tw-text-white"
+                <button class="tw-w-full tw-mx-auto tw-p-2 tw-bg-gray-400 tw-text-white tw-capitalize"
                     (click)="show_edit_form = false">Close</button>
             </div>
         </div>
@@ -132,10 +132,10 @@
                         class="tw-bg-white tw-grid tw-grid-flow-row tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4">
 
                         <!-- for the update term form -->
-                        <h2 class="tw-text-xl tw-text-center tw-font-bold">Create
-                            Medal {{
+                        <h2 class="tw-text-xl tw-text-center tw-font-bold">Create a new
+                            Medal "{{
                             this.create_form.get('name').value
-                            }}</h2>
+                            }}"</h2>
                         
                         <div class="form-control-element">
                             <label for="name">Medal Name</label>
@@ -180,13 +180,13 @@
                             <input type="text" name="" id="" formControlName="category">
                         </div>
 
-                        <input type="submit" class="tw-w-full tw-p-2 tw-mx-1 tw-bg-green-500 tw-text-white"
+                        <input type="submit" class="tw-w-full tw-p-2 tw-mx-1 tw-bg-green-500 tw-text-white tw-capitalize"
                             value="submit">
 
 
                     </div>
                 </form>
-                <button class="tw-w-full tw-mx-auto tw-p-2 tw-bg-gray-400 tw-text-white"
+                <button class="tw-w-full tw-mx-auto tw-p-2 tw-bg-gray-400 tw-text-white tw-capitalize"
                     (click)="show_create_form = false">Close</button>
             </div>
         </div>

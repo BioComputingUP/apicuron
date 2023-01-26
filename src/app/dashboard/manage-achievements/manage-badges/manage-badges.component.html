@@ -3,7 +3,8 @@
     <h3 class="tw-text-xl tw-font-bold">Manage Badges</h3>
 
     <div class="tw-flex tw-flex-row tw-justify-end">
-        <button class="tw-bg-apicuron-purple tw-text-white tw-rounded tw-font-bold tw-shadow-md tw-p-1" (click)="open_create_modal()">Create
+        <button class="tw-bg-apicuron-purple tw-text-white tw-rounded tw-font-bold tw-shadow-md tw-p-1"
+            (click)="open_create_modal()">Create
             Badge</button>
     </div>
 
@@ -90,13 +91,13 @@
                             <input type="text" name="" id="" formControlName="category">
                         </div>
 
-                        <input type="submit" class="tw-w-full tw-p-2 tw-mx-1 tw-bg-green-500 tw-text-white"
-                            value="submit">
+                        <input type="submit"
+                            class="tw-w-full tw-p-2 tw-mx-1 tw-bg-green-500 tw-text-white tw-capitalize" value="submit">
 
 
                     </div>
                 </form>
-                <button class="tw-w-full tw-mx-auto tw-p-2 tw-bg-gray-400 tw-text-white"
+                <button class="tw-w-full tw-mx-auto tw-p-2 tw-bg-gray-400 tw-text-white tw-capitalize"
                     (click)="show_edit_form = false">Close</button>
             </div>
         </div>
@@ -105,8 +106,8 @@
 
 
 
-<div *ngIf="show_create_form" class="tw-relative tw-z-50 tw-overflow-y-scroll" aria-labelledby="modal-title" role="dialog"
-    aria-modal="true">
+<div *ngIf="show_create_form" class="tw-relative tw-z-50 tw-overflow-y-scroll" aria-labelledby="modal-title"
+    role="dialog" aria-modal="true">
 
     <div class="tw-fixed tw-inset-0 tw-bg-gray-500 tw-bg-opacity-75 tw-transition-opacity tw-duration-200"
         [ngClass]="{'tw-block':show_create_form, 'tw-hidden': !show_create_form}" (click)="show_create_form = false">
@@ -123,11 +124,11 @@
                         class="tw-bg-white tw-grid tw-grid-flow-row tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4">
 
                         <!-- for the update term form -->
-                        <h2 class="tw-text-xl tw-text-center tw-font-bold">update
+                        <h2 class="tw-text-xl tw-text-center tw-font-bold">Create a new
                             Badge "{{
                             this.create_form.get('name').value
                             }}"</h2>
-                        
+
                         <div class="form-control-element">
                             <label for="name">Badge Name</label>
                             <input type="text" name="" id="" formControlName="name">
@@ -163,13 +164,13 @@
                             <input type="text" name="" id="" formControlName="category">
                         </div>
 
-                        <input type="submit" class="tw-w-full tw-p-2 tw-mx-1 tw-bg-green-500 tw-text-white"
-                            value="submit">
+                        <input type="submit"
+                            class="tw-w-full tw-p-2 tw-mx-1 tw-bg-green-500 tw-text-white tw-capitalize" value="submit">
 
 
                     </div>
                 </form>
-                <button class="tw-w-full tw-mx-auto tw-p-2 tw-bg-gray-400 tw-text-white"
+                <button class="tw-w-full tw-mx-auto tw-p-2 tw-bg-gray-400 tw-text-white tw-capitalize"
                     (click)="show_create_form = false">Close</button>
             </div>
         </div>

@@ -9,7 +9,10 @@ import { AchievmentsDefService } from './achievements.service';
 @Component({
   selector: 'app-manage-achievements',
   templateUrl: './manage-achievements.component.html',
-  styleUrls: ['./manage-achievements.component.scss']
+  styleUrls: ['./manage-achievements.component.scss'],
+  host: {
+    class: 'tw-flex-auto'
+  }
 })
 export class ManageAchievementsComponent implements OnInit {
   resourceId$: Observable<string>;

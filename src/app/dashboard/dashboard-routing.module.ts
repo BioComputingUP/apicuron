@@ -7,18 +7,18 @@ import { DashboardComponent } from './dashboard.component';
 import { SubmitReportComponent } from './submit-report/submit-report.component';
 import { ManageTermsComponent } from './manage-terms/manage-terms.component';
 import { ManageAchievementsComponent } from './manage-achievements/manage-achievements.component';
+import { DatabaseDashboardComponent } from './database-dashboard/database-dashboard.component';
 
 const routes: Routes = [
   {
-    path: '',
-    // pathMatch: 'full',
-    component: DashboardComponent,
+    path: 'database/:resource_id',
+    component: DatabaseDashboardComponent,
     canActivate: [AuthGuard],
     children: [
-      { path: 'database/:resource_id/edit', component: DatabaseUpdateComponent },
-      { path: 'database/:resource_id/reports', component: SubmitReportComponent },
-      { path: 'database/:resource_id/terms', component: ManageTermsComponent },
-      { path: 'database/:resource_id/achievements', component: ManageAchievementsComponent },
+      { path: 'edit', component: DatabaseUpdateComponent },
+      { path: 'reports', component: SubmitReportComponent },
+      { path: 'terms', component: ManageTermsComponent },
+      { path: 'achievements', component: ManageAchievementsComponent },
       { path: '**', redirectTo: '/', }, // redirects to the home page
 
     ]

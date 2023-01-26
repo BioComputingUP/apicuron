@@ -19,7 +19,8 @@ import { SvgModule } from '../svg/svg.module';
 import { ManageBadgesComponent } from './manage-achievements/manage-badges/manage-badges.component';
 import { SelectTermsComponent } from './manage-achievements/select-terms.component';
 import { ManageMedalsComponent } from './manage-achievements/manage-medals/manage-medals.component';
-import { AngularSvgIconModule } from 'angular-svg-icon'
+import { AngularSvgIconModule } from 'angular-svg-icon';
+import { DatabaseDashboardComponent } from './database-dashboard/database-dashboard.component'
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { AngularSvgIconModule } from 'angular-svg-icon'
     ManageAchievementsComponent,
     ManageBadgesComponent,
     ManageMedalsComponent,
-    SelectTermsComponent
+    SelectTermsComponent,
+    DatabaseDashboardComponent
   ],
   providers: [
     DashboardService,
