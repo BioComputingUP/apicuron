@@ -4,12 +4,8 @@ import {
 	Post,
 	HttpCode,
 	Put,
-	Param,
 	UploadedFile,
 	UseInterceptors,
-	ParseFilePipe,
-	MaxFileSizeValidator,
-	FileTypeValidator,
 	Logger,
 	UseGuards,
 	SetMetadata,
@@ -27,15 +23,9 @@ import { mkdir, rename } from 'fs/promises';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
 import { RoleGuard } from '../../auth/guards/role.guard';
 import { MakePartner } from '../dto/make-partner.dto';
+import * as mv from 'mv'
+import { ResourceLogoValidationPipe } from '../validators/logo-validation.pipe'
 
-const resource_image_validation_pipe = new ParseFilePipe({
-	validators: [
-		new MaxFileSizeValidator({ maxSize: 1000000 }),
-		new FileTypeValidator({
-			fileType: /(^image)(\/)(jpeg|png|svg\+xml|webp)*/gm,
-		}),
-	],
-});
 
 @ApiTags('Resources')
 @Controller({
@@ -65,7 +55,7 @@ export class SubmittedResourcesController {
 	}))
 	async create_resource(
 		@Body() createResource: CreateResourceDto,
-		@UploadedFile(resource_image_validation_pipe, SvgSanitationValidationPipe)
+		@UploadedFile(ResourceLogoValidationPipe(true), SvgSanitationValidationPipe)
 		logo: Express.Multer.File,
 	) {
 		const ext = mime.extension(logo.mimetype)
@@ -74,7 +64,17 @@ export class SubmittedResourcesController {
 
 
 		try {
-			await rename(logo.path, file_path);
+			mv(
+				logo.path,
+				file_path,
+				{ mkdirp: true },
+				function (err) {
+					if(err){
+						this.logger.error(err.message, err.stack, err.name)
+						throw new InternalServerErrorException();	
+					}
+				},
+			);
 		} catch (err) {
 			this.logger.error(`Error moving logo file from ${logo.path} to private folder: "${file_path}"`, err.stack, err.message)
 		}
