@@ -9,6 +9,7 @@ import { DatabasesService } from "../../databases/services/databases.service";
 import {
   CuratorPageService,
 } from "./curator-page.service";
+import { environment } from "../../../environments/environment";
 
 @Component({
   selector: "app-curator-page",
@@ -103,6 +104,13 @@ export class CuratorPageComponent implements OnInit {
     )
 
   }
+
+
+  orcid_link(orcid_id: string){
+      return new URL(orcid_id, environment.orcid_main_url).href
+  }
+
+  
 
   generate_avatar(name: string){
     const emailHash = encodeURIComponent(name);

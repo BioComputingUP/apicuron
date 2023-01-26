@@ -12,10 +12,10 @@
                 displayedName
                 }}
             </a>
-            <a [href]="'http://orcid.org/'+orcid_id" target="_blank"
-                class="tw-cursor-pointer tw-align-top">
+            <a [href]="orcid_link(orcid_id)" target="_blank" class="tw-cursor-pointer tw-align-top">
                 <!-- {{ orcid_id }} -->
-                <img class="tw-inline tw-h-6 tw-w-6" src="https://orcid.org/assets/vectors/orcid.logo.icon.svg" alt="" role="tooltip">
+                <img class="tw-inline tw-h-6 tw-w-6" src="https://orcid.org/assets/vectors/orcid.logo.icon.svg" alt=""
+                    role="tooltip">
             </a>
 
         </div>

@@ -4,7 +4,7 @@
             <img [src]="generate_avatar(curator.displayedName)" class="tw-w-24 tw-h-24 tw-mx-auto tw-rounded-full tw-bg-gray-50 tw-border-2 tw-border-gray-150" alt="">
             <h2 class="tw-text-center tw-font-bold tw-font-dm-sans tw-text-2xl">{{ curator.displayedName }}
             </h2>
-            <a [href]="'http://orcid.org/' + curator.orcid_id"
+            <a [href]="orcid_link(curator.orcid_id)"
                 class="tw-block tw-text-sm tw-text-center hover:tw-underline tw-text-blue-500 hover:tw-text-blue-600 tw-mr-1">{{
                 curator.orcid_id }}<img class="tw-inline" src="assets/link.svg" alt="" srcset=""></a>
             <div class="tw-flex tw-justify-center" *ngIf="user_resources$ | async as user_resources">

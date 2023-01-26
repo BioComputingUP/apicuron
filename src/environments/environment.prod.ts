@@ -6,5 +6,7 @@ export const environment = {
   auth_ws: 'https://apicuron.org/api',
   public_file_url: 'https://apicuron.org/api/files',
   resource_logo_path: 'resources',
-  orcid_url: 'https://pub.orcid.org/v3.0/'
+  orcid_url: 'https://pub.orcid.org/v3.0/',
+  orcid_main_url: 'https://orcid.org/'
+
 };

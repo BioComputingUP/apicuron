@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
 import { map, pluck } from "rxjs/operators";
 import { DatabasesService } from "../../databases/services/databases.service";
+import { environment } from "../../../environments/environment";
 
 type StatData = {
   resource_id: string;
@@ -85,6 +86,10 @@ export class CuratorCardComponent implements OnInit {
 
   get orcid_id() {
     return this.biocurator.orcid_id;
+  }
+
+  orcid_link(orcid_id: string){
+    return new URL(orcid_id, environment.orcid_main_url).href
   }
 
   generate_avatar(){
