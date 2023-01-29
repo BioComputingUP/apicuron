@@ -18,7 +18,6 @@ import { AchievementsModule } from './achievements/achievements.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { TermsModule } from './terms/terms.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
-import { SchedulerController } from './src/scheduler/scheduler.controller';
 import { UniqueRule } from './shared/validators/unique.validator';
 import { EntryExistsRule } from './shared/validators/entry-exists.validator';
 import { SchedulerClientModule } from './scheduler-client/scheduler-client.module';
@@ -69,7 +68,7 @@ import { SchedulerClientModule } from './scheduler-client/scheduler-client.modul
 		SchedulerModule,
 		SchedulerClientModule,
 	],
-	controllers: [AppController, SchedulerController],
+	controllers: [AppController],
 	providers: [AppService, UniqueRule, EntryExistsRule],
 })
 export class AppModule { }

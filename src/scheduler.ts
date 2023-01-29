@@ -1,13 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SchedulerService } from './scheduler/services/scheduler.service';
-import { program, Option, Command, Argument } from 'commander'
-import { hideBin } from 'yargs/helpers'
 import { ConfigService } from '@nestjs/config';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { ArgumentParser } from 'argparse'
 import { useContainer } from 'class-validator';
-import { MongooseModule } from '@nestjs/mongoose';
 
 async function bootstrap() {
     const app = await NestFactory.createApplicationContext(AppModule)
