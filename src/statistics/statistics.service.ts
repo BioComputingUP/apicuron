@@ -34,7 +34,6 @@ export class StatisticsService {
 		const skip = (page - 1) * page_size;
 		let query = {};
 		if (user_query) {
-			console.log('here')
 			const field = !!user_filter_field ? user_filter_field : 'displayedName';
 			query[field] = { $regex: user_query, $options: 'i' };
 		}
