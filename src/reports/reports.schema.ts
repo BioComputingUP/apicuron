@@ -21,7 +21,7 @@ export class Report {
 	@Prop({ required: true })
 	entity_uri: string;
 
-	@Prop({ required: true })
+	@Prop({ required: false })
 	resource_uri: string;
 
 	@Prop({ required: true })
