@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { AuthService } from '../../auth/auth.service';
 import { UsersService } from '../../auth/users/users.service';
 import { existsSync } from 'fs';
 import { build_report_stream, parse_default_report, ReportProcessReport, ValidatedReport } from '../reports.parser';
@@ -9,11 +8,10 @@ import { ReportsService } from '../../reports/reports.service';
 export class SchedulerService {
 
     constructor(
-        // public authService: AuthService,
         public userService: UsersService,
-        protected reportService: ReportsService
+        public reportService: ReportsService
         ) {
-        this.tasks = ['test_task', 'submit_bulk']
+        // this.tasks = ['test_task', 'submit_bulk']
     }
     tasks = ['test_task', 'submit_bulk']
 
@@ -79,7 +77,7 @@ export class SchedulerService {
                 total_report_count++;
                 if (errors.length == 0) {
                     successful_reports_count += 1
-                    // this.reportService.insertReport(report)
+                    this.reportService.insertReport(report)
                 } else {
                     error_report = error_report.concat(errors)
                 }

@@ -5,7 +5,7 @@ import { OldStatisticsController, StatisticsController } from './statistics/stat
 import { StatisticsService } from './statistics.service';
 import { AuthModule } from '../auth/auth.module';
 import { ResourcesModule } from '../resources/resources.module';
-import { TransformerModule } from '../shared/transformer/transformer.module';
+// import { TransformerModule } from '../shared/transformer/transformer.module';
 import { APP_INTERCEPTOR } from '@nestjs/core'
 import { TransformInterceptor } from '../shared/transformer/transform.interceptor';
 import { AchievementsModule } from '../achievements/achievements.module';
@@ -20,12 +20,9 @@ import { AchievementsModule } from '../achievements/achievements.module';
 				schema: StatisticsSchema,
 			}
 		]),
-        TransformerModule
+        // TransformerModule
     ],
     controllers: [StatisticsController, OldStatisticsController],
-    providers: [StatisticsService, {
-        provide: APP_INTERCEPTOR,
-        useClass: TransformInterceptor,
-      },]
+    providers: [StatisticsService]
 })
 export class StatisticsModule {}

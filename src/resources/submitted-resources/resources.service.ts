@@ -12,7 +12,7 @@ import { rename, mkdir } from 'fs/promises';
 import { Model } from 'mongoose';
 import path, { basename, join } from 'path';
 import { User, UserDocument } from '../../auth/users/schemas/user.schema';
-import { TransformerService } from '../../shared/transformer/transformer.service';
+// import { TransformerService } from '../../shared/transformer/transformer.service';
 import { CreateResourceDto } from '../dto/createResource.dto';
 import { PartnerResource, PartnerResourceDocument } from '../schemas/partner-resources.schema';
 import { Resource, ResourceDocument } from '../schemas/resource.schema';

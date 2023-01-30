@@ -16,7 +16,7 @@ import {
 	SubmittedResource,
 	SubmittedResourceSchema,
 } from './schemas/submitted-resource.schema';
-import { TransformerModule } from '../shared/transformer/transformer.module';
+// import { TransformerModule } from '../shared/transformer/transformer.module';
 import { UniqueResourceIdRule } from './validators/unique-resource-id';
 import { UniqueResourceURIRule } from './validators/unique-resource-uri';
 import { JwtModule } from '@nestjs/jwt';
@@ -54,7 +54,7 @@ import { ResourceIdExists } from './partner-resources/validators/resource-id-exi
 				schema: ReportSchema,
 			},
 		]),
-		TransformerModule,
+		// TransformerModule,
 	],
 })
 export class ResourcesModule { }

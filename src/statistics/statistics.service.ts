@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { TransformerService } from '../shared/transformer/transformer.service';
+// import { TransformerService } from '../shared/transformer/transformer.service';
 import { User, UserDocument, UserSchema } from '../auth/users/schemas/user.schema';
 import { Statistics, StatisticsDocument } from './schemas/statistics.schema';
 import { PartnerResourcesService } from '..//resources/partner-resources/partner-resources.service';
@@ -13,7 +13,7 @@ export class StatisticsService {
 		protected statisticsModel: Model<StatisticsDocument>,
 		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 		protected partnerResourceService: PartnerResourcesService,
-		protected transformerService: TransformerService,
+		// protected transformerService: TransformerService,
 	) { }
 
 	logger = new Logger(StatisticsService.name);
@@ -43,14 +43,14 @@ export class StatisticsService {
 			const resource_uris = (await this.partnerResourceService.get_resources())
 				.filter((x) => resource_ids.includes(x.resource_id))
 				.map(({ resource_uri }) => resource_uri);
-			if (resource_ids.length != resource_uris.length) {
-				// warning some resource_ids were wrong
-				this.transformerService.warn(
-					'resources',
-					`requested these resource_ids [${resource_ids}] but ${resource_ids.length - resource_ids.length
-					} of them are wrong`,
-				);
-			}
+			// if (resource_ids.length != resource_uris.length) {
+			// 	// warning some resource_ids were wrong
+			// 	this.transformerService.warn(
+			// 		'resources',
+			// 		`requested these resource_ids [${resource_ids}] but ${resource_ids.length - resource_ids.length
+			// 		} of them are wrong`,
+			// 	);
+			// }
 			if (resource_uris && resource_uris.length > 0) {
 				query = { ...query, 'stats.resource_uri': { $in: resource_uris } };
 			}

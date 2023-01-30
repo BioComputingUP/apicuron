@@ -6,7 +6,7 @@ import { ReportsModule } from '../reports/reports.module';
 import { SchedulerService } from './services/scheduler.service';
 
 @Module({
-  imports: [HttpModule, AuthModule, MongooseModule, ReportsModule],
+  imports: [ReportsModule, HttpModule, AuthModule, MongooseModule],
   providers: [SchedulerService],
   controllers: [],
 })

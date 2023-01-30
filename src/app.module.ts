@@ -13,7 +13,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join, resolve } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MulterModule } from '@nestjs/platform-express';
-import { TransformerModule } from './shared/transformer/transformer.module';
+// import { TransformerModule } from './shared/transformer/transformer.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { TermsModule } from './terms/terms.module';
@@ -62,7 +62,7 @@ import { SchedulerClientModule } from './scheduler-client/scheduler-client.modul
 		TermsModule,
 		ReportsModule,
 		StatisticsModule,
-		TransformerModule,
+		// TransformerModule,
 		AchievementsModule,
 		NotificationsModule,
 		SchedulerModule,
