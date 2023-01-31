@@ -7,11 +7,10 @@ import { Stream, chain } from 'stream-chain';
 import { pick } from 'stream-json/filters/Pick';
 import * as StreamArray from 'stream-json/streamers/StreamArray';
 import { SubmitReportDto } from '../reports/dto/submit-report.dto';
-import { ReportDto } from '../reports/dto/report.dto';
 import { validate, ValidationError } from 'class-validator';
 import { User } from '../auth/users/schemas/user.schema';
 
-export type ValidatedReport = {report: ReportDto, errors:ValidationError[] };
+export type ValidatedReport = {report: SubmitReportDto, errors:ValidationError[] };
 export type ReportProcessReport = { errors: ValidationError[], success_count: number, total_report_count: number };
 
 
@@ -56,12 +55,34 @@ export function build_report_stream(file, defaultReport, user:User): Stream {
 
 
 async function validate_report(report: SubmitReportDto): Promise<ValidatedReport>{
-    const validation_errors: ValidationError[] = await validate(report)
+    try {
+        const validation_errors: ValidationError[] = await validate(report)
 
-    return {
-        report,
-        errors: validation_errors
+        return {
+            report,
+            errors: validation_errors
+        }
+    }catch(e: unknown) {
+        if(e){
+            console.error('Error Validating report: \n',report)
+        }
+        return {
+            report,
+            errors: [
+                {
+                    target: report,
+                    property: 'all',
+                    constraints: {
+                        'ProcessingError': 'The report document is not processable'
+                    }
+                }
+            ]
+        }
     }
+
+    
+
+    
 }
 
 function user_can_report(user) {
@@ -85,7 +106,7 @@ function user_can_report(user) {
 } 
 
 
-function convert_object_to_report(obj: ReportDto) {
+function convert_object_to_report(obj: SubmitReportDto) {
     const report = new SubmitReportDto();
     report.activity_term = obj.activity_term;
     report.curator_orcid = obj.curator_orcid;

@@ -1,20 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { UsersService } from '../../auth/users/users.service';
 import { existsSync } from 'fs';
 import { build_report_stream, parse_default_report, ReportProcessReport, ValidatedReport } from '../reports.parser';
 import { User } from '../../auth/users/schemas/user.schema';
 import { ReportsService } from '../../reports/reports.service';
+import { ValidationError } from 'class-validator';
 @Injectable()
 export class SchedulerService {
 
     constructor(
         public userService: UsersService,
-        public reportService: ReportsService
+        public reportService: ReportsService,
         ) {
         // this.tasks = ['test_task', 'submit_bulk']
     }
     tasks = ['test_task', 'submit_bulk']
 
+    logger= new Logger(SchedulerService.name)
 
 
     async run_task(task: string, file: string | null, ...args) {
@@ -66,10 +68,15 @@ export class SchedulerService {
         // console.log(execution_report)
     }
 
-    private async process_reports(file: string, defaultReport: any, user: User): Promise<ReportProcessReport> {
+    // private async compute_statistics(resource_id: string, orcid_id: null | string =null){
+    //     if()
+    // }
+
+
+    private process_reports(file: string, defaultReport: any, user: User): Promise<ReportProcessReport> {
         const reportsStream = build_report_stream(file, defaultReport, user)
 
-        return await new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             let error_report = [];
             let successful_reports_count = 0
             let total_report_count = 0
@@ -77,7 +84,23 @@ export class SchedulerService {
                 total_report_count++;
                 if (errors.length == 0) {
                     successful_reports_count += 1
-                    this.reportService.insertReport(report)
+                    try {
+                        await this.reportService.insertReport(report)
+                    }catch(e){
+                        if(e){
+                            this.logger.error(e?.message || e, e?.stack)
+                        }else{
+                            this.logger.error(`Error Inserting the report \n ${report}`)
+                        }
+                        error_report.push({
+                            target: report,
+                            property: 'all',
+                            constraints: {
+                                'UnprocessableDocument': 'Cannot process report'
+                            }
+                        })
+                    }
+
                 } else {
                     error_report = error_report.concat(errors)
                 }
