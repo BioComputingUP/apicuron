@@ -13,7 +13,6 @@ export class StatisticsService {
 		protected statisticsModel: Model<StatisticsDocument>,
 		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 		protected partnerResourceService: PartnerResourcesService,
-		// protected transformerService: TransformerService,
 	) { }
 
 	logger = new Logger(StatisticsService.name);

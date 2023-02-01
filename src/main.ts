@@ -6,6 +6,7 @@ import * as cookieParser from 'cookie-parser';
 import { createProxyMiddleware, fixRequestBody, responseInterceptor } from 'http-proxy-middleware';
 import { useContainer } from 'class-validator';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { TransformInterceptor } from './shared/transformer/transform.interceptor';
 
 async function bootstrap() {
 	// App creation
@@ -13,6 +14,10 @@ async function bootstrap() {
 
 	// class-validator setup
 	useContainer(app.select(AppModule), { fallbackOnErrors: true });
+
+	// set the global transform pipe
+	const transformer = app.get(TransformInterceptor)
+	app.useGlobalInterceptors(transformer)
 
 
 	// setup express middlewares

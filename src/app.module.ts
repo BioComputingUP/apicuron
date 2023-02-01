@@ -21,6 +21,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
 import { UniqueRule } from './shared/validators/unique.validator';
 import { EntryExistsRule } from './shared/validators/entry-exists.validator';
 import { SchedulerClientModule } from './scheduler-client/scheduler-client.module';
+import { TransformInterceptor } from './shared/transformer/transform.interceptor';
 
 @Module({
 	imports: [
@@ -69,6 +70,6 @@ import { SchedulerClientModule } from './scheduler-client/scheduler-client.modul
 		SchedulerClientModule,
 	],
 	controllers: [AppController],
-	providers: [AppService, UniqueRule, EntryExistsRule],
+	providers: [AppService, UniqueRule, EntryExistsRule, TransformInterceptor],
 })
 export class AppModule { }

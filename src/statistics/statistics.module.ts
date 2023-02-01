@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Statistics, StatisticsSchema } from './schemas/statistics.schema';
 import { OldStatisticsController, StatisticsController } from './statistics/statistics.controller';
@@ -9,11 +9,13 @@ import { ResourcesModule } from '../resources/resources.module';
 import { APP_INTERCEPTOR } from '@nestjs/core'
 import { TransformInterceptor } from '../shared/transformer/transform.interceptor';
 import { AchievementsModule } from '../achievements/achievements.module';
+// import { ReportsModule } from '../reports/reports.module';
 @Module({
     imports:[
         AuthModule,
         ResourcesModule,
         AchievementsModule,
+        // forwardRef(() => ReportsModule),
         MongooseModule.forFeature([
 			{
 				name: Statistics.name,
@@ -23,6 +25,7 @@ import { AchievementsModule } from '../achievements/achievements.module';
         // TransformerModule
     ],
     controllers: [StatisticsController, OldStatisticsController],
-    providers: [StatisticsService]
+    providers: [StatisticsService],
+    exports: [MongooseModule]
 })
 export class StatisticsModule {}

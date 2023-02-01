@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, Schema } from 'mongoose';
+import { Aggregate, FilterQuery, Model, Schema } from 'mongoose';
 import { User, UserDocument } from '../auth/users/schemas/user.schema';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import { TermsService } from '../terms/terms.service';
@@ -15,7 +15,7 @@ export class ReportsService {
 		@InjectModel(User.name) private userModel: Model<UserDocument>,
 		protected partnerResourceService: PartnerResourcesService,
 		protected termsService: TermsService,
-	) {}
+	) { }
 
 	private page_size = 10;
 
@@ -40,6 +40,61 @@ export class ReportsService {
 	async insertReport(report: ReportDto) {
 		return await this.reportModel.insertMany(report);
 	}
+
+	group_resource_reports_by_activities(resource_id: string) {
+
+		// # this query groups reports by user and activity_terms
+		// # computes the count of each term creating a list of (term, count) pairs
+		const aggregation_pipeline = [
+			{
+				'$match': {
+					resource_id
+				}
+			},
+			{
+				'$group': {
+					'_id': {
+						'curator_orcid': '$curator_orcid',
+						'activity_term': '$activity_term'
+					},
+					'count': {
+						'$sum': 1
+					},
+					'activity_term': {
+						'$first': '$activity_term'
+					},
+					'curator_orcid': {
+						'$first': '$curator_orcid'
+					}
+				}
+			},
+			{
+				'$group': {
+					'_id': {
+						'curator_orcid': '$curator_orcid'
+					},
+					'terms': {
+						'$addToSet': {
+							'activity_term': '$activity_term',
+							'count': '$count'
+						}
+					}
+				}
+			}
+		]
+
+		return this.reportModel.aggregate(aggregation_pipeline)
+	}
+
+	user_resource_reports(resource_id: string, orcid_id: string) {
+
+		return this.reportModel.find({
+			resource_id,
+			curator_orcid: orcid_id
+		})
+
+	}
+
 
 	async get_reports({
 		sort_field = '',
@@ -177,10 +232,10 @@ export class ReportsService {
 			query_obj['curator_orcid'] = orcid_id;
 		}
 
-		const reports = await this.reportModel.find(query_obj).sort({'timestamp': -1 }).skip(skip).limit(page_size).lean();
-		
+		const reports = await this.reportModel.find(query_obj).sort({ 'timestamp': -1 }).skip(skip).limit(page_size).lean();
+
 		const activity_term_list = [...new Set(reports.map(report => report.activity_term))]
-		
+
 		const terms_list = await this.termsService.get_terms(activity_term_list, resource_id);
 
 
@@ -190,7 +245,7 @@ export class ReportsService {
 			return report;
 		})
 		const reports_count = await this.reportModel.count(query_obj);
-		
+
 		return {
 			data: reports_with_terms,
 			count: reports_count
@@ -255,7 +310,7 @@ export class ReportsService {
 	}
 
 
-	async delete_all_resource_reports(resource_id: string){
+	async delete_all_resource_reports(resource_id: string) {
 		const resource_uri = await this.partnerResourceService.retrieve_uri(resource_id);
 
 		return await this.reportModel.deleteMany({

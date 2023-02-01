@@ -1,4 +1,3 @@
-import { HttpService } from '@nestjs/axios';
 import {
 	Request,
 	Controller,
@@ -12,7 +11,8 @@ import {
 	UploadedFile,
 	Logger,
 	ForbiddenException,
-	InternalServerErrorException
+	InternalServerErrorException,
+	Inject
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -30,6 +30,7 @@ import { ParseUnsignedIntPipe } from '../shared/pipes/unsigned-int-validation.pi
 import { ReportDto } from './dto/report.dto';
 import { SubmitBulkDto, SubmitReportDto } from './dto/submit-report.dto';
 import { ReportsService } from './reports.service';
+import { ComputeStatisticsTask } from '../reports/tasks/compute_statistics.task';
 
 @ApiTags('First Version')
 @Controller('reports')
@@ -55,9 +56,8 @@ export class ReportsController {
 export class ReportsControllerV2 {
 	constructor(
 		private reportService: ReportsService,
-		private partnerResourceService: PartnerResourcesService,
-		private httpService: HttpService,
 		private schedulerService: SchedulerClientService,
+		@Inject('task:compute_statistics') private computeStatistics: ComputeStatisticsTask,
 		private config:ConfigService) {}
 
 	logger = new Logger(ReportsControllerV2.name)
@@ -184,8 +184,10 @@ export class ReportsControllerV2 {
 
 		// const resource_uri = await this.partnerResourceService.retrieve_uri(report.resource_id)
 		const report_confirmation = await this.reportService.insertReport(report);
-		await this.schedulerService.compute_achievements(report.resource_id, report.curator_orcid);
-		await this.schedulerService.compute_statistics(report.resource_id, report.curator_orcid);
+
+		await this.computeStatistics.run_task(report.resource_id, report.curator_orcid);
+		// await this.schedulerService.compute_achievements(report.resource_id, report.curator_orcid);
+		// await this.schedulerService.compute_statistics(report.resource_id, report.curator_orcid);
 		return report_confirmation;
 	}
 }

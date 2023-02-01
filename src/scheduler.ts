@@ -1,45 +1,48 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { SchedulerService } from './scheduler/services/scheduler.service';
-import { ConfigService } from '@nestjs/config';
-import { SchedulerModule } from './scheduler/scheduler.module';
+import { Logger } from '@nestjs/common'
 import { ArgumentParser } from 'argparse'
 import { useContainer } from 'class-validator';
+
+
+const parser = new ArgumentParser({
+    description: "Script to perform Database edits and fixes on APICURON,\n this script organizes database operations into tasks that can be executed together or independently",
+    prog: "APICURON scheduler",
+})
+
+
+parser.add_argument('--host', {help: 'Database Host string', required: true })
+parser.add_argument('--database', {help: 'database name', required: true })
+parser.add_argument('--task',{ help: "Task to run", required: true })
+parser.add_argument('--arguments', {nargs: '+', default: [], required: false, help: "list of task arguments"})
+parser.add_argument('--file', {required: false, help: "file argument for task"})
+parser.add_argument('--port', {help: 'Database Port string', required: false, type: 'int', default: 27017})
+
+
+const args = parser.parse_args()
+process.env.DATABASE_HOST = args.host
+process.env.DATABASE = args.database
+process.env.port = args.DB_PORT = args.port
 
 async function bootstrap() {
     const app = await NestFactory.createApplicationContext(AppModule)
     
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
     
-    const schedulerService = await app.get(SchedulerService)
-    const configService = await app.get(ConfigService)
+    const taskService = await app.get(`task:${args.task}`)
+    
+    if(taskService){
+        const mainLogger = new Logger('APICURONSchedulerLogger');
 
-
-    function splitter(args:string) {
-        return args.split(/\ +|,/)
+        if(!!args.file){
+            mainLogger.log(`Loaded Task ${args.task}... running with the following arguments: [${args.arguments}], file:${args.file}`)
+            await taskService.run_task(args.file, ...args.arguments)
+        }
+        else{
+            mainLogger.log(`Loaded Task ${args.task}... running with the following arguments: [${args.arguments}], `)
+            await taskService.run_task(...args.arguments)
+        }
     }
-
-    const parser = new ArgumentParser({
-        description: "Script to perform Database edits and fixes on APICURON,\n this script organizes database operations into tasks that can be executed together or independently",
-        prog: "APICURON scheduler",
-    })
-
-
-    parser.add_argument('--host', {help: 'Database Host string', required: false, default: configService.get('db_host')})
-    parser.add_argument('--database', {help: 'database name', required: false, default: configService.get('database')})
-    parser.add_argument('--task',{ help: "Task to run", required: true })
-    parser.add_argument('--arguments', {nargs: '+', default: [], required: false, help: "list of task arguments"})
-    parser.add_argument('--file', {required: false, help: "file argument for task"})
-    parser.add_argument('--port', {help: 'Database Port string', required: false, type: 'int', default: 27017})
-
-
-    let args = parser.parse_args()
-
-    console.log({
-        args
-    })
-
-    await schedulerService.run_task(args.task, args.file, args.arguments)
 
 
     await app.close();
