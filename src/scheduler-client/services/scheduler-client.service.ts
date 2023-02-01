@@ -5,7 +5,7 @@ import { TaskSubmit } from '../types/baseTask';
 import { ConfigService } from '@nestjs/config';
 import { createReadStream, fstatSync } from 'fs';
 import { HttpModule, HttpService } from '@nestjs/axios';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 // const FormData = require('form-data')
 @Injectable()
@@ -133,10 +133,11 @@ export class SchedulerClientService {
 
         return response['data']
     }
-
-    @Cron('0 */30 * * * *')
+    
+    @Cron(CronExpression.EVERY_5_HOURS)
     async add_resource_id() {
         if (this.config.get('environment') != 'local') {
+            
             const response = await this.submit_task({
                 task: 'add_resource_id'
             }).catch((err) => {
