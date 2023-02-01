@@ -4,7 +4,7 @@
             class="tw-text-gray-100 tw-flex tw-flex-row tw-items-center hover:tw-text-white  nav-item tw-relative before:tw-bg-white hover-underline-animation">
             <img [src]="generate_avatar()" class="tw-inline tw-w-6 tw-h-6 tw-mr-1 tw-bg-white tw-rounded-full" alt="">
             <span class="tw-font-bold">{{ user.displayedName }}</span>
-            <span *ngIf="user.notifications.length > 0"
+            <span *ngIf="user.notifications &&  user.notifications.length > 0"
                 class="tw-absolute tw-bg-apicuron-purple tw-text-white tw-font-bold tw-px-1.5 tw-py-0.5 tw-text-xs -tw-top-2 -tw-right-1 tw-shadow-md tw-rounded-full ">{{
                 user.notifications.length }}</span>
         </button>

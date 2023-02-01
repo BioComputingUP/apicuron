@@ -77,7 +77,7 @@ export class SubmitSingleComponent implements OnInit {
             resource_id,
             curator_orcid: this.curator_orcid.value,
             entity_uri: this.entity_uri.value,
-            timestamp: this.date_time,
+            timestamp: this.date_time(),
             activity_term: this.activity_term.value,
           };
           return this.dashboardService.submit_report(report);
@@ -115,7 +115,7 @@ export class SubmitSingleComponent implements OnInit {
     return this.form.get("curator_orcid");
   }
 
-  get date_time() {
+  date_time() {
     const date: string = this.form.get("date").value;
     const time = this.form.get("time").value;
     return new Date(`${date} ${time}`);
