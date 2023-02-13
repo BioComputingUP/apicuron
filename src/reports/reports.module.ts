@@ -2,7 +2,7 @@ import { Module, forwardRef } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../auth/auth.module';
-import { ReportsController, ReportsControllerV2 } from './reports.controller';
+import { ReportsController } from './reports.controller';
 import { Report, ReportSchema } from './reports.schema';
 import { ReportsService } from './reports.service';
 import { ConfigService } from '@nestjs/config';
@@ -19,7 +19,7 @@ import { ComputeStatisticsTask } from './tasks/compute_statistics.task';
 import { StatisticsModule } from '../statistics/statistics.module';
 
 @Module({
-	controllers: [ReportsControllerV2, ReportsController,],
+	controllers: [ReportsController,],
 	providers: [ReportsService,
 		{
 			provide: 'task:submit_bulk',

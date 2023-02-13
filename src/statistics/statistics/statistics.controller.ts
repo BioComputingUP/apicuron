@@ -81,7 +81,6 @@ export class StatisticsController {
 			query.page_size,
 		);
 	}
-
 	
 }
 

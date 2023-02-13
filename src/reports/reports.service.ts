@@ -4,6 +4,7 @@ import { Aggregate, FilterQuery, Model, Schema } from 'mongoose';
 import { User, UserDocument } from '../auth/users/schemas/user.schema';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import { TermsService } from '../terms/terms.service';
+import { ReportFilterDto } from './dto/report-filter.dto';
 import { ReportDto } from './dto/report.dto';
 import { Report, ReportDocument } from './reports.schema';
 
@@ -41,6 +42,12 @@ export class ReportsService {
 		return await this.reportModel.insertMany(report);
 	}
 
+	/**
+	 * 
+	 * @param resource_id The local resource_id of the specified resource
+	 * @description This function aggregates the reports, groups them by orcid and term
+	 * @returns Aggregate<any[]>
+	 */
 	group_resource_reports_by_activities(resource_id: string) {
 
 		// # this query groups reports by user and activity_terms
@@ -86,6 +93,14 @@ export class ReportsService {
 		return this.reportModel.aggregate(aggregation_pipeline)
 	}
 
+
+	/**
+	 * 
+	 * @param resource_id the resource_id concerned
+	 * @param orcid_id the orcid of the user
+	 * @description returns a cursor to the user reports on the resource_id done by the user with the specified orcid_id
+	 * @returns a cursor to the reports of the orcid_id done on the resource
+	 */
 	user_resource_reports(resource_id: string, orcid_id: string) {
 
 		return this.reportModel.find({
@@ -96,155 +111,23 @@ export class ReportsService {
 	}
 
 
-	async get_reports({
-		sort_field = '',
-		sort_value = '',
-		resource_id = '',
-		curator_orcid = '',
-		page = 1
-	}) {
-		let aggregation_pipeline = [];
-
-		// orcid and resource_id filtering
-		// by building the $match aggregation object
-
-		if (!!curator_orcid || !!resource_id) {
-			let match_obj = {
-				$match: {},
-			};
-			match_obj.$match['resource_id'] = !!resource_id ? resource_id : undefined;
-			match_obj.$match['curator_orcid'] = !!curator_orcid
-				? curator_orcid
-				: undefined;
-			aggregation_pipeline.push(match_obj);
-		}
-
-		// Validating sort field
-		const sort_field_valid = this.validate_sort_fields(sort_value);
-
-		if (!!sort_field && this.sort_fields.includes(sort_field) && !!sort_field_valid) {
-			let sort_obj = {
-				$sort: {},
-			};
-			sort_obj.$sort[sort_field] = sort_field_valid;
-			aggregation_pipeline.push(sort_obj);
-		}
-
-		aggregation_pipeline = aggregation_pipeline.concat([
-			{
-				$skip: page
-			},
-			{
-				$limit: this.page_size,
-			},
-			{
-				$lookup: {
-					from: 'terms_def',
-					localField: 'activity_term',
-					foreignField: 'activity_term',
-					as: 'term',
-				},
-			},
-			{
-				$unwind: {
-					path: '$term',
-				},
-			},
-			{
-				$project: {
-					_id: -1,
-					curator_orcid: 1,
-					resource_uri: 1,
-					entity_uri: 1,
-					activity_term: 1,
-					timestamp: 1,
-					activity_name: '$term.activity_name',
-					score: '$term.score',
-					description: '$term.description',
-					activity_category: '$term.activity_category',
-				},
-			},
-		]);
-		return await this.reportModel.aggregate(aggregation_pipeline);
-		// return await this.reportModel
-		// 	.find(null, null, {
-		// 		limit: page_size,
-		// 	}).populate('term').exec()
-	}
-
-	async get_user_statistics() {
-		const userCursor = await this.userModel
-			.find(
-				{},
-				{
-					curator_orcid: 1,
-					family_name: 1,
-					given_name: 1,
-				},
-			)
-			.cursor();
-
-		for await (const doc of userCursor) {
-			const reports = this.reportModel.aggregate([
-				{
-					$match: {
-						curator_orcid: doc['curator_orcid'],
-					},
-				},
-				{
-					$lookup: {
-						from: 'terms_def',
-						localField: 'activity_term',
-						foreignField: 'activity_term',
-						as: 'term',
-					},
-				},
-				{
-					$unwind: {
-						path: '$term',
-					},
-				},
-			]);
-		}
-	}
-
-	async getReports(
-		orcid_id: string,
-		resource_id: string,
-		page_size = 10,
-		page = 1,
-	) {
-		const skip = (page - 1) * page_size;
-		let query_obj: FilterQuery<ReportDocument> = {
-			'$or': [{ resource_id: resource_id }],
-		};
-
-		if (!!resource_id) {
-			const resource_uri = await this.partnerResourceService.retrieve_uri(
-				resource_id,
-			);
-			if (!!resource_uri) {
-				query_obj['$or'].concat([{ resource_uri: resource_uri }]);
-			}
-		}
-
-		if (!!orcid_id) {
-			query_obj['curator_orcid'] = orcid_id;
-		}
-
-		const reports = await this.reportModel.find(query_obj).sort({ 'timestamp': -1 }).skip(skip).limit(page_size).lean();
+	async get_reports(reportFilter: ReportFilterDto) {
+		const {filter, options} = ReportFilterDto.makeQuery(reportFilter)
+		
+		const {  resource_id } = reportFilter
+		
+		
+		const reports = await this.reportModel.find(filter, null, options).lean();
 
 		const activity_term_list = [...new Set(reports.map(report => report.activity_term))]
 
 		const terms_list = await this.termsService.get_terms(activity_term_list, resource_id);
 
-
-
 		const reports_with_terms = reports.map((report) => {
 			report['term'] = terms_list.find(term => term.activity_term == report.activity_term)
 			return report;
 		})
-		const reports_count = await this.reportModel.count(query_obj);
+		const reports_count = await this.reportModel.count(filter);
 
 		return {
 			data: reports_with_terms,
@@ -278,7 +161,7 @@ export class ReportsService {
 			reports_promise,
 			reports_count_promise,
 		]);
-		// the string constructor is used to convert from mongoose string type to regular typescript string (I know, it's just nonesense)
+		// the string constructor is used to convert from? mongoose string type to regular typescript string (I know, it's just nonesense)
 		const report_terms = reports.map((report) => String(report.activity_term));
 
 		const terms = await this.termsService.get_terms(report_terms, resource_id);
@@ -305,7 +188,7 @@ export class ReportsService {
 		}
 	}
 
-	async count() {
+	async all_reports_count() {
 		return await this.reportModel.count();
 	}
 
@@ -321,4 +204,5 @@ export class ReportsService {
 		})
 
 	}
+
 }

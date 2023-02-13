@@ -41,14 +41,6 @@ export class StatisticsService {
 			const resource_uris = (await this.partnerResourceService.get_resources())
 				.filter((x) => resource_ids.includes(x.resource_id))
 				.map(({ resource_uri }) => resource_uri);
-			// if (resource_ids.length != resource_uris.length) {
-			// 	// warning some resource_ids were wrong
-			// 	this.transformerService.warn(
-			// 		'resources',
-			// 		`requested these resource_ids [${resource_ids}] but ${resource_ids.length - resource_ids.length
-			// 		} of them are wrong`,
-			// 	);
-			// }
 			if (resource_uris && resource_uris.length > 0) {
 				query = { ...query, 'stats.resource_uri': { $in: resource_uris } };
 			}

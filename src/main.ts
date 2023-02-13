@@ -79,7 +79,7 @@ async function bootstrap() {
 
 	// setup basic validation Pipes
 	app.useGlobalPipes(
-		new ValidationPipe(),
+		new ValidationPipe({ transform: true }),
 	);
 
 	// retrieving port, host and other configurations

@@ -12,7 +12,9 @@ import {
 	Logger,
 	ForbiddenException,
 	InternalServerErrorException,
-	Inject
+	Inject,
+	ParseArrayPipe,
+	DefaultValuePipe
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -31,64 +33,39 @@ import { ReportDto } from './dto/report.dto';
 import { SubmitBulkDto, SubmitReportDto } from './dto/submit-report.dto';
 import { ReportsService } from './reports.service';
 import { ComputeStatisticsTask } from '../reports/tasks/compute_statistics.task';
+import { ReportFilterDto } from './dto/report-filter.dto';
 
-@ApiTags('First Version')
-@Controller('reports')
-export class ReportsController {
-	constructor(private reportService: ReportsService) {}
-
-	@Get(':orcid')
-	@Roles('admin')
-	@UseGuards(LocalAuthGuard, RoleGuard)
-	async get_user_reports(@Param('orcid') orcid: string) {
-		return await this.reportService.getUserReports(orcid);
-	}
-
-	@Get('')
-	async get_reports(@Param() params) {
-		return await this.reportService.get_reports(params);Request
-	}
-}
 
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
 @Controller({ path: 'reports', version: '2' })
-export class ReportsControllerV2 {
+export class ReportsController {
 	constructor(
 		private reportService: ReportsService,
 		private schedulerService: SchedulerClientService,
 		@Inject('task:compute_statistics') private computeStatistics: ComputeStatisticsTask,
-		private config:ConfigService) {}
+		private config: ConfigService) { }
 
-	logger = new Logger(ReportsControllerV2.name)
+	logger = new Logger(ReportsController.name)
 
-	private can_edit_resource(user, resource_id){
-        // get the resources list that belong to the current user
-        const user_resources: Array<{ resource_id: string}> = user.resources
-        // check if the resource belongs to the user
-        const resource_found = user_resources.find(resource => resource.resource_id == resource_id)
-        // if it doesn't, we respond with  a 403 exception
-        if(!resource_found){
-            throw new ForbiddenException(`You either do not have the authorization to update the terms of the (${resource_id}) resource or the resource does not exist`);
-        }
-    }
-
-	@Get()
-	async get_reports(
-		@Query('orcid_id') orcid_id: string,
-		@Query('resource_id') resource_id: string,
-		@Query('page_size', ParseUnsignedIntPipe) page_size: number,
-		@Query('page', ParseUnsignedIntPipe) page: number,
-	) {
-		return this.reportService.getReports(
-			orcid_id,
-			resource_id,
-			page_size,
-			page,
-		);
+	private can_edit_resource(user, resource_id) {
+		// get the resources list that belong to the current user
+		const user_resources: Array<{ resource_id: string }> = user.resources
+		// check if the resource belongs to the user
+		const resource_found = user_resources.find(resource => resource.resource_id == resource_id)
+		// if it doesn't, we respond with  a 403 exception
+		if (!resource_found) {
+			throw new ForbiddenException(`You either do not have the authorization to update the terms of the (${resource_id}) resource or the resource does not exist`);
+		}
 	}
 
-	@Get(':orcid_id/:resource_id')
+
+	@Get()
+	async get_reports(@Query() reportFilter: ReportFilterDto) {
+		return await this.reportService.get_reports(reportFilter)
+	}
+
+	@Get('resource/:resource_id/orcid_id/:orcid_id')
 	async get_user_reports(
 		@Param('orcid_id') orcid_id: string,
 		@Param('resource_id') resource_id: string,
@@ -104,11 +81,11 @@ export class ReportsControllerV2 {
 	}
 
 	@ApiOperation({
-        summary: 'Submit reports in bulk as a JSON file'
-    })
-    @ApiOkResponse({
-        description: 'Return message confirming the reception of the reports',
-    })
+		summary: 'Submit reports in bulk as a JSON file'
+	})
+	@ApiOkResponse({
+		description: 'Return message confirming the reception of the reports',
+	})
 	@ApiHeader(AuthorizationHeader)
 	@ApiConsumes('multipart/form-data')
 	@Post('bulk')
@@ -132,14 +109,14 @@ export class ReportsControllerV2 {
 		formData.append('database_host', database_host)
 		formData.append('task', 'submit_report')
 		formData.append('database', database)
-		
+
 		// if the delete_all exists we add it to the arguments otherwise we only send the orcid
-		if(body.delete_all){
+		if (body.delete_all) {
 			formData.append('task_arguments', `${req.user.orcid_id} ${body.delete_all.join(',')}`)
-		}else{
+		} else {
 			formData.append('task_arguments', req.user.orcid_id)
 		}
-		
+
 		// append a file to the formData
 		formData.append('task_file_argument', createReadStream(reports.path), {
 			filename: reports.originalname,
@@ -149,7 +126,7 @@ export class ReportsControllerV2 {
 
 		// send the request
 		formData.submit('https://scheduler.biocomputingup.it/task/', (err, res) => {
-			if(err){
+			if (err) {
 				this.logger.error('An error occurred after submitting a job to the biocomp scheduler')
 				this.logger.error(err)
 
@@ -157,25 +134,25 @@ export class ReportsControllerV2 {
 			}
 		})
 
-		
-		if(body.delete_all){
+
+		if (body.delete_all) {
 			body.delete_all.forEach(async (resource_id) => {
 				await this.schedulerService.compute_achievements(resource_id)
 				this.schedulerService.compute_statistics(resource_id)
 			})
 		}
 
-		return { status: 'reports submitted successfully. You will receive a notification containing the submission report'}
+		return { status: 'reports submitted successfully. You will receive a notification containing the submission report' }
 
 	}
 
 	@ApiOperation({
-        summary: 'Submit a single report'
-    })
-    @ApiOkResponse({
-        description: 'Confirmation Object of the created report',
+		summary: 'Submit a single report'
+	})
+	@ApiOkResponse({
+		description: 'Confirmation Object of the created report',
 		type: ReportDto
-    })
+	})
 	@ApiHeader(AuthorizationHeader)
 	@Post('single')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)

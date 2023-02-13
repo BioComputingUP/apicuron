@@ -25,7 +25,7 @@ export class AppController {
 	async get_home_data() {
 		const resource_count_promise = this.partnerResourceService.count();
 		const user_count_promise = this.userService.count();
-		const report_count_promise = this.reportService.count();
+		const report_count_promise = this.reportService.all_reports_count();
 		const achievement_count_promise = this.achievementsService.count();
 		const [resource_count, user_count, report_count, achievement_count] =
 			await Promise.all([
