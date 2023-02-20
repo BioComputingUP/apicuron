@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { DashboardRoutingModule } from './dashboard-routing.module';
-import { DashboardComponent } from './dashboard.component';
 import { DatabaseUpdateComponent } from './database-update/database-update.component';
 import { DatabasesModule } from '../databases/databases.module';
 import { DashboardSidebarComponent } from './dashboard-sidebar/dashboard-sidebar.component';
@@ -20,11 +19,15 @@ import { ManageBadgesComponent } from './manage-achievements/manage-badges/manag
 import { SelectTermsComponent } from './manage-achievements/select-terms.component';
 import { ManageMedalsComponent } from './manage-achievements/manage-medals/manage-medals.component';
 import { AngularSvgIconModule } from 'angular-svg-icon';
-import { DatabaseDashboardComponent } from './database-dashboard/database-dashboard.component'
+import { DatabaseDashboardComponent } from './database-dashboard/database-dashboard.component';
+import { UserDashboardComponent } from './user-dashboard/user-dashboard.component';
+import { DatabaseOverviewComponent } from './database-overview/database-overview.component'
+import { AppModule } from '../app.module';
+import { NavbarComponent } from '../alt-navbar/alt-navbar.component';
+import { ReportsByDateChartComponent } from '../charts/reports-by-date-chart/reports-by-date-chart.component';
 
 @NgModule({
   declarations: [
-    DashboardComponent,
     DatabaseUpdateComponent,
     DashboardSidebarComponent,
     SubmitReportComponent,
@@ -35,7 +38,9 @@ import { DatabaseDashboardComponent } from './database-dashboard/database-dashbo
     ManageBadgesComponent,
     ManageMedalsComponent,
     SelectTermsComponent,
-    DatabaseDashboardComponent
+    DatabaseDashboardComponent,
+    UserDashboardComponent,
+    DatabaseOverviewComponent,
   ],
   providers: [
     DashboardService,
@@ -48,7 +53,9 @@ import { DatabaseDashboardComponent } from './database-dashboard/database-dashbo
     ReactiveFormsModule,
     DatabasesModule,
     AngularSvgIconModule,
-    SvgModule
+    NavbarComponent,
+    SvgModule,
+    ReportsByDateChartComponent
   ]
 })
 export class DashboardModule { }

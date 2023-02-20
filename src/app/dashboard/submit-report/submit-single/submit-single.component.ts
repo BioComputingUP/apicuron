@@ -1,13 +1,14 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { FormBuilder, Validators } from "@angular/forms";
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { ToastrModule, ToastrService } from "ngx-toastr";
 import { Observable } from "rxjs";
 import { pluck, switchMap } from "rxjs/operators";
 import { DatabasesService } from "../../../databases/services/databases.service";
-import { DashboardService, Report } from "../../services/dashboard.service";
+import { DashboardService } from "../../services/dashboard.service";
 import { TermsService } from "../../services/terms.service";
 import { dateTimeValidator } from "../validators/date-time.validator";
 import { orcidIdValidator } from "../validators/orcid-id.validator";
+import { Report } from "../../../models/Report.model";
 
 @Component({
   selector: "submit-single",
@@ -17,7 +18,7 @@ import { orcidIdValidator } from "../validators/orcid-id.validator";
 export class SubmitSingleComponent implements OnInit {
   @Input('resource')
   resource$: Observable<any>;
-  form: any;
+  form: FormGroup;
   terms$: Observable<any>;
 
   constructor(
@@ -72,14 +73,14 @@ export class SubmitSingleComponent implements OnInit {
     // }
     this.resource$
       .pipe(
-        switchMap(({ resource_id }) => {
-          const report: Report = {
+        switchMap(({ resource_id }: { resource_id: string }) => {
+          const report = new Report().deserialize({
             resource_id,
             curator_orcid: this.curator_orcid.value,
             entity_uri: this.entity_uri.value,
             timestamp: this.date_time(),
             activity_term: this.activity_term.value,
-          };
+          });
           return this.dashboardService.submit_report(report);
         })
       )
@@ -103,19 +104,19 @@ export class SubmitSingleComponent implements OnInit {
       );
   }
 
-  get activity_term() {
+  get activity_term(): AbstractControl<string> {
     return this.form.get("activity_term");
   }
 
-  get entity_uri() {
+  get entity_uri(): AbstractControl<string> {
     return this.form.get("entity_uri");
   }
 
-  get curator_orcid() {
+  get curator_orcid(): AbstractControl<string> {
     return this.form.get("curator_orcid");
   }
 
-  date_time() {
+  date_time(): Date {
     const date: string = this.form.get("date").value;
     const time = this.form.get("time").value;
     return new Date(`${date} ${time}`);

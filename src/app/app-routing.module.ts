@@ -3,40 +3,55 @@ import { Routes, RouterModule } from "@angular/router";
 import { AuthGuard } from "./auth/auth.guard";
 import { IndexComponent } from "./index/index.component";
 import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
+import { MainLayoutComponent } from "./main-layout/main-layout.component";
 
 const routes: Routes = [
   {
     path: "about",
+    component: MainLayoutComponent,
     loadChildren: () =>
       import("./about/about.module").then((m) => m.AboutModule),
   },
   {
     path: "notifications",
+    component: MainLayoutComponent,
     loadChildren: () =>
       import("./notifications/notifications.module").then((m) => m.NotificationsModule),
     canActivate: [AuthGuard]
   },
   {
     path: "help",
+    component: MainLayoutComponent,
     loadChildren: () => import("./help/help.module").then((m) => m.HelpModule)
   },
   {
     path: "databases",
+    component: MainLayoutComponent,
     loadChildren: () =>
       import("./databases/databases.module").then((m) => m.DatabasesModule),
   },
   {
     path: "curators",
+    component: MainLayoutComponent,
     loadChildren: () =>
       import("./curator/curator.module").then((m) => m.CuratorModule),
   },
-  
 
-  {path: '', component: IndexComponent},
+
+  {
+    path: '',
+    component: MainLayoutComponent,
+    children: [
+      {
+        path: '',
+        component: IndexComponent,
+      }
+    ]
+  },
   { path: 'dashboard', loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule) },
-  { path: 'docs', loadChildren: () => import('./documentation/documentation.module').then(m => m.DocumentationModule) },
+  { path: 'docs', component: MainLayoutComponent, loadChildren: () => import('./documentation/documentation.module').then(m => m.DocumentationModule) },
   { path: 'api', redirectTo: '/api/' },
-  {path: '**', component: PageNotFoundComponent},
+  { path: '**', component: PageNotFoundComponent },
 
 ];
 
@@ -58,4 +73,4 @@ const routes: Routes = [
   ],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

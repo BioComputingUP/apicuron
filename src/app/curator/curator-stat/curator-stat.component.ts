@@ -84,7 +84,7 @@ export class CuratorStatComponent implements OnInit, AfterViewInit {
             page: page.toString(),
             page_size: this.page_size.toString(),
             resource_id,
-            orcid_id: curator.orcid_id
+            curator_orcid: curator.orcid_id
           },
         });
         return this.curatorPageService.get_reports(

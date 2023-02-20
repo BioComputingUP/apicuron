@@ -16,6 +16,8 @@ export class DashboardSidebarComponent implements OnInit {
   @Input('resource') resource$: Observable<any>;
   mobile_toggle = false;
 
+  minimized = false;
+
   logo_src(logo: string){
     if(logo.startsWith('assets')){
       return logo
@@ -30,6 +32,11 @@ export class DashboardSidebarComponent implements OnInit {
       map(({ resource_name, resource_id}) => {
 
         return [
+          {
+            href: ['/dashboard', 'database', resource_id],
+            name: `Overview`,
+            icon: 'assets/svg/overview.svg'
+          },
           {
             href: ['/dashboard', 'database', resource_id, 'edit'],
             name: `Edit ${resource_name}`,

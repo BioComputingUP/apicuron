@@ -1,0 +1,8 @@
+<div class="tw-p-2" *ngIf="user$ | async as user">
+    <h2 class="tw-text-2xl tw-font-dm-sans tw-font-bold">Welcome, {{ user.displayedName }} !</h2>
+    <div class="tw-w-full tw-flex tw-flex-row">
+        <div class="tw-w-2/3" *ngIf="reportStatistics$ | async as reportStatistics">
+            <reports-by-date-chart [first-day]="firstDay" [last-day]="lastDay" [reportStats]="reportStatistics" ></reports-by-date-chart>
+        </div>
+    </div>
+</div>

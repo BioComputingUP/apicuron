@@ -12,18 +12,20 @@ import { AppComponent } from "./app.component";
 import { FootComponent } from "./foot/foot.component";
 import { ApiComponent } from "./api/api.component";
 import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
-import { AltNavbarComponent } from "./alt-navbar/alt-navbar.component";
+import { NavbarComponent } from "./alt-navbar/alt-navbar.component";
 import { IndexModule } from "./index/index.module";
 import { AuthModule } from "./auth/auth.module";
 import { ToastrModule } from "ngx-toastr";
 import { AngularSvgIconModule } from "angular-svg-icon";
+import { MainLayoutComponent } from './main-layout/main-layout.component';
+import { CommonModule } from "@angular/common";
 @NgModule({
   declarations: [
     AppComponent,
     FootComponent,
     ApiComponent,
     PageNotFoundComponent,
-    AltNavbarComponent,
+    MainLayoutComponent,
   ],
   imports: [
     AppRoutingModule,
@@ -36,6 +38,7 @@ import { AngularSvgIconModule } from "angular-svg-icon";
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule,
+    NavbarComponent,
     AngularSvgIconModule.forRoot(),
   ],
   providers: [],

@@ -1,24 +1,8 @@
-import { HttpClient } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
-import {
-  AbstractControl,
-  FormBuilder,
-  ValidationErrors,
-  ValidatorFn,
-  Validators,
-} from "@angular/forms";
 import { ActivatedRoute, ParamMap } from "@angular/router";
-import { ToastrService } from "ngx-toastr";
 import { Observable } from "rxjs";
 import { map, pluck, shareReplay, switchMap, tap } from "rxjs/operators";
-import { environment } from "../../../environments/environment";
-import { AuthService } from "../../auth/auth.service";
 import { DatabasesService } from "../../databases/services/databases.service";
-import { DashboardService, Report } from "../services/dashboard.service";
-// import local validators for the form
-import { dateTimeValidator } from "./validators/date-time.validator";
-import { orcidIdValidator } from "./validators/orcid-id.validator";
-
 
 @Component({
   selector: "app-submit-report",
