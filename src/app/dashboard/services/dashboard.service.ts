@@ -28,7 +28,7 @@ export class DashboardService {
   }
 
   get_report_statistics(reportFilter: ReportFilter){
-    return this.http.get(environment.ws + '/reports/statistics', {
+    return this.http.get(environment.ws + '/reports', {
       headers: baseHeaders,
       params: new HttpParams({ fromObject: ReportFilter.serialize(reportFilter) })
     }).pipe(

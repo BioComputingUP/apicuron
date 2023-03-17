@@ -41,9 +41,9 @@ export class ReportsByDateChartComponent implements OnInit {
   private defaultLayout: Partial<Plotly.Layout> = {};
 
   // default value for the displayed date range is the first day of the month and Today
-  @Input('first-day') firstDay: Date = moment().subtract(30, 'days').toDate() // get the date, 30 days ago
+  @Input('first-day') firstDay: Date = moment().startOf('month').toDate() // get the date, 30 days ago
 
-  @Input('last-day') lastDay: Date = new Date()
+  @Input('last-day') lastDay: Date = moment().endOf('month').toDate()
 
   ngOnInit(): void {
     
@@ -83,6 +83,7 @@ export class ReportsByDateChartComponent implements OnInit {
 
   private build_plot_data(){
 
+
     // Create a range of dates from the first to the last day
     const dateRange = moment.range(this.firstDay, this.lastDay);
     // make an iterable of the range by DAY and format the dates to DD/MM
@@ -92,7 +93,7 @@ export class ReportsByDateChartComponent implements OnInit {
     const dateMap = new Map<string, number>();
 
     // populate the dateMap from the data
-    this.reportStats.forEach(stat => dateMap.set(moment(stat.timestamp).format('DD/MM'), stat.count))
+    this.reportStats.forEach(stat => dateMap.set(moment(stat.date).format('DD/MM'), stat.count))
     
     this.traceData['x'] = allDatesInclusive
 

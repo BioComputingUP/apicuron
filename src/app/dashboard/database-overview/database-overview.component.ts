@@ -17,9 +17,9 @@ export class DatabaseOverviewComponent implements OnInit {
   user$: any;
   reportStatistics$: Observable<ReportStatistics[]>
 
-  firstDay = moment().subtract(30, 'days').toDate()
+  firstDay = moment().startOf('month').toDate()
 
-  lastDay = new Date();
+  lastDay = moment().endOf('month').toDate()
 
   constructor(protected route:ActivatedRoute,
     protected databaseService: DatabasesService,
@@ -42,7 +42,8 @@ export class DatabaseOverviewComponent implements OnInit {
         return this.dashboardService.get_report_statistics({ 
           resource_id,
           from: this.firstDay,
-          to: this.lastDay
+          to: this.lastDay > new Date() ? new Date() : this.lastDay,
+          groupBy: 'date'
         })
       }),
       shareReplay()

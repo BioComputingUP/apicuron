@@ -1,5 +1,6 @@
 import { Deserializable } from "./deserializable"
 import * as _ from 'lodash'
+import * as moment from 'moment'
 export class Report implements Deserializable {
 
     timestamp: Date
@@ -24,16 +25,18 @@ export class ReportFilter {
     to?: Date
     page?: number
     page_size?: number
+    groupBy: 'date'
 
 
     static serialize(filter: ReportFilter): Omit<ReportFilter, 'from' | 'to'> & { from?: string, to?: string} {
         let reportFilter: any = Object.assign({}, filter)
 
         if(filter.from){
-            reportFilter.from = [filter.from.getFullYear(), filter.from.getMonth() + 1, filter.from.getDate()].join('-')
+            reportFilter.from = moment(filter.from).format('YYYY-MM-DD')
         }
         if(filter.to){
-            reportFilter.to = [filter.to.getFullYear(), filter.to.getMonth() + 1, filter.to.getDate()].join('-')
+            reportFilter.to = moment(filter.to).format('YYYY-MM-DD')
+
         }
         return reportFilter
     }
@@ -43,11 +46,13 @@ export class ReportFilter {
 export class ReportStatistics implements Deserializable {
     deserialize(input: any): this {
         Object.assign(this, input)
-        this.timestamp = new Date(this.timestamp)
+        this.timestamps = this.timestamps.map(timestamp => new Date(timestamp))
+        this.date = new Date(this.date)
         return this
     }
 
-    timestamp: Date
+    date: Date
+    timestamps: Date[]
     activity_terms: string[]
     count: number
     resource_ids: string[]
