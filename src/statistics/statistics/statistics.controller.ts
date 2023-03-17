@@ -28,7 +28,6 @@ export class StatisticsController {
 		protected statService: StatisticsService,
 		protected partnerResourceService: PartnerResourcesService,
 		protected achievementsService: AchievementsService,
-		// protected transformerService: TransformerService,
 	) {}
 
 	private readonly logger = new Logger(StatisticsController.name);

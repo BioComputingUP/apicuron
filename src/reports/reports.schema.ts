@@ -5,9 +5,6 @@ import { Term } from '../terms/schemas/terms.schema';
 export type ReportDocument = Report & Document;
 @Schema({
 	collection: 'reports',
-	
-	// toJSON: { virtuals: true },
-	// toObject: { virtuals: true },
 })
 export class Report {
 	@Prop({
@@ -29,6 +26,7 @@ export class Report {
 
 	@Prop({ required: true })
 	timestamp: Date;
+
 }
 
 const ReportSchema = SchemaFactory.createForClass(Report);

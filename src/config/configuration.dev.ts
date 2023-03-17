@@ -15,7 +15,7 @@ export default () => ({
   ORCID_API_URL: 'https://pub.sandbox.orcid.org/v3.0/',
   PUBLIC_FILES_PATH: resolve(__dirname, "../../public"), // __dirname resolves to current file directory
   PRIVATE_FILES_PATH: resolve(__dirname, "../../private"),
-  PUBLIC_FILES_URL_PATH: 'public',
+  PUBLIC_FILES_URL_PATH: '/public',
   JWT_HEADER: 'authorization',
   JWT_PREFIX: 'bearer',
   V1_HOST: 'http://localhost:8298/', // Apicuron first version host location
