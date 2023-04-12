@@ -17,10 +17,10 @@ fi
 
 echo -e "$(date -R)\tStarting APICURON update ..." |tee -a $log
 
-# submit update.sh as db@urano
+# submit update.sh as nodejs@urano
 echo -e "$(date -R)\t  Submitting update.sh as nodejs on bigmem queue ..." |tee -a $log
 #chmod 400 id_rsa_nodejs
-qsublog=$(ssh -i id_rsa_nodejs nodejs@urano -o StrictHostKeyChecking=no "cd /var/local/webservers/apps/apicuron/updates/;qsub -q bigmem -N apicuron-update update.sh" 2>&1)
+qsublog=$(ssh nodejs@urano -o StrictHostKeyChecking=no "cd /var/local/webservers/apps/apicuron/updates/;qsub -q bigmem -N apicuron-update update.sh" 2>&1)
 ex=$?
 echo -e "$(date -R)\t  qsub ($ex): $(echo $qsublog|tr -d '\r'|tr '\n' '|'|sed 's/|$//')" |tee -a $log
 echo -e "$(date -R)\t  Submitted, check apicuron-update.{o,e,log} for progress." |tee -a $log
