@@ -1,144 +1,119 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { IncomingMessage } from 'http';
-import * as FormData from 'form-data';
-import { TaskSubmit } from '../types/baseTask';
-import { ConfigService } from '@nestjs/config';
-import { createReadStream } from 'fs';
-import { HttpService } from '@nestjs/axios';
-import { Cron } from '@nestjs/schedule';
-// const FormData = require('form-data')
+import { UsersService } from '../../auth/users/users.service';
+import { existsSync } from 'fs';
+import { build_report_stream, parse_default_report, ReportProcessReport, ValidatedReport } from '../reports.parser';
+import { User } from '../../auth/users/schemas/user.schema';
+import { ReportsService } from '../../reports/reports.service';
+import { ValidationError } from 'class-validator';
 @Injectable()
 export class SchedulerService {
 
-    constructor(protected config: ConfigService, protected http: HttpService) {}
+    constructor(
+        public userService: UsersService,
+        public reportService: ReportsService,
+        ) {
+        // this.tasks = ['test_task', 'submit_bulk']
+    }
+    tasks = ['test_task', 'submit_bulk']
 
-    private url = 'https://scheduler.biocomputingup.it/task/'
+    logger= new Logger(SchedulerService.name)
 
-    private schedulerLogger = new Logger(SchedulerService.name);
 
-    private task_name = 'apicuron_tasks'
-    private database_host = this.config.get('db_host')
-    private database = this.config.get('database')
-    
-    async submit_task(task: TaskSubmit){
-        const form = this.base_form();
-
-        form.append('task', task.task)
-        if(task.task_arguments) {
-            form.append('task_arguments', task.task_arguments)
+    async run_task(task: string, file: string | null, ...args) {
+        // let tasks = ['test_task', 'submit_bulk']
+        if (!this.tasks.includes(task)) {
+            throw new Error(`Task ${task} does not exist`)
         }
-        if(task.file){
-            form.append('task_file_argument', createReadStream(task.file.path), {
-                filename: task.file.originalname,
-                contentType: task.file.mimetype,
-                knownLength: task.file.size
-            })
+        await this[task](file, ...args)
+    }
+
+    private test_task(file = null, resource_id: string, orcid_id = null) {
+        console.log({
+            resource_id,
+            orcid_id,
+            file
+        })
+        return;
+    }
+
+
+    private async submit_bulk(file: string, ...args) {
+
+
+        const [orcid_id, delete_all] = args;
+
+        if (!orcid_id) {
+            throw new Error("orcid id required for the submission")
         }
 
-        // in this part, we will convert this callback to a promise
-        return new Promise(
-            // to define a promise we need to pass a function that calls the resolve and reject consumer passed functions
-            (resolve: Function, reject: Function) => {
-                // in this part we will use the form.submit function to call the API
-                // and call the reject/resolve methods accordingly in the callback Function
-                form.submit(this.url, (err: Error, response: IncomingMessage) => {
-                    if(err){
-                        reject(err)
-                    }else{
-                        resolve(response)
+        const user = await this.userService.get_by_orcid(orcid_id);
+
+        // if (!user || !user.resources) {
+        //     throw new UnauthorizedException("user has no permission to submit to resources");
+        // }
+
+        // const user_resource_ids = user.resources.map(({ resource_id }) => { return resource_id })
+
+        if (!file || !existsSync(file)) {
+            throw new Error("File is either unset or path is invalid");
+        }
+
+        const defaultReport = await parse_default_report(file)
+
+        const test = await this.process_reports(file, defaultReport, user)
+
+
+        // const execution_report = await this.reportParser.process_reports(file, defaultReport)
+
+        // console.log(execution_report)
+    }
+
+    // private async compute_statistics(resource_id: string, orcid_id: null | string =null){
+    //     if()
+    // }
+
+
+    private process_reports(file: string, defaultReport: any, user: User): Promise<ReportProcessReport> {
+        const reportsStream = build_report_stream(file, defaultReport, user)
+
+        return new Promise((resolve, reject) => {
+            let error_report = [];
+            let successful_reports_count = 0
+            let total_report_count = 0
+            reportsStream.on('data', async ({ errors, report }: ValidatedReport) => {
+                total_report_count++;
+                if (errors.length == 0) {
+                    successful_reports_count += 1
+                    try {
+                        await this.reportService.insertReport(report)
+                    }catch(e){
+                        if(e){
+                            this.logger.error(e?.message || e, e?.stack)
+                        }else{
+                            this.logger.error(`Error Inserting the report \n ${report}`)
+                        }
+                        error_report.push({
+                            target: report,
+                            property: 'all',
+                            constraints: {
+                                'UnprocessableDocument': 'Cannot process report'
+                            }
+                        })
                     }
-                })
-            }
-        )
 
-        
-    }
+                } else {
+                    error_report = error_report.concat(errors)
+                }
 
-    private base_form(): FormData {
+            })
 
-        const form = new FormData();
+            reportsStream.on('end', () => {
+                resolve({ errors: error_report, success_count: successful_reports_count, total_report_count })
+            })
 
-        form.append('task_name', this.task_name)
-        form.append('database_host', this.database_host)
-        form.append('database', this.database)
-
-        return form
-    }
-
-
-
-    async test_task() {
-        const response = await this.submit_task({
-            task: 'test_task',
-            task_arguments: 'hello world'
-        }).catch((reason) => {
-            this.schedulerLogger.error(reason)
+            reportsStream.on('error', (error) => {
+                reject(error)
+            })
         })
-        return response;
-    }
-
-    /**
-     * 
-     * @param {Object} reports (Multer.File object describing the file containing the curation data )
-     * @param {String} orcid_id (The submitter of the data)
-     * @param {String[]} delete_all (list of resources to delete wipe the )
-     * @description This function takes three params 
-     * @returns 
-     */
-
-    async submit_reports(reports: Express.Multer.File, orcid_id: string, delete_all: string[]){
-        const response = await this.submit_task({
-            task: 'submit_report',
-            task_arguments: `${orcid_id} ${delete_all.join(',')}`,
-            file: reports
-        }).catch((err) => {
-            this.schedulerLogger.error(err)
-        })
-
-        return response['data']
-    }
-
-    /**
-     * 
-     * @param resource_id resource id of the resource to compute the statistics
-     * @param orcid_id optional orcid_id if this triggers a re-compute of the orcid_id
-     */
-    async compute_statistics(resource_id: string, orcid_id= ''){
-        
-        const response = await this.submit_task({
-            task: 'compute_statistics',
-            task_arguments: `${resource_id} ${orcid_id}`,
-        }).catch((err) => {
-            this.schedulerLogger.error(err);
-        })
-
-        return response['data']
-    }
-
-    /**
-     * 
-     * @param resource_id resource id of the resource to compute the statistics
-     * @param orcid_id optional orcid_id if this triggers a re-compute of the orcid_id
-     */
-    async compute_achievements(resource_id: string, orcid_id= ''){
-        const response = await this.submit_task({
-            task: 'compute_achievements',
-            task_arguments: `${resource_id} ${orcid_id}`,
-        }).catch((err) => {
-            this.schedulerLogger.error(err);
-        })
-
-        return response['data']
-    }
-
-    @Cron('0 */30 * * * *')
-    async add_resource_id(){
-        const response = await this.submit_task({
-            task: 'add_resource_id'
-        }).catch((err) => {
-            this.schedulerLogger.error(err);
-        })
-
-        return response['data']
     }
 }

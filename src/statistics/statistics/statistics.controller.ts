@@ -9,7 +9,7 @@ import {
 import { AchievementsService } from '../../achievements/achievements.service';
 import { ParseUnsignedIntPipe } from '../../shared/pipes/unsigned-int-validation.pipe';
 import { TransformInterceptor } from '../../shared/transformer/transform.interceptor';
-import { TransformerService } from '../../shared/transformer/transformer.service';
+// import { TransformerService } from '../../shared/transformer/transformer.service';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { GetStatisticsDto } from '../dto/get-statistics.dto';
 import { StatisticsService } from '../statistics.service';
@@ -28,7 +28,6 @@ export class StatisticsController {
 		protected statService: StatisticsService,
 		protected partnerResourceService: PartnerResourcesService,
 		protected achievementsService: AchievementsService,
-		protected transformerService: TransformerService,
 	) {}
 
 	private readonly logger = new Logger(StatisticsController.name);
@@ -81,7 +80,6 @@ export class StatisticsController {
 			query.page_size,
 		);
 	}
-
 	
 }
 

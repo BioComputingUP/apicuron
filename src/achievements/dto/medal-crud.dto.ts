@@ -57,22 +57,22 @@ export class MedalsFilter {
     @IsOptional()
     @IsDateString()
     @MaxDateField(['last_day'])
-    first_day: Date;
+    first_day?: Date;
 
     @IsOptional()
     @IsDateString()
 	@MinDateField(['first_day'])
-    last_day: Date;
+    last_day?: Date;
 
     @IsOptional()
     @IsString()
     @Validate(MedalUnique)
-	name: string;
+	name?: string;
 
     @IsOptional()
     @IsString()
     @Validate(ResourceIdExists)
-	resource_id: string;
+	resource_id?: string;
 }
 
 export class DeleteMedalDto {

@@ -1,12 +1,20 @@
 import { HttpModule } from '@nestjs/axios';
-import { Module } from '@nestjs/common';
-import { SchedulerController } from './scheduler.controller';
+import { Module, forwardRef } from '@nestjs/common';
+import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
+import { AchievementsModule } from '../achievements/achievements.module';
+import { AuthModule } from '../auth/auth.module';
+import { ReportsModule } from '../reports/reports.module';
+import { ResourcesModule } from '../resources/resources.module';
+import { StatisticsModule } from '../statistics/statistics.module';
 import { SchedulerService } from './services/scheduler.service';
+// import { ComputeStatisticsTask } from './tasks/compute_statistics.task';
 
 @Module({
-  imports: [HttpModule],
-  providers: [SchedulerService],
+  imports: [forwardRef(() => ReportsModule), HttpModule, AuthModule, StatisticsModule, ResourcesModule, AchievementsModule],
+  providers: [SchedulerService,
+  ],
+  exports: [
+  ],
   controllers: [],
-  exports: [SchedulerService]
 })
-export class SchedulerModule {}
+export class SchedulerModule { }

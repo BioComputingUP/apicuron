@@ -6,26 +6,26 @@ export type MedalDocument = Medal & Document;
 export class Medal {
 	// fields from Achievement
 	@Prop({
-		required: true,
+		required: false,
 	})
 	category: string;
 	@Prop({
-		required: true,
+		required: false,
 	})
 	color: string;
 
 	@Prop({
-		required: true,
+		required: false,
 	})
 	count_relative_index: number;
 
 	@Prop({
-		required: true,
+		required: false,
 	})
 	count_relative_valid: Boolean;
 
 	@Prop({
-		required: true,
+		required: false,
 	})
 	count_threshold_valid: Boolean;
 
@@ -60,12 +60,12 @@ export class Medal {
 	score_relative_index: number;
 
 	@Prop({
-		required: true,
+		required: false,
 	})
 	score_relative_valid: Boolean;
 
 	@Prop({
-		required: true,
+		required: false,
 	})
 	score_threshold_valid: Boolean;
 

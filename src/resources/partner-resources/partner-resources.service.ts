@@ -6,7 +6,7 @@ import {
 	PartnerResourceDocument,
 	ResourceSummary,
 } from '../schemas/partner-resources.schema';
-import { TransformerService } from '../../shared/transformer/transformer.service';
+// import { TransformerService } from '../../shared/transformer/transformer.service';
 import { UpdatePartnerResourceDto } from '../dto/updateResource.dto';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class PartnerResourcesService {
 	constructor(
 		@InjectModel(PartnerResource.name)
 		private partnerResourceModel: Model<PartnerResourceDocument>,
-		protected transformService: TransformerService
+		// protected transformService: TransformerService
 	) {}
 	async get_resources(): Promise<PartnerResource[]> {
 		return await this.partnerResourceModel.find();
@@ -27,7 +27,7 @@ export class PartnerResourcesService {
 	async retrieve_uri(resource_id: string){
 		const resource = await this.partnerResourceModel.findOne({ resource_id })
 		if(!resource){
-			this.transformService.warn('resource_id', `Incorrect resource_id: ${resource_id} Not found, parameter ignored`)
+			// this.transformService.warn('resource_id', `Incorrect resource_id: ${resource_id} Not found, parameter ignored`)
 			return null
 		}else{
 			return resource.resource_uri

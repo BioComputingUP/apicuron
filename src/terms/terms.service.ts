@@ -16,7 +16,13 @@ export class TermsService {
         @InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
         protected resourceService: PartnerResourcesService
         ) { }
-
+    
+    /**
+     * 
+     * @param term_list list of activity_terms requested
+     * @param resource_id the resource the activity terms belong to
+     * @returns Array of terms that were requested
+     */
     async get_terms(term_list: string[], resource_id: string) {
         return await this.termModel.find({ term_activity: { $in: term_list }, resource_id }).lean()
     }

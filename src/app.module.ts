@@ -13,14 +13,15 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join, resolve } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MulterModule } from '@nestjs/platform-express';
-import { TransformerModule } from './shared/transformer/transformer.module';
+// import { TransformerModule } from './shared/transformer/transformer.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { TermsModule } from './terms/terms.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
-import { SchedulerController } from './src/scheduler/scheduler.controller';
 import { UniqueRule } from './shared/validators/unique.validator';
 import { EntryExistsRule } from './shared/validators/entry-exists.validator';
+import { SchedulerClientModule } from './scheduler-client/scheduler-client.module';
+import { TransformInterceptor } from './shared/transformer/transform.interceptor';
 
 @Module({
 	imports: [
@@ -62,13 +63,13 @@ import { EntryExistsRule } from './shared/validators/entry-exists.validator';
 		TermsModule,
 		ReportsModule,
 		StatisticsModule,
-		TransformerModule,
+		// TransformerModule,
 		AchievementsModule,
 		NotificationsModule,
 		SchedulerModule,
-		// SharedValidatorsModule
+		SchedulerClientModule,
 	],
-	controllers: [AppController, SchedulerController],
-	providers: [AppService, UniqueRule, EntryExistsRule],
+	controllers: [AppController],
+	providers: [AppService, UniqueRule, EntryExistsRule, TransformInterceptor],
 })
 export class AppModule { }

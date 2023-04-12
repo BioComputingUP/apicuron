@@ -20,7 +20,7 @@ export class AchievementDef {
 	@Prop()
 	count_threshold: number;
 
-	@Prop()
+	@Prop({ required: true })
 	name: string;
 
 	@Prop()

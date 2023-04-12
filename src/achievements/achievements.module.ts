@@ -35,7 +35,7 @@ import { ResourcesModule } from '../resources/resources.module';
 			},
 		]),
 	],
-	exports: [AchievementsDefService, AchievementsService],
+	exports: [AchievementsDefService, AchievementsService, MongooseModule],
 	controllers: [AchievementsController, AchievementsDefController, BadgesDefController, MedalsDefController],
 })
 export class AchievementsModule {}

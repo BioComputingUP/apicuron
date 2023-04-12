@@ -9,7 +9,7 @@ export function loadConfig () {
 	if (process.env.NODE_ENV === 'development') {
 		return devConfig;
 	}
-	if (process.env.NODE_ENV === 'production') {
+	if (['production', 'prod'].includes(process.env.NODE_ENV)) {
 		return prodConfig;
 	}
 

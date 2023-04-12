@@ -2,8 +2,8 @@ import { IsEmpty, IsNotEmpty, IsOptional, IsString, IsUrl, Matches, Max, MaxLeng
 import { UniqueRule } from "../../shared/validators/unique.validator";
 import { Resource } from "../schemas/resource.schema";
 import { SubmittedResource } from "../schemas/submitted-resource.schema";
-import { UniqueResourceIdRule } from "../submitted-resources/validators/unique-resource-id"
-import { UniqueResourceURIRule } from "../submitted-resources/validators/unique-resource-uri"
+import { UniqueResourceIdRule } from "../validators/unique-resource-id"
+import { UniqueResourceURIRule } from "../validators/unique-resource-uri"
 
 
 export class CreateResourceDto {

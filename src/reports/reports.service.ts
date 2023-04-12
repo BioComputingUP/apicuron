@@ -1,30 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, Schema } from 'mongoose';
+import { FilterQuery, Model, PipelineStage, QueryOptions } from 'mongoose';
 import { User, UserDocument } from '../auth/users/schemas/user.schema';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import { TermsService } from '../terms/terms.service';
+import { ReportFilterDto } from './dto/report-filter.dto';
 import { ReportDto } from './dto/report.dto';
-import { Report, ReportDocument } from './reports.schema';
-
+import { Report, ReportDocument, ReportSchema } from './reports.schema';
+import * as _ from 'lodash';
+import { plainToClass } from 'class-transformer';
+import { writeFileSync } from 'fs';
 
 @Injectable()
 export class ReportsService {
 	constructor(
-		@InjectModel(Report.name) private reportModel: Model<ReportDocument>,
+		@InjectModel(Report.name)
+		private reportModel: Model<ReportDocument, {}, {}, {}, typeof ReportSchema>,
 		@InjectModel(User.name) private userModel: Model<UserDocument>,
 		protected partnerResourceService: PartnerResourcesService,
 		protected termsService: TermsService,
 	) {}
-
-	private page_size = 10;
-
-	private sort_fields = [
-		'entity_uri',
-		'activity_name',
-		'description',
-		'timestamp',
-	];
 
 	private checkOrcidId(orcid_id: string): Boolean {
 		// TODO: This needs to be implemented
@@ -41,229 +36,270 @@ export class ReportsService {
 		return await this.reportModel.insertMany(report);
 	}
 
-	async get_reports({
-		sort_field = '',
-		sort_value = '',
-		resource_id = '',
-		curator_orcid = '',
-		page = 1
-	}) {
-		let aggregation_pipeline = [];
-
-		// orcid and resource_id filtering
-		// by building the $match aggregation object
-
-		if (!!curator_orcid || !!resource_id) {
-			let match_obj = {
-				$match: {},
-			};
-			match_obj.$match['resource_id'] = !!resource_id ? resource_id : undefined;
-			match_obj.$match['curator_orcid'] = !!curator_orcid
-				? curator_orcid
-				: undefined;
-			aggregation_pipeline.push(match_obj);
-		}
-
-		// Validating sort field
-		const sort_field_valid = this.validate_sort_fields(sort_value);
-
-		if (!!sort_field && this.sort_fields.includes(sort_field) && !!sort_field_valid) {
-			let sort_obj = {
-				$sort: {},
-			};
-			sort_obj.$sort[sort_field] = sort_field_valid;
-			aggregation_pipeline.push(sort_obj);
-		}
-
-		aggregation_pipeline = aggregation_pipeline.concat([
+	/**
+	 *
+	 * @param resource_id The local resource_id of the specified resource
+	 * @description This function aggregates the reports, groups them by orcid and term
+	 * @returns Aggregate<any[]>
+	 */
+	group_resource_reports_by_activities(resource_id: string) {
+		// # this query groups reports by user and activity_terms
+		// # computes the count of each term creating a list of (term, count) pairs
+		const aggregation_pipeline = [
 			{
-				$skip: page
-			},
-			{
-				$limit: this.page_size,
-			},
-			{
-				$lookup: {
-					from: 'terms_def',
-					localField: 'activity_term',
-					foreignField: 'activity_term',
-					as: 'term',
+				$match: {
+					resource_id,
 				},
 			},
 			{
-				$unwind: {
-					path: '$term',
+				$group: {
+					_id: {
+						curator_orcid: '$curator_orcid',
+						activity_term: '$activity_term',
+					},
+					count: {
+						$sum: 1,
+					},
+					activity_term: {
+						$first: '$activity_term',
+					},
+					curator_orcid: {
+						$first: '$curator_orcid',
+					},
 				},
 			},
 			{
-				$project: {
-					_id: -1,
-					curator_orcid: 1,
-					resource_uri: 1,
-					entity_uri: 1,
-					activity_term: 1,
-					timestamp: 1,
-					activity_name: '$term.activity_name',
-					score: '$term.score',
-					description: '$term.description',
-					activity_category: '$term.activity_category',
+				$group: {
+					_id: {
+						curator_orcid: '$curator_orcid',
+					},
+					terms: {
+						$addToSet: {
+							activity_term: '$activity_term',
+							count: '$count',
+						},
+					},
 				},
 			},
-		]);
-		return await this.reportModel.aggregate(aggregation_pipeline);
-		// return await this.reportModel
-		// 	.find(null, null, {
-		// 		limit: page_size,
-		// 	}).populate('term').exec()
+		];
+
+		return this.reportModel.aggregate(aggregation_pipeline);
 	}
 
-	async get_user_statistics() {
-		const userCursor = await this.userModel
-			.find(
-				{},
-				{
-					curator_orcid: 1,
-					family_name: 1,
-					given_name: 1,
-				},
-			)
-			.cursor();
-
-		for await (const doc of userCursor) {
-			const reports = this.reportModel.aggregate([
-				{
-					$match: {
-						curator_orcid: doc['curator_orcid'],
-					},
-				},
-				{
-					$lookup: {
-						from: 'terms_def',
-						localField: 'activity_term',
-						foreignField: 'activity_term',
-						as: 'term',
-					},
-				},
-				{
-					$unwind: {
-						path: '$term',
-					},
-				},
-			]);
-		}
+	/**
+	 *
+	 * @param resource_id the resource_id concerned
+	 * @param orcid_id the orcid of the user
+	 * @description returns a cursor to the user reports on the resource_id done by the user with the specified orcid_id
+	 * @returns a cursor to the reports of the orcid_id done on the resource
+	 */
+	user_resource_reports(resource_id: string, orcid_id: string) {
+		return this.reportModel.find({
+			resource_id,
+			curator_orcid: orcid_id,
+		});
 	}
 
-	async getReports(
-		orcid_id: string,
-		resource_id: string,
-		page_size = 10,
-		page = 1,
-	) {
-		const skip = (page - 1) * page_size;
-		let query_obj: FilterQuery<ReportDocument> = {
-			'$or': [{ resource_id: resource_id }],
-		};
+	async get_reports(reportFilter: ReportFilterDto, with_terms = false) {
+		const { resource_id } = reportFilter;
+		const { filter, options } = this.buildReportsQuery(reportFilter);
 
-		if (!!resource_id) {
-			const resource_uri = await this.partnerResourceService.retrieve_uri(
-				resource_id,
-			);
-			if (!!resource_uri) {
-				query_obj['$or'].concat([{ resource_uri: resource_uri }]);
+		if (!reportFilter.groupBy) {
+			console.log(options)
+			const reports = await this.reportModel.find(filter, {}, options).lean();
+			let data = reports;
+
+			if (with_terms) {
+				const activity_term_list = [
+					...new Set(reports.map((report) => report.activity_term)),
+				];
+
+				const terms_list = await this.termsService.get_terms(
+					activity_term_list,
+					resource_id,
+				);
+
+				const reports_with_terms = reports.map((report) => {
+					report['term'] = terms_list.find(
+						(term) => term.activity_term == report.activity_term,
+					);
+					return report;
+				});
+				data = reports_with_terms;
 			}
-		}
 
-		if (!!orcid_id) {
-			query_obj['curator_orcid'] = orcid_id;
-		}
+			const reports_count = await this.reportModel.count(filter);
 
-		const reports = await this.reportModel.find(query_obj).sort({'timestamp': -1 }).skip(skip).limit(page_size).lean();
-		
-		const activity_term_list = [...new Set(reports.map(report => report.activity_term))]
-		
-		const terms_list = await this.termsService.get_terms(activity_term_list, resource_id);
+			return {
+				data,
+				total_count: reports_count,
+				page: reportFilter.page,
+				page_size: reportFilter.page_size,
+			};
+		} else {
+			const paginationPipeline = this.queryOptionsToPipeline(options);
+			const groupByAggregation = this.buildReportGroupAggregation(reportFilter.groupBy)
 
+			console.log(paginationPipeline)
 
-
-		const reports_with_terms = reports.map((report) => {
-			report['term'] = terms_list.find(term => term.activity_term == report.activity_term)
-			return report;
-		})
-		const reports_count = await this.reportModel.count(query_obj);
-		
-		return {
-			data: reports_with_terms,
-			count: reports_count
+			const aggregationPipeline: PipelineStage[] = [
+				{ $match: filter },
+				...groupByAggregation,
+				...paginationPipeline
+			]
+			const data$ = this.reportModel.aggregate(aggregationPipeline);
+			const reports_count$ = this.reportModel.aggregate([
+				...aggregationPipeline.filter(stage => !stage['$limit']), // remove the stage that limits the data for counting
+				{ $count: 'total_count' }
+			]);
+			
+			const [data, reports_count] = await Promise.all([data$, reports_count$]);
+			return {
+				data,
+				total_count: reports_count[0]['total_count'],
+				page: reportFilter.get_page(),
+				page_size: reportFilter.get_page_size(),
+			};
 		}
 	}
 
-	async get_user_reports(
-		orcid_id: string,
-		resource_id: string,
-		page = 1,
-		page_size = 10,
-	) {
+	async report_statistics() {}
+
+	async all_reports_count() {
+		return await this.reportModel.count();
+	}
+
+	async delete_all_resource_reports(resource_id: string) {
 		const resource_uri = await this.partnerResourceService.retrieve_uri(
 			resource_id,
 		);
 
-		const skip = (page - 1) * page_size;
-		const reports_promise = this.reportModel
-			.find({ curator_orcid: orcid_id, resource_uri })
-			.sort({ timestamp: -1 })
-			.skip(skip)
-			.limit(page_size)
-			.lean();
-
-		const reports_count_promise = this.reportModel.count({
-			curator_orcid: orcid_id,
-			resource_uri,
+		return await this.reportModel.deleteMany({
+			$or: [{ resource_uri }, { resource_id }],
 		});
-		const [reports, reports_count] = await Promise.all([
-			reports_promise,
-			reports_count_promise,
+	}
+
+	private buildReportsQuery(dto: ReportFilterDto): {
+		filter: FilterQuery<Report>;
+		options: QueryOptions<Report>;
+	} {
+		let filter: FilterQuery<Report> = _.pick(dto, [
+			'entity_uri',
+			'curator_orcid',
+			'resource_id',
+			'activity_term',
 		]);
-		// the string constructor is used to convert from mongoose string type to regular typescript string (I know, it's just nonesense)
-		const report_terms = reports.map((report) => String(report.activity_term));
 
-		const terms = await this.termsService.get_terms(report_terms, resource_id);
-		const user_reports = reports.map((report) => {
-			return {
-				...report,
-				term: terms.find(
-					(term) => term.activity_term == String(report.activity_term),
-				),
+		// timestamp filter object
+		// pick the keys from the dto and rename them if they're defined
+		let timestamp: any = _.mapKeys(
+			_.pick(dto, ['from', 'to']),
+			(value, key) => {
+				const rename = { from: '$gte', to: '$lte' };
+				return rename[key];
+			},
+		);
+
+		if (Object.keys(timestamp).length > 0) {
+			filter = {
+				...filter,
+				timestamp,
 			};
-		});
+		}
+
+		let sort = {};
+		const converter = {
+			desc: -1,
+			asc: 1,
+			'1': 1,
+			'-1': -1,
+		};
+		sort[dto.sortBy] = converter[dto.sortOrder];
+
+		let options: QueryOptions<Report> = {
+			sort,
+		};
+
+		// pagination objects
+		if(dto.get_page_size()){
+			options['limit'] = dto.get_page_size()
+			options['skip'] = (dto.get_page() - 1) * options['limit'];	
+		}
 
 		return {
-			data: user_reports,
-			count: reports_count,
+			filter,
+			options,
 		};
 	}
 
-	private validate_sort_fields(sort_field) {
-		if (['asc', 'desc'].includes(sort_field)) {
-			return sort_field === 'asc' ? 1 : -1;
-		} else {
-			return null;
+	private queryOptionsToPipeline(options: QueryOptions<Report>) {
+		let pipelineArray: PipelineStage[] = [];
+
+		if (options.sort) {
+			pipelineArray.push({ $sort: options.sort });
 		}
+
+		if (options.skip) {
+			pipelineArray.push({ $skip: options.skip });
+		}
+
+		if (options.limit) {
+			pipelineArray.push({ $limit: options.limit });
+		}
+
+		return pipelineArray;
 	}
 
-	async count() {
-		return await this.reportModel.count();
-	}
+	private buildReportGroupAggregation(
+		groupBy: string,
+	): PipelineStage[] {
+		const converter = {
+			'date': [
+				{
+					$group: {
+						_id: { $dateToString: { date: '$timestamp', format: '%Y-%m-%d' } },
+						activity_terms: { $addToSet: '$activity_term' },
+						resource_ids: { $addToSet: '$resource_id' },
+						curator_orcids: { $addToSet: '$curator_orcid' },
+						timestamps: { $addToSet: '$timestamp' },
+						count: { $sum: 1 }
+					},
+				},
+				{
+					$project: {
+						date: '$_id',
+						_id: 0,
+						activity_terms: 1,
+						resource_ids: 1,
+						curator_orcids: 1,
+						timestamps: 1,
+						count: 1
+					},
+				},
+			],
+			'activity_term': [
+				{
+					$group: {
+						_id: '$activity_term',
+						timestamps: { $addToSet: '$timestamp' },
+						resource_ids: { $addToSet: '$resource_id' },
+						curator_orcids: { $addToSet: '$curator_orcid' },
+						count: { $sum: 1 }
+					},
+				},
+				{
+					$project: {
+						_id: 0,
+						activity_term: '$_id',
+						timestamps: 1,
+						resource_ids: 1,
+						curator_orcids: 1,
+						count: 1
+					},
+				},
+			],
+		};
 
-
-	async delete_all_resource_reports(resource_id: string){
-		const resource_uri = await this.partnerResourceService.retrieve_uri(resource_id);
-
-		return await this.reportModel.deleteMany({
-			'$or': [
-				{ resource_uri },
-				{ resource_id }
-			]
-		})
-
+		return converter[groupBy];
 	}
 }
