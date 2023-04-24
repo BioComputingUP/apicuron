@@ -6,13 +6,17 @@
     "start-dev": "cross-env NODE_ENV=development ng serve",
     "start-dev-external": "ng serve --host 0.0.0.0 --disableHostCheck",
     "start-prod": "ng serve --configuration production",
+    "compodoc": "npx compodoc -p tsconfig.doc.json",
     "build": "rm -rf dist/* && ng build --configuration production --build-optimizer",
     "build-dev": "rm -rf dist/* && ng build --configuration development --build-optimizer",
     "deploy-dev": "(colC='\\033[0;36m';colN='\\033[0m'; echo ${colC}Running npm build-dev ...${colN} && npm run build-dev && echo ${colC}Rsyncing dist ...${colN} && rsync -avzh --delete dist biocomp@persefone:/var/www/apicuron-dev/ && echo ${colC}Done with deploy-dev!${colC})",
     "deploy-prod": "(colC='\\033[0;36m';colN='\\033[0m'; echo ${colC}Running npm build ...${colN} && npm run build && echo ${colC}Rsyncing dist ...${colN} && rsync -avh --delete dist biocomp@persefone:/var/www/apicuron/ && echo ${colC}Done with deploy-prod!${colC})",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "compodoc:build": "compodoc -p tsconfig.doc.json",
+    "compodoc:build-and-serve": "compodoc -p tsconfig.doc.json -s",
+    "compodoc:serve": "compodoc -s"
   },
   "private": true,
   "dependencies": {
@@ -25,6 +29,7 @@
     "@angular/platform-browser": "^14.2.3",
     "@angular/platform-browser-dynamic": "^14.2.3",
     "@angular/router": "^14.2.3",
+    "@compodoc/compodoc": "^1.1.19",
     "@ngneat/tailwind": "^7.0.3",
     "@nicky-lenaers/ngx-scroll-to": "^9.0.0",
     "anchor-js": "^4.3.1",
