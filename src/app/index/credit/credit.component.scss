@@ -1,3 +1,10 @@
 .credit-link{
     @apply tw-inline tw-underline hover:tw-underline tw-text-blue-600 hover:tw-text-blue-700
 }
+
+
+  .square:after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
+  }

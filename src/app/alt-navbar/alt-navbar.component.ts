@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit, ViewEncapsulation } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Observable, fromEvent } from "rxjs";
+import { delay, filter, shareReplay } from "rxjs/operators";
 
 @Component({
   selector: "app-alt-navbar",
@@ -12,8 +13,11 @@ export class AltNavbarComponent implements OnInit {
   expanded_nav = false;
   show_login = false;
   isCollapsed = new BehaviorSubject<boolean>(true);
-  
+  isCollapsed$: Observable<Boolean>;
+
   constructor() {
+
+    this.isCollapsed$ = this.isCollapsed.asObservable();
   }
 
 
@@ -25,16 +29,14 @@ export class AltNavbarComponent implements OnInit {
     // this.authService.loginData.subscribe(
     //   (displayedName) => (this.loginData = displayedName)
     // );
+
+    fromEvent(window,'scroll').pipe(
+      delay(200),
+      shareReplay(1)
+    ).subscribe(() => {
+      this.isCollapsed.next(document.documentElement.scrollTop <= 40)
+    })
   }
 
-  @HostListener('window:scroll', [ '$event'])
-  onScroll (event) {
-    if(document.documentElement.scrollTop > 40){
-      this.expanded_nav = false;
-    }
-    else {
-      this.expanded_nav = true;
-    }
-  }
 
 }

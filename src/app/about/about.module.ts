@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AboutRoutingModule } from './about-routing.module';
 import { AboutComponent } from './about.component';
 import { ScrollToModule } from '@nicky-lenaers/ngx-scroll-to';
+import { AngularSvgIconModule } from 'angular-svg-icon';
 
 
 @NgModule({
@@ -13,7 +14,8 @@ import { ScrollToModule } from '@nicky-lenaers/ngx-scroll-to';
   imports: [
     CommonModule,
     ScrollToModule.forRoot(),
-    AboutRoutingModule
+    AboutRoutingModule,
+    AngularSvgIconModule
   ]
 })
 export class AboutModule { }
