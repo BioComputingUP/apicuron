@@ -22,5 +22,6 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 			},
 		]),
 	],
+	exports: [NotificationsService]
 })
 export class NotificationsModule {}

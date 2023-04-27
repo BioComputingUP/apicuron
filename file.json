@@ -21,7 +21,7 @@
       "entity_uri": "https://identifiers.org/disprot:DP03633",
       "activity_term": "region_first_generation",
       "resource_id": "dis"
-    },
+    }
     {
       "timestamp": {
         "$date": {

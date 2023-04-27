@@ -17,6 +17,7 @@ import { ComputeMedalsTask } from './tasks/compute_medals.task';
 import { ComputeAchievementsTask } from './tasks/compute_achievements.task';
 import { ComputeStatisticsTask } from './tasks/compute_statistics.task';
 import { StatisticsModule } from '../statistics/statistics.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
 	controllers: [ReportsController,],
@@ -48,6 +49,7 @@ import { StatisticsModule } from '../statistics/statistics.module';
 		ResourcesModule,
 		TermsModule,
 		AchievementsModule,
+		NotificationsModule,
 		MongooseModule.forFeature([
 			{
 				name: Report.name,

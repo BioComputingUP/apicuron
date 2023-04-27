@@ -36,4 +36,18 @@ export class NotificationsService {
     async set_notification_as_seen(id: mongoose.Types.ObjectId, orcid_id: string){
         return await this.notificationModel.updateOne({ _id: id, orcid_id}, { seen: true })
     }
+
+    async create_user_notification(title: string, body: string, orcid_id: string) {
+        
+        const notification = new this.notificationModel({
+            title,
+            body,
+            orcid_id,
+            seen: false
+        });
+
+        await notification.save();
+        
+        return notification;
+    }
 }

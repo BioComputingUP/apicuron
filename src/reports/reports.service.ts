@@ -8,8 +8,6 @@ import { ReportFilterDto } from './dto/report-filter.dto';
 import { ReportDto } from './dto/report.dto';
 import { Report, ReportDocument, ReportSchema } from './reports.schema';
 import * as _ from 'lodash';
-import { plainToClass } from 'class-transformer';
-import { writeFileSync } from 'fs';
 
 @Injectable()
 export class ReportsService {
@@ -17,7 +15,7 @@ export class ReportsService {
 		@InjectModel(Report.name)
 		private reportModel: Model<ReportDocument, {}, {}, {}, typeof ReportSchema>,
 		@InjectModel(User.name) private userModel: Model<UserDocument>,
-		protected partnerResourceService: PartnerResourcesService,
+		protected partnerResourcesService: PartnerResourcesService,
 		protected termsService: TermsService,
 	) {}
 
@@ -170,12 +168,9 @@ export class ReportsService {
 	}
 
 	async delete_all_resource_reports(resource_id: string) {
-		const resource_uri = await this.partnerResourceService.retrieve_uri(
-			resource_id,
-		);
 
 		return await this.reportModel.deleteMany({
-			$or: [{ resource_uri }, { resource_id }],
+			resource_id
 		});
 	}
 

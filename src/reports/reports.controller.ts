@@ -115,56 +115,9 @@ export class ReportsController {
 		@Request() req,
 		@Body() body: SubmitBulkDto,
 	) {
-		// importing the formData package
-		var FormData = require('form-data');
 
-		// getting environment variables to configure the job parameters
-		const database_host = this.config.get<string>('db_host');
-		const database = this.config.get<string>('database');
 
-		const formData = new FormData();
-
-		// append multiple field values to the formData
-		formData.append('task_name', 'apicuron_tasks');
-		formData.append('database_host', database_host);
-		formData.append('task', 'submit_report');
-		formData.append('database', database);
-
-		// if the delete_all exists we add it to the arguments otherwise we only send the orcid
-		if (body.delete_all) {
-			formData.append(
-				'task_arguments',
-				`${req.user.orcid_id} ${body.delete_all.join(',')}`,
-			);
-		} else {
-			formData.append('task_arguments', req.user.orcid_id);
-		}
-
-		// append a file to the formData
-		formData.append('task_file_argument', createReadStream(reports.path), {
-			filename: reports.originalname,
-			contentType: reports.mimetype,
-			knownLength: reports.size,
-		});
-
-		// send the request
-		formData.submit('https://scheduler.biocomputingup.it/task/', (err, res) => {
-			if (err) {
-				this.logger.error(
-					'An error occurred after submitting a job to the biocomp scheduler',
-				);
-				this.logger.error(err);
-
-				throw new InternalServerErrorException('An internal error occured.');
-			}
-		});
-
-		if (body.delete_all) {
-			body.delete_all.forEach(async (resource_id) => {
-				await this.schedulerService.compute_achievements(resource_id);
-				this.schedulerService.compute_statistics(resource_id);
-			});
-		}
+		await this.schedulerService.submit_reports(reports, req.user.orcid_id, body.delete_all)
 
 		return {
 			status:
