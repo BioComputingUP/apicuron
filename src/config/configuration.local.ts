@@ -18,5 +18,7 @@ export default () => ({
   PUBLIC_FILES_URL_PATH: '/public',
   PUBLIC_FILES_PATH: resolve(__dirname, "../../public"), // __dirname resolves to current file directory
   PRIVATE_FILES_PATH: resolve(__dirname, "../../private"),
-  FRONTEND_HOST: 'http://localhost:4200/'
+  FRONTEND_HOST: 'http://localhost:4200/',
+  SCHEDULER: 'https://dev.scheduler.biocomputingup.it/job/',
+  SCHEDULER_TASK: 'apicuron_dev'
 });

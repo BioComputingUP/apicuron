@@ -141,10 +141,9 @@ export class ReportsController {
 		// const resource_uri = await this.partnerResourceService.retrieve_uri(report.resource_id)
 		const report_confirmation = await this.reportService.insertReport(report);
 
-		await this.computeStatistics.run_task(
-			report.resource_id,
-			report.curator_orcid,
-		);
+		await this.computeStatistics.run_task({
+			arguments: [ report.resource_id, report.curator_orcid]
+		});
 		// await this.schedulerService.compute_achievements(report.resource_id, report.curator_orcid);
 		// await this.schedulerService.compute_statistics(report.resource_id, report.curator_orcid);
 		return report_confirmation;

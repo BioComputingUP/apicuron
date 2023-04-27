@@ -19,7 +19,9 @@ export default () => ({
   JWT_HEADER: 'authorization',
   JWT_PREFIX: 'bearer',
   V1_HOST: 'http://localhost:8298/', // Apicuron first version host location
-  FRONTEND_HOST: 'http://dev.apicuron.org/'
+  FRONTEND_HOST: 'http://dev.apicuron.org/',
+  SCHEDULER: 'https://dev.scheduler.biocomputingup.it/job/',
+  SCHEDULER_TASK: 'apicuron_dev'
 
   //   port: parseInt(process.env.PORT, 10) || 3000,
   //   database: {

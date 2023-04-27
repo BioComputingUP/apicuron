@@ -11,6 +11,7 @@ import { Medal, MedalDocument } from '../../achievements/schemas/medals.schema';
 import { Report, ReportDocument } from '../reports.schema';
 import { MedalDef } from '../../achievements/schemas/medals_def.schema';
 import { AchievementDef } from '../../achievements/schemas/achievement-def.schema';
+import { TaskArgument } from '../../scheduler-client/types/baseTask';
 
 @Injectable()
 export class ComputeMedalsTask {
@@ -26,7 +27,9 @@ export class ComputeMedalsTask {
 
     logger = new Logger(ComputeMedalsTask.name)
 
-    public async run_task(resource_id: string) {
+    public async run_task(task_arg: TaskArgument) {
+
+        const [resource_id] = task_arg.arguments
         const resource = await this.partnerResourceService.get_resource(resource_id)
 
         if (!resource) {

@@ -8,6 +8,7 @@ import { Badge, BadgeDocument } from '../../achievements/schemas/badges.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UsersService } from '../../auth/users/users.service';
+import { TaskArgument } from '../../scheduler-client/types/baseTask';
 
 @Injectable()
 export class ComputeBadgesTask {
@@ -22,7 +23,10 @@ export class ComputeBadgesTask {
 
     logger = new Logger(ComputeBadgesTask.name)
 
-    public async run_task(resource_id: string, orcid_id: string | null = null) {
+    public async run_task(task_arg: TaskArgument) {
+
+
+        const [resource_id, orcid_id] = task_arg.arguments
         const resource = await this.partnerResourceService.get_resource(resource_id)
 
         if(!resource){

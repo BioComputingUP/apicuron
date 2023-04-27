@@ -14,6 +14,7 @@ import { User } from '../../auth/users/schemas/user.schema';
 import { ReportsService } from '../../reports/reports.service';
 import { UsersService } from '../../auth/users/users.service';
 import { NotificationsService } from '../../notifications/notifications.service';
+import { TaskArgument } from '../../scheduler-client/types/baseTask';
 
 export type ValidatedReport = { report: SubmitReportDto, errors: ValidationError[] };
 export type ReportProcessReport = { errors: ValidationError[], success_count: number, total_report_count: number };
@@ -27,16 +28,17 @@ export class SubmitBulkTask {
     logger = new Logger(SubmitBulkTask.name)
 
 
-    public async run_task(file: string, orcid_id: string, delete_all: string | null = null) {
+    public async run_task(task_arg: TaskArgument) {
+        // file: string, orcid_id: string, delete_all: string | null = null
+        const file = task_arg.file
 
-        // console.log('delete_all: ', delete_all)
+        const [orcid_id, delete_all] = task_arg.arguments
 
         if (delete_all) {
             const resources_delete_all: string[] = delete_all.split(',');
 
             for (let i = 0; i < resources_delete_all.length; i++) {
                 await this.reportService.delete_all_resource_reports(resources_delete_all[i])
-
             }
         }
         return await this.main(file, orcid_id)
@@ -60,19 +62,24 @@ export class SubmitBulkTask {
                             await this.reportService.insertReport(report)
                         } catch (e) {
                             if (e) {
-                                console.log('hi')
-                                this.logger.error(e?.message || e, e?.stack)
+                                this.logger.error(e?.message)
+                                error_report.push({
+                                    target: report,
+                                    property: 'all',
+                                    constraints: {
+                                        'InsertionError': e?.message
+                                    }
+                                })
                             } else {
-                                console.log('how')
                                 this.logger.error(`Error Inserting the report \n ${report}`)
+                                error_report.push({
+                                    target: report,
+                                    property: 'all',
+                                    constraints: {
+                                        'InsertionError': 'Error Inserting the report'
+                                    }
+                                })
                             }
-                            error_report.push({
-                                target: report,
-                                property: 'all',
-                                constraints: {
-                                    'InsertionError': 'Cannot insert report'
-                                }
-                            })
                         }
 
                     } else {
@@ -106,7 +113,7 @@ export class SubmitBulkTask {
                 orcid_id
             )
 
-            
+
         }
 
 
@@ -119,25 +126,21 @@ export class SubmitBulkTask {
             const constraints = Object.entries(report.constraints).map(([name, err]) => { return `- ${name}: ${err}` }).join('\n')
 
             let text = `
-            For Report:
-            ${report.target}
-            Errors:
-            ${constraints}
-            `
+            For Report:\n${JSON.stringify(report.target, null, 0)}\nErrors:\n${constraints}`
             return text
         }
 
         let submission_report = []
-        if(success_count > 0){
+        if (success_count > 0) {
             submission_report = [
                 `Successfully submitted ${success_count}/${total_count}:`
             ]
-        }else{
+        } else {
             submission_report = [
                 `Submission failed!`
             ]
         }
-        
+
 
 
         if (error_reports.length > 0) {

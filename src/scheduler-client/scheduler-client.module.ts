@@ -9,4 +9,13 @@ import { SchedulerClientService } from './services/scheduler-client.service';
     exports: [SchedulerClientService]
 
 })
-export class SchedulerClientModule {}
+export class SchedulerClientModule {
+
+    // public static register(){
+    //     return {
+    //         module: SchedulerClientModule,
+    //         providers: [SchedulerClientService],
+    //         exports:[SchedulerClientService]
+    //     }
+    // }
+}

@@ -12,16 +12,16 @@ const parser = new ArgumentParser({
 
 
 parser.add_argument('--host', {help: 'Database Host string', required: true })
-parser.add_argument('--database', {help: 'database name', required: true })
-parser.add_argument('--task',{ help: "Task to run", required: true })
-parser.add_argument('--arguments', {nargs: '+', default: [], required: false, help: "list of task arguments"})
-parser.add_argument('--file', {required: false, help: "file argument for task"})
+parser.add_argument('-db', {help: 'database name', required: true })
+parser.add_argument('-t',{ help: "Task to run", required: true })
+parser.add_argument('-a', {nargs: '+', default: [], required: false, help: "list of task arguments"})
+parser.add_argument('-f', {required: false, help: "file argument for task"})
 parser.add_argument('--port', {help: 'Database Port string', required: false, type: 'int', default: 27017})
 
 
 const args = parser.parse_args()
 process.env.DATABASE_HOST = args.host
-process.env.DATABASE = args.database
+process.env.DATABASE = args.db
 process.env.port = args.DB_PORT = args.port
 
 async function bootstrap() {
@@ -29,18 +29,21 @@ async function bootstrap() {
     
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
     
-    const taskService = await app.get(`task:${args.task}`)
+    const taskService = await app.get(`task:${args.t}`)
     
     if(taskService){
         const mainLogger = new Logger('APICURONSchedulerLogger');
 
-        if(!!args.file){
-            mainLogger.log(`Loaded Task ${args.task}... running with the following arguments: [${args.arguments}], file:${args.file}`)
-            await taskService.run_task(args.file, ...args.arguments)
+        if(!!args.f){
+            mainLogger.log(`Loaded Task ${args.t}... running with the following arguments: [${args.a}], file:${args.f}`)
+            await taskService.run_task({
+                arguments: args.a,
+                file: args.f
+            })
         }
         else{
-            mainLogger.log(`Loaded Task ${args.task}... running with the following arguments: [${args.arguments}], `)
-            await taskService.run_task(...args.arguments)
+            mainLogger.log(`Loaded Task ${args.t}... running with the following arguments: [${args.a}], `)
+            await taskService.run_task({arguments: args.a})
         }
     }
 

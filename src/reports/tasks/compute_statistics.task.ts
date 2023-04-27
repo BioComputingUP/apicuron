@@ -5,6 +5,7 @@ import { AchievementsService } from '../../achievements/achievements.service';
 import { UsersService } from '../../auth/users/users.service';
 import { Report, ReportDocument } from '../../reports/reports.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { Statistics, StatisticsDocument } from '../../statistics/schemas/statistics.schema';
 
 
@@ -21,7 +22,9 @@ export class ComputeStatisticsTask {
     logger = new Logger(ComputeStatisticsTask.name);
 
 
-    public async run_task(resource_id: string, orcid_id: string) {
+    public async run_task(task_arg: TaskArgument) {
+        const [resource_id, orcid_id] = task_arg.arguments
+        
         const resource = await this.partnerResourceService.get_resource(resource_id)
 
         if (!resource) {

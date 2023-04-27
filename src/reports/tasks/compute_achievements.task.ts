@@ -1,4 +1,5 @@
 import { Injectable, Logger, Inject } from '@nestjs/common'
+import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { ComputeBadgesTask } from './compute_badges.task';
 import { ComputeMedalsTask } from './compute_medals.task';
 
@@ -11,12 +12,15 @@ export class ComputeAchievementsTask {
         @Inject('task:compute_medals') protected computeMedalsTask: ComputeMedalsTask) {
     }
 
-    public async run_task(resource_id: string, orcid_id: string | null = null) {
+    public async run_task(task_arg: TaskArgument) {
+
+        const [resource_id, orcid_id] = task_arg.arguments
+
         if (orcid_id) {
-            await this.computeBadgesTask.run_task(resource_id, orcid_id)
+            await this.computeBadgesTask.run_task(task_arg)
         } else {
-            const badgesPromise = this.computeBadgesTask.run_task(resource_id)
-            const medalsPromise = this.computeMedalsTask.run_task(resource_id)
+            const badgesPromise = this.computeBadgesTask.run_task(task_arg)
+            const medalsPromise = this.computeMedalsTask.run_task(task_arg)
             await Promise.all([badgesPromise, medalsPromise])
         }
     }
