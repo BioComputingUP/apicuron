@@ -38,6 +38,7 @@ export class ReportFilterDto {
     entity_uri: string
 
     // @Transform(({ value, obj }) => !obj.from && !obj.to ? 10 : value )
+    @Transform(({ value }) => parseInt(value))
     @IsOptional()
     @IsInt()
     @Max(50)
