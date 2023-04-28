@@ -23,6 +23,8 @@ import {
 } from "../curator-page/curator-page.service";
 import * as moment from "moment";
 import { DatabasesService } from "../../databases/services/databases.service";
+import * as _ from 'lodash'
+
 @Component({
   selector: "curator-stat",
   templateUrl: "./curator-stat.component.html",
@@ -30,6 +32,7 @@ import { DatabasesService } from "../../databases/services/databases.service";
 })
 export class CuratorStatComponent implements OnInit, AfterViewInit {
   max_page$: Observable<number>;
+  terms$: Observable<unknown>;
 
   constructor(protected curatorPageService: CuratorPageService, protected databaseService: DatabasesService) {}
 
@@ -81,8 +84,8 @@ export class CuratorStatComponent implements OnInit, AfterViewInit {
       switchMap(([curator, { resource_id }, page]) => {
         const params = new HttpParams({
           fromObject: {
-            page: page.toString(),
-            page_size: this.page_size.toString(),
+            page: page,
+            page_size: this.page_size,
             resource_id,
             orcid_id: curator.orcid_id
           },
@@ -93,16 +96,30 @@ export class CuratorStatComponent implements OnInit, AfterViewInit {
       }),
       shareReplay()
     );
-    this.user_reports$ = report_data$.pipe(
-      pluck("data"),
-      map((reports: Array<Object>) => {
+
+    this.terms$ = this.resource$.pipe(
+      switchMap(
+        ({resource_id}) => {
+          return this.curatorPageService.get_resource_terms(resource_id)
+        }
+      ),
+      pluck('data'),
+      map((terms) => {
+        return _.keyBy(terms, (term) => term.activity_term)
+      }),
+    )
+    
+    const reportsArray$ = report_data$.pipe(pluck('data'))
+
+    this.user_reports$ = combineLatest([reportsArray$, this.terms$]).pipe(
+      map(([reports, terms]: [any[], any[]]) => {
         const formatted_reports = reports.map((report) => {
           const relativeDate = moment(report["timestamp"]).fromNow();
           return {
             ...report,
-            activity_name: report["term"]["activity_name"],
-            description: report["term"]["description"],
-            activity_category: report["term"]["activity_category"],
+            activity_name: terms[report.activity_term]["activity_name"],
+            description: terms[report.activity_term]["description"],
+            activity_category: terms[report.activity_term]["activity_category"],
             timestamp: relativeDate,
 
           };
