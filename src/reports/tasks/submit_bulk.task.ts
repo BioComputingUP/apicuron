@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, Logger, Inject } from '@nestjs/common'
 import { SubmitReportDto } from '../../reports/dto/submit-report.dto';
 
 import * as StreamObject from 'stream-json/streamers/StreamObject';
@@ -15,13 +15,23 @@ import { ReportsService } from '../../reports/reports.service';
 import { UsersService } from '../../auth/users/users.service';
 import { NotificationsService } from '../../notifications/notifications.service';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
+import { ComputeAchievementsTask } from './compute_achievements.task';
+import { ComputeStatisticsTask } from './compute_statistics.task';
 
 export type ValidatedReport = { report: SubmitReportDto, errors: ValidationError[] };
-export type ReportProcessReport = { errors: ValidationError[], success_count: number, total_report_count: number };
+export type ReportProcessReport = { errors: ValidationError[], success_count: number, total_report_count: number, resource_ids:string[] };
+
+
 
 @Injectable()
 export class SubmitBulkTask {
-    constructor(protected reportService: ReportsService, protected userService: UsersService, protected notificationsService: NotificationsService) {
+    constructor(
+        protected reportService: ReportsService,
+        protected userService: UsersService,
+        protected notificationsService: NotificationsService,
+        @Inject('task:compute_achievements') protected compute_achievements: ComputeAchievementsTask,
+        @Inject('task:compute_statistics') protected compute_statistics: ComputeStatisticsTask,
+        ) {
 
     }
 
@@ -45,66 +55,13 @@ export class SubmitBulkTask {
     }
 
     private async main(file: string, orcid_id: string) {
+
+        let reportStream = null
         try {
             const defaultReport = await this.parse_default_report(file)
             const user = await this.userService.get_by_orcid(orcid_id);
-            const reportsStream = this.build_report_stream(file, defaultReport, user)
-
-            return new Promise((resolve, reject) => {
-                let error_report = [];
-                let successful_reports_count = 0
-                let total_report_count = 0
-                reportsStream.on('data', async ({ errors, report }: ValidatedReport) => {
-                    total_report_count++;
-                    if (errors.length == 0) {
-                        successful_reports_count += 1
-                        try {
-                            await this.reportService.insertReport(report)
-                        } catch (e) {
-                            if (e) {
-                                this.logger.error(e?.message)
-                                error_report.push({
-                                    target: report,
-                                    property: 'all',
-                                    constraints: {
-                                        'InsertionError': e?.message
-                                    }
-                                })
-                            } else {
-                                this.logger.error(`Error Inserting the report \n ${report}`)
-                                error_report.push({
-                                    target: report,
-                                    property: 'all',
-                                    constraints: {
-                                        'InsertionError': 'Error Inserting the report'
-                                    }
-                                })
-                            }
-                        }
-
-                    } else {
-                        error_report = error_report.concat(errors)
-                    }
-
-                })
-
-                reportsStream.on('end', async () => {
-                    const notification_body = this.build_notification_body(error_report, successful_reports_count, total_report_count)
-
-                    await this.notificationsService.create_user_notification(
-                        "Submission report",
-                        notification_body,
-                        orcid_id
-                    )
-                    resolve({ errors: error_report, success_count: successful_reports_count, total_report_count })
-                })
-
-                reportsStream.on('error', (error) => {
-                    console.log('---------------')
-                    this.logger.error(error)
-                    reject(error)
-                })
-            })
+            reportStream = this.build_report_stream(file, defaultReport, user)
+            
         } catch (e) {
 
             await this.notificationsService.create_user_notification(
@@ -112,11 +69,95 @@ export class SubmitBulkTask {
                 `Error: ${e.message} `,
                 orcid_id
             )
+        }finally {
 
+            if(reportStream){
+                const { errors, success_count, total_report_count, resource_ids} = await this.process_report_stream(reportStream)
 
+                const notification_body = this.build_notification_body(errors, success_count, total_report_count)
+
+                await this.notificationsService.create_user_notification(
+                    "Submission report",
+                    notification_body,
+                    orcid_id
+                )
+
+                for (const resource_id of resource_ids) {
+                    this.logger.log(`Computing Achievements for ${resource_id}`)
+                    await this.compute_achievements.run_task({
+                        arguments: [resource_id]
+                    })
+
+                    this.logger.log(`Computing Statistics for ${resource_id}`)
+                    await this.compute_statistics.run_task({
+                        arguments: [resource_id]
+                    })
+                }
+
+            }
         }
 
 
+    }
+
+
+    private async process_report_stream(reportsStream): Promise<ReportProcessReport>{
+
+        let error_report = [];
+        let successful_reports_count = 0
+        let total_report_count = 0
+
+        let affected_resource_ids = new Set<string>()
+        return new Promise((resolve, reject) => {
+
+            reportsStream.on('data', async ({ errors, report }: ValidatedReport) => {
+                total_report_count++;
+                if (errors.length == 0) {
+                    successful_reports_count += 1
+                    try {
+                        await this.reportService.insertReport(report)
+                        this.logger.log(`Sucessfully inserted Report for ${report.resource_id} by ${report.curator_orcid}`)
+                    } catch (e) {
+                        if (e) {
+                            this.logger.error(e?.message)
+                            error_report.push({
+                                target: report,
+                                property: 'all',
+                                constraints: {
+                                    'InsertionError': e?.message
+                                }
+                            })
+                        } else {
+                            this.logger.error(`Error Inserting the report \n ${report}`)
+                            error_report.push({
+                                target: report,
+                                property: 'all',
+                                constraints: {
+                                    'InsertionError': 'Error Inserting the report'
+                                }
+                            })
+                        }
+                    }finally {
+                        affected_resource_ids.add(report.resource_id)
+                    }
+
+
+                } else {
+                    error_report = error_report.concat(errors)
+                }
+
+            })
+
+            reportsStream.on('end', async () => {
+                
+                resolve({ errors: error_report, success_count: successful_reports_count, total_report_count, resource_ids: Array.from(affected_resource_ids) })
+            })
+
+            reportsStream.on('error', (error) => {
+                this.logger.error(error)
+                reject(error)
+            })
+        })
     }
 
     private build_notification_body(error_reports: Array<any>, success_count: number, total_count: number) {

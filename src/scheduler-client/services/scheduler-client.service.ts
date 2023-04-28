@@ -26,6 +26,9 @@ export class SchedulerClientService {
         const form = this.base_form();
 
         form.append('task_name', task.task_name)
+        if(task.parent_job){
+            form.append('parent_job', task.parent_job)
+        }
         
         if (task.task_arguments) {
             form.append('task_arguments', task.task_arguments)
@@ -98,12 +101,15 @@ export class SchedulerClientService {
      * @param resource_id resource id of the resource to compute the statistics
      * @param orcid_id optional orcid_id if this triggers a re-compute of the orcid_id
      */
-    async compute_statistics(resource_id: string, orcid_id = '') {
-
-        const response = await this.submit_task({
+    async compute_statistics(resource_id: string, orcid_id = '', parent_job=null) {
+        let task = {
             task_name: 'compute_statistics',
             task_arguments: `${resource_id} ${orcid_id}`,
-        }).catch((err) => {
+        }
+        if(parent_job){
+            task['parent_job'] = parent_job
+        }
+        const response = await this.submit_task(task).catch((err) => {
             this.schedulerLogger.error(err);
         })
 
@@ -115,11 +121,15 @@ export class SchedulerClientService {
      * @param resource_id resource id of the resource to compute the statistics
      * @param orcid_id optional orcid_id if this triggers a re-compute of the orcid_id
      */
-    async compute_achievements(resource_id: string, orcid_id = '') {
-        const response = await this.submit_task({
+    async compute_achievements(resource_id: string, orcid_id = '', parent_job=null) {
+        let task = {
             task_name: 'compute_achievements',
             task_arguments: `${resource_id} ${orcid_id}`,
-        }).catch((err) => {
+        }
+        if(parent_job){
+            task['parent_job'] = parent_job
+        }
+        const response = await this.submit_task(task).catch((err) => {
             this.schedulerLogger.error(err);
         })
 

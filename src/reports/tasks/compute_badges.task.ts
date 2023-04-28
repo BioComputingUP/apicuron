@@ -96,7 +96,7 @@ export class ComputeBadgesTask {
             let term = report.activity_term
             // for each badge defined by the resource
             for (let i = 0; i < badgesDef.length; i++) {
-                // if the user has a report that belongs to the list of badges, the badge count is decremented
+                // if the user has a report that belongs to the list of badges, the badge count is incremented
                 if(badgesDef[i]['list_terms'].includes(term)){
                     badgesDef[i]['count'] = (badgesDef[i]['count'] || 0) + 1
                 }
@@ -115,6 +115,8 @@ export class ComputeBadgesTask {
 
         // we create an array to store the promises
         let save_promises = []
+
+        this.logger.log(`User ${orcid_id} earned ${obtained_badges.length} Badges`)
 
         // for each badge obtained we insert it into the database asynchronously
         obtained_badges.forEach(obtained_badge => {
