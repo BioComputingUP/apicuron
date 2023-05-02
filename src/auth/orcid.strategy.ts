@@ -6,7 +6,7 @@ import { Strategy } from 'passport-orcid';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from './users/users.service';
 
-const orcid_scopes = ['/activities/update', '/read-limited']
+const orcid_scopes = '/read-limited /activities/update'
 @Injectable()
 export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
   constructor(
@@ -20,7 +20,7 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
         callbackURL: configService.get<string>('ORCID_REDIRECT'),
         clientID: configService.get<string>('ORCID_CLIENT_ID'),
         clientSecret: configService.get<string>('ORCID_CLIENT_SECRET'),
-        scope: orcid_scopes
+        scope: configService.get<string>('environment') != 'production' ? orcid_scopes : undefined
       },
 
       async function (accessToken, refreshToken, params, profile, done) {
