@@ -20,7 +20,7 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
         callbackURL: configService.get<string>('ORCID_REDIRECT'),
         clientID: configService.get<string>('ORCID_CLIENT_ID'),
         clientSecret: configService.get<string>('ORCID_CLIENT_SECRET'),
-        scope: configService.get<string>('environment') != 'production' ? orcid_scopes : undefined
+        scope: orcid_scopes
       },
 
       async function (accessToken, refreshToken, params, profile, done) {

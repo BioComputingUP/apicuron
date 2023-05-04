@@ -34,6 +34,6 @@ export class NotificationsService {
     }
 
     async set_notification_as_seen(id: mongoose.Types.ObjectId, orcid_id: string){
-        return await this.notificationModel.updateOne({ _id: id, orcid_id}, { seen: true })
+        return (await this.notificationModel.updateOne({ _id: id, orcid_id}, { seen: true })).modifiedCount
     }
 }
