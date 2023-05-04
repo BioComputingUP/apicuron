@@ -17,6 +17,9 @@ import { IndexModule } from "./index/index.module";
 import { AuthModule } from "./auth/auth.module";
 import { ToastrModule } from "ngx-toastr";
 import { AngularSvgIconModule } from "angular-svg-icon";
+import { AuthDropdownComponent } from "./auth-dropdown/auth-dropdown.component";
+import { NotificationsDataModule } from "./notifications-data/notifications-data.module";
+// import { NotificationsModule } from "./notifications/notifications.module";
 @NgModule({
   declarations: [
     AppComponent,
@@ -28,6 +31,9 @@ import { AngularSvgIconModule } from "angular-svg-icon";
   imports: [
     AppRoutingModule,
     AuthModule,
+    NotificationsDataModule,
+    // NotificationsModule,
+    AuthDropdownComponent,
     ToastrModule.forRoot(),
     IndexModule,
     ScrollToModule.forRoot(),

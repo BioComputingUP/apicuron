@@ -32,6 +32,7 @@
     "@compodoc/compodoc": "^1.1.19",
     "@ngneat/tailwind": "^7.0.3",
     "@nicky-lenaers/ngx-scroll-to": "^9.0.0",
+    "@types/lodash": "^4.14.194",
     "anchor-js": "^4.3.1",
     "angular-svg-icon": "^14.0.0",
     "core-js": "^2.5.4",

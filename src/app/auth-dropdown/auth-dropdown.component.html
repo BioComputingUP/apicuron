@@ -2,11 +2,15 @@
     <div>
         <button (mouseover)="auth_dropdown = true"
             class="tw-text-gray-100 tw-flex tw-flex-row tw-items-center hover:tw-text-white  nav-item tw-relative before:tw-bg-white hover-underline-animation">
-            <img [src]="generate_avatar(user.displayedName)" class="tw-inline tw-w-6 tw-h-6 tw-mr-1 tw-bg-white tw-rounded-full" alt="">
+            <img [src]="generate_avatar(user.displayedName)"
+                class="tw-inline tw-w-6 tw-h-6 tw-mr-1 tw-bg-white tw-rounded-full" alt="">
             <span class="tw-font-bold">{{ user.displayedName }}</span>
-            <span *ngIf="user.notifications &&  user.notifications.length > 0"
-                class="tw-absolute tw-bg-apicuron-purple tw-text-white tw-font-bold tw-px-1.5 tw-py-0.5 tw-text-xs -tw-top-2 -tw-right-1 tw-shadow-md tw-rounded-full ">{{
-                user.notifications.length }}</span>
+            <ng-container *ngIf="notifications$ | async as notifications">
+                <span *ngIf="notifications &&  notifications.length > 0"
+                    class="tw-absolute tw-bg-apicuron-purple tw-text-white tw-font-bold tw-px-1.5 tw-py-0.5 tw-text-xs -tw-top-2 -tw-right-1 tw-shadow-md tw-rounded-full ">{{
+                    notifications.length }}</span>
+            </ng-container>
+            
         </button>
     </div>
     <div (mouseleave)="auth_dropdown = false"
@@ -33,16 +37,20 @@
                 Copy API Key to clipboard
             </button>
 
-            <a [routerLink]="['/notifications']" class="dropdown-element">
+            <a routerLink="notifications" class="dropdown-element">
                 <svg-icon src="assets/svg/bell.svg" svgClass="tw-inline tw-w-4 tw-h-4"></svg-icon>
                 Notifications
-                <span *ngIf="user.notifications.length > 0"
-                    class=" tw-bg-apicuron-purple tw-text-white tw-font-bold tw-px-1.5 tw-py-0.5 tw-text-xs tw-shadow-md tw-rounded-full ">{{
-                    user.notifications.length }}</span>
+                <ng-container *ngIf="notifications$ | async as notifications">
+                    <span *ngIf="notifications.length > 0"
+                        class=" tw-bg-apicuron-purple tw-text-white tw-font-bold tw-px-1.5 tw-py-0.5 tw-text-xs tw-shadow-md tw-rounded-full ">{{
+                        notifications.length }}</span>
+
+                </ng-container>
             </a>
 
             <a routerLink="/databases/create" class="dropdown-element">
-                <svg-icon src="assets/svg/create_icon.svg" svgClass="tw-inline tw-w-4 tw-h-4"></svg-icon> Create Resource
+                <svg-icon src="assets/svg/create_icon.svg" svgClass="tw-inline tw-w-4 tw-h-4"></svg-icon> Create
+                Resource
             </a>
 
             <button class="dropdown-element" (click)="logout()">
@@ -54,7 +62,8 @@
 
 <ng-container *ngIf="!(loggedIn$ | async)">
 
-    <button class="nav-item tw-relative before:tw-bg-white hover-underline-animation" (click)="show_login = true">Login</button>
+    <button class="nav-item tw-relative before:tw-bg-white hover-underline-animation"
+        (click)="show_login = true">Login</button>
 
     <div [ngClass]="{'tw-visible': show_login, 'tw-invisible': !show_login}" class="tw-relative tw-z-10"
         aria-labelledby="modal-title" role="dialog" aria-modal="true">

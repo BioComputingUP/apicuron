@@ -3,6 +3,7 @@ import { Routes, RouterModule } from "@angular/router";
 import { AuthGuard } from "./auth/auth.guard";
 import { IndexComponent } from "./index/index.component";
 import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
+import { NotificationsComponent } from "./notifications/notifications.component";
 
 const routes: Routes = [
   {
@@ -14,6 +15,7 @@ const routes: Routes = [
     path: "notifications",
     loadChildren: () =>
       import("./notifications/notifications.module").then((m) => m.NotificationsModule),
+    // component: NotificationsComponent,
     canActivate: [AuthGuard]
   },
   {
