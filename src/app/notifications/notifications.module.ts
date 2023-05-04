@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 
 import { NotificationsRoutingModule } from './notifications-routing.module';
 import { NotificationsComponent } from './notifications.component';
-import { AuthModule } from '../auth/auth.module';
 import { NotificationComponent } from './notification/notification.component';
+import { AngularSvgIconModule } from 'angular-svg-icon';
 
 
 @NgModule({
@@ -13,9 +13,9 @@ import { NotificationComponent } from './notification/notification.component';
     NotificationComponent
   ],
   imports: [
-    CommonModule,
-    AuthModule,
-    NotificationsRoutingModule
+    NotificationsRoutingModule,
+    AngularSvgIconModule,
+    CommonModule
   ]
 })
 export class NotificationsModule { }
