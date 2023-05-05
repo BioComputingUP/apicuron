@@ -12,7 +12,6 @@ export class NotificationsComponent implements OnInit {
   notifications$: Observable<Notification[]>;
 
   constructor(protected notificationService: NotificationService, protected toast: ToastrService) {
-    this.notificationService.load_notifications()
     this.notifications$ = this.notificationService.notifications$.asObservable();
   }
 

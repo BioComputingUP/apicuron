@@ -13,9 +13,9 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
     NotificationComponent
   ],
   imports: [
+    CommonModule,
     NotificationsRoutingModule,
-    AngularSvgIconModule,
-    CommonModule
+    AngularSvgIconModule
   ]
 })
 export class NotificationsModule { }
