@@ -104,7 +104,7 @@ export class CuratorStatComponent implements OnInit, AfterViewInit {
         }
       ),
       pluck('data'),
-      map((terms) => {
+      map((terms: any[]) => {
         return _.keyBy(terms, (term) => term.activity_term)
       }),
     )
