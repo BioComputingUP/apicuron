@@ -95,6 +95,7 @@ export class StatisticsService {
 		page: number = 1,
 		page_size: number = 10,
 	) {
+		page = 1;
 		const resource = await this.partnerResourceService.get_resource(
 			resource_id,
 		);

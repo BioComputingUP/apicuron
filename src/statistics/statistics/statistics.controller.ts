@@ -4,6 +4,7 @@ import {
 	Logger,
 	Query,
 	Param,
+	Res,
 	UseInterceptors,
 } from '@nestjs/common';
 import { AchievementsService } from '../../achievements/achievements.service';
@@ -15,6 +16,9 @@ import { GetStatisticsDto } from '../dto/get-statistics.dto';
 import { StatisticsService } from '../statistics.service';
 import { ApiHeader, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { VersionHeader } from '../../config/swagger';
+import { UsersService } from '../../auth/users/users.service';
+import * as _ from 'lodash';
+import { Response } from 'express';
 
 @ApiTags('Statistics')
 @ApiHeader(VersionHeader)
@@ -87,19 +91,42 @@ export class StatisticsController {
 @Controller()
 export class OldStatisticsController {
 
-	constructor(protected statService: StatisticsService) {}
+	constructor(protected statService: StatisticsService, protected userService: UsersService) {}
 
 	@Get('/leaderboards')
 	async leaderboard(
 		@Query('resource') resource_id: string,
 		@Query('page', ParseUnsignedIntPipe) page: number,
 		@Query('page_size', ParseUnsignedIntPipe) page_size: number,
+		@Res() res: Response
 	){
-		return await this.statService.get_resource_leaderboard(
+		const { data, count } = await this.statService.get_resource_leaderboard(
 			resource_id,
 			// in the old version, the pages are 0 indexed
 			page + 1,
 			page_size,
-		);	
+		);
+		
+		const orcid_list = _.uniq(_.map(data, 'curator_orcid'))
+		const user_list_promises = orcid_list.map(orcid => this.userService.get_by_orcid(orcid))
+		const user_list = await Promise.all(user_list_promises)
+		const orcid_to_user = _.keyBy(user_list, 'orcid_id')
+
+		const orcid_to_names = _.mapValues(orcid_to_user, ({ displayedName }) => {
+			const [given_name, family_name] = displayedName.split(' ')
+			return {
+				given_name,
+				family_name
+			}
+		})
+		const leaderboard = data.map((stat) => {
+			return {
+				...stat,
+				...orcid_to_names[stat.curator_orcid]
+			}
+		})
+		res.setHeader('count', String(count))
+		res.send(leaderboard)
+		// return 	leaderboard
 	}
 }
