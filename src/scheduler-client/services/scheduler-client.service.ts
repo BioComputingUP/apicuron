@@ -23,6 +23,7 @@ export class SchedulerClientService {
     private database = this.config.get('database')
 
     async submit_task(task: TaskSubmit) {
+
         const form = this.base_form();
 
         form.append('task_name', task.task_name)
@@ -42,13 +43,20 @@ export class SchedulerClientService {
         }
 
         try{
-            return await this.http.axiosRef.postForm(this.url, form)
+            const response = await this.http.axiosRef.postForm(this.url, form)
+
+            this.schedulerLogger.log(`Task ${task.task_name} with the arguments ${task.task_arguments} Submitted`)
+            this.schedulerLogger.log(`Response Status: ${response.statusText}/${response.status}`)
+            this.schedulerLogger.log(`Response: ${response.data}`)
+
         }catch(e){
             this.schedulerLogger.error(`Failed to submit Job ${task.task_name} !`)
             this.schedulerLogger.error(e?.message)
             this.schedulerLogger.error(e?.response?.data)
             return e
         }
+
+
 
     }
 
@@ -149,5 +157,15 @@ export class SchedulerClientService {
             return response
         }
 
+    }
+
+    @Cron(CronExpression.EVERY_DAY_AT_2AM)
+    async disprot_update() {
+        const curation_database = this.config.get('environment') != 'production' ? 'apicuron_update_dev' : 'apicuron_update'
+        const response = await this.submit_task({
+            task_name: 'disprot_update',
+            task_arguments: curation_database
+        })
+        return response
     }
 }

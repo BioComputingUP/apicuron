@@ -3,6 +3,8 @@ import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common'
 import { ArgumentParser } from 'argparse'
 import { useContainer } from 'class-validator';
+import { spawn, spawnSync } from 'child_process';
+import { join } from 'path';
 
 
 const parser = new ArgumentParser({
@@ -23,6 +25,17 @@ const args = parser.parse_args()
 process.env.DATABASE_HOST = args.host
 process.env.DATABASE = args.db
 process.env.port = args.DB_PORT = args.port
+
+// handle the unique case if the job is to update_disprot, then it should be dealt with by calling the python script
+if(args.t == 'disprot_update'){
+    const script_path = join(__dirname, '../updates/apicuron-tasks/main.py')
+
+    const result = spawnSync(`python3`, [script_path,...process.argv.slice(2)], {stdio: 'inherit'})
+    if(result.error){
+        console.log(result.error)
+    }
+    process.exit(result.status)
+}
 
 async function bootstrap() {
     const app = await NestFactory.createApplicationContext(AppModule)
