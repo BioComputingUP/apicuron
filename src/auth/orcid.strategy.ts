@@ -6,7 +6,7 @@ import { Strategy } from 'passport-orcid';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from './users/users.service';
 
-const orcid_scopes = ['/activities/update', '/read-limited']
+const orcid_scopes = '/read-limited /activities/update'
 @Injectable()
 export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
   constructor(

@@ -57,8 +57,7 @@ export class AuthController {
 		res.cookie(header, token);
 		res.set(header, token);
 		return {
-			url:
-				this.configService.get('FRONTEND_HOST') + 'curators/' + user.orcid_id,
+			url: this.configService.get('FRONTEND_HOST'),
 			statusCode: 301,
 		};
 	}
