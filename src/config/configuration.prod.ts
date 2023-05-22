@@ -8,6 +8,8 @@ export default () => ({
   ORCID_REDIRECT: 'https://apicuron.org/api/auth/orcid/redirect',
   ORCID_CLIENT_ID: 'APP-AVABS99G54THO0UW',
   ORCID_CLIENT_SECRET: '**REMOVED**',
+  ORCID_AUTH_URL: 'https://orcid.org/oauth/authorize',
+  ORCID_TOKEN_URL: 'https://orcid.org/oauth/token',
   ENV_NAME: 'production',
   JWT_SECRET: 'secret',
   PORT: parseInt(process.env.PORT) || 8098,

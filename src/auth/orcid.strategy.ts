@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { AuthService } from './auth.service';
-import { Strategy } from 'passport-orcid';
+// import { Strategy } from 'passport-orcid';
+import { Strategy } from 'passport-oauth2';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from './users/users.service';
 
@@ -16,7 +17,8 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
   ) {
     super(
       {
-        sandbox: configService.get<string>('environment') != 'production',
+        authorizationURL: configService.get<string>('ORCID_AUTH_URL'),
+        tokenURL: configService.get<string>('ORCID_TOKEN_URL'),
         callbackURL: configService.get<string>('ORCID_REDIRECT'),
         clientID: configService.get<string>('ORCID_CLIENT_ID'),
         clientSecret: configService.get<string>('ORCID_CLIENT_SECRET'),

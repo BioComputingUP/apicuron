@@ -7,6 +7,8 @@ export default () => ({
   ORCID_REDIRECT: 'http://localhost:3000/auth/orcid/redirect',
   ORCID_CLIENT_ID: 'APP-TTBI2EX11P70SRD6',
   ORCID_CLIENT_SECRET: 'YOUR-ORCID-CLIENT-SECRET',
+  ORCID_AUTH_URL: 'https://sandbox.orcid.org/oauth/authorize',
+  ORCID_TOKEN_URL: 'https://sandbox.orcid.org/oauth/token',
   ENV_NAME: 'local',
   JWT_SECRET: 'secret',
   PORT: 3000,
