@@ -34,7 +34,8 @@ export class ComputeStatisticsTask {
         if(orcid_id){
             const user = await this.userService.get_by_orcid(orcid_id)
             if(user){
-                this.compute_user_statistics(resource, user)
+                await this.compute_user_statistics(resource, user)
+                return
             }else{
                 this.logger.error(`User ${orcid_id} not found ! Aborting`)
             }
@@ -92,6 +93,8 @@ export class ComputeStatisticsTask {
         }
 
         await Promise.all(updates_promises)
+        this.logger.log(`Updated ${updates_promises.length} users statistics`)
+
     }
 
     
