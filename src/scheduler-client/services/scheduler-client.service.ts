@@ -26,10 +26,18 @@ export class SchedulerClientService {
 
         const form = this.base_form();
 
-        form.append('task_name', task.task_name)
-        if(task.parent_job){
-            form.append('parent_job', task.parent_job)
+        if(this.config.get('environment') != 'production'){
+            form.append('task_name', task.task_name)
+
+            // parent job only available to the dev version of scheduler
+            if(task.parent_job){
+                form.append('parent_job', task.parent_job)
+            }
+        }else{
+            form.append('task', task.task_name)
         }
+        
+        
         
         if (task.task_arguments) {
             form.append('task_arguments', task.task_arguments)
@@ -144,7 +152,7 @@ export class SchedulerClientService {
         return response
     }
     
-    @Cron(CronExpression.EVERY_5_HOURS)
+    // @Cron(CronExpression.EVERY_5_HOURS)
     async add_resource_id() {
         if (this.config.get('environment') != 'local') {
             

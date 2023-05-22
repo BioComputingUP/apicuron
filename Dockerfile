@@ -12,6 +12,9 @@ ARG APP_DIR
 ARG UID=1002
 ARG GID=1002
 
+# install ps command for hot reload
+RUN apt-get update && apt-get install -y procps && rm -rf /var/lib/apt/lists/*
+
 # change node uid and gid to the defined one
 RUN groupmod -g ${GID} node && \
     usermod -u ${UID} -g ${GID} node

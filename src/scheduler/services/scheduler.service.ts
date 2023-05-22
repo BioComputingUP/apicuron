@@ -46,13 +46,21 @@ export class SchedulerService {
             throw new Error("orcid id required for the submission")
         }
 
+        
+
         const user = await this.userService.get_by_orcid(orcid_id);
 
-        // if (!user || !user.resources) {
-        //     throw new UnauthorizedException("user has no permission to submit to resources");
-        // }
+        if (!user || !user.resources) {
+            throw new Error("user has no permission to submit to resources");
+        }
 
-        // const user_resource_ids = user.resources.map(({ resource_id }) => { return resource_id })
+        const user_resource_ids = user.resources.map(({ resource_id }) => { return resource_id })
+        
+        delete_all.foreach((resource_id: string) => {
+            if(user_resource_ids.includes(resource_id)){
+                this.reportService.delete_all_resource_reports(resource_id)   
+            }
+        })
 
         if (!file || !existsSync(file)) {
             throw new Error("File is either unset or path is invalid");
