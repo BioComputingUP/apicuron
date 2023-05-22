@@ -23,7 +23,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
 	controllers: [ReportsController,],
 	providers: [ReportsService,
 		{
-			provide: 'task:submit_bulk',
+			provide: 'task:submit_report',
 			useClass: SubmitBulkTask
 		},
 		{
