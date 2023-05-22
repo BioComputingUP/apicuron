@@ -159,4 +159,16 @@ export class CuratorPageService {
       }
     })
   }
+
+  get_resource_terms(resource_id: string){
+    return this.http.get(this.wsUrl + '/terms', {
+      headers: {
+        version: '2'
+      },
+      params: {
+        resource_id
+      }
+    })
+  }
+  
 }

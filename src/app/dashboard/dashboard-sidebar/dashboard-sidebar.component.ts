@@ -22,7 +22,7 @@ export class DashboardSidebarComponent implements OnInit {
     if(logo.startsWith('assets')){
       return logo
     }else{
-      return new URL(logo, environment.ws + '/');
+      return new URL(logo.split('/').filter(el => el).join('/'), environment.ws + '/');
     }
   }
 

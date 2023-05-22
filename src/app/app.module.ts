@@ -19,6 +19,9 @@ import { ToastrModule } from "ngx-toastr";
 import { AngularSvgIconModule } from "angular-svg-icon";
 import { MainLayoutComponent } from './main-layout/main-layout.component';
 import { CommonModule } from "@angular/common";
+import { AuthDropdownComponent } from "./auth-dropdown/auth-dropdown.component";
+import { NotificationsDataModule } from "./notifications-data/notifications-data.module";
+// import { NotificationsModule } from "./notifications/notifications.module";
 @NgModule({
   declarations: [
     AppComponent,
@@ -30,6 +33,9 @@ import { CommonModule } from "@angular/common";
   imports: [
     AppRoutingModule,
     AuthModule,
+    NotificationsDataModule,
+    // NotificationsModule,
+    AuthDropdownComponent,
     ToastrModule.forRoot(),
     IndexModule,
     ScrollToModule.forRoot(),

@@ -2,8 +2,8 @@ import { CommonModule } from "@angular/common";
 import { Component, HostListener, OnInit, ViewEncapsulation } from "@angular/core";
 import { BehaviorSubject, Observable, fromEvent } from "rxjs";
 import { AuthModule } from "../auth/auth.module";
-import { delay, filter, tap } from "rxjs/operators";
 import { RouterModule } from "@angular/router";
+import { delay, filter, shareReplay } from "rxjs/operators";
 
 @Component({
   selector: "navbar",
@@ -22,26 +22,27 @@ export class NavbarComponent implements OnInit {
   expanded_nav = false;
   show_login = false;
   isCollapsed = new BehaviorSubject<boolean>(true);
-  
+  isCollapsed$: Observable<Boolean>;
+
   constructor() {
-    const scrollEvent$ = fromEvent(window, 'scroll').pipe(
-      delay(200),
-    )
 
-    scrollEvent$.pipe(
-      filter(() => document.documentElement.scrollTop > 40)
-    ).subscribe((event) => {
-        this.expanded_nav = false;
-    })
-
-    scrollEvent$.pipe(
-      filter(() => document.documentElement.scrollTop < 40)
-    ).subscribe((event) => {
-        this.expanded_nav = true;
-    })
+    this.isCollapsed$ = this.isCollapsed.asObservable();
   }
 
   ngOnInit() {
+    // this.authService.authentication();
+    
+
+    // this.authService.loginData.subscribe(
+    //   (displayedName) => (this.loginData = displayedName)
+    // );
+
+    fromEvent(window,'scroll').pipe(
+      delay(200),
+      shareReplay(1)
+    ).subscribe(() => {
+      this.isCollapsed.next(document.documentElement.scrollTop <= 40)
+    })
   }
 
 

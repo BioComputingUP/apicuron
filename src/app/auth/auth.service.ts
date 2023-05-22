@@ -22,8 +22,8 @@ import { Component, OnInit, Injectable } from "@angular/core";
   providedIn: "root",
 })
 export class AuthService implements HttpInterceptor {
-  private disprotLogOut = environment.ws + "logout";
-  private disprotAuth = environment.ws + "profile";
+  private logoutUrl = environment.ws + "logout";
+  private authUrl = environment.ws + "profile";
 
   loginData = new BehaviorSubject<object>({
     authorized: false,
@@ -59,21 +59,21 @@ export class AuthService implements HttpInterceptor {
     ).pipe(shareReplay())
 
     // request to get the user current notifications
-    const user_notifications$: Observable<Array<any>> = this.http
-      .get(environment.ws + "/notifications", {
-        headers: {
-          authorization: this.token_value,
-          version: "2",
-        },
-      })
-      .pipe(shareReplay(), pluck("data"));
-
-    // combine the two data into one and push it to the user subject
-    return combineLatest([user_data$, user_notifications$]).pipe(
-      map(([user_data, user_notifications]: [Object, Array<any>]) => {
-        return { ...user_data, notifications: user_notifications };
-      })
-    );
+    // const user_notifications$: Observable<Array<any>> = this.http
+    //   .get(environment.ws + "/notifications", {
+    //     headers: {
+    //       authorization: this.token_value,
+    //       version: "2",
+    //     },
+    //   })
+      // .pipe(shareReplay(), pluck("data"));
+    return user_data$
+    // // combine the two data into one and push it to the user subject
+    // return combineLatest([user_data$, user_notifications$]).pipe(
+    //   map(([user_data, user_notifications]: [Object, Array<any>]) => {
+    //     return { ...user_data, notifications: user_notifications };
+    //   })
+    // );
   }
 
   get token_value() {
@@ -145,11 +145,11 @@ export class AuthService implements HttpInterceptor {
   }
 
   GetLogOut(): Observable<any> {
-    return this.http.get(this.disprotLogOut, { responseType: "json" });
+    return this.http.get(this.logoutUrl, { responseType: "json" });
   }
 
   GetAuth(): Observable<any> {
-    return this.http.get(this.disprotAuth, { responseType: "json" });
+    return this.http.get(this.authUrl, { responseType: "json" });
   }
 
   authentication(): Promise<object> {

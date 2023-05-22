@@ -17,6 +17,7 @@ const routes: Routes = [
     component: MainLayoutComponent,
     loadChildren: () =>
       import("./notifications/notifications.module").then((m) => m.NotificationsModule),
+    // component: NotificationsComponent,
     canActivate: [AuthGuard]
   },
   {
