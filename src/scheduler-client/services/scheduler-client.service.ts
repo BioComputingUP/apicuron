@@ -51,7 +51,13 @@ export class SchedulerClientService {
         }
 
         try{
-            const response = await this.http.axiosRef.postForm(this.url, form)
+            this.http.axiosRef.post
+            const response = await this.http.axiosRef.postForm(this.url, form, {
+                headers: {
+                    'Content-Type': `multipart/form-data; boundary=${form.getBoundary()}`,
+                    'Content-Length': form.getLengthSync()
+                }
+            })
 
             this.schedulerLogger.log(`Task ${task.task_name} with the arguments ${task.task_arguments} Submitted`)
             this.schedulerLogger.log(`Response Status: ${response.statusText}/${response.status}`)
@@ -100,7 +106,7 @@ export class SchedulerClientService {
      * @returns 
      */
 
-    async submit_reports(reports: Express.Multer.File, orcid_id: string, delete_all: string[]) {
+    async submit_reports(reports: Express.Multer.File, orcid_id: string, delete_all: string[] = []) {
         const response = await this.submit_task({
             task_name: 'submit_report',
             task_arguments: `${orcid_id} ${delete_all.join(',')}`,
