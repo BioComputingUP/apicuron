@@ -44,7 +44,7 @@ export class MedalDef {
 	@Prop({
 		transform (value: any) {
 			const date = new Date(value)
-			console.log({value})
+			// console.log({value})
 			return date.toLocaleDateString()
 		}
 	})

@@ -39,7 +39,7 @@ export class AchievementsService {
 
 
     public async delete_resource_badges(resource_id: string){
-        await this.badgeModel.deleteMany({
+        return await this.badgeModel.deleteMany({
             resource_id
         })
     }
@@ -52,7 +52,7 @@ export class AchievementsService {
     }
 
     public async delete_resource_medals(resource_id: string){
-        await this.medalModel.deleteMany({
+        return await this.medalModel.deleteMany({
             resource_id
         })
     }

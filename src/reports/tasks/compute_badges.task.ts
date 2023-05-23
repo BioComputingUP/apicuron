@@ -52,7 +52,10 @@ export class ComputeBadgesTask {
     }
 
     public async compute_resource_badges({ resource_id }: PartnerResource){
-        await this.achievementsService.delete_resource_badges(resource_id)
+        
+        // delete previously earned badges
+        const badgesDeletion = await this.achievementsService.delete_resource_badges(resource_id)
+        this.logger.log(`Deleted ${badgesDeletion.deletedCount} badges for resource ${resource_id}`)
 
         let badgesDef = await this.achievementsDefService.get_badges({ resource_id })
 
@@ -80,14 +83,16 @@ export class ComputeBadgesTask {
 
                 // if the user has more contributions than the badge, he gets the badge
                 if(terms_count >= badgeDef.count_threshold){
+
+                    const badgeObject = badgeDef.toObject()
+                    delete badgeObject._id
+
                     const user_badge = new this.badgeModel({
-                        ...badgeDef.toObject(),
+                        ...badgeObject,
                         count: terms_count,
                         curator_orcid: user._id.curator_orcid,
                     })
-
-
-                    
+                                        
                     save_promises.push(user_badge.save());
                     this.logger.log(`User ${user._id.curator_orcid} earned ${badgeDef.name} badge`)
                 }
@@ -96,8 +101,9 @@ export class ComputeBadgesTask {
 
             });
         }
-
+        
         await Promise.all(save_promises)
+        this.logger.log(`${save_promises.length} badges saved for resource ${resource_id}`)
 
     }
 

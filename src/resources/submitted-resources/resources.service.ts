@@ -76,7 +76,6 @@ export class SubmittedResourcesService {
 		// if the submitted resource has a creator, we set it as an owner of the resource
 		const { creator, resource_name } = resource
 		if (creator) {
-			console.log(creator)
 			await this.userModel.updateOne({
 				orcid_id: creator
 			}, {

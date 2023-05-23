@@ -24,19 +24,19 @@ export class ComputeStatisticsTask {
 
     public async run_task(task_arg: TaskArgument) {
         const [resource_id, orcid_id] = task_arg.arguments
-        
+
         const resource = await this.partnerResourceService.get_resource(resource_id)
 
         if (!resource) {
             this.logger.error(`Resource ${resource_id} not found ! Aborting`)
             return
         }
-        if(orcid_id){
+        if (orcid_id) {
             const user = await this.userService.get_by_orcid(orcid_id)
-            if(user){
+            if (user) {
                 await this.compute_user_statistics(resource, user)
                 return
-            }else{
+            } else {
                 this.logger.error(`User ${orcid_id} not found ! Aborting`)
             }
         }
@@ -45,6 +45,11 @@ export class ComputeStatisticsTask {
 
     async compute_resource_statistics({ resource_id, resource_uri }) {
         const users_reports = this.group_resource_reports_by_terms(resource_id)
+
+        const deletion_response = await this.statModel.deleteMany({ resource_id })
+        this.logger.log(`Deleted ${deletion_response.deletedCount} statistics for resource ${resource_id}`)
+
+
         let updates_promises = []
 
         let ranking = 0
@@ -93,11 +98,11 @@ export class ComputeStatisticsTask {
         }
 
         await Promise.all(updates_promises)
-        this.logger.log(`Updated ${updates_promises.length} users statistics`)
+        this.logger.log(`Computed ${updates_promises.length} users statistics`)
 
     }
 
-    
+
     private group_resource_reports_by_terms(resource_id: string): Aggregate<{ terms: any[], total_score: number, _id: string }[]> {
         return this.reportModel.aggregate().
             match({
@@ -153,7 +158,7 @@ export class ComputeStatisticsTask {
     }
 
 
-    async compute_user_statistics({ resource_id, resource_uri }, { orcid_id }){
+    async compute_user_statistics({ resource_id, resource_uri }, { orcid_id }) {
         const user_reports = this.group_user_reports_by_terms(resource_id, orcid_id);
 
         let user_stats = {
@@ -182,7 +187,7 @@ export class ComputeStatisticsTask {
             })
             user_stats[`${activity_category}_count`] += 1
             user_stats[`${activity_category}_score`] += report['sum']
-            
+
         }
 
         user_stats.medals_count = await this.achievementsService.user_medal_count(resource_id, orcid_id)
@@ -190,59 +195,59 @@ export class ComputeStatisticsTask {
 
 
         return await this.statModel.updateOne({
-            curator_orcid:orcid_id,
+            curator_orcid: orcid_id,
             resource_id
         }, { '$set': user_stats }, { upsert: true })
     }
 
 
-    private group_user_reports_by_terms(resource_id: string, orcid_id: string){
+    private group_user_reports_by_terms(resource_id: string, orcid_id: string) {
         return this.reportModel.aggregate().
-        // # only reports from user
-        match({
-            curator_orcid: orcid_id,
-            resource_id
-        }).
-        //  # lookup the terms to get the activity_category, name, description and score
-        lookup({
-            'from': 'terms_def',
-            'localField': 'activity_term',
-            'foreignField': 'activity_term',
-            'as': 'term'
-        }).unwind({
-            'path': '$term'
-        }).append({
-            '$set':{
-                'activity_category': '$term.activity_category',
-                'score': '$term.score',
-                'activity_name': '$term.activity_name',
-                'description': '$term.description'
-            }
-        }).
-        // # after the lookup and cleaning the results
-        // # we group the data by activity_terms
-        // # and we compute the score sum and count of each activity_term
-        group({
-            '_id': '$activity_term',
-            'sum': {
-                '$sum': '$score'
-            },
-            'score': {
-                '$first': '$score'
-            },
-            'count': {
-                '$sum': 1
-            },
-            'activity_name': {
-                '$first': '$activity_name'
-            },
-            'description': {
-                '$first': '$description'
-            },
-            'activity_category': {
-                '$first': '$activity_category'
-            }
-        })
+            // # only reports from user
+            match({
+                curator_orcid: orcid_id,
+                resource_id
+            }).
+            //  # lookup the terms to get the activity_category, name, description and score
+            lookup({
+                'from': 'terms_def',
+                'localField': 'activity_term',
+                'foreignField': 'activity_term',
+                'as': 'term'
+            }).unwind({
+                'path': '$term'
+            }).append({
+                '$set': {
+                    'activity_category': '$term.activity_category',
+                    'score': '$term.score',
+                    'activity_name': '$term.activity_name',
+                    'description': '$term.description'
+                }
+            }).
+            // # after the lookup and cleaning the results
+            // # we group the data by activity_terms
+            // # and we compute the score sum and count of each activity_term
+            group({
+                '_id': '$activity_term',
+                'sum': {
+                    '$sum': '$score'
+                },
+                'score': {
+                    '$first': '$score'
+                },
+                'count': {
+                    '$sum': 1
+                },
+                'activity_name': {
+                    '$first': '$activity_name'
+                },
+                'description': {
+                    '$first': '$description'
+                },
+                'activity_category': {
+                    '$first': '$activity_category'
+                }
+            })
     }
 
 }

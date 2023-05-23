@@ -36,11 +36,15 @@ export class ComputeMedalsTask {
             this.logger.error(`Resource ${resource_id} not found ! Aborting`)
             return
         }
+        this.logger.log(`Computing medals for resource ${resource_id}`)
+        // we first compute the medals for the resource`)
         await this.compute_resource_medals(resource_id)
     }
 
     async compute_resource_medals(resource_id: string) {
-        await this.achievementsService.delete_resource_medals(resource_id);
+        
+        const deletionResponse = await this.achievementsService.delete_resource_medals(resource_id);
+        this.logger.log(`Deleted ${deletionResponse.deletedCount} medals for resource ${resource_id}`)
 
         const medalDefs = await this.achievementsDefService.get_medals({ resource_id })
 
@@ -56,8 +60,11 @@ export class ComputeMedalsTask {
             let score_relative_index = 0
             for await (const user of user_reports) {
                 if (user) {
+                    const medalObject = medalDef.toObject()
+                    delete medalObject['_id']
+
                     const medal = new this.medalModel({
-                        ...medalDef.toObject(),
+                        ...medalObject,
                         _id: null,
                         curator_orcid: user['_id']['curator_orcid'],
                         'count_total': user['count'],
@@ -73,6 +80,7 @@ export class ComputeMedalsTask {
             }
         }
 
+        this.logger.log(`${medal_saves_promises.length} curators earned medals for resource ${resource_id}`)
         await Promise.all(medal_saves_promises)
 
     }
@@ -116,7 +124,7 @@ export class ComputeMedalsTask {
                 'activity_term': 1,
                 'score': '$result.score'
             }).
-            // # here we group by curator while computing the count ans score sum
+            // # here we group by curator while computing the count and score sum
             group({
                 '_id': {
                     'curator_orcid': '$curator_orcid'

@@ -103,7 +103,6 @@ export class ReportsService {
 		const { filter, options } = this.buildReportsQuery(reportFilter);
 
 		if (!reportFilter.groupBy) {
-			console.log(options)
 			const reports = await this.reportModel.find(filter, {}, options).lean();
 			let data = reports;
 
