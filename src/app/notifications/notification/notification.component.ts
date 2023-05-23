@@ -41,8 +41,8 @@ export class NotificationComponent implements AfterViewInit {
     })
   }
 
-  format_date(date: any) {
-    return moment(date).fromNow();
+  get dateTime () {
+    return moment(this.notification.created_at).format('LLLL');
   }
 
 

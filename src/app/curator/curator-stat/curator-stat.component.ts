@@ -114,7 +114,7 @@ export class CuratorStatComponent implements OnInit, AfterViewInit {
     this.user_reports$ = combineLatest([reportsArray$, this.terms$]).pipe(
       map(([reports, terms]: [any[], any[]]) => {
         const formatted_reports = reports.map((report) => {
-          const relativeDate = moment(report["timestamp"]).fromNow();
+          const relativeDate = moment(report["timestamp"]).format('LLLL');
           return {
             ...report,
             activity_name: terms[report.activity_term]["activity_name"],
