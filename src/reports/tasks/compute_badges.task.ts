@@ -35,6 +35,8 @@ export class ComputeBadgesTask {
         }
 
         if(orcid_id){
+            this.logger.log(`Computing Badges for user ${orcid_id} for resource ${resource_id}`)
+
             const user = await this.userService.get_by_orcid(orcid_id)
             if(user){
                 await this.compute_user_badges(resource_id, orcid_id)
@@ -42,6 +44,8 @@ export class ComputeBadgesTask {
                 this.logger.error(`User ${orcid_id} Not found !!`)
             }
         }else{
+            this.logger.log(`Computing Badges for resource ${resource_id}`)
+
             await this.compute_resource_badges(resource)
         }
 
@@ -59,24 +63,33 @@ export class ComputeBadgesTask {
         for await (const user of user_reports) {
 
             badgesDef.forEach(badgeDef => {
+                // this.logger.log(`For Badge ${badgeDef.name}: terms count is ${badgeDef.list_terms.length}`)
                 // get the list of user contributions that are concerned by the current badge
                 const user_concerned_terms = user.terms.filter(term => {
-                    badgeDef.list_terms.includes(term.activity_term)
+                    // this.logger.log('Term: ' + term.activity_term)
+                    return badgeDef.list_terms.includes(term.activity_term)
                 })
+
+                this.logger.log('User concerned terms: ', JSON.stringify(user_concerned_terms))
                 // compute the terms sum to get the total number of contributions related to the current badge
                 const terms_count = user_concerned_terms.reduce((acc, curr) => {
                     return acc + curr.count
                 }, 0)
+                // this.logger.log(`user concerned terms: ${user_concerned_terms.length}`)
+                this.logger.log(`Terms count ${terms_count}, badge ${badgeDef.name} threshold ${badgeDef.count_threshold}`)
 
                 // if the user has more contributions than the badge, he gets the badge
                 if(terms_count >= badgeDef.count_threshold){
                     const user_badge = new this.badgeModel({
-                        ...badgeDef,
+                        ...badgeDef.toObject(),
                         count: terms_count,
-                        curator_orcid: user._id.curator_orcid
+                        curator_orcid: user._id.curator_orcid,
                     })
+
+
                     
                     save_promises.push(user_badge.save());
+                    this.logger.log(`User ${user._id.curator_orcid} earned ${badgeDef.name} badge`)
                 }
 
 
@@ -84,7 +97,7 @@ export class ComputeBadgesTask {
             });
         }
 
-        await Promise.all(save_promises)    
+        await Promise.all(save_promises)
 
     }
 
@@ -117,7 +130,7 @@ export class ComputeBadgesTask {
         let save_promises = []
 
         this.logger.log(`User ${orcid_id} earned ${obtained_badges.length} Badges`)
-
+        
         // for each badge obtained we insert it into the database asynchronously
         obtained_badges.forEach(obtained_badge => {
             const badge = new this.badgeModel({

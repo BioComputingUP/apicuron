@@ -5,6 +5,7 @@ import { ArgumentParser } from 'argparse'
 import { useContainer } from 'class-validator';
 import { spawn, spawnSync } from 'child_process';
 import { join } from 'path';
+import { ConfigService } from '@nestjs/config';
 
 
 const parser = new ArgumentParser({
@@ -29,6 +30,7 @@ process.env.port = args.DB_PORT = args.port
 // handle the unique case if the job is to update_disprot, then it should be dealt with by calling the python script
 if(args.t == 'disprot_update'){
     const script_path = join(__dirname, '../updates/apicuron-tasks/main.py')
+    
 
     const result = spawnSync(`python3`, [script_path,...process.argv.slice(2)], {stdio: 'inherit'})
     if(result.error){
@@ -41,6 +43,13 @@ async function bootstrap() {
     const app = await NestFactory.createApplicationContext(AppModule)
     
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
+
+	const configService = app.get(ConfigService);
+	const appLogger = new Logger('APICURONCLIApplicationLogger');
+
+    const envConfig = configService.get<string>('environment');
+	appLogger.log(`Loaded ${envConfig} Configuration`);
+
     
     const taskService = await app.get(`task:${args.t}`)
     
