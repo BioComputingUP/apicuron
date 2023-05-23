@@ -7,12 +7,13 @@ import { createReadStream, fstatSync } from 'fs';
 import { HttpModule, HttpService } from '@nestjs/axios';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { config } from 'process';
+import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 
 // const FormData = require('form-data')
 @Injectable()
 export class SchedulerClientService {
 
-    constructor(protected config: ConfigService, protected http: HttpService) { }
+    constructor(protected config: ConfigService, protected http: HttpService, protected partnerResourceService: PartnerResourcesService) { }
 
     private url = this.config.get('SCHEDULER')
 
@@ -26,19 +27,19 @@ export class SchedulerClientService {
 
         const form = this.base_form();
 
-        if(this.config.get('environment') != 'production'){
+        if (this.config.get('environment') != 'production') {
             form.append('task_name', task.task_name)
 
             // parent job only available to the dev version of scheduler
-            if(task.parent_job){
+            if (task.parent_job) {
                 form.append('parent_job', task.parent_job)
             }
-        }else{
+        } else {
             form.append('task', task.task_name)
         }
-        
-        
-        
+
+
+
         if (task.task_arguments) {
             form.append('task_arguments', task.task_arguments)
         }
@@ -50,7 +51,7 @@ export class SchedulerClientService {
             })
         }
 
-        try{
+        try {
             this.http.axiosRef.post
             const response = await this.http.axiosRef.postForm(this.url, form, {
                 headers: {
@@ -63,7 +64,7 @@ export class SchedulerClientService {
             this.schedulerLogger.log(`Response Status: ${response.statusText}/${response.status}`)
             this.schedulerLogger.log(`Response: ${response.data}`)
 
-        }catch(e){
+        } catch (e) {
             this.schedulerLogger.error(`Failed to submit Job ${task.task_name} !`)
             this.schedulerLogger.error(e?.message)
             this.schedulerLogger.error(e?.response?.data)
@@ -123,12 +124,12 @@ export class SchedulerClientService {
      * @param resource_id resource id of the resource to compute the statistics
      * @param orcid_id optional orcid_id if this triggers a re-compute of the orcid_id
      */
-    async compute_statistics(resource_id: string, orcid_id = '', parent_job=null) {
+    async compute_statistics(resource_id: string, orcid_id = '', parent_job = null) {
         let task = {
             task_name: 'compute_statistics',
             task_arguments: `${resource_id} ${orcid_id}`,
         }
-        if(parent_job){
+        if (parent_job) {
             task['parent_job'] = parent_job
         }
         const response = await this.submit_task(task).catch((err) => {
@@ -143,12 +144,12 @@ export class SchedulerClientService {
      * @param resource_id resource id of the resource to compute the statistics
      * @param orcid_id optional orcid_id if this triggers a re-compute of the orcid_id
      */
-    async compute_achievements(resource_id: string, orcid_id = '', parent_job=null) {
+    async compute_achievements(resource_id: string, orcid_id = '', parent_job = null) {
         let task = {
             task_name: 'compute_achievements',
             task_arguments: `${resource_id} ${orcid_id}`,
         }
-        if(parent_job){
+        if (parent_job) {
             task['parent_job'] = parent_job
         }
         const response = await this.submit_task(task).catch((err) => {
@@ -157,11 +158,11 @@ export class SchedulerClientService {
 
         return response
     }
-    
+
     // @Cron(CronExpression.EVERY_5_HOURS)
     async add_resource_id() {
         if (this.config.get('environment') != 'local') {
-            
+
             const response = await this.submit_task({
                 task_name: 'add_resource_id'
             }).catch((err) => {
@@ -173,7 +174,6 @@ export class SchedulerClientService {
 
     }
 
-    @Cron(CronExpression.EVERY_DAY_AT_2AM)
     async disprot_update() {
         const curation_database = this.config.get('environment') != 'production' ? 'apicuron_update_dev' : 'apicuron_update'
         const response = await this.submit_task({
@@ -181,5 +181,23 @@ export class SchedulerClientService {
             task_arguments: curation_database
         })
         return response
+    }
+
+
+    @Cron(CronExpression.EVERY_DAY_AT_2AM)
+    private async daily_periodic_compute() {
+        if (['local', 'development'].includes(this.config.get('environment'))) {
+            // update disprot
+            await this.disprot_update();
+
+            // then we compute the achievements of all resources
+            const resources = await this.partnerResourceService.get_resources()
+
+            for (const resource of resources) {
+                await this.compute_achievements(resource.resource_id)
+                await this.compute_statistics(resource.resource_id)
+            }
+        }
+
     }
 }
