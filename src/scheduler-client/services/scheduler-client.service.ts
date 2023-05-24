@@ -186,7 +186,7 @@ export class SchedulerClientService {
 
     @Cron(CronExpression.EVERY_DAY_AT_2AM)
     private async daily_periodic_compute() {
-        if (['local', 'development'].includes(this.config.get('environment'))) {
+        if (['production', 'development'].includes(this.config.get('environment'))) {
             // update disprot
             await this.disprot_update();
 
