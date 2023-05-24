@@ -33,7 +33,10 @@ There are some **Caveats** to consider:
  - The *Resource_id* that you choose is not public but should be semantically relevant as it will be part of the endpoints you're going to use
  - You can upload either a png, jpeg or svg Logo. We recommend SVG as it is usually smaller in size and can offer a transparent background that makes the UI cleaner
  - The Resource Long Name is usually the full name of the resource that describes the resource slightly better than the Name but less extensively than the Description.
-![Resource Definition](/assets/docs/images/screenshot_databses_create.png)
+
+
+<img alt="Resource Definition" src="/assets/docs/images/screenshot_databses_create.png" class="tw-mx-auto">
+
 
 ## Defining your Terms
 
@@ -65,7 +68,7 @@ A single report contains the following fields:
  - *Entity URI*: a URI that links to the page showcasing Entity that the Curator contributed to
  - *Timestamp*: the time and date of the effort submission to the resource
 
-![Single Submission](/assets/docs/images/screenshot_single_submission.png)
+<img alt="Single Submission" src="/assets/docs/images/screenshot_single_submission.png" class="tw-mx-auto">
 
 
 ### Bulk Submission
@@ -106,7 +109,34 @@ The JSON file to be uploaded when doing a bulk upload follows the structure spec
 Where the *reports* array contains a list of reports.\
 An additional feature is to specify **global fields**
 
+<img alt="Bulk Submission" src="/assets/docs/images/screenshot_bulk_submission.png" class="tw-mx-auto">
+
 #### Global fields
 
+Global fields in Bulk submissions are fields that are placed outside of the reports array, they are meant to reduce redundancy across the file to avoid repeating them  the most common example among the report fields is the *resource_id* field.
+Instead of repeating the field across the entire array of reports you can specify it once outisde of the reports array.
 
-![Bulk Submission](/assets/docs/images/screenshot_bulk_submission.png)
+```json
+
+{
+  "resource_id": "disprot",
+  "reports": [
+    {
+      "activity_term": "region_first_generation",
+      "timestamp": "2016-08-11T09:59:17.000Z",
+      "curator_orcid": "0000-0002-0341-4888",
+      "entity_uri": "https://identifiers.org/disprot:DP00034"
+    },
+
+    {
+      "activity_term": "region_first_generation",
+      "timestamp": "2016-08-11T09:59:17.000Z",
+      "curator_orcid": "0000-0002-0341-4888",
+      "entity_uri": "https://identifiers.org/disprot:DP00034",
+      "resource_id": "another_resource" // override the global field for this specific entry 
+    }
+    
+  ]
+}
+
+```
