@@ -2,13 +2,13 @@ import { AfterContentInit, AfterViewInit, Component, ContentChild, ElementRef, I
 import { ToastrService } from 'ngx-toastr';
 import { BehaviorSubject, Observable, fromEvent } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
-import { AuthService } from '../auth/auth.service';
+import { environment } from '../../../environments/environment';
+import { AuthService } from '../../auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { AngularSvgIconModule } from 'angular-svg-icon';
-import { AuthModule } from '../auth/auth.module';
-import { NotificationService } from '../notifications-data/notification.service';
-import { Notification } from '../notifications-data/models/Notification'
+import { AuthModule } from '../../auth/auth.module';
+import { NotificationService } from '../../notifications-data/notification.service';
+import { Notification } from '../../notifications-data/models/Notification'
 import { RouterModule } from '@angular/router';
 // import { NotificationsDataModule } from '../../notifications-data/notifications-data.module';
 @Component({

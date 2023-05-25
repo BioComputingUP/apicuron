@@ -1,6 +1,6 @@
 module.exports = {
   prefix: 'tw-',
-  content: ["./src/**/*.{html,ts}", "./src/app/**/*.{html,ts}"],
+  content: ["./src/**/*.{html,ts}", "./src/app/**/*.{html,ts}", 'node_modules/preline/dist/*.js'],
   darkMode: 'class',
   // darkMode: false, // or 'media' or 'class'
   theme: {
@@ -34,6 +34,7 @@ module.exports = {
     extend: {},
   },
   plugins: [
-    require('@tailwindcss/typography')
+    require('@tailwindcss/typography'),
+    require('preline/plugin')
   ],
 };

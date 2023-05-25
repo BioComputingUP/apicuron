@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start-dev": "cross-env NODE_ENV=development ng serve",
-    "start-dev-external": "ng serve --host 0.0.0.0 --disableHostCheck",
+    "start-dev-external": "ng serve --host 0.0.0.0 --disable-host-check",
     "start-prod": "ng serve --configuration production",
     "compodoc": "npx compodoc -p tsconfig.doc.json",
     "build": "rm -rf dist/* && ng build --configuration production --build-optimizer",
@@ -42,6 +42,7 @@
     "moment": "^2.29.4",
     "ngx-markdown": "^14.0.1",
     "ngx-toastr": "^15.2.0",
+    "preline": "^1.8.0",
     "rxjs": "~6.6.3",
     "swiper": "^8.3.2",
     "tslib": "^2.0.0",
