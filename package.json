@@ -37,6 +37,7 @@
     "@nestjs/serve-static": "^3.0.0",
     "@nestjs/swagger": "^6.1.4",
     "@prisma/client": "^3.13.0",
+    "@sentry/node": "^7.53.1",
     "@types/stream-json": "^1.7.2",
     "argparse": "^2.0.1",
     "class-transformer": "^0.5.1",
