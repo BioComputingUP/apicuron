@@ -9,7 +9,7 @@ import { ResourceAchievmentsDef } from '../dto/achievement-def.dto';
 import { UpdateBadgeDto, DeleteBadgeDto, CreateBadgeDto, BadgeFilter } from '../dto/badge-crud.dto';
 import { CreateMedalDto, DeleteMedalDto, MedalsFilter, UpdateMedalDto } from '../dto/medal-crud.dto';
 
-@ApiTags('Achievements Definition')
+@ApiTags('Define Achievements')
 @ApiHeader(VersionHeader)
 @Controller({
 	path: 'achievements-def',
