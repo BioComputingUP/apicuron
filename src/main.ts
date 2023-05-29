@@ -27,55 +27,38 @@ async function bootstrap() {
 	const appLogger = new Logger('APICURONApplicationLogger');
 	const configService = app.get(ConfigService);
 
+	
 	// setup for swagger docs generation
-	const config = new DocumentBuilder()
+	const swaggerConfig = new DocumentBuilder()
 		.setTitle('APICURON V2')
-		.setBasePath('/api')
-		.setDescription('The APICURON V2 API Documentation')
+		.setTitle('APICURON API Documentation')
+		.setDescription('The APICURON API Documentation')
 		.setVersion('2.0')
 		.addTag('Resources')
 		.addTag('Partner Resources')
 		.addTag('Users')
 		.addTag('Curation Terms')
 		.addTag('Achievements Definition')
+		.setBasePath('/api/')
 		.build()
+
+	// setting the global prefix for the api docs generation
+	app.setGlobalPrefix(configService.get<string>('API_DOCS_PREFIX'))
 	
-	
-	const document = SwaggerModule.createDocument(app, config)
-	SwaggerModule.setup('/', app, document)
+
+	const document = SwaggerModule.createDocument(app, swaggerConfig, {
+		ignoreGlobalPrefix: false
+	})
+
+	SwaggerModule.setup('/', app, document, {
+		useGlobalPrefix: false,
+	})
 
 
-	// app.use(
-	// 	[
-	// 		'/leaderboards',
-	// 		'/profile',
-	// 		// '/reports',
-	// 		// '/stat',
-	// 		// '/homepage_statistics',
-	// 		'/getProfilePictureID/',
-	// 		'/getProfilePicture/',
-	// 		'/postProfilePicture',
-	// 		'/hideProfile',
-	// 		'/showProfile',
-	// 		'/getProfile',
-	// 		'/orcid_update',
-	// 		'/resubmit_activity',
-	// 		'/submit_activity',
-	// 		'/delete_activity',
-	// 		// '/resources',
-	// 	],
-	// 	createProxyMiddleware({
-	// 		target: configService.get('V1_HOST'),
-	// 		changeOrigin: true,
-	// 		// selfHandleResponse: true,
-	// 		// onProxyRes: responseInterceptor(
-	// 		// 	async (responseBuffer, proxyRes, req, res) => {
-	// 		// 		handle(req)
-	// 		// 		return responseBuffer.toString()
-	// 		// 	}
-	// 		// )
-	// 	}),
-	// );
+	// resetting the prefix for the proxy routing 
+	app.setGlobalPrefix('')
+
+
 
 	// setup basic validation Pipes
 	app.useGlobalPipes(

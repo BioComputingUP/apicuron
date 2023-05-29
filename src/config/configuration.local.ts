@@ -22,5 +22,7 @@ export default () => ({
   PRIVATE_FILES_PATH: resolve(__dirname, "../../private"),
   FRONTEND_HOST: 'http://localhost:4200/',
   SCHEDULER: 'https://dev.scheduler.biocomputingup.it/job/',
-  SCHEDULER_TASK: 'apicuron_dev'
+  SCHEDULER_TASK: 'apicuron_dev',
+  API_DOCS_PREFIX: ''
+
 });

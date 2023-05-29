@@ -23,7 +23,8 @@ export default () => ({
   V1_HOST: 'http://localhost:8298/', // Apicuron first version host location
   FRONTEND_HOST: 'http://apicuron.org/',
   SCHEDULER: 'https://scheduler.biocomputingup.it/task/',
-  SCHEDULER_TASK: 'apicuron_tasks'
+  SCHEDULER_TASK: 'apicuron_tasks',
+  API_DOCS_PREFIX: 'api/'
   //   port: parseInt(process.env.PORT, 10) || 3000,
   //   database: {
   //     host: process.env.DATABASE_HOST,
