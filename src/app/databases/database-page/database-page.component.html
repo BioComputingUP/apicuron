@@ -20,12 +20,22 @@
                     </button>
 
                 </div>
-                <term-list [terms]="terms" [collapsed]="!expand_terms"
-                    [item_per_row]="(leaderboardLoaded$ | async) ? 3 : 4"
-                    [initial_display_count]="(leaderboardLoaded$ | async) ? 6 : 8"></term-list>
+                <list-expand [collapsed]="!expand_terms">
+                    <div class="tw-flex tw-flex-row tw-flex-wrap" content>
+                        <div *ngFor="let term of terms.slice(0,4)" class="tw-w-1/4 tw-p-1">
+                            <term-card [term]="term"></term-card>
+                        </div>
+                    </div>
+                    <div class="tw-flex tw-flex-row tw-flex-wrap" expansion>
+                        <div *ngFor="let term of terms.slice(4)" class="tw-w-1/4 tw-p-1">
+                            <term-card [term]="term"></term-card>
+                        </div>
+                    </div>
+                </list-expand>
 
             </div>
 
+            
             <div class="tw-my-2 sm:tw-my-4" *ngIf="badges$ | async as badges">
                 <div class="tw-flex tw-flex-row tw-justify-between tw-pr-2" *ngIf="badges.length > 0">
                     <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold ">Badges </h4>
@@ -36,27 +46,32 @@
                     </button>
 
                 </div>
-                <div class="tw-flex tw-flex-row tw-flex-wrap">
-                    <div *ngFor="let badge of badges.slice(0,8)" class="tw-p-2 tw-w-1/4">
-                        <div
-                            class="tw-bg-white tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2">
-                            <svg-badge class="tw-w-3/4 tw-mx-auto" [database]="resource.resource_name"
-                                [title]="badge.name" [main_color]="badge.color_code">
-                            </svg-badge>
+                <list-expand [collapsed]="!more_badges">
+                    <div class="tw-flex tw-flex-row tw-flex-wrap" content>
+                        <div *ngFor="let badge of badges.slice(0,8)" class="tw-p-2 tw-w-1/4">
+                            <div
+                                class="tw-bg-white tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2">
+                                <svg-badge class="tw-w-3/4 tw-mx-auto" [database]="resource.resource_name"
+                                    [title]="badge.name" [main_color]="badge.color_code">
+                                </svg-badge>
+                            </div>
+                            <!-- <badge-def-card [badgeDef]="badge" [terms]="(terms$ | async)"></badge-def-card> -->
+    
                         </div>
-                        <!-- <badge-def-card [badgeDef]="badge" [terms]="(terms$ | async)"></badge-def-card> -->
-
                     </div>
-                    <ng-container *ngIf="more_badges">
+                         
+                    <div class="tw-flex tw-flex-row tw-flex-wrap" expansion>
                         <div *ngFor="let badge of badges.slice(8)" class="tw-p-2 tw-w-1/4">
                             <div class="tw-bg-white tw-rounded-lg tw-border tw-border-gray-400 tw-h-full tw-p-2">
                                 <svg-badge class="tw-w-3/4 tw-mx-auto" [database]="resource.resource_name"
                                     [title]="badge.name" [main_color]="badge.color_code">
                                 </svg-badge>
                             </div>
+                            <!-- <badge-def-card [badgeDef]="badge" [terms]="(terms$ | async)"></badge-def-card> -->
+
                         </div>
-                    </ng-container>
-                </div>
+                    </div>
+                </list-expand>
             </div>
 
             <div class="tw-my-2 sm:tw-my-4" *ngIf="medals$ | async as medals">

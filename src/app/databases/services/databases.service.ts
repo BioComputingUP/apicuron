@@ -93,7 +93,7 @@ export class DatabasesService {
       params: {
         resource_id
       }
-    }).pipe(pluck('data'), map((data: Term[]) => data.map(term => new Term().deserialize(term))))
+    }).pipe(pluck('data'), map((data: Term[]) => data.map(term => new Term().deserialize(term))), map(Term.computeTermScoreQuartile))
 
     // @ts-ignore
     const medals$: Observable<Object> = this.http.get(
@@ -122,8 +122,8 @@ export class DatabasesService {
       pluck('data'),
       map((badges: BadgeDef[]) => {
         return badges.map((badge) => new BadgeDef().deserialize(badge))
-      }) 
-      )
+      })
+    )
 
     return combineLatest([badges$, medals$, terms$, resource$]).pipe(
       map(([badges, medals, terms, resource]) => {

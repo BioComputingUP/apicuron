@@ -26,9 +26,27 @@ export class Term implements Deserializable {
         return this
     }
 
-    get name(){
+    get name() {
         return this.activity_name
     }
 
+    static computeTermScoreQuartile(terms: Term[]) {
+        terms.sort((a, b) => a.score - a.score)
+        let q1 = terms.length / 4;
+        let q3 = terms.length * 3 / 4
+
+        return terms.map((term, index) => {
+            if (index < q1) {
+                term.quartile = 1
+                return term
+            }
+            if (index > q3) {
+                term.quartile = 3
+                return term
+            }
+            term.quartile = 2
+            return term
+        })
+    }
 
 }

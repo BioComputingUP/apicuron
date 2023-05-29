@@ -1,6 +1,7 @@
 import { BrowserModule } from "@angular/platform-browser";
-import { NgModule, SecurityContext } from "@angular/core";
+import { NgModule, APP_INITIALIZER, ErrorHandler } from "@angular/core";
 import {
+  Router,
   RouterModule,
 } from "@angular/router";
 import { ReactiveFormsModule, FormsModule } from "@angular/forms";
@@ -19,7 +20,7 @@ import { ToastrModule } from "ngx-toastr";
 import { AngularSvgIconModule } from "angular-svg-icon";
 import { AuthDropdownComponent } from "./components/auth-dropdown/auth-dropdown.component";
 import { NotificationsDataModule } from "./notifications-data/notifications-data.module";
-// import { NotificationsModule } from "./notifications/notifications.module";
+import * as Sentry from "@sentry/angular-ivy";
 @NgModule({
   declarations: [
     AppComponent,
@@ -44,7 +45,26 @@ import { NotificationsDataModule } from "./notifications-data/notifications-data
     HttpClientModule,
     AngularSvgIconModule.forRoot(),
   ],
-  providers: [],
+  providers: [
+    // Sentry ErrorHandler and Tracer Setup 
+    {
+      provide: ErrorHandler,
+      useValue: Sentry.createErrorHandler({
+        showDialog: false,
+      }),
+    },
+    {
+      provide: Sentry.TraceService,
+      deps: [Router]
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: () => () => {},
+      deps: [Sentry.TraceService],
+      multi: true,
+    },
+    // end of sentry setup
+  ],
   bootstrap: [AppComponent],
   exports: [RouterModule],
 })

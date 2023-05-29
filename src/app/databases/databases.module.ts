@@ -13,8 +13,9 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { AuthModule } from "../auth/auth.module";
 import { DatabasesService } from "./services/databases.service";
 import { TermCardComponent } from "../components/term-card/term-card.component";
-import { TermListComponent } from "../components/term-list/term-list.component";
+// import { TermListComponent } from "../components/term-list/term-list.component";
 import { BadgeDefCardComponent } from "../components/badge-def-card/badge-def-card.component";
+import { ListExpandComponent } from "../components/list-expand/list-expand.component";
 @NgModule({
   declarations: [
     DatabasesPageComponent,
@@ -23,7 +24,8 @@ import { BadgeDefCardComponent } from "../components/badge-def-card/badge-def-ca
   ],
   imports: [
     CommonModule,
-    TermListComponent,
+    TermCardComponent,
+    ListExpandComponent,
     BadgeDefCardComponent,
     DatabasesRoutingModule,
     AuthModule,
