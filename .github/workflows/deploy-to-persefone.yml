@@ -31,9 +31,14 @@ jobs:
           npm run build
       # install openvpn and connect to it
       - name: Install OpenVPN
+        env: 
+          cert_adel_geras_key: ${{ secrets.CERT_ADEL_GERAS_KEY }}
+          cert_adel_geras_crt: ${{ secrets.CERT_ADEL_GERAS_CRT }}
         run: |
           sudo apt update
           sudo apt install -y openvpn openvpn-systemd-resolved
+          echo $cert_adel_geras_key > /opt/cert_export_adel@geras.key
+          echo $cert_adel_geras_crt > /opt/cert_export_adel@geras.crt
       - name: Connect to VPN
         uses: 'kota65535/github-openvpn-connect-action@v2'
         with:
