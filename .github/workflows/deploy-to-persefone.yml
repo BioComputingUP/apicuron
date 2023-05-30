@@ -17,12 +17,13 @@ jobs:
       # setup env variables
       - name: setting up env variables
         run: |
-          nvmrc=$(cat .nvmrc)
+          echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
+        id: env-setup
       # install nodejs
       - name: installing nodejs
         uses: 'actions/setup-node@v2.5.2'
         with:
-          node-version: $nvmrc
+          node-version: ${{ steps.env-setup.outputs.NODE_VERSION }}
       # building dist
       - name: building dist
         run: |
