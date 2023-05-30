@@ -38,10 +38,10 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y openvpn openvpn-systemd-resolved
-          echo $cert_adel_geras_key > /opt/cert_export_adel@geras.key
-          echo $cert_adel_geras_crt > /opt/cert_export_adel@geras.crt
-          echo $cert_export_geras_crt > /opt/cert_export_geras.crt
-          chmod 775 /opt/cert_export_adel@geras.key /opt/cert_export_adel@geras.crt /opt/cert_export_geras.crt
+          echo $cert_adel_geras_key > cert_export_adel@geras.key
+          echo $cert_adel_geras_crt > cert_export_adel@geras.crt
+          echo $cert_export_geras_crt > cert_export_geras.crt
+          chmod 775 cert_export_adel@geras.key cert_export_adel@geras.crt cert_export_geras.crt
       - name: Connect to VPN
         uses: 'kota65535/github-openvpn-connect-action@v2'
         with:
