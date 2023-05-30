@@ -27,8 +27,8 @@ import { rename } from 'fs';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import * as mime from 'mime-types';
-import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiHeader, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthorizationHeader, VersionHeader } from '../../config/swagger';
+import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiHeader, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiProperty, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { AuthorizationHeader, VersionHeader } from '../../swagger/config';
 import { PartnerResourceDto, SelectPartnerResourceDto } from '../dto/partner-resources.dto';
 import { AuthService } from '../../auth/auth.service';
 import * as mv from 'mv'
@@ -86,7 +86,7 @@ export class PartnerResourcesController {
 	
 	// swagger documentation decorators
 	@ApiConsumes('multipart/form-data')
-	@ApiHeader(AuthorizationHeader)
+	@ApiSecurity('basic')
 	@ApiOperation({
         summary: 'Update the information about a partner resource'
     })

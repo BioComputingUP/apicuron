@@ -36,6 +36,7 @@
     "@nestjs/schedule": "^2.1.0",
     "@nestjs/serve-static": "^3.0.0",
     "@nestjs/swagger": "^6.1.4",
+    "@ntegral/nestjs-sentry": "^4.0.0",
     "@prisma/client": "^3.13.0",
     "@sentry/node": "^7.53.1",
     "@types/stream-json": "^1.7.2",

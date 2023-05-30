@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
-import { AuthorizationHeader, VersionHeader } from '../../config/swagger';
+import { AuthorizationHeader, VersionHeader } from '../../swagger/config';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { AchievementsService } from '../achievements.service';
 import { AchievementSelectDto } from '../dto/achievements.dto';

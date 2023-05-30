@@ -1,9 +1,9 @@
 import { Controller, Delete, Req, Put, ForbiddenException, Get, Param, Body, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiHeader, ApiOperation, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiHeader, ApiOperation, ApiOkResponse, ApiTags, ApiSecurity } from '@nestjs/swagger';
 import { AuthService } from '../../auth/auth.service';
 import { HasAResourceGuard } from '../../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
-import { AuthorizationHeader, VersionHeader } from '../../config/swagger';
+import { AuthorizationHeader, VersionHeader } from '../../swagger/config';
 import { AchievementsDefService } from '../achievements-def.service';
 import { ResourceAchievmentsDef } from '../dto/achievement-def.dto';
 import { UpdateBadgeDto, DeleteBadgeDto, CreateBadgeDto, BadgeFilter } from '../dto/badge-crud.dto';
@@ -68,7 +68,7 @@ export class BadgesDefController {
         description: 'Confirmation of the created Badge',
         type: CreateBadgeDto
     })
-	@ApiHeader(AuthorizationHeader)
+	@ApiSecurity('basic')
 	// nest decorators
 	@Post('create')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
@@ -97,7 +97,7 @@ export class BadgesDefController {
         description: 'Confirmation of the updated Badge',
         type: CreateBadgeDto
     })
-	@ApiHeader(AuthorizationHeader)
+	@ApiSecurity('basic')
 	@Put('edit')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	async update_badge(@Body() update_badge: UpdateBadgeDto, @Req() req){
@@ -112,7 +112,7 @@ export class BadgesDefController {
         description: 'A boolean confirmation of the successfull deletion',
         type: Boolean
     })
-	@ApiHeader(AuthorizationHeader)
+	@ApiSecurity('basic')
 	@Delete(':name/partner-resource/:resource_id')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	async delete_badge(@Param() delete_badge: DeleteBadgeDto, @Req() req){
@@ -146,7 +146,7 @@ export class MedalsDefController {
         description: 'Confirmation of the Created Medal',
         type: CreateMedalDto
     })
-	@ApiHeader(AuthorizationHeader)
+	@ApiSecurity('basic')
 	@Post('create')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	async create_medal(@Body() medal: CreateMedalDto, @Req() req){
@@ -161,7 +161,7 @@ export class MedalsDefController {
         description: 'A list of medals that correspond to the filter',
         type: Array<CreateMedalDto>
     })
-	@ApiHeader(AuthorizationHeader)
+	@ApiSecurity('basic')
 	@Get()
 	async get_medals(@Query() medals_filter: MedalsFilter){
 		return await this.achievementsDefService.get_medals(medals_filter)
@@ -175,7 +175,7 @@ export class MedalsDefController {
         description: 'Confirmation of the Updated Medal',
         type: CreateMedalDto
     })
-	@ApiHeader(AuthorizationHeader)
+	@ApiSecurity('basic')
 	@Put('edit')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	async update_medal(@Body() update_medal: UpdateMedalDto, @Req() req){
@@ -191,7 +191,7 @@ export class MedalsDefController {
         description: 'Boolean Confirmation of the Deleted Medal',
         type: Boolean
     })
-	@ApiHeader(AuthorizationHeader)
+	@ApiSecurity('basic')
 	@Delete(':name/partner-resource/:resource_id')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	async delete_medal(@Param() delete_medal: DeleteMedalDto, @Req() req){

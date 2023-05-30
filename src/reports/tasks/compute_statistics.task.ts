@@ -123,9 +123,27 @@ export class ComputeStatisticsTask {
                     '$first': '$activity_term'
                 }
             }).lookup({
-                'from': 'terms_def',
-                'localField': 'activity_term',
-                'foreignField': 'activity_term',
+                from: 'terms_def',
+                let: { term_id: "$activity_term" },
+                // This is necessary to only uncover the terms from the specific resource
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $and: [
+                                    {
+                                        $eq: ["$resource_id", resource_id]
+                                    },
+                                    {
+                                        $eq: ["$activity_term", "$$term_id"]
+                                    }
+                                ]
+                            }
+                        }
+
+                    }
+
+                ],
                 'as': 'term'
             }).unwind({
                 'path': '$term'

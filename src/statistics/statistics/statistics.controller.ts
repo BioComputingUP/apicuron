@@ -15,7 +15,7 @@ import { PartnerResourcesService } from '../../resources/partner-resources/partn
 import { GetStatisticsDto } from '../dto/get-statistics.dto';
 import { StatisticsService } from '../statistics.service';
 import { ApiHeader, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { VersionHeader } from '../../config/swagger';
+import { VersionHeader } from '../../swagger/config';
 import { UsersService } from '../../auth/users/users.service';
 import * as _ from 'lodash';
 import { Response } from 'express';

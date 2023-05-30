@@ -17,10 +17,12 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
+	ApiBearerAuth,
 	ApiConsumes,
 	ApiHeader,
 	ApiOkResponse,
 	ApiOperation,
+	ApiSecurity,
 	ApiTags,
 } from '@nestjs/swagger';
 
@@ -28,7 +30,7 @@ import { createReadStream } from 'fs';
 import { SchedulerClientService } from '../scheduler-client/services/scheduler-client.service';
 import { HasAResourceGuard } from '../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
-import { AuthorizationHeader, VersionHeader } from '../config/swagger';
+import { VersionHeader } from '../swagger/config';
 import { ParseUnsignedIntPipe } from '../shared/pipes/unsigned-int-validation.pipe';
 import { ReportDto } from './dto/report.dto';
 import { SubmitBulkDto, SubmitReportDto } from './dto/submit-report.dto';
@@ -101,7 +103,11 @@ export class ReportsController {
 	@ApiOkResponse({
 		description: 'Return message confirming the reception of the reports',
 	})
-	@ApiHeader(AuthorizationHeader)
+	// @ApiHeader({
+	// 	name:'authorization',
+	// 	description: 'another one'
+	// })
+	@ApiSecurity('basic')
 	@ApiConsumes('multipart/form-data')
 	@Post('bulk')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
@@ -116,8 +122,11 @@ export class ReportsController {
 		@Body() body: SubmitBulkDto,
 	) {
 
-
-		await this.schedulerService.submit_reports(reports, req.user.orcid_id, body.delete_all)
+		if(body.delete_all){
+			await this.schedulerService.submit_reports(reports, req.user.orcid_id, body.delete_all)
+		}else{
+			await this.schedulerService.submit_reports(reports, req.user.orcid_id, [])
+		}
 
 		return {
 			status:
@@ -132,7 +141,7 @@ export class ReportsController {
 		description: 'Confirmation Object of the created report',
 		type: ReportDto,
 	})
-	@ApiHeader(AuthorizationHeader)
+	@ApiSecurity('basic')
 	@Post('single')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	async submit_report(@Body() report: SubmitReportDto, @Request() req) {

@@ -1,5 +1,5 @@
 
-import { loadConfig } from "./load"
+import { loadConfig } from "../config/load"
 
 const env: Function = loadConfig()
 const {
@@ -10,7 +10,8 @@ const {
 export const VersionHeader = {
 	name: 'version',
 	description: 'The header describing the API version, default version is 2',
-    allowEmptyValue: false
+    allowEmptyValue: false,
+    default: '2'
 }
 
 export const AuthorizationHeader = {

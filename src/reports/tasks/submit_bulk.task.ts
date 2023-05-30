@@ -47,8 +47,11 @@ export class SubmitBulkTask {
         if (delete_all) {
             const resources_delete_all: string[] = delete_all.split(',');
 
+            this.logger.log(`User specified resources ${delete_all}`)
+
             for (let i = 0; i < resources_delete_all.length; i++) {
-                await this.reportService.delete_all_resource_reports(resources_delete_all[i])
+                const response = await this.reportService.delete_all_resource_reports(resources_delete_all[i])
+                this.logger.log(`Deleted ${response.deletedCount} reports from resource ${resources_delete_all[i]} before proceeding`)
             }
         }
         return await this.main(file, orcid_id)

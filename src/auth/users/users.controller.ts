@@ -25,7 +25,7 @@ import { json_to_tsv } from './json-tsv';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { RoleGuard } from '../guards/role.guard';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
-import { AuthorizationHeader, VersionHeader } from '../../config/swagger';
+import { AuthorizationHeader, VersionHeader } from '../../swagger/config';
 
 @ApiTags('First Version')
 @Controller('')

@@ -13,9 +13,10 @@ import {
 	ApiExcludeEndpoint,
 	ApiHeader,
 	ApiOkResponse,
+	ApiSecurity,
 	ApiTags,
 } from '@nestjs/swagger';
-import { AuthorizationHeader } from '../config/swagger';
+import { AuthorizationHeader } from '../swagger/config';
 import { AuthService } from './auth.service';
 import { Roles } from './decorators/roles.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -72,7 +73,7 @@ export class AuthController {
 
 	// swagger documentation decorators
 	@ApiTags('Users')
-	@ApiHeader(AuthorizationHeader)
+	@ApiSecurity('basic')
 	// TODO: finish implementation of the docs
 	@ApiOkResponse({
 		description: 'An Object describing the current User and his information',

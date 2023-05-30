@@ -16,11 +16,11 @@ export class Statistics {
     @Prop({required: true})
     curator_orcid:string;
 
-    @Prop({required: true})
-    generation_count: string;
+    @Prop({required: true, type: 'Number' })
+    generation_count: number;
 
     @Prop({required: true})
-    generation_score: string;
+    generation_score: number;
 
     generation_terms:[StatisticsTerms]
     /// Multiple data types found: Float: 28.1%, Int: 71.9% out of 89 sampled entries
