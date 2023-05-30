@@ -27,6 +27,7 @@ jobs:
       # building dist
       - name: building dist
         run: |
+          npm ci
           npm run build
       # install openvpn and connect to it
       - name: Install OpenVPN
