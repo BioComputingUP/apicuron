@@ -1,5 +1,7 @@
 export const environment = {
     production: true,
+    env: 'development',
+
     // ws: window.location.protocol + '//' + window.location.hostname + '/api/',
     host: 'https://dev.apicuron.org',
     ws: 'https://dev.apicuron.org/api',

@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+  env: 'local',
   host: 'http://localhost:4200',
   ws: 'http://localhost:3000',
   auth_ws: 'http://localhost:3000',

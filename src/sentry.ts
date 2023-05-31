@@ -20,6 +20,10 @@ export function setupSentry () {
             }),
             new Sentry.Replay(),
           ],
+
+          // specify environment
+          environment: environment.env,
+
           // Performance Monitoring
           tracesSampleRate: .5, // Capture 100% of the transactions, reduce in production!
           // Session Replay
