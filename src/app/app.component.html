@@ -1,8 +1,18 @@
 <div>
-    <!-- <app-navbar></app-navbar> -->
-    <app-alt-navbar></app-alt-navbar>
+  <!-- <app-navbar></app-navbar> -->
+  <div *ngIf="development"
+    class=" tw-bg-orange-100 tw-border-orange-500 tw-text-orange-700 tw-border-l-4 tw-p-2 lg:tw-p-4"
+    [ngClass]>
+    <span class="tw-block tw-font-bold tw-font-dm-sans">Warning</span>
+    <p class=" tw-leading-7">
+      <a href="http://dev.apicuron.org" class="tw-font-bold">dev.apicuron.org</a> is a test and development website. <a
+        href="http://apicuron.org" class="tw-font-bold">apicuron.org</a> is the official website. Information here is
+      only meant to test integrations and is not factual.
+    </p>
+  </div>
+  <app-alt-navbar></app-alt-navbar>
   <div class="tw-min-h-screen tw-bg-gray-100">
-<!--    <app-alarm-banner></app-alarm-banner>-->
+    <!--    <app-alarm-banner></app-alarm-banner>-->
     <router-outlet></router-outlet>
   </div>
   <app-foot></app-foot>
