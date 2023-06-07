@@ -23,8 +23,8 @@
     "rimraf": "./node_modules/rimraf/bin.js",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "deploy-prod": "(colC='\\033[0;36m';colN='\\033[0m'; echo ${colC}Building and rsyncing dist ...${colN} && npm run build && rsync -avh --delete dist/* nodejs@persefone:/var/local/webservers/apps/apicuron/dist/ && rsync -avh --delete node_modules/* nodejs@persefone:/var/local/webservers/apps/apicuron/node_modules/ && echo ${colC}Restarting node-apicuron service ...${colN} && ssh nodejs@persefone 'sudo systemctl restart node-apicuron' && echo ${colC}Done with deploy-prod!${colN})",
-    "deploy-dev": "(colC='\\033[0;36m';colN='\\033[0m'; echo ${colC}Building and rsyncing dist ...${colN} && npm run build && rsync -avh --delete dist/* nodejs@persefone:/var/local/webservers/apps/apicuron-dev/dist/ && rsync -avh --delete node_modules/* nodejs@persefone:/var/local/webservers/apps/apicuron-dev/node_modules/ && echo ${colC}Restarting node-apicuron-dev service ...${colN} && ssh nodejs@persefone 'sudo systemctl restart node-apicuron-dev' && echo ${colC}Done with deploy-dev!${colN})"
+    "deploy-prod": "./deployment/deploy.sh prod",
+    "deploy-dev": "./deployment/deploy.sh dev"
   },
   "dependencies": {
     "@nestjs/axios": "^0.1.0",
@@ -38,6 +38,7 @@
     "@nestjs/swagger": "^6.1.4",
     "@ntegral/nestjs-sentry": "^4.0.0",
     "@prisma/client": "^3.13.0",
+    "@sentry/cli": "^2.18.1",
     "@sentry/node": "^7.53.1",
     "@types/stream-json": "^1.7.2",
     "argparse": "^2.0.1",
