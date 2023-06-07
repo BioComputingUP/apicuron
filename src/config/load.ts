@@ -1,17 +1,18 @@
-import devConfig from './configuration.dev';
-import prodConfig from './configuration.prod';
-import localConfig from './configuration.local'
+
+
 
 export function loadConfig () {
-	if (process.env.NODE_ENV === 'local') {
-		return localConfig;
-	}
-	if (process.env.NODE_ENV === 'development') {
-		return devConfig;
-	}
-	if (['production', 'prod'].includes(process.env.NODE_ENV)) {
-		return prodConfig;
+
+	const config_name = {
+		'local': 'local',
+		'prod': 'prod',
+		'production': 'prod',
+		'dev': 'dev',
+		'development': 'dev'
 	}
 
-	return localConfig;
+	const configName = config_name[process.env.NODE_ENV] || process.env.NODE_ENV
+
+	return require(`../../env/config.${configName}`);
+
 }

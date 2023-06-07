@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, InternalServerErrorException } from '@nestjs/common';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { AchievementsDefService } from './achievements/achievements-def.service';
 import { AppService } from './app.service';
@@ -16,10 +16,11 @@ export class AppController {
 		protected achievementsService: AchievementsDefService,
 	) {}
 
-	// @Get()
-	// getHello(): string {
-	// 	return this.appService.getHello();
-	// }
+	@Get('/debug-sentry')
+	getHello(): string {
+		throw new InternalServerErrorException('Sentry debug test');
+		// return this.appService.getHello();
+	}
 	@ApiExcludeEndpoint()
 	@Get('/home')
 	async get_home_data() {

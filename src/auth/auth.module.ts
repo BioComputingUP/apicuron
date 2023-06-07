@@ -11,10 +11,12 @@ import { User, UserSchema } from './users/schemas/user.schema';
 import { AuthMiddleware } from './middlewares/auth.middleware';
 import { HttpModule } from '@nestjs/axios';
 import { OrcidExists } from './validators/orcidExists.dto';
+import { OrcidGuard } from './guards/orcid.guard';
+import { PassportModule } from '@nestjs/passport';
 // import { OrcidExists } from './validators/orcidExists.dto';
 
 @Module({
-	providers: [AuthService, OrcidStrategy, UsersService, OrcidExists],
+	providers: [AuthService, OrcidStrategy, UsersService, OrcidExists, OrcidGuard],
 	imports: [
 		HttpModule,
 		MongooseModule.forFeature([
@@ -23,6 +25,7 @@ import { OrcidExists } from './validators/orcidExists.dto';
 				schema: UserSchema,
 			}
 		]),
+		PassportModule.register({ session: true }),
 		JwtModule.registerAsync({
 			inject: [ConfigService],
 			useFactory: async (configService: ConfigService) => ({

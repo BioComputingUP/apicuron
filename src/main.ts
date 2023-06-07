@@ -8,6 +8,8 @@ import { TransformInterceptor } from './shared/transformer/transform.interceptor
 import { setupSwagger } from './swagger/setup'
 import * as Sentry from "@sentry/node";
 import { Application } from "express";
+import * as session from "express-session";
+
 
 
 async function bootstrap() {
@@ -33,6 +35,14 @@ async function bootstrap() {
 
 	// setup express middlewares
 	app.use(cookieParser());
+
+	app.use(
+		session({
+			secret: 'my-secret',
+			resave: false,
+			saveUninitialized: false,
+		})
+	)
 
 
 	// swagger UI setup

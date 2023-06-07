@@ -24,7 +24,8 @@ export default () => ({
   FRONTEND_HOST: 'http://dev.apicuron.org/',
   SCHEDULER: 'https://dev.scheduler.biocomputingup.it/job/',
   SCHEDULER_TASK: 'apicuron_dev',
-  API_DOCS_PREFIX: 'api/'
+  API_DOCS_PREFIX: 'api/',
+  RELEASE: '2.0.0'
   //   port: parseInt(process.env.PORT, 10) || 3000,
   //   database: {
   //     host: process.env.DATABASE_HOST,

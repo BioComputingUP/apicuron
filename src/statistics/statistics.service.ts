@@ -17,45 +17,81 @@ export class StatisticsService {
 
 	logger = new Logger(StatisticsService.name);
 
-	async get_user_statistics(curator_orcid: string) {
+	async get_public_user_statistics(curator_orcid: string) {
+		if (await this.userModel.exists({ orcid_id: curator_orcid })) {
+			return await this.statisticsModel.find({
+				curator_orcid
+			})
+		} else {
+			throw new NotFoundException('User not found');
+		}
+	}
+
+	async get_all_user_statistics(curator_orcid: string, resource_ids: string[] = []) {
 		return await this.statisticsModel.find({
-			curator_orcid
+			curator_orcid,
+			resource_id: { $in: resource_ids }
 		})
 	}
 
 	async get_all_statistics(
-		user_query?: string,
+		passed_query?: string,
 		user_filter_field?: string,
 		resource_ids?: string[],
 		page: number = 1,
 		page_size: number = 10,
 	) {
+		// setup pagination
 		const skip = (page - 1) * page_size;
+
+		// query filter
 		let query = {};
-		if (user_query) {
+		// if there's a query passed
+		if (passed_query) {
+			// if there's no user_filter_field, default to displayedName
 			const field = !!user_filter_field ? user_filter_field : 'displayedName';
-			query[field] = { $regex: user_query, $options: 'i' };
+			// pass query using regex, case insensitive
+			query[field] = { $regex: passed_query, $options: 'i' };
 		}
 
 		if (resource_ids) {
+			// for backwards compatibility obtain resource_uris and add them in query
 			const resource_uris = (await this.partnerResourceService.get_resources())
 				.filter((x) => resource_ids.includes(x.resource_id))
 				.map(({ resource_uri }) => resource_uri);
+
 			if (resource_uris && resource_uris.length > 0) {
-				query = { ...query, 'stats.resource_uri': { $in: resource_uris } };
+				query = { 
+					...query,
+					$or: [
+						// get both stats matching resource_uris and resource_ids
+						{
+							'stats.resource_uri': { 
+								$in: resource_uris 
+							}
+						},
+						{
+							'stats.resource_id': {
+								$in: resource_ids
+							}
+						}
+					]
+					 
+				};
 			}
 		}
 
 
 		const userStatsAggregation = [
 			{
+				// remove fields we don't need
 				$project: {
 					role: 0,
 					__v: 0,
 					last_update: 0
 				}
 			},
-			{
+			{	// join with statistics
 				"$lookup": {
 					from: "statistics",
 					localField: "orcid_id",
@@ -77,6 +113,7 @@ export class StatisticsService {
 			}
 		]
 
+		// get the data aggregated
 		const dataPromise = this.userModel.aggregate([...userStatsAggregation, ...paginationAggregation])
 
 		const countPromise = this.userModel.aggregate([...userStatsAggregation, { $count: 'total_count' }])

@@ -23,6 +23,6 @@ export default () => ({
   FRONTEND_HOST: 'http://localhost:4200/',
   SCHEDULER: 'https://dev.scheduler.biocomputingup.it/job/',
   SCHEDULER_TASK: 'apicuron_dev',
-  API_DOCS_PREFIX: ''
-
+  API_DOCS_PREFIX: '',
+  RELEASE: '2.0.0'
 });

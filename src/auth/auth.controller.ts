@@ -16,7 +16,7 @@ import {
 	ApiSecurity,
 	ApiTags,
 } from '@nestjs/swagger';
-import { AuthorizationHeader } from '../swagger/config';
+import { OrcidGuard } from './guards/orcid.guard';
 import { AuthService } from './auth.service';
 import { Roles } from './decorators/roles.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -32,33 +32,44 @@ export class AuthController {
 		private authService: AuthService,
 		private configService: ConfigService,
 		private userService: UsersService,
-	) {}
+	) { }
 
 	private authControllerLogger = new Logger(AuthController.name);
 
 	// redirect to orcid
 	@ApiExcludeEndpoint()
 	@Get('orcid')
-	@UseGuards(AuthGuard('orcid'))
-	authenticate_orcid() {}
+	@UseGuards(OrcidGuard)
+	authenticate_orcid() { }
 
 	@ApiExcludeEndpoint()
 	@Get('orcid_permission')
-	@UseGuards(AuthGuard('orcid'))
-	orcid_permission() {}
+	@UseGuards(OrcidGuard)
+	orcid_permission() { }
 
 	@ApiExcludeEndpoint()
 	@Get('orcid/redirect')
 	@Redirect('/orcid/', 301)
-	@UseGuards(AuthGuard('orcid'))
+	@UseGuards(OrcidGuard)
 	async orcid_redirect(@Req() req, @Res() res) {
+		console.log('query', req.query)
+		console.log('session', req.session)
 		// console.log('redirect request', req)
 		const user = req.user;
 		const { header, token } = await this.authService.generate_jwt_token(user);
 		res.cookie(header, token);
 		res.set(header, token);
+
+		let redirect_url: string = this.configService.get<string>('FRONTEND_HOST')
+		if (req.session['redirect_code']) {
+			const code: string = req.session['redirect_code']
+			switch(code){
+				case 'user_profile':
+				redirect_url = new URL(`/user/${user.orcid_id}`, this.configService.get('FRONTEND_HOST')).href
+			}
+		}
 		return {
-			url: this.configService.get('FRONTEND_HOST'),
+			url: redirect_url,
 			statusCode: 301,
 		};
 	}

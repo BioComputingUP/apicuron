@@ -89,6 +89,7 @@ export class ComputeStatisticsTask {
                 revision_score,
                 invalidation_score,
                 ranking,
+                total_count: generation_count + revision_count + invalidation_count,
                 badges_count: await this.achievementsService.user_badge_count(resource_id, user_report._id),
                 medals_count: await this.achievementsService.user_medal_count(resource_id, user_report._id)
             }

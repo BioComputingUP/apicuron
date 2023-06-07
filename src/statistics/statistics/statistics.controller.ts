@@ -5,6 +5,7 @@ import {
 	Query,
 	Param,
 	Res,
+	Req,
 	UseInterceptors,
 } from '@nestjs/common';
 import { AchievementsService } from '../../achievements/achievements.service';
@@ -18,7 +19,7 @@ import { ApiHeader, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger
 import { VersionHeader } from '../../swagger/config';
 import { UsersService } from '../../auth/users/users.service';
 import * as _ from 'lodash';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 @ApiTags('Statistics')
 @ApiHeader(VersionHeader)
@@ -64,8 +65,13 @@ export class StatisticsController {
 		summary: 'get a single user statistics for all the Partner Resources they are concerned by'
 	})
 	@Get('user/:orcid_id')
-	async get_user_statistics(@Param('orcid_id') orcid_id:string){
-		return this.statService.get_user_statistics(orcid_id)
+	async get_user_statistics(@Param('orcid_id') orcid_id:string, @Req() req){
+		if(!req.user){
+			return await this.statService.get_public_user_statistics(orcid_id)
+		}
+		const resource_ids = (req.user.resources || []).map(res => res.resource_id)
+		return await this.statService.get_all_user_statistics(orcid_id, resource_ids)
+
 	}
 
 	@ApiOperation({
