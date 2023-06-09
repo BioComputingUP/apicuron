@@ -21,7 +21,7 @@ export function loadConfig () {
 
 	const configName = configNames[process.env.NODE_ENV] || process.env.NODE_ENV || 'local'
 
-	const config = require(`../../env/config.${configName}`)
+	const config = require(`./config.${configName}`)
 
 	return config.default
 }

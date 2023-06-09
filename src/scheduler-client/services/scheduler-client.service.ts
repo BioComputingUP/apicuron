@@ -36,6 +36,7 @@ export class SchedulerClientService {
             }
         } else {
             form.append('task', task.task_name)
+            form.append('task_name', this.task_name)
         }
 
 

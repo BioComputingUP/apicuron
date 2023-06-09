@@ -20,10 +20,14 @@ export type TransportOptionsNames = {
 
 export type EmailModuleForRootConfig = {
     transportOptions: TransportOptionsNames,
-    accounts: any
+    templates?: any
 }
 
 export type Transporters = {
     [key: string]: Transporter;
-
 }
+
+export type EmailTemplate = {
+    
+}
+

@@ -126,11 +126,11 @@ export class ReportsController {
 		@Request() req,
 		@Body() body: SubmitBulkDto,
 	) {
+			
+		const response = await this.schedulerService.submit_reports(reports, req.user.orcid_id, body.delete_all || [])
 
-		if(body.delete_all){
-			await this.schedulerService.submit_reports(reports, req.user.orcid_id, body.delete_all)
-		}else{
-			await this.schedulerService.submit_reports(reports, req.user.orcid_id, [])
+		if(response instanceof Error){
+			throw new InternalServerErrorException('An Error has occured when submitting the reports')
 		}
 
 		return {

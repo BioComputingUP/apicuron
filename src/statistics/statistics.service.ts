@@ -61,13 +61,13 @@ export class StatisticsService {
 				.map(({ resource_uri }) => resource_uri);
 
 			if (resource_uris && resource_uris.length > 0) {
-				query = { 
+				query = {
 					...query,
 					$or: [
 						// get both stats matching resource_uris and resource_ids
 						{
-							'stats.resource_uri': { 
-								$in: resource_uris 
+							'stats.resource_uri': {
+								$in: resource_uris
 							}
 						},
 						{
@@ -76,7 +76,7 @@ export class StatisticsService {
 							}
 						}
 					]
-					 
+
 				};
 			}
 		}
@@ -147,6 +147,29 @@ export class StatisticsService {
 				$match: {
 					resource_id,
 				},
+			},
+			{
+				$lookup: {
+					from: 'users',
+					localField: 'curator_orcid',
+					foreignField: 'orcid_id',
+					as: 'user'
+				}
+			},
+			{
+				$unwind: {
+					path: '$user'
+				}
+			},
+			{
+				$match: {
+					user: { $exists: true }
+				}
+			},
+			{
+				$project: {
+					user: 0
+				}
 			},
 			// sort by the total score
 			{

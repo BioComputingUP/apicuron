@@ -11,7 +11,7 @@ export class EmailModule {
     logger = new Logger(EmailModule.name)
     transporters: Transporters = {}
 
-    forRoot({ transportOptions, accounts }){
+    forRoot({ transportOptions, templates }){
 
         for(const transportName in transportOptions){
             const options = transportOptions[transportName];
