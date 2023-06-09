@@ -1,0 +1,20 @@
+<div class="tw-bg-white tw-rounded-md tw-shadow-md tw-px-4 tw-py-2 tw-h-full tw-flex tw-flex-col tw-overflow-hidden">
+    <h3 class="tw-text-gray-800 tw-font-dm-sans tw-text-xl tw-font-semibold tw-mb-2">
+        {{ term.name }}
+    </h3>
+    <span class="tw-text-sm tw-text-gray-400 tw-font-bold tw-font-dm-sans">{{ report.timestamp }}</span>
+    <p class="tw-text-gray-500 tw-font-medium tw-mb-4 tw-text-sm">{{ term.description }}</p>
+    <div class="tw-flex tw-flex-row tw-items-center tw-justify-between tw-mt-auto">
+        <div class="tw-flex tw-flex-row tw-items-center">
+            <div [title]="'score value for ' + term.name" [ngClass]="scoreColor()"
+                class="tw-rounded-full tw-h-5 tw-w-5 tw-flex tw-items-center tw-justify-center tw-mr-1">
+                <span class="tw-font-bold tw-text-xs tw-cursor-default">{{ term.score }}</span>
+            </div>
+            <!-- <span class="tw-text-gray-600">Score</span> -->
+        </div>
+        <div>
+            <span class="tw-text-sm tw-font-bold tw-rounded-full tw-px-2 tw-py-1" [ngClass]="categoryColor()">{{
+                term.category }}</span>
+        </div>
+    </div>
+</div>

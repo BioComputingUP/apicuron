@@ -1,0 +1,26 @@
+<div
+  class="tw-h-full tw-w-full tw-bg-white tw-m-auto tw-p-1 sm:tw-p-2 tw-flex tw-flex-col tw-rounded-r-lg tw-shadow-lg tw-border-l-4"
+  [ngStyle]="{ 'border-color': resource.color }">
+  <!-- top Title bar -->
+  <div class="tw-flex tw-flex-row tw-justify-between tw-w-full">
+    <span class="tw-block tw-text-lg tw-font-dm-sans">
+      <span class="tw-font-bold">{{ curator.displayedName }}</span>
+      {{ phrasing }}
+      <span class="tw-font-bold" [ngStyle]="{ color: resource.color }">{{
+        resource.resource_name
+        }} {{ statistics.total_count }} times </span>
+    </span>
+  </div>
+
+  <div class="tw-flex tw-flex-row">
+    <div class="tw-w-2/3">
+      <!-- reports list -->
+    </div>
+    <div class="tw-w-1/3 tw-p-1 tw-flex tw-flex-row tw-flex-wrap">
+      <div *ngFor="let reward of rewards" class="tw-w-full tw-px-1 tw-py-2">
+        <reward-card [icon_src]="reward.icon_src" [value_text]="reward.value_text" [label_text]="reward.label_text"
+          [color]="resource.color"></reward-card>
+      </div>
+    </div>
+  </div>
+</div>

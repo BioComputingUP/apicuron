@@ -1,14 +1,14 @@
 <form
-    class="tw-flex tw-flex-row tw-flex-wrap lg:tw-flex-nowrap tw-justify-between tw-bg-white tw-rounded-md tw-items-stretch tw-mx-auto tw-divide-y tw-divide-apicuron-purple 
-    tw-rounded-l-lg sm:tw-divide-y-0 tw-border tw-border-apicuron-purple sm:tw-border-0">
+    class="tw-flex tw-flex-row tw-flex-wrap lg:tw-flex-nowrap tw-justify-between tw-bg-white tw-rounded-md tw-items-stretch tw-mx-auto
+    tw-rounded-l-lg tw-border tw-border-apicuron-purple sm:tw-border-0">
     <div
-        class="tw-w-full tw-flex tw-my-1 tw-flex-col tw-pb-2 tw-px-2 tw-pt-1 tw-bg-white tw-overflow-y-visible md:tw-border-r tw-border-apicuron-purple lg:tw-w-min sm:tw-rounded-l-md">
+        class="tw-w-full tw-flex tw-my-1 tw-flex-col tw-pb-2 tw-px-2 tw-pt-1 tw-bg-white tw-overflow-y-visible md:tw-border-r tw-border-gray-200 lg:tw-w-min sm:tw-rounded-l-md">
         <span class="tw-text-gray-400 tw-uppercase" style="font-size: 0.60rem;">Resources</span>
         <div *ngIf="selected_resources$ | async as selected_resources" class="tw-flex tw-flex-row tw-items-center">
 
             <input #resourcesearch (input)="search_resource($event)" (focus)="search_resource($event)"
                 (keyup.enter)="add_resource($event.target.value)"
-                class="tw-outline-none sm:tw-border-b tw-border-apicuron-purple tw-flex-initial" type="text" name=""
+                class="tw-outline-none tw-flex-initial" type="text" name=""
                 id="" placeholder="Filter by resource">
             <div *ngFor="let resource of selected_resources"
                 class="tw-flex tw-flex-row tw-text-sm tw-py-1 tw-px-2 tw-text-gray-100 tw-bg-apicuron-purple tw-rounded-2xl tw-mr-1">
@@ -42,18 +42,22 @@
 
     </div>
     <div
-        class="tw-bg-white tw-my-1 tw-pb-2 tw-px-2 tw-pt-1 tw-border-0 sm:tw-border-r tw-border-apicuron-purple tw-items-stretch tw-flex-auto tw-flex tw-flex-col tw-justify-between">
+        class="tw-bg-white tw-my-1 tw-pb-2 tw-px-2 tw-pt-1 tw-border-0 sm:tw-border-r tw-border-gray-200 tw-items-stretch tw-flex-auto tw-flex tw-flex-col tw-justify-between">
         <span class="tw-text-gray-400 tw-uppercase" style="font-size: 0.60rem;">Search Field</span>
         <select [(ngModel)]="search_field" [ngModelOptions]="{standalone: true}"
-            class="tw-bg-white tw-text-apicuron-purple focus:tw-outline-none tw-pr-2 lg:tw-pr-4 sm:tw-border-b tw-border-apicuron-purple">
+            class="tw-bg-white tw-text-apicuron-purple focus:tw-outline-none tw-pr-2 lg:tw-pr-4">
             <option *ngFor="let item of search_fields" [ngValue]="item.field">
                 {{item.text}}</option>
         </select>
     </div>
 
-    <input class="tw-outline-none tw-my-2 tw-p-2 tw-flex-auto" type="search" name="search" id=""
+    <div class="tw-flex-auto tw-flex tw-flex-col tw-items-stretch tw-justify-between tw-pb-2 tw-px-2 tw-pt-1">
+        <span class="tw-text-gray-400 tw-uppercase" style="font-size: 0.60rem;">Search {{ currentField.text }}</span>
+        <input class="tw-outline-none tw-p-2 tw-flex-auto" type="search" name="search" id=""
         [(ngModel)]="search_text" [ngModelOptions]="{standalone: true}" placeholder="Search ..."
         (keyup.enter)="onSubmit()">
+
+    </div>
 
     <button
         class="tw-w-full sm:tw-w-auto tw-py-2 sm:tw-px-4 tw-bg-apicuron-bright-purple focus:tw-outline-none focus:tw-shadow-inner tw-text-gray-100 tw-rounded-b-md sm:tw-rounded-b-none sm:tw-rounded-r-md tw-px-2"

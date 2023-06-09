@@ -4,6 +4,7 @@ import { ActivatedRoute, ParamMap } from "@angular/router";
 import { catchError, map, pluck, share, shareReplay, switchMap } from "rxjs/operators";
 import { combineLatest, Observable } from "rxjs";
 import { CuratorPageService } from "src/app/curator/curator-page/curator-page.service";
+import { CuratorService } from "src/app/curator/curator.service";
 @Component({
   selector: "app-database-page",
   templateUrl: "./database-page.component.html",
@@ -23,7 +24,7 @@ export class DatabasePageComponent implements OnInit {
 
   constructor(
     private databaseService: DatabasesService,
-    private curatorpageService: CuratorPageService,
+    private curatorService: CuratorService,
     private route: ActivatedRoute
   ) {}
 
@@ -54,7 +55,7 @@ export class DatabasePageComponent implements OnInit {
       switchMap(({ data }: any) => {
         const users_stats$: Array<Observable<any>> = data.map(
           (stat) => {
-            return this.curatorpageService.get_curator(stat.curator_orcid).pipe(
+            return this.curatorService.get_curator(stat.curator_orcid).pipe(
               map((curator) => {
                 return { ...curator, stats: stat}
               })
