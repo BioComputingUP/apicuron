@@ -1,5 +1,6 @@
 import { Injectable, Logger, Inject } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose';
+import { StatisticsTerms } from '@prisma/client';
 import { Aggregate, Model } from 'mongoose';
 import { AchievementsService } from '../../achievements/achievements.service';
 import { UsersService } from '../../auth/users/users.service';
@@ -61,9 +62,9 @@ export class ComputeStatisticsTask {
                 user_report['terms'][i]['sum'] = term['score'] * term['count']
             }
 
-            const generation_terms = user_report.terms.filter(term => term.activity_category == 'generation')
-            const revision_terms = user_report.terms.filter(term => term.activity_category == 'revision')
-            const invalidation_terms = user_report.terms.filter(term => term.activity_category == 'invalidation')
+            const generation_terms: StatisticsTerms[] = user_report.terms.filter(term => term.activity_category == 'generation')
+            const revision_terms: StatisticsTerms[] = user_report.terms.filter(term => term.activity_category == 'revision')
+            const invalidation_terms: StatisticsTerms[] = user_report.terms.filter(term => term.activity_category == 'invalidation')
             // terms counts
             const generation_count = generation_terms.reduce((prev, curr) => prev + curr.count, 0)
             const revision_count = revision_terms.reduce((prev, curr) => prev + curr.count, 0)
@@ -74,7 +75,7 @@ export class ComputeStatisticsTask {
             const revision_score = revision_terms.reduce((prev, curr) => prev + curr['sum'], 0)
             const invalidation_score = invalidation_terms.reduce((prev, curr) => prev + curr['sum'], 0)
 
-            let stat_entry = {
+            let stat_entry: Statistics = {
                 curator_orcid: user_report._id,
                 resource_id,
                 resource_uri,
@@ -91,8 +92,11 @@ export class ComputeStatisticsTask {
                 ranking,
                 total_count: generation_count + revision_count + invalidation_count,
                 badges_count: await this.achievementsService.user_badge_count(resource_id, user_report._id),
-                medals_count: await this.achievementsService.user_medal_count(resource_id, user_report._id)
+                medals_count: await this.achievementsService.user_medal_count(resource_id, user_report._id),
+                privacy: await this.userService.user_exists(user_report._id) ? 'public' : 'private',
+                // type: 'contribution'
             }
+
 
             const update_promise = this.statModel.replaceOne({ curator_orcid: user_report._id, resource_id }, stat_entry, { upsert: true })
             updates_promises.push(update_promise)

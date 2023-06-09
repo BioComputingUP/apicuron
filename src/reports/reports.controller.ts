@@ -77,7 +77,12 @@ export class ReportsController {
 
 	@Get()
 	async get_reports(@Query() reportFilter: ReportFilterDto) {
-		return await this.reportService.get_reports(plainToInstance(ReportFilterDto, reportFilter));
+		const reportFilterInstance = plainToInstance(ReportFilterDto, reportFilter)
+		if(!reportFilterInstance.groupBy){
+			return await this.reportService.getReports(reportFilterInstance);
+		}else{
+			return await this.reportService.getGroupedReports(reportFilterInstance)
+		}
 	}
 
 	@Get('resource/:resource_id/orcid_id/:orcid_id')
@@ -94,7 +99,7 @@ export class ReportsController {
 			page,
 			page_size,
 		});
-		return await this.reportService.get_reports(reportFilter);
+		return await this.reportService.getReports(reportFilter);
 	}
 
 	@ApiOperation({

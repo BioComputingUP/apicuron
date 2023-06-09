@@ -10,6 +10,12 @@ export class UsersService {
 	private readonly userServiceLogger = new Logger(UsersService.name);
 	constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
+	public async user_exists(orcid_id: string): Promise<Boolean>{
+		return !! await this.userModel.exists({
+			orcid_id
+		})
+	}
+
 	async get_by_orcid(orcid_id: string): Promise<User> {
 		const user_promise = this.userModel.findOne({
 			orcid_id,

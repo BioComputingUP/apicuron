@@ -16,7 +16,7 @@ export class ReportFilterDto {
             User.name,
             ({orcid_id}) => { return { orcid_id } }
         ])
-    curator_orcid: string;
+    curator_orcid?: string;
 
     @IsOptional()
     @Validate(EntryExistsRule,
@@ -24,25 +24,25 @@ export class ReportFilterDto {
             PartnerResource.name,
             ({ resource_id }) => { return { resource_id }}
         ])
-    resource_id: string
+    resource_id?: string
 
     @IsOptional()
     @Validate(EntryExistsRule,[
         Report.name,
         ({ activity_term }) => { return { activity_term }}
     ])
-    activity_term: string
+    activity_term?: string
 
 
     @IsOptional()
-    entity_uri: string
+    entity_uri?: string
 
     // @Transform(({ value, obj }) => !obj.from && !obj.to ? 10 : value )
     @Transform(({ value }) => parseInt(value))
     @IsOptional()
     @IsInt()
     @Max(50)
-    page_size: number
+    page_size?: number
 
     get_page_size(): null | number{
         if(!this.page && !_.isEmpty(_.pick(this, ['from', 'to']))){
@@ -56,7 +56,7 @@ export class ReportFilterDto {
     @IsOptional()
     @IsInt()
     @Min(1)
-    page: number
+    page?: number
 
     get_page(): number{
         return this.page || 1
@@ -66,27 +66,27 @@ export class ReportFilterDto {
     @Transform(({ value }) => new Date(value))
     @MaxDate(() => new Date(), { message: 'maximal allowed date for $property is the current Date'})
     @Validate(DateBefore, ['to'])
-    from: Date
+    from?: Date
 
 
     @IsOptional()
     @Transform(({ value }) => new Date(value))
     @MaxDate(() => new Date(), { message: 'maximal allowed date for $property is the current Date'})
     @Validate(DateAfter, ['from'])
-    to: Date
+    to?: Date
 
     
     @IsOptional()
     @IsIn(['timestamp', 'resource_id', 'entity_uri', 'curator_orcid', 'activity_term'])
-    sortBy: string = 'timestamp'
+    sortBy?: 'timestamp'|'resource_id'|'entity_uri'|'curator_orcid'|'activity_term' = 'timestamp'
 
     @IsOptional()
     @IsIn(['asc', 'desc', -1, 1])
-    sortOrder: string | number = 'desc'
+    sortOrder?: 'asc' | 'desc' | 1 | -1 = 'desc'
 
     @IsOptional()
     @IsIn(['date', 'activity_term'])
-    groupBy:string
+    groupBy?: 'date' | 'activity_term'
 
     
 }

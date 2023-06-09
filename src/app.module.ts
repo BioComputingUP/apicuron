@@ -22,7 +22,7 @@ import { EntryExistsRule } from './shared/validators/entry-exists.validator';
 import { SchedulerClientModule } from './scheduler-client/scheduler-client.module';
 import { TransformInterceptor } from './shared/transformer/transform.interceptor';
 import { SentryInterceptor, SentryModule } from '@ntegral/nestjs-sentry';
-import { env } from 'process';
+import { EmailModule } from './email/email.module';
 
 @Module({
 	imports: [
@@ -81,6 +81,7 @@ import { env } from 'process';
 		NotificationsModule,
 		SchedulerModule,
 		SchedulerClientModule,
+		EmailModule,
 	],
 	controllers: [AppController],
 	providers: [

@@ -23,7 +23,7 @@ export class Statistics {
     generation_score: number;
 
     @Prop({ required: true })
-    generation_terms: [StatisticsTerms]
+    generation_terms: StatisticsTerms[]
     /// Multiple data types found: Float: 28.1%, Int: 71.9% out of 89 sampled entries
     @Prop({ required: true })
     invalidation_count: number;
@@ -33,7 +33,7 @@ export class Statistics {
     invalidation_score: number;
 
     @Prop({ required: true })
-    invalidation_terms: [StatisticsTerms]
+    invalidation_terms: StatisticsTerms[]
 
     @Prop({ required: true })
     medals_count: number;
@@ -56,13 +56,20 @@ export class Statistics {
     revision_score: number;
 
     @Prop({ required: true })
-    revision_terms: [StatisticsTerms]
+    revision_terms: StatisticsTerms[]
 
     @Prop({ required: false })
     total_count: number;
 
     @Prop({ required: true })
     total_score: number
+
+    @Prop({ required: true, default: "private" })
+    privacy?: "private" | "public"
+
+
+    @Prop({ required: true, default: "contribution" })
+    type?: "contribution" | "paid"
 }
 
 

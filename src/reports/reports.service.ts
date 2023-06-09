@@ -17,7 +17,7 @@ export class ReportsService {
 		@InjectModel(User.name) private userModel: Model<UserDocument>,
 		protected partnerResourcesService: PartnerResourcesService,
 		protected termsService: TermsService,
-	) {}
+	) { }
 
 	private checkOrcidId(orcid_id: string): Boolean {
 		// TODO: This needs to be implemented
@@ -98,69 +98,71 @@ export class ReportsService {
 		});
 	}
 
-	async get_reports(reportFilter: ReportFilterDto, with_terms = false) {
+	async getReports(reportFilter: ReportFilterDto, with_terms = false) {
 		const { resource_id } = reportFilter;
 		const { filter, options } = this.buildReportsQuery(reportFilter);
 
-		if (!reportFilter.groupBy) {
-			const reports = await this.reportModel.find(filter, {}, options).lean();
-			let data = reports;
+		const reports = await this.reportModel.find(filter, {}, options).lean();
+		let data = reports;
 
-			if (with_terms) {
-				const activity_term_list = [
-					...new Set(reports.map((report) => report.activity_term)),
-				];
+		if (with_terms) {
+			const activity_term_list = [
+				...new Set(reports.map((report) => report.activity_term)),
+			];
 
-				const terms_list = await this.termsService.get_terms(
-					activity_term_list,
-					resource_id,
+			const terms_list = await this.termsService.get_terms(
+				activity_term_list,
+				resource_id,
+			);
+
+			const reports_with_terms = reports.map((report) => {
+				report['term'] = terms_list.find(
+					(term) => term.activity_term == report.activity_term,
 				);
-
-				const reports_with_terms = reports.map((report) => {
-					report['term'] = terms_list.find(
-						(term) => term.activity_term == report.activity_term,
-					);
-					return report;
-				});
-				data = reports_with_terms;
-			}
-
-			const reports_count = await this.reportModel.count(filter);
-
-			return {
-				data,
-				total_count: reports_count,
-				page: reportFilter.page,
-				page_size: reportFilter.page_size,
-			};
-		} else {
-			const paginationPipeline = this.queryOptionsToPipeline(options);
-			const groupByAggregation = this.buildReportGroupAggregation(reportFilter.groupBy)
-
-			console.log(paginationPipeline)
-
-			const aggregationPipeline: PipelineStage[] = [
-				{ $match: filter },
-				...groupByAggregation,
-				...paginationPipeline
-			]
-			const data$ = this.reportModel.aggregate(aggregationPipeline);
-			const reports_count$ = this.reportModel.aggregate([
-				...aggregationPipeline.filter(stage => !stage['$limit']), // remove the stage that limits the data for counting
-				{ $count: 'total_count' }
-			]);
-			
-			const [data, reports_count] = await Promise.all([data$, reports_count$]);
-			return {
-				data,
-				total_count: reports_count[0]['total_count'],
-				page: reportFilter.get_page(),
-				page_size: reportFilter.get_page_size(),
-			};
+				return report;
+			});
+			data = reports_with_terms;
 		}
+
+		const reports_count = await this.reportModel.count(filter);
+
+		return {
+			data,
+			total_count: reports_count,
+			page: reportFilter.get_page(),
+			page_size: reportFilter.get_page_size(),
+		};
+
 	}
 
-	async report_statistics() {}
+	async getGroupedReports(reportFilter: ReportFilterDto) {
+		const { filter, options } = this.buildReportsQuery(reportFilter);
+
+		const paginationPipeline = this.queryOptionsToPipeline(options);
+		const groupByAggregation = this.buildReportGroupAggregation(reportFilter.groupBy)
+
+
+		const aggregationPipeline: PipelineStage[] = [
+			{ $match: filter },
+			...groupByAggregation,
+			...paginationPipeline
+		]
+		const data$ = this.reportModel.aggregate(aggregationPipeline);
+		const reports_count$ = this.reportModel.aggregate([
+			...aggregationPipeline.filter(stage => !stage['$limit']), // remove the stage that limits the data for counting
+			{ $count: 'total_count' }
+		]);
+
+		const [data, reports_count] = await Promise.all([data$, reports_count$]);
+		return {
+			data,
+			total_count: reports_count[0]['total_count'],
+			page: reportFilter.get_page(),
+			page_size: reportFilter.get_page_size(),
+		};
+	}
+
+	async report_statistics() { }
 
 	async all_reports_count() {
 		return await this.reportModel.count();
@@ -215,9 +217,9 @@ export class ReportsService {
 		};
 
 		// pagination objects
-		if(dto.get_page_size()){
+		if (dto.get_page_size()) {
 			options['limit'] = dto.get_page_size()
-			options['skip'] = (dto.get_page() - 1) * options['limit'];	
+			options['skip'] = (dto.get_page() - 1) * options['limit'];
 		}
 
 		return {
@@ -245,7 +247,7 @@ export class ReportsService {
 	}
 
 	private buildReportGroupAggregation(
-		groupBy: string,
+		groupBy: 'date' | 'activity_term',
 	): PipelineStage[] {
 		const converter = {
 			'date': [

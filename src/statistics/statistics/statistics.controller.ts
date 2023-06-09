@@ -70,7 +70,7 @@ export class StatisticsController {
 			return await this.statService.get_public_user_statistics(orcid_id)
 		}
 		const resource_ids = (req.user.resources || []).map(res => res.resource_id)
-		return await this.statService.get_all_user_statistics(orcid_id, resource_ids)
+		return await this.statService.get_all_user_statistics(orcid_id, resource_ids) 	
 
 	}
 
