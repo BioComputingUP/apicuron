@@ -14,7 +14,7 @@ export class ReportFilterDto {
     @Validate(EntryExistsRule, 
         [
             User.name,
-            ({orcid_id}) => { return { orcid_id } }
+            ({curator_orcid}) => { return { orcid_id: curator_orcid } }
         ])
     curator_orcid?: string;
 
