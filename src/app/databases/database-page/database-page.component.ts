@@ -56,7 +56,7 @@ export class DatabasePageComponent implements OnInit {
           (stat) => {
             return this.curatorpageService.get_curator(stat.curator_orcid).pipe(
               map((curator) => {
-                return { ...curator, stats: stat}
+                return { ...curator, stats: [stat]}
               })
             )
           }
