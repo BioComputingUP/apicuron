@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 
 import { AboutRoutingModule } from './about-routing.module';
 import { AboutComponent } from './about.component';
-// import { ScrollToModule } from '@nicky-lenaers/ngx-scroll-to';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 
 
@@ -13,7 +12,6 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
   ],
   imports: [
     CommonModule,
-    // ScrollToModule.forRoot(),
     AboutRoutingModule,
     AngularSvgIconModule
   ]

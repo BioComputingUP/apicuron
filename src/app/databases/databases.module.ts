@@ -7,7 +7,6 @@ import { DatabasesRoutingModule } from "./databases-routing.module";
 import { DatabasePageComponent } from "./database-page/database-page.component";
 import { CuratorModule } from "../curator/curator.module";
 import { SvgModule } from "../svg/svg.module";
-// import { ScrollToModule } from "@nicky-lenaers/ngx-scroll-to";
 import { DatabaseCreateComponent } from "./database-create/database-create.component";
 import { ReactiveFormsModule } from "@angular/forms";
 import { AuthModule } from "../auth/auth.module";
@@ -28,7 +27,6 @@ import { ListExpandComponent } from "../components/utils/list-expand/list-expand
     BadgeDefCardComponent,
     DatabasesRoutingModule,
     AuthModule,
-    // ScrollToModule,
     SvgModule,
     ResourceModule,
     RouterModule,
