@@ -30,6 +30,11 @@ export class Badge {
 	@Prop({
 		required: true,
 	})
+	resource_id: string;
+
+	@Prop({
+		required: true,
+	})
 	count: number;
 	@Prop({
 		required: true,

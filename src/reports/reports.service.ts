@@ -183,8 +183,13 @@ export class ReportsService {
 			'entity_uri',
 			'curator_orcid',
 			'resource_id',
-			'activity_term',
 		]);
+		if (dto.activity_terms && dto.activity_terms.length > 0) {
+			filter.activity_term = {
+				$in: dto.activity_terms
+			}
+		}
+
 
 		// timestamp filter object
 		// pick the keys from the dto and rename them if they're defined
@@ -221,7 +226,6 @@ export class ReportsService {
 			options['limit'] = dto.get_page_size()
 			options['skip'] = (dto.get_page() - 1) * options['limit'];
 		}
-
 		return {
 			filter,
 			options,

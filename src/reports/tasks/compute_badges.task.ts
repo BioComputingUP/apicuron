@@ -63,9 +63,12 @@ export class ComputeBadgesTask {
 
         let save_promises = []
 
+        // group reports by user
         for await (const user of user_reports) {
 
+            this.logger.log(`Computing Badges for user ${user._id.curator_orcid}`)
             badgesDef.forEach(badgeDef => {
+                this.logger.log(`   For Badge ${badgeDef.name}`)
                 // this.logger.log(`For Badge ${badgeDef.name}: terms count is ${badgeDef.list_terms.length}`)
                 // get the list of user contributions that are concerned by the current badge
                 const user_concerned_terms = user.terms.filter(term => {
@@ -73,13 +76,13 @@ export class ComputeBadgesTask {
                     return badgeDef.list_terms.includes(term.activity_term)
                 })
 
-                this.logger.log('User concerned terms: ', JSON.stringify(user_concerned_terms))
+                this.logger.log('       User concerned terms: ', JSON.stringify(user_concerned_terms))
                 // compute the terms sum to get the total number of contributions related to the current badge
                 const terms_count = user_concerned_terms.reduce((acc, curr) => {
                     return acc + curr.count
                 }, 0)
                 // this.logger.log(`user concerned terms: ${user_concerned_terms.length}`)
-                this.logger.log(`Terms count ${terms_count}, badge ${badgeDef.name} threshold ${badgeDef.count_threshold}`)
+                this.logger.log(`       Terms count ${terms_count}, badge ${badgeDef.name} threshold ${badgeDef.count_threshold}`)
 
                 // if the user has more contributions than the badge, he gets the badge
                 if(terms_count >= badgeDef.count_threshold){
@@ -94,7 +97,7 @@ export class ComputeBadgesTask {
                     })
                                         
                     save_promises.push(user_badge.save());
-                    this.logger.log(`User ${user._id.curator_orcid} earned ${badgeDef.name} badge`)
+                    this.logger.log(`       User ${user._id.curator_orcid} earned ${badgeDef.name} badge`)
                 }
 
 

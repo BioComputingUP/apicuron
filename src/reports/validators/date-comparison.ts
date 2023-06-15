@@ -11,17 +11,17 @@ import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface,
 @ValidatorConstraint({ name: "isBefore", async: false })
 export class DateBefore implements ValidatorConstraintInterface {
 
-    validate(propertyValue: string, args: ValidationArguments) {
-        if(args.object[args.constraints[0]]){
-          return new Date(propertyValue) < new Date(args.object[args.constraints[0]]);
-        }else{
-          return true
-        }
+  validate(propertyValue: string, args: ValidationArguments) {
+    if (args.object[args.constraints[0]]) {
+      return new Date(propertyValue) < new Date(args.object[args.constraints[0]]);
+    } else {
+      return true
     }
+  }
 
-    defaultMessage(args: ValidationArguments) {
-      return `"${args.property}" must be before "${args.constraints[0]}"`;
-    }
+  defaultMessage(args: ValidationArguments) {
+    return `"${args.property}" must be before "${args.constraints[0]}"`;
+  }
 }
 
 
@@ -29,12 +29,16 @@ export class DateBefore implements ValidatorConstraintInterface {
 @ValidatorConstraint({ name: "isAfter", async: false })
 export class DateAfter implements ValidatorConstraintInterface {
 
-    validate(propertyValue: string, args: ValidationArguments) {
-        return new Date(propertyValue) > new Date(args.object[args.constraints[0]]);
+  validate(propertyValue: string, args: ValidationArguments) {
+    if (args.object[args.constraints[0]]) {
+      return new Date(propertyValue) > new Date(args.object[args.constraints[0]]);
+    } else {
+      return true
     }
+  }
 
-    defaultMessage(args: ValidationArguments) {
-      return `"${args.property}" must be after "${args.constraints[0]}"`;
-    }
+  defaultMessage(args: ValidationArguments) {
+    return `"${args.property}" must be after "${args.constraints[0]}"`;
+  }
 }
 

@@ -52,6 +52,11 @@ export class Medal {
 	@Prop({
 		required: true,
 	})
+	resource_id: string;
+
+	@Prop({
+		required: true,
+	})
 	score_relative: number;
 
 	@Prop({
