@@ -3,7 +3,7 @@ import { Observable } from "rxjs";
 import { map, pluck } from "rxjs/operators";
 import { DatabasesService } from "../../databases/services/databases.service";
 import { environment } from "../../../environments/environment";
-
+import * as _ from 'lodash'
 type StatData = {
   resource_id: string;
   generation_score;
@@ -50,7 +50,7 @@ export class CuratorCardComponent implements OnInit {
   display_resources = true;
 
   single_resource() {
-    return !Array.isArray(this.biocurator["stats"]);
+    return !Array.isArray(this.biocurator["stats"]) || this.biocurator['stats'].length == 1;
   }
 
   // @Input() full_name: "Bouhraoua Kamel Eddine Adel";
@@ -62,6 +62,14 @@ export class CuratorCardComponent implements OnInit {
 
   get resources() {
     return this.biocurator.stats.map((x) => x.resource_id);
+  }
+
+  get badge_count() {
+    return _.map(this.biocurator.stats, 'badges_count').reduce((prev, curr) => prev + curr , 0)
+  }
+
+  get medal_count() {
+    return _.map(this.biocurator.stats, 'medals_count').reduce((prev, curr) => prev + curr , 0)
   }
 
   get generation_score() {
