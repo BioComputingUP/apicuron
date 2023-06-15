@@ -49,9 +49,9 @@ export class CuratorCardComponent implements OnInit {
   @Input()
   display_resources = true;
 
-  // single_resource() {
-  //   return !Array.isArray(this.biocurator["stats"]);
-  // }
+  single_resource() {
+    return !Array.isArray(this.biocurator["stats"]) || this.biocurator['stats'].length == 1;
+  }
 
   // @Input() full_name: "Bouhraoua Kamel Eddine Adel";
   // @Input() resources: ["disprot", "ped"];
