@@ -7,7 +7,7 @@ import {
 import { ReactiveFormsModule, FormsModule } from "@angular/forms";
 import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { ScrollToModule } from "@nicky-lenaers/ngx-scroll-to";
+// import { ScrollToModule } from "@nicky-lenaers/ngx-scroll-to";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { FootComponent } from "./foot/foot.component";
@@ -37,7 +37,7 @@ import * as Sentry from "@sentry/angular-ivy";
     AuthDropdownComponent,
     ToastrModule.forRoot(),
     IndexModule,
-    ScrollToModule.forRoot(),
+    // ScrollToModule.forRoot(),
     BrowserModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,

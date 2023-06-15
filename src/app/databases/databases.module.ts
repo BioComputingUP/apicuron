@@ -7,15 +7,14 @@ import { DatabasesRoutingModule } from "./databases-routing.module";
 import { DatabasePageComponent } from "./database-page/database-page.component";
 import { CuratorModule } from "../curator/curator.module";
 import { SvgModule } from "../svg/svg.module";
-import { ScrollToModule } from "@nicky-lenaers/ngx-scroll-to";
+// import { ScrollToModule } from "@nicky-lenaers/ngx-scroll-to";
 import { DatabaseCreateComponent } from "./database-create/database-create.component";
 import { ReactiveFormsModule } from "@angular/forms";
 import { AuthModule } from "../auth/auth.module";
 import { DatabasesService } from "./services/databases.service";
 import { TermCardComponent } from "../components/term-card/term-card.component";
-// import { TermListComponent } from "../components/term-list/term-list.component";
 import { BadgeDefCardComponent } from "../components/badge-def-card/badge-def-card.component";
-import { ListExpandComponent } from "../components/list-expand/list-expand.component";
+import { ListExpandComponent } from "../components/utils/list-expand/list-expand.component";
 @NgModule({
   declarations: [
     DatabasesPageComponent,
@@ -29,7 +28,7 @@ import { ListExpandComponent } from "../components/list-expand/list-expand.compo
     BadgeDefCardComponent,
     DatabasesRoutingModule,
     AuthModule,
-    ScrollToModule,
+    // ScrollToModule,
     SvgModule,
     ResourceModule,
     RouterModule,

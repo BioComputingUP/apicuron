@@ -1,4 +1,4 @@
-import { AfterContentInit, AfterViewInit, Component, ContentChild, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterContentInit, AfterViewInit, Component, ContentChild, ElementRef, HostListener, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { BehaviorSubject, Observable, fromEvent } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
@@ -15,7 +15,7 @@ import { RouterModule } from '@angular/router';
   selector: 'auth-dropdown',
   templateUrl: './auth-dropdown.component.html',
   styleUrls: ['./auth-dropdown.component.scss'],
-  imports:[AuthModule, CommonModule, RouterModule,
+  imports: [AuthModule, CommonModule, RouterModule,
     AngularSvgIconModule],
   standalone: true
 })

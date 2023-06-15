@@ -1,20 +1,35 @@
 import { CommonModule } from "@angular/common";
-import { Component, Input } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { Term } from "src/app/models/term.model";
-
+import { Report } from "src/app/models/report.model";
+import * as _ from "lodash";
 
 @Component({
     standalone: true,
     imports: [CommonModule],
     selector: 'report-card',
-    templateUrl: './report-card.component.ts'
+    templateUrl: './report-card.component.html'
 })
 export class ReportCardComponent {
-    
-    constructor() {}
+
+    constructor() {
+    }
 
     @Input() report: Report;
 
     @Input() term: Term;
-    
+
+    @Input() truncate_description: Boolean = true;
+
+
+    categoryColor() {
+        const converter = {
+            'tw-text-green-100 tw-bg-green-500': 'generation',
+            'tw-text-orange-100 tw-bg-orange-500': 'revision',
+            'tw-text-red-100 tw-bg-red-500': 'invalidation',
+        }
+
+        return _.mapValues(converter, (category) => category == this.term.category)
+    }
+
 }

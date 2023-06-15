@@ -1,26 +1,47 @@
 <div
-  class="tw-h-full tw-w-full tw-bg-white tw-m-auto tw-p-1 sm:tw-p-2 tw-flex tw-flex-col tw-rounded-r-lg tw-shadow-lg tw-border-l-4"
+  class="tw-h-full tw-w-full tw-bg-white tw-m-auto tw-p-1 sm:tw-p-2 tw-flex tw-flex-col tw-rounded-b-lg tw-shadow-lg tw-border-t-2 sm:tw-border-t-4"
   [ngStyle]="{ 'border-color': resource.color }">
   <!-- top Title bar -->
-  <div class="tw-flex tw-flex-row tw-justify-between tw-w-full">
-    <span class="tw-block tw-text-lg tw-font-dm-sans">
-      <span class="tw-font-bold">{{ curator.displayedName }}</span>
-      {{ phrasing }}
-      <span class="tw-font-bold" [ngStyle]="{ color: resource.color }">{{
-        resource.resource_name
-        }} {{ statistics.total_count }} times </span>
-    </span>
-  </div>
+  <div class="tw-flex tw-flex-row tw-w-full tw-items-center tw-justify-between sm:tw-justify-normal">
+    <span class="tw-font-bold tw-text-xl tw-font-dm-sans sm:tw-pr-2" [ngStyle]="{ color: resource.color }">{{
+      resource.resource_name }}</span>
+    <span class="tw-text-gray-500 tw-font-bold tw-font-dm-sans tw-text-sm">{{
+      resource.resource_long_name
+      }}</span>
 
-  <div class="tw-flex tw-flex-row">
-    <div class="tw-w-2/3">
-      <!-- reports list -->
+    <button class="tw-ml-auto tw-text-sm hover:tw-underline tw-font-thin tw-text-blue-500 hover:tw-text-blue-600"
+      (click)="open_details = true">
+      View Details
+    </button>
+  </div>
+  <div class="tw-flex tw-flex-row tw-flex-wrap">
+    <!-- Latest Contributions List -->
+    <div
+      class="tw-w-full sm:tw-w-3/4 tw-flex tw-flex-row tw-content-start tw-flex-wrap tw-order-last sm:tw-order-first">
+      <div class="tw-w-full">
+        <span class="tw-text-sm tw-font-bold tw-text-gray-500">{{ curator.displayedName }}'s Latest Contributions</span>
+      </div>
+      <ng-container *ngIf="reportsWithTerms$ | async as reports">
+        <div class="tw-w-1/2 sm:tw-w-1/3 tw-p-2" *ngFor="let report of reports">
+          <report-card [term]="report.term" [report]="report.report"></report-card>
+        </div>
+      </ng-container>
     </div>
-    <div class="tw-w-1/3 tw-p-1 tw-flex tw-flex-row tw-flex-wrap">
-      <div *ngFor="let reward of rewards" class="tw-w-full tw-px-1 tw-py-2">
+
+    <!-- rewards list -->
+    <div
+      class="tw-w-full sm:tw-w-1/4 tw-px-1 tw-flex tw-flex-row sm:tw-flex-col tw-justify-stretch tw-order-first sm:tw-order-last tw-flex-wrap sm:tw-flex-nowrap">
+      <div class="tw-w-full">
+        <span class="tw-text-sm tw-font-bold tw-text-gray-500">Rewards and scores</span>
+      </div>
+      <div *ngFor="let reward of rewards" class="sm:tw-w-full tw-w-1/2 tw-px-1 tw-py-2">
         <reward-card [icon_src]="reward.icon_src" [value_text]="reward.value_text" [label_text]="reward.label_text"
           [color]="resource.color"></reward-card>
       </div>
     </div>
   </div>
 </div>
+
+<slide-over-panel [(openPanel)]="open_details">
+  <curator-stat-details [curator]="curator" [resource]="resource" [terms]="terms$ | async" ></curator-stat-details>
+</slide-over-panel>

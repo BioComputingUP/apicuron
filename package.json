@@ -31,7 +31,6 @@
     "@angular/router": "^14.2.3",
     "@compodoc/compodoc": "^1.1.19",
     "@ngneat/tailwind": "^7.0.3",
-    "@nicky-lenaers/ngx-scroll-to": "^9.0.0",
     "@sentry/angular-ivy": "^7.53.1",
     "@types/lodash": "^4.14.194",
     "anchor-js": "^4.3.1",

@@ -1,0 +1,109 @@
+<div class="tw-flex tw-h-full tw-flex-col tw-overflow-y-hidden tw-bg-gray-100 tw-py-6 tw-shadow-xl">
+    <div class="tw-px-2 sm:tw-px-6">
+        <h2 class="tw-text-base tw-font-semibold tw-leading-6 tw-text-gray-900" id="slide-over-title">
+            {{ curator.displayedName }}'s Contributions to
+            <span [ngStyle]="{ color: resource.color }">{{
+                resource.resource_name
+                }}</span>
+        </h2>
+    </div>
+    <div class="tw-relative tw-mt-6 tw-px-4 sm:tw-px-6">
+        <form [formGroup]="form" class="tw-shadow-md tw-flex tw-flex-row sm:tw-p-1 tw-bg-white">
+            <div class="tw-w-1/6 tw-flex tw-flex-col tw-items-start tw-pr-2">
+                <span class="tw-text-sm tw-font-bold tw-tracking-wide tw-text-gray-700">From</span>
+                <input type="date" name="" id="" class="tw-w-full tw-h-6 tw-grow focus:tw-outline-none"
+                    formControlName="from">
+            </div>
+            <div class="tw-w-1/6 tw-flex tw-flex-col tw-items-start tw-pr-2">
+                <span class="tw-text-sm tw-font-bold tw-tracking-wide tw-text-gray-700">To</span>
+                <input type="date" name="" id="" class="tw-w-full tw-h-6 tw-grow focus:tw-outline-none"
+                    formControlName="to">
+            </div>
+            <div class="tw-w-1/3 tw-flex tw-flex-col tw-items-start tw-pr-2">
+                <span class="tw-text-sm tw-font-bold tw-tracking-wide tw-text-gray-700">Filter By Activity</span>
+                <select-multiple class="tw-w-full" [completeSet]="itemizedTerms" formControlName="activity_terms"
+                    hintText="Select Activities to filter By"></select-multiple>
+            </div>
+            <div class="tw-w-1/6 tw-flex tw-flex-col tw-items-start">
+                <span class="tw-text-sm tw-font-bold tw-tracking-wide tw-text-gray-700">Sort By</span>
+                <select name="" id="" class="tw-bg-white tw-p-1 tw-text-gray-700 tw-grow focus:tw-outline-none"
+                    formControlName="sortBy">
+                    <option class="tw-text-sm tw-tracking-wide tw-text-gray-700 tw-whitespace-break-spaces tw-bg-white"
+                        *ngFor="let field of sortFields" [value]="field.value" [selected]="field.value == 'timestamp'">
+                        {{ field.text }}</option>
+                </select>
+            </div>
+            <div class="tw-w-1/6 tw-flex tw-flex-col tw-items-start">
+                <span class="tw-text-sm tw-font-bold tw-tracking-wide tw-text-gray-700">Sort Order</span>
+                <select name="" id="" class="tw-bg-white tw-p-1 tw-text-gray-700 tw-grow focus:tw-outline-none"
+                    formControlName="sortOrder">
+                    <option class="tw-text-sm tw-tracking-wide tw-text-gray-700 tw-whitespace-break-spaces"
+                        value="desc">
+                        Decending</option>
+                    <option class="tw-text-sm tw-tracking-wide tw-text-gray-700 tw-whitespace-break-spaces" value="asc">
+                        Ascending</option>
+
+                </select>
+
+            </div>
+        </form>
+    </div>
+
+    <div class="tw-relative tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-pt-4 tw-px-2 sm:tw-px-6"
+        *ngIf="reportsWithTerms$ | async as filteredReports">
+
+        <!-- <div class="tw-overflow-x-auto">
+            <table class="tw-min-w-full tw-divide-y-2 tw-divide-gray-200 tw-bg-white tw-text-sm">
+                <thead class="ltr:tw-text-left rtl:tw-text-right">
+                    <tr>
+                        <th class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-font-medium tw-text-gray-900">
+                            Activity
+                        </th>
+                        <th class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-font-medium tw-text-gray-900">
+                            Date
+                        </th>
+                        <th class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-font-medium tw-text-gray-900">
+                            Role
+                        </th>
+                        <th class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-font-medium tw-text-gray-900">
+                            Salary
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody class="tw-divide-y tw-divide-gray-200">
+                    <tr>
+                        <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-font-medium tw-text-gray-900">
+                            John Doe
+                        </td>
+                        <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-text-gray-700">24/05/1995</td>
+                        <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-text-gray-700">Web Developer</td>
+                        <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-text-gray-700">$120,000</td>
+                    </tr>
+
+                    <tr>
+                        <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-font-medium tw-text-gray-900">
+                            Jane Doe
+                        </td>
+                        <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-text-gray-700">04/11/1980</td>
+                        <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-text-gray-700">Web Designer</td>
+                        <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-text-gray-700">$100,000</td>
+                    </tr>
+
+                    <tr>
+                        <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-font-medium tw-text-gray-900">
+                            Gary Barlow
+                        </td>
+                        <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-text-gray-700">24/05/1995</td>
+                        <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-text-gray-700">Singer</td>
+                        <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-text-gray-700">$20,000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div> -->
+        <div class="tw-w-1/4 tw-p-1" *ngFor="let entry of filteredReports.data">
+            <report-card [term]="entry.term" [report]="entry.report"></report-card>
+        </div>
+
+    </div>
+</div>

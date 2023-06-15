@@ -1,10 +1,11 @@
+import * as moment from "moment";
 import { Deserializable } from "src/app/interfaces/deserializable.model";
 import { Term } from "src/app/models/term.model";
 
 
 export class Report implements Deserializable {
     deserialize(input: any): this {
-        this.name = input.activity_name
+        this.name = input.activity_term
         this.activity_term = input.activity_term
         this.term = input.term || null
         this.timestamp = new Date(input.timestamp)
@@ -13,6 +14,11 @@ export class Report implements Deserializable {
         this.entity_uri = input.entity_uri
         
         return this
+    }
+
+    get formattedDate () {
+        const dateTime = moment(this.timestamp)
+        return dateTime.format('MMMM Do YYYY, h:mm:ss a');
     }
 
     name: string

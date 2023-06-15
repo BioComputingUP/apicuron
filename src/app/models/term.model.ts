@@ -26,6 +26,13 @@ export class Term implements Deserializable {
         return this
     }
 
+    itemize(){
+        return {
+            value: this.activity_term,
+            text: this.activity_name
+        }
+    }
+
     get name() {
         return this.activity_name
     }

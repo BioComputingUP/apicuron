@@ -14,6 +14,7 @@
         </button>
     </div>
     <div (mouseleave)="auth_dropdown = false"
+        (focusout)="auth_dropdown = false"
         [ngClass]="{'tw-visible tw-opacity-100': auth_dropdown, 'tw-invisible tw-opacity-0': !auth_dropdown}"
         class="tw-absolute tw-left-0 sm:tw-left-auto sm:tw-right-0 tw-z-10 tw-mt-2 tw-w-full tw-min-w-max tw-origin-top-right tw-rounded-md tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none tw-transition-opacity tw-duration-200"
         role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
