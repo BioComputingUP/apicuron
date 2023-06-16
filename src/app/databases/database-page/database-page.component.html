@@ -110,7 +110,7 @@
                 <span class="tw-uppercase tw-text-gray-500 tw-text-xs tw-font-bold">Leaderboard</span>
                 <div class="tw-flex tw-flex-col">
                     <div class="tw-pb-2" *ngFor="let biocurator of leaderboard">
-                        <curator-card [vertical]="false" [biocurator]="biocurator" [display_resources]="false"
+                        <curator-card [vertical]="false" [biocurator]="biocurator" [display_resources]="false" [display_achievement_counts]="true"
                             [display_scores]="false"></curator-card>
                     </div>
                 </div>

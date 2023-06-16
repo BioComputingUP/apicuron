@@ -47,6 +47,9 @@ export class CuratorCardComponent implements OnInit {
   display_scores = true;
 
   @Input()
+  display_achievement_counts = false;
+
+  @Input()
   display_resources = true;
 
   single_resource() {
