@@ -40,6 +40,10 @@ export class CuratorPageComponent implements OnInit {
     this.statsWithResource$ = this.curatorPageService.getStatisticsWithResource();
   }
 
+  // getResourceMedals(resource_id) {
+  //   return this.curatorPageService.getResourceMedals(resource_id)
+  // }
+
 
   
   ngOnInit() { }

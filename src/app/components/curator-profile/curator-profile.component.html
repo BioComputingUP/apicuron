@@ -49,7 +49,17 @@
     </table> -->
     <ng-container *ngIf="(keywords$ | async) || (profileLinks$ | async) || (biography$ | async)">
         <div class="tw-grid tw-grid-cols-1 tw-gap-4 tw-mb-2">
-            <div *ngIf="keywords$ | async as keywords" class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
+            <div *ngIf="biography$ | async as biography"
+                class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
+                <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Biography</div>
+                <div class="tw-ml-2">
+                    <p class="tw-leading-relaxed tw-tracking-wider tw-text-justify tw-text-sm sm:tw-text-base">
+                        {{ biography }}
+                    </p>
+                </div>
+            </div>
+            <div *ngIf="keywords$ | async as keywords"
+                class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
                 <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Keywords</div>
                 <div class="tw-ml-2 tw-flex tw-flex-row tw-flex-wrap tw-gap-3 tw-items-center">
                     <span *ngFor="let keyword of keywords"
@@ -58,7 +68,8 @@
                     </span>
                 </div>
             </div>
-            <div *ngIf="profileLinks$ | async as orcid_links" class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
+            <div *ngIf="profileLinks$ | async as orcid_links"
+                class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
                 <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Social Links</div>
                 <div class="tw-ml-2">
                     <a *ngFor="let url of orcid_links"
@@ -68,14 +79,7 @@
                     </a>
                 </div>
             </div>
-            <div *ngIf="biography$ | async as biography" class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
-                <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Biography</div>
-                <div class="tw-ml-2">
-                    <p class="tw-leading-relaxed tw-tracking-wider tw-text-justify tw-text-sm sm:tw-text-base">
-                        {{ biography }}
-                    </p>
-                </div>
-            </div>
+
         </div>
     </ng-container>
 </div>

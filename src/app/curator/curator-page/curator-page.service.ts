@@ -27,6 +27,9 @@ import { ResourcesService } from "src/app/resource/service/resources.service";
 import { Resource } from "src/app/models/resource.model";
 import { User } from "src/app/models/User";
 import { CuratorService } from "src/app/curator/curator.service";
+import { MedalsService } from "src/app/achievements/services/medals.service";
+import { Medal } from "../../models/medal.model";
+import _ from "lodash";
 
 export interface StatisticsWithResource {
   resource: Resource,
@@ -43,12 +46,15 @@ export class CuratorPageService {
   resources$: Observable<Resource[]>;
   statistics$: Observable<CuratorStatistics[]>;
   statisticsWithResource$: Observable<StatisticsWithResource[]>;
+  resourceIds$: Observable<string[]>;
+  medals$: Observable<any[]>;
 
   constructor(
     private http: HttpClient,
     private resources: ResourcesService,
     private curatorStatistics: CuratorStatisticsService,
-    private curatorService: CuratorService
+    private curatorService: CuratorService,
+    private medalsService: MedalsService
   ) {
     // load statistics
   }
@@ -62,13 +68,36 @@ export class CuratorPageService {
     // loading the statistics
     this.statistics$ = this.load_statistics(orcid_id$)
 
+    this.resourceIds$ = this.statistics$.pipe(
+      // extract to list of resource_ids
+      map((stats: CuratorStatistics[]) => stats.map((stat) => stat.resource_id))
+    )
+
     // load resources using statistics
-    this.resources$ = this.resources_from_statstics(this.statistics$)
+    this.resources$ = this.loadResources(this.resourceIds$)
 
     // load statistics with resources grouped 
     this.statisticsWithResource$ = this.combine_resources_statistics(this.resources$, this.statistics$)
+
+    // Load Medals for resources
+    // this.medals$ = this.curator$.pipe(
+    //   switchMap((curator: User) => {
+    //     return this.medalsService.getCuratorMedals({ curator_orcid: curator.orcid_id }).pipe(shareReplay(1))
+    //   }),
+    // )
+
+    // debugger;
+
   }
-  
+
+  // public getResourceMedals(resource_id: string) {
+  //   return this.medals$.pipe(
+  //     map((medals: Medal[]) => {
+  //       return medals.filter((medal:Medal) => medal.resource_id == resource_id)
+  //     })
+  //   )
+  // }
+
 
   public getCurator() {
     return this.curator$;
@@ -126,17 +155,7 @@ export class CuratorPageService {
     );
   }
 
-  private resources_from_statstics(
-    curatorStatistics$: Observable<CuratorStatistics[]>
-  ): Observable<Resource[]> {
-    // extract resource_id array
-    const resourceIds$: Observable<string[]> = curatorStatistics$.pipe(
-      map((curator_statistics: CuratorStatistics[]) => {
-        return curator_statistics.map(
-          (curator_statistic) => curator_statistic.resource_id
-        );
-      })
-    );
+  private loadResources(resourceIds$: Observable<string[]>): Observable<Resource[]> {
 
     // use resource_id array to load resources
     return resourceIds$.pipe(

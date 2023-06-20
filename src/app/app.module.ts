@@ -44,7 +44,7 @@ import * as Sentry from "@sentry/angular-ivy";
     AngularSvgIconModule.forRoot(),
   ],
   providers: [
-    // Sentry ErrorHandler and Tracer Setup 
+    // *** Sentry ErrorHandler and Tracer Setup ***
     {
       provide: ErrorHandler,
       useValue: Sentry.createErrorHandler({
@@ -61,7 +61,8 @@ import * as Sentry from "@sentry/angular-ivy";
       deps: [Sentry.TraceService],
       multi: true,
     },
-    // end of sentry setup
+    // *** end of sentry setup ***
+
   ],
   bootstrap: [AppComponent],
   exports: [RouterModule],

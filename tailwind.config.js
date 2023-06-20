@@ -34,7 +34,6 @@ module.exports = {
     extend: {},
   },
   plugins: [
-    require('@tailwindcss/typography'),
-    require('preline/plugin')
+    require('@tailwindcss/typography')
   ],
 };

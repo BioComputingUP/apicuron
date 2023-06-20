@@ -7,7 +7,6 @@ import { CuratorSearchComponent } from './curator-search/curator-search.componen
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CuratorPageComponent } from './curator-page/curator-page.component';
 import { SvgModule } from '../svg/svg.module';
-// import { CuratorStatComponent } from './curator-stat/curator-stat.component';
 import { PaginationComponent } from '../pagination/pagination.component';
 import { CuratorService } from './curator.service';
 import { CuratorPageService } from './curator-page/curator-page.service';
@@ -15,6 +14,7 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
 import { CuratorProfileComponent } from '../components/curator-profile/curator-profile.component';
 import { CuratorStatCardComponent } from 'src/app/components/curator-stat-card/curator-stat-card.component';
 import { CuratorStatisticsModule } from 'src/app/curator-statistics/curator-statistics.module';
+import { AchievementsModule } from 'src/app/achievements/achievements.module';
 
 @NgModule({
   declarations: [
@@ -22,7 +22,6 @@ import { CuratorStatisticsModule } from 'src/app/curator-statistics/curator-stat
     CuratorsPageComponent,
     CuratorSearchComponent,
     CuratorPageComponent,
-    // CuratorStatComponent,
     PaginationComponent
   ],
   imports: [
@@ -30,6 +29,7 @@ import { CuratorStatisticsModule } from 'src/app/curator-statistics/curator-stat
     CuratorProfileComponent,
     CuratorStatCardComponent,
     CommonModule,
+    AchievementsModule,
     CuratorStatisticsModule,
     FormsModule,
     AngularSvgIconModule,

@@ -19,6 +19,14 @@ import { CuratorStatDetailsComponent } from "../curator-stat-details/curator-sta
 import { SlideOverPanelComponent } from "../utils/slide-over-panel/slide-over-panel.component";
 import { FormBuilder } from "@angular/forms";
 import { MultipleSelectComponent } from "../utils/multiple-select/mutliple-select.component";
+import { Medal } from '../../models/medal.model'
+import { MedalCardComponent } from "src/app/components/medal-card/medal-card.component";
+import { AchievementsModule } from "src/app/achievements/achievements.module";
+import { MedalsService } from "src/app/achievements/services/medals.service";
+import { AchievementFilter } from "src/app/achievements/interfaces/achievement-filter";
+import { BadgeCardComponent } from "src/app/components/badge-card/badge-card.component";
+import { BadgesService } from "src/app/achievements/services/badges.service";
+import { Badge } from "src/app/models/badge.model";
 @Component({
   selector: "curator-stat-card",
   standalone: true,
@@ -31,6 +39,9 @@ import { MultipleSelectComponent } from "../utils/multiple-select/mutliple-selec
     CuratorStatDetailsComponent,
     SlideOverPanelComponent,
     MultipleSelectComponent,
+    MedalCardComponent,
+    AchievementsModule,
+    BadgeCardComponent
   ],
   templateUrl: "./curator-stat-card.component.html",
   styleUrls: ["./curator-stat-card.component.scss"],
@@ -39,17 +50,20 @@ export class CuratorStatCardComponent implements OnInit {
   terms$: Observable<Object>;
   reportsWithTerms$: Observable<{ report: Report; term: Term }[]>;
   detailForm: any;
+  badges$: Observable<Badge[]>;
 
   constructor(
     protected reportsService: ReportsService,
     protected termService: TermsService,
-    protected formBuilder: FormBuilder
+    protected formBuilder: FormBuilder,
+    protected medalService: MedalsService,
+    protected badgeService: BadgesService
   ) {}
 
   reports$: Observable<PaginatedReports>;
 
-  open_details: Boolean = true;
-
+  open_details: Boolean = false;
+  medals$: Observable<Medal[]>;
   
 
   ngOnInit(): void {
@@ -59,7 +73,7 @@ export class CuratorStatCardComponent implements OnInit {
       curator_orcid: this.curator.orcid_id,
       sortBy: "timestamp",
       sortOrder: "asc",
-      page_size: 9,
+      page_size: 6,
     });
     this.reports$ = this.reportsService
       .getReports(reportFilter)
@@ -81,17 +95,20 @@ export class CuratorStatCardComponent implements OnInit {
         });
       })
     );
+    const filter = AchievementFilter.create({
+      curator_orcid: this.curator.orcid_id,
+      resource_id: this.resource.resource_id,
+      page_size: 4
+    })
+    this.medals$ = this.medalService.getMedals(filter.serialize())
 
-    // this.detailForm = this.formBuilder.group({
-    //   resource_id: [this.resource.resource_id],
-    //   curator_orcid: [this.curator.orcid_id],
-    //   sortBy
-    // })
+    this.badges$ = this.badgeService.getBadges(filter.serialize())
   }
 
   @Input() statistics: CuratorStatistics;
   @Input() resource: Resource;
   @Input() curator: User;
+  @Input() medals: Medal[]
 
   get curatorStats(): CuratorStatistics {
     return this.statistics;
@@ -135,15 +152,8 @@ export class CuratorStatCardComponent implements OnInit {
         color: this.resource.color,
         value_text: stat.invalidation_count,
         label_text: "Invalidation Events",
-      },
-      {
-        icon_src: "assets/svg/score.svg",
-        color: this.resource.color,
-        value_text: stat.total_score,
-        label_text: "Total Score",
-      },
+      }
     ];
-    // return contribution_stats.filter((s) => s.value_text > 0);
     return contribution_stats;
   }
 }
