@@ -21,6 +21,12 @@ export class Report implements Deserializable {
         return dateTime.format('MMMM Do YYYY, h:mm:ss a');
     }
 
+    formatDate(type: 'dateTime' | 'date'){
+        const dateTime = moment(this.timestamp)
+        return type == 'dateTime' ? dateTime.format('MMMM Do YYYY, h:mm:ss a') : dateTime.format('MMMM Do YYYY')
+    }
+
+
     name: string
     activity_term: string
     term?: Term

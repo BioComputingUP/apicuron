@@ -4,15 +4,18 @@
   <!-- top Title bar -->
   <div class="tw-flex tw-flex-row tw-w-full tw-flex-wrap sm:tw-flex-nowrap tw-items-center tw-justify-between">
     <div class="tw-flex tw-flex-row tw-items-center">
-      <span class="tw-font-bold tw-text-lg sm:tw-text-xl tw-font-dm-sans sm:tw-pr-2" [ngStyle]="{ color: resource.color }">{{
+      <span class="tw-font-bold tw-text-lg sm:tw-text-xl tw-font-dm-sans sm:tw-pr-2"
+        [ngStyle]="{ color: resource.color }">{{
         resource.resource_name }}</span>
-      <span class="tw-block tw-text-gray-500 tw-font-bold tw-font-dm-sans tw-text-xs sm:tw-text-sm tw-ml-1 sm:tw-ml-0 tw-align-middle">{{
+      <span
+        class="tw-block tw-text-gray-500 tw-font-bold tw-font-dm-sans tw-text-xs sm:tw-text-sm tw-ml-1 sm:tw-ml-0 tw-align-middle">{{
         resource.resource_long_name
         }}</span>
 
     </div>
 
-    <div class="sm:tw-grow tw-flex tw-flex-row tw-flex-wrap tw-justify-center sm:tw-justify-normal tw-w-full sm:tw-w-3/4">
+    <div
+      class="sm:tw-grow tw-flex tw-flex-row tw-flex-wrap tw-justify-center sm:tw-justify-normal tw-w-full sm:tw-w-3/4">
       <div *ngFor="let reward of rewards" class="tw-px-1 tw-py-2 tw-w-1/5">
         <reward-card [icon_src]="reward.icon_src" [value_text]="reward.value_text" [label_text]="reward.label_text"
           [color]="resource.color"></reward-card>
@@ -24,30 +27,38 @@
     </button> -->
   </div>
   <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-start">
-    <div class="tw-w-full"><span class="tw-font-bold tw-text-gray-500 tw-font-dm-sans tw-capitalize tw-text-sm">{{ curator.displayedName }}'s Earned Medals</span></div>
+    <div class="tw-w-full tw-flex tw-flex-row tw-justify-between">
+      <span class="tw-font-bold tw-text-gray-500 tw-font-dm-sans tw-capitalize tw-text-sm">{{
+        curator.displayedName }}'s Earned Medals</span>
+        <button class="tw-text-sm tw-text-blue-500 tw-underline " (click)="open_medal_details = true">View
+          Details</button>
+    </div>
     <div *ngFor="let medal of (medals$ | async)" class="tw-w-1/2 sm:tw-w-1/4 tw-p-1">
       <medal-card [medal]="medal"></medal-card>
     </div>
   </div>
   <div class="tw-flex tw-flex-row tw-flex-wrap">
     <!-- Badges list -->
-    <div
-      class="tw-w-full sm:tw-w-1/2 tw-flex tw-flex-col tw-content-start tw-px-1 tw-py-2">
-      <div class="tw-w-full">
+    <div class="tw-w-full sm:tw-w-1/2 tw-flex tw-flex-col tw-content-start tw-px-1 tw-py-2">
+      <div class="tw-w-full tw-flex tw-flex-row tw-justify-between">
         <span class="tw-text-sm tw-font-bold tw-text-gray-500">{{ curator.displayedName }}'s Earned Badges</span>
+        <button class="tw-text-sm tw-text-blue-500 tw-underline " (click)="open_badge_details = true">View
+          Details</button>
+
       </div>
-      <div class="tw-w-full tw-flex tw-flex-row tw-items-stretch tw-grow tw-flex-wrap" *ngIf="badges$ | async as badges">
+      <div class="tw-w-full tw-flex tw-flex-row tw-items-stretch tw-grow tw-flex-wrap"
+        *ngIf="badges$ | async as badges">
         <div class="tw-w-1/2 tw-p-2" *ngFor="let badge of badges">
           <badge-card [badge]="badge" [terms]="(terms$ | async)"></badge-card>
         </div>
       </div>
-      
+
     </div>
     <!-- Latest Contributions List -->
-    <div
-      class="tw-w-full sm:tw-w-1/2 tw-flex tw-flex-row tw-content-start tw-flex-wrap tw-px-1 tw-py-2">
+    <div class="tw-w-full sm:tw-w-1/2 tw-flex tw-flex-row tw-content-start tw-flex-wrap tw-px-1 tw-py-2">
       <div class="tw-w-full tw-flex tw-flex-row tw-justify-between">
-        <span class="tw-text-sm tw-font-bold tw-text-gray-500 tw-font-dm-sans tw-capitalize">{{ curator.displayedName }}'s Latest Contributions</span>
+        <span class="tw-text-sm tw-font-bold tw-text-gray-500 tw-font-dm-sans tw-capitalize">{{ curator.displayedName
+          }}'s Latest Contributions</span>
         <button class="tw-text-sm tw-text-blue-500 tw-underline " (click)="open_details = true">View Details</button>
       </div>
 
@@ -58,10 +69,24 @@
       </ng-container>
     </div>
 
-    
+
   </div>
 </div>
 
 <slide-over-panel [(openPanel)]="open_details">
   <curator-stat-details [curator]="curator" [resource]="resource" [terms]="terms$ | async"></curator-stat-details>
+</slide-over-panel>
+
+
+<slide-over-panel [(openPanel)]="open_badge_details">
+  <div class="tw-w-full tw-h-full tw-bg-white">
+    Hello world !
+  </div>
+</slide-over-panel>
+
+
+<slide-over-panel [(openPanel)]="open_medal_details">
+  <div class="tw-w-full tw-h-full tw-bg-white">
+    Hello world !
+  </div>
 </slide-over-panel>

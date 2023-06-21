@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import { Deserializable } from "../interfaces/deserializable.model";
 
 
@@ -24,6 +25,16 @@ export class Term implements Deserializable {
         this.resource_id = input.resource_id
 
         return this
+    }
+
+    categoryColor() {
+        const converter = {
+            'tw-text-green-100 tw-bg-green-500': 'generation',
+            'tw-text-orange-100 tw-bg-orange-500': 'revision',
+            'tw-text-red-100 tw-bg-red-500': 'invalidation',
+        }
+
+        return _.mapValues(converter, (category) => category == this.category)
     }
 
     itemize(){

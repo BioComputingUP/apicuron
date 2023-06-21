@@ -10,13 +10,14 @@ import { AuthModule } from '../../auth/auth.module';
 import { NotificationService } from '../../notifications-data/notification.service';
 import { Notification } from '../../notifications-data/models/Notification'
 import { RouterModule } from '@angular/router';
+import { NgxPopperModule } from 'ngx-popper';
 // import { NotificationsDataModule } from '../../notifications-data/notifications-data.module';
 @Component({
   selector: 'auth-dropdown',
   templateUrl: './auth-dropdown.component.html',
   styleUrls: ['./auth-dropdown.component.scss'],
   imports: [AuthModule, CommonModule, RouterModule,
-    AngularSvgIconModule],
+    AngularSvgIconModule, NgxPopperModule],
   standalone: true
 })
 export class AuthDropdownComponent {

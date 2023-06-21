@@ -63,6 +63,8 @@ export class CuratorStatCardComponent implements OnInit {
   reports$: Observable<PaginatedReports>;
 
   open_details: Boolean = false;
+  open_badge_details: Boolean = false;
+  open_medal_details: Boolean = false;
   medals$: Observable<Medal[]>;
   
 

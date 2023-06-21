@@ -1,9 +1,11 @@
 import { CommonModule } from "@angular/common";
 import { Component, Input, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
+import { AngularSvgIconModule } from "angular-svg-icon";
 import { BehaviorSubject, Observable, combineLatest, of } from "rxjs";
 import { filter, map, startWith, switchMap, tap } from "rxjs/operators";
 import { ReportCardComponent } from "src/app/components/report-card/report-card.component";
+import { ReportTableComponent } from "src/app/components/report-table/report-table.component";
 import { SelectMultipleComponent } from "src/app/components/utils/multiple-select/select-multiple.component";
 import { User } from "src/app/models/User";
 import { Report } from "src/app/models/report.model";
@@ -19,7 +21,7 @@ import { ReportsService } from "src/app/reports/services/reports.service";
 @Component({
     standalone: true,
     selector: 'curator-stat-details',
-    imports: [CommonModule, ReactiveFormsModule, SelectMultipleComponent, ReportCardComponent, ReportsModule],
+    imports: [CommonModule, ReactiveFormsModule, SelectMultipleComponent, ReportCardComponent, ReportTableComponent, ReportsModule, AngularSvgIconModule],
     templateUrl: './curator-stat-details.component.html',
     styleUrls: []
 })
@@ -38,6 +40,8 @@ export class CuratorStatDetailsComponent implements OnInit {
     terms$: BehaviorSubject<Term[]> = new BehaviorSubject<Term[]>([]);
     paginatedReports$: Observable<PaginatedReports>;
 
+
+    viewType: 'table' | 'grid' = 'grid';
 
     ngOnInit(): void {
         this.form = this.formBuilder.group({
