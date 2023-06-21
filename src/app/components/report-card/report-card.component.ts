@@ -3,10 +3,11 @@ import { Component, Input, OnInit } from "@angular/core";
 import { Term } from "src/app/models/term.model";
 import { Report } from "src/app/models/report.model";
 import * as _ from "lodash";
+import { NgxPopperModule } from "ngx-popper";
 
 @Component({
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, NgxPopperModule],
     selector: 'report-card',
     templateUrl: './report-card.component.html'
 })

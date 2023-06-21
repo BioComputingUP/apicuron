@@ -52,7 +52,7 @@
     <div class="tw-relative tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-pt-4 tw-px-2 sm:tw-px-6"
         *ngIf="reportsWithTerms$ | async as filteredReports">
 
-        <div class="tw-overflow-x-auto tw-w-full">
+        <!-- <div class="tw-overflow-x-auto tw-w-full">
             <table class="tw-w-full tw-divide-y-2 tw-divide-gray-200 tw-bg-white tw-text-sm">
                 <thead class="tw-text-left">
                     <tr>
@@ -89,10 +89,10 @@
 
                 </tbody>
             </table>
-        </div>
-        <!-- <div class="tw-w-1/4 tw-p-1" *ngFor="let entry of filteredReports.data">
-            <report-card [term]="entry.term" [report]="entry.report"></report-card>
         </div> -->
+        <div class="tw-w-1/4 tw-p-1" *ngFor="let entry of filteredReports.data">
+            <report-card [term]="entry.term" [report]="entry.report"></report-card>
+        </div>
 
     </div>
 </div>

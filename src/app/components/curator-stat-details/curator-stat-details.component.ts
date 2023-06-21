@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { BehaviorSubject, Observable, combineLatest, of } from "rxjs";
 import { filter, map, startWith, switchMap, tap } from "rxjs/operators";
 import { ReportCardComponent } from "src/app/components/report-card/report-card.component";
-import { MultipleSelectComponent } from "src/app/components/utils/multiple-select/mutliple-select.component";
+import { SelectMultipleComponent } from "src/app/components/utils/multiple-select/select-multiple.component";
 import { User } from "src/app/models/User";
 import { Report } from "src/app/models/report.model";
 import { Resource } from "src/app/models/resource.model";
@@ -19,7 +19,7 @@ import { ReportsService } from "src/app/reports/services/reports.service";
 @Component({
     standalone: true,
     selector: 'curator-stat-details',
-    imports: [CommonModule, ReactiveFormsModule, MultipleSelectComponent, ReportCardComponent, ReportsModule],
+    imports: [CommonModule, ReactiveFormsModule, SelectMultipleComponent, ReportCardComponent, ReportsModule],
     templateUrl: './curator-stat-details.component.html',
     styleUrls: []
 })

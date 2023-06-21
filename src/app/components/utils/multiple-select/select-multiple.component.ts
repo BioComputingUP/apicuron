@@ -11,17 +11,17 @@ import { AngularSvgIconModule } from "angular-svg-icon";
     standalone: true,
     imports: [CommonModule, ReactiveFormsModule, AngularSvgIconModule],
     selector: "select-multiple",
-    templateUrl: "./multiple-select.component.html",
+    templateUrl: "./select-multiple.component.html",
     styleUrls: [],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
             multi: true,
-            useExisting: MultipleSelectComponent,
+            useExisting: SelectMultipleComponent,
         },
     ],
 })
-export class MultipleSelectComponent implements ControlValueAccessor {
+export class SelectMultipleComponent implements ControlValueAccessor {
     @Input("completeSet") completeSet: { value: any; text: string }[];
 
     @Input('hintText') hintText: string = '';

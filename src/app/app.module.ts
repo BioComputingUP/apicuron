@@ -20,6 +20,7 @@ import { AngularSvgIconModule } from "angular-svg-icon";
 import { AuthDropdownComponent } from "./components/auth-dropdown/auth-dropdown.component";
 import { NotificationsDataModule } from "./notifications-data/notifications-data.module";
 import * as Sentry from "@sentry/angular-ivy";
+import { NgxPopperModule } from "ngx-popper";
 @NgModule({
   declarations: [
     AppComponent,
@@ -42,6 +43,11 @@ import * as Sentry from "@sentry/angular-ivy";
     FormsModule,
     HttpClientModule,
     AngularSvgIconModule.forRoot(),
+    // popper Integration
+    NgxPopperModule.forRoot({
+      disableDefaultStyling: true,
+      disableAnimation: false,
+    })
   ],
   providers: [
     // *** Sentry ErrorHandler and Tracer Setup ***

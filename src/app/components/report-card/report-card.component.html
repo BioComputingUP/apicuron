@@ -1,8 +1,8 @@
 <div
-  class="tw-bg-white tw-rounded-md tw-shadow-md tw-shadow-gray-400 tw-px-4 tw-py-2 tw-h-full tw-flex tw-flex-col tw-overflow-hidden"
+  class="tw-bg-white tw-rounded-md tw-shadow-md tw-shadow-gray-400 tw-p-2 tw-h-full tw-flex tw-flex-col tw-overflow-hidden"
 >
   <h3
-    class="tw-text-gray-800 tw-font-dm-sans tw-text-lg sm:tw-text-xl tw-font-semibold sm:tw-mb-2"
+    class="tw-text-gray-800 tw-font-dm-sans tw-text-sm sm:tw-text-base tw-font-semibold sm:tw-mb-2"
   >
     {{ term.name }}
   </h3>
@@ -12,7 +12,11 @@
   <p
     class="tw-text-gray-500 tw-font-medium sm:tw-mb-2 tw-text-xs sm:tw-text-sm"
     [ngClass]="{ 'tw-truncate': truncate_description }"
-    [title]="term.description"
+    [popper]="term.description"
+    [popperTrigger]="'hover'"
+    [popperDisableStyle]="false"
+    [popperPlacement]="'top'"
+    [popperApplyClass]="'tw-bg-white'"
   >
     {{ term.description }}
   </p>

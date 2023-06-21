@@ -18,7 +18,7 @@ import { TermsModule } from "src/app/terms/terms.module";
 import { CuratorStatDetailsComponent } from "../curator-stat-details/curator-stat-details.component";
 import { SlideOverPanelComponent } from "../utils/slide-over-panel/slide-over-panel.component";
 import { FormBuilder } from "@angular/forms";
-import { MultipleSelectComponent } from "../utils/multiple-select/mutliple-select.component";
+import { SelectMultipleComponent } from "../utils/multiple-select/select-multiple.component";
 import { Medal } from '../../models/medal.model'
 import { MedalCardComponent } from "src/app/components/medal-card/medal-card.component";
 import { AchievementsModule } from "src/app/achievements/achievements.module";
@@ -38,7 +38,7 @@ import { Badge } from "src/app/models/badge.model";
     TermsModule,
     CuratorStatDetailsComponent,
     SlideOverPanelComponent,
-    MultipleSelectComponent,
+    SelectMultipleComponent,
     MedalCardComponent,
     AchievementsModule,
     BadgeCardComponent
@@ -73,7 +73,7 @@ export class CuratorStatCardComponent implements OnInit {
       curator_orcid: this.curator.orcid_id,
       sortBy: "timestamp",
       sortOrder: "asc",
-      page_size: 6,
+      page_size: 4,
     });
     this.reports$ = this.reportsService
       .getReports(reportFilter)

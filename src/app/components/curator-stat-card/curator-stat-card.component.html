@@ -24,7 +24,7 @@
     </button> -->
   </div>
   <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-start">
-    <div class="tw-w-full"><span class="tw-font-bold tw-text-gray-500 tw-font-dm-sans tw-capitalize">{{ curator.displayedName }}'s Earned Medals</span></div>
+    <div class="tw-w-full"><span class="tw-font-bold tw-text-gray-500 tw-font-dm-sans tw-capitalize tw-text-sm">{{ curator.displayedName }}'s Earned Medals</span></div>
     <div *ngFor="let medal of (medals$ | async)" class="tw-w-1/2 sm:tw-w-1/4 tw-p-1">
       <medal-card [medal]="medal"></medal-card>
     </div>
@@ -32,25 +32,27 @@
   <div class="tw-flex tw-flex-row tw-flex-wrap">
     <!-- Badges list -->
     <div
-      class="tw-w-full sm:tw-w-1/2 tw-flex tw-flex-row tw-content-start tw-flex-wrap">
+      class="tw-w-full sm:tw-w-1/2 tw-flex tw-flex-col tw-content-start tw-px-1 tw-py-2">
       <div class="tw-w-full">
         <span class="tw-text-sm tw-font-bold tw-text-gray-500">{{ curator.displayedName }}'s Earned Badges</span>
       </div>
-      <ng-container *ngIf="badges$ | async as badges">
+      <div class="tw-w-full tw-flex tw-flex-row tw-items-stretch tw-grow tw-flex-wrap" *ngIf="badges$ | async as badges">
         <div class="tw-w-1/2 tw-p-2" *ngFor="let badge of badges">
-          <badge-card [badge]="badge"></badge-card>
+          <badge-card [badge]="badge" [terms]="(terms$ | async)"></badge-card>
         </div>
-      </ng-container>
+      </div>
       
     </div>
     <!-- Latest Contributions List -->
     <div
-      class="tw-w-full sm:tw-w-1/2 tw-flex tw-flex-row tw-content-start tw-flex-wrap">
-      <div class="tw-w-full">
+      class="tw-w-full sm:tw-w-1/2 tw-flex tw-flex-row tw-content-start tw-flex-wrap tw-px-1 tw-py-2">
+      <div class="tw-w-full tw-flex tw-flex-row tw-justify-between">
         <span class="tw-text-sm tw-font-bold tw-text-gray-500 tw-font-dm-sans tw-capitalize">{{ curator.displayedName }}'s Latest Contributions</span>
+        <button class="tw-text-sm tw-text-blue-500 tw-underline " (click)="open_details = true">View Details</button>
       </div>
+
       <ng-container *ngIf="reportsWithTerms$ | async as reports">
-        <div class="tw-w-1/2 sm:tw-w-1/3 tw-p-2" *ngFor="let report of reports">
+        <div class="tw-w-1/2 tw-p-2" *ngFor="let report of reports">
           <report-card [term]="report.term" [report]="report.report"></report-card>
         </div>
       </ng-container>
