@@ -15,10 +15,9 @@ import { TermsService } from "src/app/terms/services/terms.service";
 import { Term } from "src/app/models/term.model";
 import { Report } from "src/app/models/report.model";
 import { TermsModule } from "src/app/terms/terms.module";
-import { CuratorStatDetailsComponent } from "../curator-stat-details/curator-stat-details.component";
+import { CuratorStatDetailsComponent } from "../curator-reports-details/curator-reports-details.component";
 import { SlideOverPanelComponent } from "../utils/slide-over-panel/slide-over-panel.component";
 import { FormBuilder } from "@angular/forms";
-import { SelectMultipleComponent } from "../utils/multiple-select/select-multiple.component";
 import { Medal } from '../../models/medal.model'
 import { MedalCardComponent } from "src/app/components/medal-card/medal-card.component";
 import { AchievementsModule } from "src/app/achievements/achievements.module";
@@ -27,6 +26,9 @@ import { AchievementFilter } from "src/app/achievements/interfaces/achievement-f
 import { BadgeCardComponent } from "src/app/components/badge-card/badge-card.component";
 import { BadgesService } from "src/app/achievements/services/badges.service";
 import { Badge } from "src/app/models/badge.model";
+import { CuratorMedalsDetailsComponent } from "src/app/components/curator-medals-details/curator-medals-details.component";
+import { Paginated } from "src/app/interfaces/paginated";
+import { CuratorBadgesDetailsComponent } from "src/app/components/curator-badges-details/curator-badges-details.component";
 @Component({
   selector: "curator-stat-card",
   standalone: true,
@@ -38,10 +40,11 @@ import { Badge } from "src/app/models/badge.model";
     TermsModule,
     CuratorStatDetailsComponent,
     SlideOverPanelComponent,
-    SelectMultipleComponent,
     MedalCardComponent,
     AchievementsModule,
-    BadgeCardComponent
+    BadgeCardComponent,
+    CuratorMedalsDetailsComponent,
+    CuratorBadgesDetailsComponent
   ],
   templateUrl: "./curator-stat-card.component.html",
   styleUrls: ["./curator-stat-card.component.scss"],
@@ -50,7 +53,7 @@ export class CuratorStatCardComponent implements OnInit {
   terms$: Observable<Object>;
   reportsWithTerms$: Observable<{ report: Report; term: Term }[]>;
   detailForm: any;
-  badges$: Observable<Badge[]>;
+  badges$: Observable<Paginated<Badge>>;
 
   constructor(
     protected reportsService: ReportsService,
@@ -65,7 +68,7 @@ export class CuratorStatCardComponent implements OnInit {
   open_details: Boolean = false;
   open_badge_details: Boolean = false;
   open_medal_details: Boolean = false;
-  medals$: Observable<Medal[]>;
+  medals$: Observable<Paginated<Medal>>;
   
 
   ngOnInit(): void {
@@ -102,15 +105,14 @@ export class CuratorStatCardComponent implements OnInit {
       resource_id: this.resource.resource_id,
       page_size: 4
     })
-    this.medals$ = this.medalService.getMedals(filter.serialize())
+    this.medals$ = this.medalService.getMedals(filter)
 
-    this.badges$ = this.badgeService.getBadges(filter.serialize())
+    this.badges$ = this.badgeService.getBadges(filter)
   }
 
   @Input() statistics: CuratorStatistics;
   @Input() resource: Resource;
   @Input() curator: User;
-  @Input() medals: Medal[]
 
   get curatorStats(): CuratorStatistics {
     return this.statistics;

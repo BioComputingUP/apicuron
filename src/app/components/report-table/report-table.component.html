@@ -17,20 +17,20 @@
     </thead>
 
     <tbody class="tw-divide-y tw-divide-gray-200">
-        <tr *ngFor="let entry of reports.data">
+        <tr *ngFor="let report of reports">
             <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-font-medium tw-text-gray-900">
-                {{ entry.term.activity_name }}
+                {{ report.term.activity_name }}
             </td>
             <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-text-gray-700">
-                <span [ngClass]="entry.term.categoryColor()" class="tw-font-bold tw-px-1 tw-rounded-full">
-                    {{ entry.term.category }}
+                <span [ngClass]="report.term.categoryColor()" class="tw-font-bold tw-px-1 tw-rounded-full">
+                    {{ report.term.category }}
                 </span>
             </td>
             <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-text-gray-700">
-                {{ entry.report.formatDate('date') }}
+                {{ report.formatDate('date') }}
             </td>
             <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-text-gray-700">
-                {{ entry.term.score }}
+                {{ report.term.score }}
             </td>
         </tr>
 

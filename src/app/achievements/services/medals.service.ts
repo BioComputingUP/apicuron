@@ -4,28 +4,33 @@ import { environment } from 'src/environments/environment'
 import { map, pluck, tap } from 'rxjs/operators'
 import { Medal } from 'src/app/models/medal.model'
 import { Observable } from 'rxjs'
-import {  } from 'lodash'
+import { } from 'lodash'
+import { AchievementFilter } from 'src/app/achievements/interfaces/achievement-filter'
+import { Paginated } from 'src/app/interfaces/paginated'
 @Injectable()
 export class MedalsService {
 
-    constructor(protected http: HttpClient) {}
+    constructor(protected http: HttpClient) { }
 
     wsUrl = environment.ws + '/achievements/medals'
 
 
-    getMedals(params: { curator_orcid: string, page_size: string }): Observable<Medal[]>{
+    getMedals(params: AchievementFilter): Observable<Paginated<Medal>> {
         const url = new URL(this.wsUrl)
 
-        const httpParams = new HttpParams({ fromObject: params })
+        const httpParams = new HttpParams({ fromObject: params.serialize() })
         return this.http.get(url.href, {
             headers: {
                 version: '2'
             },
             params: httpParams
         }).pipe(
-            pluck('data'),
             // Deserialize medals
-            map((medals: Medal[]) => medals.map((medal:Medal) => new Medal().deserialize(medal)))
+            map((paginatedMedals: Paginated<Medal>) => {
+                const { data } = paginatedMedals;
+                paginatedMedals.data = data.map((medal: Medal) => new Medal().deserialize(medal))
+                return paginatedMedals
+            })
         )
     }
 }

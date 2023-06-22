@@ -21,26 +21,23 @@
           [color]="resource.color"></reward-card>
       </div>
     </div>
-    <!-- <button class="tw-ml-auto tw-text-sm hover:tw-underline tw-font-thin tw-text-blue-500 hover:tw-text-blue-600"
-      (click)="open_details = true">
-      View Details
-    </button> -->
   </div>
-  <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-start">
+  <!-- Medals List -->
+  <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-start" *ngIf="medals$ | async as medals">
     <div class="tw-w-full tw-flex tw-flex-row tw-justify-between">
       <span class="tw-font-bold tw-text-gray-500 tw-font-dm-sans tw-capitalize tw-text-sm">{{
         curator.displayedName }}'s Earned Medals</span>
         <button class="tw-text-sm tw-text-blue-500 tw-underline " (click)="open_medal_details = true">View
           Details</button>
     </div>
-    <div *ngFor="let medal of (medals$ | async)" class="tw-w-1/2 sm:tw-w-1/4 tw-p-1">
+    <div *ngFor="let medal of medals.data" class="tw-w-1/2 sm:tw-w-1/4 tw-p-1">
       <medal-card [medal]="medal"></medal-card>
     </div>
   </div>
   <div class="tw-flex tw-flex-row tw-flex-wrap">
     <!-- Badges list -->
     <div class="tw-w-full sm:tw-w-1/2 tw-flex tw-flex-col tw-content-start tw-px-1 tw-py-2">
-      <div class="tw-w-full tw-flex tw-flex-row tw-justify-between">
+      <div class="tw-w-full tw-flex tw-flex-row tw-justify-between sm:tw-px-2">
         <span class="tw-text-sm tw-font-bold tw-text-gray-500">{{ curator.displayedName }}'s Earned Badges</span>
         <button class="tw-text-sm tw-text-blue-500 tw-underline " (click)="open_badge_details = true">View
           Details</button>
@@ -48,7 +45,7 @@
       </div>
       <div class="tw-w-full tw-flex tw-flex-row tw-items-stretch tw-grow tw-flex-wrap"
         *ngIf="badges$ | async as badges">
-        <div class="tw-w-1/2 tw-p-2" *ngFor="let badge of badges">
+        <div class="tw-w-1/2 tw-p-2" *ngFor="let badge of badges.data">
           <badge-card [badge]="badge" [terms]="(terms$ | async)"></badge-card>
         </div>
       </div>
@@ -56,7 +53,7 @@
     </div>
     <!-- Latest Contributions List -->
     <div class="tw-w-full sm:tw-w-1/2 tw-flex tw-flex-row tw-content-start tw-flex-wrap tw-px-1 tw-py-2">
-      <div class="tw-w-full tw-flex tw-flex-row tw-justify-between">
+      <div class="tw-w-full tw-flex tw-flex-row tw-justify-between sm:tw-px-2">
         <span class="tw-text-sm tw-font-bold tw-text-gray-500 tw-font-dm-sans tw-capitalize">{{ curator.displayedName
           }}'s Latest Contributions</span>
         <button class="tw-text-sm tw-text-blue-500 tw-underline " (click)="open_details = true">View Details</button>
@@ -74,19 +71,15 @@
 </div>
 
 <slide-over-panel [(openPanel)]="open_details">
-  <curator-stat-details [curator]="curator" [resource]="resource" [terms]="terms$ | async"></curator-stat-details>
+  <curator-stat-details *ngIf="open_details" [curator]="curator" [resource]="resource" [terms]="terms$ | async"></curator-stat-details>
 </slide-over-panel>
 
 
 <slide-over-panel [(openPanel)]="open_badge_details">
-  <div class="tw-w-full tw-h-full tw-bg-white">
-    Hello world !
-  </div>
+  <curator-badges-details *ngIf="open_badge_details" [curator]="curator" [resource]="resource"></curator-badges-details>
 </slide-over-panel>
 
 
 <slide-over-panel [(openPanel)]="open_medal_details">
-  <div class="tw-w-full tw-h-full tw-bg-white">
-    Hello world !
-  </div>
+  <curator-medals-details *ngIf="open_medal_details" [curator]="curator" [resource]="resource"></curator-medals-details>
 </slide-over-panel>

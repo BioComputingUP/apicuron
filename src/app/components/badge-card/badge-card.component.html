@@ -6,10 +6,10 @@
         <svg-icon src="assets/svg/badge_check.svg" svgClass="tw-w-16"></svg-icon>
         <div class="tw-flex tw-grow tw-flex-col tw-pl-2">
             <span class="tw-block tw-text-sm tw-w-full">
-                Earned by completing more than <span class="tw-italic tw-font-bold">{{ badge.count_threshold }}</span> <span
+                Earned by completing more than <span class="tw-italic tw-font-bold">{{ badge.count_threshold }} </span> <span
                     class="tw-font-bold tw-underline tw-cursor-pointer" [popper]="activitiesList"
                     [popperShowOnStart]="false" [popperTrigger]="'hover'" [popperHideOnScroll]="true"
-                    [popperPlacement]="'right'" > {{
+                    [popperPlacement]="'right'" >{{
                     badge.count_threshold > 1 ? 'Activities' : 'Activity'}}</span>
             </span>
         </div>
@@ -22,6 +22,6 @@
         class="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-py-2 tw-rounded tw-shadow-md tw-shadow-gray-400">
         <span
             class="tw-block tw-text-sm tw-font-dm-sans tw-text-gray-600 tw-leading-normal tw-py-1 tw-px-2 tw-text-center"
-            *ngFor="let term of badge.list_terms">{{ getTerm(term).activity_name }}</span>
+            *ngFor="let term of (termNames$ | async)">{{ term }}</span>
     </div>
 </popper-content>

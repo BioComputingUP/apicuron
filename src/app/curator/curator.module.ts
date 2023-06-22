@@ -22,10 +22,11 @@ import { AchievementsModule } from 'src/app/achievements/achievements.module';
     CuratorsPageComponent,
     CuratorSearchComponent,
     CuratorPageComponent,
-    PaginationComponent
+    
   ],
   imports: [
     SvgModule,
+    PaginationComponent,
     CuratorProfileComponent,
     CuratorStatCardComponent,
     CommonModule,
