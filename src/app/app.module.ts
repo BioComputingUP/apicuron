@@ -1,12 +1,12 @@
 import { BrowserModule } from "@angular/platform-browser";
-import { NgModule, SecurityContext } from "@angular/core";
+import { NgModule, APP_INITIALIZER, ErrorHandler } from "@angular/core";
 import {
+  Router,
   RouterModule,
 } from "@angular/router";
 import { ReactiveFormsModule, FormsModule } from "@angular/forms";
 import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { ScrollToModule } from "@nicky-lenaers/ngx-scroll-to";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { FootComponent } from "./foot/foot.component";
@@ -19,9 +19,10 @@ import { ToastrModule } from "ngx-toastr";
 import { AngularSvgIconModule } from "angular-svg-icon";
 import { MainLayoutComponent } from './main-layout/main-layout.component';
 import { CommonModule } from "@angular/common";
-import { AuthDropdownComponent } from "./auth-dropdown/auth-dropdown.component";
+import { AuthDropdownComponent } from "./components/auth-dropdown/auth-dropdown.component";
 import { NotificationsDataModule } from "./notifications-data/notifications-data.module";
-// import { NotificationsModule } from "./notifications/notifications.module";
+import * as Sentry from "@sentry/angular-ivy";
+import { NgxPopperModule } from "ngx-popper";
 @NgModule({
   declarations: [
     AppComponent,
@@ -38,7 +39,6 @@ import { NotificationsDataModule } from "./notifications-data/notifications-data
     AuthDropdownComponent,
     ToastrModule.forRoot(),
     IndexModule,
-    ScrollToModule.forRoot(),
     BrowserModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
@@ -46,8 +46,33 @@ import { NotificationsDataModule } from "./notifications-data/notifications-data
     HttpClientModule,
     NavbarComponent,
     AngularSvgIconModule.forRoot(),
+    // popper Integration
+    NgxPopperModule.forRoot({
+      disableDefaultStyling: true,
+      disableAnimation: false,
+    })
   ],
-  providers: [],
+  providers: [
+    // *** Sentry ErrorHandler and Tracer Setup ***
+    {
+      provide: ErrorHandler,
+      useValue: Sentry.createErrorHandler({
+        showDialog: false,
+      }),
+    },
+    {
+      provide: Sentry.TraceService,
+      deps: [Router]
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: () => () => {},
+      deps: [Sentry.TraceService],
+      multi: true,
+    },
+    // *** end of sentry setup ***
+
+  ],
   bootstrap: [AppComponent],
   exports: [RouterModule],
 })

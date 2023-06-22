@@ -1,7 +1,10 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 
 @Component({
-  selector: 'app-pagination',
+  standalone: true,
+  imports: [CommonModule],
+  selector: 'pagination',
   templateUrl: './pagination.component.html',
   styleUrls: ['./pagination.component.scss']
 })
@@ -22,8 +25,8 @@ export class PaginationComponent implements OnInit {
   pages_list(){
     // if the total number of pages is smaller than the total number of items, we use the maximum number of pages instead
     const button_count = this.max_page < this.maxSize ? this.max_page : this.maxSize
-    if(this.currentPage < button_count) {
-      return [...Array(button_count).keys()].map(x => ++x);
+    if(this.currentPage <= button_count) {
+      return [...Array(button_count).keys()].map(x => x + 1);
     }
     if(this.currentPage > (this.max_page - button_count)){
       return [...Array(button_count).keys()].map(x => x + (this.max_page - button_count))

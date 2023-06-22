@@ -1,0 +1,48 @@
+<!-- <div class="tw-border tw-border-gray-400 tw-p-2 tw-bg-white tw-h-full tw-rounded tw-flex tw-flex-col tw-items-start">
+    <span class="tw-text-base">{{ term.name }}</span>
+    <span class="tw-text-sm tw-text-gray-500">{{ term.description }}</span>
+
+    <span class="tw-text-sm tw-text-gray-500">Score: {{ term.score }}</span>
+
+</div> -->
+
+<!-- <div class="tw-bg-white tw-rounded-lg tw-shadow-md tw-p-4">
+    <h3 class="tw-text-xl tw-font-semibold tw-mb-2">{{ term.name }}</h3>
+    <p class="tw-text-gray-600 tw-mb-4">{{ term.description }}</p>
+    <div class="tw-flex tw-items-center">
+      <svg class="tw-w-5 tw-h-5 tw-text-gray-500 tw-mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 4v16m8-8H4"></path>
+      </svg>
+      <span class="tw-text-gray-600">{{ term.score }}</span>
+    </div>
+  </div> -->
+
+<div
+  class="tw-bg-white tw-rounded-md tw-shadow-md tw-px-4 tw-py-2 tw-h-full tw-flex tw-flex-col tw-overflow-hidden"
+>
+  <h3 class="tw-text-gray-800 tw-font-dm-sans tw-text-xl tw-font-semibold tw-mb-2">
+    {{ term.name }}
+  </h3>
+  <p class="tw-text-gray-500 tw-font-medium tw-mb-4 tw-text-sm">{{ term.description }}</p>
+  <div
+    class="tw-flex tw-flex-row tw-items-center tw-justify-between tw-mt-auto"
+  >
+    <div class="tw-flex tw-flex-row tw-items-center">
+      <div
+        [title]="'score value for ' + term.name"
+        [ngClass]="scoreColor()"
+        class="tw-rounded-full tw-h-5 tw-w-5 tw-flex tw-items-center tw-justify-center tw-mr-1"
+      >
+        <span class="tw-font-bold tw-text-xs tw-cursor-default" >{{ term.score }}</span>
+      </div>
+      <!-- <span class="tw-text-gray-600">Score</span> -->
+    </div>
+    <div>
+      <span
+        class="tw-text-sm tw-font-bold tw-rounded-full tw-px-2 tw-py-1"
+        [ngClass]="categoryColor()"
+        >{{ term.category }}</span
+      >
+    </div>
+  </div>
+</div>

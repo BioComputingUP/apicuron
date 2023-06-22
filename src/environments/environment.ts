@@ -4,10 +4,11 @@
 
 export const environment = {
   production: false,
+  env: 'local',
   host: 'http://localhost:4200',
   ws: 'http://localhost:3000',
   auth_ws: 'http://localhost:3000',
-  public_file_url: 'http://dione:3000/files',
+  public_file_url: 'http://localhost:3000/files',
   resource_logo_path: 'resources',
   orcid_url: 'https://pub.sandbox.orcid.org/v3.0/',
   orcid_main_url: 'https://sandbox.orcid.org/'

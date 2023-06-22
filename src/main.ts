@@ -3,10 +3,14 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
+import { setupSentry } from './sentry';
 
-if (environment.production) {
+setupSentry();
+
+if(environment.production){
   enableProdMode();
 }
 
 platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.error(err));
+  .then((success) => console.log(`Bootstrap success`))
+  .catch((err) => console.error(err));

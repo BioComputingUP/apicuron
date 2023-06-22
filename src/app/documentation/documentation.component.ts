@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router, UrlSegment } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
@@ -9,7 +9,8 @@ import AnchorJS from 'anchor-js';
 @Component({
   selector: 'app-documentation',
   templateUrl: './documentation.component.html',
-  styleUrls: ['./documentation.component.scss']
+  styleUrls: ['./documentation.component.scss'],
+  encapsulation: ViewEncapsulation.Emulated
 })
 export class DocumentationComponent implements OnInit {
 

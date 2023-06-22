@@ -112,6 +112,10 @@ export class CuratorSearchComponent implements AfterViewInit {
     this.selected_resources$.next(this.selected_resources$.value.filter((res) => resource.resource_id != res.resource_id))
   }
 
+  get currentField(){
+    return this.search_fields.find((searchField) => searchField.field == this.search_field)
+  }
+
   onSubmit() {
 
     const filter_field = this.search_field;

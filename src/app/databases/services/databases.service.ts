@@ -5,6 +5,8 @@ import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
 import { AuthService } from "../../auth/auth.service";
 import { catchError, map, pluck, shareReplay, switchMap } from "rxjs/operators";
+import { Term } from "../../models/term.model";
+import { BadgeDef } from "../../models/badge-def.model";
 
 
 class Resource {
@@ -84,14 +86,16 @@ export class DatabasesService {
         },
       }
     ).pipe(pluck('data'))
-    const terms$: Observable<Object> = this.http.get(this.termsPath, {
+    const terms$: Observable<Term[]> = this.http.get(this.termsPath, {
       headers: {
         version: '2'
       },
       params: {
         resource_id
       }
-    }).pipe(pluck('data'))
+    }).pipe(pluck('data'), map((data: Term[]) => data.map(term => new Term().deserialize(term))), map(Term.computeTermScoreQuartile))
+
+    // @ts-ignore
     const medals$: Observable<Object> = this.http.get(
       environment.ws + '/achievements-def/medals',
       {
@@ -115,7 +119,11 @@ export class DatabasesService {
         }
       }
     ).pipe(
-      pluck('data'))
+      pluck('data'),
+      map((badges: BadgeDef[]) => {
+        return badges.map((badge) => new BadgeDef().deserialize(badge))
+      })
+    )
 
     return combineLatest([badges$, medals$, terms$, resource$]).pipe(
       map(([badges, medals, terms, resource]) => {

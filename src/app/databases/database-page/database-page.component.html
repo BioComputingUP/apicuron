@@ -3,11 +3,39 @@
     <h2 class="tw-text-3xl tw-font-dm-sans tw-font-bold tw-my-2">{{ resource.resource_name }}</h2>
     <h3 class="tw-text-lg tw-font-dm-sans tw-font-bold">{{ resource.resource_long_name }}</h3>
     <div class="tw-flex tw-flex-row tw-flex-wrap tw-my-2">
-        <div class="tw-w-2/3">
+        <div class="tw-w-2/3"
+            [ngClass]="{'tw-w-2/3': (leaderboardLoaded$ | async), 'tw-w-full': !(leaderboardLoaded$ | async)}">
             <p class="tw-leading-relaxed tw-tracking-wide tw-pr-2 tw-text-justify">
                 {{ resource.resource_description }}
             </p>
 
+            <div class="tw-my-2 sm:tw-my-4" *ngIf="terms$ | async as terms">
+                <div class="tw-flex tw-flex-row tw-justify-between tw-pr-2" *ngIf="terms.length > 0">
+                    <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold ">What can be curated on {{
+                        resource.resource_name }} ?</h4>
+
+                    <button
+                        class="tw-text-blue-400 hover:tw-text-blue-500 tw-bg-transparent tw-text-sm tw-border-0 focus:tw-outline-none hover:tw-underline"
+                        (click)="expand_terms = !expand_terms">{{ expand_terms ? 'show less' : 'show more'}}
+                    </button>
+
+                </div>
+                <list-expand [collapsed]="!expand_terms">
+                    <div class="tw-flex tw-flex-row tw-flex-wrap" content>
+                        <div *ngFor="let term of terms.slice(0,3)" class="tw-w-1/3 tw-p-1">
+                            <term-card [term]="term"></term-card>
+                        </div>
+                    </div>
+                    <div class="tw-flex tw-flex-row tw-flex-wrap" expansion>
+                        <div *ngFor="let term of terms.slice(3)" class="tw-w-1/3 tw-p-1">
+                            <term-card [term]="term"></term-card>
+                        </div>
+                    </div>
+                </list-expand>
+
+            </div>
+
+            
             <div class="tw-my-2 sm:tw-my-4" *ngIf="badges$ | async as badges">
                 <div class="tw-flex tw-flex-row tw-justify-between tw-pr-2" *ngIf="badges.length > 0">
                     <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold ">Badges </h4>
@@ -18,22 +46,32 @@
                     </button>
 
                 </div>
-                <div class="tw-flex tw-flex-row tw-flex-wrap">
-                    <div *ngFor="let badge of badges.slice(0,8)" class="tw-p-2 tw-w-1/4">
-                        <div class="tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2">
-                            <svg-badge class="tw-w-3/4 tw-mx-auto" [database]="resource.resource_name" [title]="badge.name" [main_color]="badge.color_code">
-                            </svg-badge>
-                        </div>
-                    </div>
-                    <ng-container *ngIf="more_badges">
-                        <div *ngFor="let badge of badges.slice(8)" class="tw-p-2 tw-w-1/4">
-                            <div class="tw-bg-white tw-rounded-lg tw-border tw-border-gray-400 tw-h-full tw-p-2">
-                                <svg-badge class="tw-w-3/4 tw-mx-auto" [database]="resource.resource_name" [title]="badge.name" [main_color]="badge.color_code">
+                <list-expand [collapsed]="!more_badges">
+                    <div class="tw-flex tw-flex-row tw-flex-wrap" content>
+                        <div *ngFor="let badge of badges.slice(0,8)" class="tw-p-2 tw-w-1/4">
+                            <div
+                                class="tw-bg-white tw-border tw-border-gray-400 tw-rounded-lg tw-shadow-lg tw-h-full tw-p-2">
+                                <svg-badge class="tw-w-3/4 tw-mx-auto" [database]="resource.resource_name"
+                                    [title]="badge.name" [main_color]="badge.color_code">
                                 </svg-badge>
                             </div>
+                            <!-- <badge-def-card [badgeDef]="badge" [terms]="(terms$ | async)"></badge-def-card> -->
+    
                         </div>
-                    </ng-container>
-                </div>
+                    </div>
+                         
+                    <div class="tw-flex tw-flex-row tw-flex-wrap" expansion>
+                        <div *ngFor="let badge of badges.slice(8)" class="tw-p-2 tw-w-1/4">
+                            <div class="tw-bg-white tw-rounded-lg tw-border tw-border-gray-400 tw-h-full tw-p-2">
+                                <svg-badge class="tw-w-3/4 tw-mx-auto" [database]="resource.resource_name"
+                                    [title]="badge.name" [main_color]="badge.color_code">
+                                </svg-badge>
+                            </div>
+                            <!-- <badge-def-card [badgeDef]="badge" [terms]="(terms$ | async)"></badge-def-card> -->
+
+                        </div>
+                    </div>
+                </list-expand>
             </div>
 
             <div class="tw-my-2 sm:tw-my-4" *ngIf="medals$ | async as medals">
@@ -49,14 +87,16 @@
                 <div class="tw-flex tw-flex-row tw-flex-wrap">
                     <div *ngFor="let medal of medals.slice(0,8)" class="tw-p-2 tw-w-1/4">
                         <div class="tw-bg-white tw-rounded-lg tw-border tw-border-gray-400 tw-h-full tw-p-2">
-                            <svg-medal class="tw-w-3/4 tw-mx-auto" [database]="resource.resource_name" [title]="medal.name" [main_color]="medal.color">
+                            <svg-medal class="tw-w-3/4 tw-mx-auto" [database]="resource.resource_name"
+                                [title]="medal.name" [main_color]="medal.color">
                             </svg-medal>
                         </div>
                     </div>
                     <ng-container *ngIf="more_medals">
                         <div *ngFor="let medals of medals.slice(8)" class="tw-p-2 tw-w-1/4">
                             <div class="tw-bg-white tw-rounded-lg tw-border tw-border-gray-400 tw-h-full tw-p-2">
-                                <svg-medal class="tw-w-3/4 tw-mx-auto" [database]="resource.resource_name" [title]="medals.name" [main_color]="medal.color">
+                                <svg-medal class="tw-w-3/4 tw-mx-auto" [database]="resource.resource_name"
+                                    [title]="medals.name" [main_color]="medal.color">
                                 </svg-medal>
                             </div>
                         </div>
@@ -70,12 +110,12 @@
                 <span class="tw-uppercase tw-text-gray-500 tw-text-xs tw-font-bold">Leaderboard</span>
                 <div class="tw-flex tw-flex-col">
                     <div class="tw-pb-2" *ngFor="let biocurator of leaderboard">
-                        <curator-card [vertical]="false" [biocurator]="biocurator" [display_resources]="false"
+                        <curator-card [vertical]="false" [biocurator]="biocurator" [display_resources]="false" [display_achievement_counts]="true"
                             [display_scores]="false"></curator-card>
                     </div>
                 </div>
             </div>
         </ng-container>
-        
+
     </div>
 </div>

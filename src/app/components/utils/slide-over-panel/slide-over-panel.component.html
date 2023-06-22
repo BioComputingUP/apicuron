@@ -1,0 +1,38 @@
+<!-- Modal -->
+<div class="tw-relative tw-z-40 tw-ease-in-out tw-duration-500"
+    [ngClass]="{ 'tw-invisible': !open_panel, 'tw-visible': open_panel }" aria-labelledby="slide-over-title"
+    role="dialog" aria-modal="true">
+    <div class="tw-fixed tw-inset-0 tw-bg-gray-700 tw-bg-opacity-75 tw-backdrop-blur tw-transition-opacity tw-ease-in-out tw-duration-500"
+        (click)="open_panel = false" [ngClass]="{
+      'tw-opacity-0': !open_panel,
+      'tw-opacity-100': open_panel
+    }"></div>
+
+    <div class="tw-fixed tw-inset-0 tw-overflow-hidden">
+        <div class="tw-absolute tw-inset-0 tw-overflow-hidden" (click)="open_panel = false">
+
+        </div>
+        <div class="tw-pointer-events-none tw-fixed tw-inset-y-0 tw-flex tw-w-full sm:tw-w-3/4 md:tw-w-2/3 tw-max-w-full tw-transform tw-transition tw-ease-in-out tw-duration-500"
+            [ngClass]="{
+                '-tw-translate-x-full': !open_panel,
+                'tw-translate-x-0': open_panel,
+                'tw-left-0': !is_right_side(),
+                'tw-right-0': is_right_side() }">
+            <div class="tw-pointer-events-auto tw-relative tw-w-full">
+                <div class="tw-absolute tw-top-0 tw-flex tw-pr-2 tw-pt-4 sm:tw-pr-4 tw-z-40"
+                    [ngClass]="{ 'tw-right-0': !is_right_side(), 'tw-left-0': is_right_side() }">
+                    <button (click)="open_panel= false" type="button"
+                        class="tw-text-gray-600 hover:tw-text-gray-800 tw-rounded-full tw-bg-gray-300 tw-p-1">
+                        <span class="tw-sr-only">Close panel</span>
+                        <svg class="tw-h-6 tw-w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.7"
+                            stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <!-- Content to display -->
+                <ng-content></ng-content>
+            </div>
+        </div>
+    </div>
+</div>

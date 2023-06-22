@@ -14,35 +14,26 @@ import {
   filter,
   map,
   pluck,
+  share,
   shareReplay,
   switchMap,
+  take,
   tap,
 } from "rxjs/operators";
 import { environment } from "../../../environments/environment";
+import { CuratorStatisticsService } from "src/app/curator-statistics/services/curator-statistics.service";
+import { CuratorStatistics } from "src/app/models/statistics.model";
+import { ResourcesService } from "src/app/resource/service/resources.service";
+import { Resource } from "src/app/models/resource.model";
+import { User } from "src/app/models/User";
+import { CuratorService } from "src/app/curator/curator.service";
+import { MedalsService } from "src/app/achievements/services/medals.service";
+import { Medal } from "../../models/medal.model";
+import _ from "lodash";
 
-export interface CuratorAchievements {
-  medals?: [any];
-  badges?: [any];
-}
-export interface CuratorStat extends CuratorAchievements {
-  generation_count: number;
-  revision_count: number;
-  invalidation_count: number;
-  badges_count: number;
-  medals_count: number;
-  resource_id: string;
-}
-
-export interface Curator {
-  displayedName: string;
-  orcid_id: string;
-  stats: [CuratorStat];
-}
-
-export interface OrcidData {
-  keywords?: [string];
-  biography?: string;
-  social_urls?: [[string, string]];
+export interface StatisticsWithResource {
+  resource: Resource,
+  curatorStatistics: CuratorStatistics
 }
 
 @Injectable()
@@ -50,125 +41,141 @@ export class CuratorPageService {
   private wsUrl = environment.ws;
   private orcid_url = environment.orcid_url;
 
-  constructor(private http: HttpClient, private route: ActivatedRoute) { }
+  // state observables
+  curator$: Observable<User>;
+  resources$: Observable<Resource[]>;
+  statistics$: Observable<CuratorStatistics[]>;
+  statisticsWithResource$: Observable<StatisticsWithResource[]>;
+  resourceIds$: Observable<string[]>;
+  medals$: Observable<any[]>;
 
-  get_curator(orcid_id: string) {
-    return this.http
-      .get<{ data: Curator }>(this.wsUrl + "/users/" + orcid_id, {
-        headers: {
-          version: "2",
-        },
-      })
-      .pipe(pluck("data"));
+  constructor(
+    private http: HttpClient,
+    private resources: ResourcesService,
+    private curatorStatistics: CuratorStatisticsService,
+    private curatorService: CuratorService,
+    private medalsService: MedalsService
+  ) {
+    // load statistics
   }
 
-  get_curator_orcid_details(orcid_id: string) {
-    return this.http
-      .get(this.orcid_url + orcid_id, {
-        headers: {
-          Accept: "application/json",
-        },
+
+
+  public init(orcid_id$: Observable<string>) {
+    // setting up the curator behavior subject
+    this.curator$ = this.load_curator(orcid_id$)
+
+    // loading the statistics
+    this.statistics$ = this.load_statistics(orcid_id$)
+
+    this.resourceIds$ = this.statistics$.pipe(
+      // extract to list of resource_ids
+      map((stats: CuratorStatistics[]) => stats.map((stat) => stat.resource_id))
+    )
+
+    // load resources using statistics
+    this.resources$ = this.loadResources(this.resourceIds$)
+
+    // load statistics with resources grouped 
+    this.statisticsWithResource$ = this.combine_resources_statistics(this.resources$, this.statistics$)
+
+    // Load Medals for resources
+    // this.medals$ = this.curator$.pipe(
+    //   switchMap((curator: User) => {
+    //     return this.medalsService.getCuratorMedals({ curator_orcid: curator.orcid_id }).pipe(shareReplay(1))
+    //   }),
+    // )
+
+    // debugger;
+
+  }
+
+  // public getResourceMedals(resource_id: string) {
+  //   return this.medals$.pipe(
+  //     map((medals: Medal[]) => {
+  //       return medals.filter((medal:Medal) => medal.resource_id == resource_id)
+  //     })
+  //   )
+  // }
+
+
+  public getCurator() {
+    return this.curator$;
+  }
+
+  public getResources() {
+    return this.resources$;
+  }
+
+  public getStatistics() {
+    return this.statistics$;
+  }
+
+  public getStatisticsWithResource() {
+    return this.statisticsWithResource$;
+  }
+
+
+  load_curator(orcid_id$: Observable<string>) {
+    return orcid_id$.pipe(
+      switchMap((orcid_id: string) => {
+        return this.curatorService.get_curator(orcid_id);
+      }),
+      shareReplay(1),
+      pluck("data"),
+      map((curator: User) => {
+        return new User().deserialize(curator);
       })
-      .pipe(
-        map((response) => {
-          const keywords = response["person"]?.["keywords"]?.["keyword"]?.map(
-            (x: string) => x["content"].trim()
-          );
-          const biography = response["person"]?.["biography"]?.["content"];
-          const social_urls = response["person"]?.["researcher-urls"]?.[
-            "researcher-url"
-          ]?.map((x) => [x?.["url-name"], x?.["url"]?.["value"]]);
+    );
+
+  }
+
+  private load_statistics(orcid_id$: Observable<string>): Observable<CuratorStatistics[]> {
+    return orcid_id$.pipe(
+      switchMap((orcid_id: string) => {
+        return this.curatorStatistics.get_curator_statistics(orcid_id);
+      }
+      ))
+  }
+
+  private combine_resources_statistics(
+    resources$: Observable<Resource[]>,
+    curatorStatistics$: Observable<CuratorStatistics[]>
+  ): Observable<StatisticsWithResource[]> {
+    // Done: Finish implementation
+    return combineLatest([resources$, curatorStatistics$]).pipe(
+      map(([resources, curatorStats]) => {
+        return curatorStats.map((stat) => {
           return {
-            keywords,
-            biography,
-            social_urls,
+            resource: resources.find((res) => res.resource_id == stat.resource_id),
+            curatorStatistics: stat
           };
-        })
-      );
-  }
-
-  get_orcid_biography(orcid_id: string): Observable<string> {
-    const url = new URL(`${orcid_id}/biography`, this.orcid_url)
-    return this.http.get(url.href, {
-      headers: {
-        Accept: "application/json",
-      }
-    }).pipe(
-      filter((response) => !!response['content']),
-      pluck('content')
-    )
-  }
-
-  get_orcid_links(orcid_id: string) {
-    const url = new URL(`${orcid_id}/researcher-urls`, this.orcid_url)
-
-    return this.http.get(url.href, {
-      headers: {
-        Accept: "application/json",
-      }
-    }).pipe(
-      filter(({'researcher-url': urls}: any) => !!urls && urls),
-      pluck('researcher-url'),
-      map((url_list) => {
-        // for each url in the url_list, build object containing "name" and "url" attributes
-        return url_list.map(({'url-name': name, url }) => {
-          return { name, value: url.value }
-        })
-      }) 
-    )
-  }
-
-  get_orcid_keywords(orcid_id: string) {
-    const url = new URL(`${orcid_id}/keywords`, this.orcid_url)
-    return this.http.get(url.href, {
-      headers: {
-        Accept: "application/json",
-      }
-    }).pipe(
-      filter((response: any) => !!response.keyword && response.keyword.length > 0),
-      pluck('keyword'),
-      map((keyword_list: any[]): string[] => {
-        return keyword_list.map((keyword) => keyword.content)
+        });
       })
-    )
+    );
   }
 
-  get_achievements(orcid_id: string, resource_id: string) {
-    return this.http
-      .get(this.wsUrl + `/achievements/${orcid_id}/${resource_id}`, {
-        headers: {
-          version: "2",
-        },
+  private loadResources(resourceIds$: Observable<string[]>): Observable<Resource[]> {
+
+    // use resource_id array to load resources
+    return resourceIds$.pipe(
+      switchMap((resourceIds: string[]) => {
+        const resourcesArray$ = resourceIds.map((resource_id: string) =>
+          this.resources.get_resource(resource_id)
+        );
+        return combineLatest(resourcesArray$);
       })
-      .pipe(pluck("data"));
+    );
   }
 
-  get_reports(httpParams: HttpParams) {
-    return this.http.get(this.wsUrl + `/reports`, {
+  get_resource_terms(resource_id: string) {
+    return this.http.get(this.wsUrl + "/terms", {
       headers: {
-        version: '2'
-      },
-      params: httpParams
-    })
-  }
-
-  curator_statistics(orcid_id: string) {
-    return this.http.get(this.wsUrl + '/statistics/user/' + orcid_id, {
-      headers: {
-        version: '2'
-      }
-    })
-  }
-
-  get_resource_terms(resource_id: string){
-    return this.http.get(this.wsUrl + '/terms', {
-      headers: {
-        version: '2'
+        version: "2",
       },
       params: {
-        resource_id
-      }
-    })
+        resource_id,
+      },
+    });
   }
-  
 }

@@ -1,5 +1,5 @@
-<div class="tw-w-screen tw-flex tw-flex-row tw-flex-wrap" *ngIf="markdownPath$ | async as markdownPath">
-  <div class="tw-px-2 tw-w-full tw-max-h-screen sm:tw-w-1/4 2xl:tw-w-1/6">
+<div class="tw-w-screen tw-flex tw-flex-row tw-flex-wrap tw-justify-between" *ngIf="markdownPath$ | async as markdownPath">
+  <div class="tw-px-2 sm:tw-px-4 tw-w-full tw-max-h-screen sm:tw-w-1/4 2xl:tw-w-1/4">
     <div class="sm:tw-fixed">
       <div class="tw-flex tw-justify-between">
         <h2 class="tw-text-xl sm:tw-text-center tw-mt-2 tw-font-bold">Table of contents</h2>
@@ -16,8 +16,10 @@
 
   </div>
   <main
-    class="tw-w-full tw-block sm:tw-w-3/4 2xl:tw-w-2/3 tw-p-2 tw-shadow-lg sm:tw-px-4"
+    class="tw-w-full tw-block sm:tw-w-3/4 2xl:tw-w-1/2 tw-p-2 sm:tw-px-4"
   >
     <markdown [src]="markdownPath" (load)="onLoad($event)" (ready)="onDocumentReady()" class="tw-prose prose-a:tw-text-blue-500 prose-strong:tw-text-apicuron-purple dark:prose-invert prose-img:sm:tw-block"> </markdown>
   </main>
+  <div class="tw-px-2 tw-w-0 tw-max-h-screen 2xl:tw-w-1/4">
+  </div>
 </div>

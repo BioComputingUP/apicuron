@@ -4,6 +4,7 @@ import { ActivatedRoute, ParamMap } from "@angular/router";
 import { catchError, map, pluck, share, shareReplay, switchMap } from "rxjs/operators";
 import { combineLatest, Observable } from "rxjs";
 import { CuratorPageService } from "src/app/curator/curator-page/curator-page.service";
+import { CuratorService } from "src/app/curator/curator.service";
 @Component({
   selector: "app-database-page",
   templateUrl: "./database-page.component.html",
@@ -18,18 +19,20 @@ export class DatabasePageComponent implements OnInit {
   resource$: Observable<Object>;
   stats$: Observable<unknown>;
   users$: Observable<unknown>;
+  leaderboardLoaded$: Observable<Boolean>;
 
 
   constructor(
     private databaseService: DatabasesService,
-    private curatorpageService: CuratorPageService,
+    private curatorService: CuratorService,
     private route: ActivatedRoute
   ) {}
 
   
   more_badges= false;
   more_medals= false;
-
+  expand_terms = false;
+  
   
   ngOnInit(): void {Observable
 
@@ -52,9 +55,9 @@ export class DatabasePageComponent implements OnInit {
       switchMap(({ data }: any) => {
         const users_stats$: Array<Observable<any>> = data.map(
           (stat) => {
-            return this.curatorpageService.get_curator(stat.curator_orcid).pipe(
+            return this.curatorService.get_curator(stat.curator_orcid).pipe(
               map((curator) => {
-                return { ...curator, stats: stat}
+                return { ...curator, stats: [stat]}
               })
             )
           }
@@ -64,8 +67,15 @@ export class DatabasePageComponent implements OnInit {
       shareReplay(),
       // pluck('data')
     )
+    
+    this.leaderboardLoaded$ = this.leaderboard$.pipe(
+      map((leaderboard: Array<any>): Boolean => {
+        return !!leaderboard && leaderboard.length > 0
+      })
+    )
 
-    // this.leaderboard$ = combineLatest([this.users$, this.stats$])
+
+
     
     this.resource$ = this.resourceId$.pipe(
       switchMap(
@@ -86,7 +96,6 @@ export class DatabasePageComponent implements OnInit {
     this.terms$ = this.resource$.pipe(
       pluck('terms')
     )
-
 
   }
 }

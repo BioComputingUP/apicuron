@@ -1,0 +1,38 @@
+<table class="tw-w-full tw-divide-y-2 tw-divide-gray-200 tw-bg-white tw-text-sm">
+    <thead class="tw-text-left">
+        <tr>
+            <th class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-font-medium tw-text-gray-900">
+                Activity
+            </th>
+            <th class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-font-medium tw-text-gray-900">
+                Activity Type
+            </th>
+            <th class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-font-medium tw-text-gray-900">
+                Date
+            </th>
+            <th class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-font-medium tw-text-gray-900">
+                Score
+            </th>
+        </tr>
+    </thead>
+
+    <tbody class="tw-divide-y tw-divide-gray-200">
+        <tr *ngFor="let report of reports">
+            <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-font-medium tw-text-gray-900">
+                {{ report.term.activity_name }}
+            </td>
+            <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-text-gray-700">
+                <span [ngClass]="report.term.categoryColor()" class="tw-font-bold tw-px-1 tw-rounded-full">
+                    {{ report.term.category }}
+                </span>
+            </td>
+            <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-text-gray-700">
+                {{ report.formatDate('date') }}
+            </td>
+            <td class="tw-whitespace-nowrap tw-px-4 tw-py-2 tw-text-gray-700">
+                {{ report.term.score }}
+            </td>
+        </tr>
+
+    </tbody>
+</table>

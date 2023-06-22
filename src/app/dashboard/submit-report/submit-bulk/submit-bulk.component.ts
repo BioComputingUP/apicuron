@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { FormBuilder, FormControl, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
 import { Observable } from "rxjs";
+import { switchMap } from 'rxjs/operators'
 import { DashboardService } from "../../services/dashboard.service";
 
 @Component({
@@ -31,7 +32,16 @@ export class SubmitBulkComponent implements OnInit {
     const formData = new FormData();
     formData.append('reports', this.reports.value)
 
-    this.dashboardService.submit_reports_bulk(formData).subscribe(
+    this.resource$.pipe(
+      switchMap((resource: { resource_id: string }) => {
+        if(this.delete_all){
+          const res_id: string = resource['resource_id']
+          formData.append('delete_all[]', res_id)
+        }
+        
+        return this.dashboardService.submit_reports_bulk(formData)
+      })
+    ).subscribe(
       (response) => {
         this.toast.success('you will receive a submission report in your notifications soon.','Reports submitted')
       },
@@ -59,5 +69,9 @@ export class SubmitBulkComponent implements OnInit {
 
   get reports(): FormControl{
     return this.form.get('reports')
+  }
+
+  get delete_all(): FormControl{
+    return this.form.get('delete-all')
   }
 }
