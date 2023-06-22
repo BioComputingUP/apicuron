@@ -44,6 +44,15 @@ export class Badge {
 		required: true,
 	})
 	count_threshold: number;
+
+	@Prop()
+	list_terms: string[]
+
+
+	@Prop({
+		type: Date
+	})
+	earned_at: Date
 }
 
 export const BadgeSchema = SchemaFactory.createForClass(Badge);

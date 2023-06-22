@@ -15,8 +15,6 @@ export class MedalDef {
 
 	@Prop()
 	category: string;
-
-	
 	
 	@Prop()
 	count_threshold: number;

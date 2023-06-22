@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { plainToInstance } from 'class-transformer';
 import { Model } from 'mongoose';
+import { AchievementFilter } from './dto/achievement-filter.dto';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import { AchievementsDefService } from './achievements-def.service';
 import { Badge, BadgeDocument } from './schemas/badges.schema';
@@ -13,6 +15,33 @@ export class AchievementsService {
 		@InjectModel('badge') protected badgeModel: Model<BadgeDocument>,
 		@InjectModel('medal') protected medalModel: Model<MedalDocument>,
 	) {}
+
+    async getBadges(filter: AchievementFilter){
+        const filterInstance = plainToInstance(AchievementFilter, filter)
+        const dataPromise = this.badgeModel.find(filterInstance.getQuery(), {}, filterInstance.getQueryOptions())
+        const countPromise = this.badgeModel.count(filterInstance.getQuery())
+
+        const [data, count] = await Promise.all([dataPromise, countPromise])
+        return {
+            data,
+            count,
+            page: filterInstance.page
+        }
+    }
+
+
+    async getMedals(filter: AchievementFilter){
+        const filterInstance = plainToInstance(AchievementFilter, filter)
+        const dataPromise = this.medalModel.find(filterInstance.getQuery(), {}, filterInstance.getQueryOptions())
+        const countPromise = this.medalModel.count(filterInstance.getQuery())
+
+        const [data, count] = await Promise.all([dataPromise, countPromise])
+        return {
+            data,
+            count,
+            page: filterInstance.page
+        }
+    }
 
     async user_achievements(curator_orcid: string, resource_id: string){
         const resource_uri = await this.partnerResourceService.retrieve_uri(resource_id)
@@ -49,7 +78,7 @@ export class AchievementsService {
             resource_id,
             curator_orcid: orcid_id
         })
-    }
+    }filterInstance
 
     public async delete_resource_medals(resource_id: string){
         return await this.medalModel.deleteMany({

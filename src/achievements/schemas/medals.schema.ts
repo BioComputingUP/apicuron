@@ -78,6 +78,9 @@ export class Medal {
 		required: true,
 	})
 	score_total: number;
+
+	@Prop()
+	list_terms: string[]
 }
 
 export const MedalSchema = SchemaFactory.createForClass(Medal);

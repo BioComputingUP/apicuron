@@ -25,6 +25,8 @@ export class Achievement {
 		enum: ['badge', 'medal'],
 	})
 	type: string;
+
+	
 }
 
 export const AchievementSchema = SchemaFactory.createForClass(Achievement);
