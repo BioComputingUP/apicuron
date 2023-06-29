@@ -66,6 +66,7 @@
     "uuidv4": "^6.2.13"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.0.2",
     "@nestjs/cli": "^9.1.1",
     "@nestjs/schematics": "^9.0.1",
     "@nestjs/testing": "^9.0.11",

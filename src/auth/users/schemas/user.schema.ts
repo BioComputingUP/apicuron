@@ -101,14 +101,17 @@ export class User {
 	@Prop({ required: false, select: true })
 	resources: UserResource[];
 
-	@Prop({ required: false })
-	stats: UserStat[];
+	@Prop({ required: true, default() { return [] }})
+	contributed_to: string[]
+
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.virtual('statistics', {
 	ref: 'Statistics',
 	localField: 'orcid_id',
 	foreignField: 'curator_orcid',
 });
+
+export { UserSchema };

@@ -10,7 +10,6 @@ import { Term } from "../../terms/schemas/terms.schema";
 
 export class ReportFilterDto {
 
-
     @IsOptional()
     @Validate(EntryExistsRule,
         [
@@ -49,27 +48,14 @@ export class ReportFilterDto {
     @IsOptional()
     @IsInt()
     @Max(50)
-    page_size?: number = 10
-
-    get_page_size(): null | number {
-        // if (!this.page && !_.isEmpty(_.pick(this, ['from', 'to']))) {
-        //     return undefined
-        // } else {
-        //     return this.page_size || 10
-        // }
-
-        return this.page_size || 10
-    }
+    page_size?: number
 
     @Transform(({ value }) => parseInt(value))
     @IsOptional()
     @IsInt()
     @Min(1)
-    page?: number
+    page: number = 1
 
-    get_page(): number {
-        return this.page || 1
-    }
 
     @IsOptional()
     @Transform(({ value }) => new Date(value))
@@ -93,10 +79,13 @@ export class ReportFilterDto {
     @IsIn(['asc', 'desc', -1, 1])
     sortOrder?: 'asc' | 'desc' | 1 | -1 = 'desc'
 
-    @IsOptional()
-    @IsIn(['date', 'activity_term'])
-    groupBy?: 'date' | 'activity_term'
+
 
 
 }
 
+export class ReportFilterGroupBy {
+    @IsOptional()
+    @IsIn(['day', 'month', 'activity_term'])
+    groupBy: 'day' | 'month' | 'activity_term'
+}

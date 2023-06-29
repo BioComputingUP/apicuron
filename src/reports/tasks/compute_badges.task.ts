@@ -6,7 +6,7 @@ import { AchievementsService } from '../../achievements/achievements.service';
 import { PartnerResource } from '../../resources/schemas/partner-resources.schema';
 import { Badge, BadgeDocument } from '../../achievements/schemas/badges.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Cursor, Model } from 'mongoose';
 import { UsersService } from '../../auth/users/users.service';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { Report, ReportDocument } from '../../reports/reports.schema';
@@ -59,17 +59,31 @@ export class ComputeBadgesTask {
 
 
     public async computeResourceBadges({ resource_id }: PartnerResource) {
-        const curators = await this.reportModel.aggregate([
+
+        await this.badgeModel.deleteMany({ resource_id })
+        
+        const curators: Cursor<any, never> = this.reportModel.aggregate([
             {
                 $group: {
                     _id: '$curator_orcid'
                 }
             }
-        ])
+        ]).cursor()
 
-        const orcid_ids = curators.map((entry) => entry._id);
 
-        const userBadgesPromises = orcid_ids.map((orcid_id) => this.computeUserBadges(resource_id, orcid_id))
+        const userBadgesPromises: Promise<any>[] = []
+
+        await curators.eachAsync((doc) => {
+            const orcid_id: string = doc._id;
+
+            const badgeComputePromise = this.computeUserBadges(resource_id, orcid_id)
+            userBadgesPromises.push(badgeComputePromise)
+
+        })
+
+        // const orcid_ids = curators.map((entry) => entry._id);
+
+        // const userBadgesPromises = orcid_ids.map((orcid_id) => this.computeUserBadges(resource_id, orcid_id))
 
         return await Promise.all(userBadgesPromises)
 

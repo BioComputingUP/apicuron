@@ -36,7 +36,7 @@ import { ReportDto } from './dto/report.dto';
 import { SubmitBulkDto, SubmitReportDto } from './dto/submit-report.dto';
 import { ReportsService } from './reports.service';
 import { ComputeStatisticsTask } from '../reports/tasks/compute_statistics.task';
-import { ReportFilterDto } from './dto/report-filter.dto';
+import { ReportFilterDto, ReportFilterGroupBy } from './dto/report-filter.dto';
 import * as _ from 'lodash';
 import { plainToClass, plainToInstance } from 'class-transformer';
 
@@ -78,11 +78,19 @@ export class ReportsController {
 	@Get()
 	async get_reports(@Query() reportFilter: ReportFilterDto) {
 		const reportFilterInstance = plainToInstance(ReportFilterDto, reportFilter)
-		if(!reportFilterInstance.groupBy){
-			return await this.reportService.getReports(reportFilterInstance);
-		}else{
-			return await this.reportService.getGroupedReports(reportFilterInstance)
-		}
+		return await this.reportService.getReports(reportFilterInstance);
+
+		// if(!reportFilterInstance.groupBy){
+		// }else{
+		// }
+	}
+
+	@Get('group-by/:groupBy')
+	async getGroupedReports(@Query() filter: ReportFilterDto, @Param() groupBy: ReportFilterGroupBy){
+		const filterInstance: ReportFilterDto = plainToInstance(ReportFilterDto, filter);
+		const groupByInstance: ReportFilterGroupBy = plainToInstance(ReportFilterGroupBy, groupBy)
+
+		return await this.reportService.getGroupedReports(filterInstance, groupByInstance)
 	}
 
 	@Get('resource/:resource_id/orcid_id/:orcid_id')

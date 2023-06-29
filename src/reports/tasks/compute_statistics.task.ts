@@ -151,7 +151,8 @@ export class ComputeStatisticsTask {
                 ],
                 'as': 'term'
             }).unwind({
-                'path': '$term'
+                'path': '$term',
+                preserveNullAndEmptyArrays: true
             }).append(
                 {
                     '$set': {

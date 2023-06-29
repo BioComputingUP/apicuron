@@ -5,7 +5,6 @@ import * as StreamObject from 'stream-json/streamers/StreamObject';
 import { createReadStream } from 'fs';
 import { filter } from 'stream-json/filters/Filter';
 import { parser } from 'stream-json';
-import { verifier } from 'stream-json/utils/Verifier';
 import { Stream, chain } from 'stream-chain';
 import { pick } from 'stream-json/filters/Pick';
 import * as StreamArray from 'stream-json/streamers/StreamArray';
