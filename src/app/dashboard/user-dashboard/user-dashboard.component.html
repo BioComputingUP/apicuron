@@ -1,1 +1,47 @@
-<p>user-dashboard works!</p>
+<div *ngIf="development" id="dev_warning_header"
+    class=" tw-bg-orange-100 tw-border-orange-500 tw-text-orange-700 tw-border-l-4 tw-p-2 lg:tw-p-4 tw-text-xs sm:tw-text-base"
+    [ngClass]>
+    <span class="sm:tw-block tw-font-bold tw-font-dm-sans tw-text-base">Warning </span>
+    <p class="tw-inline sm:tw-block sm:tw-leading-7">
+        <a href="http://dev.apicuron.org" class="tw-font-bold">dev.apicuron.org</a> is a test and development website.
+        <a href="http://apicuron.org" class="tw-font-bold">apicuron.org</a> is the official website. Information on this
+        website is
+        only meant to test integrations and is not factual.
+    </p>
+</div>
+
+<div class="tw-flex tw-flex-row tw-w-full tw-h-screen tw-items-start">
+    <dashboard-sidebar class="tw-hidden sm:tw-block sm:tw-w-1/4 md:tw-w-1/5 lg:tw-w-1/6 tw-flex-none"></dashboard-sidebar>
+    <slide-over-panel [(openPanel)]="openMobileMenu">
+        <dashboard-sidebar></dashboard-sidebar>
+    </slide-over-panel>
+
+    <!-- main content -->
+    <div class="tw-grow">
+        <!-- navbar -->
+        <div class="tw-flex tw-flex-row tw-justify-between tw-shadow-md  tw-px-2 tw-py-4 tw-bg-white">
+            <div class="sm:tw-hidden">
+                <button aria-controls="mobile-menu" aria-expanded="false"
+                    class="tw-inline-flex tw-items-center tw-justify-center tw-p-2 tw-rounded-md hover:tw-text-gray-700 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-inset focus:tw-ring-gray-500"
+                    type="button" (click)="openMobileMenu = !openMobileMenu">
+                    <span class="tw-sr-only">Open main menu</span>
+                    <svg-icon [ngClass]="{'tw-hidden': openMobileMenu, 'tw-block': !openMobileMenu }"
+                        svgClass="tw-text-gray-700" src="assets/svg/menu_icon.svg"></svg-icon>
+                    <svg-icon [ngClass]="{'tw-hidden': !openMobileMenu, 'tw-block': openMobileMenu }"
+                        src="assets/svg/close.svg" svgClass="tw-w-6 tw-h-6 tw-text-gray-700"></svg-icon>
+                </button>
+
+            </div>
+            <div>
+                <h2 class="tw-text-2xl tw-font-dm-sans tw-text-gray-700 tw-leading-relaxed tw-tracking-wide ">Dashboard
+                </h2>
+            </div>
+            <auth-dropdown class="tw-text-gray-700 tw-ml-auto"></auth-dropdown>
+
+        </div>
+
+        <router-outlet></router-outlet>
+    </div>
+
+
+</div>

@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Component, Input, OnInit } from "@angular/core";
-import { User } from '../../models/User' ;
+import { User } from '../../models/User.model' ;
 import { OrcidService } from "src/app/orcid/services/orcid.service";
 import { OrcidModule } from "src/app/orcid/orcid.module";
 import { Observable } from "rxjs";

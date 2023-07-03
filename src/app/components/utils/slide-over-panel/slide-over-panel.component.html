@@ -1,5 +1,7 @@
 <!-- Modal -->
+
 <div class="tw-relative tw-z-40 tw-ease-in-out tw-duration-500"
+    *ngIf="loaded$ | async"
     [ngClass]="{ 'tw-invisible': !open_panel, 'tw-visible': open_panel }" aria-labelledby="slide-over-title"
     role="dialog" aria-modal="true">
     <div class="tw-fixed tw-inset-0 tw-bg-gray-700 tw-bg-opacity-75 tw-backdrop-blur tw-transition-opacity tw-ease-in-out tw-duration-500"

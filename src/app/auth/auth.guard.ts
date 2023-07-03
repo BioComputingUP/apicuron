@@ -19,9 +19,9 @@ export class AuthGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Observable<boolean | UrlTree> {
     return this.auth.loggedIn$.pipe(
-      map((loggedIn) => {
+      map((loggedIn: Boolean) => {
         // if the user is loggedIn we return true
-        if (loggedIn) {
+        if (!!loggedIn) {
           return true;
         } else {
           // if the user is not loggedIn, we redirect him to the homepage

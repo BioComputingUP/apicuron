@@ -1,5 +1,16 @@
 <div>
-    <navbar></navbar>
+  <div *ngIf="development" id="dev_warning_header"
+    class=" tw-bg-orange-100 tw-border-orange-500 tw-text-orange-700 tw-border-l-4 tw-p-2 lg:tw-p-4 tw-text-xs sm:tw-text-base"
+    [ngClass]>
+    <span class="sm:tw-block tw-font-bold tw-font-dm-sans tw-text-base">Warning </span>
+    <p class="tw-inline sm:tw-block sm:tw-leading-7">
+      <a href="http://dev.apicuron.org" class="tw-font-bold">dev.apicuron.org</a> is a test and development website. <a
+        href="http://apicuron.org" class="tw-font-bold">apicuron.org</a> is the official website. Information on this
+      website is
+      only meant to test integrations and is not factual.
+    </p>
+  </div>
+  <navbar></navbar>
   <div class="tw-min-h-screen tw-bg-gray-100">
     <router-outlet></router-outlet>
   </div>

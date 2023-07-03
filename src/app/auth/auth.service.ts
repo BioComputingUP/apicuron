@@ -17,6 +17,7 @@ import {
   HttpRequest,
 } from "@angular/common/http";
 import { Component, OnInit, Injectable } from "@angular/core";
+import { User } from "src/app/models/User.model";
 
 @Injectable({
   providedIn: "root",
@@ -47,16 +48,19 @@ export class AuthService implements HttpInterceptor {
     this.user$ = this.set_user_data();
   }
 
-  private set_user_data(): Observable<Object> {
+  private set_user_data(): Observable<User> {
     // request to get the current user
-    const user_data$: Observable<Object> = this.http.get(
+    const user_data$: Observable<User> = this.http.get(
       environment.ws + "/auth/profile",
       {
         headers: {
           authorization: this.token_value,
         },
       }
-    ).pipe(shareReplay())
+    ).pipe(
+      shareReplay(),
+      map((user: User) => new User().deserialize(user))
+    )
 
     // request to get the user current notifications
     // const user_notifications$: Observable<Array<any>> = this.http

@@ -5,8 +5,9 @@ import { DatabasesService } from '../../databases/services/databases.service';
 import { AuthService } from '../../auth/auth.service';
 import { DashboardService } from '../services/dashboard.service';
 import { Observable } from 'rxjs';
-import { ReportStatistics } from '../../models/Report.model';
+import { ReportStatistics } from 'src/app/models/report-statistics';
 import * as moment from 'moment'
+import { ReportFilter } from 'src/app/reports/interfaces/report-filter.interface';
 @Component({
   selector: 'app-database-overview',
   templateUrl: './database-overview.component.html',
@@ -39,12 +40,14 @@ export class DatabaseOverviewComponent implements OnInit {
     this.reportStatistics$ = this.resource$.pipe(
       switchMap(({ resource_id }: { resource_id: string }) => {
         moment()
-        return this.dashboardService.get_report_statistics({ 
-          resource_id,
-          from: this.firstDay,
-          to: this.lastDay > new Date() ? new Date() : this.lastDay,
-          groupBy: 'date'
-        })
+        return this.dashboardService.get_report_statistics(ReportFilter.create(
+          { 
+            resource_id,
+            from: this.firstDay,
+            to: this.lastDay > new Date() ? new Date() : this.lastDay,
+            groupBy: 'date'
+          }
+        ))
       }),
       shareReplay()
     )

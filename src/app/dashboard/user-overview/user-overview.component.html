@@ -1,0 +1,42 @@
+<div *ngIf="user$ | async as user" class="tw-p-1 sm:tw-p-2">
+    <h2 class="tw-text-lg lg:tw-text-xl tw-font-bold tw-font-dm-sans">Welcome {{ user.displayedName }}</h2>
+
+    <div class="tw-flex tw-flex-row tw-flex-wrap">
+        <div class="tw-w-full sm:tw-w-2/3">
+            <div class="tw-p-1 tw-rounded tw-shadow-md tw-shadow-gray-500 tw-bg-white">
+                <div class="tw-w-full tw-px-2">
+                    <div>
+                        <h3 class="tw-text-lg tw-font-dm-sans tw-font-bold tw-tracking-wide tw-capitalize">My
+                            Contributions</h3>
+                        <div>
+                            <form class="tw-w-full tw-flex tw-flex-row tw-justify-end tw-gap-2"
+                                [formGroup]="reportsChartForm" action="">
+                                <div>
+                                    <label class="tw-text-sm tw-font-bold tw-text-gray-700 tw-mr-1"
+                                        for="from">from</label>
+                                    <p-calendar p-datepicker="tw-bg-white tw-rounded tw-shadow-gray-700"
+                                        formControlName="from"
+                                        [maxDate]="reportsChartForm.controls.to.value"></p-calendar>
+                                </div>
+                                <div>
+                                    <label class="tw-text-sm tw-font-bold tw-text-gray-700 tw-mr-1" for="to">to</label>
+                                    <p-calendar formControlName="to" [maxDate]="maxTo"
+                                        [minDate]="reportsChartForm.controls.from.value"></p-calendar>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- <ng-container *ngIf="reportFilter$ | async as reportFilter"> -->
+                    <ng-container *ngIf="chartData$ | async as chartData">
+                        <div class="tw-w-full tw-overflow-hidden">
+                            <reports-by-date-chart [resources]="chartData[0]" [reportsData]="chartData[1]"
+                                [reportFilter]="chartData[2]"></reports-by-date-chart>
+                        </div>
+                    </ng-container>
+                <!-- </ng-container> -->
+
+            </div>
+        </div>
+    </div>
+</div>

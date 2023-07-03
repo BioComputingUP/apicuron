@@ -8,12 +8,12 @@ import { ReportCardComponent } from "src/app/components/report-card/report-card.
 import { ReportFilterFormComponent } from "src/app/components/report-filter-form/report-filter-form.component";
 import { ReportTableComponent } from "src/app/components/report-table/report-table.component";
 import { SelectMultipleComponent } from "src/app/components/utils/multiple-select/select-multiple.component";
-import { User } from "src/app/models/User";
+import { Paginated } from "src/app/interfaces/paginated";
+import { User } from "src/app/models/User.model";
 import { Report } from "src/app/models/report.model";
 import { Resource } from "src/app/models/resource.model";
 import { Term } from "src/app/models/term.model";
 import { PaginationComponent } from "src/app/pagination/pagination.component";
-import { PaginatedReports, PaginatedReportsWithTerms } from "src/app/reports/interfaces/paginated-reports.interface";
 import { ReportFilter } from "src/app/reports/interfaces/report-filter.interface";
 import { ReportsModule } from "src/app/reports/reports.module";
 import { ReportsService } from "src/app/reports/services/reports.service";
@@ -35,7 +35,7 @@ export class CuratorStatDetailsComponent implements OnInit {
     terms$: BehaviorSubject<Term[]> = new BehaviorSubject<Term[]>([]);
     reportsWithTerms$: Observable<{ data: Report[], total_count: Number, page: Number, page_size: Number }>;
 
-    paginatedReports$: Observable<PaginatedReports>;
+    paginatedReports$: Observable<Paginated<Report>>;
     reportFilter$: BehaviorSubject<ReportFilter> = new BehaviorSubject<ReportFilter>(null);
 
 
@@ -74,7 +74,7 @@ export class CuratorStatDetailsComponent implements OnInit {
         
         this.reportsWithTerms$ = combineLatest([this.paginatedReports$, this.terms$]).pipe(
             filter(([reports, terms]) => terms.length > 0),
-            map(([reports, terms]: [PaginatedReports, Term[]]) => {
+            map(([reports, terms]: [Paginated<Report>, Term[]]) => {
                 const { total_count, page, page_size }= reports
                 const data = reports.data.map((report) => {
                     report.term = terms.find((term) => term.activity_term === report.activity_term)

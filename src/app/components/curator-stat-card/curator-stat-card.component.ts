@@ -3,12 +3,11 @@ import { Component, Input, OnInit } from "@angular/core";
 import { Resource } from "src/app/models/resource.model";
 import { CuratorStatistics } from "src/app/models/statistics.model";
 import { RewardCardComponent } from "./reward-card.component";
-import { User } from "../../models/User";
+import { User } from "../../models/User.model";
 import { ReportsModule } from "src/app/reports/reports.module";
 import { ReportsService } from "src/app/reports/services/reports.service";
 import { ReportFilter } from "src/app/reports/interfaces/report-filter.interface";
 import { Observable, combineLatest } from "rxjs";
-import { PaginatedReports } from "src/app/reports/interfaces/paginated-reports.interface";
 import { map, shareReplay, tap } from "rxjs/operators";
 import { ReportCardComponent } from "src/app/components/report-card/report-card.component";
 import { TermsService } from "src/app/terms/services/terms.service";
@@ -63,7 +62,7 @@ export class CuratorStatCardComponent implements OnInit {
     protected badgeService: BadgesService
   ) {}
 
-  reports$: Observable<PaginatedReports>;
+  reports$: Observable<Paginated<Report>>;
 
   open_details: Boolean = false;
   open_badge_details: Boolean = false;
@@ -89,7 +88,7 @@ export class CuratorStatCardComponent implements OnInit {
       .pipe(shareReplay());
 
     this.reportsWithTerms$ = combineLatest([this.terms$, this.reports$]).pipe(
-      map(([terms, reports]: [Term[], PaginatedReports]) => {
+      map(([terms, reports]: [Term[], Paginated<Report>]) => {
         return reports.data.map((report: Report) => {
           return {
             report: report,

@@ -1,51 +1,152 @@
-
-
 <div
-    class="tw-h-full tw-min-h-screen tw-top-16 sm:tw-top-0 tw-bottom-0 lg:tw-left-0 tw-py-2 tw-overflow-x-visible tw-transition-all tw-text-center tw-bg-apicuron-purple md:tw-block tw-fixed md:tw-relative tw-duration-300 tw-ease-in sm:tw-translate-x-0"
-    [ngClass]="{'tw-translate-x-0': mobile_toggle, '-tw-translate-x-full': !mobile_toggle, 'tw-w-80': !minimized, 'tw-w-12': minimized}"
-    >
-    <div class="tw-text-gray-100 tw-text-xl">
-        <div *ngIf="resource$ | async as resource" class="tw-p-2.5 tw-mt-1 tw-flex tw-flex-col tw-items-center" [ngClass]="{'tw-w-0 tw-invisible': minimized}">
-            <img [src]="logo_src(resource.logo)"
-                class="tw-w-40 tw-mx-auto"
-                style="filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(183deg) brightness(115%) contrast(101%)"
-                alt="">
-            <h1 class="tw-font-bold tw-text-gray-200 tw-text-xl tw-ml-3">{{ resource.resource_name }} Dashboard</h1>
+    class="tw-flex tw-h-screen tw-flex-col tw-justify-between tw-border-e tw-bg-white tw-w-full">
+    <div class="tw-px-4 tw-py-6">
+        <span class="tw-grid tw-h-10 tw-w-32 tw-place-content-center tw-rounded-lg tw-text-xs tw-text-gray-600">
+            <svg-icon src="assets/APICURON.svg" svgClass="tw-w-full"></svg-icon>
+        </span>
 
-        </div>
-        <div class="tw-my-2 tw-bg-gray-500 tw-bg-opacity-20 tw-h-[1px]"></div>
+        <ul class="tw-mt-6 tw-space-y-1">
+            <li>
+                <a routerLink="/dashboard"
+                    class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item-colors list-item-active">
+                    General
+                </a>
+            </li>
+
+            <ng-container *ngIf="links$ | async as resourcesLinks">
+                <span class="tw-text-gray-400 tw-font-bold tw-text-sm">Manage Resources</span>
+
+                <ng-container *ngFor="let resourceLinks of resourcesLinks">
+                    <li>
+                        <details class="tw-group summary::-webkit-details-marker]:tw-hidden">
+                            <summary
+                                class="tw-flex tw-cursor-pointer tw-items-center tw-justify-between tw-rounded-lg tw-px-4 tw-py-2 list-item-colors">
+                                <span class="tw-text-sm ">
+                                    <img [src]="resourceLinks.resource.faviconLink()" alt="" class="tw-inline tw-w-4 tw-h-4">
+                                    {{ resourceLinks.resource.resource_name }}
+                                </span>
+        
+                                <span class="tw-shrink-0 tw-transition tw-duration-300 group-open:tw--rotate-180">
+                                    <svg-icon src="assets/svg/chevron_down.svg" svgClass="tw-h-4 tw-w-4 tw-stroke-2"></svg-icon>
+                                </span>
+        
+                            </summary>
+        
+                            <ul class="tw-mt-2 tw-space-y-1 tw-px-4">
+                                <li *ngFor="let link of resourceLinks.links">
+                                    <a [routerLink]="link.href"
+                                        class="tw-flex tw-w-full tw-flex-row tw-justify-between tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item-colors">
+                                        {{ link.name}}
+
+                                        <svg-icon [src]="link.icon" svgClass="tw-w-4 tw-h-4"></svg-icon>
+                                    </a>
+                                </li>
+        
+                            </ul>
+                        </details>
+                    </li>
+
+                </ng-container>
+            </ng-container>
+            <li>
+                <details class="tw-group summary::-webkit-details-marker]:tw-hidden">
+                    <summary
+                        class="tw-flex tw-cursor-pointer tw-items-center tw-justify-between tw-rounded-lg tw-px-4 tw-py-2 list-item-colors">
+                        <span class="tw-text-sm "> Teams </span>
+
+                        <span class="tw-shrink-0 tw-transition tw-duration-300 group-open:tw--rotate-180">
+                            <svg-icon src="assets/svg/chevron_down.svg" svgClass="tw-h-4 tw-w-4 tw-stroke-2"></svg-icon>
+
+                        </span>
+
+                    </summary>
+
+                    <ul class="tw-mt-2 tw-space-y-1 tw-px-4">
+                        <li>
+                            <a href=""
+                                class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item-colors">
+                                Banned Users
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href=""
+                                class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item-colors">
+                                Calendar
+                            </a>
+                        </li>
+                    </ul>
+                </details>
+            </li>
+
+            <!-- <li>
+                <a href=""
+                    class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item-colors">
+                    Billing
+                </a>
+            </li>
+
+            <li>
+                <a href=""
+                    class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item-colors">
+                    Invoices
+                </a>
+            </li>
+
+            <li>
+                <details class="tw-group summary::-webkit-details-marker]:tw-hidden">
+                    <summary
+                        class="tw-flex tw-cursor-pointer tw-items-center tw-justify-between tw-rounded-lg tw-px-4 tw-py-2 list-item-colors">
+                        <span class="tw-text-sm "> Account </span>
+
+                        <span class="tw-shrink-0 tw-transition tw-duration-300 group-open:tw--rotate-180">
+                            <svg-icon src="assets/svg/chevron_down.svg" svgClass="tw-h-4 tw-w-4 tw-stroke-2"></svg-icon>
+
+                        </span>
+                    </summary>
+
+                    <ul class="tw-mt-2 tw-space-y-1 tw-px-4">
+                        <li>
+                            <a href=""
+                                class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item-colors">
+                                Details
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href=""
+                                class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item-colors">
+                                Security
+                            </a>
+                        </li>
+
+                        <li>
+                            <form action="/logout">
+                                <button type="submit"
+                                    class="tw-w-full tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  tw-text-gray-500 text-align:tw-_inherit] hover:tw-bg-gray-100 hover:tw-text-gray-700">
+                                    Logout
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </details>
+            </li> -->
+        </ul>
     </div>
-    <span class="tw-block tw-uppercase tw-text-gray-300 tw-text-left tw-text-sm tw-font-bold tw-ml-1" [ngClass]="{'tw-hidden': minimized}">Database Information</span>
-    <ng-container *ngIf="links$ | async as links">
-        <a *ngFor="let link of links" [routerLink]="link.href"
-            routerLinkActive="tw-bg-opacity-20 tw-bg-gray-100 tw-text-gray-200 tw-border-gray-200 tw-border-opacity-100"
-            [routerLinkActiveOptions]="{ exact: true }"
-            class="tw-p-2.5 tw-flex tw-items-center tw-px-4 tw-duration-300 tw-cursor-pointer tw-text-gray-300 tw-border-l-2 tw-border-apicuron-purple tw-border-opacity-20 hover:tw-bg-opacity-20 hover:tw-bg-gray-50 hover:tw-border-opacity-100 hover:tw-text-gray-200 hover:tw-border-gray-200 ">
-            <svg-icon svgClass="tw-h-4 tw-w-4 tw-text-inherit" [src]="link.icon" alt=""></svg-icon>
-            <span class="tw-text-[15px] tw-ml-4 tw-text-inherit tw-capitalize" [ngClass]="{'tw-hidden': minimized}" >{{ link.name }}</span>
+
+    <div class="tw-sticky tw-inset-x-0 tw-bottom-0 tw-border-t tw-border-gray-100" *ngIf="user$ | async as user">
+        <a href="#" class="tw-flex tw-items-center tw-gap-2 tw-bg-white tw-p-4 hover:tw-bg-gray-50">
+            <img alt="Man"
+                [src]="user.generate_avatar()"
+                class="tw-h-10 tw-w-10 tw-rounded-full tw-object-cover">
+
+            <div>
+                <p class="tw-text-xs">
+                    <strong class="tw-block ">{{ user.displayedName }}</strong>
+
+                    <!-- <span> eric@frusciante.com </span> -->
+                </p>
+            </div>
         </a>
-
-    </ng-container>
-    <div class="tw-my-4 tw-bg-gray-500 tw-bg-opacity-20 tw-h-[1px]"></div>
-    
-    <!-- additionnal options place -->
-    <!-- <div
-        class="tw-p-2.5 tw-mt-3 tw-flex tw-items-center tw-rounded-md tw-px-4 tw-duration-300 tw-cursor-pointer hover:tw-bg-apicuron-bright-purple tw-text-white">
-        <i class="tw-bi tw-bi-box-arrow-in-right"></i>
-        <span class="tw-text-[15px] tw-ml-4 tw-text-gray-200 tw-font-bold">Logout</span>
-    </div> -->
-    <button class="tw-block sm:tw-hidden tw-absolute tw-transform tw-top-1/2 tw-translate-x-full -tw-translate-y-1/2 tw-right-0" (click)="mobile_toggle = !mobile_toggle">
-        <div [class]="{'tw-rotate-180': mobile_toggle}">
-            <svg-icon src="assets/svg/chevron-right.svg" svgClass="tw-w-6 tw-h-6 tw-rounded tw-bg-apicuron-purple tw-text-white tw-mx-1"></svg-icon>
-        </div>
-    </button>
-
-    <button class="tw-block tw-absolute tw-bottom-2 tw-right-2 tw-text-gray-100 tw-bg-gray-300 tw-bg-opacity-25 tw-rounded" (click)="minimized = !minimized">
-        <svg class="tw-transition-all tw-w-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-            [ngClass]="{ 'tw-rotate-180': minimized, 'tw-rotate-0': !minimized}">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"></path>
-          </svg>
-    </button>
-    
+    </div>
 </div>
-

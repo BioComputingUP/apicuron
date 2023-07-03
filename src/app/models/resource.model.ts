@@ -29,6 +29,10 @@ export class Resource implements Deserializable {
     return this;
   }
 
+  faviconLink(): string{
+    return new URL('/favicon.ico', this.resource_url).href;
+  }
+
   resource_description: string;
   resource_id: string;
   resource_long_name: string;

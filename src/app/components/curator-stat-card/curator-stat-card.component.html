@@ -45,7 +45,7 @@
       </div>
       <div class="tw-w-full tw-flex tw-flex-row tw-items-stretch tw-grow tw-flex-wrap"
         *ngIf="badges$ | async as badges">
-        <div class="tw-w-1/2 tw-p-2" *ngFor="let badge of badges.data">
+        <div class="tw-w-1/2 tw-h-1/2 tw-p-2" *ngFor="let badge of badges.data">
           <badge-card [badge]="badge" [terms]="(terms$ | async)"></badge-card>
         </div>
       </div>

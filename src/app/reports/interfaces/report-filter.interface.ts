@@ -1,5 +1,6 @@
 import * as _ from "lodash";
 import { Serializable } from "src/app/interfaces/deserializable.model";
+import { NonFunctionKeys } from "../../interfaces/non-function-keys";
 
 export class ReportFilter implements Serializable {
     
@@ -55,7 +56,9 @@ export class ReportFilter implements Serializable {
 
     sortOrder?: 'asc' | 'desc' | 1 | -1
 
-    groupBy?: 'date' | 'activity_term'
 
 
 }
+
+export type ReportFilterField = NonFunctionKeys<ReportFilter>
+

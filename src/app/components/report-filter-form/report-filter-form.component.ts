@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { BehaviorSubject, Observable } from "rxjs";
 import { filter, map, startWith, switchMap } from "rxjs/operators";
 import { SelectMultipleComponent } from "src/app/components/utils/multiple-select/select-multiple.component";
-import { User } from "src/app/models/User";
+import { User } from "src/app/models/User.model";
 import { Resource } from "src/app/models/resource.model";
 import { Term } from "src/app/models/term.model";
 import { ReportFilter } from "src/app/reports/interfaces/report-filter.interface";

@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, Input, Output, EventEmitter } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
-
+import { delay } from 'rxjs/operators'
 
 
 @Component({
@@ -12,6 +12,7 @@ import { BehaviorSubject } from "rxjs";
     styleUrls: []
 })
 export class SlideOverPanelComponent {
+    loaded$: any;
 
     // private  _open_panel: Boolean = false;
     @Input('openPanel')
@@ -39,7 +40,11 @@ export class SlideOverPanelComponent {
 
     @Input() side: 'right' | 'left' = 'left';
 
-    constructor() { }
+    constructor() {
+        this.loaded$ = this.openPanel$.asObservable().pipe(
+            delay(200)
+        )
+    }
 
 
     is_right_side() {

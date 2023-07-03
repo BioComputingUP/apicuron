@@ -25,7 +25,7 @@ import { CuratorStatisticsService } from "src/app/curator-statistics/services/cu
 import { CuratorStatistics } from "src/app/models/statistics.model";
 import { ResourcesService } from "src/app/resource/service/resources.service";
 import { Resource } from "src/app/models/resource.model";
-import { User } from "src/app/models/User";
+import { User } from "src/app/models/User.model";
 import { CuratorService } from "src/app/curator/curator.service";
 import { MedalsService } from "src/app/achievements/services/medals.service";
 import { Medal } from "../../models/medal.model";

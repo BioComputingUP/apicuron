@@ -8,7 +8,7 @@ import { DashboardService } from "../../services/dashboard.service";
 import { TermsService } from "../../services/terms.service";
 import { dateTimeValidator } from "../validators/date-time.validator";
 import { orcidIdValidator } from "../validators/orcid-id.validator";
-import { Report } from "../../../models/Report.model";
+import { Report } from "../../../models/report.model";
 
 @Component({
   selector: "submit-single",

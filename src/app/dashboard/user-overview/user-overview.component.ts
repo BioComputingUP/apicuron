@@ -1,0 +1,44 @@
+import { Component, OnInit } from "@angular/core";
+import { BehaviorSubject, Observable, combineLatest } from "rxjs";
+import { map } from "rxjs/operators";
+import { AuthService } from "src/app/auth/auth.service";
+import { User } from "src/app/models/User.model";
+import { ReportFilter } from "src/app/reports/interfaces/report-filter.interface";
+import { UserOverviewPageService } from "../services/user-overview-page.service";
+import { ReportsByResourceId } from "../../reports/services/reports.service";
+import { Resource } from "../../models/resource.model";
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from "@angular/forms";
+import * as moment from "moment";
+
+
+@Component({
+    selector: 'user-overview',
+    templateUrl:'./user-overview.component.html',
+    styleUrls: ['./user-overview.component.scss'],
+})
+export class UserOverviewComponent implements OnInit{
+    user$: Observable<User>;
+    chartReports$: Observable<ReportsByResourceId>;
+    resources$: Observable<Resource[]>;
+    chartData$: Observable<[Resource[], ReportsByResourceId, ReportFilter]>;
+    readonly reportFilter$: Observable<ReportFilter>;
+    reportsChartForm: FormGroup<{ from: FormControl<Date>, to: FormControl<Date> }>;
+    maxTo = new Date();
+
+
+    constructor(protected auth: AuthService, protected page: UserOverviewPageService, protected formBuilder: FormBuilder) {
+        this.user$ = this.auth.user$
+
+        this.reportFilter$ = this.page.reportFilter$;
+        this.resources$ = this.page.resources$;
+        this.chartReports$ = this.page.chartReports$;
+        this.reportsChartForm = this.page.reportsChartForm;
+
+        this.chartData$ = combineLatest([this.resources$, this.chartReports$, this.reportFilter$])
+    }
+    ngOnInit(): void {
+
+
+    }
+
+}

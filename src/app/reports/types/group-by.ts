@@ -1,0 +1,1 @@
+export type ReportGroupBy = 'day' | 'month' | 'activity_term'

@@ -1,4 +1,4 @@
-<section class="tw-bg-white tw-border tw-border-gray-500 tw-shadow-md tw-rounded tw-p-2"
+<section class="tw-bg-white tw-border tw-border-gray-500 tw-shadow-md tw-rounded tw-p-2 tw-w-full"
     *ngIf="resource$ | async as resource">
     <h3 class="tw-text-xl tw-font-bold">Manage Badges</h3>
 
@@ -21,11 +21,11 @@
                     [main_color]="badge.color_code">
                 </svg-badge>
                 <div class="tw-flex tw-flex-row tw-justify-between">
-                    <div class="tw-w-1/2 tw-p-1">
+                    <div class="tw-w-1/2 tw-py-1">
                         <button (click)="open_edit_modal(badge)"
                             class="tw-bg-green-500 tw-text-white tw-font-bold tw-w-full tw-rounded tw-shadow-md">Edit</button>
                     </div>
-                    <div class="tw-w-1/2 tw-p-1">
+                    <div class="tw-w-1/2 tw-py-1">
                         <button (click)="delete_badge(badge)"
                             class="tw-bg-red-500 tw-text-white tw-font-bold tw-w-full tw-rounded tw-shadow-md">Delete</button>
                     </div>

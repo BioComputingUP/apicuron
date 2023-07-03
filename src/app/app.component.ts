@@ -9,5 +9,4 @@ import { environment } from 'src/environments/environment';
 export class AppComponent {
   title = 'apicuron-ui';
 
-  development = ['development', 'local'].includes(environment.env);
 }

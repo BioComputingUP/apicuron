@@ -7,7 +7,7 @@ import { AchievementFilter } from "src/app/achievements/interfaces/achievement-f
 import { MedalsService } from "src/app/achievements/services/medals.service";
 import { MedalCardComponent } from "src/app/components/medal-card/medal-card.component";
 import { Paginated } from "src/app/interfaces/paginated";
-import { User } from "src/app/models/User";
+import { User } from "src/app/models/User.model";
 import { Medal } from "src/app/models/medal.model";
 import { Resource } from "src/app/models/resource.model";
 import { PaginationComponent } from "src/app/pagination/pagination.component";

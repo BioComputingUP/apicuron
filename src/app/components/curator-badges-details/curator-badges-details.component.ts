@@ -6,7 +6,7 @@ import { AchievementFilter } from "src/app/achievements/interfaces/achievement-f
 import { BadgesService } from "src/app/achievements/services/badges.service";
 import { BadgeCardComponent } from "src/app/components/badge-card/badge-card.component";
 import { Paginated } from "src/app/interfaces/paginated";
-import { User } from "src/app/models/User";
+import { User } from "src/app/models/User.model";
 import { Badge } from "src/app/models/badge.model";
 import { Resource } from "src/app/models/resource.model";
 import { PaginationComponent } from "src/app/pagination/pagination.component";

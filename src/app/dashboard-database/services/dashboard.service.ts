@@ -2,10 +2,11 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { environment } from "../../../environments/environment";
-import { Report, ReportFilter, ReportStatistics } from "../../models/Report.model";
+import { Report } from "../../models/report.model";
+import { ReportStatistics } from "src/app/models/report-statistics";
 import { report } from "process";
 import { map, pluck } from "rxjs/operators";
-
+import { ReportFilter } from "src/app/reports/interfaces/report-filter.interface";
 const baseHeaders = {
   version: "2"
 }
@@ -30,7 +31,7 @@ export class DashboardService {
   get_report_statistics(reportFilter: ReportFilter){
     return this.http.get(environment.ws + '/reports', {
       headers: baseHeaders,
-      params: new HttpParams({ fromObject: ReportFilter.serialize(reportFilter) })
+      params: new HttpParams({ fromObject: reportFilter.serialize() })
     }).pipe(
       pluck('data'),
       map((data: any[]) => {

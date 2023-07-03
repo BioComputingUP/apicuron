@@ -15,18 +15,16 @@
               Icon when menu is closed.
               Menu open: "hidden", Menu closed: "block"
             -->
-          <svg aria-hidden="true" class="tw-block tw-h-6 tw-w-6" fill="none" stroke="currentColor" stroke-width="2"
-            viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round"></path>
-          </svg>
+          <svg-icon [ngClass]="{'tw-hidden': !closed_mobile_menu, 'tw-block': closed_mobile_menu }" src="assets/svg/menu_icon.svg"></svg-icon>
           <!--
               Icon when menu is open.
               Menu open: "block", Menu closed: "hidden"
             -->
-          <svg aria-hidden="true" class="tw-hidden tw-h-6 tw-w-6" fill="none" stroke="currentColor" stroke-width="2"
+            <svg-icon [ngClass]="{'tw-hidden': closed_mobile_menu, 'tw-block': !closed_mobile_menu }" src="assets/svg/close.svg" class="tw-w-6 tw-h-6"></svg-icon>
+          <!-- <svg aria-hidden="true" class="tw-hidden tw-h-6 tw-w-6" fill="none" stroke="currentColor" stroke-width="2"
             viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path>
-          </svg>
+          </svg> -->
         </button>
       </div>
       <div class="tw-flex-1 tw-flex tw-items-center tw-justify-center sm:tw-items-stretch sm:tw-justify-start">
@@ -49,7 +47,7 @@
         <a class="nav-item tw-relative before:tw-bg-white hover-underline-animation"
           routerLinkActive="active-underline-animation" routerLink="/about">About</a>
         
-        <auth-dropdown>
+        <auth-dropdown class="tw-dark">
         </auth-dropdown>
       </div>
     </div>
@@ -63,7 +61,7 @@
       <a class="tw-block nav-item" routerLink="/docs">Docs</a>
       <a class="tw-block nav-item" routerLink="/about">About</a>
 
-      <auth-dropdown>
+      <auth-dropdown class="tw-dark">
 
       </auth-dropdown>
 

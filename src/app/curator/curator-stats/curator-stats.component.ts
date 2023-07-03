@@ -1,7 +1,7 @@
 import { Component, Input } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { Observable } from "rxjs";
-import { User } from "src/app/models/User";
+import { User } from "src/app/models/User.model";
 
 @Component({
     selector:'curator-stats',

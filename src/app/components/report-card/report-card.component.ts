@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, Input, OnInit } from "@angular/core";
 import { Term } from "src/app/models/term.model";
-import { Report } from "src/app/models/report.model";
+import { Report } from "../../models/report.model";
 import * as _ from "lodash";
 import { NgxPopperModule } from "ngx-popper";
 

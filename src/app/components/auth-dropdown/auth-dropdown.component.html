@@ -1,7 +1,7 @@
 <div *ngIf="(loggedIn$ | async) && user$ | async as user" class="tw-relative tw-inline-block tw-text-left">
     <div>
         <button [popper]="dropdown" [popperTrigger]="'hover'" [popperDisableAnimation]="false" [popperPlacement]="'bottom-start'" [popperApplyClass]="'tw-duration-200 tw-transition-opacity'"
-            class="tw-text-gray-100 tw-flex tw-flex-row tw-items-center hover:tw-text-white  nav-item tw-relative before:tw-bg-white hover-underline-animation">
+            class="tw-text-gray-700 hover:tw-text-gray-800 dark:tw-text-gray-100 tw-flex tw-flex-row tw-items-center dark:hover:tw-text-white nav-item tw-relative dark:before:tw-bg-white before:tw-bg-gray-700 hover-underline-animation">
             <img [src]="generate_avatar(user.displayedName)"
                 class="tw-inline tw-w-6 tw-h-6 tw-mr-1 tw-bg-white tw-rounded-full" alt="">
             <span class="tw-font-bold">{{ user.displayedName }}</span>

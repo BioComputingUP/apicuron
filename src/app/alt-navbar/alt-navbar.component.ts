@@ -4,7 +4,8 @@ import { BehaviorSubject, Observable, fromEvent } from "rxjs";
 import { AuthModule } from "../auth/auth.module";
 import { RouterModule } from "@angular/router";
 import { delay, filter, shareReplay } from "rxjs/operators";
-
+import { AuthDropdownComponent } from "src/app/components/auth-dropdown/auth-dropdown.component";
+import { AngularSvgIconModule } from 'angular-svg-icon';
 @Component({
   selector: "navbar",
   templateUrl: "./alt-navbar.component.html",
@@ -13,6 +14,8 @@ import { delay, filter, shareReplay } from "rxjs/operators";
     RouterModule,
     CommonModule,
     AuthModule,
+    AuthDropdownComponent,
+    AngularSvgIconModule
   ],
   standalone: true
 })

@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { AuthService } from 'src/app/auth/auth.service';
+import { environment } from 'src/environments/environment';
+import { Observable } from 'rxjs';
 @Component({
   selector: 'app-user-dashboard',
   templateUrl: './user-dashboard.component.html',
@@ -7,9 +9,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class UserDashboardComponent implements OnInit {
 
-  constructor() { }
+  development = ['development', 'local'].includes(environment.env);
+  user$: Observable<any>;
 
+  openSidePanel: Boolean = false;
+  openMobileMenu: Boolean = false;
+
+  constructor(protected auth: AuthService) {
+    this.user$ = this.auth.user$
+  }
   ngOnInit(): void {
   }
+
 
 }

@@ -10,7 +10,7 @@ import {
   CuratorPageService, StatisticsWithResource,
 } from "./curator-page.service";
 import { environment } from "../../../environments/environment";
-import { User } from "src/app/models/User";
+import { User } from "src/app/models/User.model";
 import { CuratorStatistics } from "src/app/models/statistics.model";
 import { Resource } from "src/app/models/resource.model";
 
