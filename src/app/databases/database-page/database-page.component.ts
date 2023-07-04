@@ -1,8 +1,8 @@
-import { Component, OnInit } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from "@angular/core";
 import { DatabasesService } from "../services/databases.service";
 import { ActivatedRoute, ParamMap } from "@angular/router";
-import { catchError, map, pluck, share, shareReplay, switchMap } from "rxjs/operators";
-import { combineLatest, Observable } from "rxjs";
+import { catchError, delay, map, pluck, share, shareReplay, switchMap, tap } from "rxjs/operators";
+import { combineLatest, interval, Observable } from "rxjs";
 import { CuratorPageService } from "src/app/curator/curator-page/curator-page.service";
 import { CuratorService } from "src/app/curator/curator.service";
 @Component({
@@ -10,7 +10,7 @@ import { CuratorService } from "src/app/curator/curator.service";
   templateUrl: "./database-page.component.html",
   styleUrls: ["./database-page.component.scss"],
 })
-export class DatabasePageComponent implements OnInit {
+export class DatabasePageComponent implements OnInit, AfterViewInit {
   resourceId$: Observable<string>;
   leaderboard$: Observable<Object>;
   badges$: Observable<any>;
@@ -28,10 +28,29 @@ export class DatabasePageComponent implements OnInit {
     private route: ActivatedRoute
   ) {}
 
+
+  ngAfterViewInit(): void {
+    const subscription = interval(1000).pipe(
+      delay(500),
+      tap((number) => {
+        const el: HTMLDivElement = this.mainPanel?.nativeElement
+        const leaderboard: HTMLDivElement = this.leaderboardPanel?.nativeElement
+        if(el){
+          const height = el.getBoundingClientRect().height
+          leaderboard.style.height = height + 'px'
+        }
+      })
+    )
+    
+  }
+
   
   more_badges= false;
   more_medals= false;
   expand_terms = false;
+
+  @ViewChild('mainPanel') mainPanel: ElementRef
+  @ViewChild('leaderboardPanel') leaderboardPanel: ElementRef
   
   
   ngOnInit(): void {Observable
@@ -48,7 +67,6 @@ export class DatabasePageComponent implements OnInit {
         return this.databaseService.get_resource_leaderboard(resource_id)
       }),
       shareReplay(),
-      // pluck('data')
     )
 
     this.leaderboard$ = this.stats$.pipe(
@@ -65,7 +83,6 @@ export class DatabasePageComponent implements OnInit {
         return combineLatest(users_stats$);
       }),
       shareReplay(),
-      // pluck('data')
     )
     
     this.leaderboardLoaded$ = this.leaderboard$.pipe(

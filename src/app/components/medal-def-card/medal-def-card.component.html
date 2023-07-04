@@ -1,0 +1,27 @@
+<div class="tw-rounded-md tw-shadow-md tw-shadow-gray-400 tw-font-dm-sans tw-p-1 tw-h-full">
+    <span class="tw-text-sm sm:tw-text-base tw-text-gray-700 tw-font-bold tw-block tw-text-center">{{ medal.name
+        }}</span>
+    <div class="tw-flex tw-flex-row">
+        <div class="tw-shrink-0">
+            <img src="assets/svg/gold_medal.svg" class="tw-w-16 sm:tw-w-20 lg:tw-w-24" alt="">
+        </div>
+        <div class=" tw-pl-1 tw-text-gray-500 tw-text-sm tw-leading-relaxed tw-font-bold">
+
+            <span *ngIf="medal.score_relative > 1"> Requires ranking Among {{ medal.score_relative }} biocurators</span>
+            <span *ngIf="medal.score_relative == 1"> Requires ranking <span class="tw-not-sr-only">1st</span> <span
+                    class="tw-sr-only">First</span> </span>
+            in the following
+            <span class="tw-font-bold tw-underline tw-cursor-pointer" [popper]="activitiesList"
+                [popperShowOnStart]="false" [popperTrigger]="'hover'" [popperHideOnScroll]="true"
+                [popperPlacement]="'right'">Contributions</span>
+        </div>
+    </div>
+</div>
+
+<popper-content #activitiesList>
+    <div class="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-py-2 tw-rounded tw-shadow-md tw-shadow-gray-400">
+        <span
+            class="tw-block tw-text-sm tw-font-dm-sans tw-text-gray-600 tw-leading-normal tw-py-1 tw-px-2 tw-text-center"
+            *ngFor="let term of (termNames$ | async)">{{ term }}</span>
+    </div>
+</popper-content>

@@ -5,11 +5,16 @@
             <svg-icon src="assets/APICURON.svg" svgClass="tw-w-full"></svg-icon>
         </a>
 
-        <ul class="tw-mt-6 tw-space-y-1">
+        <ul class="tw-mt-6 tw-space-y-1 tw-gap-1">
             <li>
                 <a routerLink="/dashboard"
-                    class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item-colors list-item-active">
+                    class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item list-item-colors list-item-active">
                     General
+                </a>
+
+                <a [routerLink]="['/dashboard', 'profile']"
+                    class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item list-item-colors">
+                    Edit Profile
                 </a>
             </li>
 
@@ -20,7 +25,7 @@
                     <li>
                         <details class="tw-group summary::-webkit-details-marker]:tw-hidden">
                             <summary
-                                class="tw-flex tw-cursor-pointer tw-items-center tw-justify-between tw-rounded-lg tw-px-4 tw-py-2 list-item-colors">
+                                class="tw-flex tw-cursor-pointer tw-items-center tw-justify-between tw-rounded-lg tw-px-4 tw-py-2 list-item list-item-colors">
                                 <span class="tw-text-sm ">
                                     <img [src]="resourceLinks.resource.faviconLink()" alt="" class="tw-inline tw-w-4 tw-h-4">
                                     {{ resourceLinks.resource.resource_name }}
@@ -35,7 +40,7 @@
                             <ul class="tw-mt-2 tw-space-y-1 tw-px-4">
                                 <li *ngFor="let link of resourceLinks.links">
                                     <a [routerLink]="link.href"
-                                        class="tw-flex tw-w-full tw-flex-row tw-justify-between tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item-colors">
+                                        class="tw-flex tw-w-full tw-flex-row tw-justify-between tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item list-item-colors">
                                         {{ link.name}}
 
                                         <svg-icon [src]="link.icon" svgClass="tw-w-4 tw-h-4"></svg-icon>
@@ -49,7 +54,7 @@
                 </ng-container>
             </ng-container>
             <li>
-                <details class="tw-group summary::-webkit-details-marker]:tw-hidden">
+                <!-- <details class="tw-group summary::-webkit-details-marker]:tw-hidden">
                     <summary
                         class="tw-flex tw-cursor-pointer tw-items-center tw-justify-between tw-rounded-lg tw-px-4 tw-py-2 list-item-colors">
                         <span class="tw-text-sm "> Teams </span>
@@ -76,7 +81,7 @@
                             </a>
                         </li>
                     </ul>
-                </details>
+                </details> -->
             </li>
 
             <!-- <li>

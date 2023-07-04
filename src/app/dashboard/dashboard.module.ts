@@ -16,11 +16,13 @@ import { ReportsByDateChartComponent } from 'src/app/components/charts/reports-b
 import { UserOverviewPageService } from './services/user-overview-page.service';
 import { CalendarModule } from 'primeng/calendar';
 import { CategoriesPieChartComponent } from '../components/charts/categories-pie-chart/categories-pie-chart.component';
+import { ProfileUpdateComponent } from './profile-update/profile-update.component';
 @NgModule({
   declarations: [
     DashboardSidebarComponent,
     UserDashboardComponent,
     UserOverviewComponent,
+    ProfileUpdateComponent
   ],
   providers: [
     UserOverviewPageService
@@ -37,7 +39,7 @@ import { CategoriesPieChartComponent } from '../components/charts/categories-pie
     NavbarComponent,
     SvgModule,
     ReportsByDateChartComponent,
-    CategoriesPieChartComponent
+    CategoriesPieChartComponent,
   ]
 })
 export class DashboardModule { }

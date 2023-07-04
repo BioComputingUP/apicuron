@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { map } from "rxjs/operators";
+import { map, pluck } from "rxjs/operators";
 import { User } from "../models/User.model";
 import { environment } from "src/environments/environment";
 
@@ -26,7 +26,7 @@ export class CuratorService {
       headers: {
         version: "2",
       },
-    })
+    }).pipe(pluck('data'))
   }
 
 

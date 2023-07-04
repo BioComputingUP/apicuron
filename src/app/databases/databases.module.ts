@@ -14,6 +14,7 @@ import { DatabasesService } from "./services/databases.service";
 import { TermCardComponent } from "../components/term-card/term-card.component";
 import { BadgeDefCardComponent } from "../components/badge-def-card/badge-def-card.component";
 import { ListExpandComponent } from "../components/utils/list-expand/list-expand.component";
+import { MedalDefCardComponent } from "../components/medal-def-card/medal-def-card.component";
 @NgModule({
   declarations: [
     DatabasesPageComponent,
@@ -32,6 +33,8 @@ import { ListExpandComponent } from "../components/utils/list-expand/list-expand
     RouterModule,
     CuratorModule,
     ReactiveFormsModule,
+    BadgeDefCardComponent,
+    MedalDefCardComponent
   ],
   providers:[DatabasesService],
   exports: [DatabasesPageComponent],

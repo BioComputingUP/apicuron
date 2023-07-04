@@ -1,26 +1,50 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { BadgeDef } from '../../models/badge-def.model';
-import { Term } from '../../models/term.model';
-
+import { Component, ElementRef, Input, OnInit, TemplateRef, ViewChild } from '@angular/core'
+import { CommonModule } from '@angular/common'
+import { Badge } from 'src/app/models/badge.model'
+import { AngularSvgIconModule } from 'angular-svg-icon'
+import { NgxPopperModule } from 'ngx-popper'
+import { Term } from 'src/app/models/term.model'
+import { BehaviorSubject, Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+import { BadgeDef } from '../../models/badge-def.model'
 @Component({
-  selector: 'badge-def-card',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './badge-def-card.component.html',
-  styleUrls: ['./badge-def-card.component.scss']
+    standalone: true,
+    selector: 'badge-def-card',
+    imports: [CommonModule, AngularSvgIconModule, NgxPopperModule],
+    templateUrl: './badge-def-card.component.html',
+    styleUrls: []
 })
 export class BadgeDefCardComponent implements OnInit {
 
-  constructor() { }
 
-  @Input()
-  badgeDef: BadgeDef;
+    ngOnInit(): void {
+        this.termNames$ = this.terms$.asObservable().pipe(
+            map((terms: Term[]) => {
+                return terms.filter((term: Term) => this.badge.list_terms.includes(term.activity_term))
+            }),
+            map((terms: Term[]) => {
+                return terms.map((term: Term) => term.activity_name)
+            })
+        )
+    }
 
-  @Input()
-  terms: Term[]
+    terms$: BehaviorSubject<Term[]> = new BehaviorSubject([]);
+    termNames$: Observable<string[]>
 
-  ngOnInit(): void {
-  }
+    @Input()
+    badge: BadgeDef
+
+    @Input()
+    public get terms() {
+        return this.terms$.getValue();
+    }
+    public set terms(value) {
+        if(!!value && value instanceof Array && value.length > 0){
+            this.terms$.next(value);
+        }
+    }
+
+    
+
 
 }

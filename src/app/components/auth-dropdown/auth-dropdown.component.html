@@ -24,12 +24,12 @@
                     My Biocuration Profile
 
                 </a>
-                <ng-container *ngFor="let resource of user.resources">
-                    <a [routerLink]="['/dashboard', 'database', resource.resource_id, 'edit']" class="dropdown-element">
-                        <svg-icon src="assets/svg/settings.svg" svgClass="tw-inline tw-w-4 tw-h-4"></svg-icon>
-                        Manage {{ resource.name }}
-                    </a>
-                </ng-container>
+                <!-- <ng-container *ngFor="let resource of user.resources"> -->
+                <a routerLink="/dashboard" class="dropdown-element">
+                    <svg-icon src="assets/svg/dashboard.svg" svgClass="tw-inline tw-w-4 tw-h-4"></svg-icon>
+                    Dashboard
+                </a>
+                <!-- </ng-container> -->
 
                 <button *ngIf="user.resources && user.resources.length > 0" (click)="copy_key()"
                     class="dropdown-element">

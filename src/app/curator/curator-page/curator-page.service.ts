@@ -122,7 +122,6 @@ export class CuratorPageService {
         return this.curatorService.get_curator(orcid_id);
       }),
       shareReplay(1),
-      pluck("data"),
       map((curator: User) => {
         return new User().deserialize(curator);
       })

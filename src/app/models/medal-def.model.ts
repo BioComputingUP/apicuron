@@ -5,7 +5,7 @@ import { AcheivementDef } from "./achievement-def"
 export class MedalDef extends AcheivementDef implements Deserializable{
     deserialize(input: any): this {
         this.name = input.name
-        this.list_terms = input.terms
+        this.list_terms = input.list_terms
         this.resource_id = input.resource_id
         this.resource_uri = input.resource_uri
         this.color = input.color

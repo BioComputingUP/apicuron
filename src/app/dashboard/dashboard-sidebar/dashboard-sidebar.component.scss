@@ -13,6 +13,10 @@
     @apply tw-text-gray-500 hover:tw-bg-gradient-to-r hover:tw-from-apicuron-red hover:tw-to-apicuron-bright-purple hover:tw-text-gray-100
 }
 
+.list-item {
+    @apply tw-mb-1
+}
+
 .list-item-active {
     @apply tw-bg-gradient-to-r tw-from-apicuron-red tw-to-apicuron-bright-purple tw-text-gray-100 tw-font-bold
 }
