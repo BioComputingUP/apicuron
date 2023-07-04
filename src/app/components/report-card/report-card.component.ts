@@ -25,9 +25,9 @@ export class ReportCardComponent {
 
     categoryColor() {
         const converter = {
-            'tw-text-green-100 tw-bg-green-500': 'generation',
-            'tw-text-orange-100 tw-bg-orange-500': 'revision',
-            'tw-text-red-100 tw-bg-red-500': 'invalidation',
+            'tw-text-green-100 tw-bg-generation': 'generation',
+            'tw-text-orange-100 tw-bg-revision': 'revision',
+            'tw-text-red-100 tw-bg-invalidation': 'invalidation',
         }
 
         return _.mapValues(converter, (category) => category == this.term.category)

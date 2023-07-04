@@ -15,6 +15,7 @@ import { UserOverviewComponent } from 'src/app/dashboard/user-overview/user-over
 import { ReportsByDateChartComponent } from 'src/app/components/charts/reports-by-date-chart/reports-by-date-chart.component';
 import { UserOverviewPageService } from './services/user-overview-page.service';
 import { CalendarModule } from 'primeng/calendar';
+import { CategoriesPieChartComponent } from '../components/charts/categories-pie-chart/categories-pie-chart.component';
 @NgModule({
   declarations: [
     DashboardSidebarComponent,
@@ -35,7 +36,8 @@ import { CalendarModule } from 'primeng/calendar';
     AngularSvgIconModule,
     NavbarComponent,
     SvgModule,
-    ReportsByDateChartComponent
+    ReportsByDateChartComponent,
+    CategoriesPieChartComponent
   ]
 })
 export class DashboardModule { }

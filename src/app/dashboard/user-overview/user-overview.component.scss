@@ -4,3 +4,7 @@
 // ::ng-deep p-calendar .p-calendar {
 //     @apply tw-p-1 tw-rounded tw-shadow-md tw-shadow-gray-700
 // }
+
+::ng-deep * {
+    font-family: var(--font-family);
+}

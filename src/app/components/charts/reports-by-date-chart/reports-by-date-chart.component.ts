@@ -1,14 +1,30 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild,
+} from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Data } from "plotly.js-dist-min";
-import * as Plotly from 'plotly.js-dist-min'
+import * as Plotly from "plotly.js-dist-min";
 import * as Moment from "moment";
-import { extendMoment } from 'moment-range';
-import { ReportFilter, ReportFilterField } from "src/app/reports/interfaces/report-filter.interface";
+import { extendMoment } from "moment-range";
+import {
+  ReportFilter,
+  ReportFilterField,
+} from "src/app/reports/interfaces/report-filter.interface";
 import { BehaviorSubject, Observable, Subscription, combineLatest } from "rxjs";
-import { filter, map, switchMap, tap } from "rxjs/operators";
+import { filter, map, switchMap, take, tap } from "rxjs/operators";
 import { ReportsModule } from "src/app/reports/reports.module";
-import { ReportsByResourceId, ReportsService } from "src/app/reports/services/reports.service";
+import {
+  ReportsByResourceId,
+  ReportsService,
+} from "src/app/reports/services/reports.service";
 import { Paginated } from "src/app/interfaces/paginated";
 import { ReportGroupBy } from "src/app/reports/types/group-by";
 import { GroupedReports } from "src/app/reports/interfaces/grouped-reports.interface";
@@ -18,31 +34,40 @@ import { ResourceModule } from "../../../resource/resource.module";
 import { ResourcesService } from "../../../resource/service/resources.service";
 import { Resource } from "../../../models/resource.model";
 
-const moment = extendMoment(Moment)
-
+const moment = extendMoment(Moment);
 
 @Component({
   selector: "reports-by-date-chart",
   standalone: true,
-  imports: [CommonModule, ReportsModule, ReportFilterFormComponent, ResourceModule],
+  imports: [
+    CommonModule,
+    ReportsModule,
+    ReportFilterFormComponent,
+    ResourceModule,
+  ],
   templateUrl: "./reports-by-date-chart.component.html",
   styleUrls: ["./reports-by-date-chart.component.scss"],
 })
-export class ReportsByDateChartComponent implements  OnDestroy, AfterViewInit {
+export class ReportsByDateChartComponent implements OnDestroy, AfterViewInit {
   plot$: Subscription;
 
-
-  constructor(protected reports: ReportsService, protected resourceService: ResourcesService) { }
+  constructor(
+    protected reports: ReportsService,
+    protected resourceService: ResourcesService
+  ) {}
 
   ngAfterViewInit(): void {
-    this.plot$ = combineLatest([this.plotData$, this.plotLayout$]).subscribe(([plotData, plotLayout]: [Data[], Plotly.Layout]) => {
-      return Plotly.newPlot(this.Graph.nativeElement, plotData, plotLayout, { responsive: true })
-    })
+    this.plot$ = combineLatest([this.plotData$, this.plotLayout$]).subscribe(
+      ([plotData, plotLayout]: [Data[], Plotly.Layout]) => {
+        return Plotly.newPlot(this.Graph.nativeElement, plotData, plotLayout, {
+          responsive: true,
+        });
+      }
+    );
   }
   ngOnDestroy(): void {
     this.plot$.unsubscribe();
   }
-
 
   @ViewChild("Graph")
   Graph: ElementRef;
@@ -57,8 +82,8 @@ export class ReportsByDateChartComponent implements  OnDestroy, AfterViewInit {
 
   readonly reportFilter$ = new BehaviorSubject(null);
 
-
-  readonly reportsData$: BehaviorSubject<ReportsByResourceId> = new BehaviorSubject({});
+  readonly reportsData$: BehaviorSubject<ReportsByResourceId> =
+    new BehaviorSubject({});
 
   @Input()
   public get reportsData(): ReportsByResourceId {
@@ -67,7 +92,6 @@ export class ReportsByDateChartComponent implements  OnDestroy, AfterViewInit {
   public set reportsData(value: ReportsByResourceId) {
     this.reportsData$.next(value);
   }
-
 
   readonly resources$: BehaviorSubject<Resource[]> = new BehaviorSubject([]);
   @Input()
@@ -78,49 +102,58 @@ export class ReportsByDateChartComponent implements  OnDestroy, AfterViewInit {
     this.resources$.next(value);
   }
 
-  private readonly _plotData$: Observable<Data[]> = combineLatest([this.reportFilter$, this.reportsData$, this.resources$]).pipe(
-    tap(console.log),
-    map(([reportFilter, reportsData, resources]: [ReportFilter, ReportsByResourceId, Resource[]]) => {
+  private readonly _plotData$: Observable<Data[]> = combineLatest([
+    this.reportFilter$,
+    this.reportsData$,
+    this.resources$,
+  ]).pipe(
+    map(
+      ([reportFilter, reportsData, resources]: [
+        ReportFilter,
+        ReportsByResourceId,
+        Resource[]
+      ]) => {
+        // for Each resource
+        return resources.map((resource) => {
+          const reports: Report[] = reportsData[resource.resource_id];
 
-      // for Each resource
-      return resources.map((resource) => {
-        const reports: Report[] = reportsData[resource.resource_id];
+          // Create a range of dates from the first to the last day
+          const dateRange = moment.range(reportFilter.from, reportFilter.to);
+          // make an iterable of the range by DAY and format the dates to DD/MM
+          const allDatesInclusive: string[] = Array.from(
+            dateRange.by("day")
+          ).map((d) => moment(d).format("DD/MM/YY"));
 
-        // Create a range of dates from the first to the last day
-        const dateRange = moment.range(reportFilter.from, reportFilter.to);
-        // make an iterable of the range by DAY and format the dates to DD/MM
-        const allDatesInclusive: string[] = Array.from(dateRange.by('day')).map(d => moment(d).format('DD/MM/YY'));
+          // create a dateMap that maps each date string to a number
+          const dateMap = new Map<string, number>();
 
-        // create a dateMap that maps each date string to a number
-        const dateMap = new Map<string, number>();
+          // populate the dateMap from the data
+          reports.forEach((report) => {
+            const dateFormat = moment(report.timestamp).format("DD/MM/YY");
+            dateMap.set(dateFormat, (dateMap.get(dateFormat) || 0) + 1);
+          });
 
+          const traceData: Data = {
+            x: new Array(),
+            y: new Array(),
+            type: "bar",
+            name: "Number of Contributions",
+            text: new Array<string>(),
+            showlegend: false,
+            marker: {
+              color: resource.color || "#4D194D",
+            },
+            hovertemplate: `%{y} Contributions to ${resource.resource_name}<extra></extra>`,
+          };
+          traceData["x"] = allDatesInclusive;
 
-        // populate the dateMap from the data
-        reports.forEach((report) => {
-          const dateFormat = moment(report.timestamp).format('DD/MM/YY');
-          dateMap.set(dateFormat, (dateMap.get(dateFormat) || 0) + 1);
+          // if the data is present in the datemap return the value, otherwise return 0
+          traceData["y"] = allDatesInclusive.map((d) => dateMap.get(d) || 0);
+
+          return traceData;
         });
-
-        const traceData: Data = {
-          x: new Array(),
-          y: new Array(),
-          type: 'bar',
-          name: 'Number of Contributions',
-          text: new Array<string>(),
-          showlegend: false,
-          marker: {
-            color: resource.color || '#4D194D'
-          },
-          hovertemplate: `%{y} Contributions to ${resource.resource_name}<extra></extra>`,
-        };
-        traceData['x'] = allDatesInclusive;
-
-        // if the data is present in the datemap return the value, otherwise return 0
-        traceData['y'] = allDatesInclusive.map(d => dateMap.get(d) || 0);
-
-        return traceData;
-      });
-    })
+      }
+    )
   );
   public get plotData$(): Observable<Data[]> {
     return this._plotData$;
@@ -136,19 +169,18 @@ export class ReportsByDateChartComponent implements  OnDestroy, AfterViewInit {
     //   },
     // },
     autosize: true,
-    barmode: 'stack',
+    barmode: "stack",
     xaxis: {
-      title: 'Days'
+      title: "Days",
     },
     yaxis: {
-      title: 'Contributions',
-      tickmode: 'linear',
+      title: "Contributions",
+      tickmode: "linear",
       dtick: 1,
-      range: [0, null]
+      range: [0, null],
     },
     margin: {
-      t: 10
-    }
-  })
-
+      t: 10,
+    },
+  });
 }
