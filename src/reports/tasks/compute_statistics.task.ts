@@ -239,7 +239,8 @@ export class ComputeStatisticsTask {
                 'foreignField': 'activity_term',
                 'as': 'term'
             }).unwind({
-                'path': '$term'
+                'path': '$term',
+                preserveNullAndEmptyArrays: true,
             }).append({
                 '$set': {
                     'activity_category': '$term.activity_category',

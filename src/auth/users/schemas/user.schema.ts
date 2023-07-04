@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { Report } from '../../../reports/reports.schema';
+import { Term } from '../../../terms/schemas/terms.schema';
 
 export type UserDocument = User & Document;
 export interface UserResource {
@@ -114,4 +116,10 @@ UserSchema.virtual('statistics', {
 	foreignField: 'curator_orcid',
 });
 
+
+UserSchema.virtual('reports', {
+	ref: Report.name,
+	localField: 'orcid_id',
+	foreignField: 'curator_orcid',
+});
 export { UserSchema };

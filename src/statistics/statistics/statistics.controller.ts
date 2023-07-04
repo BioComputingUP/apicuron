@@ -11,7 +11,6 @@ import {
 import { AchievementsService } from '../../achievements/achievements.service';
 import { ParseUnsignedIntPipe } from '../../shared/pipes/unsigned-int-validation.pipe';
 import { TransformInterceptor } from '../../shared/transformer/transform.interceptor';
-// import { TransformerService } from '../../shared/transformer/transformer.service';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { GetStatisticsDto } from '../dto/get-statistics.dto';
 import { StatisticsService } from '../statistics.service';
@@ -33,6 +32,7 @@ export class StatisticsController {
 		protected statService: StatisticsService,
 		protected partnerResourceService: PartnerResourcesService,
 		protected achievementsService: AchievementsService,
+		protected userService: UsersService
 	) {}
 
 	private readonly logger = new Logger(StatisticsController.name);
@@ -65,12 +65,19 @@ export class StatisticsController {
 		summary: 'get a single user statistics for all the Partner Resources they are concerned by'
 	})
 	@Get('user/:orcid_id')
-	async get_user_statistics(@Param('orcid_id') orcid_id:string, @Req() req){
-		if(!req.user){
+	async get_user_statistics(@Param('orcid_id') orcid_id: string, @Req() req){
+		
+		const exists = await this.userService.user_exists(orcid_id)
+		if(exists){
 			return await this.statService.get_public_user_statistics(orcid_id)
+		}else{
+			if(!req.user){
+				return await this.statService.get_public_user_statistics(orcid_id)
+			}
+
+			const resource_ids = (req.user.resources || []).map(res => res.resource_id)
+			return await this.statService.get_all_user_statistics(orcid_id, resource_ids) 	
 		}
-		const resource_ids = (req.user.resources || []).map(res => res.resource_id)
-		return await this.statService.get_all_user_statistics(orcid_id, resource_ids) 	
 
 	}
 
