@@ -24,10 +24,11 @@ export class PaginateDto {
 	limit?: number = null;
 
 	getMongoQueryOptions(): QueryOptions<any> {
-		return {
+
+		return !! this.limit ? {
 			limit: this.limit,
 			skip: this.skip,
-		};
+		}: { skup: this.skip };
 	}
 
 	getMongoAggregation(): [PipelineStage.Skip, PipelineStage.Limit?] {

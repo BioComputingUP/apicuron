@@ -44,19 +44,6 @@ export class ReportFilterDto extends PaginateDto {
     @IsOptional()
     entity_uri?: string
 
-    // @Transform(({ value, obj }) => !obj.from && !obj.to ? 10 : value )
-    @Transform(({ value }) => parseInt(value))
-    @IsOptional()
-    @IsInt()
-    @Max(50)
-    page_size?: number
-
-    @Transform(({ value }) => parseInt(value))
-    @IsOptional()
-    @IsInt()
-    @Min(1)
-    page: number = 1
-
 
     @IsOptional()
     @Transform(({ value }) => new Date(value))

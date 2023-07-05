@@ -5,6 +5,9 @@ import mongoose, { Model } from 'mongoose';
 import { User, UserDocument, UserSchema } from '../auth/users/schemas/user.schema';
 import { Statistics, StatisticsDocument } from './schemas/statistics.schema';
 import { PartnerResourcesService } from '..//resources/partner-resources/partner-resources.service';
+import { GetStatisticsDto } from './dto/get-statistics.dto';
+import { paginate } from '../pagination/paginator';
+import { PaginateDto } from '../pagination/dto/paginate.dto';
 
 @Injectable()
 export class StatisticsService {
@@ -34,15 +37,9 @@ export class StatisticsService {
 		})
 	}
 
-	async get_all_statistics(
-		passed_query?: string,
-		user_filter_field?: string,
-		resource_ids?: string[],
-		page: number = 1,
-		page_size: number = 10,
-	) {
-		// setup pagination
-		const skip = (page - 1) * page_size;
+	async get_all_statistics(getStatDto: GetStatisticsDto) {		
+		const { resources: resource_ids, query: passed_query, filter_field: user_filter_field } = getStatDto
+
 
 		// query filter
 		let query = {};
@@ -104,17 +101,9 @@ export class StatisticsService {
 			},
 
 		]
-		const paginationAggregation = [
-			{
-				"$skip": skip
-			},
-			{
-				'$limit': +page_size
-			}
-		]
 
 		// get the data aggregated
-		const dataPromise = this.userModel.aggregate([...userStatsAggregation, ...paginationAggregation])
+		const dataPromise = this.userModel.aggregate([...userStatsAggregation, ...getStatDto.getMongoAggregation()])
 
 		const countPromise = this.userModel.aggregate([...userStatsAggregation, { $count: 'total_count' }])
 
@@ -124,22 +113,19 @@ export class StatisticsService {
 		// extracting the count if available, otherwise it's an empty list and therefore 0
 		const count = aggregation_count?.[0]?.total_count || 0
 
-		return { data, count, page, page_size };
+		return paginate(data, getStatDto, count)
 	}
 
-	async get_resource_leaderboard(
+	async getResourceLeaderboard(
 		resource_id: string,
-		page: number = 1,
-		page_size: number = 10,
+		pagination: PaginateDto
 	) {
-		page = 1;
 		const resource = await this.partnerResourceService.get_resource(
 			resource_id,
 		);
 		if (!resource) {
 			throw new NotFoundException(`Resource ${resource_id} does not Exist`);
 		}
-		const skip = (page - 1) * page_size;
 
 		const leaderboardPromise = this.statisticsModel.aggregate([
 			// get the users with the corresponding resource_id
@@ -177,18 +163,13 @@ export class StatisticsService {
 					'total_score': -1,
 				},
 			},
-			{
-				$skip: skip,
-			},
-			{
-				$limit: page_size,
-			},
+			...pagination.getMongoAggregation()
 		]);
 
 
 		const query = { resource_id };
 		const countPromise = this.statisticsModel.count(query);
 		const [leaderboard, count] = await Promise.all([leaderboardPromise, countPromise])
-		return { data: leaderboard, page, count };
+		return paginate(leaderboard, pagination, count)
 	}
 }

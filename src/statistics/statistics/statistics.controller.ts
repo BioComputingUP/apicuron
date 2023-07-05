@@ -19,6 +19,9 @@ import { VersionHeader } from '../../swagger/config';
 import { UsersService } from '../../auth/users/users.service';
 import * as _ from 'lodash';
 import { Request, Response } from 'express';
+import { plainToInstance } from 'class-transformer';
+import { paginate } from '../../pagination/paginator';
+import { PaginateDto } from '../../pagination/dto/paginate.dto';
 
 @ApiTags('Statistics')
 @ApiHeader(VersionHeader)
@@ -46,14 +49,15 @@ export class StatisticsController {
 	@Get('leaderboard/:resource_id')
 	async get_resource_leaderboard(
 		@Param('resource_id') resource_id: string,
-		@Query('page', ParseUnsignedIntPipe) page: number,
-		@Query('page_size', ParseUnsignedIntPipe) page_size: number,
+		@Query() pagination: PaginateDto,
 	) {
-		return await this.statService.get_resource_leaderboard(
+
+		
+		return await this.statService.getResourceLeaderboard(
 			resource_id,
-			page,
-			page_size,
+			pagination
 		);
+
 	}
 	
 
@@ -89,13 +93,8 @@ export class StatisticsController {
 	})
 	@Get()
 	async findAll(@Query() query: GetStatisticsDto) {
-		return await this.statService.get_all_statistics(
-			query.query,
-			query.filter_field,
-			query.resources,
-			query.page,
-			query.page_size,
-		);
+		const getStatDtoInstance = plainToInstance(GetStatisticsDto, query)
+		return await this.statService.get_all_statistics(getStatDtoInstance);
 	}
 	
 }
@@ -113,11 +112,14 @@ export class OldStatisticsController {
 		@Query('page_size', ParseUnsignedIntPipe) page_size: number,
 		@Res() res: Response
 	){
-		const { data, count } = await this.statService.get_resource_leaderboard(
+		const pagination = new PaginateDto();
+		pagination.limit = page_size;
+		pagination.skip = ( page - 1 ) * pagination.limit;
+
+		const { data, meta } = await this.statService.getResourceLeaderboard(
 			resource_id,
 			// in the old version, the pages are 0 indexed
-			page + 1,
-			page_size,
+			pagination
 		);
 		
 		const orcid_list = _.uniq(_.map(data, 'curator_orcid'))
@@ -135,10 +137,10 @@ export class OldStatisticsController {
 		const leaderboard = data.map((stat) => {
 			return {
 				...stat,
-				...orcid_to_names[stat.curator_orcid]
+				...orcid_to_names[stat['curator_orcid']]
 			}
 		})
-		res.setHeader('count', String(count))
+		res.setHeader('count', String(meta.pagination.total))
 		res.send(leaderboard)
 		// return 	leaderboard
 	}

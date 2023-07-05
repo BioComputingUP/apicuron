@@ -13,7 +13,7 @@ export function paginate(data: any[], page: PaginateDto, totalCount: number): Pa
         meta: {
             pagination: {
                 start: page.skip + 1,
-                limit: page.limit,
+                limit: page.limit || -1,
                 total: totalCount
             }
         }

@@ -8,12 +8,13 @@ import {
 	IsString,
 	ValidateIf,
 } from 'class-validator';
+import { PaginateDto } from '../../pagination/dto/paginate.dto';
 export enum FilterField {
 	displayedName = 'displayedName',
 	orcid_id = 'orcid_id',
 }
 
-export class GetStatisticsDto {
+export class GetStatisticsDto extends PaginateDto {
 
 	@IsEnum(FilterField,{
         message: `filter field can only be one of these values ${Object.values(FilterField)}`
@@ -29,14 +30,7 @@ export class GetStatisticsDto {
 	@IsOptional()
 	resources: Array<string>;
 
-	@IsInt()
-	@Type(() => Number)
-	@IsOptional()
-	page: number;
 
-	@IsInt()
-	@Type(() => Number)
-	@IsOptional()
-	page_size: number;
+	limit= 10
 
 }

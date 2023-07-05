@@ -94,22 +94,22 @@ export class ReportsController {
 		return await this.reportService.getGroupedReports(groupByInstance)
 	}
 
-	@Get('resource/:resource_id/orcid_id/:orcid_id')
-	async get_user_reports(
-		@Param('orcid_id') orcid_id: string,
-		@Param('resource_id') resource_id: string,
-		@Query('page', ParseUnsignedIntPipe) page = 1,
-		@Query('page_size', ParseUnsignedIntPipe) page_size = 10,
-	) {
-		const reportFilter = new ReportFilterDto();
-		_.assign(reportFilter, {
-			curator_orcid: orcid_id,
-			resource_id,
-			page,
-			page_size,
-		});
-		return await this.reportService.getReports(reportFilter);
-	}
+	// @Get('resource/:resource_id/orcid_id/:orcid_id')
+	// async get_user_reports(
+	// 	@Param('orcid_id') orcid_id: string,
+	// 	@Param('resource_id') resource_id: string,
+	// 	@Query('page', ParseUnsignedIntPipe) page = 1,
+	// 	@Query('page_size', ParseUnsignedIntPipe) page_size = 10,
+	// ) {
+	// 	const reportFilter = new ReportFilterDto();
+	// 	_.assign(reportFilter, {
+	// 		curator_orcid: orcid_id,
+	// 		resource_id,
+	// 		page,
+	// 		page_size,
+	// 	});
+	// 	return await this.reportService.getReports(reportFilter);
+	// }
 
 	@ApiOperation({
 		summary: 'Submit reports in bulk as a JSON file',

@@ -26,11 +26,11 @@ export class AchievementsController {
     @Get('medals')
 	async get_medals(@Query() filter: AchievementFilter){
 
-		return this.achievementsService.getMedals(filter)
+		return await this.achievementsService.getMedals(filter)
 	}
 
     @Get('badges')
 	async get_badges(@Query() filter: AchievementFilter){
-		return this.achievementsService.getBadges(filter)
+		return await this.achievementsService.getBadges(filter)
 	}
 }

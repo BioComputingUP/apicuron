@@ -7,6 +7,7 @@ import { PartnerResourcesService } from '../resources/partner-resources/partner-
 import { AchievementsDefService } from './achievements-def.service';
 import { Badge, BadgeDocument } from './schemas/badges.schema';
 import { Medal, MedalDocument } from './schemas/medals.schema';
+import { paginate } from '../pagination/paginator';
 
 @Injectable()
 export class AchievementsService {
@@ -18,29 +19,22 @@ export class AchievementsService {
 
     async getBadges(filter: AchievementFilter){
         const filterInstance = plainToInstance(AchievementFilter, filter)
-        const dataPromise = this.badgeModel.find(filterInstance.getQuery(), {}, filterInstance.getQueryOptions())
+        const dataPromise = this.badgeModel.find(filterInstance.getQuery(), {}, filterInstance.getMongoQueryOptions())
         const countPromise = this.badgeModel.count(filterInstance.getQuery())
 
         const [data, count] = await Promise.all([dataPromise, countPromise])
-        return {
-            data,
-            count,
-            page: filterInstance.page
-        }
+        return paginate(data, filterInstance, count)
+
     }
 
 
     async getMedals(filter: AchievementFilter){
         const filterInstance = plainToInstance(AchievementFilter, filter)
-        const dataPromise = this.medalModel.find(filterInstance.getQuery(), {}, filterInstance.getQueryOptions())
+        const dataPromise = this.medalModel.find(filterInstance.getQuery(), {}, filterInstance.getMongoQueryOptions())
         const countPromise = this.medalModel.count(filterInstance.getQuery())
 
         const [data, count] = await Promise.all([dataPromise, countPromise])
-        return {
-            data,
-            count,
-            page: filterInstance.page
-        }
+        return paginate(data, filterInstance, count)
     }
 
     async user_achievements(curator_orcid: string, resource_id: string){

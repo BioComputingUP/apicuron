@@ -1,10 +1,11 @@
 import { Transform } from "class-transformer"
 import { IsIn, IsInt, IsOptional, IsString, Min } from "class-validator"
 import * as _ from "lodash"
+import { PaginateDto } from "../../pagination/dto/paginate.dto"
 
 
 
-export class AchievementFilter {
+export class AchievementFilter extends PaginateDto {
 
     @IsOptional()
     @IsString()
@@ -26,17 +27,6 @@ export class AchievementFilter {
     @Min(1)
     count_threshold?: number
 
-    @Transform(({ value }) => parseInt(value))
-    @IsOptional()
-    @IsInt()
-    @Min(1)
-    page?: number = 1
-
-    @Transform(({ value }) => parseInt(value))
-    @IsOptional()
-    @IsInt()
-    @Min(1)
-    page_size?: number = 10
 
     @IsOptional()
     @IsString()
@@ -50,16 +40,6 @@ export class AchievementFilter {
 
     getQuery(){
         return _.pick(this, ['curator_orcid', 'resource_id', 'name', 'count_threshold'])   
-    }
-
-    getQueryOptions(){
-        let sort = {}
-        sort[this.sortBy] = this.sortOrder
-        return {
-            limit: this.page_size,
-            skip: this.page - 1,
-            sort
-        }
     }
 
 }

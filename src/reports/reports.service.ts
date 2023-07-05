@@ -156,12 +156,6 @@ export class ReportsService {
 		const totalCount: number = reports_count[0]?.['total_count'] || 0
 		
 		return paginate(data, reportFilter, totalCount);
-		// return {
-		// 	data,
-		// 	total_count: reports_count[0]?.['total_count'] || 0,
-		// 	page: reportFilter.page,
-		// 	page_size: reportFilter.page_size,
-		// };
 	}
 
 	async report_statistics() { }
