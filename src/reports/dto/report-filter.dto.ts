@@ -1,4 +1,4 @@
-import { Transform, Type } from "class-transformer";
+import { Exclude, Transform, Type } from "class-transformer";
 import { IsInt, IsOptional, Max, Min, MaxDate, Validate, IsIn, IsNotEmpty, ValidateIf } from "class-validator";
 import { User } from "../../auth/users/schemas/user.schema";
 import { PartnerResource } from "../../resources/schemas/partner-resources.schema";
@@ -7,8 +7,9 @@ import { DateAfter, DateBefore } from "../validators/date-comparison";
 import { Report } from "../reports.schema";
 import * as _ from 'lodash';
 import { Term } from "../../terms/schemas/terms.schema";
+import { PaginateDto } from "../../pagination/dto/paginate.dto";
 
-export class ReportFilterDto {
+export class ReportFilterDto extends PaginateDto {
 
     @IsOptional()
     @Validate(EntryExistsRule,
@@ -76,16 +77,22 @@ export class ReportFilterDto {
     sortBy?: 'timestamp' | 'resource_id' | 'entity_uri' | 'curator_orcid' | 'activity_term' = 'timestamp'
 
     @IsOptional()
-    @IsIn(['asc', 'desc', -1, 1])
-    sortOrder?: 'asc' | 'desc' | 1 | -1 = 'desc'
+	@Transform(({ value }) => parseInt(value))
+    @IsIn([-1, 1])
+    sortOrder?: 1 | -1 = -1
 
 
 
 
 }
 
-export class ReportFilterGroupBy {
+export class ReportFilterGroupedDto extends ReportFilterDto {
     @IsOptional()
     @IsIn(['day', 'month', 'activity_term'])
     groupBy: 'day' | 'month' | 'activity_term'
+
+
+    @Exclude()
+    sortBy?
+
 }

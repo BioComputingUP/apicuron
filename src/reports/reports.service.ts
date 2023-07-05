@@ -4,10 +4,12 @@ import { FilterQuery, Model, PipelineStage, QueryOptions } from 'mongoose';
 import { User, UserDocument } from '../auth/users/schemas/user.schema';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import { TermsService } from '../terms/terms.service';
-import { ReportFilterDto, ReportFilterGroupBy } from './dto/report-filter.dto';
+import { ReportFilterDto, ReportFilterGroupedDto } from './dto/report-filter.dto';
 import { ReportDto } from './dto/report.dto';
 import { Report, ReportDocument, ReportSchema } from './reports.schema';
 import * as _ from 'lodash';
+import { paginate } from '../pagination/paginator';
+import { PaginationAggregation } from '../pagination/interfaces/pagination-aggregation';
 
 @Injectable()
 export class ReportsService {
@@ -125,28 +127,23 @@ export class ReportsService {
 			data = reports_with_terms;
 		}
 
-		const reports_count = await this.reportModel.count(filter);
+		const reports_count: number = await this.reportModel.count(filter);
 
-		return {
-			data,
-			total_count: reports_count,
-			page: reportFilter.page,
-			page_size: reportFilter.page_size,
-		};
+		return paginate(data, reportFilter, reports_count);
 
 	}
 
-	async getGroupedReports(reportFilter: ReportFilterDto, groupByFilter: ReportFilterGroupBy) {
-		const { filter, options } = this.buildReportsQuery({...reportFilter, ...groupByFilter});
+	async getGroupedReports(reportFilter: ReportFilterGroupedDto) {
+		const { filter, options } = this.buildReportsQuery(reportFilter);
 
-		const paginationPipeline = this.queryOptionsToPipeline(options);
-		const groupByAggregation = this.buildReportGroupAggregation(groupByFilter)
+		const paginationPipeline: PaginationAggregation = reportFilter.getMongoAggregation()
+		const groupByAggregation: PipelineStage[] = this.buildReportGroupAggregation(reportFilter)
 
 
 		const aggregationPipeline: PipelineStage[] = [
 			{ $match: filter },
 			...groupByAggregation,
-			...paginationPipeline
+			...paginationPipeline,
 		]
 		const data$ = this.reportModel.aggregate(aggregationPipeline);
 		const reports_count$ = this.reportModel.aggregate([
@@ -155,12 +152,16 @@ export class ReportsService {
 		]);
 
 		const [data, reports_count] = await Promise.all([data$, reports_count$]);
-		return {
-			data,
-			total_count: reports_count[0]?.['total_count'] || 0,
-			page: reportFilter.page,
-			page_size: reportFilter.page_size,
-		};
+
+		const totalCount: number = reports_count[0]?.['total_count'] || 0
+		
+		return paginate(data, reportFilter, totalCount);
+		// return {
+		// 	data,
+		// 	total_count: reports_count[0]?.['total_count'] || 0,
+		// 	page: reportFilter.page,
+		// 	page_size: reportFilter.page_size,
+		// };
 	}
 
 	async report_statistics() { }
@@ -222,11 +223,8 @@ export class ReportsService {
 			sort,
 		};
 
-		// pagination objects
-		if (dto.page_size) {
-			options['limit'] = dto.page_size
-			options['skip'] = (dto.page - 1) * options['limit'];
-		}
+		Object.assign(options, dto.getMongoQueryOptions())
+
 		return {
 			filter,
 			options,
@@ -252,8 +250,17 @@ export class ReportsService {
 	}
 
 	private buildReportGroupAggregation(
-		{ groupBy }: ReportFilterGroupBy,
+		{ groupBy, sortOrder }: ReportFilterGroupedDto,
 	): PipelineStage[] {
+
+
+		const t: PipelineStage.Sort = {
+			$sort: {
+				groupKey: 1
+			}
+		}
+
+		
 		const converter = {
 			'day': [
 				{
@@ -279,6 +286,11 @@ export class ReportsService {
 						count: 1
 					},
 				},
+				{
+					$sort: {
+						'groupKey': sortOrder as any
+					}
+				}
 			],
 			'month': [
 				{
@@ -304,6 +316,11 @@ export class ReportsService {
 						count: 1
 					},
 				},
+				{
+					$sort: {
+						'groupKey': sortOrder as any
+					}
+				}
 			],
 			'activity_term': [
 				{
@@ -329,9 +346,13 @@ export class ReportsService {
 						count: 1
 					},
 				},
+				{
+					$sort: {
+						'groupKey': sortOrder as any
+					}
+				}
 			],
 		};
-
 		return converter[groupBy];
 	}
 }

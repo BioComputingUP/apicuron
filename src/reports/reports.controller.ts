@@ -36,7 +36,7 @@ import { ReportDto } from './dto/report.dto';
 import { SubmitBulkDto, SubmitReportDto } from './dto/submit-report.dto';
 import { ReportsService } from './reports.service';
 import { ComputeStatisticsTask } from '../reports/tasks/compute_statistics.task';
-import { ReportFilterDto, ReportFilterGroupBy } from './dto/report-filter.dto';
+import { ReportFilterDto, ReportFilterGroupedDto } from './dto/report-filter.dto';
 import * as _ from 'lodash';
 import { plainToClass, plainToInstance } from 'class-transformer';
 
@@ -76,8 +76,9 @@ export class ReportsController {
 	// }
 
 	@Get()
-	async get_reports(@Query() reportFilter: ReportFilterDto) {
-		const reportFilterInstance = plainToInstance(ReportFilterDto, reportFilter)
+	async get_reports(@Query() reportFilter: ReportFilterDto, @Request() req) {
+		
+		const reportFilterInstance: ReportFilterDto = plainToInstance(ReportFilterDto, reportFilter)
 		return await this.reportService.getReports(reportFilterInstance);
 
 		// if(!reportFilterInstance.groupBy){
@@ -86,11 +87,11 @@ export class ReportsController {
 	}
 
 	@Get('group-by/:groupBy')
-	async getGroupedReports(@Query() filter: ReportFilterDto, @Param() groupBy: ReportFilterGroupBy){
-		const filterInstance: ReportFilterDto = plainToInstance(ReportFilterDto, filter);
-		const groupByInstance: ReportFilterGroupBy = plainToInstance(ReportFilterGroupBy, groupBy)
+	async getGroupedReports(@Query()  filter: ReportFilterDto, @Param() groupBy: Pick<ReportFilterGroupedDto, 'groupBy'>){
+		// const filterInstance: ReportFilterDto = plainToInstance(ReportFilterDto, filter);
+		const groupByInstance: ReportFilterGroupedDto = plainToInstance(ReportFilterGroupedDto, {...filter, ...groupBy})
 
-		return await this.reportService.getGroupedReports(filterInstance, groupByInstance)
+		return await this.reportService.getGroupedReports(groupByInstance)
 	}
 
 	@Get('resource/:resource_id/orcid_id/:orcid_id')
