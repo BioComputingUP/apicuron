@@ -8,15 +8,7 @@ import { catchError, map, pluck, shareReplay, switchMap } from "rxjs/operators";
 import { Term } from "../../models/term.model";
 import { BadgeDef } from "../../models/badge-def.model";
 import { Medal } from "../../models/medal.model";
-
-class Resource {
-  resource_name: string;
-  resource_id: string;
-  resource_description: string;
-  logo: string;
-  resource_uri: string;
-  resource_url: string;
-}
+import { Resource } from "../../models/resource.model";
 
 type ResourceList = {
   data: Array<Resource>;
@@ -137,8 +129,8 @@ export class DatabasesService {
     );
   }
 
-  get_resource(resource_id: string) {
-    const response = this.http.get(
+  get_resource(resource_id: string): Observable<{ data: Resource}> {
+    const response = this.http.get<{ data: Resource }>(
       `${this.partnerResourcesPath}/${resource_id}`,
       {
         responseType: "json",

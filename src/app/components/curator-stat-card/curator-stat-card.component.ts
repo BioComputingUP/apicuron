@@ -76,7 +76,7 @@ export class CuratorStatCardComponent implements OnInit {
       resource_id: this.resource.resource_id,
       curator_orcid: this.curator.orcid_id,
       sortBy: "timestamp",
-      sortOrder: "asc",
+      sortOrder: 1,
       limit: 4,
     });
     this.reports$ = this.reportsService
@@ -97,7 +97,7 @@ export class CuratorStatCardComponent implements OnInit {
             ),
           };
         });
-      })
+      }),
     );
     const filter = AchievementFilter.create({
       curator_orcid: this.curator.orcid_id,

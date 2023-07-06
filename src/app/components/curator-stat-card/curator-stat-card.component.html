@@ -3,7 +3,7 @@
   [ngStyle]="{ 'border-color': resource.color }">
   <!-- top Title bar -->
   <div class="tw-flex tw-flex-row tw-w-full tw-flex-wrap sm:tw-flex-nowrap tw-items-center tw-justify-between">
-    <div class="tw-flex tw-flex-row tw-items-center">
+    <div class="tw-flex tw-flex-col tw-items-start sm:tw-w-1/4">
       <span class="tw-font-bold tw-text-lg sm:tw-text-xl tw-font-dm-sans sm:tw-pr-2"
         [ngStyle]="{ color: resource.color }">{{
         resource.resource_name }}</span>
@@ -43,9 +43,9 @@
           Details</button>
 
       </div>
-      <div class="tw-w-full tw-flex tw-flex-row tw-items-stretch tw-grow tw-flex-wrap"
+      <div class="tw-w-full tw-flex tw-flex-row tw-items-start tw-grow tw-flex-wrap"
         *ngIf="badges$ | async as badges">
-        <div class="tw-w-1/2 tw-h-1/2 tw-p-2" *ngFor="let badge of badges.data">
+        <div class="tw-w-1/2 tw-p-2" *ngFor="let badge of badges.data">
           <badge-card [badge]="badge" [terms]="(terms$ | async)"></badge-card>
         </div>
       </div>
