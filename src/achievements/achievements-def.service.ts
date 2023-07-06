@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import {
 	UpdateBadgeDto,
@@ -55,17 +55,32 @@ export class AchievementsDefService {
 		const newBadge = new this.achievementDefModel({
 			...badge,
 			type: 'badge',
-			resource_uri: await this.partnerResourceService.retrieve_uri(badge.resource_id),
+			resource_uri: await this.partnerResourceService.retrieve_uri(
+				badge.resource_id,
+			),
 		});
 
 		return await newBadge.save();
 	}
 
-	async get_badges(badge_filter: BadgeFilter) {
-		return await this.achievementDefModel.find({
-			...badge_filter,
+	async get_badges(badgeFilter: BadgeFilter) {
+		const filterQuery: FilterQuery<AchievementDef> = {
+			...badgeFilter.omitPagination(),
 			type: 'badge',
-		});
+		};
+		const dataPromise = this.achievementDefModel.find(
+			filterQuery,
+			{},
+			badgeFilter.getMongoQueryOptions(),
+		);
+		const countPromise = this.achievementDefModel.count(filterQuery);
+
+		const [data, count] = await Promise.all([dataPromise, countPromise]);
+
+		return {
+			data,
+			count,
+		};
 	}
 
 	async update_badge(badge_update: UpdateBadgeDto) {
@@ -97,17 +112,33 @@ export class AchievementsDefService {
 		const newMedal = new this.achievementDefModel({
 			...medal,
 			type: 'medal',
-			resource_uri: await this.partnerResourceService.retrieve_uri(medal.resource_id),
+			resource_uri: await this.partnerResourceService.retrieve_uri(
+				medal.resource_id,
+			),
 		});
 
 		return await newMedal.save();
 	}
 
-	async get_medals(medals_filter: MedalsFilter) {
-		return await this.achievementDefModel.find({
-			...medals_filter,
+	async get_medals(medalFilter: MedalsFilter) {
+		const filter = medalFilter.omitPagination();
+		const filterQuery: FilterQuery<AchievementDef> = {
+			...filter,
 			type: 'medal',
-		});
+		};
+		const dataPromise = this.achievementDefModel.find(
+			filterQuery,
+			{},
+			medalFilter.getMongoQueryOptions(),
+		);
+		const countPromise = this.achievementDefModel.count(filterQuery);
+
+		const [data, count] = await Promise.all([dataPromise, countPromise]);
+
+		return {
+			data,
+			count,
+		};
 	}
 
 	async update_medal(medal_update: UpdateMedalDto) {

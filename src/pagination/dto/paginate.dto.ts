@@ -7,6 +7,7 @@ import {
 	Max,
 	Min,
 } from 'class-validator';
+import * as _ from 'lodash';
 import { PipelineStage, QueryOptions } from 'mongoose';
 
 export class PaginateDto {
@@ -42,5 +43,9 @@ export class PaginateDto {
 					},
 			  ]
 			: [{ $skip: this.skip }];
+	}
+
+	omitPagination(): Omit<this, 'skip' | 'limit'> {
+		return _.omit(this, ['skip', 'limit'])
 	}
 }

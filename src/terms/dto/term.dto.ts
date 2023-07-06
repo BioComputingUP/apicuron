@@ -1,4 +1,5 @@
 import { IsIn, IsNotEmpty, IsNumber, IsOptional, IsUrl, Min, Validate } from "class-validator";
+import { PaginateDto } from "../../pagination/dto/paginate.dto";
 import { ActivityTermExists } from "../validators/activity-term-exists";
 
 
@@ -37,7 +38,7 @@ export class TermDto {
 	score: number;
 }
 
-export class TermFilterDto {
+export class TermFilterDto extends PaginateDto {
 	
 	@IsOptional()
 	resource_id?: string;

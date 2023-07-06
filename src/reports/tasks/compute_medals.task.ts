@@ -12,6 +12,7 @@ import { Report, ReportDocument } from '../reports.schema';
 import { MedalDef } from '../../achievements/schemas/medals_def.schema';
 import { AchievementDef } from '../../achievements/schemas/achievement-def.schema';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
+import { MedalsFilter } from '../../achievements/dto/medal-crud.dto';
 
 @Injectable()
 export class ComputeMedalsTask {
@@ -46,7 +47,7 @@ export class ComputeMedalsTask {
         const deletionResponse = await this.achievementsService.delete_resource_medals(resource_id);
         this.logger.log(`Deleted ${deletionResponse.deletedCount} medals for resource ${resource_id}`)
 
-        const medalDefs = await this.achievementsDefService.get_medals({ resource_id })
+        const { data: medalDefs } = await this.achievementsDefService.get_medals(MedalsFilter.create({ resource_id }))
 
         let medal_saves_promises = []
 

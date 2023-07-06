@@ -3,6 +3,7 @@ import { ApiHeader, ApiOperation, ApiOkResponse, ApiTags, ApiSecurity } from '@n
 import { AuthService } from '../../auth/auth.service';
 import { HasAResourceGuard } from '../../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
+import { paginate } from '../../pagination/paginator';
 import { AuthorizationHeader, VersionHeader } from '../../swagger/config';
 import { AchievementsDefService } from '../achievements-def.service';
 import { ResourceAchievmentsDef } from '../dto/achievement-def.dto';
@@ -87,7 +88,9 @@ export class BadgesDefController {
     })
 	@Get()
 	async get_badges(@Query() badges_filter: BadgeFilter){
-		return await this.achievementsDefService.get_badges(badges_filter)
+		const { data , count } =  await this.achievementsDefService.get_badges(badges_filter)
+
+		return paginate(data, badges_filter, count);
 	}
 
 	@ApiOperation({
@@ -164,7 +167,8 @@ export class MedalsDefController {
 	@ApiSecurity('basic')
 	@Get()
 	async get_medals(@Query() medals_filter: MedalsFilter){
-		return await this.achievementsDefService.get_medals(medals_filter)
+		const {data, count} = await this.achievementsDefService.get_medals(medals_filter)
+		return paginate(data, medals_filter, count);
 	}
 
 

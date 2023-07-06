@@ -73,8 +73,7 @@ export class PartnerResourcesController {
 		description: 'A 404 Not Found Response and Error Message'
 	})
 	@Get(':resource_id')
-	async get_resource(@Param() resourceSelector: SelectPartnerResourceDto){
-		const { resource_id } = resourceSelector
+	async get_resource(@Param() { resource_id }: SelectPartnerResourceDto){
 		const resource = await this.partnerResourceService.get_resource(resource_id);
 		if(resource){
 			return resource

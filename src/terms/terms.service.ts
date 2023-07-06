@@ -28,7 +28,7 @@ export class TermsService {
     }
 
     async get_resource_terms(term_filter: TermFilterDto) {
-        return await this.termModel.find(term_filter)
+        return await this.termModel.find(term_filter.omitPagination(), {}, term_filter.getMongoQueryOptions());
     }
 
     async resource_has_term(resource_id: string, activity_term: string) {

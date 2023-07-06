@@ -1,4 +1,6 @@
 import { IsDate, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, MaxDate, Min, MinDate, Validate } from "class-validator";
+import * as _ from "lodash";
+import { PaginateDto } from "../../pagination/dto/paginate.dto";
 import { ResourceIdExists } from "../../resources/partner-resources/validators/resource-id-exists";
 import { ActivityTermExists } from "../../terms/validators/activity-term-exists";
 import { MedalUnique } from "../validators/achievement-exists";
@@ -53,7 +55,15 @@ export class CreateMedalDto {
 
 }
 
-export class MedalsFilter {
+export class MedalsFilter extends PaginateDto {
+
+    static create (obj: any) {
+        const filter = new MedalsFilter();
+        Object.assign(filter, obj);
+        return filter;
+    }
+
+
     @IsOptional()
     @IsDateString()
     @MaxDateField(['last_day'])
