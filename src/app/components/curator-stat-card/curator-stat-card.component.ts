@@ -77,7 +77,7 @@ export class CuratorStatCardComponent implements OnInit {
       curator_orcid: this.curator.orcid_id,
       sortBy: "timestamp",
       sortOrder: "asc",
-      page_size: 4,
+      limit: 4,
     });
     this.reports$ = this.reportsService
       .getReports(reportFilter)
@@ -102,7 +102,7 @@ export class CuratorStatCardComponent implements OnInit {
     const filter = AchievementFilter.create({
       curator_orcid: this.curator.orcid_id,
       resource_id: this.resource.resource_id,
-      page_size: 4
+      limit: 4
     })
     this.medals$ = this.medalService.getMedals(filter)
 

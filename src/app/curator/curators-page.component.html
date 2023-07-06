@@ -35,7 +35,7 @@
 
     <div class="tw-flex tw-justify-center tw-my-2">
 
-        <pagination [totalItems]="(biocurators_count$ | async)" [itemsPerPage]="page_size"
+        <pagination [totalItems]="(biocurators_count$ | async)" [itemsPerPage]="limit"
             [(ngModel)]="current_page" (pageChanged)="update_page($event.page)" [maxSize]="5"></pagination>
     </div>
 </div>

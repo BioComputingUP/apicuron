@@ -12,54 +12,54 @@ import { Medal } from "src/app/models/medal.model";
 import { Resource } from "src/app/models/resource.model";
 import { PaginationComponent } from "src/app/pagination/pagination.component";
 
-
-
 @Component({
-    standalone: true,
-    selector: 'curator-medals-details',
-    imports: [CommonModule, AchievementsModule, MedalCardComponent, PaginationComponent],
-    templateUrl: './curator-medals-details.component.html',
-    styleUrls: []
+  standalone: true,
+  selector: "curator-medals-details",
+  imports: [
+    CommonModule,
+    AchievementsModule,
+    MedalCardComponent,
+    PaginationComponent,
+  ],
+  templateUrl: "./curator-medals-details.component.html",
+  styleUrls: [],
 })
 export class CuratorMedalsDetailsComponent implements OnInit {
-    medals$: Observable<Paginated<Medal>>;
+  medals$: Observable<Paginated<Medal>>;
 
-    get currentPage (){
-        return this.medalFilter$.value.page
-    }
+  get currentPage() {
+    const filter = this.medalFilter$.value;
+    return (filter.skip / filter.limit) + 1;
+  }
 
-    update_page(page) {
-        const filter = this.medalFilter$.value
-        filter.page = page
-        this.medalFilter$.next(filter)
-    }
+  update_page(page) {
+    const filter = this.medalFilter$.value;
+    filter.skip = (page - 1) * filter.limit;
+    this.medalFilter$.next(filter);
+  }
 
-    medalFilter$ = new BehaviorSubject(null)
+  medalFilter$: BehaviorSubject<AchievementFilter> = new BehaviorSubject(null);
 
-    constructor(protected medalService: MedalsService) {}
+  constructor(protected medalService: MedalsService) {}
 
-    @Input() curator: User;
-    @Input() resource: Resource;
-    
+  @Input() curator: User;
+  @Input() resource: Resource;
 
-    
+  ngOnInit(): void {
+    const medalFilter = AchievementFilter.create({
+      resource_id: this.resource.resource_id,
+      curator_orcid: this.curator.orcid_id,
+      limit: 16,
+      skip: 0,
+    });
+    this.medalFilter$.next(medalFilter);
 
-    ngOnInit(): void {
-        const medalFilter = AchievementFilter.create({
-            resource_id: this.resource.resource_id,
-            curator_orcid: this.curator.orcid_id,
-            page_size: 16,
-            page: 1
-        })
-        this.medalFilter$.next(medalFilter)
-
-        this.medals$ = this.medalFilter$.pipe(
-            filter((filter) => !!filter),
-            switchMap((medalFilter: AchievementFilter) => {
-                return this.medalService.getMedals(medalFilter)
-            }),
-            shareReplay(1)
-        )
-    }
-
+    this.medals$ = this.medalFilter$.pipe(
+      filter((filter) => !!filter),
+      switchMap((medalFilter: AchievementFilter) => {
+        return this.medalService.getMedals(medalFilter);
+      }),
+      shareReplay(1)
+    );
+  }
 }

@@ -24,8 +24,8 @@ export class AchievementFilter implements Serializable {
 
     curator_orcid?: string;
     resource_id?: string;
-    page_size?: number;
-    page?: number;
+    skip?: number;
+    limit?: number;
     name?: string;
     sortBy?: 'curator_threshold' | 'name'
     sortOrder?: '1' | '-1' | 'asc' | 'desc'

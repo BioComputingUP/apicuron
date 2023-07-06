@@ -26,7 +26,8 @@ export class CuratorBadgesDetailsComponent {
     badges$: Observable<Paginated<Badge>>;
 
     get currentPage (){
-        return this.medalFilter$.value.page
+        const val = this.badgeFilter$.value
+        return (val.skip / val.limit) + 1; 
     }
 
     set currentPage(value) {
@@ -34,12 +35,12 @@ export class CuratorBadgesDetailsComponent {
     }
 
     update_page(page) {
-        const filter = this.medalFilter$.value
-        filter.page = page
-        this.medalFilter$.next(filter)
+        const filter = this.badgeFilter$.value
+        filter.skip = (page - 1) * filter.limit
+        this.badgeFilter$.next(filter)
     }
 
-    medalFilter$ = new BehaviorSubject(null)
+    badgeFilter$: BehaviorSubject<AchievementFilter> = new BehaviorSubject(null);
 
     constructor(protected badgeService: BadgesService) {}
 
@@ -48,18 +49,18 @@ export class CuratorBadgesDetailsComponent {
     
 
     ngOnInit(): void {
-        const medalFilter = AchievementFilter.create({
+        const badgeFilter = AchievementFilter.create({
             resource_id: this.resource.resource_id,
             curator_orcid: this.curator.orcid_id,
-            page_size: 16,
-            page: 1
+            limit: 16,
+            skip: 0
         })
-        this.medalFilter$.next(medalFilter)
+        this.badgeFilter$.next(badgeFilter)
 
-        this.badges$ = this.medalFilter$.pipe(
+        this.badges$ = this.badgeFilter$.pipe(
             filter((filter) => !!filter),
-            switchMap((medalFilter: AchievementFilter) => {
-                return this.badgeService.getBadges(medalFilter)
+            switchMap((badgeFilter: AchievementFilter) => {
+                return this.badgeService.getBadges(badgeFilter)
             }),
             shareReplay(1)
         )

@@ -26,8 +26,6 @@ import {
   ReportsService,
 } from "src/app/reports/services/reports.service";
 import { Paginated } from "src/app/interfaces/paginated";
-import { ReportGroupBy } from "src/app/reports/types/group-by";
-import { GroupedReports } from "src/app/reports/interfaces/grouped-reports.interface";
 import { ReportFilterFormComponent } from "../../report-filter-form/report-filter-form.component";
 import { Report } from "../../../models/report.model";
 import { ResourceModule } from "../../../resource/resource.module";

@@ -33,14 +33,15 @@ export class CuratorStatDetailsComponent implements OnInit {
 
     // handle terms prop reactivity
     terms$: BehaviorSubject<Term[]> = new BehaviorSubject<Term[]>([]);
-    reportsWithTerms$: Observable<{ data: Report[], total_count: Number, page: Number, page_size: Number }>;
+    reportsWithTerms$: Observable<{ data: Report[], total: Number, skip: Number, limit: Number }>;
 
     paginatedReports$: Observable<Paginated<Report>>;
     reportFilter$: BehaviorSubject<ReportFilter> = new BehaviorSubject<ReportFilter>(null);
 
 
     get currentPage (){
-        return this.reportFilter$.value.page
+        const filter =  this.reportFilter$.value
+        return (filter.skip / filter.limit) + 1;
     }
     set currentPage(value){
         this.update_page(value)
@@ -48,7 +49,7 @@ export class CuratorStatDetailsComponent implements OnInit {
 
     update_page(page) {
         const filter = this.reportFilter$.value
-        filter.page = page
+        filter.skip = (page - 1) * filter.limit;
         this.reportFilter$.next(filter)
     }
 
@@ -60,8 +61,8 @@ export class CuratorStatDetailsComponent implements OnInit {
         this.reportFilter$.next(ReportFilter.create({
             resource_id: this.resource.resource_id,
             curator_orcid: this.curator.orcid_id,
-            page: 1,
-            page_size: 20
+            skip: 0,
+            limit: 20
         }))
 
         this.paginatedReports$ = this.reportFilter$.pipe(
@@ -75,12 +76,12 @@ export class CuratorStatDetailsComponent implements OnInit {
         this.reportsWithTerms$ = combineLatest([this.paginatedReports$, this.terms$]).pipe(
             filter(([reports, terms]) => terms.length > 0),
             map(([reports, terms]: [Paginated<Report>, Term[]]) => {
-                const { total_count, page, page_size }= reports
+                const { meta: { pagination: { total , start, limit}, } }= reports
                 const data = reports.data.map((report) => {
                     report.term = terms.find((term) => term.activity_term === report.activity_term)
                     return report
                 })
-                return { data, total_count, page, page_size }
+                return { data, total, skip: start - 1, limit }
             }),
         )
     }

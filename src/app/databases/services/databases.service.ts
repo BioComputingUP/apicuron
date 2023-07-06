@@ -159,7 +159,7 @@ export class DatabasesService {
           version: "2",
         },
         params: {
-          page_size: "20",
+          limit: "20",
         },
       }
     );

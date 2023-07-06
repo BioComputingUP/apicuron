@@ -44,9 +44,9 @@ export class ReportFilter implements Serializable {
 
     entity_uri?: string
 
-    page_size?: number
+    limit?: number
 
-    page?: number
+    skip?: number
 
     from?: Date
 

@@ -12,7 +12,7 @@ import { CuratorService } from "./curator.service";
 })
 export class CuratorsPageComponent implements OnInit {
   current_page = 1;
-  page_size = 15;
+  limit = 15;
 
   biocurators = [];
   private last_query_params = {};
@@ -57,7 +57,7 @@ export class CuratorsPageComponent implements OnInit {
         return this.curatorService
           .search_curators(
             new HttpParams({
-              fromObject: { ...query_params, page_size: this.page_size },
+              fromObject: { ...query_params, limit: this.limit },
             })
           )
       }),
