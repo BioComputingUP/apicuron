@@ -44,6 +44,7 @@ export class ComputeStatisticsTask {
         await this.compute_resource_statistics(resource)
     }
 
+
     async compute_resource_statistics({ resource_id, resource_uri }) {
         const users_reports = this.group_resource_reports_by_terms(resource_id)
 
@@ -181,9 +182,9 @@ export class ComputeStatisticsTask {
 
     }
 
-
     async compute_user_statistics({ resource_id, resource_uri }, { orcid_id }) {
         const user_reports = this.group_user_reports_by_terms(resource_id, orcid_id);
+        
 
         let user_stats = {
             generation_terms: [],
@@ -198,7 +199,8 @@ export class ComputeStatisticsTask {
             resource_id,
             curator_orcid: orcid_id,
             medals_count: 0,
-            badges_count: 0
+            badges_count: 0,
+            privacy: await this.userService.user_exists(orcid_id) ? 'public' : 'private'
         }
 
         for await (const report of user_reports) {

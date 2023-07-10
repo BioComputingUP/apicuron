@@ -1,20 +1,29 @@
 import { HttpModule } from '@nestjs/axios';
-import { Module, forwardRef } from '@nestjs/common';
-import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
-import { AchievementsModule } from '../achievements/achievements.module';
+import { Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
-import { ReportsModule } from '../reports/reports.module';
-import { ResourcesModule } from '../resources/resources.module';
-import { StatisticsModule } from '../statistics/statistics.module';
 import { SchedulerService } from './services/scheduler.service';
 // import { ComputeStatisticsTask } from './tasks/compute_statistics.task';
-
+import { Provider } from '@nestjs/common/interfaces/modules';
 @Module({
-  imports: [forwardRef(() => ReportsModule), HttpModule, AuthModule, StatisticsModule, ResourcesModule, AchievementsModule],
+  imports: [HttpModule, AuthModule],
   providers: [SchedulerService,
   ],
   exports: [
   ],
   controllers: [],
 })
-export class SchedulerModule { }
+export class SchedulerModule {
+
+  // dynamic modules explained here
+  // https://dev.to/nestjs/providing-providers-to-dynamic-nestjs-modules-1i6n
+  static registerTasks(tasks: Provider[]) {
+    return {
+      module: SchedulerModule,
+      providers: [
+        ...tasks,
+        HttpModule,
+      ],
+      exports: [SchedulerService]
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
+import { User } from '../../auth/users/schemas/user.schema';
 import { StatisticsTerms } from './statistics-terms.schema';
 
 export type StatisticsDocument = Statistics & Document;
@@ -73,10 +74,13 @@ export class Statistics {
 }
 
 
-export const StatisticsSchema = SchemaFactory.createForClass(Statistics);
+const StatisticsSchema = SchemaFactory.createForClass(Statistics);
 
-// StatisticsSchema.virtual('user', {
-//     ref: 'User',
-//     localField: 'curator_orcid',
-//     foreignField: 'orcid_id'
-//   });
+StatisticsSchema.virtual('user', {
+    ref: User.name,
+    localField: 'curator_orcid',
+    foreignField: 'orcid_id',
+    justOne: true
+  });
+
+export { StatisticsSchema }

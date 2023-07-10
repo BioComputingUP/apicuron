@@ -18,29 +18,30 @@ import { ComputeAchievementsTask } from './tasks/compute_achievements.task';
 import { ComputeStatisticsTask } from './tasks/compute_statistics.task';
 import { StatisticsModule } from '../statistics/statistics.module';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { SchedulerModule } from '../scheduler/scheduler.module';
 
 @Module({
 	controllers: [ReportsController,],
 	providers: [ReportsService,
 		{
 			provide: 'task:submit_report',
-			useClass: SubmitBulkTask
+			useClass: SubmitBulkTask,
 		},
 		{
 			provide: 'task:compute_badges',
-			useClass: ComputeBadgesTask
+			useClass: ComputeBadgesTask,
 		},
 		{
 			provide: 'task:compute_medals',
-			useClass: ComputeMedalsTask
+			useClass: ComputeMedalsTask,
 		},
 		{
 			provide: 'task:compute_achievements',
-			useClass: ComputeAchievementsTask
+			useClass: ComputeAchievementsTask,
 		},
 		{
 			provide: 'task:compute_statistics',
-			useClass: ComputeStatisticsTask
+			useClass: ComputeStatisticsTask,
 		}
 	],
 	imports: [
@@ -62,6 +63,28 @@ import { NotificationsModule } from '../notifications/notifications.module';
 				secret: configService.get('JWT_SECRET'),
 			}),
 		}),
+		SchedulerModule.registerTasks([
+			{
+				provide: 'task:submit_report',
+				useFactory: (task: SubmitBulkTask) => task
+			},
+			{
+				provide: 'task:compute_badges',
+				useFactory: (task: ComputeBadgesTask) => task
+			},
+			{
+				provide: 'task:compute_medals',
+				useFactory: (task: ComputeMedalsTask) => task
+			},
+			{
+				provide: 'task:compute_achievements',
+				useFactory: (task: ComputeAchievementsTask) => task
+			},
+			{
+				provide: 'task:compute_statistics',
+				useFactory: (task: ComputeStatisticsTask) => task
+			}
+		]),
 		SchedulerClientModule,
 		StatisticsModule
 	],

@@ -20,6 +20,7 @@ import { ActivityTermExists } from './validators/activity-term-exists';
         ActivityTermExists
     ],
     exports: [
+        MongooseModule,
         TermsService,
         ActivityTermExists
     ],
