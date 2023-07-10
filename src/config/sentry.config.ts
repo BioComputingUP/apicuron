@@ -1,6 +1,9 @@
 import { enableProdMode } from '@angular/core';
-
-import { environment } from './environments/environment';
+import { APP_INITIALIZER, ErrorHandler } from "@angular/core";
+import {
+  Router,
+} from "@angular/router";
+import { environment } from '../environments/environment';
 // Sentry setup
 import * as Sentry from "@sentry/angular-ivy";
 
@@ -33,3 +36,23 @@ export function setupSentry () {
       }
       
 }
+
+
+export const SentryModuleConfig = [
+  {
+    provide: ErrorHandler,
+    useValue: Sentry.createErrorHandler({
+      showDialog: false,
+    }),
+  },
+  {
+    provide: Sentry.TraceService,
+    deps: [Router]
+  },
+  {
+    provide: APP_INITIALIZER,
+    useFactory: () => () => {},
+    deps: [Sentry.TraceService],
+    multi: true,
+  },
+]

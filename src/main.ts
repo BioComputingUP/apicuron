@@ -3,7 +3,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
-import { setupSentry } from './sentry';
+import { setupSentry } from './config/sentry.config';
 
 setupSentry();
 
