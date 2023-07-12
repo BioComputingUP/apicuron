@@ -35,6 +35,9 @@ export class BadgeDefCardComponent implements OnInit {
     badge: BadgeDef
 
     @Input()
+    enableShadow = true;
+
+    @Input()
     public get terms() {
         return this.terms$.getValue();
     }

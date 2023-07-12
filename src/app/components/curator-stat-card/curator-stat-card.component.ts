@@ -7,7 +7,7 @@ import { User } from "../../models/User.model";
 import { ReportsModule } from "src/app/reports/reports.module";
 import { ReportsService } from "src/app/reports/services/reports.service";
 import { ReportFilter } from "src/app/reports/interfaces/report-filter.interface";
-import { Observable, combineLatest } from "rxjs";
+import { Observable, combineLatest, of } from "rxjs";
 import { map, shareReplay, tap } from "rxjs/operators";
 import { ReportCardComponent } from "src/app/components/report-card/report-card.component";
 import { TermsService } from "src/app/terms/services/terms.service";
@@ -53,6 +53,7 @@ export class CuratorStatCardComponent implements OnInit {
   reportsWithTerms$: Observable<{ report: Report; term: Term }[]>;
   detailForm: any;
   badges$: Observable<Paginated<Badge>>;
+  achievements$: Observable<[Paginated<Medal>, Paginated<Badge>]>;
 
   constructor(
     protected reportsService: ReportsService,
@@ -106,7 +107,10 @@ export class CuratorStatCardComponent implements OnInit {
     })
     this.medals$ = this.medalService.getMedals(filter)
 
+    // this.badges$ = of({ data:[], meta: { pagination: { total: 0, start: 0, limit: 0 }} });
     this.badges$ = this.badgeService.getBadges(filter)
+
+    this.achievements$ = combineLatest([this.medals$, this.badges$])
   }
 
   @Input() statistics: CuratorStatistics;

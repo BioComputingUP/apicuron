@@ -10,8 +10,8 @@ import { environment } from "src/environments/environment";
 export class OrcidService {
     constructor(protected http: HttpClient) { }
 
-    private orcid_url= 'https://pub.orcid.org/v3.0/'
-//   private orcid_url = environment.orcid_url;
+    // private orcid_url= 'https://pub.orcid.org/v3.0/'
+    private orcid_url = environment.orcid_url;
     private base_headers = {
         Accept: "application/json",
     }

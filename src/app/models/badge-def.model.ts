@@ -1,10 +1,14 @@
-import { Deserializable } from "../interfaces/deserializable.model";
+import { Deserializable, Serializable } from "../interfaces/deserializable.model";
 import { AcheivementDef } from "./achievement-def";
 import { Term } from "./term.model";
 
+export type DeleteBadgeDef =  Pick<BadgeDef, 'name' | 'resource_id'>;
+export type UpdateBadgeDef = Partial<BadgeDef> & DeleteBadgeDef;
 
-
-export class BadgeDef extends AcheivementDef implements Deserializable {
+export class BadgeDef extends AcheivementDef implements Deserializable, Serializable {
+    serialize(): any {
+        return Object.assign({}, this);
+    }
     deserialize(input: any): this {
         this.color_code = this.color = input.color_code
         this.count_threshold = input.count_threshold
@@ -12,11 +16,11 @@ export class BadgeDef extends AcheivementDef implements Deserializable {
         this.list_terms = input.list_terms
         this.resource_id = input.resource_id
         this.resource_uri = input.resource_uri
-        this.image = input.image
+        // this.image = input.image
         return this
     }
 
-    image?: string
+    // image?: string
     color_code?: string
     count_threshold: number
 

@@ -60,74 +60,7 @@ export class DatabasesService {
     return data;
   }
 
-  get_resource_details(resource_id: string) {
-    const resource$: Observable<Object> = this.http
-      .get(`${this.partnerResourcesPath}/${resource_id}`, {
-        responseType: "json",
-        headers: {
-          version: "2",
-        },
-      })
-      .pipe(pluck("data"));
-    const terms$: Observable<Term[]> = this.http
-      .get(this.termsPath, {
-        headers: {
-          version: "2",
-        },
-        params: {
-          resource_id,
-        },
-      })
-      .pipe(
-        pluck("data"),
-        map((data: Term[]) => data.map((term) => new Term().deserialize(term))),
-        map(Term.computeTermScoreQuartile)
-      );
-
-    // @ts-ignore
-    const medals$: Observable<Object> = this.http
-      .get(environment.ws + "/achievements-def/medals", {
-        headers: {
-          version: "2",
-        },
-        params: {
-          resource_id,
-        },
-      })
-      .pipe(
-        pluck("data"),
-        map((medals: any[]) =>
-          medals.map((medal) => new Medal().deserialize(medal))
-        )
-      );
-
-    const badges$: Observable<Object> = this.http
-      .get(environment.ws + "/achievements-def/badges", {
-        headers: {
-          version: "2",
-        },
-        params: {
-          resource_id,
-        },
-      })
-      .pipe(
-        pluck("data"),
-        map((badges: BadgeDef[]) => {
-          return badges.map((badge) => new BadgeDef().deserialize(badge));
-        })
-      );
-
-    return combineLatest([badges$, medals$, terms$, resource$]).pipe(
-      map(([badges, medals, terms, resource]) => {
-        return {
-          badges,
-          medals,
-          terms,
-          ...resource,
-        };
-      })
-    );
-  }
+  
 
   get_resource(resource_id: string): Observable<{ data: Resource}> {
     const response = this.http.get<{ data: Resource }>(
@@ -151,7 +84,7 @@ export class DatabasesService {
           version: "2",
         },
         params: {
-          limit: "20",
+          limit: "10",
         },
       }
     );

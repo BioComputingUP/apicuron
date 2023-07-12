@@ -31,6 +31,7 @@
     "@compodoc/compodoc": "^1.1.19",
     "@ngneat/tailwind": "^7.0.3",
     "@sentry/angular-ivy": "^7.53.1",
+    "@tailwindcss/container-queries": "^0.1.1",
     "@types/lodash": "^4.14.194",
     "@types/plotly.js-dist-min": "^2.3.1",
     "anchor-js": "^4.3.1",

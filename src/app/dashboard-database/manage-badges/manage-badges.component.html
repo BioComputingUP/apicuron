@@ -1,5 +1,4 @@
-<section class="tw-bg-white tw-border tw-border-gray-500 tw-shadow-md tw-rounded tw-p-2 tw-w-full"
-    *ngIf="resource$ | async as resource">
+<section class="tw-bg-white tw-p-2 tw-w-full" *ngIf="resource$ | async as resource">
     <h3 class="tw-text-xl tw-font-bold">Manage Badges</h3>
 
     <div class="tw-flex tw-flex-row tw-justify-end">
@@ -9,29 +8,27 @@
     </div>
 
     <div class="tw-flex tw-flex-row tw-flex-wrap tw-py-1" *ngIf="badges$ | async as badges">
-        <div *ngFor="let badge of badges" class="tw-p-1 tw-w-1/2 sm:tw-w-1/4">
-            <div class="tw-bg-white tw-relative tw-rounded-lg tw-border tw-border-gray-400 tw-p-1 tw-pt-3">
-                <!-- <div class="tw-absolute tw-z-10 tw-top-0 tw-right-0 tw-pt-1 tw-pr-1">
-                    <button>
-                        <svg class="tw-w-4 tw-h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
-                    </button>
+        <ng-container *ngIf="terms$ | async as terms">
+            <div *ngFor="let badge of badges.data" class="tw-p-1 sm:tw-p-2 tw-w-1/2 sm:tw-w-1/3 lg:tw-w-1/4">
+                <div class="tw-bg-white tw-relative tw-p-1 tw-h-full tw-shadow-md tw-shadow-gray-400">
 
-                </div> -->
-                <svg-badge class="tw-w-full tw-mx-auto" [database]="resource.resource_name" [title]="badge.name"
-                    [main_color]="badge.color_code">
-                </svg-badge>
-                <div class="tw-flex tw-flex-row tw-justify-between">
-                    <div class="tw-w-1/2 tw-py-1">
-                        <button (click)="open_edit_modal(badge)"
-                            class="tw-bg-green-500 tw-text-white tw-font-bold tw-w-full tw-rounded tw-shadow-md">Edit</button>
+                    <div>
+                        <badge-def-card [badge]="badge" [terms]="terms" [enableShadow]="false"></badge-def-card>
                     </div>
-                    <div class="tw-w-1/2 tw-py-1">
-                        <button (click)="delete_badge(badge)"
-                            class="tw-bg-red-500 tw-text-white tw-font-bold tw-w-full tw-rounded tw-shadow-md">Delete</button>
+                    <div class="tw-flex tw-flex-row tw-justify-between">
+                        <div class="tw-w-1/2">
+                            <button (click)="open_edit_modal(badge)"
+                                class="tw-bg-green-500 tw-text-white tw-font-bold tw-w-full tw-rounded tw-shadow-md">Edit</button>
+                        </div>
+                        <div class="tw-w-1/2">
+                            <button (click)="delete_badge(badge)"
+                                class="tw-bg-red-500 tw-text-white tw-font-bold tw-w-full tw-rounded tw-shadow-md">Delete</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </ng-container>
+
 
     </div>
 </section>
@@ -40,7 +37,7 @@
 <div *ngIf="show_edit_form" class="tw-relative tw-z-50 tw-overflow-y-scroll" aria-labelledby="modal-title" role="dialog"
     aria-modal="true">
 
-    <div class="tw-fixed tw-inset-0 tw-bg-gray-500 tw-bg-opacity-75 tw-transition-opacity tw-duration-200"
+    <div class="tw-fixed tw-inset-0 tw-bg-gray-500 tw-bg-opacity-75 tw-backdrop-blur-sm tw-transition-opacity tw-duration-200"
         [ngClass]="{'tw-block':show_edit_form, 'tw-hidden': !show_edit_form}" (click)="show_edit_form = false">
     </div>
 
@@ -49,10 +46,10 @@
             class="tw-flex tw-min-h-full tw-items-center tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0">
 
             <div [ngClass]="{'tw-block':show_edit_form, 'tw-hidden': !show_edit_form}"
-                class="tw-relative tw-transform tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 ">
+                class="tw-relative tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 ">
                 <form action="" [formGroup]="edit_form" (submit)="edit_form_submit()">
                     <div
-                        class="tw-bg-white tw-grid tw-grid-flow-row tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4">
+                        class="tw-bg-white tw-grid tw-grid-flow-row tw-grid-cols-1 tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4">
 
                         <!-- for the update term form -->
                         <h2 class="tw-text-xl tw-text-center tw-font-bold">update
@@ -61,9 +58,17 @@
                             }}"</h2>
 
 
-                        <div *ngIf="terms$ | async as terms" class="form-control-element">
+                        <div *ngIf="terms$ | async as terms" class="tw-w-full">
                             <label for="list_terms">List of Terms</label>
-                            <select-terms [terms_list]="terms" formControlName="list_terms"></select-terms>
+
+                            <p-multiSelect [options]="terms" [group]="true" formControlName="list_terms"
+                                defaultLabel="Select an activity Term" scrollHeight="250px" display="chip">
+                                <ng-template let-group pTemplate="group">
+                                    <div class="tw-flex tw-items-center">
+                                        <span class="tw-capitalize">{{group.label}} Terms</span>
+                                    </div>
+                                </ng-template>
+                            </p-multiSelect>
                         </div>
 
                         <div class="form-control-element">
@@ -86,10 +91,6 @@
                             </small>
                         </div>
 
-                        <div class="form-control-element">
-                            <label for="description">Category</label>
-                            <input type="text" name="" id="" formControlName="category">
-                        </div>
 
                         <input type="submit"
                             class="tw-w-full tw-p-2 tw-mx-1 tw-bg-green-500 tw-text-white tw-capitalize" value="submit">
@@ -109,7 +110,7 @@
 <div *ngIf="show_create_form" class="tw-relative tw-z-50 tw-overflow-y-scroll" aria-labelledby="modal-title"
     role="dialog" aria-modal="true">
 
-    <div class="tw-fixed tw-inset-0 tw-bg-gray-500 tw-bg-opacity-75 tw-transition-opacity tw-duration-200"
+    <div class="tw-fixed tw-inset-0 tw-bg-gray-500 tw-bg-opacity-75 tw-backdrop-blur-sm tw-transition-opacity tw-duration-200"
         [ngClass]="{'tw-block':show_create_form, 'tw-hidden': !show_create_form}" (click)="show_create_form = false">
     </div>
 
@@ -118,10 +119,10 @@
             class="tw-flex tw-min-h-full tw-items-center tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0">
 
             <div [ngClass]="{'tw-block':show_create_form, 'tw-hidden': !show_create_form}"
-                class="tw-relative tw-transform tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 ">
+                class="tw-relative tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 ">
                 <form action="" [formGroup]="create_form" (submit)="create_form_submit()">
                     <div
-                        class="tw-bg-white tw-grid tw-grid-flow-row tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4">
+                        class="tw-bg-white tw-grid tw-grid-flow-row tw-grid-cols-1 tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4">
 
                         <!-- for the update term form -->
                         <h2 class="tw-text-xl tw-text-center tw-font-bold">Create a new
@@ -134,9 +135,17 @@
                             <input type="text" name="" id="" formControlName="name">
                         </div>
 
-                        <div *ngIf="terms$ | async as terms" class="form-control-element">
+                        <div *ngIf="terms$ | async as terms" class="tw-w-full">
                             <label for="list_terms">List of Terms</label>
-                            <select-terms [terms_list]="terms" formControlName="list_terms"></select-terms>
+
+                            <p-multiSelect [options]="terms" [group]="true" formControlName="list_terms"
+                                defaultLabel="Select an activity Term" scrollHeight="250px" display="chip">
+                                <ng-template let-group pTemplate="group">
+                                    <div class="tw-flex tw-items-center">
+                                        <span class="tw-capitalize">{{group.label}} Terms</span>
+                                    </div>
+                                </ng-template>
+                            </p-multiSelect>
                         </div>
 
                         <div class="form-control-element">
@@ -157,11 +166,6 @@
                                 *ngIf="create_form.get('count_threshold').hasError('min') && create_form.get('count_threshold').touched">
                                 Minimum value of a count threshold is 1
                             </small>
-                        </div>
-
-                        <div class="form-control-element">
-                            <label for="description">Category</label>
-                            <input type="text" name="" id="" formControlName="category">
                         </div>
 
                         <input type="submit"

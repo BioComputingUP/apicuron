@@ -1,4 +1,4 @@
-<div class="tw-rounded-md tw-shadow-md tw-shadow-gray-400 tw-bg-white tw-font-dm-sans tw-p-1 tw-h-full">
+<div class="tw-rounded-md  tw-bg-white tw-font-dm-sans tw-p-1 tw-h-full" [ngClass]="{'tw-shadow-md tw-shadow-gray-400': enableShadow}">
     <span class="tw-text-sm sm:tw-text-base tw-text-gray-700 tw-font-bold tw-block tw-text-center">{{ medal.name
         }}</span>
     <div class="tw-flex tw-flex-row">
@@ -13,7 +13,7 @@
             in the following
             <span class="tw-font-bold tw-underline tw-cursor-pointer" [popper]="activitiesList"
                 [popperShowOnStart]="false" [popperTrigger]="'hover'" [popperHideOnScroll]="true"
-                [popperPlacement]="'right'">Contributions</span>
+                [popperPlacement]="'right'" popperApplyClass="tw-z-40">Contributions</span>
         </div>
     </div>
 </div>

@@ -1,8 +1,18 @@
-import { Deserializable } from "../interfaces/deserializable.model"
+import { Deserializable, Serializable } from "../interfaces/deserializable.model"
+import { Paginated } from "../interfaces/paginated";
 import { AcheivementDef } from "./achievement-def"
 
+export type DeleteMedalDef = Pick<MedalDef, 'name' | 'resource_id'>;
+export type UpdateMedalDef = Partial<MedalDef> & DeleteMedalDef;
 
-export class MedalDef extends AcheivementDef implements Deserializable{
+export class MedalDef extends AcheivementDef implements Deserializable, Serializable{
+
+
+    serialize() {
+        return Object.assign({}, this);
+    }
+
+
     deserialize(input: any): this {
         this.name = input.name
         this.list_terms = input.list_terms

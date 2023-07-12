@@ -17,6 +17,7 @@ import { UserOverviewPageService } from './services/user-overview-page.service';
 import { CalendarModule } from 'primeng/calendar';
 import { CategoriesPieChartComponent } from '../components/charts/categories-pie-chart/categories-pie-chart.component';
 import { ProfileUpdateComponent } from './profile-update/profile-update.component';
+import { RouterModule } from '@angular/router';
 @NgModule({
   declarations: [
     DashboardSidebarComponent,
@@ -30,6 +31,7 @@ import { ProfileUpdateComponent } from './profile-update/profile-update.componen
   imports: [
     CalendarModule,
     CommonModule,
+    RouterModule,
     DashboardRoutingModule,
     SlideOverPanelComponent,
     AuthDropdownComponent,

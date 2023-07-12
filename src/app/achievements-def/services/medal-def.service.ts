@@ -4,7 +4,7 @@ import { environment } from "../../../environments/environment";
 import { MedalDefFilter } from "../interfaces/medal-def.filter";
 import { Observable } from "rxjs";
 import { Paginated } from "../../interfaces/paginated";
-import { MedalDef } from "../../models/medal-def.model";
+import { DeleteMedalDef, MedalDef, UpdateMedalDef } from "../../models/medal-def.model";
 
 
 
@@ -14,15 +14,41 @@ export class MedalDefService {
     
 
     constructor(protected http: HttpClient) {}
-    url = environment.ws;
+    url: string = new URL('achievements-def/medals',environment.ws + '/').href;
+
 
     getMedalDefs(medalDefFilter: MedalDefFilter): Observable<Paginated<MedalDef>> {
-        const url: string = new URL('achievements-def/medals',this.url + '/').href;
-        return this.http.get<Paginated<MedalDef>>(url, {
+        return this.http.get<Paginated<MedalDef>>(this.url, {
             headers: {
                 version: '2'
             },
             params: medalDefFilter.serialize()
         });
+    }
+
+    createMedalDef(medalDef: MedalDef) {
+        return this.http.post(this.url, medalDef.serialize(), {
+            headers: {
+                version: '2'
+            },
+        })
+    }
+
+
+    updateMedalDef(updateMedal: UpdateMedalDef) {
+        return this.http.put(new URL('edit/', this.url).href, updateMedal, {
+            headers: {
+                version: '2'
+            },
+        })
+    }
+
+    deleteMedal({ name, resource_id }: DeleteMedalDef){
+        const link = new URL(`${name}/partner-resource/${resource_id}`, this.url).href;
+        return this.http.delete(link, {
+            headers: {
+                version: "2"
+            }
+        })
     }
 }

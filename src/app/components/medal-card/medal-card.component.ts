@@ -15,4 +15,8 @@ export class MedalCardComponent {
     medal: Medal
 
 
+    @Input()
+    enableShadow = true
+
+
 }

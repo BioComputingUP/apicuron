@@ -33,6 +33,10 @@ export class MedalDefCardComponent implements OnInit {
     @Input()
     medal: MedalDef
 
+    
+    @Input()
+    enableShadow = true;
+
 
 
     @Input()

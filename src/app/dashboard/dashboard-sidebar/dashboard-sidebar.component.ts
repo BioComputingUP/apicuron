@@ -6,7 +6,6 @@ import { AuthService } from "src/app/auth/auth.service";
 import { User } from "src/app/models/User.model";
 import { ResourcesService } from "src/app/resource/service/resources.service";
 import { Resource } from "src/app/models/resource.model";
-
 @Component({
   selector: "dashboard-sidebar",
   templateUrl: "./dashboard-sidebar.component.html",
@@ -47,6 +46,7 @@ export class DashboardSidebarComponent implements OnInit {
     this.links$ = this.resources$.pipe(
       map((resources: Resource[]) => {
         return resources.map((resource: Resource) => {
+
           return {
             resource,
             links: [
@@ -80,10 +80,20 @@ export class DashboardSidebarComponent implements OnInit {
                   "/dashboard",
                   "database",
                   resource.resource_id,
-                  "achievements",
+                  "medals",
                 ],
-                name: "Manage Achievements",
+                name: "Manage Medals",
                 icon: "assets/medal_icon.svg",
+              },
+              {
+                href: [
+                  "/dashboard",
+                  "database",
+                  resource.resource_id,
+                  "badges",
+                ],
+                name: "Manage Badges",
+                icon: "assets/badge_icon.svg",
               },
             ],
           };

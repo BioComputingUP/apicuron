@@ -8,11 +8,16 @@
         <ul class="tw-mt-6 tw-space-y-1 tw-gap-1">
             <li>
                 <a routerLink="/dashboard"
-                    class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item list-item-colors list-item-active">
+                    routerLinkActive="list-item-active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item list-item-colors">
                     General
                 </a>
 
                 <a [routerLink]="['/dashboard', 'profile']"
+                    routerLinkActive="list-item-active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+
                     class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item list-item-colors">
                     Edit Profile
                 </a>
@@ -40,6 +45,8 @@
                             <ul class="tw-mt-2 tw-space-y-1 tw-px-4">
                                 <li *ngFor="let link of resourceLinks.links">
                                     <a [routerLink]="link.href"
+                                        [routerLinkActiveOptions]="{ exact: true}"
+                                        routerLinkActive="list-item-active"
                                         class="tw-flex tw-w-full tw-flex-row tw-justify-between tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item list-item-colors">
                                         {{ link.name}}
 

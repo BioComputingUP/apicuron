@@ -10,19 +10,18 @@ import { SubmitSingleComponent } from './submit-report/submit-single/submit-sing
 import { SubmitBulkComponent } from './submit-report/submit-bulk/submit-bulk.component';
 import { ManageTermsComponent } from './manage-terms/manage-terms.component';
 import { TermsService } from './services/terms.service';
-import { ManageAchievementsComponent } from './manage-achievements/manage-achievements.component';
-import { AchievmentsDefService } from './manage-achievements/achievements.service';
 import { SvgModule } from '../svg/svg.module';
-import { ManageBadgesComponent } from './manage-achievements/manage-badges/manage-badges.component';
-import { SelectTermsComponent } from './manage-achievements/select-terms.component';
-import { ManageMedalsComponent } from './manage-achievements/manage-medals/manage-medals.component';
+import { ManageBadgesComponent } from './manage-badges/manage-badges.component';
+import { ManageMedalsComponent } from './manage-medals/manage-medals.component';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { DatabaseOverviewComponent } from './database-overview/database-overview.component'
-import { NavbarComponent } from '../alt-navbar/alt-navbar.component';
 import { SlideOverPanelComponent } from 'src/app/components/utils/slide-over-panel/slide-over-panel.component';
 import { AuthDropdownComponent } from 'src/app/components/auth-dropdown/auth-dropdown.component';
 import { DashboardDatabaseRoutingModule } from 'src/app/dashboard-database/dashboard-database-routing.module';
-
+import { BadgeDefCardComponent } from '../components/badge-def-card/badge-def-card.component';
+import { MedalDefCardComponent } from '../components/medal-def-card/medal-def-card.component';
+import {MultiSelectModule} from 'primeng/multiselect';
+import { CalendarModule } from 'primeng/calendar';
 @NgModule({
   declarations: [
     DatabaseUpdateComponent,
@@ -30,16 +29,13 @@ import { DashboardDatabaseRoutingModule } from 'src/app/dashboard-database/dashb
     SubmitSingleComponent,
     SubmitBulkComponent,
     ManageTermsComponent,
-    ManageAchievementsComponent,
     ManageBadgesComponent,
     ManageMedalsComponent,
-    SelectTermsComponent,
     DatabaseOverviewComponent,
   ],
   providers: [
     DashboardService,
     TermsService,
-    AchievmentsDefService
   ],
   imports: [
     CommonModule,
@@ -49,7 +45,10 @@ import { DashboardDatabaseRoutingModule } from 'src/app/dashboard-database/dashb
     ReactiveFormsModule,
     DatabasesModule,
     AngularSvgIconModule,
-    NavbarComponent,
+    BadgeDefCardComponent,
+    MedalDefCardComponent,
+    MultiSelectModule,
+    CalendarModule,
     SvgModule,
   ]
 })

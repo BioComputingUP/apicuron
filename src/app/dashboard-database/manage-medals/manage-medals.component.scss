@@ -21,3 +21,11 @@ input[type=text], input[type=number], input[type=datetime-local],textarea, .text
 .form-control-element {
     @apply tw-flex tw-flex-col tw-my-2 tw-px-2 tw-py-1
 }
+
+::ng-deep .p-multiselect.p-component.p-multiselect-chip {
+    @apply tw-w-full
+}
+
+::ng-deep .p-calendar {
+    @apply tw-w-full
+}

@@ -1,5 +1,5 @@
 <div
-    class="tw-flex tw-flex-col tw-bg-white tw-shadow-md tw-shadow-gray-400 tw-rounded-md tw-px-1 sm:tw-p-2 tw-text-gray-800 tw-h-full">
+    class="tw-flex tw-flex-col tw-bg-white tw-rounded-md tw-px-1 sm:tw-p-2 tw-text-gray-800 tw-h-full" [ngClass]="{'tw-shadow-md tw-shadow-gray-400': enableShadow}">
     <span class="tw-block tw-text-sm sm:tw-text-base tw-font-dm-sans tw-font-bold">{{ badge.name }}</span>
     <div class="tw-flex tw-flex-row tw-justify-between">
         <!-- <img src="assets/svg/badge_check.svg" class="tw-w-16" alt=""> -->

@@ -5,21 +5,23 @@ import { AuthModule } from '../auth/auth.module';
 import { DatabaseUpdateComponent } from './database-update/database-update.component';
 import { SubmitReportComponent } from './submit-report/submit-report.component';
 import { ManageTermsComponent } from './manage-terms/manage-terms.component';
-import { ManageAchievementsComponent } from './manage-achievements/manage-achievements.component';
 import { DatabaseOverviewComponent } from 'src/app/dashboard-database/database-overview/database-overview.component';
 import { UserDashboardComponent } from 'src/app/dashboard/user-dashboard/user-dashboard.component';
+import { ManageBadgesComponent } from './manage-badges/manage-badges.component';
+import { ManageMedalsComponent } from './manage-medals/manage-medals.component';
 
-const routes: Routes = [
+const databaseDashboardRoutes: Routes = [
   {
     path: ':resource_id',
     canActivate: [AuthGuard],
     component: UserDashboardComponent,
     children: [
-      { path: '', component: DatabaseOverviewComponent },
-      { path: 'edit', component: DatabaseUpdateComponent },
-      { path: 'reports', component: SubmitReportComponent },
-      { path: 'terms', component: ManageTermsComponent },
-      { path: 'achievements', component: ManageAchievementsComponent },
+      { path: '', component: DatabaseOverviewComponent, title:"Resource Overview" },
+      { path: 'edit', component: DatabaseUpdateComponent, title:"Edit Resource" },
+      { path: 'reports', component: SubmitReportComponent, title:"Manage Resource Reports" },
+      { path: 'terms', component: ManageTermsComponent, title:"Manage Resource Terms" },
+      { path: 'badges', component: ManageBadgesComponent, title:"Manage Resource Badges" },
+      { path: 'medals', component: ManageMedalsComponent, title:"Manage Resource Medals" },
       { path: '**', redirectTo: '/', }, // redirects to the home page
 
     ]
@@ -28,7 +30,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes), AuthModule],
+  imports: [RouterModule.forChild(databaseDashboardRoutes), AuthModule],
   exports: [RouterModule]
 })
 export class DashboardDatabaseRoutingModule { }

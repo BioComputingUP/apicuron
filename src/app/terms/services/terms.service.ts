@@ -6,29 +6,36 @@ import { Term } from "src/app/models/term.model";
 import { TermsFilter } from "src/app/terms/models/terms-filter";
 import { environment } from "src/environments/environment";
 
-
 @Injectable()
 export class TermsService {
-    
-    ws = environment.ws + '/'
+  ws = environment.ws + "/";
+  url = new URL("terms", this.ws).href;
+  constructor(protected http: HttpClient) {}
 
-    constructor(protected http: HttpClient) {}
+  getTerms(termsFilter: TermsFilter): Observable<Term[]> {
 
-    getTerms(termsFilter: TermsFilter): Observable<Term[]> {
-        const url = new URL('terms', this.ws).href
+    const params = new HttpParams({ fromObject: { ...termsFilter } });
 
-        const params = new HttpParams({ fromObject: { ...termsFilter } })
+    return this.http
+      .get(this. url, {
+        headers: {
+          version: "2",
+        },
+        params,
+      })
+      .pipe(
+        pluck("data"),
+        map((data: Term[]) => {
+          return data.map((term: Term) => new Term().deserialize(term));
+        })
+      );
+  }
 
-        return this.http.get(url, {
-          headers: {
-            version: '2'
-          },
-          params
-        }).pipe(
-            pluck('data'),
-            map((data: Term[]) => {
-                return data.map((term:Term) => new Term().deserialize(term))
-            })
-        )
-      }
+  create_term(term: Term) {
+    return this.http.post(this.url, term.serialize(), {
+      headers: {
+        version: "2",
+      },
+    });
+  }
 }

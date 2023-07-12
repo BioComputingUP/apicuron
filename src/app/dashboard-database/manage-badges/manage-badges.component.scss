@@ -21,3 +21,7 @@ input[type=text], input[type=number],textarea, .text-input, select{
 .form-control-element {
     @apply tw-flex tw-flex-col tw-my-2 tw-px-2 tw-py-1
 }
+
+::ng-deep .p-multiselect.p-component.p-multiselect-chip {
+    @apply tw-w-full
+}

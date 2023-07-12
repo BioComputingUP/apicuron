@@ -1,17 +1,19 @@
 import * as _ from "lodash";
-import { Deserializable } from "../interfaces/deserializable.model";
+import { Deserializable, Serializable } from "../interfaces/deserializable.model";
 
+export type TermCategory = 'generation' | 'invalidation' | 'revision';
 
-
-export class Term implements Deserializable {
-    category: string;
+export class Term implements Deserializable, Serializable {
+    serialize(): any {
+        return Object.assign({}, this)
+    }
+    category: TermCategory;
     activity_term: string;
     resource_uri?: string;
     activity_name: string;
     description: string;
     score: number;
     resource_id: string;
-    quartile?: number;
 
     deserialize(input: any): this {
 
@@ -48,23 +50,5 @@ export class Term implements Deserializable {
         return this.activity_name
     }
 
-    static computeTermScoreQuartile(terms: Term[]) {
-        terms.sort((a, b) => a.score - a.score)
-        let q1 = terms.length / 4;
-        let q3 = terms.length * 3 / 4
-
-        return terms.map((term, index) => {
-            if (index < q1) {
-                term.quartile = 1
-                return term
-            }
-            if (index > q3) {
-                term.quartile = 3
-                return term
-            }
-            term.quartile = 2
-            return term
-        })
-    }
 
 }

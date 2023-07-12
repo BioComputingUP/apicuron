@@ -10,16 +10,16 @@
     </p>
 </div>
 
-<div class="tw-flex tw-flex-row tw-w-full tw-h-screen tw-items-start">
-    <dashboard-sidebar class="tw-hidden sm:tw-block sm:tw-w-1/4 md:tw-w-1/5 lg:tw-w-1/6 tw-flex-none"></dashboard-sidebar>
+<div class="tw-flex tw-flex-row tw-w-full tw-items-start">
+    <dashboard-sidebar class="tw-hidden sm:tw-block sm:tw-w-1/4 md:tw-w-1/5 lg:tw-w-1/6 tw-flex-none tw-flex-start tw-top-0 tw-sticky"></dashboard-sidebar>
     <slide-over-panel [(openPanel)]="openMobileMenu">
         <dashboard-sidebar></dashboard-sidebar>
     </slide-over-panel>
 
     <!-- main content -->
-    <div class="tw-grow">
+    <div class="tw-w-full sm:tw-w-3/4 md:tw-w-4/5 lg:tw-w-5/6">
         <!-- navbar -->
-        <div class="tw-flex tw-flex-row tw-justify-between tw-shadow-md  tw-px-2 tw-py-4 tw-bg-white">
+        <div class="tw-flex tw-flex-row tw-justify-between tw-shadow-md  tw-px-2 tw-py-4 tw-bg-white tw-sticky tw-top-0 tw-z-20">
             <div class="sm:tw-hidden">
                 <button aria-controls="mobile-menu" aria-expanded="false"
                     class="tw-inline-flex tw-items-center tw-justify-center tw-p-2 tw-rounded-md hover:tw-text-gray-700 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-inset focus:tw-ring-gray-500"
@@ -39,8 +39,9 @@
             <auth-dropdown class="tw-text-gray-700 tw-ml-auto"></auth-dropdown>
 
         </div>
-
-        <router-outlet></router-outlet>
+        <div class="">
+            <router-outlet></router-outlet>
+        </div>
     </div>
 
 

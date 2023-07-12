@@ -28,7 +28,10 @@ export class BadgeCardComponent implements OnInit {
     }
 
     terms$: BehaviorSubject<Term[]> = new BehaviorSubject([]);
-    termNames$: Observable<string[]>
+    termNames$: Observable<string[]>;
+
+    @Input()
+    enableShadow = true;
 
     @Input()
     badge: Badge
