@@ -1,0 +1,56 @@
+version: '3'
+services:
+  apicuron-ws:
+    container_name: apicuron_webserver
+    # build:
+    #   context: "./apicuron-ws"
+    #   target: development
+    #   tags:
+    #    - "apicuron-ws:dev"
+    # image: "apicuron-ws" 
+    image: "node:16.14.2-buster-slim"
+    working_dir: "/home/node/app"
+    user: $DOCKER_USER
+    volumes:
+      - "./apicuron-ws:/home/node/app"
+    ports:
+      - "3000:3000"
+    dns: 10.69.69.1
+    command: "npm run start:dev"
+    network_mode: "host"
+    
+  
+  apicuron-ui:
+    container_name: apicuron_ui
+    # build:
+    #   context: "./apicuron-ui"
+    #   target: development
+    #   tags:
+    #    - "apicuron-ui:dev"
+    # image: "apicuron-ui" 
+    working_dir: "/home/node/app"
+    image: "node:16.14.2-buster-slim"
+    user: $DOCKER_USER
+    volumes:
+      - "./apicuron-ui:/home/node/app"
+    ports:
+      - "4200:4200"
+    dns: 10.69.69.1
+    network_mode: "host"
+    command: "npm run start-dev"
+    
+    
+  documentation:
+    container_name: apicuron_docs
+    working_dir: "/home/node/app"
+    image: "node:16.14.2-buster-slim"
+    volumes:
+      - "./docs:/home/node/app"
+    user: $DOCKER_USER
+    ports:
+      - "8080:8080"
+    dns: 10.69.69.1
+    command: "npm run dev"
+    network_mode: "host"
+
+  # uid=1002 && gid=1002 && groupmod -g ${gid} node && usermod -u ${uid} -g ${gid} node

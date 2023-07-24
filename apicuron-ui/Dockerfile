@@ -2,7 +2,7 @@ ARG UID=1002
 ARG GID=1002
 
 
-FROM node:16.14-slim AS development
+FROM node:16.14.2-buster-slim AS development
 
 
 # load arguments in this target
@@ -29,7 +29,7 @@ WORKDIR ${APP_DIR}
 COPY --chown=node:node ./package*.json ${APP_DIR}/
 
 # npm install all the packages precisely
-RUN npm ci
+RUN npm install
 
 
 # run the app in the development server
