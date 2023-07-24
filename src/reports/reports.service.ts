@@ -139,7 +139,6 @@ export class ReportsService {
 		const paginationPipeline: PaginationAggregation = reportFilter.getMongoAggregation()
 		const groupByAggregation: PipelineStage[] = this.buildReportGroupAggregation(reportFilter)
 
-
 		const aggregationPipeline: PipelineStage[] = [
 			{ $match: filter },
 			...groupByAggregation,

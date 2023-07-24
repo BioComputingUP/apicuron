@@ -9,9 +9,9 @@ import { MaxDateField, MinDateField } from "../validators/date-comparison";
 
 export class CreateMedalDto {
 
-    @IsNotEmpty()
-    @IsString()
-	category: string;
+    // @IsNotEmpty()
+    // @IsString()
+	// category: string;
 
     @IsNotEmpty()
     @IsString()
@@ -46,12 +46,12 @@ export class CreateMedalDto {
     @IsOptional()
     @IsDateString()
     @MaxDateField(['last_day'])
-    first_day: Date;
+    first_day?: Date;
 
     @IsOptional()
     @IsDateString()
 	@MinDateField(['first_day'])
-    last_day: Date;
+    last_day?: Date;
 
 }
 
@@ -100,9 +100,9 @@ export class DeleteMedalDto {
 export class UpdateMedalDto extends DeleteMedalDto {
 
 
-    @IsOptional()
-    @IsString()
-	category: string;
+    // @IsOptional()
+    // @IsString()
+	// category: string;
 
     @IsOptional()
     @Validate(ActivityTermExists, [{ each: true }])

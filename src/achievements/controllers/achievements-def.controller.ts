@@ -71,7 +71,7 @@ export class BadgesDefController {
     })
 	@ApiSecurity('basic')
 	// nest decorators
-	@Post('create')
+	@Post()
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	async create_badge(@Body() badge: CreateBadgeDto, @Req() req){
 		this.can_edit_resource(req.user, badge.resource_id);
@@ -150,7 +150,7 @@ export class MedalsDefController {
         type: CreateMedalDto
     })
 	@ApiSecurity('basic')
-	@Post('create')
+	@Post()
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	async create_medal(@Body() medal: CreateMedalDto, @Req() req){
 		this.can_edit_resource(req.user, medal.resource_id);

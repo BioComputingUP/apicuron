@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AchievementsModule } from '../achievements/achievements.module';
+import { AchievementDef, AchievementDefDocument } from '../achievements/schemas/achievement-def.schema';
 import { AuthModule } from '../auth/auth.module';
 import { Report, ReportSchema } from '../reports/reports.schema';
 import { ResourcesModule } from '../resources/resources.module';
@@ -17,7 +19,7 @@ import { ActivityTermExists } from './validators/activity-term-exists';
     ],
     providers: [
         TermsService,
-        ActivityTermExists
+        ActivityTermExists,
     ],
     exports: [
         MongooseModule,
@@ -28,14 +30,15 @@ import { ActivityTermExists } from './validators/activity-term-exists';
         AuthModule,
         JwtModule,
         ResourcesModule,
+        AchievementsModule,
         MongooseModule.forFeature([
             {
                 name: Term.name,
-                schema: TermSchema,
+                schema: TermSchema
             },
             {
 				name: Report.name,
-				schema: ReportSchema,
+                schema: ReportSchema
 			}
         ])
     ]

@@ -5,10 +5,10 @@ export type MedalDocument = Medal & Document;
 @Schema({ collection: 'achievements_def' })
 export class Medal {
 	// fields from Achievement
-	@Prop({
-		required: false,
-	})
-	category: string;
+	// @Prop({
+	// 	required: false,
+	// })
+	// category: string;
 	@Prop({
 		required: false,
 	})

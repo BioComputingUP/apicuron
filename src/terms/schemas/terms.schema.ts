@@ -1,4 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Model, model, UpdateWriteOpResult } from 'mongoose';
+import { AchievementDef, AchievementDefDocument, AchievementDefSchema } from '../../achievements/schemas/achievement-def.schema';
 
 export type TermDocument = Term & Document;
 
