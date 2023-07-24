@@ -1,0 +1,109 @@
+<div class="tw-p-2 tw-flex-auto" *ngIf="resource$ | async as resource">
+
+    <div class=" tw-p-2">
+        <span class="tw-text-xl tw-font-bold">Update {{ resource.resource_name }}</span>
+
+        <form class="tw-flex tw-flex-row tw-flex-wrap" (ngSubmit)="submit()" [formGroup]="form">
+
+            <!-- left section -->
+            <div class="tw-w-full sm:tw-w-1/2">
+                <div class="form-control-element">
+                    <label for="resource_name">Resource Name</label>
+                    <input type="text" formControlName="resource_name">
+                    <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                        *ngIf="resource_name.hasError('required') && resource_name.touched">
+                        The Resource Name is required
+                    </small>
+
+                </div>
+                <div class="form-control-element">
+                    <label for="resource_long_name">Resource Long Name</label>
+                    <input type="text" formControlName="resource_long_name">
+                    <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                        *ngIf="resource_long_name.hasError('required') && resource_long_name.touched">
+                        The Resource Long Name is required
+                    </small>
+                </div>
+
+                <div class="form-control-element">
+                    <label for="resource_long_name">Resource Color</label>
+                    <input type="text" formControlName="color">
+                    <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                        *ngIf="color.hasError('required') && color.touched">
+                        The Resource URI Name is required
+                    </small>
+                </div>
+                <div class="form-control-element">
+                    <label for="resource_description">Resource Description</label>
+                    <textarea class="text-input" name="resource_description" formControlName="resource_description"
+                        id="resource_description_textarea" cols="30" rows="10"></textarea>
+                    <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                        *ngIf="resource_description.hasError('required') && resource_description.touched">
+                        The Resource Description is required
+                    </small>
+                </div>
+
+            </div>
+
+            <!-- right section -->
+            <div class="tw-w-full sm:tw-w-1/2">
+
+                <div class="form-control-element">
+                    <label for="resource_url">Resource URL</label>
+                    <input type="text" formControlName="resource_url">
+                    <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                        *ngIf="resource_url.hasError('required') && resource_url.touched">
+                        The Resource URL is required
+                    </small>
+                </div>
+
+                <div class="form-control-element">
+                    <label for="resource_long_name">Resource URI</label>
+                    <input type="text" formControlName="resource_uri">
+                    <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                        *ngIf="resource_uri.hasError('required') && resource_uri.touched">
+                        The Resource URI Name is required
+                    </small>
+                </div>
+
+
+                <div class="form-control-element">
+
+                    <label>Upload Resource Logo</label>
+
+                    <p-fileUpload #fubauto mode="advanced" name="logo" accept="image/*" maxFileSize="1000000"
+                        [customUpload]="true" (uploadHandler)="onFileSelected($event)" [auto]="true"
+                        chooseLabel="Load Image" uploadIcon="" [multiple]="false">
+                    </p-fileUpload>
+                    <div>
+                        <span class="tw-text-base tw-font-bold tw-text-gray-700 tw-my-1 sm:tw-my-2">
+                            Current Logo:
+                        </span>
+                        <div class="tw-flex tw-justify-center tw-items-center " *ngIf="logoLink$ | async as logoLink">
+                            <img class="tw-max-w-full tw-w-32 sm:tw-w-48 xl:tw-w-64" [src]="logoLink" alt="">
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="tw-w-full tw-flex tw-justify-center tw-py-1 sm:tw-py-2">
+                <div class="tw-flex tw-justify-center">
+                    <input type="submit" [value]="'Update ' + resource.resource_name" [disabled]="form.invalid"
+                        [ngClass]="{'tw-bg-gray-300 tw-text-gray-600':form.invalid, 'tw-bg-apicuron-purple tw-text-white tw-shadow-md tw-pointer-cursor': !form.invalid}"
+                        class=" tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded-md" />
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+
+<p-blockUI [blocked]="blocked"></p-blockUI>
+<p-progressSpinner class="tw-absolute tw-z-40 tw-left-1/2 tw-top-1/2 -tw-translate-y-1/2 -tw-translate-x-1/2"
+    [ngClass]="{'tw-hidden': !blocked}"></p-progressSpinner>
+    <p-toast></p-toast>

@@ -1,0 +1,89 @@
+<div
+  class="tw-h-full tw-w-full tw-bg-white tw-m-auto tw-p-1 sm:tw-p-2 tw-flex tw-flex-col tw-rounded-b-lg tw-shadow-lg tw-border-t-2 sm:tw-border-t-4"
+  [ngStyle]="{ 'border-color': resource.color }">
+  <!-- top Title bar -->
+  <div class="tw-flex tw-flex-row tw-w-full tw-flex-wrap sm:tw-flex-nowrap tw-items-center tw-justify-between">
+    <div class="tw-flex tw-flex-col tw-items-start sm:tw-w-1/4">
+      <span class="tw-font-bold tw-text-lg sm:tw-text-xl tw-font-dm-sans sm:tw-pr-2"
+        [ngStyle]="{ color: resource.color }">{{
+        resource.resource_name }}</span>
+      <span
+        class="tw-block tw-text-gray-500 tw-font-bold tw-font-dm-sans tw-text-xs sm:tw-text-sm tw-ml-1 sm:tw-ml-0 tw-align-middle">{{
+        resource.resource_long_name
+        }}</span>
+
+    </div>
+
+    <div
+      class="sm:tw-grow tw-flex tw-flex-row tw-flex-wrap tw-justify-center sm:tw-justify-normal tw-w-full sm:tw-w-3/4">
+      <div *ngFor="let reward of rewards" class="tw-px-1 tw-py-2 tw-w-1/5">
+        <reward-card [icon_src]="reward.icon_src" [value_text]="reward.value_text" [label_text]="reward.label_text"
+          [color]="resource.color"></reward-card>
+      </div>
+    </div>
+  </div>
+  <!-- Medals List -->
+  <ng-container *ngIf="medals$ | async as medals">
+    <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-start" *ngIf="medals.data.length > 0">
+      <div class="tw-w-full tw-flex tw-flex-row tw-justify-between">
+        <span class="tw-font-bold tw-text-gray-500 tw-font-dm-sans tw-capitalize tw-text-sm">{{
+          curator.displayedName }}'s Earned Medals</span>
+          <button class="tw-text-sm tw-text-blue-500 tw-underline " (click)="open_medal_details = true">View
+            Details</button>
+      </div>
+      <div *ngFor="let medal of medals.data" class="tw-w-1/2 sm:tw-w-1/4 tw-p-1">
+        <medal-card [medal]="medal"></medal-card>
+      </div>
+    </div>
+  </ng-container>
+  
+  <div class="tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
+    <!-- Badges list -->
+    <ng-container *ngIf="badges$ | async as badges">
+      <div class="tw-w-full sm:tw-w-1/2 tw-flex-grow tw-flex tw-flex-col tw-content-start tw-px-1 tw-py-2" *ngIf="badges.data.length > 0">
+        <div class="tw-w-full tw-flex tw-flex-row tw-justify-between sm:tw-px-2">
+          <span class="tw-text-sm tw-font-bold tw-text-gray-500">{{ curator.displayedName }}'s Earned Badges</span>
+          <button class="tw-text-sm tw-text-blue-500 tw-underline " (click)="open_badge_details = true">View
+            Details</button>
+  
+        </div>
+        <div class="tw-w-full tw-flex tw-flex-row tw-items-start tw-grow tw-flex-wrap tw-@container"
+          >
+          <div class="@2xl:tw-w-1/4 tw-w-1/2 tw-flex-shrink tw-p-2" *ngFor="let badge of badges.data">
+            <badge-card [badge]="badge" [terms]="(terms$ | async)"></badge-card>
+          </div>
+        </div>
+  
+      </div>
+    </ng-container>
+    
+    <!-- Latest Contributions List -->
+    <div class="tw-w-full sm:tw-w-1/2 tw-flex-grow tw-flex tw-flex-row tw-content-start tw-flex-wrap tw-px-1 tw-py-2 tw-@container" *ngIf="reportsWithTerms$ | async as reports">
+      <div class="tw-w-full tw-flex tw-flex-row tw-justify-between sm:tw-px-2">
+        <span class="tw-text-sm tw-font-bold tw-text-gray-500 tw-font-dm-sans tw-capitalize">{{ curator.displayedName
+          }}'s Latest Contributions</span>
+        <button class="tw-text-sm tw-text-blue-500 tw-underline " (click)="open_details = true">View Details</button>
+      </div>
+
+        <div class="@2xl:tw-w-1/4 tw-w-1/2 tw-flex-shrink tw-p-2" *ngFor="let report of reports">
+          <report-card [term]="report.term" [report]="report.report"></report-card>
+        </div>
+    </div>
+
+
+  </div>
+</div>
+
+<slide-over-panel [(openPanel)]="open_details">
+  <curator-stat-details *ngIf="open_details" [curator]="curator" [resource]="resource" [terms]="terms$ | async"></curator-stat-details>
+</slide-over-panel>
+
+
+<slide-over-panel [(openPanel)]="open_badge_details">
+  <curator-badges-details *ngIf="open_badge_details" [curator]="curator" [resource]="resource"></curator-badges-details>
+</slide-over-panel>
+
+
+<slide-over-panel [(openPanel)]="open_medal_details">
+  <curator-medals-details *ngIf="open_medal_details" [curator]="curator" [resource]="resource"></curator-medals-details>
+</slide-over-panel>

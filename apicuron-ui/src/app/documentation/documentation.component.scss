@@ -1,0 +1,13 @@
+@import "../../../node_modules/prismjs/themes/prism-okaidia.css";
+
+h1 {
+  @apply tw-text-xl tw-font-bold;
+}
+
+:target::before {
+  content: "";
+  display: block;
+  margin-top: -5rem;
+  height: 5rem;
+  width: 1px;
+}

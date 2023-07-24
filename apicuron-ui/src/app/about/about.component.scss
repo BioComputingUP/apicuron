@@ -1,0 +1,22 @@
+
+h1{
+    @apply tw-text-4xl tw-font-semibold tw-font-dm-sans
+  }
+  
+  h2 {
+    @apply tw-text-3xl
+  }
+  
+  h4{
+    @apply tw-text-2xl
+  }
+  ul{
+    @apply tw-list-disc tw-ml-12
+  }
+  
+  a{
+    @apply tw-cursor-pointer hover:tw-underline
+  }
+  a{
+    color: #0F4C5C; 
+  }

@@ -1,0 +1,48 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { DashboardRoutingModule } from './dashboard-routing.module';
+import { DatabasesModule } from '../databases/databases.module';
+import { DashboardSidebarComponent } from './dashboard-sidebar/dashboard-sidebar.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { SvgModule } from '../svg/svg.module';
+import { AngularSvgIconModule } from 'angular-svg-icon';
+import { UserDashboardComponent } from './user-dashboard/user-dashboard.component';
+import { NavbarComponent } from '../alt-navbar/alt-navbar.component';
+import { SlideOverPanelComponent } from 'src/app/components/utils/slide-over-panel/slide-over-panel.component';
+import { AuthDropdownComponent } from 'src/app/components/auth-dropdown/auth-dropdown.component';
+import { UserOverviewComponent } from 'src/app/dashboard/user-overview/user-overview.component';
+import { ReportsByDateChartComponent } from 'src/app/components/charts/reports-by-date-chart/reports-by-date-chart.component';
+import { UserOverviewPageService } from './services/user-overview-page.service';
+import { CalendarModule } from 'primeng/calendar';
+import { CategoriesPieChartComponent } from '../components/charts/categories-pie-chart/categories-pie-chart.component';
+import { ProfileUpdateComponent } from './profile-update/profile-update.component';
+import { RouterModule } from '@angular/router';
+@NgModule({
+  declarations: [
+    DashboardSidebarComponent,
+    UserDashboardComponent,
+    UserOverviewComponent,
+    ProfileUpdateComponent
+  ],
+  providers: [
+    UserOverviewPageService
+  ],
+  imports: [
+    // CalendarModule,
+    CommonModule,
+    RouterModule,
+    DashboardRoutingModule,
+    SlideOverPanelComponent,
+    AuthDropdownComponent,
+    ReactiveFormsModule,
+    DatabasesModule,
+    AngularSvgIconModule,
+    NavbarComponent,
+    CalendarModule,
+    SvgModule,
+    ReportsByDateChartComponent,
+    CategoriesPieChartComponent,
+  ]
+})
+export class DashboardModule { }

@@ -1,0 +1,16 @@
+<div class="tw-px-2 tw-mx-auto tw-max-w-7xl sm:tw-px-8 2xl:tw-px-0">
+  <ng-container *ngIf="curator$ | async as curator">
+    <curator-profile [curator]="curator"></curator-profile>
+    <div>
+      <div class="tw-flex tw-flex-col tw-gap-4">
+        <div *ngFor="let stats of statsWithResource$ | async">
+          <curator-stat-card
+            [statistics]="stats.curatorStatistics"
+            [resource]="stats.resource"
+            [curator]="curator"
+          ></curator-stat-card>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

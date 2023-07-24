@@ -1,0 +1,107 @@
+<div class="main-content">
+    <h2 class="tw-text-3xl tw-font-dm-sans tw-font-bold tw-my-2">Create Resource</h2>
+
+    <div class="tw-bg-apicuron-purple-100 tw-border-t-4 tw-border-apicuron-purple-500 tw-rounded-b tw-text-apicuron-purple tw-px-4 tw-py-3 tw-shadow-md"
+        role="alert">
+        <div class="tw-flex">
+            <div class="tw-py-1"><svg class="tw-fill-current tw-h-6 tw-w-6 tw-text-apicuron-purple-500 tw-mr-4"
+                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path
+                        d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z">
+                    </path>
+                </svg></div>
+            <div>
+                <p class="tw-font-bold">Creating a Resource</p>
+                <p class="tw-text-sm">You can create a resource to add to APICURON using the form below. The created resource is not public
+                    until it is validated by the APICURON team. You can contact us on <a class="tw-underline tw-italic" href="mailto:apicuron@ngp-net.bio.unipd.it">apicuron@ngp-net.bio.unipd.it</a> to request a validation, make sure to let us know the id and name of your resource and the orcid id of the account you usedh here when you do so.
+                    Upon Validation you can update the resource and push additional information</p>
+            </div>
+        </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="data$ | async">
+        <div class="tw-flex tw-flex-row tw-flex-wrap tw-mb-2">
+            <div class="form-control-element tw-w-1/2">
+                <label for="resource_id">Resource Id</label>
+                <input type="text" formControlName="resource_id">
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_id.invalid && resource_id.hasError('resourceIdAlreadyExists')">The resource Id "{{ resource_id.value }}" is already taken </small>
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_id.invalid && resource_id.hasError('onlyLowerCaseUnderscoreDash')">The resource Id
+                    must
+                    only contain lower-case letters or underscores</small>
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_id.hasError('required') && resource_id.touched">
+                    The Resource Id is required
+                </small>
+            </div>
+            <div class="form-control-element tw-w-1/2">
+                <label for="resource_name">Resource Name</label>
+                <input type="text" formControlName="resource_name">
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_name.hasError('required') && resource_name.touched">
+                    The Resource Name is required
+                </small>
+
+            </div>
+            <div class="form-control-element tw-w-1/2">
+                <label for="resource_uri">Resource URI</label>
+                <input type="text" formControlName="resource_uri">
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_uri.hasError('required') && resource_uri.touched">
+                    The Resource URI is required
+                </small>
+
+            </div>
+            <div class="form-control-element tw-w-1/2">
+                <label for="resource_url">Resource URL</label>
+                <input type="text" formControlName="resource_url">
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_url.hasError('required') && resource_url.touched">
+                    The Resource URL is required
+                </small>
+            </div>
+            <div class="form-control-element tw-w-1/2">
+                <label for="resource_long_name">Resource Long Name</label>
+                <input type="text" formControlName="resource_long_name">
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_long_name.hasError('required') && resource_long_name.touched">
+                    The Resource Long Name is required
+                </small>
+            </div>
+            <div class="form-control-element tw-w-1/2">
+
+                <label>Upload Resource Logo</label>
+                <input id="file_input" type="file" (change)="onFileSelected($event)">
+
+            </div>
+            <div class="form-control-element tw-w-1/2">
+                <label for="resource_description">Resource Description</label>
+                <textarea class="text-input" name="resource_description" formControlName="resource_description"
+                    id="resource_description_textarea" cols="30" rows="10"></textarea>
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_description.hasError('required') && resource_description.touched">
+                    The Resource Description is required
+                </small>
+            </div>
+            <div class="form-control-element tw-w-1/2">
+                <label for="color">Resource Color</label>
+                <div class="tw-flex tw-items-center tw-flex-row">
+                    <span>Select Color: </span>
+                    <input type="color" name="color" formControlName="color">
+                </div>
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="color.hasError('required') && color.touched">
+                    The Resource Color is required
+                </small>
+            </div>
+        </div>
+
+        <div class="tw-flex tw-justify-center">
+            <input type="submit" value="Create Partner Resource" [disabled]="form.invalid || clicked"
+                [ngClass]="{'tw-bg-gray-300 tw-text-gray-600':form.invalid || clicked, 'tw-bg-apicuron-purple tw-text-white tw-shadow-md': !form.invalid || clicked}"
+                class=" tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded" />
+        </div>
+
+    </form>
+</div>

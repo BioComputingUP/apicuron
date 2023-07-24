@@ -1,0 +1,117 @@
+<div class="main-content" *ngIf="resource$ | async as resource">
+    <!-- <h2></h2> -->
+    <h2 class="tw-text-3xl tw-font-dm-sans tw-font-bold tw-my-2">{{ resource.resource_name }}</h2>
+    <h3 class="tw-text-lg tw-font-dm-sans tw-font-bold">{{ resource.resource_long_name }}</h3>
+    <div class="tw-flex tw-flex-row-reverse tw-items-start tw-my-2" *ngIf="terms$ | async as terms">
+        <ng-container *ngIf="leaderboard$ | async as leaderboard">
+            <div class="tw-w-1/3 tw-px-2 tw-h-screen tw-overflow-y-scroll" *ngIf="leaderboard.length > 0"
+                #leaderboardPanel>
+                <span class="tw-uppercase tw-text-gray-500 tw-text-xs tw-font-bold">Leaderboard</span>
+                <div class="tw-flex tw-flex-col">
+                    <div class="tw-pb-2" *ngFor="let biocurator of leaderboard">
+                        <curator-card [vertical]="false" [biocurator]="biocurator" [display_resources]="false"
+                            [display_achievement_counts]="true" [display_scores]="true"></curator-card>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+        <div class="tw-w-2/3"
+            [ngClass]="{'tw-w-2/3': (leaderboardLoaded$ | async), 'tw-w-full': !(leaderboardLoaded$ | async)}"
+            #mainPanel>
+            <p class="tw-leading-relaxed tw-tracking-wide tw-pr-2 tw-text-justify">
+                {{ resource.resource_description }}
+            </p>
+
+            <div class="tw-my-2 sm:tw-my-4">
+                <div class="tw-flex tw-flex-row tw-justify-between tw-pr-2" *ngIf="terms.length > 0">
+                    <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold ">What can be curated on {{
+                        resource.resource_name }} ?</h4>
+
+                    <button
+                        class="tw-text-blue-400 hover:tw-text-blue-500 tw-bg-transparent tw-text-sm tw-border-0 focus:tw-outline-none hover:tw-underline"
+                        (click)="expand_terms = !expand_terms">{{ expand_terms ? 'show less' : 'show more'}}
+                    </button>
+
+                </div>
+                <list-expand [collapsed]="!expand_terms">
+                    <div class="tw-flex tw-flex-row tw-flex-wrap" content>
+                        <div *ngFor="let term of terms.slice(0,3)" class="tw-w-1/3 tw-p-1">
+                            <term-card [term]="term"></term-card>
+                        </div>
+                    </div>
+                    <div class="tw-flex tw-flex-row tw-flex-wrap" expansion>
+                        <div *ngFor="let term of terms.slice(3)" class="tw-w-1/3 tw-p-1">
+                            <term-card [term]="term"></term-card>
+                        </div>
+                    </div>
+                </list-expand>
+
+            </div>
+
+
+            <div class="tw-my-2 sm:tw-my-4" *ngIf="firstBadges$ | async as badges">
+                <div class="tw-flex tw-flex-row tw-justify-between tw-pr-2" *ngIf="badges.data.length > 0">
+                    <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold ">Badges </h4>
+
+                    <button *ngIf="badges.meta.pagination.total > badges.data.length"
+                        class="tw-text-blue-400 hover:tw-text-blue-500 tw-bg-transparent tw-text-sm tw-border-0 focus:tw-outline-none hover:tw-underline"
+                        (click)="more_badges = !more_badges">{{ more_badges ? 'show less' : 'show more'}}
+                    </button>
+
+                </div>
+                <list-expand [collapsed]="!more_badges">
+                    <div class="tw-flex tw-flex-row tw-flex-wrap" content>
+                        <div *ngFor="let badge of badges.data" class="tw-p-2 tw-w-1/3">
+                            <badge-def-card [badge]="badge" [terms]="terms"></badge-def-card>
+                        </div>
+                    </div>
+
+                    <div class="tw-flex tw-flex-row tw-flex-wrap" expansion>
+                        <ng-container *ngIf="more_badges">
+                            <ng-container *ngIf="lastBadges$ | async as lastBadges">
+                                <div *ngFor="let badge of lastBadges.data" class="tw-p-2 tw-w-1/3">
+                                    <badge-def-card [badge]="badge" [terms]="terms"></badge-def-card>
+                                </div>
+                            </ng-container>
+
+                        </ng-container>
+
+                    </div>
+                </list-expand>
+            </div>
+
+            <div class="tw-my-2 sm:tw-my-4" *ngIf="firstMedals$ | async as medals">
+                <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-between tw-pr-2" *ngIf="medals.data.length > 0">
+                    <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold ">Medals </h4>
+
+                    <button *ngIf="medals.meta.pagination.total > medals.data.length"
+                        class="tw-text-blue-400 hover:tw-text-blue-500 tw-bg-transparent tw-text-sm tw-border-0 focus:tw-outline-none hover:tw-underline"
+                        (click)="more_medals = !more_medals">{{ more_medals ? 'show less' : 'show more'}}
+                    </button>
+
+                </div>
+                <list-expand [collapsed]="!more_medals">
+                    <div class="tw-flex tw-flex-row tw-flex-wrap" content>
+                        <div *ngFor="let medal of medals.data" class="tw-p-2 tw-w-1/2">
+                            <medal-def-card class="tw-h-full" [medal]="medal" [terms]="terms"></medal-def-card>
+                        </div>
+                    </div>
+
+                    <div class="tw-flex tw-flex-row tw-flex-wrap" expansion>
+                        <ng-container *ngIf="more_medals">
+                            <ng-container *ngIf="lastMedals$ | async as lastMedals">
+                                <div *ngFor="let medal of lastMedals.data" class="tw-p-2 tw-w-1/2">
+                                    <medal-def-card class="tw-h-full" [medal]="medal" [terms]="terms"></medal-def-card>
+                                </div>
+
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                </list-expand>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>

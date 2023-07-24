@@ -1,0 +1,25 @@
+<div class="tw-w-screen tw-flex tw-flex-row tw-flex-wrap tw-justify-between" *ngIf="markdownPath$ | async as markdownPath">
+  <div class="tw-px-2 sm:tw-px-4 tw-w-full tw-max-h-screen sm:tw-w-1/4 2xl:tw-w-1/4">
+    <div class="sm:tw-fixed">
+      <div class="tw-flex tw-justify-between">
+        <h2 class="tw-text-xl sm:tw-text-center tw-mt-2 tw-font-bold">Table of contents</h2>
+      <button class="tw-block sm:tw-hidden" (click)="display_toc = ! display_toc">
+
+        <svg aria-hidden="true" class="tw-block tw-h-6 tw-w-6" fill="none" stroke="currentColor" stroke-width="2"
+            viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+      </button>
+      </div>
+      <markdown [ngClass]="{'tw-hidden': !display_toc}"  src="assets/docs/table_of_contents.md" class="sm:tw-block tw-prose tw-prose-sm prose-headings:tw-text-base prose-headings:tw-text-gray-900 prose-headings:tw-font-bold prose-ul:tw-list-none prose-a:tw-pb-2 prose-a:tw-pt-1 prose-a:tw-m-0 prose-a:tw-pl-2 prose-a:tw-border-l prose-a:tw-no-underline prose-a:tw-border-gray-200 hover:prose-a:tw-border-gray-900 prose-a:tw-text-gray-700 hover:prose-a:tw-text-gray-900"></markdown>  
+    </div>
+
+  </div>
+  <main
+    class="tw-w-full tw-block sm:tw-w-3/4 2xl:tw-w-1/2 tw-p-2 sm:tw-px-4"
+  >
+    <markdown [src]="markdownPath" (load)="onLoad($event)" (ready)="onDocumentReady()" class="tw-prose prose-a:tw-text-blue-500 prose-strong:tw-text-apicuron-purple dark:prose-invert prose-img:sm:tw-block"> </markdown>
+  </main>
+  <div class="tw-px-2 tw-w-0 tw-max-h-screen 2xl:tw-w-1/4">
+  </div>
+</div>

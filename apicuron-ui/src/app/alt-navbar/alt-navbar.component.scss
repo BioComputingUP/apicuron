@@ -1,0 +1,11 @@
+.nav-item {
+    @apply tw-text-gray-100 hover:tw-text-white tw-px-2 tw-mx-1 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium
+}
+
+#nav_docs {
+    line-height: inherit;
+}
+
+// #nav_docs::after {
+//     @apply tw-content-["beta"] tw-text-[10px] tw-leading-[10px] tw-align-super tw-bg-gray-100 tw-rounded-[5px] tw-px-[2px] tw-text-gray-800
+// }

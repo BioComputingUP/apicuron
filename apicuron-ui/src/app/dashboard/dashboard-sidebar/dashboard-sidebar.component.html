@@ -1,0 +1,164 @@
+<div
+    class="tw-flex tw-h-screen tw-flex-col tw-justify-between tw-border-e tw-bg-white tw-w-full">
+    <div class="tw-px-4 tw-py-6">
+        <a routerLink="/" class="tw-grid tw-h-10 tw-w-32 tw-place-content-center tw-rounded-lg tw-text-xs tw-text-gray-600">
+            <svg-icon src="assets/APICURON.svg" svgClass="tw-w-full"></svg-icon>
+        </a>
+
+        <ul class="tw-mt-6 tw-space-y-1 tw-gap-1">
+            <li>
+                <a routerLink="/dashboard"
+                    routerLinkActive="list-item-active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item list-item-colors">
+                    General
+                </a>
+
+                <!-- <a [routerLink]="['/dashboard', 'profile']"
+                    routerLinkActive="list-item-active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+
+                    class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item list-item-colors">
+                    Edit Profile
+                </a> -->
+            </li>
+
+            <ng-container *ngIf="links$ | async as resourcesLinks">
+                <span class="tw-text-gray-400 tw-font-bold tw-text-sm">Manage Resources</span>
+
+                <ng-container *ngFor="let resourceLinks of resourcesLinks">
+                    <li>
+                        <details class="tw-group summary::-webkit-details-marker]:tw-hidden" [open]="openDetails(resourceLinks)">
+                            <summary
+                                class="tw-flex tw-cursor-pointer tw-items-center tw-justify-between tw-rounded-lg tw-px-4 tw-py-2 list-item list-item-colors">
+                                <span class="tw-text-sm ">
+                                    <img [src]="resourceLinks.resource.faviconLink()" alt="" class="tw-inline tw-w-4 tw-h-4">
+                                    {{ resourceLinks.resource.resource_name }}
+                                </span>
+        
+                                <span class="tw-shrink-0 tw-transition tw-duration-300 group-open:tw--rotate-180">
+                                    <svg-icon src="assets/svg/chevron_down.svg" svgClass="tw-h-4 tw-w-4 tw-stroke-2"></svg-icon>
+                                </span>
+        
+                            </summary>
+        
+                            <ul class="tw-mt-2 tw-space-y-1 tw-px-4">
+                                <li *ngFor="let link of resourceLinks.links">
+                                    <a [routerLink]="link.href"
+                                        [routerLinkActiveOptions]="{ exact: true}"
+                                        routerLinkActive="list-item-active"
+                                        class="tw-flex tw-w-full tw-flex-row tw-justify-between tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item list-item-colors">
+                                        {{ link.name}}
+
+                                        <svg-icon [src]="link.icon" svgClass="tw-w-4 tw-h-4"></svg-icon>
+                                    </a>
+                                </li>
+        
+                            </ul>
+                        </details>
+                    </li>
+
+                </ng-container>
+            </ng-container>
+            <li>
+                <!-- <details class="tw-group summary::-webkit-details-marker]:tw-hidden">
+                    <summary
+                        class="tw-flex tw-cursor-pointer tw-items-center tw-justify-between tw-rounded-lg tw-px-4 tw-py-2 list-item-colors">
+                        <span class="tw-text-sm "> Teams </span>
+
+                        <span class="tw-shrink-0 tw-transition tw-duration-300 group-open:tw--rotate-180">
+                            <svg-icon src="assets/svg/chevron_down.svg" svgClass="tw-h-4 tw-w-4 tw-stroke-2"></svg-icon>
+
+                        </span>
+
+                    </summary>
+
+                    <ul class="tw-mt-2 tw-space-y-1 tw-px-4">
+                        <li>
+                            <a href=""
+                                class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item-colors">
+                                Banned Users
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href=""
+                                class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item-colors">
+                                Calendar
+                            </a>
+                        </li>
+                    </ul>
+                </details> -->
+            </li>
+
+            <!-- <li>
+                <a href=""
+                    class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item-colors">
+                    Billing
+                </a>
+            </li>
+
+            <li>
+                <a href=""
+                    class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item-colors">
+                    Invoices
+                </a>
+            </li>
+
+            <li>
+                <details class="tw-group summary::-webkit-details-marker]:tw-hidden">
+                    <summary
+                        class="tw-flex tw-cursor-pointer tw-items-center tw-justify-between tw-rounded-lg tw-px-4 tw-py-2 list-item-colors">
+                        <span class="tw-text-sm "> Account </span>
+
+                        <span class="tw-shrink-0 tw-transition tw-duration-300 group-open:tw--rotate-180">
+                            <svg-icon src="assets/svg/chevron_down.svg" svgClass="tw-h-4 tw-w-4 tw-stroke-2"></svg-icon>
+
+                        </span>
+                    </summary>
+
+                    <ul class="tw-mt-2 tw-space-y-1 tw-px-4">
+                        <li>
+                            <a href=""
+                                class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item-colors">
+                                Details
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href=""
+                                class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item-colors">
+                                Security
+                            </a>
+                        </li>
+
+                        <li>
+                            <form action="/logout">
+                                <button type="submit"
+                                    class="tw-w-full tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  tw-text-gray-500 text-align:tw-_inherit] hover:tw-bg-gray-100 hover:tw-text-gray-700">
+                                    Logout
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </details>
+            </li> -->
+        </ul>
+    </div>
+
+    <div class="tw-sticky tw-inset-x-0 tw-bottom-0 tw-border-t tw-border-gray-100" *ngIf="user$ | async as user">
+        <a href="#" class="tw-flex tw-items-center tw-gap-2 tw-bg-white tw-p-4 hover:tw-bg-gray-50">
+            <img alt="Man"
+                [src]="user.generate_avatar()"
+                class="tw-h-10 tw-w-10 tw-rounded-full tw-object-cover">
+
+            <div>
+                <p class="tw-text-xs">
+                    <strong class="tw-block ">{{ user.displayedName }}</strong>
+
+                    <!-- <span> eric@frusciante.com </span> -->
+                </p>
+            </div>
+        </a>
+    </div>
+</div>
