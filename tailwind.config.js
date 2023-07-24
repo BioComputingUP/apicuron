@@ -1,7 +1,10 @@
 module.exports = {
-  prefix: 'tw-',
-  content: ["./src/**/*.{html,ts}", "./src/app/**/*.{html,ts}", 'node_modules/primeng/resources/**/*.css'],
-  darkMode: 'class',
+  prefix: "tw-",
+  content: [
+    "./src/**/*.{html,ts}",
+    "./src/app/**/*.{html,ts}",
+  ],
+  darkMode: "class",
   // darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
@@ -14,9 +17,9 @@ module.exports = {
         "apicuron-purple-100": "hsl(300, 51%, 89%)",
         "apicuron-purple-500": "hsl(300, 51%, 40%)",
         "apicuron-red": "#9A031E",
-        "invalidation": "#F76135",
-        "revision": "#EDBF3A",
-        "generation": "#59C794"
+        invalidation: "#F76135",
+        revision: "#EDBF3A",
+        generation: "#59C794",
         // orange: {
         //   50: '#fff7ed',
         //   100: '#ffedd5',
@@ -37,7 +40,7 @@ module.exports = {
     extend: {},
   },
   plugins: [
-    require('@tailwindcss/typography'),
-    require('@tailwindcss/container-queries')
+    require("@tailwindcss/typography"),
+    require("@tailwindcss/container-queries"),
   ],
 };

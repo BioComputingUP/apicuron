@@ -85,6 +85,8 @@ export class ManageMedalsComponent implements OnInit, OnDestroy {
   resource$: Observable<Resource>;
   terms$: Observable<any>;
 
+  maxDate = new Date()
+
   show_edit_form = false;
   show_create_form = false;
   medals$ = new BehaviorSubject<Array<any>>([]);
@@ -107,7 +109,7 @@ export class ManageMedalsComponent implements OnInit, OnDestroy {
     this.medals$.next([medal, ...medals]);
   }
 
-  open_edit_modal(medal) {
+  open_edit_modal(medal: MedalDef) {
     this.edit_form = this.formBuilder.group({
       name: [medal.name, [Validators.required]],
       //   category: [medal.category, [Validators.required]],
@@ -125,8 +127,8 @@ export class ManageMedalsComponent implements OnInit, OnDestroy {
         [Validators.required, Validators.min(1)],
       ],
       list_terms: [medal.list_terms, [Validators.required]],
-      first_day: [medal["first_day"] || "", []],
-      last_day: [medal["last_day"] || "", []],
+      first_day: [medal.first_day || null, []],
+      last_day: [medal.last_day || null, []],
     });
     this.show_edit_form = true;
   }
@@ -174,9 +176,8 @@ export class ManageMedalsComponent implements OnInit, OnDestroy {
 
   open_create_modal() {
     this.create_form = this.formBuilder.group({
-      date_range: [[], [Validators.required]],
       color: [
-        "",
+        "gold",
         [
           Validators.required,
           Validators.pattern(
@@ -184,11 +185,10 @@ export class ManageMedalsComponent implements OnInit, OnDestroy {
           ),
         ],
       ],
-      score_relative: ["", [Validators.required, Validators.min(1)]],
-    //   first_day: ["", []],
-    //   last_day: ["", []],
+      score_relative: [1, [Validators.required, Validators.min(1)]],
+      first_day: [null, []],
+      last_day: [new Date(), []],
       name: ["", [Validators.required]],
-      //   category: ["", [Validators.required]],
       list_terms: [[], [Validators.required]],
     });
     this.show_create_form = true;

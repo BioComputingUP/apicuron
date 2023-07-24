@@ -29,7 +29,7 @@ import { RouterModule } from '@angular/router';
     UserOverviewPageService
   ],
   imports: [
-    CalendarModule,
+    // CalendarModule,
     CommonModule,
     RouterModule,
     DashboardRoutingModule,
@@ -39,6 +39,7 @@ import { RouterModule } from '@angular/router';
     DatabasesModule,
     AngularSvgIconModule,
     NavbarComponent,
+    CalendarModule,
     SvgModule,
     ReportsByDateChartComponent,
     CategoriesPieChartComponent,

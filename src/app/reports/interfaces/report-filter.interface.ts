@@ -54,7 +54,7 @@ export class ReportFilter implements Serializable {
 
     sortBy?: 'timestamp' | 'resource_id' | 'entity_uri' | 'curator_orcid' | 'activity_term'
 
-    sortOrder?: 'asc' | 'desc' | 1 | -1
+    sortOrder?: 1 | -1
 
 
 

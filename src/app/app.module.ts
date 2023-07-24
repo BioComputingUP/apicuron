@@ -3,13 +3,11 @@ import { NgModule } from "@angular/core";
 import {
   RouterModule,
 } from "@angular/router";
-import { ReactiveFormsModule, FormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { FootComponent } from "./foot/foot.component";
-import { ApiComponent } from "./api/api.component";
 import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
 import { NavbarComponent } from "./alt-navbar/alt-navbar.component";
 import { IndexModule } from "./index/index.module";
@@ -25,7 +23,6 @@ import { SentryModuleConfig } from "../config/sentry.config";
   declarations: [
     AppComponent,
     FootComponent,
-    ApiComponent,
     PageNotFoundComponent,
     MainLayoutComponent,
   ],
@@ -39,8 +36,8 @@ import { SentryModuleConfig } from "../config/sentry.config";
     IndexModule,
     BrowserModule,
     BrowserAnimationsModule,
-    ReactiveFormsModule,
-    FormsModule,
+    // ReactiveFormsModule,
+    // FormsModule,
     HttpClientModule,
     NavbarComponent,
     AngularSvgIconModule.forRoot(),

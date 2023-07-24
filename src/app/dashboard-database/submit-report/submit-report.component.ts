@@ -2,7 +2,8 @@ import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { Observable } from "rxjs";
 import { map, pluck, shareReplay, switchMap, tap } from "rxjs/operators";
-import { DatabasesService } from "../../databases/services/databases.service";
+import { Resource } from "src/app/models/resource.model";
+import { ResourcesService } from "src/app/resource/service/resources.service";
 
 @Component({
   selector: "app-submit-report",
@@ -14,12 +15,11 @@ import { DatabasesService } from "../../databases/services/databases.service";
 })
 export class SubmitReportComponent implements OnInit {
   resource_id$: Observable<string>;
-  resource_data$: Observable<any>;
-  resource$: Observable<any>;
+  resource$: Observable<Resource>;
 
   constructor(
     private route: ActivatedRoute,
-    private databaseService: DatabasesService,
+    private resourceService: ResourcesService,
   ) {
     this.resource_id$ = this.route.paramMap.pipe(
       map((params: ParamMap) => {
@@ -27,14 +27,12 @@ export class SubmitReportComponent implements OnInit {
       })
     );
 
-    this.resource_data$ = this.resource_id$.pipe(
-      switchMap((resource_id: string) => {
-        return this.databaseService.get_resource(resource_id);
-      }),
-      shareReplay()
-    );
 
-    this.resource$ = this.resource_data$.pipe(pluck("data"));
+    this.resource$ = this.resource_id$.pipe(
+      switchMap((resource_id: string) => {
+        return this.resourceService.get_resource(resource_id)
+      })
+    )
   }
 
   ngOnInit(): void {

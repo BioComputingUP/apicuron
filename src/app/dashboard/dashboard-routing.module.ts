@@ -17,7 +17,7 @@ const routes: Routes = [
       // { path: 'profile', component: ProfileUpdateComponent }
     ]
   },
-  { path: 'database', loadChildren: () => import('../dashboard-database/dashboard-database.module').then(m => m.DashboardDatabaseModule) },
+  { path: 'database', loadChildren: () => import('../dashboard-database/dashboard-database.module').then(m => m.DashboardDatabaseModule), canActivate: [AuthGuard] },
   
 ];
 

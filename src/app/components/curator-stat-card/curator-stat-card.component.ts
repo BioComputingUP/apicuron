@@ -14,7 +14,7 @@ import { TermsService } from "src/app/terms/services/terms.service";
 import { Term } from "src/app/models/term.model";
 import { Report } from "src/app/models/report.model";
 import { TermsModule } from "src/app/terms/terms.module";
-import { CuratorStatDetailsComponent } from "../curator-reports-details/curator-reports-details.component";
+import { CuratorReportsDetailsComponent } from "../curator-reports-details/curator-reports-details.component";
 import { SlideOverPanelComponent } from "../utils/slide-over-panel/slide-over-panel.component";
 import { FormBuilder } from "@angular/forms";
 import { Medal } from '../../models/medal.model'
@@ -37,7 +37,7 @@ import { CuratorBadgesDetailsComponent } from "src/app/components/curator-badges
     ReportsModule,
     ReportCardComponent,
     TermsModule,
-    CuratorStatDetailsComponent,
+    CuratorReportsDetailsComponent,
     SlideOverPanelComponent,
     MedalCardComponent,
     AchievementsModule,

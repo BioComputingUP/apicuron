@@ -14,13 +14,13 @@
                     General
                 </a>
 
-                <a [routerLink]="['/dashboard', 'profile']"
+                <!-- <a [routerLink]="['/dashboard', 'profile']"
                     routerLinkActive="list-item-active"
                     [routerLinkActiveOptions]="{ exact: true }"
 
                     class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item list-item-colors">
                     Edit Profile
-                </a>
+                </a> -->
             </li>
 
             <ng-container *ngIf="links$ | async as resourcesLinks">
@@ -28,7 +28,7 @@
 
                 <ng-container *ngFor="let resourceLinks of resourcesLinks">
                     <li>
-                        <details class="tw-group summary::-webkit-details-marker]:tw-hidden">
+                        <details class="tw-group summary::-webkit-details-marker]:tw-hidden" [open]="openDetails(resourceLinks)">
                             <summary
                                 class="tw-flex tw-cursor-pointer tw-items-center tw-justify-between tw-rounded-lg tw-px-4 tw-py-2 list-item list-item-colors">
                                 <span class="tw-text-sm ">

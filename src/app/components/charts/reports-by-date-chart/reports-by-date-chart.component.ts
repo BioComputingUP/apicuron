@@ -2,11 +2,8 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
-  EventEmitter,
   Input,
   OnDestroy,
-  OnInit,
-  Output,
   ViewChild,
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
@@ -16,16 +13,14 @@ import * as Moment from "moment";
 import { extendMoment } from "moment-range";
 import {
   ReportFilter,
-  ReportFilterField,
 } from "src/app/reports/interfaces/report-filter.interface";
 import { BehaviorSubject, Observable, Subscription, combineLatest } from "rxjs";
-import { filter, map, switchMap, take, tap } from "rxjs/operators";
+import { map } from "rxjs/operators";
 import { ReportsModule } from "src/app/reports/reports.module";
 import {
   ReportsByResourceId,
   ReportsService,
 } from "src/app/reports/services/reports.service";
-import { Paginated } from "src/app/interfaces/paginated";
 import { ReportFilterFormComponent } from "../../report-filter-form/report-filter-form.component";
 import { Report } from "../../../models/report.model";
 import { ResourceModule } from "../../../resource/resource.module";
@@ -102,7 +97,7 @@ export class ReportsByDateChartComponent implements OnDestroy, AfterViewInit {
 
   private readonly _plotData$: Observable<Data[]> = combineLatest([
     this.reportFilter$,
-    this.reportsData$,
+    this.reportsData$.asObservable(),
     this.resources$,
   ]).pipe(
     map(
@@ -113,7 +108,7 @@ export class ReportsByDateChartComponent implements OnDestroy, AfterViewInit {
       ]) => {
         // for Each resource
         return resources.map((resource) => {
-          const reports: Report[] = reportsData[resource.resource_id];
+          const reports: Report[] = reportsData[resource.resource_id] || [];
 
           // Create a range of dates from the first to the last day
           const dateRange = moment.range(reportFilter.from, reportFilter.to);
@@ -173,9 +168,10 @@ export class ReportsByDateChartComponent implements OnDestroy, AfterViewInit {
     },
     yaxis: {
       title: "Contributions",
-      tickmode: "linear",
-      dtick: 1,
-      range: [0, null],
+      autorange: true,
+      autotick: true,
+      // dtick: 1,
+      // range: [0, null],
     },
     margin: {
       t: 10,

@@ -44,7 +44,7 @@ export class ReportFilterFormComponent implements OnInit, OnDestroy {
             from: [null],
             to: [new Date()],
             sortBy: ['timestamp', Validators.pattern(/^(timestamp|activity_term)$/)],
-            sortOrder: ['desc', Validators.pattern(/^(asc|desc|1|0)$/)],
+            sortOrder: [-1, Validators.pattern(/^(1|0)$/)],
             activity_terms: [[]],
             limit: [20],
             skip: [1]

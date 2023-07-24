@@ -5,6 +5,7 @@ import { MedalDefFilter } from "../interfaces/medal-def.filter";
 import { Observable } from "rxjs";
 import { Paginated } from "../../interfaces/paginated";
 import { DeleteMedalDef, MedalDef, UpdateMedalDef } from "../../models/medal-def.model";
+import { map } from "rxjs/operators";
 
 
 
@@ -14,7 +15,7 @@ export class MedalDefService {
     
 
     constructor(protected http: HttpClient) {}
-    url: string = new URL('achievements-def/medals',environment.ws + '/').href;
+    url: string = new URL('achievements-def/medals/',environment.ws + '/').href;
 
 
     getMedalDefs(medalDefFilter: MedalDefFilter): Observable<Paginated<MedalDef>> {
@@ -23,7 +24,12 @@ export class MedalDefService {
                 version: '2'
             },
             params: medalDefFilter.serialize()
-        });
+        }).pipe(
+            map((paginatedMedals: Paginated<MedalDef>) => {
+                paginatedMedals.data = paginatedMedals.data.map((medal) => new MedalDef().deserialize(medal))
+                return paginatedMedals;
+            })
+        )
     }
 
     createMedalDef(medalDef: MedalDef) {

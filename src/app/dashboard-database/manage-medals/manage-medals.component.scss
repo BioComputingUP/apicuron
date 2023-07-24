@@ -1,3 +1,6 @@
+
+
+
 .head-cell{
     @apply tw-text-sm tw-font-medium tw-text-gray-900 tw-px-6 tw-py-4 tw-text-left tw-font-bold
 }
@@ -28,4 +31,8 @@ input[type=text], input[type=number], input[type=datetime-local],textarea, .text
 
 ::ng-deep .p-calendar {
     @apply tw-w-full
+}
+
+:host ::ng-deep .p-inputtext {
+    @apply hover:tw-shadow hover:tw-shadow-apicuron-purple hover:tw-border hover:tw-border-apicuron-purple focus:tw-shadow focus:tw-shadow-apicuron-purple focus:tw-border focus:tw-border-apicuron-purple
 }

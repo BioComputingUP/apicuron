@@ -27,7 +27,7 @@ import { ReportsService } from "src/app/reports/services/reports.service";
     templateUrl: './curator-reports-details.component.html',
     styleUrls: []
 })
-export class CuratorStatDetailsComponent implements OnInit {
+export class CuratorReportsDetailsComponent implements OnInit {
 
     constructor(protected formBuilder: FormBuilder, protected reportsService: ReportsService) { }
 

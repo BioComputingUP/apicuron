@@ -2,8 +2,10 @@ import { Component, Input, OnInit } from "@angular/core";
 import { FormBuilder, FormControl, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
 import { Observable } from "rxjs";
-import { switchMap } from 'rxjs/operators'
+import { catchError, finalize, switchMap, tap } from "rxjs/operators";
 import { DashboardService } from "../../services/dashboard.service";
+import { Resource } from "src/app/models/resource.model";
+import { MessageService } from "primeng/api";
 
 @Component({
   selector: "submit-bulk",
@@ -16,62 +18,82 @@ import { DashboardService } from "../../services/dashboard.service";
 export class SubmitBulkComponent implements OnInit {
   form: any;
 
-  constructor(private formBuilder: FormBuilder, private dashboardService: DashboardService, private toast: ToastrService) {}
+  blocked: Boolean = false;
+
+  constructor(
+    private formBuilder: FormBuilder,
+    private dashboardService: DashboardService,
+    private messageService: MessageService
+  ) {}
 
   @Input("resource")
-  resource$: Observable<any>;
+  resource: Resource;
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({
       reports: [null, [Validators.required]],
-      'delete-all': [false, []]
+      "delete-all": [[], []],
     });
   }
 
   submit() {
     const formData = new FormData();
-    formData.append('reports', this.reports.value)
+    formData.append("reports", this.reports.value);
+    if (this.delete_all) {
+      const res_id: string = this.resource.resource_id;
+      formData.append("delete_all[]", res_id);
+    }
 
-    this.resource$.pipe(
-      switchMap((resource: { resource_id: string }) => {
-        if(this.delete_all){
-          const res_id: string = resource['resource_id']
-          formData.append('delete_all[]', res_id)
-        }
-        
-        return this.dashboardService.submit_reports_bulk(formData)
-      })
-    ).subscribe(
-      (response) => {
-        this.toast.success('you will receive a submission report in your notifications soon.','Reports submitted')
-      },
-      (error) => {
-        (error) => {
+    this.blocked = true;
+
+    this.dashboardService
+      .submit_reports_bulk(formData)
+      .pipe(
+        catchError(({ error }, caught) => {
           if (error.message && error.statusCode == 400) {
             let errors = Array.isArray(error.message)
               ? error.message.join("\n")
               : error.message;
-            this.toast.warning(errors, "Validation Error");
+            this.messageService.add({
+              severity: "warn",
+              detail: errors,
+              summary: "Validation Error",
+            });
           } else {
-            this.toast.error(
-              "An error occured while sending the form, please contact the developers",
-              "Error"
-            );
+            this.messageService.add({
+              severity: "error",
+              detail:
+                "An error occured while sending the form, please contact the developers",
+              summary: "Error",
+            });
           }
-        }
-      }
-    )
+
+          throw new Error("Submission Failed");
+        }),
+        tap(() => {
+          this.messageService.add({
+            severity: "success",
+            detail:
+              "you will receive a submission report in your notifications soon.",
+            summary: "Reports submitted",
+          });
+        }),
+        finalize(() => {
+          this.blocked = false;
+        })
+      )
+      .subscribe(() => {});
   }
   onFileSelected(event) {
     const file: File = event.target.files[0];
     this.form.controls["reports"].setValue(file);
   }
 
-  get reports(): FormControl{
-    return this.form.get('reports')
+  get reports(): FormControl {
+    return this.form.get("reports");
   }
 
-  get delete_all(): FormControl{
-    return this.form.get('delete-all')
+  get delete_all(): FormControl {
+    return this.form.get("delete-all");
   }
 }

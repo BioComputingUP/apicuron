@@ -1,11 +1,17 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Observable, combineLatest } from "rxjs";
-import { map, shareReplay, switchMap } from "rxjs/operators";
+import { map, shareReplay, switchMap, tap } from "rxjs/operators";
 import { environment } from "../../../environments/environment";
 import { AuthService } from "src/app/auth/auth.service";
 import { User } from "src/app/models/User.model";
 import { ResourcesService } from "src/app/resource/service/resources.service";
 import { Resource } from "src/app/models/resource.model";
+import { ActivatedRoute } from "@angular/router";
+
+type ResourceLinks = {
+  links: { href: string[]; name: string; icon: string }[]; // extract managed resources from user and request their data
+  resource: Resource
+};
 @Component({
   selector: "dashboard-sidebar",
   templateUrl: "./dashboard-sidebar.component.html",
@@ -13,34 +19,33 @@ import { Resource } from "src/app/models/resource.model";
 })
 export class DashboardSidebarComponent implements OnInit {
   links$: Observable<
-    {
-      links: { href: string[]; name: string; icon: string }[]; // extract managed resources from user and request their data
-      resource: Resource
-    }[]
+  ResourceLinks[]
   >;
   user$: Observable<User>;
   resources$: Observable<Resource[]>;
 
   constructor(
     protected auth: AuthService,
-    protected resourceService: ResourcesService
+    protected resourceService: ResourcesService,
+    protected route: ActivatedRoute
   ) {
     this.user$ = this.auth.user$;
 
     this.resources$ = this.user$.pipe(
       // extract managed resources from user and request their data
       map((user: User) => {
-        const resourceIds = user.resources.map(
+        const resourceIds: string[] = user.resources.map(
           (resource) => resource.resource_id
         );
-        return resourceIds.map((resource_id) =>
+        return resourceIds.map((resource_id: string) =>
           this.resourceService.get_resource(resource_id).pipe(shareReplay(1))
         );
       }),
       // Combine these resources into a single observable array
       switchMap((resources: Observable<Resource>[]) => {
         return combineLatest(resources);
-      })
+      }),
+      shareReplay(1)
     );
 
     this.links$ = this.resources$.pipe(
@@ -100,6 +105,11 @@ export class DashboardSidebarComponent implements OnInit {
         });
       })
     );
+  }
+
+  openDetails(resourceLinks: ResourceLinks) {
+    const currentUrl =  this.route.snapshot.pathFromRoot.map((snap) => snap.url).join('/')
+    return resourceLinks.links.some((link) => currentUrl.startsWith(link.href.join('/')))
   }
 
   // @Input('resource') resource$: Observable<any>;

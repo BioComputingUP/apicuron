@@ -37,18 +37,23 @@ const routes: Routes = [
     loadChildren: () =>
       import("./curator/curator.module").then((m) => m.CuratorModule),
   },
-
-
   {
-    path: '',
+    path: "",
     component: MainLayoutComponent,
-    children: [
-      {
-        path: '',
-        component: IndexComponent,
-      }
-    ]
+    loadChildren: () =>
+      import("./index/index.module").then((m) => m.IndexModule),
   },
+
+  // {
+  //   path: '',
+  //   component: MainLayoutComponent,
+  //   children: [
+  //     {
+  //       path: '',
+  //       component: IndexComponent,
+  //     }
+  //   ]
+  // },
   { path: 'dashboard', loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule) },
   { path: 'docs', component: MainLayoutComponent, loadChildren: () => import('./documentation/documentation.module').then(m => m.DocumentationModule) },
   { path: 'api', redirectTo: '/api/' },
