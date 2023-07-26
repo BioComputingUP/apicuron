@@ -15,6 +15,10 @@ services:
       - "./apicuron-ws:/home/node/app"
     ports:
       - "3000:3000"
+    environment:
+      - DATABASE_HOST=moros
+      - DATABASE=apicuron_test
+      - DB_PORT=27017
     dns: 10.69.69.1
     command: "npm run start:dev"
     network_mode: "host"
