@@ -1,0 +1,146 @@
+
+2023/07/31 16:47:17 [notice] 1#1: using the "epoll" event method
+2023/07/31 16:47:17 [notice] 1#1: nginx/1.25.1
+2023/07/31 16:47:17 [notice] 1#1: built by gcc 12.2.0 (Debian 12.2.0-14) 
+2023/07/31 16:47:17 [notice] 1#1: OS: Linux 5.15.0-76-generic
+2023/07/31 16:47:17 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1048576:1048576
+2023/07/31 16:47:17 [notice] 1#1: start worker processes
+2023/07/31 16:47:17 [notice] 1#1: start worker process 28
+2023/07/31 16:47:17 [notice] 1#1: start worker process 29
+2023/07/31 16:47:17 [notice] 1#1: start worker process 30
+2023/07/31 16:47:17 [notice] 1#1: start worker process 31
+2023/07/31 16:50:45 [warn] 30#30: *6 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.23.0.1, server: localhost, request: "GET /vendor.js HTTP/1.1", upstream: "http://172.23.0.3:4200/vendor.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/07/31 17:21:45 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2023/07/31 17:21:45 [notice] 28#28: gracefully shutting down
+2023/07/31 17:21:45 [notice] 29#29: gracefully shutting down
+2023/07/31 17:21:45 [notice] 29#29: exiting
+2023/07/31 17:21:45 [notice] 29#29: exit
+2023/07/31 17:21:45 [notice] 30#30: gracefully shutting down
+2023/07/31 17:21:45 [notice] 30#30: exiting
+2023/07/31 17:21:45 [notice] 30#30: exit
+2023/07/31 17:21:45 [notice] 31#31: gracefully shutting down
+2023/07/31 17:21:45 [notice] 31#31: exiting
+2023/07/31 17:21:45 [notice] 31#31: exit
+2023/07/31 17:21:45 [notice] 1#1: signal 17 (SIGCHLD) received from 29
+2023/07/31 17:21:45 [notice] 1#1: worker process 29 exited with code 0
+2023/07/31 17:21:45 [notice] 1#1: signal 29 (SIGIO) received
+2023/07/31 17:21:45 [notice] 1#1: signal 17 (SIGCHLD) received from 31
+2023/07/31 17:21:45 [notice] 1#1: worker process 31 exited with code 0
+2023/07/31 17:21:45 [notice] 1#1: signal 29 (SIGIO) received
+2023/07/31 17:21:45 [notice] 1#1: signal 17 (SIGCHLD) received from 30
+2023/07/31 17:21:45 [notice] 1#1: worker process 30 exited with code 0
+2023/07/31 17:21:45 [notice] 1#1: signal 29 (SIGIO) received
+2023/08/01 08:16:25 [notice] 1#1: using the "epoll" event method
+2023/08/01 08:16:25 [notice] 1#1: nginx/1.25.1
+2023/08/01 08:16:25 [notice] 1#1: built by gcc 12.2.0 (Debian 12.2.0-14) 
+2023/08/01 08:16:25 [notice] 1#1: OS: Linux 5.15.0-76-generic
+2023/08/01 08:16:25 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1048576:1048576
+2023/08/01 08:16:25 [notice] 1#1: start worker processes
+2023/08/01 08:16:25 [notice] 1#1: start worker process 28
+2023/08/01 08:16:25 [notice] 1#1: start worker process 29
+2023/08/01 08:16:25 [notice] 1#1: start worker process 30
+2023/08/01 08:16:25 [notice] 1#1: start worker process 31
+2023/08/01 08:34:25 [warn] 28#28: *1 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /polyfills.js HTTP/1.1", upstream: "http://172.24.0.3:4200/polyfills.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 08:34:25 [warn] 29#29: *2 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/2/00/0000000002 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /vendor.js HTTP/1.1", upstream: "http://172.24.0.3:4200/vendor.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 08:34:26 [warn] 31#31: *9 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/3/00/0000000003 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /assets/logos/UniPD-800_logo_white.svg HTTP/1.1", upstream: "http://172.24.0.3:4200/assets/logos/UniPD-800_logo_white.svg", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 08:35:58 [warn] 28#28: *46 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/4/00/0000000004 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /polyfills.js.map HTTP/1.1", upstream: "http://172.24.0.3:4200/polyfills.js.map", host: "localhost:3000"
+2023/08/01 08:35:58 [warn] 28#28: *38 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/5/00/0000000005 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /vendor.js.map HTTP/1.1", upstream: "http://172.24.0.3:4200/vendor.js.map", host: "localhost:3000"
+2023/08/01 08:37:48 [warn] 28#28: *63 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/6/00/0000000006 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /default-node_modules_moment_moment_js.js HTTP/1.1", upstream: "http://172.24.0.3:4200/default-node_modules_moment_moment_js.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 08:41:41 [error] 29#29: *109 recv() failed (104: Connection reset by peer) while proxying upgraded connection, client: 172.24.0.1, server: localhost, request: "GET /ng-cli-ws HTTP/1.1", upstream: "http://172.24.0.3:4200/ng-cli-ws", host: "localhost:3000"
+2023/08/01 08:51:27 [warn] 29#29: *160 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/7/00/0000000007 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /default-src_app_curator_curator_module_ts.js.map HTTP/1.1", upstream: "http://172.24.0.3:4200/default-src_app_curator_curator_module_ts.js.map", host: "localhost:3000"
+2023/08/01 08:55:21 [warn] 30#30: *218 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/8/00/0000000008 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /default-src_app_curator_curator_module_ts.js HTTP/1.1", upstream: "http://172.24.0.3:4200/default-src_app_curator_curator_module_ts.js", host: "localhost:3000", referrer: "http://localhost:3000/curators/0000-0002-2472-5685"
+2023/08/01 08:56:21 [warn] 29#29: *287 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/9/00/0000000009 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /default-src_app_curator_curator_module_ts.js HTTP/1.1", upstream: "http://172.24.0.3:4200/default-src_app_curator_curator_module_ts.js", host: "localhost:3000", referrer: "http://localhost:3000/curators/0000-0002-2472-5685"
+2023/08/01 09:18:13 [warn] 30#30: *377 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/0/01/0000000010 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /vendor.js.map HTTP/1.1", upstream: "http://172.24.0.3:4200/vendor.js.map", host: "localhost:3000"
+2023/08/01 09:18:13 [warn] 30#30: *370 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/01/0000000011 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /default-src_app_curator_curator_module_ts.js HTTP/1.1", upstream: "http://172.24.0.3:4200/default-src_app_curator_curator_module_ts.js", host: "localhost:3000", referrer: "http://localhost:3000/curators/0000-0002-2472-5685"
+2023/08/01 09:28:29 [warn] 30#30: *424 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/2/01/0000000012 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /vendor.js.map HTTP/1.1", upstream: "http://172.24.0.3:4200/vendor.js.map", host: "localhost:3000"
+2023/08/01 09:48:23 [warn] 28#28: *537 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/3/01/0000000013 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /vendor.js HTTP/1.1", upstream: "http://172.24.0.3:4200/vendor.js", host: "localhost:3000", referrer: "http://localhost:3000/curators/0000-0002-2472-5685"
+2023/08/01 09:48:24 [warn] 28#28: *537 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/4/01/0000000014 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /vendor.js.map HTTP/1.1", upstream: "http://172.24.0.3:4200/vendor.js.map", host: "localhost:3000"
+2023/08/01 10:02:27 [warn] 29#29: *592 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/5/01/0000000015 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /vendor.js.map HTTP/1.1", upstream: "http://172.24.0.3:4200/vendor.js.map", host: "localhost:3000"
+2023/08/01 10:04:08 [warn] 28#28: *646 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/6/01/0000000016 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /src_app_dashboard_dashboard_module_ts.js HTTP/1.1", upstream: "http://172.24.0.3:4200/src_app_dashboard_dashboard_module_ts.js", host: "localhost:3000", referrer: "http://localhost:3000/dashboard"
+2023/08/01 10:04:10 [warn] 28#28: *646 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/7/01/0000000017 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /src_app_dashboard_dashboard_module_ts.js.map HTTP/1.1", upstream: "http://172.24.0.3:4200/src_app_dashboard_dashboard_module_ts.js.map", host: "localhost:3000"
+2023/08/01 10:06:01 [error] 28#28: *743 recv() failed (104: Connection reset by peer) while proxying upgraded connection, client: 172.24.0.1, server: localhost, request: "GET /ng-cli-ws HTTP/1.1", upstream: "http://172.24.0.3:4200/ng-cli-ws", host: "localhost:3000"
+2023/08/01 10:09:49 [warn] 29#29: *785 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/8/01/0000000018 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:10:21 [warn] 29#29: *864 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/9/01/0000000019 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:14:38 [warn] 30#30: *1035 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/0/02/0000000020 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:15:58 [warn] 30#30: *1034 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/02/0000000021 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:18:05 [warn] 30#30: *1227 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/2/02/0000000022 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:19:18 [warn] 31#31: *1277 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/3/02/0000000023 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:24:24 [warn] 28#28: *1472 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/4/02/0000000024 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:27:06 [warn] 28#28: *1513 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/5/02/0000000025 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:36:59 [warn] 30#30: *1674 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/6/02/0000000026 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:39:57 [warn] 29#29: *1756 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/7/02/0000000027 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:41:11 [warn] 30#30: *1805 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/8/02/0000000028 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:44:01 [warn] 31#31: *1846 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/9/02/0000000029 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:48:09 [warn] 31#31: *1887 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/0/03/0000000030 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:49:25 [warn] 31#31: *1942 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/03/0000000031 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:50:32 [warn] 28#28: *1990 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/2/03/0000000032 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:52:14 [warn] 28#28: *2041 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/3/03/0000000033 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:53:48 [warn] 30#30: *2089 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/4/03/0000000034 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:54:01 [warn] 29#29: *2111 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/5/03/0000000035 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 10:54:42 [warn] 28#28: *2084 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/6/03/0000000036 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.24.0.3:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 15:13:23 [warn] 29#29: *2252 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/7/03/0000000037 while reading upstream, client: 172.24.0.1, server: localhost, request: "GET /default-node_modules_moment_moment_js.js.map HTTP/1.1", upstream: "http://172.24.0.3:4200/default-node_modules_moment_moment_js.js.map", host: "localhost:3000"
+2023/08/01 15:24:34 [error] 30#30: *2291 connect() failed (111: Connection refused) while connecting to upstream, client: 172.24.0.1, server: localhost, request: "GET /api/auth/profile HTTP/1.1", upstream: "http://172.24.0.2:3000/auth/profile", host: "localhost:3000"
+2023/08/01 15:25:46 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2023/08/01 15:25:46 [notice] 29#29: gracefully shutting down
+2023/08/01 15:25:46 [notice] 28#28: gracefully shutting down
+2023/08/01 15:25:46 [notice] 28#28: exiting
+2023/08/01 15:25:46 [notice] 31#31: gracefully shutting down
+2023/08/01 15:25:46 [notice] 31#31: exiting
+2023/08/01 15:25:46 [notice] 28#28: exit
+2023/08/01 15:25:46 [notice] 31#31: exit
+2023/08/01 15:25:46 [notice] 30#30: gracefully shutting down
+2023/08/01 15:25:46 [notice] 30#30: exiting
+2023/08/01 15:25:46 [notice] 30#30: exit
+2023/08/01 15:25:46 [notice] 1#1: signal 17 (SIGCHLD) received from 30
+2023/08/01 15:25:46 [notice] 1#1: worker process 30 exited with code 0
+2023/08/01 15:25:46 [notice] 1#1: signal 29 (SIGIO) received
+2023/08/01 15:25:46 [notice] 1#1: signal 17 (SIGCHLD) received from 28
+2023/08/01 15:25:46 [notice] 1#1: worker process 28 exited with code 0
+2023/08/01 15:25:46 [notice] 1#1: worker process 31 exited with code 0
+2023/08/01 15:25:46 [notice] 1#1: signal 29 (SIGIO) received
+2023/08/01 15:26:02 [notice] 1#1: using the "epoll" event method
+2023/08/01 15:26:02 [notice] 1#1: nginx/1.25.1
+2023/08/01 15:26:02 [notice] 1#1: built by gcc 12.2.0 (Debian 12.2.0-14) 
+2023/08/01 15:26:02 [notice] 1#1: OS: Linux 5.15.0-76-generic
+2023/08/01 15:26:02 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1048576:1048576
+2023/08/01 15:26:02 [notice] 1#1: start worker processes
+2023/08/01 15:26:02 [notice] 1#1: start worker process 28
+2023/08/01 15:26:02 [notice] 1#1: start worker process 29
+2023/08/01 15:26:02 [notice] 1#1: start worker process 30
+2023/08/01 15:26:02 [notice] 1#1: start worker process 31
+2023/08/01 15:26:05 [error] 28#28: *1 connect() failed (111: Connection refused) while connecting to upstream, client: 172.25.0.1, server: localhost, request: "GET /ng-cli-ws HTTP/1.1", upstream: "http://172.25.0.2:4200/ng-cli-ws", host: "localhost:3000"
+2023/08/01 15:26:40 [error] 31#31: *3 recv() failed (104: Connection reset by peer) while proxying upgraded connection, client: 172.25.0.1, server: localhost, request: "GET /ng-cli-ws HTTP/1.1", upstream: "http://172.25.0.2:4200/ng-cli-ws", host: "localhost:3000"
+2023/08/01 15:26:58 [warn] 30#30: *8 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.25.0.1, server: localhost, request: "GET /vendor.js HTTP/1.1", upstream: "http://172.25.0.2:4200/vendor.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 15:26:58 [warn] 30#30: *7 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/2/00/0000000002 while reading upstream, client: 172.25.0.1, server: localhost, request: "GET /polyfills.js.map HTTP/1.1", upstream: "http://172.25.0.2:4200/polyfills.js.map", host: "localhost:3000"
+2023/08/01 15:26:59 [warn] 30#30: *7 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/3/00/0000000003 while reading upstream, client: 172.25.0.1, server: localhost, request: "GET /vendor.js.map HTTP/1.1", upstream: "http://172.25.0.2:4200/vendor.js.map", host: "localhost:3000"
+2023/08/01 15:58:51 [warn] 29#29: *103 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/4/00/0000000004 while reading upstream, client: 172.25.0.1, server: localhost, request: "GET /vendor.js.map HTTP/1.1", upstream: "http://172.25.0.2:4200/vendor.js.map", host: "localhost:3000"
+2023/08/01 16:15:22 [warn] 29#29: *160 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/5/00/0000000005 while reading upstream, client: 172.25.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.25.0.2:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 16:16:31 [warn] 31#31: *187 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/6/00/0000000006 while reading upstream, client: 172.25.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.25.0.2:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 16:16:52 [warn] 31#31: *207 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/7/00/0000000007 while reading upstream, client: 172.25.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.25.0.2:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 16:17:10 [warn] 31#31: *212 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/8/00/0000000008 while reading upstream, client: 172.25.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.25.0.2:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 16:18:16 [warn] 31#31: *187 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/9/00/0000000009 while reading upstream, client: 172.25.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.25.0.2:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 16:18:45 [warn] 31#31: *187 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/0/01/0000000010 while reading upstream, client: 172.25.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.25.0.2:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 16:22:19 [warn] 29#29: *537 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/01/0000000011 while reading upstream, client: 172.25.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.25.0.2:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 16:25:05 [warn] 30#30: *1236 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/2/01/0000000012 while reading upstream, client: 172.25.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.25.0.2:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 16:28:40 [error] 30#30: *1298 connect() failed (111: Connection refused) while connecting to upstream, client: 172.25.0.1, server: localhost, request: "GET /api/auth/orcid HTTP/1.1", upstream: "http://172.25.0.3:3000/auth/orcid", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 16:36:11 [warn] 28#28: *3009 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/3/01/0000000013 while reading upstream, client: 172.25.0.1, server: localhost, request: "GET /main.js HTTP/1.1", upstream: "http://172.25.0.2:4200/main.js", host: "localhost:3000", referrer: "http://localhost:3000/"
+2023/08/01 16:46:13 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2023/08/01 16:46:13 [notice] 28#28: gracefully shutting down
+2023/08/01 16:46:13 [notice] 28#28: exiting
+2023/08/01 16:46:13 [notice] 30#30: gracefully shutting down
+2023/08/01 16:46:13 [notice] 29#29: gracefully shutting down
+2023/08/01 16:46:13 [notice] 30#30: exiting
+2023/08/01 16:46:13 [notice] 29#29: exiting
+2023/08/01 16:46:13 [notice] 30#30: exit
+2023/08/01 16:46:13 [notice] 29#29: exit
+2023/08/01 16:46:13 [notice] 28#28: exit
+2023/08/01 16:46:13 [notice] 31#31: gracefully shutting down
+2023/08/01 16:46:13 [notice] 1#1: signal 17 (SIGCHLD) received from 30
+2023/08/01 16:46:13 [notice] 1#1: worker process 30 exited with code 0
+2023/08/01 16:46:13 [notice] 1#1: signal 29 (SIGIO) received
+2023/08/01 16:46:13 [notice] 1#1: signal 17 (SIGCHLD) received from 28
+2023/08/01 16:46:13 [notice] 1#1: worker process 28 exited with code 0
+2023/08/01 16:46:13 [notice] 1#1: signal 29 (SIGIO) received
+2023/08/01 16:46:13 [notice] 1#1: signal 17 (SIGCHLD) received from 29
+2023/08/01 16:46:13 [notice] 1#1: worker process 29 exited with code 0
+2023/08/01 16:46:13 [notice] 1#1: signal 29 (SIGIO) received

@@ -11,6 +11,22 @@ export class ResourcesService {
 
   partnerResourcesPath = environment.ws + "/partner-resources";
 
+
+  getAllResources(): Observable<Resource[]> {
+    return this.http.get(this.partnerResourcesPath, {
+      responseType: "json",
+      headers: {
+        version: "2"
+      }
+    }).pipe(
+      pluck('data'),
+      map((resources: Resource[]) => {
+        return resources.map(resource => new Resource().deserialize(resource));
+      })
+    )
+    
+  }
+
   get_resource(resource_id: string): Observable<Resource> {
     const response = this.http.get(
       `${this.partnerResourcesPath}/${resource_id}`,

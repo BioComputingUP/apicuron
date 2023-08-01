@@ -39,7 +39,7 @@ export class UsersController {
   create_or_update_user(@Body() userData: UpdateUserDto, @Res() res) {
     // console.log(`Received message: ${userData}`);
     this.usersService
-      .upsert_user(userData.orcid_id, userData)
+      .createOrUpdateUser(userData)
       .then((response) => {
         this.usersControllerLogger.log(response);
         res.status(HttpStatus.ACCEPTED).send({

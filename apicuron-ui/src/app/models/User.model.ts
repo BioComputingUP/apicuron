@@ -9,12 +9,13 @@ export class User implements Deserializable {
         this.role = input.role;
         this.orcid_id = input.orcid_id;
         // optional fields
-        this.full_name = input.full_name || null;
-        this.last_update = input.last_update || null;
-        this._id = input._id || null;
-        this.resources = input.resources || null;
-        this.family_name = input.family_name || null;
-        this.given_name = input.given_name || null;
+        this.full_name = input.full_name ?? null;
+        this.last_update = input.last_update ?? null;
+        this._id = input._id ?? null;
+        this.resources = input.resources ?? null;
+        this.family_name = input.family_name ?? null;
+        this.given_name = input.given_name ?? null;
+        this.avatar = input.avatar ?? null;
         return this;
     }
 
@@ -27,10 +28,14 @@ export class User implements Deserializable {
     role: "user" | 'admin';
     family_name?: string;
     given_name?: string;
+    avatar?: string;
 
 
 
     generate_avatar(scale= 80, radius= 50): URL {
+        if(this.avatar) {
+            return new URL(this.avatar, environment.ws + '/');
+        }
         const hash = encodeURIComponent(this.displayedName);
         const defaultImage = encodeURIComponent(`https://api.dicebear.com/5.x/identicon/png/seed=${hash}&scale=${scale}&radius=${radius}`);
         return new URL(`https://www.gravatar.com/avatar/${hash}?d=${defaultImage}`);

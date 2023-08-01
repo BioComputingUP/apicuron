@@ -133,8 +133,9 @@ export class CuratorPageService {
     return orcid_id$.pipe(
       switchMap((orcid_id: string) => {
         return this.curatorStatistics.get_curator_statistics(orcid_id);
-      }
-      ))
+      }),
+      shareReplay(1)
+      )
   }
 
   private combine_resources_statistics(

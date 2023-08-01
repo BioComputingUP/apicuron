@@ -8,7 +8,7 @@ button:focus {
 
 $apicuron_purple: #4d194d;
 
-$primaryDarkColor: hsl(300, 51%, 40%);
+
 
 :root {
   --bronze: #967444;
@@ -45,11 +45,11 @@ html {
 @tailwind base;
 
 
-$primaryColor: #4d194d;
-$secondaryColor: #742574;
-@import "primeng/resources/primeng.min.css";
-@import "primeicons/primeicons.css";
-@import "primeng-sass-theme/themes/tailwind/tailwind-light/theme.scss";
+// $primaryColor: #4d194d;
+// $secondaryColor: #742574;
+// @import "primeng/resources/primeng.min.css";
+// @import "primeicons/primeicons.css";
+// @import "primeng-sass-theme/themes/tailwind/tailwind-light/theme.scss";
 
 
 

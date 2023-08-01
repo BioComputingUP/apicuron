@@ -28,7 +28,6 @@ export class CuratorPageComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private curatorPageService: CuratorPageService,
-    private databaseService: DatabasesService,
   ) {
     this.orcidId$ = this.route.paramMap.pipe(
       map((params: ParamMap) => {

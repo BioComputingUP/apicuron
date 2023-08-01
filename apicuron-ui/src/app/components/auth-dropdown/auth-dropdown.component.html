@@ -2,7 +2,7 @@
     <div>
         <button [popper]="dropdown" [popperTrigger]="'hover'" [popperDisableAnimation]="false" [popperPlacement]="'bottom-start'" [popperApplyClass]="'tw-duration-200 tw-transition-opacity'"
             class="tw-text-gray-700 hover:tw-text-gray-800 dark:tw-text-gray-100 tw-flex tw-flex-row tw-items-center dark:hover:tw-text-white nav-item tw-relative dark:before:tw-bg-white before:tw-bg-gray-700 hover-underline-animation">
-            <img [src]="generate_avatar(user.displayedName)"
+            <img [src]="user.generate_avatar()"
                 class="tw-inline tw-w-6 tw-h-6 tw-mr-1 tw-bg-white tw-rounded-full" alt="">
             <span class="tw-font-bold">{{ user.displayedName }}</span>
             <ng-container *ngIf="notifications$ | async as notifications">
@@ -81,7 +81,7 @@
                         <img class="tw-justify-self-center" src="../assets/APICURON.svg">
                         <h2 class="tw-text-xl tw-text-gray-900 tw-font-bold tw-text-center tw-w-full sm:tw-mb-8">Login
                         </h2>
-                        <a style="background-color: #A6CE39;" [href]="login_link"
+                        <a style="background-color: #A6CE39;" (click)="login()"
                             class="tw-w-full tw-cursor-pointer hover:tw-text-white tw-text-center tw-py-2 tw-text-white tw-font-bold">Continue
                             with ORCID</a>
                         <button class="tw-w-full tw-py-2 tw-text-gray-700 tw-font-bold tw-bg-gray-300"

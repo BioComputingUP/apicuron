@@ -1,8 +1,6 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
-import {
-  RouterModule,
-} from "@angular/router";
+import { RouterModule } from "@angular/router";
 import { HttpClientModule } from "@angular/common/http";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { AppRoutingModule } from "./app-routing.module";
@@ -14,11 +12,13 @@ import { IndexModule } from "./index/index.module";
 import { AuthModule } from "./auth/auth.module";
 import { ToastrModule } from "ngx-toastr";
 import { AngularSvgIconModule } from "angular-svg-icon";
-import { MainLayoutComponent } from './main-layout/main-layout.component';
+import { MainLayoutComponent } from "./main-layout/main-layout.component";
 import { AuthDropdownComponent } from "./components/auth-dropdown/auth-dropdown.component";
 import { NotificationsDataModule } from "./notifications-data/notifications-data.module";
 import { NgxPopperModule } from "ngx-popper";
 import { SentryModuleConfig } from "../config/sentry.config";
+import { PRECONNECT_CHECK_BLOCKLIST } from "@angular/common";
+import { environment } from "../environments/environment";
 @NgModule({
   declarations: [
     AppComponent,
@@ -49,7 +49,7 @@ import { SentryModuleConfig } from "../config/sentry.config";
   ],
   providers: [
     // *** Sentry ErrorHandler and Tracer Setup ***
-    SentryModuleConfig
+    SentryModuleConfig,
     // *** end of sentry setup ***
 
   ],

@@ -13,12 +13,12 @@ import { ROUTES, Router, Routes } from "@angular/router";
 @Component({
   selector: "app-user-dashboard",
   templateUrl: "./user-dashboard.component.html",
-  // encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.None,
   styleUrls: [
     "./user-dashboard.component.scss",
-    // "../../../../node_modules/primeicons/primeicons.css",
-    // "../../../../node_modules/primeng/resources/primeng.min.css",
-    // "../../../../node_modules/primeng-sass-theme/themes/tailwind/tailwind-light/theme.scss",
+    // "../styles/primeicons.css",
+    // "../styles/primeng.min.css",
+    // "../styles/theme.scss",
   ],
 })
 export class UserDashboardComponent implements OnInit {

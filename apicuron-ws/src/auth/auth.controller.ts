@@ -6,6 +6,7 @@ import {
 	Redirect,
 	UseGuards,
 	Res,
+	Render,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
@@ -23,6 +24,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { RoleGuard } from './guards/role.guard';
 import { User } from './users/schemas/user.schema';
 import { UsersService } from './users/users.service';
+import { Response } from 'express';
 
 @Controller({
 	path: 'auth',
@@ -32,7 +34,7 @@ export class AuthController {
 		private authService: AuthService,
 		private configService: ConfigService,
 		private userService: UsersService,
-	) { }
+	) {}
 
 	private authControllerLogger = new Logger(AuthController.name);
 
@@ -40,39 +42,50 @@ export class AuthController {
 	@ApiExcludeEndpoint()
 	@Get('orcid')
 	@UseGuards(OrcidGuard)
-	authenticate_orcid() { }
+	authenticate_orcid() {}
 
 	@ApiExcludeEndpoint()
 	@Get('orcid_permission')
 	@UseGuards(OrcidGuard)
-	orcid_permission() { }
+	orcid_permission() {}
 
 	@ApiExcludeEndpoint()
 	@Get('orcid/redirect')
-	@Redirect('/orcid/', 301)
+	// @Redirect('/orcid/', 301)
+	@Render('auth')
 	@UseGuards(OrcidGuard)
-	async orcid_redirect(@Req() req, @Res() res) {
-		console.log('query', req.query)
-		console.log('session', req.session)
+	orcid_redirect(@Req() req) {
+		// console.log('query', req.query)
 		// console.log('redirect request', req)
-		const user = req.user;
-		const { header, token } = await this.authService.generate_jwt_token(user);
-		res.cookie(header, token);
-		res.set(header, token);
 
-		let redirect_url: string = this.configService.get<string>('FRONTEND_HOST')
-		if (req.session['redirect_code']) {
-			const code: string = req.session['redirect_code']
-			switch(code){
-				case 'user_profile':
-				redirect_url = new URL(`/user/${user.orcid_id}`, this.configService.get('FRONTEND_HOST')).href
-			}
-		}
+		const user = req.user;
+		// const { header, token } = await this.authService.generate_jwt_token(user);
+		// res.cookie(header, token);
+		// res.set(header, token);
+		console.log({ user });
+
+		// let redirect_url: string = this.configService.get<string>('FRONTEND_HOST')
+
+		// res.send('<div id="access_token">' + token + '</div>');
+
 		return {
-			url: redirect_url,
-			statusCode: 301,
+			access_token: user.orcid_permission,
+			refresh_token: user.refresh_token,
+			message: 'testing message',
 		};
+		// return {
+		// 	url: redirect_url,
+		// 	statusCode: 301,
+		// };
 	}
+
+	// @Get('/testing/bs')
+	// @Render('auth')
+	// testig_page(){
+	// 	return {
+	// 		access_token: 'random_bs'
+	// 	}
+	// }
 
 	@ApiExcludeEndpoint()
 	@Get('/orcid/:orcid_id')
@@ -93,7 +106,9 @@ export class AuthController {
 	@Get('profile')
 	@UseGuards(LocalAuthGuard)
 	async get_user_profile(@Req() request) {
-		const user = await this.userService.get_by_orcid(request.user.orcid_id);
+		const user = await this.userService.getPrivateUser({
+			orcid_id: request.user.orcid_id,
+		});
 		return user;
 	}
 }

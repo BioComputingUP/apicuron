@@ -6,15 +6,14 @@ import * as cookieParser from 'cookie-parser';
 import { useContainer } from 'class-validator';
 import { TransformInterceptor } from './shared/transformer/transform.interceptor';
 import { setupSwagger } from './swagger/setup'
-import * as Sentry from "@sentry/node";
-import { Application } from "express";
-import * as session from "express-session";
-
+import { bootstrap as generateAllAvatars } from './scripts/generate-avatars';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 
 async function bootstrap() {
 	// App creation
-	const app = await NestFactory.create(AppModule);
+	const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
 	// Logging and config setup
 	const appLogger = new Logger('APICURONApplicationLogger');
@@ -35,14 +34,6 @@ async function bootstrap() {
 
 	// setup express middlewares
 	app.use(cookieParser());
-
-	app.use(
-		session({
-			secret: 'my-secret',
-			resave: false,
-			saveUninitialized: false,
-		})
-	)
 
 
 	// swagger UI setup
@@ -68,8 +59,17 @@ async function bootstrap() {
 		header: 'version',
 	});
 
+	// setup the static handler
+	app.useStaticAssets(join(__dirname, '..', 'public'));
+	app.setBaseViewsDir(join(__dirname, '..', 'views'));
+	app.setViewEngine('hbs');
+
+	// const taskAwait = generateAllAvatars(app);
+
 	// starting to listen to requests
 	await app.listen(port, host);
+
+	// await taskAwait;
 }
 
 bootstrap();

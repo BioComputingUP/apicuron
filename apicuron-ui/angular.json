@@ -17,6 +17,14 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "plotly.js-dist-min",
+              "moment",
+              "moment-range",
+              "lodash",
+              "anchor-js",
+              "ordinal"
+            ],
             "outputPath": "dist/apicuron-ui",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -112,6 +120,16 @@
                   "maximumWarning": "600kb"
                 }
               ]
+            },
+            "build-auth-response": {
+              "outputPath": "dist/oauth-response",
+              "index": "src/auth-confirmation/index.html",
+              "main": "src/scripts/build-auth-confirmation.ts",
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "buildOptimizer": false,
+              "optimization": false,
+              "namedChunks": true
             }
           },
           "defaultConfiguration": ""
@@ -124,6 +142,15 @@
           "configurations": {
             "production": {
               "browserTarget": "apicuron-ui:build:production"
+            },
+            "development": {
+              "browserTarget": "apicuron-ui:build:development"
+            },
+            "build-auth-response": {
+              "browserTarget": "apicuron-ui:build:build-auth-response",
+              "host": "0.0.0.0",
+              "disableHostCheck": true,
+              "port": 1050
             }
           }
         },

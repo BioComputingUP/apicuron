@@ -28,7 +28,6 @@ export class AuthMiddleware implements NestMiddleware {
 		try {
 			const header = this.check_auth_header(req);
 			if(!header){
-				req.user = null
 				next();
 				return
 			}
@@ -36,8 +35,8 @@ export class AuthMiddleware implements NestMiddleware {
 			const payload = this.check_token(token);
 			req.user = await this.usersService.get_by_orcid(payload.orcid_id);
 		} catch (e) {
-			// this.authMiddlewareLogger.error(e.message);
-			req.user = null;
+			this.authMiddlewareLogger.error(e.message);
+			// req.user = null;
 		}
 		next();
 	}
