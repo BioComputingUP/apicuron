@@ -15,8 +15,9 @@ services:
       - "./apicuron-ws:/home/node/app"
     networks:
       - apicuron-network
+    
     environment:
-      - DATABASE_HOST=moros
+      - DATABASE_HOST=dione
       - DATABASE=apicuron_test
       - DB_PORT=27017
     dns: 10.69.69.1
@@ -26,6 +27,8 @@ services:
         max-size: '10m'
         max-file: 5
     command: "npm run start:dev"
+    depends_on:
+      - mongo-db
     
   
   apicuron-ui:
@@ -59,6 +62,12 @@ services:
       - apicuron-ws
     ports:
       - 3000:3000
+  
+  mongo-db:
+    image: mongo
+    volumes:
+      - ./db:/data/db
+    network_mode: host
 
 
 networks:

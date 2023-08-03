@@ -1,33 +1,11 @@
 import { Router } from "@angular/router";
-import {
-  catchError,
-  defaultIfEmpty,
-  filter,
-  map,
-  pluck,
-  shareReplay,
-  startWith,
-  switchMap,
-  tap,
-} from "rxjs/operators";
+import { filter, map, shareReplay, startWith, switchMap } from "rxjs/operators";
 import { environment } from "../../environments/environment";
-import {
-  BehaviorSubject,
-  combineLatest,
-  concat,
-  Observable,
-  of,
-  Subscriber,
-  Subscription,
-  throwError,
-} from "rxjs";
+import { BehaviorSubject, combineLatest, Observable, Subscription } from "rxjs";
 import {
   HttpClient,
-  HttpErrorResponse,
   HttpEvent,
-  HttpEventType,
   HttpHandler,
-  HttpHeaders,
   HttpInterceptor,
   HttpRequest,
 } from "@angular/common/http";

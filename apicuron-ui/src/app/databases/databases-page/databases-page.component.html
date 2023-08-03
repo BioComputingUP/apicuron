@@ -4,7 +4,7 @@
       <div class="">
         <h2 class="tw-text-3xl tw-font-dm-sans tw-font-bold">Partner Resources</h2>
       </div>
-      
+
     </div>
   </div>
 
@@ -26,7 +26,8 @@
           </p>
         </div>
 
-        <div class="tw-mt-2 lg:tw-mt-4 tw-bg-orange-100 tw-border-orange-500 tw-text-orange-700 tw-border-l-4 tw-p-2 lg:tw-p-4">
+        <div
+          class="tw-mt-2 lg:tw-mt-4 tw-bg-orange-100 tw-border-orange-500 tw-text-orange-700 tw-border-l-4 tw-p-2 lg:tw-p-4">
           <span class="tw-block tw-font-bold tw-font-dm-sans">Disclaimer</span>
           <p class=" tw-leading-7">
             <strong>A comparison across databases is meaningless </strong>.
@@ -43,24 +44,27 @@
       <div class="tw-w-full lg:tw-w-1/4 tw-py-4">
         <div class="tw-bg-gray-200 tw-border-2 tw-border-gray-400 tw-rounded tw-px-2 md:tw-px-4 tw-pb-2 md:tw-pb-4">
           <span class="tw-block tw-uppercase tw-text-xs tw-text-gray-400 tw-font-bold tw-pt-1">Resources</span>
-          <div class="tw-flex tw-flex-row tw-flex-wrap tw-gap-1">
-            <a class="database-pill" routerLink="." [fragment]="'resource_' + currResource['resource_id']"
-              *ngFor="let currResource of listResourcesDescriptions">
-              {{currResource['resource_name']}}
-            </a>
+          <div class="tw-flex tw-flex-row tw-flex-wrap tw-gap-1" *ngIf="resources$ | async as resources">
+            <ng-container *ngFor="let currResource of resources">
+              <a class="database-pill" routerLink="." [fragment]="'resource_' + currResource.resource_id">
+                {{ currResource.resource_name }}
+              </a>
+
+            </ng-container>
+
           </div>
         </div>
       </div>
     </div>
 
-    <div class="tw-flex tw-flex-row tw-flex-wrap tw-pt-2 tw-justify-center md:tw-pt-4">
-      <div class="tw-w-full lg:tw-w-1/2 tw-p-2" [id]="'resource_' + currResource['resource_id']"
-        *ngFor="let currResource of listResourcesDescriptions">
-        <partner-resource [name]="currResource['resource_name']" [description]="currResource['resource_description']"
-          [short_description]="currResource['resource_long_name']"
-          [logo]="currResource['logo'] || 'assets/disprot-logo.svg'" [resource_uri]="currResource['resource_uri']"
-          [resource_url]="currResource['resource_url']" [resource_id]="currResource['resource_id']">
-        </partner-resource>
-      </div>
+    <div class="tw-flex tw-flex-row tw-flex-wrap tw-pt-2 tw-justify-center md:tw-pt-4"
+      *ngIf="resources$ | async as resources">
+      <ng-container *ngFor="let resource of resources">
+        <div class="tw-w-full lg:tw-w-1/2 tw-p-2" [id]="'resource_' + resource.resource_id">
+          <partner-resource [resource]="resource">
+          </partner-resource>
+        </div>
+      </ng-container>
+
     </div>
   </div>

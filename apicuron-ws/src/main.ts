@@ -5,11 +5,10 @@ import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { useContainer } from 'class-validator';
 import { TransformInterceptor } from './shared/transformer/transform.interceptor';
-import { setupSwagger } from './swagger/setup'
+import { setupSwagger } from './swagger/setup';
 import { bootstrap as generateAllAvatars } from './scripts/generate-avatars';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
-
 
 async function bootstrap() {
 	// App creation
@@ -24,35 +23,33 @@ async function bootstrap() {
 	const host = configService.get('HOST');
 	const envConfig = configService.get<string>('environment');
 
-
 	// class-validator setup
 	useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
 	// set the global transform pipe
-	const transformer = app.get(TransformInterceptor)
-	app.useGlobalInterceptors(transformer)
+	const transformer = app.get(TransformInterceptor);
+	app.useGlobalInterceptors(transformer);
 
 	// setup express middlewares
 	app.use(cookieParser());
 
-
 	// swagger UI setup
-	setupSwagger(app, configService.get<string>('API_DOCS_PREFIX'))
-
+	setupSwagger(app, configService.get<string>('API_DOCS_PREFIX'));
 
 	// setup basic validation Pipes
 	app.useGlobalPipes(
-		new ValidationPipe({ transform: true, forbidUnknownValues: false, skipMissingProperties: true }),
+		new ValidationPipe({
+			transform: true,
+			forbidUnknownValues: false,
+			skipMissingProperties: true,
+		}),
 	);
-
-
 
 	app.enableCors();
 
 	// Logging startup
 	appLogger.log(`Loaded ${envConfig} Configuration`);
 	appLogger.log(`Started Listening on http://${host}:${port}`);
-
 
 	app.enableVersioning({
 		type: VersioningType.HEADER,
@@ -63,8 +60,9 @@ async function bootstrap() {
 	app.useStaticAssets(join(__dirname, '..', 'public'));
 	app.setBaseViewsDir(join(__dirname, '..', 'views'));
 	app.setViewEngine('hbs');
+	console.log('test');
 
-	// const taskAwait = generateAllAvatars(app);
+	generateAllAvatars(app);
 
 	// starting to listen to requests
 	await app.listen(port, host);

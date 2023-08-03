@@ -92,7 +92,7 @@ export class UsersService {
 		if (exists) {
 			await this.userModel.updateOne({ orcid_id }, data);
 		} else {
-			await this.createUser({ orcid_id, ...data });
+			return await this.createUser({ orcid_id, ...data });
 		}
 	}
 

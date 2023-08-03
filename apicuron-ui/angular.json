@@ -140,6 +140,9 @@
             "browserTarget": "apicuron-ui:build"
           },
           "configurations": {
+            "defaultConfiguration": {
+              "browserTarget": "apicuron-ui:build:development"
+            },
             "production": {
               "browserTarget": "apicuron-ui:build:production"
             },

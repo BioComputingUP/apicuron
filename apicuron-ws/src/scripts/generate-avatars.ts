@@ -39,19 +39,21 @@ export async function bootstrap(app: INestApplicationContext) {
 		return updatedUser;
 	}
 
-	for await (const user of usersCursor) {
-		userSavePromises.push(addAvatarToUser(user));
+	try {
+		for await (const user of usersCursor) {
+			userSavePromises.push(addAvatarToUser(user));
+		}
+		await Promise.all(userSavePromises);
+	} catch (error) {
+		logger.error(error.stack);
 	}
-
-	await Promise.all(userSavePromises);
-
-	await app.close();
 }
 
-if (require.main == module) {
+if (require.main === module) {
 	async function main() {
 		const app = await NestFactory.createApplicationContext(AppModule);
 		await bootstrap(app);
+		await app.close();
 	}
 
 	main();

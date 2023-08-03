@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, Input } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { filter, shareReplay, switchMap } from "rxjs/operators";
 import { AchievementFilter } from "src/app/achievements/interfaces/achievement-filter";
@@ -17,7 +17,9 @@ import { PaginationComponent } from "src/app/pagination/pagination.component";
     selector: 'curator-badges-details',
     imports: [CommonModule, BadgeCardComponent, PaginationComponent],
     templateUrl: './curator-badges-details.component.html',
-    styleUrls: []
+    styleUrls: [],
+    changeDetection: ChangeDetectionStrategy.OnPush
+
 })
 export class CuratorBadgesDetailsComponent {
 

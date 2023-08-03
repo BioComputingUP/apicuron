@@ -53,7 +53,9 @@ export class User {
 	email?: string;
 
 	/// Could not determine type the field only had null or empty values in the sample set.
-	@Prop()
+	@Prop({
+		required: false,		
+	})
 	employment?: string;
 
 	@Prop()
@@ -68,7 +70,9 @@ export class User {
 	@Prop()
 	gmail?: string;
 
-	@Prop()
+	@Prop({
+		required: false
+	})
 	institution?: string;
 
 	@Prop({ select: false })
