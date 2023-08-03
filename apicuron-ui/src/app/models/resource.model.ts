@@ -25,9 +25,9 @@ export class Resource implements Deserializable, Serializable {
     this.resource_url = new URL(input.resource_url);
     this.color = input.color;
 
-    if (input.logo && input.logo instanceof String) {
+    if (input.logo && typeof input.logo == "string") {
       if (input.logo.startsWith("assets")) {
-        this.logo = new URL(input.logo, environment.ws + "/");
+        this.logo = new URL(input.logo, environment.host + "/");
       } else {
         this.logo = new URL(
           input.logo
@@ -38,6 +38,7 @@ export class Resource implements Deserializable, Serializable {
         );
       }
     }
+
 
     // this.logo = input.logo;
 

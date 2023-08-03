@@ -60,8 +60,10 @@ async function bootstrap() {
 
     
     const taskService = await app.get(`task:${args.t}`)
+
     
     if(taskService){
+        console.log('taskService Found !')
         const mainLogger = new Logger('APICURONSchedulerLogger');
 
         if(!!args.f){

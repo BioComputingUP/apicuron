@@ -1,9 +1,23 @@
 import { Router } from "@angular/router";
-import { filter, map, shareReplay, startWith, switchMap } from "rxjs/operators";
+import {
+  catchError,
+  filter,
+  map,
+  shareReplay,
+  startWith,
+  switchMap,
+} from "rxjs/operators";
 import { environment } from "../../environments/environment";
-import { BehaviorSubject, combineLatest, Observable, Subscription } from "rxjs";
+import {
+  BehaviorSubject,
+  combineLatest,
+  Observable,
+  Subscription,
+  throwError,
+} from "rxjs";
 import {
   HttpClient,
+  HttpErrorResponse,
   HttpEvent,
   HttpHandler,
   HttpInterceptor,
@@ -72,7 +86,6 @@ export class AuthService implements HttpInterceptor {
     );
 
     this.loggedIn$ = this.requestHeaders$.pipe(
-      startWith({}),
       map((headers: any) => {
         return Object.keys(headers).length > 0;
       })
@@ -182,7 +195,11 @@ export class AuthService implements HttpInterceptor {
 
     return this.requestHeaders$.pipe(
       switchMap((authHeaders: any) => {
-        if (req.url.startsWith(environment.ws)) {
+        if (
+          req.url.startsWith(environment.ws) &&
+          !!authHeaders &&
+          !_.isEmpty(authHeaders)
+        ) {
           const cloned = req.clone({
             setHeaders: authHeaders,
           });

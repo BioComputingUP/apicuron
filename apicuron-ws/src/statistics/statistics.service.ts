@@ -99,6 +99,13 @@ export class StatisticsService {
 			{
 				"$match": query
 			},
+			{
+				$project: {
+					'stats.generation_terms': 0,
+					'stats.invalidation_terms': 0,
+					'stats.revision_terms': 0
+				}
+			}
 
 		]
 
@@ -154,7 +161,10 @@ export class StatisticsService {
 			},
 			{
 				$project: {
-					user: 0
+					user: 0,
+					generation_terms: 0,
+					invalidation_terms: 0,
+					revision_terms: 0
 				}
 			},
 			// sort by the total score

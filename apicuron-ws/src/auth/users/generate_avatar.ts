@@ -25,5 +25,7 @@ export async function generateAvatar(
 
 	await avatar.toFile(avatarFilepath);
 
-	return avatarFilepath.replace(publicFolderPath, publicUrlPath);
+	return avatarFilepath
+		.replace(publicFolderPath, publicUrlPath)
+		.replace(/^\/+/, '');
 }

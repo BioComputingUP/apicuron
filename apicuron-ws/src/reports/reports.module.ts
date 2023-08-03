@@ -63,28 +63,28 @@ import { SchedulerModule } from '../scheduler/scheduler.module';
 				secret: configService.get('JWT_SECRET'),
 			}),
 		}),
-		SchedulerModule.registerTasks([
-			{
-				provide: 'task:submit_report',
-				useFactory: (task: SubmitBulkTask) => task
-			},
-			{
-				provide: 'task:compute_badges',
-				useFactory: (task: ComputeBadgesTask) => task
-			},
-			{
-				provide: 'task:compute_medals',
-				useFactory: (task: ComputeMedalsTask) => task
-			},
-			{
-				provide: 'task:compute_achievements',
-				useFactory: (task: ComputeAchievementsTask) => task
-			},
-			{
-				provide: 'task:compute_statistics',
-				useFactory: (task: ComputeStatisticsTask) => task
-			}
-		]),
+		// SchedulerModule.registerTasks([
+		// 	{
+		// 		provide: 'task:submit_report',
+		// 		useFactory: (task: SubmitBulkTask) => task
+		// 	},
+		// 	{
+		// 		provide: 'task:compute_badges',
+		// 		useFactory: (task: ComputeBadgesTask) => task
+		// 	},
+		// 	{
+		// 		provide: 'task:compute_medals',
+		// 		useFactory: (task: ComputeMedalsTask) => task
+		// 	},
+		// 	{
+		// 		provide: 'task:compute_achievements',
+		// 		useFactory: (task: ComputeAchievementsTask) => task
+		// 	},
+		// 	{
+		// 		provide: 'task:compute_statistics',
+		// 		useFactory: (task: ComputeStatisticsTask) => task
+		// 	}
+		// ]),
 		SchedulerClientModule,
 		StatisticsModule
 	],

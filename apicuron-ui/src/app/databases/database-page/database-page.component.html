@@ -8,8 +8,8 @@
                 #leaderboardPanel>
                 <span class="tw-uppercase tw-text-gray-500 tw-text-xs tw-font-bold">Leaderboard</span>
                 <div class="tw-flex tw-flex-col">
-                    <div class="tw-pb-2" *ngFor="let biocurator of leaderboard">
-                        <curator-card [vertical]="false" [biocurator]="biocurator" [display_resources]="false"
+                    <div class="tw-pb-2" *ngFor="let entry of leaderboard">
+                        <curator-card [vertical]="false" [biocurator]="entry.curator" [stats]="entry.stats" [display_resources]="false"
                             [display_achievement_counts]="true" [display_scores]="true"></curator-card>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                                     <badge-def-card [badge]="badge" [terms]="terms"></badge-def-card>
                                 </div>
                             </ng-container>
-
+                            stats
                         </ng-container>
 
                     </div>
@@ -91,7 +91,7 @@
 
                 </div>
                 <list-expand [collapsed]="!more_medals">
-                    <div class="tw-flex tw-flex-row tw-flex-wrap" content>
+                    <div class="tw-flex tstatsw-flex-row tw-flex-wrap" content>
                         <div *ngFor="let medal of medals.data" class="tw-p-2 tw-w-1/2">
                             <medal-def-card class="tw-h-full" [medal]="medal" [terms]="terms"></medal-def-card>
                         </div>
