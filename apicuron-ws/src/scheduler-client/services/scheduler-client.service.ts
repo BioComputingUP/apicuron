@@ -209,9 +209,11 @@ export class SchedulerClientService {
 	@Cron(CronExpression.EVERY_DAY_AT_2AM)
 	private async daily_periodic_compute() {
         const currentEnv = this.config.get('environment')
-		if (
-			['production', 'development'].includes(currentEnv)
-		) {
+		if(currentEnv == 'production') {
+			await this.compute_all_metrics();
+			return;
+		}
+		if(currentEnv == 'development'){
 			// update disprot
 			await this.disprot_update();
 
@@ -227,6 +229,8 @@ export class SchedulerClientService {
 					await this.compute_statistics(resource.resource_id);
 				}
 			}
+
+			return;
 		}
 	}
 }

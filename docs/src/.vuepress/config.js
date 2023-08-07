@@ -1,10 +1,10 @@
-const { description } = require('../../package')
+const { description } = require("../../package");
 
 module.exports = {
   /**
    * Ref：https://v1.vuepress.vuejs.org/config/#title
    */
-  title: 'APICURON Official Documentation',
+  title: "APICURON Official Documentation",
   /**
    * Ref：https://v1.vuepress.vuejs.org/config/#description
    */
@@ -16,16 +16,57 @@ module.exports = {
    * ref：https://v1.vuepress.vuejs.org/config/#head
    */
   head: [
-    ['meta', { name: 'theme-color', content: '#4D194D' }],
-    ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
-    ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }],
-    ['link', { rel: 'icon', type: "image/x-icon",  sizes:"180x180", href:"https://apicuron.org/assets/favicon/apple-touch-icon.png?v=Gv6aQQKvGz" }],
-    ['link', { rel: 'icon', type: "image/x-icon",  sizes:"32x32", href:"https://apicuron.org/assets/favicon/favicon-32x32.png?v=Gv6aQQKvGz" }],
-    ['link', { rel: 'icon', type: "image/x-icon",  sizes:"194x194", href:"https://apicuron.org/assets/favicon/favicon-194x194.png?v=Gv6aQQKvGz" }],
-    ['link', { rel: 'icon', type: "image/x-icon",  sizes:"192x192", href:"https://apicuron.org/assets/favicon/android-chrome-192x192.png?v=Gv6aQQKvGz" }],
-    ['link', { rel: 'icon', type: "image/x-icon",  sizes:"16x16", href:"https://apicuron.org/assets/favicon/favicon-16x16.png?v=Gv6aQQKvGz" }]
-    
-    
+    ["meta", { name: "theme-color", content: "#4D194D" }],
+    ["meta", { name: "apple-mobile-web-app-capable", content: "yes" }],
+    [
+      "meta",
+      { name: "apple-mobile-web-app-status-bar-style", content: "black" },
+    ],
+    [
+      "link",
+      {
+        rel: "icon",
+        type: "image/x-icon",
+        sizes: "180x180",
+        href: "https://apicuron.org/assets/favicon/apple-touch-icon.png?v=Gv6aQQKvGz",
+      },
+    ],
+    [
+      "link",
+      {
+        rel: "icon",
+        type: "image/x-icon",
+        sizes: "32x32",
+        href: "https://apicuron.org/assets/favicon/favicon-32x32.png?v=Gv6aQQKvGz",
+      },
+    ],
+    [
+      "link",
+      {
+        rel: "icon",
+        type: "image/x-icon",
+        sizes: "194x194",
+        href: "https://apicuron.org/assets/favicon/favicon-194x194.png?v=Gv6aQQKvGz",
+      },
+    ],
+    [
+      "link",
+      {
+        rel: "icon",
+        type: "image/x-icon",
+        sizes: "192x192",
+        href: "https://apicuron.org/assets/favicon/android-chrome-192x192.png?v=Gv6aQQKvGz",
+      },
+    ],
+    [
+      "link",
+      {
+        rel: "icon",
+        type: "image/x-icon",
+        sizes: "16x16",
+        href: "https://apicuron.org/assets/favicon/favicon-16x16.png?v=Gv6aQQKvGz",
+      },
+    ],
   ],
 
   /**
@@ -34,44 +75,52 @@ module.exports = {
    * ref：https://v1.vuepress.vuejs.org/theme/default-theme-config.html
    */
   themeConfig: {
-    repo: '',
+    repo: "",
     editLinks: false,
-    docsDir: '',
-    editLinkText: '',
+    docsDir: "",
+    editLinkText: "",
     lastUpdated: false,
     nav: [
       {
-        text: 'Guide',
-        link: '/guide/',
+        text: "Guide",
+        link: "/main/guide/",
       },
       {
-        text: 'Config',
-        link: '/config/'
+        text: "Get started",
+        link: "/main/get-started/",
       },
       {
-        text: 'VuePress',
-        link: 'https://v1.vuepress.vuejs.org'
-      }
+        text: "API Reference",
+        link: "http://dev.apicuron.org/api/",
+      },
+      // {
+      //   text: 'Config',
+      //   link: '/config/'
+      // },
+      // {
+      //   text: 'VuePress',
+      //   link: 'https://v1.vuepress.vuejs.org'
+      // }
     ],
     sidebar: {
-      '/guide/': [
+      "/main/": [
         {
-          title: 'Guide',
+          title: "Get started",
           collapsable: false,
-          children: [
-            '',
-            'using-vue',
-          ]
-        }
+          children: ["/main/get-started/","/main/get-started/getting-started"],
+        },
+        {
+          title: "Guide",
+          collapsable: false,
+          children: ["/main/guide/"],
+        },
+        
       ],
-    }
+    },
   },
 
   /**
    * Apply plugins，ref：https://v1.vuepress.vuejs.org/zh/plugin/
    */
-  plugins: [
-    '@vuepress/plugin-back-to-top',
-    '@vuepress/plugin-medium-zoom',
-  ]
-}
+  plugins: ["@vuepress/plugin-back-to-top", "@vuepress/plugin-medium-zoom"],
+};

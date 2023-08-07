@@ -2,13 +2,13 @@ version: '3'
 services:
   apicuron-ws:
     container_name: apicuron-webserver
-    # build:
-    #   context: "./apicuron-ws"
-    #   target: development
-    #   tags:
-    #    - "apicuron-ws:dev"
-    # image: "apicuron-ws" 
-    image: "node:16.14"
+    build:
+      context: "./apicuron-ws"
+      target: development
+      tags:
+       - "apicuron-ws:dev"
+    image: "apicuron-ws" 
+    # image: "node:16.14"
     working_dir: "/home/node/app"
     user: $DOCKER_USER
     volumes:
@@ -33,15 +33,14 @@ services:
   
   apicuron-ui:
     container_name: apicuron-ui
-    # build:
-    #   context: "./apicuron-ui"
-    #   target: development
-    #   tags:
-    #    - "apicuron-ui:dev"
-    # image: "apicuron-ui" 
+    build:
+      context: "./apicuron-ui"
+      target: development
+      tags:
+       - "apicuron-ui:dev"
+    image: "apicuron-ui" 
     working_dir: "/home/node/app"
-    image: "node:16.14"
-    user: $DOCKER_USER
+    # image: "node:16.14"
     volumes:
       - "./apicuron-ui:/home/node/app"
     networks:
@@ -60,6 +59,7 @@ services:
     depends_on:
       - apicuron-ui
       - apicuron-ws
+      - apicuron-docs
     ports:
       - 3000:3000
   
@@ -69,23 +69,26 @@ services:
       - ./db:/data/db
     network_mode: host
 
+  apicuron-docs:
+    container_name: apicuron-docs
+    working_dir: "/home/node/app"
+    image: "node:16.14"
+    volumes:
+      - "./docs:/home/node/app"
+    user: $DOCKER_USER
+    networks:
+      - apicuron-network
+    ports:
+      - "8080:8080"
+    dns: 10.69.69.1
+    command: "npm run dev"
+
 
 networks:
   apicuron-network:
     name: apicuron-network
 
 
-  # documentation:
-  #   container_name: apicuron_docs
-  #   working_dir: "/home/node/app"
-  #   image: "node:16.14"
-  #   volumes:
-  #     - "./docs:/home/node/app"
-  #   user: $DOCKER_USER
-  #   ports:
-  #     - "8080:8080"
-  #   dns: 10.69.69.1
-  #   command: "npm run dev"
-  #   network_mode: "host"
+    # network_mode: "host"
 
   # uid=1002 && gid=1002 && groupmod -g ${gid} node && usermod -u ${uid} -g ${gid} node
