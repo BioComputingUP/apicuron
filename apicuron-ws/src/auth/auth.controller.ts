@@ -24,7 +24,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { RoleGuard } from './guards/role.guard';
 import { User } from './users/schemas/user.schema';
 import { UsersService } from './users/users.service';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 @Controller({
 	path: 'auth',
@@ -55,37 +55,28 @@ export class AuthController {
 	@Render('auth')
 	@UseGuards(OrcidGuard)
 	orcid_redirect(@Req() req) {
-		// console.log('query', req.query)
-		// console.log('redirect request', req)
-
 		const user = req.user;
-		// const { header, token } = await this.authService.generate_jwt_token(user);
-		// res.cookie(header, token);
-		// res.set(header, token);
-		console.log({ user });
-
-		// let redirect_url: string = this.configService.get<string>('FRONTEND_HOST')
-
-		// res.send('<div id="access_token">' + token + '</div>');
-
 		return {
 			access_token: user.orcid_permission,
 			refresh_token: user.refresh_token,
 			message: 'testing message',
 		};
-		// return {
-		// 	url: redirect_url,
-		// 	statusCode: 301,
-		// };
 	}
 
-	// @Get('/testing/bs')
-	// @Render('auth')
-	// testig_page(){
-	// 	return {
-	// 		access_token: 'random_bs'
-	// 	}
-	// }
+	@ApiExcludeEndpoint()
+	@Get('token')
+	@UseGuards(LocalAuthGuard)
+	async get_jwt_token(@Req() req) {
+		if (req.headers['authorization'] && !req.headers['orcid-token']) {
+			return {
+				token: req.headers['authorization'],
+			};
+		}
+		const { header, token } = await this.authService.generate_jwt_token(
+			req.user,
+		);
+		return { token };
+	}
 
 	@ApiExcludeEndpoint()
 	@Get('/orcid/:orcid_id')

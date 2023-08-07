@@ -50,7 +50,6 @@ export class DatabaseOverviewComponent implements OnInit {
         return this.databaseService.get_resource(resource_id);
       }),
       shareReplay(1),
-      tap(console.log)
     );
 
     this.reportFilter$ = this.resource$.pipe(
@@ -62,7 +61,6 @@ export class DatabaseOverviewComponent implements OnInit {
           groupBy: "date",
         });
       }),
-      tap(console.log)
     );
     this.user$ = this.authService.user$;
 

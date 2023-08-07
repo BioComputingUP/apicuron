@@ -1,6 +1,11 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "paths": {
+      "@apicuron/leaderboard": [
+        "dist/apicuron/leaderboard"
+      ]
+    },
     "allowSyntheticDefaultImports": true,
     "baseUrl": "./",
     "downlevelIteration": true,

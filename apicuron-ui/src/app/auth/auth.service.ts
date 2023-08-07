@@ -1,29 +1,21 @@
 import { Router } from "@angular/router";
-import {
-  catchError,
-  filter,
-  map,
-  shareReplay,
-  startWith,
-  switchMap,
-} from "rxjs/operators";
+import { filter, map, pluck, shareReplay, switchMap } from "rxjs/operators";
 import { environment } from "../../environments/environment";
 import {
   BehaviorSubject,
   combineLatest,
   Observable,
+  of,
   Subscription,
-  throwError,
 } from "rxjs";
 import {
   HttpClient,
-  HttpErrorResponse,
   HttpEvent,
   HttpHandler,
   HttpInterceptor,
   HttpRequest,
 } from "@angular/common/http";
-import { Component, OnInit, Injectable, OnDestroy } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { User } from "src/app/models/User.model";
 import * as _ from "lodash";
 
@@ -64,6 +56,7 @@ export class AuthService implements HttpInterceptor {
   orcidTokenSubscription: Subscription;
 
   orcidPopup: Window;
+  destroy$: any;
 
   constructor(public router: Router, private http: HttpClient) {
     this.getTokens();
@@ -131,6 +124,22 @@ export class AuthService implements HttpInterceptor {
     orcidToken
       ? localStorage.setItem(this.orcidHeader, orcidToken)
       : localStorage.removeItem(this.orcidHeader);
+  }
+
+  loadJwtToken(): Observable<string> {
+    return this.jwtToken$.pipe(
+      switchMap((token) => {
+        if (token) {
+          return of(token);
+        } else {
+          const url = new URL("auth/token", environment.ws + "/");
+          const request: Observable<string> = this.http
+            .get(url.href)
+            .pipe(pluck("token"));
+          return request;
+        }
+      })
+    );
   }
 
   private getTokens() {

@@ -12,7 +12,7 @@ import {
 } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
 import { BehaviorSubject, Observable, fromEvent, interval } from "rxjs";
-import { filter, map, switchMap, takeWhile } from "rxjs/operators";
+import { filter, map, switchMap, take, takeWhile } from "rxjs/operators";
 import { environment } from "../../../environments/environment";
 import { AuthService } from "../../auth/auth.service";
 import { CommonModule } from "@angular/common";
@@ -68,11 +68,16 @@ export class AuthDropdownComponent {
     );
   }
 
-  copy_key() {
-    navigator.clipboard.writeText(this.authService.token_value);
-    this.toastr.show("API Key Sucessfully copied", "API KEY", {
-      positionClass: "toast-bottom-right",
-    });
+  async copy_key() {
+    this.authService
+      .loadJwtToken()
+      .pipe(take(1))
+      .subscribe((token: string) => {
+        navigator.clipboard.writeText(token);
+        this.toastr.show("API Key Sucessfully copied", "API KEY", {
+          positionClass: "toast-bottom-right",
+        });
+      });
   }
 
   logout() {

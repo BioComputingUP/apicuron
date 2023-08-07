@@ -2,7 +2,7 @@
     <div>
         <button [popper]="dropdown" [popperTrigger]="'hover'" [popperDisableAnimation]="false" [popperPlacement]="'bottom-start'" [popperApplyClass]="'tw-duration-200 tw-transition-opacity'"
             class="tw-text-gray-700 hover:tw-text-gray-800 dark:tw-text-gray-100 tw-flex tw-flex-row tw-items-center dark:hover:tw-text-white nav-item tw-relative dark:before:tw-bg-white before:tw-bg-gray-700 hover-underline-animation">
-            <img [src]="user.generate_avatar()"
+            <img [src]="user.generate_avatar().href"
                 class="tw-inline tw-w-6 tw-h-6 tw-mr-1 tw-bg-white tw-rounded-full" alt="">
             <span class="tw-font-bold">{{ user.displayedName }}</span>
             <ng-container *ngIf="notifications$ | async as notifications">

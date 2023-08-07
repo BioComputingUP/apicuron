@@ -51,7 +51,8 @@ export class ReportsByDateChartComponent implements OnDestroy, AfterViewInit {
   constructor(
     protected reports: ReportsService,
     protected resourceService: ResourcesService
-  ) {}
+  ) {
+  }
 
   ngAfterViewInit(): void {
     combineLatest([this.plotData$, this.plotLayout$])

@@ -28,8 +28,8 @@ WORKDIR ${APP_DIR}
 
 COPY --chown=node:node ./package*.json ${APP_DIR}/
 
-# npm install all the packages precisely
-RUN npm install
+# # npm install all the packages precisely
+# RUN npm install
 
 
 # run the app in the development server

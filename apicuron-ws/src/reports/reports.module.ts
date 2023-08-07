@@ -19,6 +19,7 @@ import { ComputeStatisticsTask } from './tasks/compute_statistics.task';
 import { StatisticsModule } from '../statistics/statistics.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { SchedulerModule } from '../scheduler/scheduler.module';
+import { ComputeAllMetricsTask } from './tasks/compute_all_metrics.task';
 
 @Module({
 	controllers: [ReportsController,],
@@ -42,6 +43,10 @@ import { SchedulerModule } from '../scheduler/scheduler.module';
 		{
 			provide: 'task:compute_statistics',
 			useClass: ComputeStatisticsTask,
+		},
+		{
+			provide: 'task:compute_all_metrics',
+			useClass: ComputeAllMetricsTask
 		}
 	],
 	imports: [
