@@ -6,8 +6,8 @@ FROM node:16.14.2-buster-slim AS development
 
 
 # load arguments in this target
-ARG UID=1002
-ARG GID=1002
+ARG UID
+ARG GID
 
 # set the APP directory
 ENV APP_DIR /home/node/app

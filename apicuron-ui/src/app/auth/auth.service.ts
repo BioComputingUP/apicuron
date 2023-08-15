@@ -133,11 +133,15 @@ export class AuthService implements HttpInterceptor {
           return of(token);
         } else {
           const url = new URL("auth/token", environment.ws + "/");
-          const request: Observable<string> = this.http
+          const request: Observable<Object> = this.http
             .get(url.href)
-            .pipe(pluck("token"));
           return request;
         }
+      }),
+      pluck("token"),
+      map((token: string) => {
+        const [prefix, key]= token.split(' ')
+        return key
       })
     );
   }

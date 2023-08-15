@@ -197,13 +197,11 @@ export class SchedulerClientService {
 	async compute_all_metrics() {
 		const curation_database =
 			this.config.get('environment') != 'production'
-				? 'apicuron_update_dev'
-				: 'apicuron_update';
-		const response = await this.submit_task({
-			task_name: 'disprot_update',
-			task_arguments: curation_database,
+				? 'apicuron_test'
+				: 'apicuron';
+		return await this.submit_task({
+			task_name: 'compute_all_metrics',
 		});
-		return;
 	}
 
 	@Cron(CronExpression.EVERY_DAY_AT_2AM)

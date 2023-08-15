@@ -1,14 +1,14 @@
-version: '3'
+version: '3.0'
 services:
   apicuron-ws:
     container_name: apicuron-webserver
     build:
       context: "./apicuron-ws"
       target: development
-      tags:
-       - "apicuron-ws:dev"
-    image: "apicuron-ws" 
-    # image: "node:16.14"
+      args:
+        - UID=1000
+        - GID=1000
+    image: "apicuron-ws:dev" 
     working_dir: "/home/node/app"
     user: $DOCKER_USER
     volumes:
@@ -17,15 +17,15 @@ services:
       - apicuron-network
     
     environment:
-      - DATABASE_HOST=dione
-      - DATABASE=apicuron_test
+      - DATABASE_HOST=mongo-db
+      - DATABASE=apicuron_dev
       - DB_PORT=27017
     dns: 10.69.69.1
-    logging:
-      driver: local
-      options:
-        max-size: '10m'
-        max-file: 5
+    # logging:
+    #   driver: local
+    #   options:
+    #     max-size: '10m'
+    #     max-file: 5
     command: "npm run start:dev"
     depends_on:
       - mongo-db
@@ -36,9 +36,13 @@ services:
     build:
       context: "./apicuron-ui"
       target: development
-      tags:
-       - "apicuron-ui:dev"
-    image: "apicuron-ui" 
+      args:
+        - UID=1000
+        - GID=1000
+      
+      # tags:
+      #  - "apicuron-ui:dev"
+    image: "apicuron-ui:dev" 
     working_dir: "/home/node/app"
     # image: "node:16.14"
     volumes:
@@ -64,10 +68,14 @@ services:
       - 3000:3000
   
   mongo-db:
+    container_name: mongo-db
     image: mongo
     volumes:
       - ./db:/data/db
-    network_mode: host
+    networks:
+      - apicuron-network
+    ports:
+      - 27017:27017
 
   apicuron-docs:
     container_name: apicuron-docs

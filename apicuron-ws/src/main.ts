@@ -39,9 +39,13 @@ async function bootstrap() {
 	// setup basic validation Pipes
 	app.useGlobalPipes(
 		new ValidationPipe({
+			transformOptions: {
+				enableImplicitConversion: true,
+			},
+			stopAtFirstError: true,
 			transform: true,
 			forbidUnknownValues: false,
-			skipMissingProperties: true,
+			skipMissingProperties: false,
 		}),
 	);
 

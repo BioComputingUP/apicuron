@@ -1,4 +1,4 @@
-import { IsArray, IsEmail, IsEmpty, IsNotEmpty, IsOptional, Validate } from 'class-validator';
+import { IsArray, IsDate, IsDateString, IsEmail, IsEmpty, IsNotEmpty, IsOptional, IsUrl, Validate } from 'class-validator';
 import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
 import { ResourceIdExists } from '../../resources/partner-resources/validators/resource-id-exists';
 import { OrcidChecksum } from '../validators/orcid-checksum';
@@ -6,9 +6,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 import { Term } from '../../terms/schemas/terms.schema';
 import { PartnerResource } from '../../resources/schemas/partner-resources.schema';
+import { EntityUriValid } from '../validators/entity-uri';
 export class SubmitReportDto {
 
-    @IsNotEmpty()
     @Validate(
         EntryExistsRule,
         [
@@ -24,16 +24,17 @@ export class SubmitReportDto {
             message: `the activity_term $value does not exist for this resource`
         }
     )
+    @IsNotEmpty()
     activity_term: string;
 
-    @IsNotEmpty()
     @Validate(OrcidChecksum)
+    @IsNotEmpty()
     curator_orcid: string;
 
+    @Validate(EntityUriValid, [({ resource_id }: SubmitReportDto): string => resource_id])
     @IsNotEmpty()
     entity_uri: string;
 
-    @IsNotEmpty()
     @Validate(EntryExistsRule, [
         PartnerResource.name,
         ({ resource_id }) => {
@@ -42,8 +43,10 @@ export class SubmitReportDto {
             }
         }
     ])
+    @IsNotEmpty()
     resource_id: string;
 
+    @IsDate()
     @IsNotEmpty()
     timestamp: Date;
 
@@ -57,7 +60,7 @@ export class SubmitBulkDto {
     delete_all: Array<string>
 
     // swagger docs entry
-    @ApiProperty({ type: 'file', format:'binary', description: 'A JSON file containing a list named "reports" that contains reports for a curation' })
+    @ApiProperty({ type: 'file', format: 'binary', description: 'A JSON file containing a list named "reports" that contains reports for a curation' })
     @IsEmpty()
     reports: string
 }

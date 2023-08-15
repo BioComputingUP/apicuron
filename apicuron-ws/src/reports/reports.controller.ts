@@ -171,4 +171,5 @@ export class ReportsController {
 		await this.schedulerService.compute_statistics(report.resource_id, report.curator_orcid);
 		return report_confirmation;
 	}
+	
 }

@@ -20,10 +20,11 @@ import { StatisticsModule } from '../statistics/statistics.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { SchedulerModule } from '../scheduler/scheduler.module';
 import { ComputeAllMetricsTask } from './tasks/compute_all_metrics.task';
+import { EntityUriValid } from './validators/entity-uri';
 
 @Module({
 	controllers: [ReportsController,],
-	providers: [ReportsService,
+	providers: [ReportsService, EntityUriValid,
 		{
 			provide: 'task:submit_report',
 			useClass: SubmitBulkTask,

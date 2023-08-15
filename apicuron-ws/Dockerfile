@@ -1,7 +1,7 @@
 # Global Arguments for all build stages
 ARG APP_DIR=/home/node/app
-ARG UID=1002
-ARG GID=1002
+ARG UID
+ARG GID
 ###################
 # BUILD FOR LOCAL DEVELOPMENT
 ###################
@@ -9,8 +9,8 @@ ARG GID=1002
 FROM node:16.14.2-buster-slim As development
 
 ARG APP_DIR
-ARG UID=1002
-ARG GID=1002
+ARG UID
+ARG GID
 
 # install ps command for hot reload
 RUN apt-get update && apt-get install -y procps && rm -rf /var/lib/apt/lists/*
