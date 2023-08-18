@@ -139,7 +139,7 @@ export class ReportsService {
 	async getGroupedReports(reportFilter: ReportFilterGroupedDto) {
 		const { filter, options } = this.buildReportsQuery(reportFilter);
 
-		const paginationPipeline: PaginationAggregation =
+		const [paginationPipeline, limitAggregation]: PaginationAggregation =
 			reportFilter.getMongoAggregation();
 		const groupByAggregation: PipelineStage[] =
 			this.buildReportGroupAggregation(reportFilter);
@@ -147,7 +147,7 @@ export class ReportsService {
 		const aggregationPipeline: PipelineStage[] = [
 			{ $match: filter },
 			...groupByAggregation,
-			...paginationPipeline,
+			paginationPipeline,
 		];
 		const data$ = this.reportModel.aggregate(aggregationPipeline);
 		const reports_count$ = this.reportModel.aggregate([
