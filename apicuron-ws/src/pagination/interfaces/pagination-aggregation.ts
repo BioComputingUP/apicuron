@@ -2,4 +2,4 @@ import { PipelineStage } from "mongoose";
 
 
 
-export type PaginationAggregation = [PipelineStage.Skip, PipelineStage.Limit?];
+export type PaginationAggregation = [PipelineStage.Skip, PipelineStage.Limit];
