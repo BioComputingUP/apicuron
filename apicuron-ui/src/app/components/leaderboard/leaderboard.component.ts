@@ -83,7 +83,6 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
 
     constructor(protected statService: CuratorStatisticsService, protected curatorService: CuratorService, protected resourceService: ResourcesService) {
 
-        console.log('Component instantiated !!')
         this.stats$ = this.leaderboardQuery$.asObservable().pipe(
             filter((query: LeaderboardQuery) => { return !!query.resource_id }),
             shareReplay(),
@@ -121,13 +120,13 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
             }),
             tap(console.log),
             filter(([curr, prev]) => curr.skip != prev.skip && curr.limit != prev.limit && curr.limit >= 0),
-            tap(() => {console.log('passed filter')}),
+            tap(() => { console.log('passed filter') }),
             map(([curr, prev]) => {
                 const query = this.leaderboardQuery$.value
                 this.leaderboardQuery$.next({ ...query, skip: curr.skip, limit: curr.limit })
             }),
             takeUntil(this.destroy$)
-        ).subscribe(() => {})
+        ).subscribe(() => { })
 
         // combineLatest([this.page.valueChanges, this.statsMeta$.pipe(pluck('pagination'))]).pipe(
         //     // filter(([x, pagination]) => !!x && x != ((pagination.start - 1) / pagination.limit) + 1 && x <= pagination.total / pagination.limit && x >= 1),

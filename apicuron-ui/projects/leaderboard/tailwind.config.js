@@ -1,8 +1,8 @@
 module.exports = {
   prefix: "tw-",
   content: [
-    "./src/**/*.{html,ts}",
-    "./src/app/**/*.{html,ts}",
+    "./projects/leaderboard/src/app/leaderboard/*.{html,ts}",
+    // "./src/app/leaderboard/**/*.{html,ts}",
   ],
   darkMode: "class",
   // darkMode: false, // or 'media' or 'class'
@@ -17,6 +17,7 @@ module.exports = {
         "apicuron-purple-100": "hsl(300, 51%, 89%)",
         "apicuron-purple-500": "hsl(300, 51%, 40%)",
         "apicuron-red": "#9A031E",
+        "test-color": '#fff',
         invalidation: "#F76135",
         revision: "#EDBF3A",
         generation: "#59C794",
