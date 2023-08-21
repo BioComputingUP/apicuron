@@ -7,7 +7,6 @@
   "files": [
     "main.ts",
     "polyfills.ts",
-    "leaderboard/main.ts",
     // "scripts/build-auth-confirmation.ts"
   ],
   "include": [
