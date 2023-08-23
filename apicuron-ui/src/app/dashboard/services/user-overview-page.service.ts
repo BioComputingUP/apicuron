@@ -9,8 +9,10 @@ import { BehaviorSubject, Observable, combineLatest, of } from "rxjs";
 import { User } from "../../models/User.model";
 import { ReportFilter } from "../../reports/interfaces/report-filter.interface";
 import {
+  delay,
   filter,
   map,
+  mapTo,
   pairwise,
   shareReplay,
   startWith,
@@ -58,30 +60,6 @@ export class UserOverviewPageService {
 
     this.setReportPlot();
 
-    // this.resources$ = this.barChartReports$.pipe(
-    //   // extracts the resourceIds from the reportsList
-    //   map((reports: ReportsByResourceId) => Object.keys(reports)),
-    //   // emit initial empty array to be compared with later using the pairwise operator
-    //   startWith([]),
-    //   // groups stream events in pairs making each entry previous, curr
-    //   pairwise(),
-
-    //   switchMap(([prev, resourceIds]: [string[], string[]]) => {
-    //     // now if previous and current are different we request new resourceIds, otherwise we don't emit a new value !!
-    //     // to achieve caching and eliminate redundant requests
-
-    //     if (!(prev.length || resourceIds.length)) {
-    //       return of([]);
-    //     }
-    //     if (!_.isEqual(prev, resourceIds)) {
-    //       return this.resourceService.getResources(resourceIds);
-    //     } else {
-    //       return this.resourceService.getResources(prev);
-    //     }
-    //   }),
-    //   shareReplay(1)
-    // );
-
     
 
     this.userStatistics$ = this.user$.pipe(
@@ -89,7 +67,9 @@ export class UserOverviewPageService {
         return this.stats.get_curator_statistics(user.orcid_id);
       }),
       tap((stats: CuratorStatistics[]) => {
-        this.selectedResource.setValue(stats[0].resource_id);
+        if(stats && stats.length > 0){
+          this.selectedResource.setValue(stats[0].resource_id);
+        }
       })
     );
 

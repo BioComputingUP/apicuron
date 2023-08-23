@@ -12,7 +12,7 @@ const routes: Routes = [
     // canActivate: [AuthGuard],
     component: UserDashboardComponent,
     children: [
-      { path: "", component: UserOverviewComponent },
+      { path: "", component: UserOverviewComponent, title: 'Dashboard Overview' },
       // TODO: Implement
       // { path: 'profile', component: ProfileUpdateComponent }
     ],
