@@ -1,14 +1,11 @@
-import { CommonModule } from "@angular/common";
 import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { BehaviorSubject, Observable, Subject, combineLatest, of } from "rxjs";
-import { delay, filter, map, pluck, share, shareReplay, switchMap, take, takeUntil, tap } from "rxjs/operators";
+import { filter, map, pluck, shareReplay, switchMap, takeUntil } from "rxjs/operators";
 import { User } from "../../../../../src/app/models/User.model";
 import { Resource } from "../../../../../src/app/models/resource.model";
 import { environment } from "src/environments/environment";
-import { AngularSvgIconModule } from "angular-svg-icon";
 import { Paginated } from "../../../../../src/app/interfaces/paginated";
-import { FormControl, ReactiveFormsModule } from "@angular/forms";
-import { ResourceModule } from "src/app/resource/resource.module";
+import { FormControl } from "@angular/forms";
 import { CuratorStatistics } from "../../../../../src/app/models/statistics.model";
 import { MainService } from "../main.service";
 
