@@ -9,7 +9,7 @@ import { Stream, chain } from 'stream-chain';
 import { pick } from 'stream-json/filters/Pick';
 import * as StreamArray from 'stream-json/streamers/StreamArray';
 import { validate, ValidationError } from 'class-validator';
-import { User } from '../../auth/users/schemas/user.schema';
+import { User } from '../../core/schemas/user.schema';
 import { ReportsService } from '../../reports/reports.service';
 import { UsersService } from '../../auth/users/users.service';
 import { NotificationsService } from '../../notifications/notifications.service';

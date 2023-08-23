@@ -1,9 +1,9 @@
 import { Injectable, Logger, NotFoundException, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import { Model } from 'mongoose';
 // import { TransformerService } from '../shared/transformer/transformer.service';
-import { User, UserDocument, UserSchema } from '../auth/users/schemas/user.schema';
-import { Statistics, StatisticsDocument } from './schemas/statistics.schema';
+import { User, UserDocument } from '../core/schemas/user.schema';
+import { Statistics, StatisticsDocument } from '../core/schemas/statistics.schema';
 import { PartnerResourcesService } from '..//resources/partner-resources/partner-resources.service';
 import { GetStatisticsDto } from './dto/get-statistics.dto';
 import { paginate } from '../pagination/paginator';

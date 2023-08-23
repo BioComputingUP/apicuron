@@ -1,8 +1,7 @@
 import { InjectModel } from "@nestjs/mongoose";
 import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface } from "class-validator";
 import { Model } from "mongoose";
-import { InjectMany } from "typedi";
-import { User, UserDocument } from "../users/schemas/user.schema";
+import { User, UserDocument } from "../../core/schemas/user.schema";
 
 
 

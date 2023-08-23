@@ -1,12 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { getModelToken } from '@nestjs/mongoose';
 import { AppModule } from '../app.module';
-import { Report } from '../reports/reports.schema';
+import { Report } from '../core/schemas/reports.schema';
 import { faker } from '@faker-js/faker';
-import { Term } from '../terms/schemas/terms.schema';
+import { Term } from '../core/schemas/terms.schema';
 import { Model } from 'mongoose';
 import * as _ from 'lodash';
-import { User } from '../auth/users/schemas/user.schema';
+import { User } from '../core/schemas/user.schema';
 
 async function bootstrap() {
     const app = await NestFactory.createApplicationContext(AppModule)

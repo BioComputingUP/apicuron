@@ -3,15 +3,15 @@ import { ReportsService } from '../reports.service';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { AchievementsDefService } from '../../achievements/achievements-def.service';
 import { AchievementsService } from '../../achievements/achievements.service';
-import { PartnerResource } from '../../resources/schemas/partner-resources.schema';
-import { Badge, BadgeDocument } from '../../achievements/schemas/badges.schema';
+import { PartnerResource } from '../../core/schemas/resource.schema';
+import { Badge, BadgeDocument } from '../../core/schemas/badges.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cursor, Model } from 'mongoose';
 import { UsersService } from '../../auth/users/users.service';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
-import { Report, ReportDocument } from '../../reports/reports.schema';
-import { Term, TermDocument } from '../../terms/schemas/terms.schema';
-import { AchievementDef, AchievementDefDocument } from '../../achievements/schemas/achievement-def.schema';
+import { Report, ReportDocument } from '../../core/schemas/reports.schema';
+import { Term, TermDocument } from '../../core/schemas/terms.schema';
+import { AchievementDef, AchievementDefDocument } from '../../core/schemas/achievement-def.schema';
 
 @Injectable()
 export class ComputeBadgesTask {

@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { Logger, INestApplicationContext } from '@nestjs/common';
 import { AppModule } from '../app.module';
 import { getModelToken } from '@nestjs/mongoose';
-import { User, UserDocument } from '../auth/users/schemas/user.schema';
+import { User, UserDocument } from '../core/schemas/user.schema';
 import { Model } from 'mongoose';
 import { generateAvatar } from '../auth/users/generate_avatar';
 import { ConfigService } from '@nestjs/config';

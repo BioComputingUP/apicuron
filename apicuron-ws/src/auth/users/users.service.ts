@@ -3,10 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { achievements_v1_pipeline } from './aggregation-pipeline/achievements.pipeline';
 import { browse_v1_pipeline } from './aggregation-pipeline/browse.pipeline';
-import { User, UserDocument } from './schemas/user.schema';
-import { uuid } from 'uuidv4';
+import { User, UserDocument } from '../../core/schemas/user.schema';
 import { ConfigService } from '@nestjs/config';
-import { join } from 'path';
 import { generateAvatar } from './generate_avatar';
 @Injectable()
 export class UsersService {

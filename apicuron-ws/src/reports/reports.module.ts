@@ -1,9 +1,7 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../auth/auth.module';
 import { ReportsController } from './reports.controller';
-import { Report, ReportSchema } from './reports.schema';
 import { ReportsService } from './reports.service';
 import { ConfigService } from '@nestjs/config';
 import { ResourcesModule } from '../resources/resources.module';
@@ -18,9 +16,9 @@ import { ComputeAchievementsTask } from './tasks/compute_achievements.task';
 import { ComputeStatisticsTask } from './tasks/compute_statistics.task';
 import { StatisticsModule } from '../statistics/statistics.module';
 import { NotificationsModule } from '../notifications/notifications.module';
-import { SchedulerModule } from '../scheduler/scheduler.module';
 import { ComputeAllMetricsTask } from './tasks/compute_all_metrics.task';
 import { EntityUriValid } from './validators/entity-uri';
+import { CoreApicuronModule } from '../core/core.module';
 
 @Module({
 	controllers: [ReportsController,],
@@ -52,17 +50,12 @@ import { EntityUriValid } from './validators/entity-uri';
 	],
 	imports: [
 		HttpModule,
+		CoreApicuronModule,
 		AuthModule,
 		ResourcesModule,
 		TermsModule,
 		AchievementsModule,
 		NotificationsModule,
-		MongooseModule.forFeature([
-			{
-				name: Report.name,
-				schema: ReportSchema,
-			}
-		]),
 		JwtModule.registerAsync({
 			inject: [ConfigService],
 			useFactory: async (configService: ConfigService) => ({
@@ -94,7 +87,7 @@ import { EntityUriValid } from './validators/entity-uri';
 		SchedulerClientModule,
 		StatisticsModule
 	],
-	exports: [ReportsService, MongooseModule]
+	exports: [ReportsService]
 })
 export class ReportsModule { }
 

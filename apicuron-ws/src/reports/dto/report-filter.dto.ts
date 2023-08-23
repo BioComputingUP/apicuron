@@ -1,12 +1,12 @@
 import { Exclude, Transform, Type } from "class-transformer";
 import { IsInt, IsOptional, Max, Min, MaxDate, Validate, IsIn, IsNotEmpty, ValidateIf } from "class-validator";
-import { User } from "../../auth/users/schemas/user.schema";
-import { PartnerResource } from "../../resources/schemas/partner-resources.schema";
+import { User } from "../../core/schemas/user.schema";
+import { PartnerResource } from "../../core/schemas/resource.schema";
 import { EntryExistsRule } from "../../shared/validators/entry-exists.validator";
 import { DateAfter, DateBefore } from "../validators/date-comparison";
-import { Report } from "../reports.schema";
+import { Report } from "../../core/schemas/reports.schema";
 import * as _ from 'lodash';
-import { Term } from "../../terms/schemas/terms.schema";
+import { Term } from "../../core/schemas/terms.schema";
 import { PaginateDto } from "../../pagination/dto/paginate.dto";
 
 export class ReportFilterDto extends PaginateDto {

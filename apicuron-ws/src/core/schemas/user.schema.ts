@@ -1,8 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Report } from '../../../reports/reports.schema';
-import { Term } from '../../../terms/schemas/terms.schema';
-import { generateAvatar } from '../generate_avatar';
+import { Report } from './reports.schema';
 
 export type UserDocument = User & Document;
 export interface UserResource {
@@ -121,12 +119,6 @@ export class User {
 }
 
 const UserSchema = SchemaFactory.createForClass(User);
-
-UserSchema.virtual('statistics', {
-	ref: 'Statistics',
-	localField: 'orcid_id',
-	foreignField: 'curator_orcid',
-});
 
 UserSchema.virtual('reports', {
 	ref: Report.name,

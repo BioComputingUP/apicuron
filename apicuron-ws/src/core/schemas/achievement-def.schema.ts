@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { PartnerResourcesService } from "../../resources/partner-resources/partner-resources.service";
 
 export type AchievementDefDocument = AchievementDef & Document;
 

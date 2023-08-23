@@ -4,9 +4,8 @@ import { plainToInstance } from 'class-transformer';
 import { Model } from 'mongoose';
 import { AchievementFilter } from './dto/achievement-filter.dto';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
-import { AchievementsDefService } from './achievements-def.service';
-import { Badge, BadgeDocument } from './schemas/badges.schema';
-import { Medal, MedalDocument } from './schemas/medals.schema';
+import { BadgeDocument } from '../core/schemas/badges.schema';
+import { MedalDocument } from '../core/schemas/medals.schema';
 import { paginate } from '../pagination/paginator';
 
 @Injectable()

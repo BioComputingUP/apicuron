@@ -8,7 +8,7 @@ import { pick } from 'stream-json/filters/Pick';
 import * as StreamArray from 'stream-json/streamers/StreamArray';
 import { SubmitReportDto } from '../reports/dto/submit-report.dto';
 import { validate, ValidationError } from 'class-validator';
-import { User } from '../auth/users/schemas/user.schema';
+import { User } from '../core/schemas/user.schema';
 
 export type ValidatedReport = {report: SubmitReportDto, errors:ValidationError[] };
 export type ReportProcessReport = { errors: ValidationError[], success_count: number, total_report_count: number };

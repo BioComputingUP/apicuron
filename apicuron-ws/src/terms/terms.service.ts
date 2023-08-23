@@ -5,12 +5,12 @@ import { DeleteTermDto } from './dto/deleteTerm.dto';
 import { TermDto, TermFilterDto } from './dto/term.dto';
 import { UpdateTermDto } from './dto/updateTerm.dto';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
-import { Term, TermDocument } from './schemas/terms.schema';
-import { Report, ReportDocument } from '../reports/reports.schema';
+import { Term, TermDocument } from '../core/schemas/terms.schema';
+import { Report, ReportDocument } from '../core/schemas/reports.schema';
 import {
 	AchievementDef,
 	AchievementDefDocument,
-} from '../achievements/schemas/achievement-def.schema';
+} from '../core/schemas/achievement-def.schema';
 
 @Injectable()
 export class TermsService {

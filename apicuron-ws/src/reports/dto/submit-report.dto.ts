@@ -4,8 +4,8 @@ import { ResourceIdExists } from '../../resources/partner-resources/validators/r
 import { OrcidChecksum } from '../validators/orcid-checksum';
 import { ApiProperty } from '@nestjs/swagger';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
-import { Term } from '../../terms/schemas/terms.schema';
-import { PartnerResource } from '../../resources/schemas/partner-resources.schema';
+import { Term } from '../../core/schemas/terms.schema';
+import { PartnerResource } from '../../core/schemas/resource.schema';
 import { EntityUriValid } from '../validators/entity-uri';
 export class SubmitReportDto {
 

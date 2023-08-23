@@ -9,7 +9,7 @@ import { AngularSvgIconModule } from "angular-svg-icon";
     selector:'spinner',
     imports: [CommonModule, AngularSvgIconModule],
     template: `
-    <div class="tw-bg-white tw-rounded tw-p-2 tw-flex tw-justify-center">
+    <div class="tw-rounded tw-p-2 tw-flex tw-items-center tw-h-full tw-justify-center">
         <svg-icon svgClass="tw-w-16 tw-h-16 md:tw-w-24 md:tw-h-24 tw-text-apicuron-purple tw-animate-spin" src="assets/svg/loading-spinner.svg"></svg-icon>
     </div>
     `

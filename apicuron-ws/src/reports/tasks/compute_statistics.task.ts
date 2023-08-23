@@ -3,11 +3,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Aggregate, Model } from 'mongoose';
 import { AchievementsService } from '../../achievements/achievements.service';
 import { UsersService } from '../../auth/users/users.service';
-import { Report, ReportDocument } from '../../reports/reports.schema';
+import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
-import { Statistics, StatisticsDocument } from '../../statistics/schemas/statistics.schema';
-import { StatisticsTerms } from '../../statistics/schemas/statistics-terms.schema';
+import { Statistics, StatisticsDocument } from '../../core/schemas/statistics.schema';
+import { StatisticsTerms } from '../../core/schemas/statistics-terms.schema';
 
 
 @Injectable()

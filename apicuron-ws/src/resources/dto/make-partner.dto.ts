@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, Validate } from "class-validator";
 import { EntryExistsRule } from "../../shared/validators/entry-exists.validator";
-import { SubmittedResource } from "../schemas/submitted-resource.schema";
+import { SubmittedResource } from "../../core/schemas/resource.schema";
 
 export class MakePartner {
     

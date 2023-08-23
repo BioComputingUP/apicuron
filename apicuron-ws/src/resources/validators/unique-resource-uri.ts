@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
-import { SubmittedResource } from '../schemas/submitted-resource.schema';
+import { SubmittedResource } from '../../core/schemas/resource.schema';
 
 
 // create custom validator according to class-validator standards

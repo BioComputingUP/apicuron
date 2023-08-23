@@ -1,6 +1,6 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
-import { User } from '../../auth/users/schemas/user.schema';
+import { User } from './user.schema';
 import { StatisticsTerms } from './statistics-terms.schema';
 
 export type StatisticsDocument = Statistics & Document;

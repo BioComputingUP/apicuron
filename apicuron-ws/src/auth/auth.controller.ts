@@ -3,9 +3,7 @@ import {
 	Get,
 	Logger,
 	Req,
-	Redirect,
 	UseGuards,
-	Res,
 	Render,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -22,9 +20,7 @@ import { AuthService } from './auth.service';
 import { Roles } from './decorators/roles.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { RoleGuard } from './guards/role.guard';
-import { User } from './users/schemas/user.schema';
 import { UsersService } from './users/users.service';
-import { Request, Response } from 'express';
 
 @Controller({
 	path: 'auth',

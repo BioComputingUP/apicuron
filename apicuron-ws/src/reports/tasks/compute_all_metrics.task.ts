@@ -1,9 +1,6 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
-import { TaskArgument } from '../../scheduler-client/types/baseTask';
-import { ComputeBadgesTask } from './compute_badges.task';
-import { ComputeMedalsTask } from './compute_medals.task';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
-import { PartnerResource } from '../../resources/schemas/partner-resources.schema';
+import { PartnerResource } from '../../core/schemas/resource.schema';
 
 @Injectable()
 export class ComputeAllMetricsTask {

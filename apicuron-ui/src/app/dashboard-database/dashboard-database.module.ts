@@ -29,6 +29,7 @@ import { ProgressSpinnerModule } from "primeng/progressspinner";
 import { BlockUIModule } from "primeng/blockui";
 import { ToastModule } from "primeng/toast";
 import { MessageService } from "primeng/api";
+import { SpinnerComponent } from "../components/utils/spinner/spinner.component";
 @NgModule({
   declarations: [
     DatabaseUpdateComponent,
@@ -58,7 +59,7 @@ import { MessageService } from "primeng/api";
     SvgModule,
     ReportsByDateChartComponent,
     ProgressSpinnerModule,
-    BlockUIModule,
+    SpinnerComponent,
     ToastModule,
   ],
 })

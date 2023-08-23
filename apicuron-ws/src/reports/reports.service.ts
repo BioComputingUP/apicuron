@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, PipelineStage, QueryOptions } from 'mongoose';
-import { User, UserDocument } from '../auth/users/schemas/user.schema';
+import { User, UserDocument } from '../core/schemas/user.schema';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import { TermsService } from '../terms/terms.service';
 import {
@@ -9,7 +9,7 @@ import {
 	ReportFilterGroupedDto,
 } from './dto/report-filter.dto';
 import { ReportDto } from './dto/report.dto';
-import { Report, ReportDocument, ReportSchema } from './reports.schema';
+import { Report, ReportDocument, ReportSchema } from '../core/schemas/reports.schema';
 import * as _ from 'lodash';
 import { paginate } from '../pagination/paginator';
 import { PaginationAggregation } from '../pagination/interfaces/pagination-aggregation';

@@ -7,10 +7,9 @@ import { AchievementsService } from '../../achievements/achievements.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UsersService } from '../../auth/users/users.service';
-import { Medal, MedalDocument } from '../../achievements/schemas/medals.schema';
-import { Report, ReportDocument } from '../reports.schema';
-import { MedalDef } from '../../achievements/schemas/medals_def.schema';
-import { AchievementDef } from '../../achievements/schemas/achievement-def.schema';
+import { MedalDocument } from '../../core/schemas/medals.schema';
+import { Report, ReportDocument } from '../../core/schemas/reports.schema';
+import { AchievementDef } from '../../core/schemas/achievement-def.schema';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { MedalsFilter } from '../../achievements/dto/medal-crud.dto';
 
