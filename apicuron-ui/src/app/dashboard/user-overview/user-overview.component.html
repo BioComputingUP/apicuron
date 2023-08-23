@@ -1,5 +1,5 @@
 <div *ngIf="user$ | async as user" class="tw-p-1 sm:tw-p-2">
-    <h2 class="tw-text-lg lg:tw-text-xl tw-font-bold tw-font-dm-sans">Welcome {{ user.displayedName }}</h2>
+    <h2 class="tw-text-lg lg:tw-text-xl tw-font-bold tw-font-dm-sans">{{ user.displayedName }}'s Statistics</h2>
 
     <div class="tw-flex tw-flex-row tw-items-stretch tw-h-auto" *ngIf="statistics$ | async as stats; else loading">
         <ng-container *ngIf="stats.length > 0; else emptyStats">
