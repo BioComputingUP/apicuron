@@ -52,7 +52,7 @@ import { ResourcesService } from "../../resource/service/resources.service";
 })
 export class CuratorStatCardComponent implements OnInit {
   terms$: Observable<Object>;
-  reportsWithTerms$: Observable<{ report: Report; term: Term }[]>;
+  reportsWithTerms$: Observable<Report[]>;
   detailForm: any;
   badges$: Observable<Paginated<Badge>>;
   achievements$: Observable<[Paginated<Medal>, Paginated<Badge>]>;
@@ -126,7 +126,7 @@ export class CuratorStatCardComponent implements OnInit {
       resource_id: this.statistics.resource_id,
       curator_orcid: this.curator.orcid_id,
       sortBy: "timestamp",
-      sortOrder: 1,
+      sortOrder: -1,
       limit: 4,
     });
 
@@ -141,12 +141,11 @@ export class CuratorStatCardComponent implements OnInit {
     this.reportsWithTerms$ = combineLatest([this.terms$, this.reports$]).pipe(
       map(([terms, reports]: [Term[], Paginated<Report>]) => {
         return reports.data.map((report: Report) => {
-          return {
-            report: report,
-            term: terms.find(
-              (term) => term.activity_term == report.activity_term
-            ),
-          };
+
+          report.term = terms.find(
+            (term) => term.activity_term == report.activity_term
+          )
+          return report;
         });
       })
     );

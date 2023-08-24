@@ -56,6 +56,8 @@ export class ReportFilter implements Serializable {
 
     sortOrder?: 1 | -1
 
+    extend?: ('term')[]
+
 
 
 }

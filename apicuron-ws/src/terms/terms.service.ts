@@ -20,7 +20,7 @@ export class TermsService {
 		@InjectModel(AchievementDef.name)
 		protected achievementDefModel: Model<AchievementDefDocument>,
 		protected resourceService: PartnerResourcesService,
-	) {}
+	) { }
 
 	/**
 	 *
@@ -35,11 +35,7 @@ export class TermsService {
 	}
 
 	async get_resource_terms(term_filter: TermFilterDto) {
-		return await this.termModel.find(
-			term_filter.omitPagination(),
-			{},
-			term_filter.getMongoQueryOptions(),
-		);
+		return await this.termModel.find(term_filter.omitPagination());
 	}
 
 	async resource_has_term(resource_id: string, activity_term: string) {

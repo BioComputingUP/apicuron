@@ -63,12 +63,17 @@ export class ReportFilterDto extends PaginateDto {
     @IsIn(['timestamp', 'resource_id', 'entity_uri', 'curator_orcid', 'activity_term'])
     sortBy?: 'timestamp' | 'resource_id' | 'entity_uri' | 'curator_orcid' | 'activity_term' = 'timestamp'
 
-    @IsOptional()
-	@Transform(({ value }) => parseInt(value))
+
     @IsIn([-1, 1])
+	@Transform(({ value }) => parseInt(value))
+    @IsOptional()
     sortOrder?: 1 | -1 = -1
 
 
+    @IsIn(['term', 'resource'], { each: true })
+    @IsOptional()
+    extend: ('term' | 'resource')[] = [];
+    
 
 
 }

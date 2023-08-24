@@ -86,7 +86,7 @@ export class CuratorReportsDetailsComponent implements OnInit {
         resource_id: this.resource.resource_id,
         curator_orcid: this.curator.orcid_id,
         skip: 0,
-        limit: 20,
+        limit: 15,
       })
     );
 

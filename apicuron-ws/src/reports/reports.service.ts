@@ -104,13 +104,13 @@ export class ReportsService {
 		});
 	}
 
-	async getReports(reportFilter: ReportFilterDto, with_terms = false) {
+	async getReports(reportFilter: ReportFilterDto) {
 		const { filter, options } = this.buildReportsQuery(reportFilter);
 
 		const reports = await this.reportModel.find(filter, {}, options).lean();
 		let data = reports;
 
-		if (with_terms) {
+		if (reportFilter.extend.includes('term')) {
 			const { resource_id } = reportFilter;
 
 			const activity_term_list = [

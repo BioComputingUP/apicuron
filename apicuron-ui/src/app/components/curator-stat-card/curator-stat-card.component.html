@@ -41,7 +41,7 @@
     <div class="tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
       <!-- Badges list -->
       <ng-container *ngIf="badges$ | async as badges">
-        <div class="tw-w-full sm:tw-w-1/2 tw-flex-grow tw-flex tw-flex-col tw-content-start tw-px-1 tw-py-2"
+        <div class="tw-w-full sm:tw-w-1/2 tw-flex-grow tw-flex tw-flex-col tw-content-start tw-px-1 tw-py-2 tw-z-10"
           *ngIf="badges.data.length > 0">
           <div class="tw-w-full tw-flex tw-flex-row tw-justify-between sm:tw-px-2">
             <span class="tw-text-sm tw-font-bold tw-text-gray-500">{{ curator.displayedName }}'s Earned Badges</span>
@@ -69,7 +69,7 @@
         </div>
 
         <div class="@2xl:tw-w-1/4 tw-w-1/2 tw-flex-shrink tw-p-2" *ngFor="let report of reports">
-          <report-card [term]="report.term" [report]="report.report"></report-card>
+          <report-card [term]="report.term" [report]="report"></report-card>
         </div>
       </div>
 

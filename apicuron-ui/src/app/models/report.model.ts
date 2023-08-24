@@ -12,13 +12,17 @@ export class Report implements Deserializable {
         this.resource_id = input.resource_id
         this.curator_orcid = input.curator_orcid
         this.entity_uri = input.entity_uri
+
+        if(input.term){
+            this.term = new Term().deserialize(input.term);
+        }
         
         return this
     }
 
     get formattedDate () {
         const dateTime = moment(this.timestamp)
-        return dateTime.format('MMMM Do YYYY, h:mm:ss a');
+        return dateTime.format('MMMM Do YYYY, h:mm');
     }
 
     formatDate(type: 'dateTime' | 'date'){
