@@ -100,7 +100,7 @@ export class ComputeStatisticsTask {
                 ranking,
                 total_count: generation_count + revision_count + invalidation_count,
                 badges_count: await this.badgeModel.count({ resource_id, curator_orcid }),
-                medals_count: await this.medalModel.count({ resource_id: curator_orcid }),
+                medals_count: await this.medalModel.count({ resource_id, curator_orcid }),
                 privacy: await this.userModel.exists({ curator_orcid }) ? 'public' : 'private',
                 // type: 'contribution'
             }
