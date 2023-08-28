@@ -47,6 +47,18 @@ if(args.t == 'disprot_update'){
     process.exit(result.status)
 }
 
+// handle the unique case if the job is to compute_all_metrics, we run update_disprot first
+if(args.t == 'compute_all_metrics'){
+    const script_path = join(__dirname, '../updates/apicuron-tasks/main.py')
+    
+
+    const result = spawnSync(`python3`, [script_path,...process.argv.slice(2)], {stdio: 'inherit'})
+    if(result.error){
+        console.error('Error on Update Disprot')
+        console.error(result.error)
+    }
+}
+
 async function bootstrap() {
     const app = await NestFactory.createApplicationContext(AppModule)
     
