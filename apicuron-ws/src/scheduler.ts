@@ -51,8 +51,17 @@ if(args.t == 'disprot_update'){
 if(args.t == 'compute_all_metrics'){
     const script_path = join(__dirname, '../updates/apicuron-tasks/main.py')
     
+    // building argument array
 
-    const result = spawnSync(`python3`, [script_path,...process.argv.slice(2)], {stdio: 'inherit'})
+    let disprotUpdateArgs: string[] = process.argv.slice(2)
+    // extracting index of task from current arg array (finding the option -t and taking the argument one step after)
+    const taskIndex = disprotUpdateArgs.findIndex((x) => x == '-t') + 1
+
+    disprotUpdateArgs[taskIndex] = 'disprot_update';
+    
+    
+
+    const result = spawnSync(`python3`, [script_path,...disprotUpdateArgs], {stdio: 'inherit'})
     if(result.error){
         console.error('Error on Update Disprot')
         console.error(result.error)

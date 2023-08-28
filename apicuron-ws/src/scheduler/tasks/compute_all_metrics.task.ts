@@ -14,6 +14,8 @@ export class ComputeAllMetricsTask {
 
 	public async run_task() {
 
+		
+
 		const resources = await this.resources.get_resources()
 
 		const statPromises = resources.map(async ({ resource_id }: PartnerResource) => {
