@@ -8,45 +8,22 @@ import { ResourcesModule } from '../resources/resources.module';
 import { HttpModule } from '@nestjs/axios';
 import { TermsModule } from '../terms/terms.module';
 import { SchedulerClientModule } from '../scheduler-client/scheduler-client.module';
-import { SubmitBulkTask } from './tasks/submit_bulk.task';
+// import { SubmitBulkTask } from './tasks/submit_bulk.task';
 import { AchievementsModule } from '../achievements/achievements.module';
-import { ComputeBadgesTask } from './tasks/compute_badges.task';
-import { ComputeMedalsTask } from './tasks/compute_medals.task';
-import { ComputeAchievementsTask } from './tasks/compute_achievements.task';
-import { ComputeStatisticsTask } from './tasks/compute_statistics.task';
+// import { ComputeBadgesTask } from './tasks/compute_badges.task';
+// import { ComputeMedalsTask } from './tasks/compute_medals.task';
+// import { ComputeAchievementsTask } from './tasks/compute_achievements.task';
+// import { ComputeStatisticsTask } from './tasks/compute_statistics.task';
 import { StatisticsModule } from '../statistics/statistics.module';
 import { NotificationsModule } from '../notifications/notifications.module';
-import { ComputeAllMetricsTask } from './tasks/compute_all_metrics.task';
+// import { ComputeAllMetricsTask } from './tasks/compute_all_metrics.task';
 import { EntityUriValid } from './validators/entity-uri';
 import { CoreApicuronModule } from '../core/core.module';
 
 @Module({
 	controllers: [ReportsController,],
 	providers: [ReportsService, EntityUriValid,
-		{
-			provide: 'task:submit_report',
-			useClass: SubmitBulkTask,
-		},
-		{
-			provide: 'task:compute_badges',
-			useClass: ComputeBadgesTask,
-		},
-		{
-			provide: 'task:compute_medals',
-			useClass: ComputeMedalsTask,
-		},
-		{
-			provide: 'task:compute_achievements',
-			useClass: ComputeAchievementsTask,
-		},
-		{
-			provide: 'task:compute_statistics',
-			useClass: ComputeStatisticsTask,
-		},
-		{
-			provide: 'task:compute_all_metrics',
-			useClass: ComputeAllMetricsTask
-		}
+		
 	],
 	imports: [
 		HttpModule,

@@ -1,29 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { ReportsService } from '../reports.service';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
-import { AchievementsDefService } from '../../achievements/achievements-def.service';
-import { AchievementsService } from '../../achievements/achievements.service';
 import { PartnerResource } from '../../core/schemas/resource.schema';
 import { Badge, BadgeDocument } from '../../core/schemas/badges.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cursor, Model } from 'mongoose';
-import { UsersService } from '../../auth/users/users.service';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { AchievementDef, AchievementDefDocument } from '../../core/schemas/achievement-def.schema';
+import { User, UserDocument } from '../../core/schemas/user.schema';
 
 @Injectable()
 export class ComputeBadgesTask {
     constructor(protected partnerResourceService: PartnerResourcesService,
-        protected userService: UsersService,
-        protected achievementsService: AchievementsService,
-        protected achievementsDefService: AchievementsDefService,
+        @InjectModel(User.name) protected userModel: Model<UserDocument>,
         @InjectModel('badge') protected badgeModel: Model<BadgeDocument>,
         @InjectModel(AchievementDef.name) private achievementDefModel: Model<AchievementDefDocument>,
         @InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-        // @InjectModel(Term.name) protected termModel: Model<TermDocument>,
-        protected reportService: ReportsService) {
+    ) {
 
     }
 
@@ -43,7 +36,7 @@ export class ComputeBadgesTask {
         if (orcid_id) {
             this.logger.log(`Computing Badges for user ${orcid_id} for resource ${resource_id}`)
 
-            const user = await this.userService.get_by_orcid(orcid_id)
+            const user = await this.userModel.findOne({ orcid_id })
             if (user) {
                 await this.computeUserBadges(resource_id, orcid_id)
             } else {
@@ -61,7 +54,7 @@ export class ComputeBadgesTask {
     public async computeResourceBadges({ resource_id }: PartnerResource) {
 
         await this.badgeModel.deleteMany({ resource_id })
-        
+
         const curators: Cursor<any, never> = this.reportModel.aggregate([
             {
                 $group: {

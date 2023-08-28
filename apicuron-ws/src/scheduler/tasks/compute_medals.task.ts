@@ -1,27 +1,19 @@
 
 import { Injectable, Logger } from '@nestjs/common'
-import { ReportsService } from '../reports.service';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
-import { AchievementsDefService } from '../../achievements/achievements-def.service';
-import { AchievementsService } from '../../achievements/achievements.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { UsersService } from '../../auth/users/users.service';
 import { MedalDocument } from '../../core/schemas/medals.schema';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { AchievementDef } from '../../core/schemas/achievement-def.schema';
+import { AchievementDef, AchievementDefDocument } from '../../core/schemas/achievement-def.schema';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
-import { MedalsFilter } from '../../achievements/dto/medal-crud.dto';
 
 @Injectable()
 export class ComputeMedalsTask {
     constructor(protected partnerResourceService: PartnerResourcesService,
-        protected userService: UsersService,
-        protected achievementsService: AchievementsService,
-        protected achievementsDefService: AchievementsDefService,
+        @InjectModel(AchievementDef.name) protected achievementDefModel: Model<AchievementDefDocument>,
         @InjectModel('medal') protected medalModel: Model<MedalDocument>,
-        @InjectModel(Report.name) private reportModel: Model<ReportDocument>,
-        protected reportService: ReportsService) {
+        @InjectModel(Report.name) private reportModel: Model<ReportDocument>) {
 
     }
 
@@ -43,10 +35,12 @@ export class ComputeMedalsTask {
 
     async compute_resource_medals(resource_id: string) {
         
-        const deletionResponse = await this.achievementsService.delete_resource_medals(resource_id);
+        const deletionResponse = await this.medalModel.deleteMany({ resource_id });
         this.logger.log(`Deleted ${deletionResponse.deletedCount} medals for resource ${resource_id}`)
 
-        const { data: medalDefs } = await this.achievementsDefService.get_medals(MedalsFilter.create({ resource_id }))
+        // const { data: medalDefs } = await this.achievementsDefService.get_medals(MedalsFilter.create({ resource_id }))
+
+        const medalDefs = await this.achievementDefModel.find({ resource_id, type: 'medal' })
 
         let medal_saves_promises = []
 

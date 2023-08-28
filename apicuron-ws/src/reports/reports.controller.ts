@@ -35,10 +35,13 @@ import { ParseUnsignedIntPipe } from '../shared/pipes/unsigned-int-validation.pi
 import { ReportDto } from './dto/report.dto';
 import { SubmitBulkDto, SubmitReportDto } from './dto/submit-report.dto';
 import { ReportsService } from './reports.service';
-import { ComputeStatisticsTask } from '../reports/tasks/compute_statistics.task';
 import { ReportFilterDto, ReportFilterGroupedDto } from './dto/report-filter.dto';
 import * as _ from 'lodash';
 import { plainToClass, plainToInstance } from 'class-transformer';
+import { Model } from 'mongoose';
+import { Statistics, StatisticsDocument } from '../core/schemas/statistics.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { TermsService } from '../terms/terms.service';
 
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
@@ -47,8 +50,8 @@ export class ReportsController {
 	constructor(
 		private reportService: ReportsService,
 		private schedulerService: SchedulerClientService,
-		@Inject('task:compute_statistics')
-		private computeStatistics: ComputeStatisticsTask,
+		@InjectModel(Statistics.name) private statModel: Model<StatisticsDocument>,
+		private termService: TermsService,
 		private config: ConfigService,
 	) {}
 
@@ -69,21 +72,12 @@ export class ReportsController {
 		}
 	}
 
-	// @Get('statistics')
-	// async report_statistics(@Query() reportFilter: ReportFilterDto){
-	// 	const { filter, options } = this.reportService.buildReportsQuery(reportFilter)
-	// 	return await this.reportService.group_reports_by_date(filter, options)
-	// }
-
 	@Get()
 	async get_reports(@Query() reportFilter: ReportFilterDto, @Request() req) {
 		
 		const reportFilterInstance: ReportFilterDto = plainToInstance(ReportFilterDto, reportFilter)
 		return await this.reportService.getReports(reportFilterInstance);
 
-		// if(!reportFilterInstance.groupBy){
-		// }else{
-		// }
 	}
 
 	@Get('group-by/:groupBy')
@@ -94,22 +88,6 @@ export class ReportsController {
 		return await this.reportService.getGroupedReports(groupByInstance)
 	}
 
-	// @Get('resource/:resource_id/orcid_id/:orcid_id')
-	// async get_user_reports(
-	// 	@Param('orcid_id') orcid_id: string,
-	// 	@Param('resource_id') resource_id: string,
-	// 	@Query('page', ParseUnsignedIntPipe) page = 1,
-	// 	@Query('page_size', ParseUnsignedIntPipe) page_size = 10,
-	// ) {
-	// 	const reportFilter = new ReportFilterDto();
-	// 	_.assign(reportFilter, {
-	// 		curator_orcid: orcid_id,
-	// 		resource_id,
-	// 		page,
-	// 		page_size,
-	// 	});
-	// 	return await this.reportService.getReports(reportFilter);
-	// }
 
 	@ApiOperation({
 		summary: 'Submit reports in bulk as a JSON file',
@@ -164,9 +142,7 @@ export class ReportsController {
 		// const resource_uri = await this.partnerResourceService.retrieve_uri(report.resource_id)
 		const report_confirmation = await this.reportService.insertReport(report);
 
-		await this.computeStatistics.run_task({
-			arguments: [ report.resource_id, report.curator_orcid]
-		});
+
 		await this.schedulerService.compute_achievements(report.resource_id, report.curator_orcid);
 		await this.schedulerService.compute_statistics(report.resource_id, report.curator_orcid);
 		return report_confirmation;

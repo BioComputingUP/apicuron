@@ -34,6 +34,10 @@ export class TermsService {
 			.lean();
 	}
 
+	async get_term(activity_term: string, resource_id: string) {
+		return await this.termModel.findOne({ activity_term, resource_id })
+	}
+
 	async get_resource_terms(term_filter: TermFilterDto) {
 		return await this.termModel.find(term_filter.omitPagination());
 	}

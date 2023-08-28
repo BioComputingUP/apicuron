@@ -9,13 +9,16 @@ import { Stream, chain } from 'stream-chain';
 import { pick } from 'stream-json/filters/Pick';
 import * as StreamArray from 'stream-json/streamers/StreamArray';
 import { validate, ValidationError } from 'class-validator';
-import { User } from '../../core/schemas/user.schema';
+import { User, UserDocument } from '../../core/schemas/user.schema';
 import { ReportsService } from '../../reports/reports.service';
 import { UsersService } from '../../auth/users/users.service';
 import { NotificationsService } from '../../notifications/notifications.service';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { ComputeAchievementsTask } from './compute_achievements.task';
 import { ComputeStatisticsTask } from './compute_statistics.task';
+import { InjectModel } from '@nestjs/mongoose';
+import { Report, ReportDocument } from '../../core/schemas/reports.schema';
+import { Model } from 'mongoose';
 
 export type ValidatedReport = { report: SubmitReportDto, errors: ValidationError[] };
 export type ReportProcessReport = { errors: ValidationError[], success_count: number, total_report_count: number, resource_ids:string[] };
@@ -25,8 +28,9 @@ export type ReportProcessReport = { errors: ValidationError[], success_count: nu
 @Injectable()
 export class SubmitBulkTask {
     constructor(
-        protected reportService: ReportsService,
-        protected userService: UsersService,
+        // protected reportService: ReportsService,
+        @InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
+        @InjectModel(User.name) protected userModel: Model<UserDocument>,
         protected notificationsService: NotificationsService,
         @Inject('task:compute_achievements') protected compute_achievements: ComputeAchievementsTask,
         @Inject('task:compute_statistics') protected compute_statistics: ComputeStatisticsTask,
@@ -49,7 +53,8 @@ export class SubmitBulkTask {
             this.logger.log(`User specified resources ${delete_all}`)
 
             for (let i = 0; i < resources_delete_all.length; i++) {
-                const response = await this.reportService.delete_all_resource_reports(resources_delete_all[i])
+                const currentResourceId = resources_delete_all[i];
+                const response =  await this.reportModel.deleteMany({ resource_id: currentResourceId })
                 this.logger.log(`Deleted ${response.deletedCount} reports from resource ${resources_delete_all[i]} before proceeding`)
             }
         }
@@ -61,7 +66,7 @@ export class SubmitBulkTask {
         let reportStream = null
         try {
             const defaultReport = await this.parse_default_report(file)
-            const user = await this.userService.get_by_orcid(orcid_id);
+            const user = await this.userModel.findOne({ orcid_id });
             reportStream = this.build_report_stream(file, defaultReport, user)
             
         } catch (e) {
@@ -117,7 +122,7 @@ export class SubmitBulkTask {
                 if (errors.length == 0) {
                     successful_reports_count += 1
                     try {
-                        await this.reportService.insertReport(report)
+                        await this.reportModel.insertMany([report]);
                         this.logger.log(`Sucessfully inserted Report for ${report.resource_id} by ${report.curator_orcid}`)
                     } catch (e) {
                         if (e) {

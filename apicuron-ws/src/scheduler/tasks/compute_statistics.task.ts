@@ -8,6 +8,9 @@ import { PartnerResourcesService } from '../../resources/partner-resources/partn
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { Statistics, StatisticsDocument } from '../../core/schemas/statistics.schema';
 import { StatisticsTerms } from '../../core/schemas/statistics-terms.schema';
+import { BadgeDocument } from '../../core/schemas/badges.schema';
+import { MedalDocument } from '../../core/schemas/medals.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
 
 
 @Injectable()
@@ -15,9 +18,12 @@ export class ComputeStatisticsTask {
     constructor(
         @InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
         @InjectModel(Statistics.name) protected statModel: Model<StatisticsDocument>,
+        @InjectModel('badge') protected badgeModel: Model<BadgeDocument>,
+        @InjectModel('medal') protected medalModel: Model<MedalDocument>,
+        @InjectModel('User') protected userModel: Model<UserDocument>,
         protected partnerResourceService: PartnerResourcesService,
-        protected achievementsService: AchievementsService,
-        protected userService: UsersService
+        // protected achievementsService: AchievementsService,
+        // protected userService: UsersService
     ) { }
 
     logger = new Logger(ComputeStatisticsTask.name);
@@ -33,7 +39,7 @@ export class ComputeStatisticsTask {
             return
         }
         if (orcid_id) {
-            const user = await this.userService.get_by_orcid(orcid_id)
+            const user = await this.userModel.findOne({ orcid_id })
             if (user) {
                 await this.compute_user_statistics(resource, user)
                 return
@@ -56,6 +62,7 @@ export class ComputeStatisticsTask {
 
         let ranking = 0
         for await (const user_report of users_reports) {
+            const curator_orcid = user_report._id
             ranking++
             // for each term we compute the total sum of scores multiplied by their count
             for (let i = 0; i < user_report['terms'].length; i++) {
@@ -77,7 +84,7 @@ export class ComputeStatisticsTask {
             const invalidation_score = invalidation_terms.reduce((prev, curr) => prev + curr['sum'], 0)
 
             let stat_entry: Statistics = {
-                curator_orcid: user_report._id,
+                curator_orcid,
                 resource_id,
                 resource_uri,
                 total_score: user_report['total_score'],
@@ -92,9 +99,9 @@ export class ComputeStatisticsTask {
                 invalidation_score,
                 ranking,
                 total_count: generation_count + revision_count + invalidation_count,
-                badges_count: await this.achievementsService.user_badge_count(resource_id, user_report._id),
-                medals_count: await this.achievementsService.user_medal_count(resource_id, user_report._id),
-                privacy: await this.userService.user_exists(user_report._id) ? 'public' : 'private',
+                badges_count: await this.badgeModel.count({ resource_id, curator_orcid }),
+                medals_count: await this.medalModel.count({ resource_id: curator_orcid }),
+                privacy: await this.userModel.exists({ curator_orcid }) ? 'public' : 'private',
                 // type: 'contribution'
             }
 
@@ -200,7 +207,7 @@ export class ComputeStatisticsTask {
             curator_orcid: orcid_id,
             medals_count: 0,
             badges_count: 0,
-            privacy: await this.userService.user_exists(orcid_id) ? 'public' : 'private'
+            privacy: await this.userModel.exists({ orcid_id }) ? 'public' : 'private'
         }
 
         for await (const report of user_reports) {
@@ -216,8 +223,8 @@ export class ComputeStatisticsTask {
 
         }
 
-        user_stats.medals_count = await this.achievementsService.user_medal_count(resource_id, orcid_id)
-        user_stats.badges_count = await this.achievementsService.user_badge_count(resource_id, orcid_id)
+        user_stats.medals_count = await this.medalModel.count({ resource_id, curator_orcid: orcid_id })
+        user_stats.badges_count = await this.badgeModel.count({ resource_id})
 
 
         return await this.statModel.updateOne({
