@@ -7,6 +7,7 @@ import { EntryExistsRule } from '../../shared/validators/entry-exists.validator'
 import { Term } from '../../core/schemas/terms.schema';
 import { PartnerResource } from '../../core/schemas/resource.schema';
 import { EntityUriValid } from '../validators/entity-uri';
+import { Type } from 'class-transformer';
 export class SubmitReportDto {
 
     @Validate(
@@ -47,6 +48,7 @@ export class SubmitReportDto {
     resource_id: string;
 
     @IsDate()
+    @Type(() => Date)
     @IsNotEmpty()
     timestamp: Date;
 
