@@ -14,13 +14,18 @@ export class EntityUriValid implements ValidatorConstraintInterface {
     const resource_id: string = resourceIdFactory(args.object)
     
     const resource = await this.resourcesService.get_resource(resource_id);
-    
-    const host_whitelist = [new URL(resource.resource_uri).host, new URL(resource.resource_url).host];
 
-    return isURL(propertyValue, {
-        protocols: this.config.get('environment') == 'prodution' ?  ['https'] : ['http', 'https'],
-        host_whitelist
-    })
+    if(resource){
+      const host_whitelist = [new URL(resource.resource_uri).host, new URL(resource.resource_url).host];
+
+      return isURL(propertyValue, {
+          protocols: this.config.get('environment') == 'prodution' ?  ['https'] : ['http', 'https'],
+          host_whitelist
+      })
+  
+    }else{
+      return true;
+    }
      
   }
 
