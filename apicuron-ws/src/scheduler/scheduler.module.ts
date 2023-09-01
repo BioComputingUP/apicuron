@@ -13,6 +13,7 @@ import { ComputeAllMetricsTask } from './tasks/compute_all_metrics.task';
 import { CoreApicuronModule } from '../core/core.module';
 import { ResourcesModule } from '../resources/resources.module';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { OrcidSubmissionTask } from '../auth/tasks/orcid-submission.task';
 @Module({
   imports: [HttpModule, CoreApicuronModule, NotificationsModule, ResourcesModule, AuthModule],
   providers: [SchedulerService,
@@ -40,6 +41,10 @@ import { NotificationsModule } from '../notifications/notifications.module';
 		{
 			provide: 'task:compute_all_metrics',
 			useClass: ComputeAllMetricsTask
+		},
+		{
+			provide: 'task:submit-orcid',
+			useClass: OrcidSubmissionTask
 		}
   ],
   exports: [

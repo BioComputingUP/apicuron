@@ -52,7 +52,7 @@ export class User {
 
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop({
-		required: false,		
+		required: false,
 	})
 	employment?: string;
 
@@ -99,6 +99,16 @@ export class User {
 		select: true,
 	})
 	orcid_permission: string;
+
+	@Prop({
+		required: false
+	})
+	orcid_scope?: string;
+
+	@Prop({
+		required: false
+	})
+	orcid_work_put_code?: string;
 
 	@Prop({ required: false, select: true })
 	resources: UserResource[];

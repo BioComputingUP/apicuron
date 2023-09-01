@@ -52,6 +52,7 @@ export class CuratorCardComponent implements OnInit {
   @Input()
   display_resources = true;
 
+
   single_resource() {
     return !Array.isArray(this.stats) || this.stats.length == 1;
   }
@@ -99,5 +100,9 @@ export class CuratorCardComponent implements OnInit {
     return this.biocurator.orcid_id;
   }
 
-  ngOnInit(): void {}
+  get total_score() {
+    return this.stats.reduce((prev, curr) => prev + curr.total_score, 0)
+  }
+
+  ngOnInit(): void { }
 }

@@ -27,7 +27,7 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 			async function (accessToken, refreshToken, params, profile, done) {
 				const orcid_id: string = params.orcid;
 				// const user = { orcid_id, username: params.name };
-				console.log({ params });
+				// console.log({ params });
 				try {
 					await usersService.createOrUpdateUser({
 						// displayed Name obtained from orcid
@@ -36,6 +36,7 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 						orcid_id,
 						// orcid_permission authorization token for updating a user information (/works)
 						orcid_permission: accessToken ?? params.access_token,
+						orcid_scope: params.scope,
 
 						refresh_token: refreshToken,
 					});
