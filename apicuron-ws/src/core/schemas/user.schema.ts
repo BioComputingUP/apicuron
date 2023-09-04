@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, SchemaTypes, Types } from 'mongoose';
 import { Report } from './reports.schema';
 
 export type UserDocument = User & Document;
@@ -9,19 +9,9 @@ export interface UserResource {
 	resource_id: string;
 }
 
-export interface UserStat {
-	resource_uri: string;
+export interface UserResourcePutCode {
 	resource_id: string;
-	generation_count: number;
-	revision_count: number;
-	invalidation_count: number;
-	generation_score: number;
-	revision_score: number;
-	invalidation_score: number;
-	total_score: number;
-	ranking: number;
-	badges_count: number;
-	medals_count: number;
+	putCode: string
 }
 
 @Schema({
@@ -29,6 +19,14 @@ export interface UserStat {
 	toJSON: {
 		virtuals: true,
 	},
+	// methods: {
+	// 	hasResourcePutCode: function (resource_id: string): Boolean {
+	// 		return this.orcid_work_put_codes.findIndex((item) => item.resource_id == resource_id) != -1;
+	// 	},	
+	// 	getResourcePutCode: function (resource_id: string): string {
+	// 		return this.orcid_work_put_codes.find((item) => item.resource_id == resource_id).putCode;
+	// 	}
+	// }
 })
 export class User {
 	@Prop({
@@ -53,6 +51,7 @@ export class User {
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop({
 		required: false,
+		type: SchemaTypes.String
 	})
 	employment?: string;
 
@@ -108,7 +107,7 @@ export class User {
 	@Prop({
 		required: false
 	})
-	orcid_work_put_code?: string;
+	orcid_work_put_codes: UserResourcePutCode[] = [];
 
 	@Prop({ required: false, select: true })
 	resources: UserResource[];
@@ -126,6 +125,10 @@ export class User {
 
 	@Prop({ required: true })
 	avatar: string;
+
+	hasResourcePutCode: (resource_id: string)=> boolean;
+	getResourcePutCode: (resource_id: string)=> string;
+
 }
 
 const UserSchema = SchemaFactory.createForClass(User);
@@ -135,4 +138,18 @@ UserSchema.virtual('reports', {
 	localField: 'orcid_id',
 	foreignField: 'curator_orcid',
 });
+
+UserSchema.method('hasResourcePutCode', function (resource_id: string): boolean {
+	return this.orcid_work_put_codes.findIndex((item) => item.resource_id == resource_id) != -1;
+})
+
+UserSchema.method('getResourcePutCode', function (resource_id: string): string {
+	return this.orcid_work_put_codes.find((item) => item.resource_id == resource_id).putCode;
+})
+
+// UserSchema.methods.hasResourcePutCode = function (resource_id: string): Boolean {
+// return this.orcid_work_put_codes.find((item) => item.resource_id == resource_id) != -1;
+// }
+
+
 export { UserSchema };
