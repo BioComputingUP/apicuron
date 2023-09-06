@@ -6,7 +6,6 @@ import { Model } from 'mongoose';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { Statistics, StatisticsDocument } from '../../core/schemas/statistics.schema';
-import { UsersService } from '../users/users.service';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 
 
@@ -72,8 +71,11 @@ export class OrcidSubmissionTask {
             }
         }
 
-        if (user.orcid_work_put_code) {
+        
+
+        if (user.hasResourcePutCode(stat.resource_id)) {
             // this is an update of a an existing work
+            const resourcePutCode = user.getResourcePutCode(stat.resource_id)
 
             const rawData = `
             <?xml version="1.0" encoding="UTF-8"?>
@@ -81,7 +83,7 @@ export class OrcidSubmissionTask {
                 xmlns:common="http://www.orcid.org/ns/common" xmlns:work="http://www.orcid.org/ns/work"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xsi:schemaLocation="http://www.orcid.org/ns/work /work-3.0.xsd"
-                put-code="${user.orcid_work_put_code}">	
+                put-code="${resourcePutCode}">	
                 <work:title>
                     <common:title>Contributions to ${resource.resource_name}</common:title>
                 </work:title>
@@ -97,7 +99,7 @@ export class OrcidSubmissionTask {
                 </common:external-ids>
             </work:work>
             `
-            const response = await this.httpService.axiosRef.put(`${orcidApiUrl}${user.orcid_id}/work/${user.orcid_work_put_code}`, rawData.trim(), {
+            const response = await this.httpService.axiosRef.put(`${orcidApiUrl}${user.orcid_id}/work/${resourcePutCode}`, rawData.trim(), {
                 headers: {
                     'Accept': '*/*',
                     'Content-type': 'application/vnd.orcid+xml',
@@ -156,7 +158,12 @@ export class OrcidSubmissionTask {
                 const splitUrl = response.headers.location.split('/');
 
                 const orcid_work_put_code = splitUrl[splitUrl.length - 1];
-                await this.userModel.updateOne({ orcid_id: user.orcid_id }, { $set: { orcid_work_put_code } })
+                user.orcid_work_put_codes.push({
+                    resource_id: stat.resource_id,
+                    putCode: orcid_work_put_code
+                })
+                const userInstance = new this.userModel(user);
+                await userInstance.save();
                 return;
             }
         }
