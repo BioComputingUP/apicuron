@@ -13,7 +13,7 @@ import { ComputeAllMetricsTask } from './tasks/compute_all_metrics.task';
 import { CoreApicuronModule } from '../core/core.module';
 import { ResourcesModule } from '../resources/resources.module';
 import { NotificationsModule } from '../notifications/notifications.module';
-import { OrcidSubmissionTask } from '../auth/tasks/orcid-submission.task';
+import { OrcidSubmissionTask } from './tasks/orcid-submission.task';
 @Module({
   imports: [HttpModule, CoreApicuronModule, NotificationsModule, ResourcesModule, AuthModule],
   providers: [SchedulerService,
