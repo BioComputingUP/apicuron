@@ -1,4 +1,4 @@
-<div>
+<div *ngIf="currentPage$ | async as currentPage"    >
     <nav class="tw-isolate tw-inline-flex tw--space-x-px tw-rounded-md tw-shadow-sm" aria-label="Pagination">
         <a
             (click)="previous_page()"
@@ -14,13 +14,16 @@
                     clip-rule="evenodd"></path>
             </svg>
         </a>
-        <a *ngFor="let page of pages_list()" aria-current="page"
+        <ng-container *ngIf="pageList$ | async as pageList">
+            <a *ngFor="let page of pageList" aria-current="page"
             class="tw-relative tw-inline-flex tw-items-center tw-border tw-px-4 tw-py-2 tw-text-sm tw-font-medium focus:tw-z-20"
             [ngClass]="{'tw-z-10 tw-text-indigo-600 tw-border-indigo-500 tw-bg-indigo-50 tw-cursor-default': currentPage == page, 'tw-text-gray-500 hover:tw-bg-gray-50 tw-border-gray-300 tw-bg-white tw-cursor-pointer': currentPage != page }"
             (click)="go_to_page(page)">
             {{ page }}
         </a>
-        <a
+
+        </ng-container>
+        <button
             (click)="next_page()"
             class="tw-relative tw-inline-flex tw-items-center tw-rounded-r-md tw-border tw-border-gray-300 tw-bg-white tw-px-2 tw-py-2 tw-text-sm tw-font-medium tw-text-gray-500 hover:tw-bg-gray-50 focus:tw-z-20"
             [ngClass]="{'tw-text-gray-500 tw-cursor-pointer': currentPage < max_page, 'tw-text-gray-300 hover:tw-text-gray-300': currentPage >= max_page}"
@@ -34,6 +37,6 @@
                     d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
                     clip-rule="evenodd"></path>
             </svg>
-        </a>
+        </button>
     </nav>
 </div>
