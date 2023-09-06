@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
-import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Component, Input, OnInit, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { BehaviorSubject, Observable, Subject, combineLatest } from 'rxjs';
+import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 @Component({
   standalone: true,
@@ -10,12 +10,16 @@ import { map } from 'rxjs/operators';
   templateUrl: './pagination.component.html',
   styleUrls: ['./pagination.component.scss']
 })
-export class PaginationComponent implements OnInit {
+export class PaginationComponent implements OnInit, OnDestroy {
+
+  destroy$ = new Subject();
 
 
   currentPage$ = new BehaviorSubject<number>(1);
   totalCount$ = new BehaviorSubject<number>(0);
   itemsPerPage$ = new BehaviorSubject<number>(10);
+  nextPage$ = new Subject();
+
 
 
   pageList$: Observable<number[]>;
@@ -27,6 +31,7 @@ export class PaginationComponent implements OnInit {
     }
   }
   @Input() set itemsPerPage(value: number) {
+
     if (value && typeof value == 'number') {
       this.itemsPerPage$.next(value)
     }
@@ -46,7 +51,7 @@ export class PaginationComponent implements OnInit {
   constructor() {
 
     this.maxPage$ = combineLatest([this.totalCount$, this.itemsPerPage$]).pipe(
-      map(([totalCount, itemsPerPage]) => Math.round(totalCount / itemsPerPage))
+      map(([totalCount, itemsPerPage]) => Math.round(totalCount / itemsPerPage)),
     )
 
     this.pageList$ = combineLatest([
@@ -64,53 +69,46 @@ export class PaginationComponent implements OnInit {
       }
       return [...Array(button_count).keys()].map(x => x + currentPage - Math.floor(maxButton / 2))
     }))
+
+    this.currentPage$.pipe(
+      takeUntil(this.destroy$),
+    ).subscribe((value: number) => {
+      this.currentPageChange.emit(value)
+      this.pageChanged.emit({ page: value })
+    })
+
+    this.nextPage$.pipe(
+      takeUntil(this.destroy$),
+      switchMap(() => this.maxPage$),
+      map((maxPage: number) => {
+        if (this.currentPage$.value + 1 <= maxPage) {
+          this.go_to_page(this.currentPage$.value + 1)
+        }
+      }),
+    ).subscribe(() => { })
+
+
   }
-
-
-  pages_list() {
-    // if the total number of pages is smaller than the total number of items, we use the maximum number of pages instead
-    const button_count = this.max_page < this.maxSize ? this.max_page : this.maxSize
-    if (this.currentPage < button_count) {
-      return [...Array(button_count).keys()].map(x => x + 1);
-    }
-    if (this.currentPage > (this.max_page - button_count)) {
-      return [...Array(button_count).keys()].map(x => x + (this.max_page - button_count))
-    }
-    return [...Array(button_count).keys()].map(x => x + this.currentPage - Math.floor(button_count / 2))
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
   }
 
   go_to_page(page: number) {
-    console.log('go to page' + page)
-    console.log({ pageList: this.pages_list() })
-    this.currentPageChange.emit(page)
-    this.pageChanged.emit({ page })
-    this.currentPage = page;
+    this.currentPage$.next(page)
   }
 
-
-  get max_page() {
-    return Math.round(this.totalItems / this.itemsPerPage);
-  }
 
   previous_page() {
-    if (this.currentPage > 1) {
-      this.go_to_page(this.currentPage - 1)
+    if (this.currentPage$.value > 1) {
+      this.go_to_page(this.currentPage$.value - 1)
     }
   }
   next_page() {
-    if (this.currentPage + 1 <= this.max_page) {
-      this.go_to_page(this.currentPage + 1)
-    }
+    this.nextPage$.next(true);
   }
 
 
   ngOnInit(): void {
-    console.log({
-      page_list: this.pages_list(),
-      max_page: this.max_page,
-      totalItems: this.totalItems,
-      itemsPerPage: this.itemsPerPage
-    })
   }
 
 }
