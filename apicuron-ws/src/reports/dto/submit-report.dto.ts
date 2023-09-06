@@ -47,8 +47,8 @@ export class SubmitReportDto {
     @IsNotEmpty()
     resource_id: string;
 
-    @IsDate()
     @Type(() => Date)
+    @IsDateString()
     @IsNotEmpty()
     timestamp: Date;
 

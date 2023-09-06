@@ -67,8 +67,10 @@ export class SubmitBulkTask {
         try {
             const defaultReport = await this.parse_default_report(file)
             const user = await this.userModel.findOne({ orcid_id });
+            if(!user){
+                throw new Error(`User with the ORCID ID ${orcid_id} does not exist`)
+            }
             reportStream = this.build_report_stream(file, defaultReport, user)
-            
         } catch (e) {
 
             await this.notificationsService.create_user_notification(
@@ -76,6 +78,8 @@ export class SubmitBulkTask {
                 `Error: ${e.message} `,
                 orcid_id
             )
+
+            this.logger.error(`Error: ${e.message}`)
         }finally {
 
             if(reportStream){
@@ -265,7 +269,9 @@ export class SubmitBulkTask {
     private async validate_report(report: SubmitReportDto): Promise<ValidatedReport> {
         try {
             const validation_errors: ValidationError[] = await validate(report)
-
+            if(validation_errors.length > 0){
+                console.error(`Errors found in Report validation\n`, report)
+            }
             return {
                 report,
                 errors: validation_errors
