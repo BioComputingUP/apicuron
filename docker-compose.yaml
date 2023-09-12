@@ -63,7 +63,7 @@ services:
     depends_on:
       - apicuron-ui
       - apicuron-ws
-      - apicuron-docs
+      # - apicuron-docs
     ports:
       - 3000:3000
   
@@ -77,19 +77,19 @@ services:
     ports:
       - 27017:27017
 
-  apicuron-docs:
-    container_name: apicuron-docs
-    working_dir: "/home/node/app"
-    image: "node:16.14"
-    volumes:
-      - "./docs:/home/node/app"
-    user: $DOCKER_USER
-    networks:
-      - apicuron-network
-    ports:
-      - "8080:8080"
-    # dns: 10.69.69.1
-    command: "npm run dev"
+  # apicuron-docs:
+  #   container_name: apicuron-docs
+  #   working_dir: "/home/node/app"
+  #   image: "node:16.14"
+  #   volumes:
+  #     - "./docs:/home/node/app"
+  #   user: $DOCKER_USER
+  #   networks:
+  #     - apicuron-network
+  #   ports:
+  #     - "8080:8080"
+  #   # dns: 10.69.69.1
+  #   command: "npm run dev"
 
 
 networks:
