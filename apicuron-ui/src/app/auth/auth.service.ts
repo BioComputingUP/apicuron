@@ -1,5 +1,13 @@
 import { Router } from "@angular/router";
-import { filter, map, pluck, shareReplay, switchMap } from "rxjs/operators";
+import {
+  catchError,
+  filter,
+  map,
+  pluck,
+  shareReplay,
+  switchMap,
+  tap,
+} from "rxjs/operators";
 import { environment } from "../../environments/environment";
 import {
   BehaviorSubject,
@@ -10,6 +18,7 @@ import {
 } from "rxjs";
 import {
   HttpClient,
+  HttpErrorResponse,
   HttpEvent,
   HttpHandler,
   HttpInterceptor,
@@ -51,10 +60,6 @@ export class AuthService implements HttpInterceptor {
   loggedIn$: Observable<Boolean>;
 
   // authentication JWT token key and value
-  token_key = "authorization";
-  jwtSubscription: Subscription;
-  orcidTokenSubscription: Subscription;
-
   orcidPopup: Window;
   destroy$: any;
 
@@ -133,15 +138,14 @@ export class AuthService implements HttpInterceptor {
           return of(token);
         } else {
           const url = new URL("auth/token", environment.ws + "/");
-          const request: Observable<Object> = this.http
-            .get(url.href)
+          const request: Observable<Object> = this.http.get(url.href);
           return request;
         }
       }),
       pluck("token"),
       map((token: string) => {
-        const [prefix, key]= token.split(' ')
-        return key
+        const [prefix, key] = token.split(" ");
+        return key;
       })
     );
   }
@@ -157,6 +161,13 @@ export class AuthService implements HttpInterceptor {
     }
   }
 
+  private dropTokens(){
+    localStorage.removeItem(this.jwtHeader);
+    localStorage.removeItem(this.orcidHeader);
+    this.orcidToken$.next(null)
+    this.jwtToken$.next(null)
+  }
+
   get token_value() {
     return this.jwtToken$.getValue();
   }
@@ -167,27 +178,27 @@ export class AuthService implements HttpInterceptor {
       ? localStorage.setItem(this.jwtHeader, value)
       : localStorage.removeItem(this.jwtHeader);
   }
+  // Old method to extract token from cookies
+  // private get_token_from_cookies(): string | null {
+  //   // we check in the cookies for the token
+  //   const cookies = document.cookie.split("; ");
+  //   // get the cookie value
+  //   const authorization_cookie = cookies.find((x: string) =>
+  //     x.startsWith(this.jwtHeader)
+  //   );
 
-  private get_token_from_cookies(): string | null {
-    // we check in the cookies for the token
-    const cookies = document.cookie.split("; ");
-    // get the cookie value
-    const authorization_cookie = cookies.find((x: string) =>
-      x.startsWith(this.token_key)
-    );
+  //   // if the cookie value is there
+  //   if (authorization_cookie) {
+  //     // we remove it from the cookies and add it to the localStorage
+  //     document.cookie = ` ${this.jwtHeader}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
 
-    // if the cookie value is there
-    if (authorization_cookie) {
-      // we remove it from the cookies and add it to the localStorage
-      document.cookie = ` ${this.token_key}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
-
-      // extract the jwt token value
-      const [_, token_value] = authorization_cookie.split("=");
-      return decodeURI(token_value);
-    } else {
-      return null;
-    }
-  }
+  //     // extract the jwt token value
+  //     const [_, token_value] = authorization_cookie.split("=");
+  //     return decodeURI(token_value);
+  //   } else {
+  //     return null;
+  //   }
+  // }
 
   public openOauthDialog() {
     if (!this.orcidPopup) {
@@ -216,14 +227,18 @@ export class AuthService implements HttpInterceptor {
           const cloned = req.clone({
             setHeaders: authHeaders,
           });
-          return next.handle(cloned);
+          return next.handle(cloned).pipe(catchError((err: HttpErrorResponse) => {
+            if(err.status == 401){
+              this.dropTokens();
+              return next.handle(req);
+            }
+          }));
         } else {
           return next.handle(req);
         }
-      })
+      }),
     );
 
-    // return next.handle(req);
   }
 
   GetLogOut(): Observable<any> {
