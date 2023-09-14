@@ -10,7 +10,9 @@
   "repository": "/docs",
   "scripts": {
     "dev": "vuepress dev src",
-    "build": "vuepress build src"
+    "build": "vuepress build src",
+    "deploy-dev": "echo 'Building Dist' && npm run build && echo 'deploying to APICURON documentation Development' && rsync -av src/.vuepress/dist/ biocomp@persefone:/var/www/apicuron-dev/dist/apicuron-ui/docs/",
+    "deploy-prod": "echo 'Building Dist' && npm run build && echo 'deploying to APICURON documentation to Production' && rsync -av src/.vuepress/dist/ biocomp@persefone:/var/www/apicuron/dist/apicuron-ui/docs/"
   },
   "license": "MIT",
   "devDependencies": {

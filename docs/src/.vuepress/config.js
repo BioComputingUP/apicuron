@@ -1,5 +1,4 @@
 const { description } = require("../../package");
-
 module.exports = {
   /**
    * Ref：https://v1.vuepress.vuejs.org/config/#title
@@ -9,6 +8,9 @@ module.exports = {
    * Ref：https://v1.vuepress.vuejs.org/config/#description
    */
   description: description,
+
+  base: '/docs/',
+  
 
   /**
    * Extra tags to be injected to the page HTML `<head>`
@@ -82,12 +84,12 @@ module.exports = {
     lastUpdated: false,
     nav: [
       {
-        text: "Guide",
+        text: "General Guide",
         link: "/main/guide/",
       },
       {
-        text: "Get started",
-        link: "/main/get-started/",
+        text: 'Developer Documentation',
+        link: '/dev/introduction'
       },
       {
         text: "API Reference",
@@ -103,19 +105,23 @@ module.exports = {
       // }
     ],
     sidebar: {
-      "/main/": [
+      // "/main/":[
+      //   ['/main/guide/', 'Curator Documentation']
+      //   ['/dev/', 'Developer Documentation']
+      // ],
+      "/main/guide/": [
         {
-          title: "Get started",
-          collapsable: false,
-          children: ["/main/get-started/","/main/get-started/getting-started"],
-        },
-        {
-          title: "Guide",
+          title: "General Guide",
           collapsable: false,
           children: ["/main/guide/"],
         },
         
       ],
+      '/dev/': [
+        ['/dev/', 'Intro'],
+        '/dev/integration',
+        '/dev/privacy',
+      ]
     },
   },
 

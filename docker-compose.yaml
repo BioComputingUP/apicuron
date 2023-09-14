@@ -18,7 +18,7 @@ services:
     
     environment:
       - DATABASE_HOST=mongo-db
-      - DATABASE=apicuron_dev
+      - DATABASE=apicuron_test
       - DB_PORT=27017
     # dns: 10.69.69.1
     # logging:
@@ -77,19 +77,19 @@ services:
     ports:
       - 27017:27017
 
-  # apicuron-docs:
-  #   container_name: apicuron-docs
-  #   working_dir: "/home/node/app"
-  #   image: "node:16.14"
-  #   volumes:
-  #     - "./docs:/home/node/app"
-  #   user: $DOCKER_USER
-  #   networks:
-  #     - apicuron-network
-  #   ports:
-  #     - "8080:8080"
-  #   # dns: 10.69.69.1
-  #   command: "npm run dev"
+  apicuron-docs:
+    container_name: apicuron-docs
+    working_dir: "/home/node/app"
+    image: "node:16.14"
+    volumes:
+      - "./docs:/home/node/app"
+    user: $DOCKER_USER
+    networks:
+      - apicuron-network
+    ports:
+      - "8080:8080"
+    # dns: 10.69.69.1
+    command: "npm run dev"
 
 
 networks:
