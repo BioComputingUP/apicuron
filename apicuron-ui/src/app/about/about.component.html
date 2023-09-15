@@ -1,9 +1,9 @@
 <div class="tw-container tw-mx-auto sm:tw-px-4 tw-max-w-full tw-container-wide">
   <div class="tw-flex tw-flex-wrap tw-pt-3">
-    <div class="lg:tw-w-1/4 tw-pr-4 tw-pl-4 tw-hidden lg:tw-block xl:tw-block">
-      <div class="tw-sticky tw-sidebar">
+    <div class="tw-w-full lg:tw-w-1/4 tw-pr-4 tw-pl-4 lg:tw-block xl:tw-block">
+      <div class="sm:tw-sticky sm:tw-top-28 tw-sidebar">
         <div class="tw-flex tw-flex-wrap">
-          <div class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1 tw-px-4">
+          <div class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1 sm:tw-px-4">
             <div
               class="tw-relative tw-flex tw-flex-col tw-min-w-0 tw-rounded tw-break-words tw-border tw-bg-white tw-border-1 tw-border-gray-300">
               <div class="tw-py-3 tw-px-6 tw-mb-0 tw-bg-gray-200 tw-border-b-1 tw-border-gray-300 tw-text-gray-900">
@@ -20,7 +20,19 @@
                   </ul>
                   <li><a routerLink="." fragment="becomemember">Become a member</a></li>
                   <li><a routerLink="." fragment="license">License</a></li>
+                  <ul>
+                    <li><a routerLink="." fragment="elsi-policy">ELSI Policy and Equal Opportunity Research Support</a>
+                    </li>
+                  </ul>
                   <li><a routerLink="." fragment="privacy">Privacy notice</a></li>
+                  <li><a routerLink="." fragment="governance">Governance</a></li>
+                  <ul>
+                    <li><a routerLink="." fragment="team">APICURON Team</a></li>
+                    <li><a routerLink="." fragment="qa-life-cycle-plan">QA Life Cycle Plan</a></li>
+                    <li><a routerLink="." fragment="sab">SAB</a></li>
+
+                  </ul>
+                  <li><a routerLink="." fragment="funding">Funding</a></li>
                 </ul>
 
               </div>
@@ -29,10 +41,10 @@
         </div>
       </div>
     </div>
-    <div class="lg:tw-w-3/4 tw-pr-4 tw-pl-4">
+    <div class="lg:tw-w-3/4 tw-pr-4 tw-pl-2 sm:tw-pl-0 sm:tw-pr-8">
       <h1 id="top">About APICURON</h1>
       <div class="tw-flex tw-flex-wrap">
-        <div class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1 tw-px-4">
+        <div class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1">
           <h2 class="tw-pt-3 tw-pb-2" id="intro">How to cite</h2>
           <p class="tw-text-justify">
             <span class="tw-font-bold">APICURON: a database to credit and acknowledge the work of biocurators</span>
@@ -115,11 +127,12 @@
           </ul>
           A list of the entity and activity terms for each one of our partner databases is available.
 
-          <h4 class="tw-mt-2" id="gamification">Gamification</h4>
+          <h4 class="tw-mt-2" id="gamification">Badges and scores</h4>
           <p class="tw-text-justify">
             Gamification is a trending topic that consists of providing motivational affordances and “gameful”
             experiences
-            in non-game related settings. In APICURON it is used to support biocurators’ engagement by acknowledging
+            in non-game related settings. In <strong>APICURON</strong> it is used to support biocurators engagement by
+            acknowledging
             their
             work and effort. Badges and scores are assigned to each biocurator based on their achievements, as a
             positive
@@ -149,14 +162,14 @@
           <p>
             To become an APICURON member database and open an account to submit data please
             <strong>contact us</strong> at
-            <a
+            <a class="tw-underline hover:tw-blue-500"
               href="mailto:apicuron@ngp-net.bio.unipd.it?subject=Database membership request">apicuron@ngp-net.bio.unipd.it</a>
           </p>
 
         </div>
       </div>
       <div class="tw-flex tw-flex-wrap" id="license">
-        <div class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1 tw-px-4">
+        <div class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1">
           <h2 class="tw-pt-3 tw-pb-2">License</h2>
           <div class="tw-self-center">
             <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
@@ -170,106 +183,211 @@
 
           </div>
 
+          <div id="elsi-policy" class="tw-ml-2 sm:tw-ml-4">
+            <h4>ELSI Policy and Equal Opportunity</h4>
+            <p class="tw-whitespace-pre-line">
+              MobiDB is committed to upholding ethical, legal, and social implications (ELSI) policies and providing
+              equal opportunity research support. These principles ensure that the database operates in a fair and
+              inclusive manner, taking into account the ethical considerations and promoting equal access and
+              opportunity for all users and researchers.
+            </p>
+          </div>
         </div>
       </div>
 
-      <h2 id="privacy" class="tw-pt-3 tw-pb-2">Privacy notice</h2>
-      <p>
-        This privacy notice explains what personal data is collected by APICURON, for what purposes, how it is
-        processed,
-        and how we keep it secure.
-      </p>
-      <h5 class="tw-pt-2"><strong>Who controls your personal data and how to contact us?</strong></h5>
+      <!-- Privacy Notice -->
+      <div>
+        <h2 id="privacy" class="tw-pt-3 tw-pb-2">Privacy notice</h2>
+        <p>
+          This privacy notice explains what personal data is collected by APICURON, for what purposes, how it is
+          processed,
+          and how we keep it secure.
+        </p>
+        <h5 class="tw-pt-2"><strong>Who controls your personal data and how to contact us?</strong></h5>
 
-      <div class="tw-flex tw-flex-wrap">
-        <div class="tw-w-1/2">
-          <strong>Data controller</strong>'s contact details are:<br>
-          Damiano Piovesan<br>
-          University of Padua, Department of Biomedical Sciences<br>
-          Viale G. Colombo 3<br>
-          35131 Padua, Italy<br>
-          <svg-icon src="assets/svg/phone.svg" svgClass="tw-w-4 tw-h-4 tw-inline" ></svg-icon>
-          <a href="tel:+39 049 827 6269">+39 049 827 6269</a>
-          <br>
-          <svg-icon src="assets/svg/envelope.svg" svgClass="tw-w-4 tw-h-4 tw-inline" ></svg-icon> <a href="mailto:apicuron@ngp-net.bio.unipd.it">apicuron@ngp-net.bio.unipd.it</a>
+        <div class="tw-flex tw-flex-wrap">
+          <p class="tw-w-1/2 tw-block">
+            <strong>Data controller</strong>'s contact details are:<br>
+            Damiano Piovesan<br>
+            University of Padua, Department of Biomedical Sciences<br>
+            Viale G. Colombo 3<br>
+            35131 Padua, Italy<br>
+            <svg-icon src="assets/svg/phone.svg" svgClass="tw-w-4 tw-h-4 tw-inline"></svg-icon>
+            <a href="tel:+39 049 827 6269">+39 049 827 6269</a>
+            <br>
+            <svg-icon src="assets/svg/envelope.svg" svgClass="tw-w-4 tw-h-4 tw-inline"></svg-icon> <a
+              href="mailto:apicuron@ngp-net.bio.unipd.it">apicuron@ngp-net.bio.unipd.it</a>
+          </p>
+          <p class="tw-w-1/2 tw-block">
+            <strong>Data protection officer</strong>'s contact details are:<br>
+            Director of the Department of Biomedical Sciences, University of Padua<br>
+            University of Padua, Department of Biomedical Sciences<br>
+            Viale G. Colombo 3<br>
+            35131 Padua, Italy<br>
+            <svg-icon src="assets/svg/phone.svg" svgClass="tw-w-4 tw-h-4 tw-inline"></svg-icon> <a
+              href="tel:+39 049 827 6047">+39 049 827 6047</a><br>
+            <svg-icon src="assets/svg/envelope.svg" svgClass="tw-w-4 tw-h-4 tw-inline"></svg-icon> <a
+              href="mailto:direzione.biomed@unipd.it">direzione.biomed@unipd.it</a>
+          </p>
         </div>
-        <div class="tw-w-1/2">
-          <strong>Data protection officer</strong>'s contact details are:<br>
-          Director of the Department of Biomedical Sciences, University of Padua<br>
-          University of Padua, Department of Biomedical Sciences<br>
-          Viale G. Colombo 3<br>
-          35131 Padua, Italy<br>
-          <svg-icon src="assets/svg/phone.svg" svgClass="tw-w-4 tw-h-4 tw-inline" ></svg-icon> <a href="tel:+39 049 827 6047">+39 049 827 6047</a><br>
-          <svg-icon src="assets/svg/envelope.svg" svgClass="tw-w-4 tw-h-4 tw-inline" ></svg-icon> <a href="mailto:direzione.biomed@unipd.it">direzione.biomed@unipd.it</a>
+        <h5 class="tw-pt-2"><strong>What is our lawful basis for processing your personal data?</strong></h5>
+        <p>
+          Processing your personal data is necessary for our legitimate interest of allowing the day-to-day management,
+          operation and functioning of APICURON.
+        </p>
+        <h5 class="tw-pt-2"><strong>How will your personal data be used?</strong></h5>
+        <p>We will use the personal data to:</p>
+        <ul>
+          <li>provide user access to the service</li>
+          <li>create anonymous usage statistics</li>
+        </ul>
+        <h5 class="tw-pt-2"><strong>Who will have access to your personal data?</strong></h5>
+        <p>The personal data will be disclosed to authorized APICURON staff.</p>
+        <h5 class="tw-pt-2"><strong>Will your personal data be transferred to third countries (i.e. countries not part
+            of
+            EU/EAA) and/or
+            international organisations?</strong></h5>
+        <p>Personal data is transferred to the following service provider based in a third country which APICURON relies
+          on
+          to provide the service:</p>
+        <ul>
+          <li>Google Analytics</li>
+        </ul>
+        <p>There are no personal data transfers to international organisations.</p>
+        <h5 class="tw-pt-2"><strong>How long do we keep your personal data?</strong></h5>
+        <p>Any personal data directly obtained from you will be retained as long as the service is live, even if you
+          stop
+          using the service. We will keep the personal data for the minimum amount of time possible to ensure legal
+          compliance and to facilitate internal and external audits if they arise. Access to the web and security logs
+          containing personal data are restricted to relevant APICURON staff.
+        </p>
+        <h5 class="tw-pt-2"><strong>Your rights regarding your personal data</strong></h5>
+        <p>You have the right to:</p>
+        <ol type="1">
+          <li>
+            Not be subject to decisions based solely on an automated processing of data (i.e. without human
+            intervention) without you having your views taken into consideration.
+          </li>
+          <li>
+            Request at reasonable intervals and without excessive delay or expense, information about the personal data
+            processed about you. Under your request we will inform you in writing about, for example, the origin of the
+            personal data or the preservation period.
+          </li>
+          <li>
+            Request information to understand data processing activities when the results of these activities are
+            applied to you.
+          </li>
+          <li>
+            Object at any time to the processing of your personal data unless we can demonstrate that we have legitimate
+            reasons to process your personal data.
+          </li>
+          <li>
+            Request free of charge and without excessive delay rectification or erasure of your personal data.
+          </li>
+        </ol>
+        <p>
+          It must be clarified that rights 4 and 5 are only available whenever the processing of your personal data is
+          not
+          necessary to:
+        </p>
+        <ul>
+          <li>Comply with a legal obligation.</li>
+          <li>Perform a task carried out in the public interest.</li>
+          <li>Exercise authority as a data controller.</li>
+          <li>
+            Archive for purposes in the public interest, or for historical research purposes, or for statistical
+            purposes.
+          </li>
+          <li>Establish, exercise or defend legal claims.</li>
+        </ul>
+      </div>
+
+      <!-- Governance -->
+      <div id="governance">
+        <h2>Governance</h2>
+
+        <!-- APICURON Team -->
+        <div class="tw-ml-4" id="team">
+          <h4>APICURON Team</h4>
+          <p class="tw-whitespace-pre-wrap ">The <strong>APICURON</strong> resource is maintained at the <a
+              href="https://biocomputingup.it/">BioComputingUP</a> lab, <a href="https://www.unipd.it/en/dsb">Department
+              of Biomedical Sciences</a>, <a href="https://www.unipd.it/">University of Padova</a> - italy
+
+            <br>
+            <span class="tw-font-bold">Team members</span>
+          <ul>
+            <li>Silvio CE Tosatto - Team leader (Full Professor)</li>
+            <li>Damiano Piovesan - Team leader & software developer (Associate Professor)</li>
+            <li>Bouhraoua Kamel Eddine Adel - Web Developer (PhD Student)</li>
+            <li>Ivan Micetic - System administrator & support</li>
+          </ul>
+
+          <span class="tw-font-bold tw-text-gray-700">Previous contributors</span>
+          <ul>
+            <li>András Hatos - Web Developer (PhD Student)</li>
+          </ul>
+
+        </div>
+
+        <!-- QA Life Cycle Plan -->
+        <div class="tw-ml-4" id="qa-life-cycle-plan">
+          <h4>QA Life Cycle Plan</h4>
+          <p class="tw-whitespace-pre-wrap">The goal of the Quality Assurance (QA) Life Cycle Plan is to ensure the
+            continuous improvement, reliability, and accuracy of the MobiDB database, focusing on the implementation of
+            effective QA and QC practices. The document outlines the standard operating procedures (SOPs), roadmap,
+            resource improvement plan, and QA/QC implementation strategies for maintaining the quality of the MobiDB
+            database.
+            <br>
+            <br>
+
+            The QA Life Cycle Plan for MobiDB serves as a roadmap for ensuring the ongoing quality and reliability of
+            the database. By following the defined SOPs, adhering to the roadmap, implementing the resource improvement
+            plan, and executing effective QA/QC practices, we aim to provide users with a robust and accurate resource
+            for intrinsically disordered protein information. Regular reviews, internal audits, and continuous
+            improvement efforts will be integral to maintaining the high standards expected from MobiDB.
+            <br>
+            <a href="https://docs.google.com/document/d/1kJxmbaMwzrbKhNa6i7ntdkzg2G7rt6B3pGcr8ZZWQF4/edit?usp=sharing">Quality
+              Assurance Life Cycle Plan document
+              <svg-icon src="assets/svg/document-text.svg" alt="Quality Assurance Life Cycle Plan Document"
+                svgClass="tw-h-5 tw-w-5 tw-inline " class="tw-align-text-bottom"></svg-icon>
+            </a>
+          </p>
+
+        </div>
+
+
+        <!-- SAB -->
+        <div class="tw-ml-4" id="sab">
+          <h4>SAB</h4>
+          <p class="tw-whitespace-pre-line">APICURON does not currently have a separate Scientific Advisory Board, it is
+            reviewed through the SAB of <a href="https://elixir-italy.org/about/sab/">the Italian ELIXIR node</a>.
+            Moreover, it is involved in the ELIXIR Biocuration Focus Group and linked to the International Society for
+            Biocuration (ISB). These connections to the broader biocuration community provide valuable guidance and
+            feedback to help ensure that the platform operates in accordance with best practices and standards.</p>
+
         </div>
       </div>
-      <h5 class="tw-pt-2"><strong>What is our lawful basis for processing your personal data?</strong></h5>
-      <p>
-        Processing your personal data is necessary for our legitimate interest of allowing the day-to-day management,
-        operation and functioning of APICURON.
-      </p>
-      <h5 class="tw-pt-2"><strong>How will your personal data be used?</strong></h5>
-      <p>We will use the personal data to:</p>
-      <ul>
-        <li>provide user access to the service</li>
-        <li>create anonymous usage statistics</li>
-      </ul>
-      <h5 class="tw-pt-2"><strong>Who will have access to your personal data?</strong></h5>
-      <p>The personal data will be disclosed to authorized APICURON staff.</p>
-      <h5 class="tw-pt-2"><strong>Will your personal data be transferred to third countries (i.e. countries not part of
-          EU/EAA) and/or
-          international organisations?</strong></h5>
-      <p>Personal data is transferred to the following service provider based in a third country which APICURON relies
-        on
-        to provide the service:</p>
-      <ul>
-        <li>Google Analytics</li>
-      </ul>
-      <p>There are no personal data transfers to international organisations.</p>
-      <h5 class="tw-pt-2"><strong>How long do we keep your personal data?</strong></h5>
-      <p>Any personal data directly obtained from you will be retained as long as the service is live, even if you stop
-        using the service. We will keep the personal data for the minimum amount of time possible to ensure legal
-        compliance and to facilitate internal and external audits if they arise. Access to the web and security logs
-        containing personal data are restricted to relevant APICURON staff.
-      </p>
-      <h5 class="tw-pt-2"><strong>Your rights regarding your personal data</strong></h5>
-      <p>You have the right to:</p>
-      <ol type="1">
-        <li>
-          Not be subject to decisions based solely on an automated processing of data (i.e. without human
-          intervention) without you having your views taken into consideration.
-        </li>
-        <li>
-          Request at reasonable intervals and without excessive delay or expense, information about the personal data
-          processed about you. Under your request we will inform you in writing about, for example, the origin of the
-          personal data or the preservation period.
-        </li>
-        <li>
-          Request information to understand data processing activities when the results of these activities are
-          applied to you.
-        </li>
-        <li>
-          Object at any time to the processing of your personal data unless we can demonstrate that we have legitimate
-          reasons to process your personal data.
-        </li>
-        <li>
-          Request free of charge and without excessive delay rectification or erasure of your personal data.
-        </li>
-      </ol>
-      <p>
-        It must be clarified that rights 4 and 5 are only available whenever the processing of your personal data is not
-        necessary to:
-      </p>
-      <ul>
-        <li>Comply with a legal obligation.</li>
-        <li>Perform a task carried out in the public interest.</li>
-        <li>Exercise authority as a data controller.</li>
-        <li>
-          Archive for purposes in the public interest, or for historical research purposes, or for statistical
-          purposes.
-        </li>
-        <li>Establish, exercise or defend legal claims.</li>
-      </ul>
+
+      <div id="funding">
+        <h2>Funding</h2>
+        <p class="tw-whitespace-pre-line">
+          APICURON is currently supported by the University of Padova, which provides the necessary hardware
+          infrastructure and personnel for software maintenance, both via its core funding and ELIXIR-Italy funding. In
+          addition, APICURON has received support from ELIXIR's Data Platform, which has provided funding to improve
+          integration with core data resources and to enhance guidelines and standardization processes for connecting
+          resources.<br><br>
+
+          To ensure the long-term sustainability of APICURON, we plan to pursue additional funding opportunities from
+          both public and private sources. We will also explore partnerships with relevant organizations and
+          stakeholders to increase the visibility and impact of the platform.<br><br>
+          Additionally, we plan to explore potential revenue streams, such as charging for premium features or offering
+          consulting services, to supplement existing funding sources; especially for private entities such as
+          pharmaceutical companies building their private datasets. Finally, we will continue to prioritize sustainable
+          software development practices to ensure that the platform remains stable, secure, and efficient.
+
+        </p>
+
+      </div>
     </div>
   </div>
 </div>

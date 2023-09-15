@@ -17,6 +17,14 @@
   max-height: 30px;
 }
 
+a {
+  @apply hover:tw-underline
+}
+
+li {
+  @apply tw-pb-1
+}
+
 //
 //.logoimg {
 //  max-width: 6rem;

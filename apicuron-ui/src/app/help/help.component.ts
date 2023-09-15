@@ -7,10 +7,16 @@ import { environment } from "../../environments/environment";
   styleUrls: ["./help.component.scss"],
 })
 export class HelpComponent implements OnInit {
+  navigation_panel = [
+    { text: "Web interface", href: "#gui" },
+    { text: "API", href: "#api" },
+    { text: "Widget", href: "#widget" },
+    { text: "Open Collaboration and Feedback", href: "#feedback" },
+  ];
   codeWidget = `<apicuron-widget database="disprot"></apicuron-widget>
 <script type="text/javascript" src="https://apicuron.org/assets/apicuron-widget.js"></script>`;
 
-  wsname = environment.ws;
+  wsname = environment.ws + "/";
   curator_orcid = "0000-0002-0341-4888";
   resource_uri = "https://registry.identifiers.org/registry/disprot";
   output = {};

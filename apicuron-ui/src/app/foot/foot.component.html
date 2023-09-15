@@ -1,3 +1,70 @@
+<div class="">
+  <div class="tw-relative tw-w-full tw-bg-apicuron-purple tw-text-gray-200">
+    <div class="tw-flex tw-flex-row tw-flex-wrap tw-w-full tw-justify-around tw-container sm:tw-p-6 tw-p-2 tw-mx-auto">
+      <div class="tw-p-1 sm:tw-p-2">
+        <img src="assets/APICURON_white.svg" alt="APICURON LOGO">
+      </div>
+
+      <div class="tw-p-1 sm:tw-p-2">
+        <span class="tw-text-white tw-font-bold tw-text-base">
+          <a routerLink="/about" class="tw-underline">About us</a>
+        </span>
+        <ul class="tw-text-sm tw-font-normal">
+          <li>
+            <a [routerLink]="'/about'" fragment="intro">About APICURON </a>
+          </li>
+          <li>
+            <a [routerLink]="['/about']" fragment="becomemember">Become a member Resource</a>
+          </li>
+          <li>
+            <a [routerLink]="['/about']" fragment="license">License</a>
+          </li>
+          <li>
+            <a [routerLink]="['/about']" fragment="governance">Governance</a>
+          </li>
+        </ul>
+      </div>
+      <div class="tw-p-1 sm:tw-p-2">
+        <span class="tw-text-white tw-font-bold tw-text-base">
+          <a routerLink="/help" class="tw-underline">Help</a>
+        </span>
+        <ul class="tw-text-sm tw-font-normal">
+          <li>
+            <a [href]="host + '/docs/'">Documentation</a>
+          </li>
+          <li>
+            <a [href]="ws">API Documentation</a>
+          </li>
+          <li>
+            <a [href]="host + '/docs/dev/widgets.html'">Widgets</a>
+          </li>
+          <li>
+            <a [routerLink]="['/help']" fragment="feedback">Open Collaboration and Feedback</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="tw-p-1 sm:tw-p-2">
+        <span class="tw-text-white tw-font-bold tw-text-base">Contact</span>
+        <ul class="tw-text-sm tw-font-normal">
+          <li>
+            <a href="https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w">Join Slack</a>
+          </li>
+          <li>
+            <a href="mailto:apicuron@ngp-net.bio.unipd.it">E-mail</a>
+          </li>
+          <li>
+            <a href="https://github.com/BioComputingUP/apicuron-issue-tracker">Issue Tracker</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+
 <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-between tw-bg-black tw-gap-2 tw-py-2 tw-items-center">
   <span class="tw-text-xs tw-text-white tw-font-light tw-text-center sm:tw-text-right">
     BioComputing UP - Department of Biomedical Sciences - University of Padua, Italy - 2019. <a

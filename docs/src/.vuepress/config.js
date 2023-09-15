@@ -3,7 +3,7 @@ module.exports = {
   /**
    * Ref：https://v1.vuepress.vuejs.org/config/#title
    */
-  title: "APICURON Official Documentation",
+  title: "APICURON Documentation",
   /**
    * Ref：https://v1.vuepress.vuejs.org/config/#description
    */
@@ -79,7 +79,7 @@ module.exports = {
   themeConfig: {
     repo: "",
     editLinks: false,
-    docsDir: "",
+    docsDir: "docs",
     editLinkText: "",
     lastUpdated: false,
     nav: [
@@ -92,17 +92,14 @@ module.exports = {
         link: '/dev/introduction'
       },
       {
+        text: 'Join Slack',
+        link:'https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w'
+      },
+      {
         text: "API Reference",
         link: "http://dev.apicuron.org/api/",
       },
-      // {
-      //   text: 'Config',
-      //   link: '/config/'
-      // },
-      // {
-      //   text: 'VuePress',
-      //   link: 'https://v1.vuepress.vuejs.org'
-      // }
+      
     ],
     sidebar: {
       // "/main/":[
@@ -120,6 +117,7 @@ module.exports = {
       '/dev/': [
         ['/dev/', 'Intro'],
         '/dev/integration',
+        '/dev/widgets',
         '/dev/privacy',
       ]
     },

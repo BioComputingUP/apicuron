@@ -1,4 +1,5 @@
 import { Component, OnInit } from "@angular/core";
+import { environment } from "../../environments/environment";
 
 @Component({
   selector: "app-foot",
@@ -7,6 +8,10 @@ import { Component, OnInit } from "@angular/core";
 })
 export class FootComponent implements OnInit {
   constructor() {}
+
+
+  host = environment.host;
+  ws = environment.ws + '/';
 
   link_list = [
     {
