@@ -1,4 +1,4 @@
-p, h2, h2, h4, li {
+p, h2, h2, h4, h5, li {
   @apply tw-text-gray-700 tw-leading-relaxed tw-text-justify;
 }
 
@@ -12,6 +12,10 @@ h2 {
 
 h4 {
   @apply tw-text-2xl tw-mt-1;
+}
+
+h5 {
+  @apply tw-text-xl tw-mt-1;
 }
 ul {
   @apply tw-list-disc tw-ml-12;
