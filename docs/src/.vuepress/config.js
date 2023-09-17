@@ -9,8 +9,7 @@ module.exports = {
    */
   description: description,
 
-  base: '/docs/',
-  
+  base: "/docs/",
 
   /**
    * Extra tags to be injected to the page HTML `<head>`
@@ -77,6 +76,8 @@ module.exports = {
    * ref：https://v1.vuepress.vuejs.org/theme/default-theme-config.html
    */
   themeConfig: {
+    // TODO: Enable in the future
+    // search: true,
     repo: "",
     editLinks: false,
     docsDir: "docs",
@@ -88,38 +89,50 @@ module.exports = {
         link: "/main/guide/",
       },
       {
-        text: 'Developer Documentation',
-        link: '/dev/introduction'
+        text: "Developer Documentation",
+        link: "/dev/",
       },
       {
-        text: 'Join Slack',
-        link:'https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w'
+        text: "Join Slack",
+        link: "https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w",
       },
       {
         text: "API Reference",
         link: "http://dev.apicuron.org/api/",
       },
-      
     ],
     sidebar: {
-      // "/main/":[
-      //   ['/main/guide/', 'Curator Documentation']
-      //   ['/dev/', 'Developer Documentation']
-      // ],
       "/main/guide/": [
         {
           title: "General Guide",
           collapsable: false,
           children: ["/main/guide/"],
         },
-        
       ],
-      '/dev/': [
-        ['/dev/', 'Intro'],
-        '/dev/integration',
-        '/dev/widgets',
-        '/dev/privacy',
-      ]
+      "/dev/": [
+        ["/dev/", "Intro"],
+        "/dev/integration",
+        "/dev/widgets",
+        "/dev/privacy",
+        {
+          title: "API",
+          collapsable: false,
+          children: [
+            ["https://apicuron.org/api/", "API reference"],
+            [
+              "https://apicuron.org/api/#/Partner%20Resources",
+              "Partner Resources",
+            ],
+            ["https://apicuron.org/api/#/Curation%20Terms", "Curation Terms"],
+            [
+              "https://apicuron.org/api/#/Achievements%20Definition",
+              "Curation Terms",
+            ],
+            ["https://apicuron.org/api/#/Reports", "Reports"],
+            ["https://apicuron.org/api/#/Statistics", "Statistics"],
+          ],
+        },
+      ],
     },
   },
 

@@ -6,54 +6,83 @@
       </div>
 
       <div class="tw-p-1 sm:tw-p-2">
-        <span class="tw-text-white tw-font-bold tw-text-base">
-          <a routerLink="/about" class="tw-underline">About us</a>
-        </span>
+        <span class="tw-text-apicuron-purple-100 tw-opacity-75 tw-font-bold tw-text-lg sm:tw-mb-2">
+          About us </span>
         <ul class="tw-text-sm tw-font-normal">
           <li>
             <a [routerLink]="'/about'" fragment="intro">About APICURON </a>
           </li>
           <li>
+            <svg-icon src="assets/svg/member.svg" svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"></svg-icon>
             <a [routerLink]="['/about']" fragment="becomemember">Become a member Resource</a>
           </li>
           <li>
+            <svg-icon src="assets/svg/tags.svg" svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"></svg-icon>
             <a [routerLink]="['/about']" fragment="license">License</a>
           </li>
           <li>
+            <svg-icon src="assets/svg/sitemap.svg" svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"></svg-icon>
             <a [routerLink]="['/about']" fragment="governance">Governance</a>
+          </li>
+          <li>
+            <svg-icon src="assets/svg/euro.svg" svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"></svg-icon>
+            <a [routerLink]="['/about']" fragment="funding">Funding</a>
+          </li>
+          <li>
+            <svg-icon src="assets/svg/box.svg" svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"></svg-icon>
+
+            <a [routerLink]="['/about']" fragment="qa-life-cycle-plan">QA Plan</a>
+          </li>
+          <li>
+            <svg-icon src="assets/svg/badge-solid.svg" svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"></svg-icon>
+            <a [routerLink]="['/about']" fragment="sab">SAB</a>
           </li>
         </ul>
       </div>
       <div class="tw-p-1 sm:tw-p-2">
-        <span class="tw-text-white tw-font-bold tw-text-base">
-          <a routerLink="/help" class="tw-underline">Help</a>
+        <span class="tw-text-apicuron-purple-100 tw-opacity-75 tw-font-bold tw-text-lg sm:tw-mb-2">
+          Help
         </span>
-        <ul class="tw-text-sm tw-font-normal">
+        <ul class="tw-text-base tw-font-normal">
           <li>
-            <a [href]="host + '/docs/'">Documentation</a>
+            <a routerLink="/help">Help</a>
           </li>
           <li>
+
+            <a [href]="host + '/docs/'">
+              <svg-icon src="assets/svg/document-text.svg" svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"></svg-icon>
+              Documentation
+            </a>
+          </li>
+          <li>
+            <svg-icon src="assets/svg/wrench.svg" svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"></svg-icon>
             <a [href]="ws">API Documentation</a>
           </li>
           <li>
-            <a [href]="host + '/docs/dev/widgets.html'">Widgets</a>
+            <svg-icon src="assets/svg/widget.svg" svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"></svg-icon>
+            <a [href]="host + '/docs/dev/widgets.html'">APICURON Widgets</a>
           </li>
           <li>
+            <svg-icon src="assets/svg/message-bubble.svg" svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"></svg-icon>
             <a [routerLink]="['/help']" fragment="feedback">Open Collaboration and Feedback</a>
           </li>
         </ul>
       </div>
 
       <div class="tw-p-1 sm:tw-p-2">
-        <span class="tw-text-white tw-font-bold tw-text-base">Contact</span>
+        <span class="tw-text-apicuron-purple-100 tw-opacity-75 tw-font-bold tw-text-lg sm:tw-mb-2">Contact</span>
         <ul class="tw-text-sm tw-font-normal">
           <li>
+            <svg-icon src="assets/svg/slack-icon.svg"
+              svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1 tw-text-apicuron-purple-100 tw-opacity-75"></svg-icon>
             <a href="https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w">Join Slack</a>
           </li>
           <li>
+            <svg-icon src="assets/svg/envelope.svg" svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"></svg-icon>
             <a href="mailto:apicuron@ngp-net.bio.unipd.it">E-mail</a>
           </li>
           <li>
+            <svg-icon src="assets/svg/bug.svg" svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"></svg-icon>
             <a href="https://github.com/BioComputingUP/apicuron-issue-tracker">Issue Tracker</a>
           </li>
         </ul>

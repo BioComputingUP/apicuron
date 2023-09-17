@@ -1,4 +1,4 @@
-@import '../../styles';
+@import "../../styles";
 
 .footer {
   background-color: theme-color("footer");
@@ -10,7 +10,7 @@
 }
 
 .footer-link:hover {
-  color: #61CCE5;
+  color: #61cce5;
 }
 
 .img-fluid {
@@ -18,37 +18,9 @@
 }
 
 a {
-  @apply hover:tw-underline
+  @apply hover:tw-underline;
 }
 
 li {
-  @apply tw-pb-1
+  @apply tw-pb-1;
 }
-
-//
-//.logoimg {
-//  max-width: 6rem;
-//}
-//
-//.logoimg2 {
-//  //max-width: 6rem ;
-//  max-height: 3rem;
-//  margin-right: 2rem !important;
-//  margin-bottom: 1rem !important;
-//}
-//
-//.logoimg20 {
-//  //max-width: 6rem ;
-//  max-height: 3rem;
-//  margin-right: 0rem !important;
-//  margin-bottom: 1rem !important;
-//}
-//
-//.logoimg3 {
-//  //max-width: 6rem ;
-//  max-height: 2rem;
-//  margin-right: 2rem !important;
-//  margin-bottom: 1rem !important;
-//}
-
-

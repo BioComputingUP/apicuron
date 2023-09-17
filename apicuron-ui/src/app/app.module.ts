@@ -17,8 +17,6 @@ import { AuthDropdownComponent } from "./components/auth-dropdown/auth-dropdown.
 import { NotificationsDataModule } from "./notifications-data/notifications-data.module";
 import { NgxPopperModule } from "ngx-popper";
 import { SentryModuleConfig } from "../config/sentry.config";
-import { PRECONNECT_CHECK_BLOCKLIST } from "@angular/common";
-import { environment } from "../environments/environment";
 @NgModule({
   declarations: [
     AppComponent,

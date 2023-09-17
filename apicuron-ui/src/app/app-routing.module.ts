@@ -4,6 +4,7 @@ import { AuthGuard } from "./auth/auth.guard";
 import { IndexComponent } from "./index/index.component";
 import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
 import { MainLayoutComponent } from "./main-layout/main-layout.component";
+import { environment } from "../environments/environment";
 
 const routes: Routes = [
   {
@@ -55,14 +56,16 @@ const routes: Routes = [
     loadChildren: () =>
       import("./dashboard/dashboard.module").then((m) => m.DashboardModule),
   },
-  {
-    path: "docs",
-    component: MainLayoutComponent,
-    loadChildren: () =>
-      import("./documentation/documentation.module").then(
-        (m) => m.DocumentationModule
-      ),
-  },
+  // {
+  //   path: "docs",
+  //   redirectTo: '/docs/'
+  //   // Old Version of the docs
+  //   // component: MainLayoutComponent,
+  //   // loadChildren: () =>
+  //   //   import("./documentation/documentation.module").then(
+  //   //     (m) => m.DocumentationModule
+  //   //   ),
+  // },
   { path: "api", redirectTo: "/api/" },
   {
     path: "",
