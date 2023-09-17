@@ -250,8 +250,7 @@ export class AuthService implements HttpInterceptor {
   }
 
   logout(): void {
-    this.token_value = null;
-    this.setOrcidToken(null);
+    this.dropTokens();
     this.router.navigate([""]);
   }
 }
