@@ -1,6 +1,5 @@
+## The Web interface
 
-# Using APICURON
+## Integration with ORCID
 
-## Concepts
-
-The base structure **APICURON** relies on to enable you to recognize your efforts is to add a
+<!-- ## your rights to your data -->
