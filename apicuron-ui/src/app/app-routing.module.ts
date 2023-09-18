@@ -66,6 +66,7 @@ const routes: Routes = [
   //   //     (m) => m.DocumentationModule
   //   //   ),
   // },
+  { path: "docs", redirectTo: "/docs/" },
   { path: "api", redirectTo: "/api/" },
   {
     path: "",
