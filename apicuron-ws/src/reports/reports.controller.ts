@@ -12,9 +12,8 @@ import {
 	Logger,
 	ForbiddenException,
 	InternalServerErrorException,
-	Inject,
+	BadRequestException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
 	ApiBearerAuth,
@@ -22,16 +21,15 @@ import {
 	ApiHeader,
 	ApiOkResponse,
 	ApiOperation,
+	ApiQuery,
 	ApiSecurity,
 	ApiTags,
 } from '@nestjs/swagger';
 
-import { createReadStream } from 'fs';
 import { SchedulerClientService } from '../scheduler-client/services/scheduler-client.service';
 import { HasAResourceGuard } from '../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { VersionHeader } from '../swagger/config';
-import { ParseUnsignedIntPipe } from '../shared/pipes/unsigned-int-validation.pipe';
 import { ReportDto } from './dto/report.dto';
 import { SubmitBulkDto, SubmitReportDto } from './dto/submit-report.dto';
 import { ReportsService } from './reports.service';
@@ -40,14 +38,14 @@ import {
 	ReportFilterGroupedDto,
 } from './dto/report-filter.dto';
 import * as _ from 'lodash';
-import { plainToClass, plainToInstance } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import { Model } from 'mongoose';
 import {
 	Statistics,
 	StatisticsDocument,
 } from '../core/schemas/statistics.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { TermsService } from '../terms/terms.service';
+import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
@@ -57,8 +55,7 @@ export class ReportsController {
 		private reportService: ReportsService,
 		private schedulerService: SchedulerClientService,
 		@InjectModel(Statistics.name) private statModel: Model<StatisticsDocument>,
-		private termService: TermsService,
-		private config: ConfigService,
+		private resourceService: PartnerResourcesService
 	) {}
 
 	logger = new Logger(ReportsController.name);
@@ -101,16 +98,23 @@ export class ReportsController {
 		return await this.reportService.getGroupedReports(groupByInstance);
 	}
 
+
+	
+
 	@ApiOperation({
 		summary: 'Submit reports in bulk as a JSON file',
 	})
 	@ApiOkResponse({
 		description: 'Return message confirming the reception of the reports',
 	})
-	// @ApiHeader({
-	// 	name:'authorization',
-	// 	description: 'another one'
-	// })
+	@ApiQuery({
+		description: 'A list of Resource Ids where the database manager specifies which resources he wishes to delete all the previous reports (effectively resubmitting everything through this bulk update)',
+		name: 'delete-all',
+		type: 'string',
+		isArray: true,
+		example: ['disprot'],
+		required: false
+	})
 	@ApiSecurity('basic')
 	@ApiConsumes('multipart/form-data')
 	@Post('bulk')
@@ -134,6 +138,14 @@ export class ReportsController {
 			if (_.isArray(deleteAllInput)) {
 				delete_all = deleteAllInput;
 			}
+		}
+
+		// handle if a resource_id that is passed does not exist
+		const existsPromises = delete_all.map((res_id) => this.resourceService.exists(res_id))
+		const exists = await Promise.all(existsPromises)
+		const i = exists.findIndex((v) => !v)
+		if(i != -1){
+			throw new BadRequestException(`Resource id ${delete_all[i]} does not exist !`)
 		}
 
 
