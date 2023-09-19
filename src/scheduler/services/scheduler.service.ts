@@ -1,13 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { existsSync } from 'fs';
-import {
-	build_report_stream,
-	parse_default_report,
-	ReportProcessReport,
-	ValidatedReport,
-} from '../reports.parser';
-import { User } from '../../auth/users/schemas/user.schema';
-import { ValidationError } from 'class-validator';
+
+
 @Injectable()
 export class SchedulerService {
 	constructor() {

@@ -23,6 +23,7 @@ import { SchedulerClientModule } from './scheduler-client/scheduler-client.modul
 import { TransformInterceptor } from './shared/transformer/transform.interceptor';
 import { SentryInterceptor, SentryModule } from '@ntegral/nestjs-sentry';
 import { EmailModule } from './email/email.module';
+import { CoreApicuronModule } from './core/core.module';
 
 @Module({
 	imports: [
@@ -73,6 +74,7 @@ import { EmailModule } from './email/email.module';
 			}]),
 		}),
 
+		CoreApicuronModule,
 		ResourcesModule,
 		TermsModule,
 		ReportsModule,

@@ -9,6 +9,7 @@ import {
 } from 'class-validator';
 import * as _ from 'lodash';
 import { PipelineStage, QueryOptions } from 'mongoose';
+import { PaginationAggregation } from '../interfaces/pagination-aggregation';
 
 export class PaginateDto {
 	@IsOptional()
@@ -22,19 +23,18 @@ export class PaginateDto {
 	@IsInt()
 	@Min(1)
 	@Max(100)
-	limit?: number = null;
+	limit: number = 10;
 
-	getMongoQueryOptions(): QueryOptions<any> {
+	getMongoQueryOptions<T>(): QueryOptions<T> {
 
-		return !! this.limit ? {
+		return {
 			limit: this.limit,
 			skip: this.skip,
-		}: { skup: this.skip };
+		}
 	}
 
-	getMongoAggregation(): [PipelineStage.Skip, PipelineStage.Limit?] {
-		return !!this.limit
-			? [
+	getMongoAggregation(): PaginationAggregation {
+		return [
 					{
 						$skip: this.skip,
 					},
@@ -42,7 +42,6 @@ export class PaginateDto {
 						$limit: this.limit,
 					},
 			  ]
-			: [{ $skip: this.skip }];
 	}
 
 	omitPagination(): Omit<this, 'skip' | 'limit'> {

@@ -47,6 +47,27 @@ if(args.t == 'disprot_update'){
     process.exit(result.status)
 }
 
+// handle the unique case if the job is to compute_all_metrics, we run update_disprot first
+if(args.t == 'compute_all_metrics'){
+    const script_path = join(__dirname, '../updates/apicuron-tasks/main.py')
+    
+    // building argument array
+
+    let disprotUpdateArgs: string[] = process.argv.slice(2)
+    // extracting index of task from current arg array (finding the option -t and taking the argument one step after)
+    const taskIndex = disprotUpdateArgs.findIndex((x) => x == '-t') + 1
+
+    disprotUpdateArgs[taskIndex] = 'disprot_update';
+    
+    
+
+    const result = spawnSync(`python3`, [script_path,...disprotUpdateArgs], {stdio: 'inherit'})
+    if(result.error){
+        console.error('Error on Update Disprot')
+        console.error(result.error)
+    }
+}
+
 async function bootstrap() {
     const app = await NestFactory.createApplicationContext(AppModule)
     
@@ -60,8 +81,10 @@ async function bootstrap() {
 
     
     const taskService = await app.get(`task:${args.t}`)
+
     
     if(taskService){
+        console.log('taskService Found !')
         const mainLogger = new Logger('APICURONSchedulerLogger');
 
         if(!!args.f){

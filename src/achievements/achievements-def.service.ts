@@ -17,10 +17,7 @@ import {
 import {
 	AchievementDef,
 	AchievementDefDocument,
-} from './schemas/achievement-def.schema';
-import { BadgeDefDocument } from './schemas/badges_def.schema';
-import { MedalDefDocument } from './schemas/medals_def.schema';
-
+} from '../core/schemas/achievement-def.schema';
 @Injectable()
 export class AchievementsDefService {
 	constructor(

@@ -4,9 +4,48 @@ import { AuthModule } from '../auth/auth.module';
 import { SchedulerService } from './services/scheduler.service';
 // import { ComputeStatisticsTask } from './tasks/compute_statistics.task';
 import { Provider } from '@nestjs/common/interfaces/modules';
+import { SubmitBulkTask } from './tasks/submit_bulk.task';
+import { ComputeBadgesTask } from './tasks/compute_badges.task';
+import { ComputeMedalsTask } from './tasks/compute_medals.task';
+import { ComputeAchievementsTask } from './tasks/compute_achievements.task';
+import { ComputeStatisticsTask } from './tasks/compute_statistics.task';
+import { ComputeAllMetricsTask } from './tasks/compute_all_metrics.task';
+import { CoreApicuronModule } from '../core/core.module';
+import { ResourcesModule } from '../resources/resources.module';
+import { NotificationsModule } from '../notifications/notifications.module';
+import { OrcidSubmissionTask } from './tasks/orcid-submission.task';
 @Module({
-  imports: [HttpModule, AuthModule],
+  imports: [HttpModule, CoreApicuronModule, NotificationsModule, ResourcesModule, AuthModule],
   providers: [SchedulerService,
+
+    {
+			provide: 'task:submit_report',
+			useClass: SubmitBulkTask,
+		},
+		{
+			provide: 'task:compute_badges',
+			useClass: ComputeBadgesTask,
+		},
+		{
+			provide: 'task:compute_medals',
+			useClass: ComputeMedalsTask,
+		},
+		{
+			provide: 'task:compute_achievements',
+			useClass: ComputeAchievementsTask,
+		},
+		{
+			provide: 'task:compute_statistics',
+			useClass: ComputeStatisticsTask,
+		},
+		{
+			provide: 'task:compute_all_metrics',
+			useClass: ComputeAllMetricsTask
+		},
+		{
+			provide: 'task:submit-orcid',
+			useClass: OrcidSubmissionTask
+		}
   ],
   exports: [
   ],

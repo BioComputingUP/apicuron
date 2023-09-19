@@ -1,13 +1,14 @@
 import { Injectable, Logger, NotFoundException, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import { Document, Model } from 'mongoose';
 // import { TransformerService } from '../shared/transformer/transformer.service';
-import { User, UserDocument, UserSchema } from '../auth/users/schemas/user.schema';
-import { Statistics, StatisticsDocument } from './schemas/statistics.schema';
+import { User, UserDocument } from '../core/schemas/user.schema';
+import { Statistics, StatisticsDocument } from '../core/schemas/statistics.schema';
 import { PartnerResourcesService } from '..//resources/partner-resources/partner-resources.service';
 import { GetStatisticsDto } from './dto/get-statistics.dto';
 import { paginate } from '../pagination/paginator';
 import { PaginateDto } from '../pagination/dto/paginate.dto';
+import { ReportDocument } from '../core/schemas/reports.schema';
 
 @Injectable()
 export class StatisticsService {
@@ -19,6 +20,16 @@ export class StatisticsService {
 	) { }
 
 	logger = new Logger(StatisticsService.name);
+
+
+	async incrementStatByReport(report: ReportDocument){
+		const { resource_id, curator_orcid } = report;
+		const stat=  await this.statisticsModel.findOne({ resource_id, curator_orcid });
+
+		if(stat){
+			stat
+		}
+	}
 
 	async get_public_user_statistics(curator_orcid: string) {
 		if (await this.userModel.exists({ orcid_id: curator_orcid })) {
@@ -99,6 +110,13 @@ export class StatisticsService {
 			{
 				"$match": query
 			},
+			{
+				$project: {
+					'stats.generation_terms': 0,
+					'stats.invalidation_terms': 0,
+					'stats.revision_terms': 0
+				}
+			}
 
 		]
 
@@ -154,7 +172,10 @@ export class StatisticsService {
 			},
 			{
 				$project: {
-					user: 0
+					user: 0,
+					generation_terms: 0,
+					invalidation_terms: 0,
+					revision_terms: 0
 				}
 			},
 			// sort by the total score

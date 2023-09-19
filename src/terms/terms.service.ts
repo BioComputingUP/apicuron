@@ -5,12 +5,12 @@ import { DeleteTermDto } from './dto/deleteTerm.dto';
 import { TermDto, TermFilterDto } from './dto/term.dto';
 import { UpdateTermDto } from './dto/updateTerm.dto';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
-import { Term, TermDocument } from './schemas/terms.schema';
-import { Report, ReportDocument } from '../reports/reports.schema';
+import { Term, TermDocument } from '../core/schemas/terms.schema';
+import { Report, ReportDocument } from '../core/schemas/reports.schema';
 import {
 	AchievementDef,
 	AchievementDefDocument,
-} from '../achievements/schemas/achievement-def.schema';
+} from '../core/schemas/achievement-def.schema';
 
 @Injectable()
 export class TermsService {
@@ -20,7 +20,7 @@ export class TermsService {
 		@InjectModel(AchievementDef.name)
 		protected achievementDefModel: Model<AchievementDefDocument>,
 		protected resourceService: PartnerResourcesService,
-	) {}
+	) { }
 
 	/**
 	 *
@@ -34,12 +34,12 @@ export class TermsService {
 			.lean();
 	}
 
+	async get_term(activity_term: string, resource_id: string) {
+		return await this.termModel.findOne({ activity_term, resource_id })
+	}
+
 	async get_resource_terms(term_filter: TermFilterDto) {
-		return await this.termModel.find(
-			term_filter.omitPagination(),
-			{},
-			term_filter.getMongoQueryOptions(),
-		);
+		return await this.termModel.find(term_filter.omitPagination());
 	}
 
 	async resource_has_term(resource_id: string, activity_term: string) {

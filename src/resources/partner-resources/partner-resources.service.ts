@@ -4,8 +4,7 @@ import { Model } from 'mongoose';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
-	ResourceSummary,
-} from '../schemas/partner-resources.schema';
+} from '../../core/schemas/resource.schema';
 // import { TransformerService } from '../../shared/transformer/transformer.service';
 import { UpdatePartnerResourceDto } from '../dto/updateResource.dto';
 

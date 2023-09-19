@@ -5,9 +5,9 @@ import { INestApplication } from '@nestjs/common';
 export function setupSwagger(app: INestApplication, docs_prefix= '') {
     // setup for swagger docs generation
     const swaggerConfig = new DocumentBuilder()
-        // .setTitle('APICURON V2')
         .setTitle('APICURON API Documentation')
         .setDescription('The APICURON API Documentation')
+        // add the authorization header token
         .addSecurity('basic',{
             type: 'apiKey',
             in: 'header',

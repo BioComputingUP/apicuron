@@ -6,6 +6,7 @@ import {
 	IsNumber,
 	IsOptional,
 	IsString,
+	Min,
 	ValidateIf,
 } from 'class-validator';
 import { PaginateDto } from '../../pagination/dto/paginate.dto';
@@ -29,8 +30,5 @@ export class GetStatisticsDto extends PaginateDto {
 	@IsArray()
 	@IsOptional()
 	resources: Array<string>;
-
-
-	limit= 10
 
 }

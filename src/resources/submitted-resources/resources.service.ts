@@ -2,24 +2,21 @@ import {
 	Injectable,
 	Logger,
 	NotImplementedException,
-	BadRequestException,
-	InternalServerErrorException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { rename, mkdir } from 'fs/promises';
+import { rename } from 'fs/promises';
 import { Model } from 'mongoose';
-import path, { basename, join } from 'path';
-import { User, UserDocument } from '../../auth/users/schemas/user.schema';
+import { basename, join } from 'path';
+import { User, UserDocument } from '../../core/schemas/user.schema';
 // import { TransformerService } from '../../shared/transformer/transformer.service';
 import { CreateResourceDto } from '../dto/createResource.dto';
-import { PartnerResource, PartnerResourceDocument } from '../schemas/partner-resources.schema';
-import { Resource, ResourceDocument } from '../schemas/resource.schema';
+import { Resource, ResourceDocument } from '../../core/schemas/resource.schema';
 import {
 	SubmittedResource,
 	SubmittedResourceDocument,
-} from '../schemas/submitted-resource.schema';
+} from '../../core/schemas/resource.schema';
+import { PartnerResource } from '../../core/schemas/resource.schema';
 
 @Injectable()
 export class SubmittedResourcesService {

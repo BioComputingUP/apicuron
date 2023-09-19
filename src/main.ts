@@ -5,16 +5,14 @@ import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { useContainer } from 'class-validator';
 import { TransformInterceptor } from './shared/transformer/transform.interceptor';
-import { setupSwagger } from './swagger/setup'
-import * as Sentry from "@sentry/node";
-import { Application } from "express";
-import * as session from "express-session";
-
-
+import { setupSwagger } from './swagger/setup';
+import { bootstrap as generateAllAvatars } from './scripts/generate-avatars';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
 	// App creation
-	const app = await NestFactory.create(AppModule);
+	const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
 	// Logging and config setup
 	const appLogger = new Logger('APICURONApplicationLogger');
@@ -25,36 +23,31 @@ async function bootstrap() {
 	const host = configService.get('HOST');
 	const envConfig = configService.get<string>('environment');
 
-
 	// class-validator setup
 	useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
 	// set the global transform pipe
-	const transformer = app.get(TransformInterceptor)
-	app.useGlobalInterceptors(transformer)
+	const transformer = app.get(TransformInterceptor);
+	app.useGlobalInterceptors(transformer);
 
 	// setup express middlewares
 	app.use(cookieParser());
 
-	app.use(
-		session({
-			secret: 'my-secret',
-			resave: false,
-			saveUninitialized: false,
-		})
-	)
-
-
 	// swagger UI setup
-	setupSwagger(app, configService.get<string>('API_DOCS_PREFIX'))
-
+	setupSwagger(app, configService.get<string>('API_DOCS_PREFIX'));
 
 	// setup basic validation Pipes
 	app.useGlobalPipes(
-		new ValidationPipe({ transform: true, forbidUnknownValues: false, skipMissingProperties: true }),
+		new ValidationPipe({
+			transformOptions: {
+				enableImplicitConversion: true,
+			},
+			stopAtFirstError: true,
+			transform: true,
+			forbidUnknownValues: false,
+			skipMissingProperties: false,
+		}),
 	);
-
-
 
 	app.enableCors();
 
@@ -62,14 +55,23 @@ async function bootstrap() {
 	appLogger.log(`Loaded ${envConfig} Configuration`);
 	appLogger.log(`Started Listening on http://${host}:${port}`);
 
-
 	app.enableVersioning({
 		type: VersioningType.HEADER,
 		header: 'version',
 	});
 
+	// setup the static handler
+	app.useStaticAssets(join(__dirname, '..', 'public'));
+	app.setBaseViewsDir(join(__dirname, '..', 'views'));
+	app.setViewEngine('hbs');
+	console.log('test');
+
+	generateAllAvatars(app);
+
 	// starting to listen to requests
 	await app.listen(port, host);
+
+	// await taskAwait;
 }
 
 bootstrap();

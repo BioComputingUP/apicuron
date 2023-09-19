@@ -1,12 +1,12 @@
 import { Exclude, Transform, Type } from "class-transformer";
 import { IsInt, IsOptional, Max, Min, MaxDate, Validate, IsIn, IsNotEmpty, ValidateIf } from "class-validator";
-import { User } from "../../auth/users/schemas/user.schema";
-import { PartnerResource } from "../../resources/schemas/partner-resources.schema";
+import { User } from "../../core/schemas/user.schema";
+import { PartnerResource } from "../../core/schemas/resource.schema";
 import { EntryExistsRule } from "../../shared/validators/entry-exists.validator";
 import { DateAfter, DateBefore } from "../validators/date-comparison";
-import { Report } from "../reports.schema";
+import { Report } from "../../core/schemas/reports.schema";
 import * as _ from 'lodash';
-import { Term } from "../../terms/schemas/terms.schema";
+import { Term } from "../../core/schemas/terms.schema";
 import { PaginateDto } from "../../pagination/dto/paginate.dto";
 
 export class ReportFilterDto extends PaginateDto {
@@ -63,12 +63,17 @@ export class ReportFilterDto extends PaginateDto {
     @IsIn(['timestamp', 'resource_id', 'entity_uri', 'curator_orcid', 'activity_term'])
     sortBy?: 'timestamp' | 'resource_id' | 'entity_uri' | 'curator_orcid' | 'activity_term' = 'timestamp'
 
-    @IsOptional()
-	@Transform(({ value }) => parseInt(value))
+
     @IsIn([-1, 1])
+	@Transform(({ value }) => parseInt(value))
+    @IsOptional()
     sortOrder?: 1 | -1 = -1
 
 
+    @IsIn(['term', 'resource'], { each: true })
+    @IsOptional()
+    extend: ('term' | 'resource')[] = [];
+    
 
 
 }

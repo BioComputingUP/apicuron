@@ -1,7 +1,6 @@
 import { IsEmpty, IsNotEmpty, IsOptional, IsString, IsUrl, Matches, Max, MaxLength, MinLength, Validate } from "class-validator";
 import { UniqueRule } from "../../shared/validators/unique.validator";
-import { Resource } from "../schemas/resource.schema";
-import { SubmittedResource } from "../schemas/submitted-resource.schema";
+import { Resource } from "../../core/schemas/resource.schema";
 import { UniqueResourceIdRule } from "../validators/unique-resource-id"
 import { UniqueResourceURIRule } from "../validators/unique-resource-uri"
 
