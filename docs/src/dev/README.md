@@ -1,7 +1,5 @@
 # Introduction
 
-## Introduction
-
 Welcome to Documentation dedicated to Developers of Resources to integrate with APICURON.
 
 A brief explanation of the [structure of APICURON](#structure) can be found below

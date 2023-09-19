@@ -102,23 +102,20 @@ module.exports = {
       },
     ],
     sidebar: {
-      "/main/guide/": [
+      "/": [
+        "/",
         {
-          title: "General Guide",
+          title: "User Guide",
           collapsable: false,
           children: ["/main/guide/"],
         },
-      ],
-
-      "/main/": [
-        ['/dev/', 'Developer Guide'],
-        ['/main/guide/', 'User Guide'],
-      ],
-      "/dev/": [
-        ["/dev/", "Intro"],
-        "/dev/integration",
-        "/dev/widgets",
-        "/dev/privacy",
+        // ["/dev/", "Developer Guide"],
+        // ["/main/guide/", "User Guide"],
+        {
+          title: "Developer Guide",
+          collapsable: false,
+          children: [ "/dev/","/dev/integration", "/dev/widgets", "/dev/privacy"],
+        },
         {
           title: "API",
           collapsable: false,
@@ -138,6 +135,13 @@ module.exports = {
           ],
         },
       ],
+
+      // "/main/": [
+      // ],
+      // "/dev/": [
+      //   ["/dev/", "Intro"],
+
+      // ],
     },
   },
 

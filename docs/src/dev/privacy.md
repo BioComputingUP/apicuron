@@ -1,3 +1,3 @@
-# Privacy concerns
+# Privacy
 
 TO BE FILLED
