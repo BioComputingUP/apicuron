@@ -35,11 +35,17 @@ import { ParseUnsignedIntPipe } from '../shared/pipes/unsigned-int-validation.pi
 import { ReportDto } from './dto/report.dto';
 import { SubmitBulkDto, SubmitReportDto } from './dto/submit-report.dto';
 import { ReportsService } from './reports.service';
-import { ReportFilterDto, ReportFilterGroupedDto } from './dto/report-filter.dto';
+import {
+	ReportFilterDto,
+	ReportFilterGroupedDto,
+} from './dto/report-filter.dto';
 import * as _ from 'lodash';
 import { plainToClass, plainToInstance } from 'class-transformer';
 import { Model } from 'mongoose';
-import { Statistics, StatisticsDocument } from '../core/schemas/statistics.schema';
+import {
+	Statistics,
+	StatisticsDocument,
+} from '../core/schemas/statistics.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { TermsService } from '../terms/terms.service';
 
@@ -74,20 +80,26 @@ export class ReportsController {
 
 	@Get()
 	async get_reports(@Query() reportFilter: ReportFilterDto, @Request() req) {
-		
-		const reportFilterInstance: ReportFilterDto = plainToInstance(ReportFilterDto, reportFilter)
+		const reportFilterInstance: ReportFilterDto = plainToInstance(
+			ReportFilterDto,
+			reportFilter,
+		);
 		return await this.reportService.getReports(reportFilterInstance);
-
 	}
 
 	@Get('group-by/:groupBy')
-	async getGroupedReports(@Query()  filter: ReportFilterDto, @Param() groupBy: Pick<ReportFilterGroupedDto, 'groupBy'>){
+	async getGroupedReports(
+		@Query() filter: ReportFilterDto,
+		@Param() groupBy: Pick<ReportFilterGroupedDto, 'groupBy'>,
+	) {
 		// const filterInstance: ReportFilterDto = plainToInstance(ReportFilterDto, filter);
-		const groupByInstance: ReportFilterGroupedDto = plainToInstance(ReportFilterGroupedDto, {...filter, ...groupBy})
+		const groupByInstance: ReportFilterGroupedDto = plainToInstance(
+			ReportFilterGroupedDto,
+			{ ...filter, ...groupBy },
+		);
 
-		return await this.reportService.getGroupedReports(groupByInstance)
+		return await this.reportService.getGroupedReports(groupByInstance);
 	}
-
 
 	@ApiOperation({
 		summary: 'Submit reports in bulk as a JSON file',
@@ -112,12 +124,29 @@ export class ReportsController {
 		@UploadedFile() reports: Express.Multer.File,
 		@Request() req,
 		@Body() body: SubmitBulkDto,
+		@Query('delete-all') deleteAll: string[] | string,
 	) {
-			
-		const response = await this.schedulerService.submit_reports(reports, req.user.orcid_id, body.delete_all || [])
+		let delete_all = [];
+		const deleteAllInput = deleteAll ?? body.delete_all;
+		if (typeof deleteAllInput == 'string') {
+			delete_all = [deleteAllInput];
+		} else {
+			if (_.isArray(deleteAllInput)) {
+				delete_all = deleteAllInput;
+			}
+		}
 
-		if(response instanceof Error){
-			throw new InternalServerErrorException('An Error has occured when submitting the reports')
+
+		const response = await this.schedulerService.submit_reports(
+			reports,
+			req.user.orcid_id,
+			delete_all || [],
+		);
+
+		if (response instanceof Error) {
+			throw new InternalServerErrorException(
+				'An Error has occured when submitting the reports',
+			);
 		}
 
 		return {
@@ -142,10 +171,14 @@ export class ReportsController {
 		// const resource_uri = await this.partnerResourceService.retrieve_uri(report.resource_id)
 		const report_confirmation = await this.reportService.insertReport(report);
 
-
-		await this.schedulerService.compute_achievements(report.resource_id, report.curator_orcid);
-		await this.schedulerService.compute_statistics(report.resource_id, report.curator_orcid);
+		await this.schedulerService.compute_achievements(
+			report.resource_id,
+			report.curator_orcid,
+		);
+		await this.schedulerService.compute_statistics(
+			report.resource_id,
+			report.curator_orcid,
+		);
 		return report_confirmation;
 	}
-	
 }
