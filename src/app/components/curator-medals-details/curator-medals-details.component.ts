@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, Input, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input, OnInit } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { filter, map, shareReplay, switchMap } from "rxjs/operators";
 import { AchievementsModule } from "src/app/achievements/achievements.module";
@@ -23,6 +23,7 @@ import { PaginationComponent } from "src/app/pagination/pagination.component";
   ],
   templateUrl: "./curator-medals-details.component.html",
   styleUrls: [],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CuratorMedalsDetailsComponent implements OnInit {
   medals$: Observable<Paginated<Medal>>;

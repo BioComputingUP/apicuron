@@ -1,8 +1,8 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { FormBuilder, FormControl, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
-import { Observable } from "rxjs";
-import { catchError, finalize, switchMap, tap } from "rxjs/operators";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { catchError, finalize, switchMap, takeUntil, tap } from "rxjs/operators";
 import { DashboardService } from "../../services/dashboard.service";
 import { Resource } from "src/app/models/resource.model";
 import { MessageService } from "primeng/api";
@@ -15,16 +15,21 @@ import { MessageService } from "primeng/api";
     "../submit-report.component.scss",
   ],
 })
-export class SubmitBulkComponent implements OnInit {
+export class SubmitBulkComponent implements OnInit, OnDestroy {
   form: any;
 
-  blocked: Boolean = false;
+  destroy$ = new Subject<Boolean>();
+  
+  blockUI$ = new BehaviorSubject<Boolean>(false);
 
   constructor(
     private formBuilder: FormBuilder,
     private dashboardService: DashboardService,
     private messageService: MessageService
   ) {}
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+  }
 
   @Input("resource")
   resource: Resource;
@@ -44,7 +49,7 @@ export class SubmitBulkComponent implements OnInit {
       formData.append("delete_all[]", res_id);
     }
 
-    this.blocked = true;
+    this.blockUI$.next(true);
 
     this.dashboardService
       .submit_reports_bulk(formData)
@@ -79,8 +84,9 @@ export class SubmitBulkComponent implements OnInit {
           });
         }),
         finalize(() => {
-          this.blocked = false;
-        })
+          this.blockUI$.next(false);
+        }),
+        takeUntil(this.destroy$)
       )
       .subscribe(() => {});
   }

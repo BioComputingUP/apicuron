@@ -4,6 +4,7 @@ import { AuthGuard } from "./auth/auth.guard";
 import { IndexComponent } from "./index/index.component";
 import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
 import { MainLayoutComponent } from "./main-layout/main-layout.component";
+import { environment } from "../environments/environment";
 
 const routes: Routes = [
   {
@@ -16,14 +17,16 @@ const routes: Routes = [
     path: "notifications",
     component: MainLayoutComponent,
     loadChildren: () =>
-      import("./notifications/notifications.module").then((m) => m.NotificationsModule),
+      import("./notifications/notifications.module").then(
+        (m) => m.NotificationsModule
+      ),
     // component: NotificationsComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
   },
   {
     path: "help",
     component: MainLayoutComponent,
-    loadChildren: () => import("./help/help.module").then((m) => m.HelpModule)
+    loadChildren: () => import("./help/help.module").then((m) => m.HelpModule),
   },
   {
     path: "databases",
@@ -37,12 +40,6 @@ const routes: Routes = [
     loadChildren: () =>
       import("./curator/curator.module").then((m) => m.CuratorModule),
   },
-  {
-    path: "",
-    component: MainLayoutComponent,
-    loadChildren: () =>
-      import("./index/index.module").then((m) => m.IndexModule),
-  },
 
   // {
   //   path: '',
@@ -54,11 +51,30 @@ const routes: Routes = [
   //     }
   //   ]
   // },
-  { path: 'dashboard', loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule) },
-  { path: 'docs', component: MainLayoutComponent, loadChildren: () => import('./documentation/documentation.module').then(m => m.DocumentationModule) },
-  { path: 'api', redirectTo: '/api/' },
-  { path: '**', component: PageNotFoundComponent },
-
+  {
+    path: "dashboard",
+    loadChildren: () =>
+      import("./dashboard/dashboard.module").then((m) => m.DashboardModule),
+  },
+  // {
+  //   path: "docs",
+  //   redirectTo: '/docs/'
+  //   // Old Version of the docs
+  //   // component: MainLayoutComponent,
+  //   // loadChildren: () =>
+  //   //   import("./documentation/documentation.module").then(
+  //   //     (m) => m.DocumentationModule
+  //   //   ),
+  // },
+  { path: "docs", redirectTo: "/docs/" },
+  { path: "api", redirectTo: "/api/" },
+  {
+    path: "",
+    component: MainLayoutComponent,
+    loadChildren: () =>
+      import("./index/index.module").then((m) => m.IndexModule),
+  },
+  { path: "**", component: PageNotFoundComponent },
 ];
 
 @NgModule({
@@ -72,11 +88,11 @@ const routes: Routes = [
       scrollPositionRestoration: "enabled",
       anchorScrolling: "enabled",
       scrollOffset: [0, 64],
-      paramsInheritanceStrategy: 'always',
+      paramsInheritanceStrategy: "always",
       // relativeLinkResolution: "legacy",
       enableTracing: true, // <-- debugging purposes
     }),
   ],
   exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

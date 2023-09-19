@@ -74,29 +74,13 @@ export class CuratorPageService {
     )
 
     // load resources using statistics
-    this.resources$ = this.loadResources(this.resourceIds$)
+    // this.resources$ = this.loadResources(this.resourceIds$)
 
     // load statistics with resources grouped 
-    this.statisticsWithResource$ = this.combine_resources_statistics(this.resources$, this.statistics$)
+    // this.statisticsWithResource$ = this.combine_resources_statistics(this.resources$, this.statistics$)
 
-    // Load Medals for resources
-    // this.medals$ = this.curator$.pipe(
-    //   switchMap((curator: User) => {
-    //     return this.medalsService.getCuratorMedals({ curator_orcid: curator.orcid_id }).pipe(shareReplay(1))
-    //   }),
-    // )
-
-    // debugger;
 
   }
-
-  // public getResourceMedals(resource_id: string) {
-  //   return this.medals$.pipe(
-  //     map((medals: Medal[]) => {
-  //       return medals.filter((medal:Medal) => medal.resource_id == resource_id)
-  //     })
-  //   )
-  // }
 
 
   public getCurator() {
@@ -133,8 +117,9 @@ export class CuratorPageService {
     return orcid_id$.pipe(
       switchMap((orcid_id: string) => {
         return this.curatorStatistics.get_curator_statistics(orcid_id);
-      }
-      ))
+      }),
+      shareReplay(1)
+      )
   }
 
   private combine_resources_statistics(

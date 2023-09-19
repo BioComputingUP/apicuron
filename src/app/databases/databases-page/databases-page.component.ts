@@ -1,27 +1,22 @@
 import { Component, OnInit } from "@angular/core";
-import { DatabasesService } from "../services/databases.service";
+import { Observable } from "rxjs";
+import { Resource } from "../../models/resource.model";
+import { ResourcesService } from "../../resource/service/resources.service";
+import { shareReplay } from "rxjs/operators";
 
 @Component({
   selector: "app-databases",
   templateUrl: "./databases-page.component.html",
   styleUrls: ["./databases-page.component.scss"],
 })
-export class DatabasesPageComponent implements OnInit {
+export class DatabasesPageComponent {
   listResourcesDescriptions;
 
-  constructor(private databaseService: DatabasesService) { }
-
-  ngOnInit(): void {
-    // this.databaseService.GetResources({}).subscribe(
-    //   (response) => {
-    //     console.log('data', response)
-    //     this.listResourcesDescriptions = response;
-    //   },
-    //   (err) => {},
-    //   () => {}
-    // );
-    this.databaseService.get_resources().subscribe((response: Object & { data: object }) => {
-      this.listResourcesDescriptions = response.data
-    })
+  constructor(private resourceService: ResourcesService) {
+    this.resources$ = this.resourceService
+      .getAllResources()
+      .pipe(shareReplay());
   }
+
+  resources$: Observable<Resource[]>;
 }

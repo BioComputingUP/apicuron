@@ -2,12 +2,12 @@ ARG UID=1002
 ARG GID=1002
 
 
-FROM node:16.14-slim AS development
+FROM node:16.14.2-buster-slim AS development
 
 
 # load arguments in this target
-ARG UID=1002
-ARG GID=1002
+ARG UID
+ARG GID
 
 # set the APP directory
 ENV APP_DIR /home/node/app
@@ -28,8 +28,8 @@ WORKDIR ${APP_DIR}
 
 COPY --chown=node:node ./package*.json ${APP_DIR}/
 
-# npm install all the packages precisely
-RUN npm ci
+# # npm install all the packages precisely
+# RUN npm install
 
 
 # run the app in the development server

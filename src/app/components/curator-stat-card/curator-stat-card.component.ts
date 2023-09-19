@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, Input, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input, OnInit } from "@angular/core";
 import { Resource } from "src/app/models/resource.model";
 import { CuratorStatistics } from "src/app/models/statistics.model";
 import { RewardCardComponent } from "./reward-card.component";
@@ -17,7 +17,7 @@ import { TermsModule } from "src/app/terms/terms.module";
 import { CuratorReportsDetailsComponent } from "../curator-reports-details/curator-reports-details.component";
 import { SlideOverPanelComponent } from "../utils/slide-over-panel/slide-over-panel.component";
 import { FormBuilder } from "@angular/forms";
-import { Medal } from '../../models/medal.model'
+import { Medal } from "../../models/medal.model";
 import { MedalCardComponent } from "src/app/components/medal-card/medal-card.component";
 import { AchievementsModule } from "src/app/achievements/achievements.module";
 import { MedalsService } from "src/app/achievements/services/medals.service";
@@ -28,6 +28,7 @@ import { Badge } from "src/app/models/badge.model";
 import { CuratorMedalsDetailsComponent } from "src/app/components/curator-medals-details/curator-medals-details.component";
 import { Paginated } from "src/app/interfaces/paginated";
 import { CuratorBadgesDetailsComponent } from "src/app/components/curator-badges-details/curator-badges-details.component";
+import { ResourcesService } from "../../resource/service/resources.service";
 @Component({
   selector: "curator-stat-card",
   standalone: true,
@@ -43,20 +44,22 @@ import { CuratorBadgesDetailsComponent } from "src/app/components/curator-badges
     AchievementsModule,
     BadgeCardComponent,
     CuratorMedalsDetailsComponent,
-    CuratorBadgesDetailsComponent
+    CuratorBadgesDetailsComponent,
   ],
   templateUrl: "./curator-stat-card.component.html",
   styleUrls: ["./curator-stat-card.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CuratorStatCardComponent implements OnInit {
   terms$: Observable<Object>;
-  reportsWithTerms$: Observable<{ report: Report; term: Term }[]>;
+  reportsWithTerms$: Observable<Report[]>;
   detailForm: any;
   badges$: Observable<Paginated<Badge>>;
   achievements$: Observable<[Paginated<Medal>, Paginated<Badge>]>;
 
   constructor(
     protected reportsService: ReportsService,
+    protected resourceService: ResourcesService,
     protected termService: TermsService,
     protected formBuilder: FormBuilder,
     protected medalService: MedalsService,
@@ -69,52 +72,96 @@ export class CuratorStatCardComponent implements OnInit {
   open_badge_details: Boolean = false;
   open_medal_details: Boolean = false;
   medals$: Observable<Paginated<Medal>>;
-  
+
+  resource$: Observable<Resource>;
+
+  rewards$: Observable<any>;
 
   ngOnInit(): void {
-    // load initial reports
+
+    this.resource$ = this.resourceService
+      .get_resource(this.statistics.resource_id)
+      .pipe(shareReplay());
+
+    this.rewards$ = this.resource$.pipe(
+      map(({ color }: Resource) => {
+        const stat = this.statistics;
+        const contributionStats = [
+          {
+            icon_src: "assets/badge_icon.svg",
+            color,
+            value_text: stat.badges_count,
+            label_text: "Earned Badges",
+          },
+          {
+            icon_src: "assets/medal_icon.svg",
+            color,
+            value_text: stat.medals_count,
+            label_text: "Earned Medals",
+          },
+          {
+            icon_src: "assets/svg/create_icon.svg",
+            color,
+            value_text: stat.generation_count,
+            label_text: "Generation Events",
+          },
+          {
+            icon_src: "assets/svg/pencil.svg",
+            color,
+            value_text: stat.revision_count,
+            label_text: "Revision Events",
+          },
+          {
+            icon_src: "assets/svg/invalidation_icon.svg",
+            color,
+            value_text: stat.invalidation_count,
+            label_text: "Invalidation Events",
+          },
+        ];
+        return contributionStats;
+      })
+    );
+
     const reportFilter = ReportFilter.create({
-      resource_id: this.resource.resource_id,
+      resource_id: this.statistics.resource_id,
       curator_orcid: this.curator.orcid_id,
       sortBy: "timestamp",
-      sortOrder: 1,
+      sortOrder: -1,
       limit: 4,
     });
+
     this.reports$ = this.reportsService
       .getReports(reportFilter)
       .pipe(shareReplay());
 
     this.terms$ = this.termService
-      .getTerms({ resource_id: this.resource.resource_id })
+      .getTerms({ resource_id: this.statistics.resource_id })
       .pipe(shareReplay());
 
     this.reportsWithTerms$ = combineLatest([this.terms$, this.reports$]).pipe(
       map(([terms, reports]: [Term[], Paginated<Report>]) => {
         return reports.data.map((report: Report) => {
-          return {
-            report: report,
-            term: terms.find(
-              (term) => term.activity_term == report.activity_term
-            ),
-          };
+
+          report.term = terms.find(
+            (term) => term.activity_term == report.activity_term
+          )
+          return report;
         });
-      }),
+      })
     );
     const filter = AchievementFilter.create({
       curator_orcid: this.curator.orcid_id,
-      resource_id: this.resource.resource_id,
-      limit: 4
-    })
-    this.medals$ = this.medalService.getMedals(filter)
+      resource_id: this.statistics.resource_id,
+      limit: 4,
+    });
+    this.medals$ = this.medalService.getMedals(filter);
 
-    // this.badges$ = of({ data:[], meta: { pagination: { total: 0, start: 0, limit: 0 }} });
-    this.badges$ = this.badgeService.getBadges(filter)
+    this.badges$ = this.badgeService.getBadges(filter);
 
-    this.achievements$ = combineLatest([this.medals$, this.badges$])
+    this.achievements$ = combineLatest([this.medals$, this.badges$]);
   }
 
   @Input() statistics: CuratorStatistics;
-  @Input() resource: Resource;
   @Input() curator: User;
 
   get curatorStats(): CuratorStatistics {
@@ -127,40 +174,4 @@ export class CuratorStatCardComponent implements OnInit {
       : "professionally worked at";
   }
 
-  get rewards() {
-    const stat = this.statistics;
-    const contribution_stats = [
-      {
-        icon_src: "assets/badge_icon.svg",
-        color: this.resource.color,
-        value_text: stat.badges_count,
-        label_text: "Earned Badges",
-      },
-      {
-        icon_src: "assets/medal_icon.svg",
-        color: this.resource.color,
-        value_text: stat.medals_count,
-        label_text: "Earned Medals",
-      },
-      {
-        icon_src: "assets/svg/create_icon.svg",
-        color: this.resource.color,
-        value_text: stat.generation_count,
-        label_text: "Generation Events",
-      },
-      {
-        icon_src: "assets/svg/pencil.svg",
-        color: this.resource.color,
-        value_text: stat.revision_count,
-        label_text: "Revision Events",
-      },
-      {
-        icon_src: "assets/svg/invalidation_icon.svg",
-        color: this.resource.color,
-        value_text: stat.invalidation_count,
-        label_text: "Invalidation Events",
-      }
-    ];
-    return contribution_stats;
-  }
 }

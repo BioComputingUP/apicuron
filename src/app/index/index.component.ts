@@ -1,6 +1,7 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { fromEvent } from 'rxjs';
-import { DatabasesService } from '../databases/services/databases.service';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { ResourcesService } from '../resource/service/resources.service';
+import { Resource } from '../models/resource.model';
 
 @Component({
   selector: 'app-index',
@@ -8,20 +9,20 @@ import { DatabasesService } from '../databases/services/databases.service';
   styleUrls: ['./index.component.scss']
 })
 export class IndexComponent implements OnInit, AfterViewInit {
-  database_list: Object;
+  resources$: Observable<Resource[]>;
 
   search_biocurators_text = ''
   
   // @ViewChild("search_biocurators", { static: false }) search_biocurators_button: ElementRef;
 
-  constructor(protected databaseService: DatabasesService) { }
+  constructor(protected resourceService: ResourcesService) {
+    this.resources$ = this.resourceService.getAllResources();
+  }
   ngAfterViewInit(): void {
   }
 
   ngOnInit(): void {
-    this.databaseService.get_resources().subscribe((response) => {
-      this.database_list = response['data']
-    })
+    
   }
 
 }

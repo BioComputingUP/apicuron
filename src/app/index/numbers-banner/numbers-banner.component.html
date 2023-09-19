@@ -1,8 +1,10 @@
 <div class="tw-bg-gradient-to-r tw-from-apicuron-purple tw-to-apicuron-red tw-p-2 md:tw-p-4">
-    <h2 class="tw-text-center tw-font-bold tw-text-white tw-text-xl md:tw-text-2xl lg:tw-text-3xl tw-font-dm-sans tw-uppercase">
+    <h2
+        class="tw-text-center tw-font-bold tw-text-white tw-text-xl md:tw-text-2xl lg:tw-text-3xl tw-font-dm-sans tw-uppercase">
         APICURON in numbers</h2>
-    <div class="tw-mx-auto tw-max-w-7xl tw-flex tw-flex-row tw-flex-wrap tw-justify-center tw-py-2 md:tw-py-4 lg:tw-pt-6 lg:tw-pb-4">
-        <div *ngFor="let numberElement of numberElements" class="lg:tw-w-1/4 md:tw-w-1/3 tw-w-1/2 tw-mb-2 sm:tw-mb-0">
+    <div class="tw-mx-auto tw-max-w-7xl tw-flex tw-flex-row tw-flex-wrap tw-justify-center tw-py-2 md:tw-py-4 lg:tw-pt-6 lg:tw-pb-4"
+        *ngIf="numberElements$ | async as numberElements">
+        <div *ngFor=" let numberElement of numberElements" class="lg:tw-w-1/4 md:tw-w-1/3 tw-w-1/2 tw-mb-2 sm:tw-mb-0">
             <app-number-element [count]="numberElement.count" [text]="numberElement.text">
                 <svg-icon svgClass="tw-h-14 md:tw-h-24  lg:tw-h-42 tw-text-white" [src]="numberElement.icon"></svg-icon>
             </app-number-element>

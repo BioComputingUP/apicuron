@@ -3,7 +3,12 @@ import { Observable } from "rxjs";
 import { map, pluck } from "rxjs/operators";
 import { DatabasesService } from "../../databases/services/databases.service";
 import { environment } from "../../../environments/environment";
-import * as _ from 'lodash'
+import * as _ from "lodash";
+import { User } from "../../models/User.model";
+import {
+  BaseCuratorStatistics,
+  CuratorStatistics,
+} from "../../models/statistics.model";
 type StatData = {
   resource_id: string;
   generation_score;
@@ -21,27 +26,22 @@ export class CuratorCardComponent implements OnInit {
 
   constructor(protected databaseService: DatabasesService) {
     this.resources$ = this.databaseService.get_resources().pipe(
-      pluck('data'),
+      pluck("data"),
       map((resources: Array<any>) => {
         let result = {};
-        resources.map(
-          ({resource_id, resource_name}) => {
-            result[resource_id] = resource_name
-          }
-        )
+        resources.map(({ resource_id, resource_name }) => {
+          result[resource_id] = resource_name;
+        });
         return result;
       })
-    )
+    );
   }
 
   @Input()
   vertical = true;
 
-  @Input() biocurator: {
-    displayedName: string;
-    stats: Array<StatData>;
-    orcid_id: string;
-  } = null;
+  @Input() biocurator: User;
+  @Input() stats: BaseCuratorStatistics[];
 
   @Input()
   display_scores = true;
@@ -52,8 +52,9 @@ export class CuratorCardComponent implements OnInit {
   @Input()
   display_resources = true;
 
+
   single_resource() {
-    return !Array.isArray(this.biocurator["stats"]) || this.biocurator['stats'].length == 1;
+    return !Array.isArray(this.stats) || this.stats.length == 1;
   }
 
   // @Input() full_name: "Bouhraoua Kamel Eddine Adel";
@@ -64,34 +65,34 @@ export class CuratorCardComponent implements OnInit {
   }
 
   get resources() {
-    return this.biocurator.stats.map((x) => x.resource_id);
+    return this.stats.map((x) => x.resource_id);
   }
 
   get badge_count() {
-    return _.map(this.biocurator.stats, 'badges_count').reduce((prev, curr) => prev + curr , 0)
+    return this.stats.reduce(
+      (acc, curr: CuratorStatistics) => acc + curr.badges_count,
+      0
+    );
   }
 
   get medal_count() {
-    return _.map(this.biocurator.stats, 'medals_count').reduce((prev, curr) => prev + curr , 0)
+    return this.stats.reduce(
+      (acc, curr: CuratorStatistics) => acc + curr.medals_count,
+      0
+    );
   }
 
   get generation_score() {
-    const scores = this.biocurator.stats.map(
-      (resource) => resource.generation_score
-    );
+    const scores = this.stats.map((resource) => resource.generation_score);
     return scores.reduce((a, b) => a + b, 0);
   }
   get revision_score() {
-    const scores = this.biocurator.stats.map(
-      (resource) => resource.revision_score
-    );
+    const scores = this.stats.map((resource) => resource.revision_score);
     return scores.reduce((a, b) => a + b, 0);
   }
 
   get invalidation_score() {
-    const scores = this.biocurator.stats.map(
-      (resource) => resource.invalidation_score
-    );
+    const scores = this.stats.map((resource) => resource.invalidation_score);
     return scores.reduce((a, b) => a + b, 0);
   }
 
@@ -99,14 +100,9 @@ export class CuratorCardComponent implements OnInit {
     return this.biocurator.orcid_id;
   }
 
-  orcid_link(orcid_id: string){
-    return new URL(orcid_id, environment.orcid_main_url).href
+  get total_score() {
+    return this.stats.reduce((prev, curr) => prev + curr.total_score, 0)
   }
 
-  generate_avatar(){
-    const emailHash = encodeURIComponent(this.displayedName);
-    const defaultImage = encodeURIComponent(`https://api.dicebear.com/5.x/identicon/png/seed=${emailHash}&scale=75&radius=50`);
-    return `https://www.gravatar.com/avatar/${emailHash}?d=${defaultImage}`;
-  }
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 }

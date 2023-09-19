@@ -1,18 +1,16 @@
-<div id="anchor1" class="container-fluid container-wide">
-  <div class="row pt-3">
-    <div class="col-lg-2 d-none d-lg-block d-xl-block">
-      <div class="sticky sidebar">
-        <div class="card">
-          <div class="card-header">
+<div id="anchor1" class="tw-container tw-mx-auto sm:tw-px-4 tw-max-w-full">
+  <div class="tw-flex tw-flex-wrap  tw-pt-3">
+    <div class="lg:tw-w-1/5 tw-pr-4 tw-pl-4 tw-hidden lg:tw-block xl:tw-block">
+      <div class="tw-sticky tw-top-28 sidebar">
+        <div
+          class="tw-relative tw-flex tw-flex-col tw-min-w-0 tw-rounded tw-break-words tw-border tw-bg-white border-1 tw-border-gray-300">
+          <div class="tw-py-3 tw-px-6 tw-mb-0 tw-bg-gray-200 border-b-1 tw-border-gray-300 tw-text-gray-900">
             <h5 class="tw-text-lg ">Navigate</h5>
           </div>
-          <div class="card-body">
+          <div class="tw-flex-auto tw-p-6">
 
-            <a class="tw-block" (click)="scroll(link.item)"
-              *ngFor="let link of [{text:'Web interface', item: gui}, {text:'API', item: api}, {text: 'Widget', item: widget}]">{{
+            <a class="tw-block" [href]="link.href" *ngFor="let link of navigation_panel">{{
               link.text }}</a>
-            <!-- <a class="tw-" (click)="scroll(api)">API</a>
-                <a class="tw-" (click)="scroll(widget)">Widget</a> -->
 
           </div>
         </div>
@@ -21,19 +19,19 @@
     </div>
 
 
-    <div class="col-lg-10 text-justify mb-5">
+    <div class="lg:tw-w-4/5 tw-pr-4 tw-pl-4 tw-text-justify tw-mb-5">
       <!-- <a routerLink="/about"> Read more</a> -->
 
 
       <!-- web interface-->
       <h1 #top>Help</h1>
       <hr>
-      <h2 class="pt-3 mb-3 mt-5" id="gui" #gui>Web interface</h2>
+      <h2 class="tw-pt-3 tw-mb-3 tw-mt-5" id="gui" #gui>Web interface</h2>
 
-      <p class="mb-3">
+      <p class="tw-mb-3">
         This page describes APICURON website use.
       </p>
-      <p class="mb-3">
+      <p class="tw-mb-3">
         The APICURON graphical user interface allows easy access to the biocuration activities of our partner databases
         in
         a graphical way. Biocurators can be searched from the <a routerLink="/curators">Curators page</a> or from the
@@ -42,17 +40,19 @@
       </p>
 
 
-      <h4 class="mt-2" #databases id="databases">Databases page</h4>
-      <p class="mb-3">
+      <h4 class="tw-mt-2" #databases id="databases">Databases page</h4>
+      <p class="tw-mb-3">
         The <a routerLink="/databases">Databases page</a> lists all member databases registered to APICURON.
         Member databases periodically push curation activities and APICURON synchronously
         calculates achievements and leaderboards.
       </p>
 
-      <h4 class="mt-2" #database id="database">Database specific page</h4>
-      By clicking on a card in the <a routerLink="/databases">Databases page</a>, you get redirected to a
-      page dedicated to a specific resource.
-      <ol class="mb-3">
+      <h4 class="tw-mt-2" #database id="database">Database specific page</h4>
+        <p>
+          By clicking on a card in the <a routerLink="/databases">Databases page</a>, you get redirected to a
+          page dedicated to a specific resource.
+        </p>
+      <ol class="tw-mb-3">
         <li>
           <strong>Database description</strong>
           as provided by the database project manager
@@ -77,13 +77,13 @@
       </ol>
 
 
-      <h4 class="mt-2" #browse id="browse">Curators page</h4>
-      The <a routerLink="/curators">Curators page</a> is composed of a result table, a sidebar and a search bar.
-      <ul class="mb-3">
+      <h4 class="tw-mt-2" #browse id="browse">Curators page</h4>
+      The <a routerLink="/curators">Curators page</a> is composed of a result tw-table, a sidebar and a search bar.
+      <ul class="tw-mb-3">
         <li>
           <strong>Table</strong>
           By default it shows the first entries of the database
-          sorted alphabetically. You can change the table sorting by clicking on column headers.
+          sorted alphabetically. You can change the tw-table sorting by clicking on column headers.
         </li>
 
         <li>
@@ -95,11 +95,14 @@
       </ul>
 
 
-      <h4 class="mt-2" #biocurator id="biocurator">Personal profile page</h4>
-      By clicking on a row of the curators table in the <a routerLink="/curators">Curators page</a> or
-      from the search box in the <a routerLink="/">Home page</a>, you get redirected to the
-      personal profile page of a biocurator. The profile page features different sections.
-      <ol class="mb-5">
+      <h4 class="tw-mt-2" #biocurator id="biocurator">Personal profile page</h4>
+      <p>
+        By clicking on a row of the curators tw-table in the <a routerLink="/curators">Curators page</a> or
+        from the search box in the <a routerLink="/">Home page</a>, you get redirected to the
+        personal profile page of a biocurator. The profile page features different sections.
+
+      </p>
+      <ol class="tw-mb-5">
         <li>
           <strong>Personal information</strong> name and ORCID
         </li>
@@ -113,633 +116,38 @@
         </li>
         <li>
           <strong>Biocuration events</strong>
-          This section include a search bar (above) and a table (below) listing all the
+          This section include a search bar (above) and a tw-table (below) listing all the
           entity identifiers, activity terms and timestamps.
         </li>
       </ol>
-      <h2 class="pt-3 mb-3 mt-5" id="api" #api>Application Programming Interface (API)</h2>
-      For information about <strong>API endpoints</strong>
-      and the output format see the <a routerLink="/api">API documentation</a> section.
+      <h2 class="tw-pt-3 tw-mb-3 tw-mt-5" id="api" #api>Application Programming Interface (API)</h2>
 
-      <h2 class="pt-3 mb-3 mt-5" id="widget" #widget>Widget</h2>
-      The connected resources can use the APICURON widget to acknowledge their biocurators on the resource homepage,
-      using APICURON leaderboard.
-      The widget is a web-component, you can simply add to you HTML codebase:
-      <pre class="style-code mb-5 mt-3">{{codeWidget}}</pre>
+      <p>API Documentation can be found <a [href]="wsname">here</a>.</p>
 
-
-
-      <!-- API reports -->
-      <h2 id="public" class="tw-my-3" #public="">Public API</h2>
-
-      <h4 class="tw-mb-2" #reports="">Reports (biocuration events or activities)</h4>
-      <div class="tw-relative tw-inline-flex tw-align-middle">
-        <label
-          class="tw-inline-block tw-align-middle tw-text-center tw-select-none tw-border tw-font-normal tw-whitespace-no-wrap tw-rounded tw-py-1 tw-px-3 tw-leading-normal tw-no-underline tw-bg-blue-600 tw-text-white hover:tw-bg-blue-600">GET</label>
-        <a href="{{wsname}}reports"
-          class="tw-inline-block tw-align-middle tw-text-center tw-select-none tw-border tw-font-normal tw-whitespace-no-wrap tw-rounded tw-py-1 tw-px-3 tw-leading-normal tw-no-underline tw-btn-outline-primary-input tw-mb-2">{{wsname}}<strong>reports</strong></a>
-      </div>
-
-      <dl>
-        <dt>Purpose</dt>
-        <dd>Retrieve biocuration events (or activities)</dd>
-        <dt>Return</dt>
-        <dd>A JSON list of objects representing the biocurators and their activities. One object per event</dd>
-        <dt>Examples</dt>
-        <dd>
-          <a
-            href="{{wsname}}reports?curator_orcid={{curator_orcid}}&amp;limit=2">{{wsname}}reports?curator_orcid={{curator_orcid}}&amp;limit=2</a>
-          <br>
-          <a
-            href="{{wsname}}reports?resource_uri={{resource_uri}}&amp;limit=2">{{wsname}}reports?resource_uri={{resource_uri}}&amp;limit=2</a>
-        </dd>
-      </dl>
-
-      <strong>Query parameters</strong>
-      <table class="tw-w-full tw-max-w-full tw-mb-4 tw-bg-transparent tw-p-1 tw-table-striped tw-text-xs">
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Example value</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>curator_orcid</td>
-            <td>{{curator_orcid}}</td>
-            <td>Biocurator ORCID</td>
-          </tr>
-          <tr>
-            <td>curator_name</td>
-            <td>Federica Quaglia</td>
-            <td>Biocurator name</td>
-          </tr>
-          <tr>
-            <td>resource_uri</td>
-            <td>{{resource_uri}}</td>
-            <td>Resource unique identifier (URI)</td>
-          </tr>
-
-          <tr>
-            <td>date_from</td>
-            <td>2020-01-01</td>
-            <td>Event date from</td>
-          </tr>
-
-          <tr>
-            <td>date_to</td>
-            <td>2020-12-31</td>
-            <td>Event date to</td>
-          </tr>
-
-        </tbody>
-      </table>
-
-      <strong>Other parameters</strong>
-      <table class="tw-w-full tw-max-w-full tw-mb-4 tw-bg-transparent tw-p-1 tw-table-striped tw-text-xs">
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Example value</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>limit</td>
-            <td>10</td>
-            <td>Number of items to return</td>
-          </tr>
-          <tr>
-            <td>skip</td>
-            <td>20</td>
-            <td>NUmber of items to skip (useful for pagination)</td>
-          </tr>
-          <tr>
-            <td>format</td>
-            <td>tsv</td>
-            <td>The output format. By default it returns a json stream. If explicitly format=json it returns a json file
-            </td>
-          </tr>
-
-        </tbody>
-      </table>
-
-      <strong>Output format</strong>
-      <pre class="tw-style-code tw-mb-5 tw-mt-3">{{output["reports"] | json}}</pre>
-
-
-
-      <!-- API achievements -->
-      <h4 class="tw-pb-2" #achievements="">Achievements (badges and medals)</h4>
-      <div class="tw-relative tw-inline-flex tw-align-middle">
-        <label
-          class="tw-inline-block tw-align-middle tw-text-center tw-select-none tw-border tw-font-normal tw-whitespace-no-wrap tw-rounded tw-py-1 tw-px-3 tw-leading-normal tw-no-underline tw-bg-blue-600 tw-text-white hover:tw-bg-blue-600">GET</label>
-        <a href="{{wsname}}achievements"
-          class="tw-inline-block tw-align-middle tw-text-center tw-select-none tw-border tw-font-normal tw-whitespace-no-wrap tw-rounded tw-py-1 tw-px-3 tw-leading-normal tw-no-underline tw-btn-outline-primary-input tw-mb-2">{{wsname}}<strong>achievements</strong></a>
-      </div>
-
-      <dl>
-        <dt>Purpose</dt>
-        <dd>Retrieve biocurators achievements in terms of badges and medals</dd>
-        <dt>Return</dt>
-        <dd>A JSON list of objects representing biocurators badges or medals</dd>
-        <dt>Examples</dt>
-        <dd>
-          <a
-            href="{{wsname}}achievements?curator_orcid={{curator_orcid}}&amp;limit=2">{{wsname}}achievements?curator_orcid={{curator_orcid}}&amp;limit=2</a>
-          <br>
-          <a
-            href="{{wsname}}achievements?resource_uri={{resource_uri}}&amp;limit=2">{{wsname}}achievements?resource_uri={{resource_uri}}&amp;limit=2</a>
-        </dd>
-      </dl>
-
-      <strong>Query parameters</strong>
-      <table class="tw-w-full tw-max-w-full tw-mb-4 tw-bg-transparent tw-p-1 tw-table-striped tw-text-xs">
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Example value</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>curator_orcid</td>
-            <td>{{curator_orcid}}</td>
-            <td>Biocurator ORCID</td>
-          </tr>
-          <tr>
-            <td>curator_name</td>
-            <td>Federica Quaglia</td>
-            <td>Biocurator name</td>
-          </tr>
-          <tr>
-            <td>resource_uri</td>
-            <td>{{resource_uri}}</td>
-            <td>Resource unique identifier (URI)</td>
-          </tr>
-
-          <tr>
-            <td>type</td>
-            <td>badge</td>
-            <td>The type of achievement, either "badge" or "medal"</td>
-          </tr>
-
-          <tr>
-            <td>min_count</td>
-            <td>200</td>
-            <td>Minimum number of curation events</td>
-          </tr>
-
-        </tbody>
-      </table>
-
-      <strong>Other parameters</strong>
-      <table class="tw-w-full tw-max-w-full tw-mb-4 tw-bg-transparent tw-p-1 tw-table-striped tw-text-xs">
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Example value</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>limit</td>
-            <td>10</td>
-            <td>Number of items to return</td>
-          </tr>
-          <tr>
-            <td>skip</td>
-            <td>20</td>
-            <td>Number of items to skip (useful for pagination)</td>
-          </tr>
-          <tr>
-            <td>format</td>
-            <td>tsv</td>
-            <td>Output format. By default it returns a json stream. If explicitly format=json it returns a json file
-            </td>
-          </tr>
-
-        </tbody>
-      </table>
-
-      <strong>Output format</strong>
-      <pre class="tw-style-code tw-mb-5 tw-mt-3">{{output["achievements"] | json}}</pre>
-
-
-
-      <!-- API leaderboards -->
-      <h4 class="tw-pb-2" #leaderboards="">Leaderboards (biocurators ranking and scores)</h4>
-      <div class="tw-relative tw-inline-flex tw-align-middle">
-        <label
-          class="tw-inline-block tw-align-middle tw-text-center tw-select-none tw-border tw-font-normal tw-whitespace-no-wrap tw-rounded tw-py-1 tw-px-3 tw-leading-normal tw-no-underline tw-bg-blue-600 tw-text-white hover:tw-bg-blue-600">GET</label>
-        <a href="{{wsname}}leaderboards"
-          class="tw-inline-block tw-align-middle tw-text-center tw-select-none tw-border tw-font-normal tw-whitespace-no-wrap tw-rounded tw-py-1 tw-px-3 tw-leading-normal tw-no-underline tw-btn-outline-primary-input tw-mb-2">{{wsname}}<strong>leaderboards</strong></a>
-      </div>
-
-      <dl>
-        <dt>Purpose</dt>
-        <dd>Retrieve ranking and scores</dd>
-        <dt>Return</dt>
-        <dd>A JSON list of objects representing the biocurators ranking and scores. One object per biocurator and
-          database
-        </dd>
-        <dt>Examples</dt>
-        <dd>
-          <a
-            href="{{wsname}}leaderboards?curator_orcid={{curator_orcid}}&amp;limit=2">{{wsname}}leaderboards?curator_orcid={{curator_orcid}}&amp;limit=2</a>
-          <br>
-          <a
-            href="{{wsname}}leaderboards?resource_uri={{resource_uri}}&amp;limit=2">{{wsname}}leaderboards?resource_uri={{resource_uri}}&amp;limit=2</a>
-        </dd>
-      </dl>
-
-      <strong>Query parameters</strong>
-      <table class="tw-w-full tw-max-w-full tw-mb-4 tw-bg-transparent tw-p-1 tw-table-striped tw-text-xs">
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Example value</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>curator_orcid</td>
-            <td>{{curator_orcid}}</td>
-            <td>Biocurator ORCID</td>
-          </tr>
-          <tr>
-            <td>curator_name</td>
-            <td>Federica Quaglia</td>
-            <td>Biocurator name</td>
-          </tr>
-          <tr>
-            <td>resource_uri</td>
-            <td>{{resource_uri}}</td>
-            <td>Resource unique identifier (URI)</td>
-          </tr>
-          <tr>
-            <td>ranking</td>
-            <td>badge</td>
-            <td>Position in the global database ranking</td>
-          </tr>
-
-          <tr>
-            <td>min_total_score</td>
-            <td>2000</td>
-            <td>Minimum total score of a biocurator</td>
-          </tr>
-
-        </tbody>
-      </table>
-
-      <strong>Other parameters</strong>
-      <table class="tw-w-full tw-max-w-full tw-mb-4 tw-bg-transparent tw-p-1 tw-table-striped tw-text-xs">
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Example value</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>limit</td>
-            <td>10</td>
-            <td>Number of items to return</td>
-          </tr>
-          <tr>
-            <td>skip</td>
-            <td>20</td>
-            <td>Number of items to skip (useful for pagination)</td>
-          </tr>
-          <tr>
-            <td>format</td>
-            <td>tsv</td>
-            <td>Output format. By default it returns a json stream. If explicitly format=json it returns a json file
-            </td>
-          </tr>
-          <tr>
-            <td>sort</td>
-            <td>generation_score</td>
-            <td>Sorting field</td>
-          </tr>
-
-        </tbody>
-      </table>
-
-      <strong>Output format</strong>
-      <pre class="tw-style-code tw-mb-5 tw-mt-3">{{output["leaderboards"] | json}}</pre>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      <h2 id="private" class="tw-pt-3 tw-pb-2" #private="">Private API</h2>
-
-      All private endpoints are only available to registered organizations and intended to be used only for submitting
-      curation data. To become an APICURON member database and open an account to submit data please
-      <strong>contact us</strong> at
-      <a
-        href="mailto:apicuron@ngp-net.bio.unipd.it?subject=Database membership request">apicuron@ngp-net.bio.unipd.it</a>
-
-
-      <!-- API submit_description -->
-      <h4 class="tw-pb-2 tw-mt-3" #submit_description="">Submit description</h4>
-      <div class="tw-relative tw-inline-flex tw-align-middle">
-        <label
-          class="tw-inline-block tw-align-middle tw-text-center tw-select-none tw-border tw-font-normal tw-whitespace-no-wrap tw-rounded tw-py-1 tw-px-3 tw-leading-normal tw-no-underline tw-bg-blue-600 tw-text-white hover:tw-bg-blue-600">POST</label>
-        <a href="{{wsname}}submit_description"
-          class="tw-inline-block tw-align-middle tw-text-center tw-select-none tw-border tw-font-normal tw-whitespace-no-wrap tw-rounded tw-py-1 tw-px-3 tw-leading-normal tw-no-underline tw-btn-outline-primary-input tw-mb-2">{{wsname}}<strong>submit_description</strong></a>
-      </div>
-
-      <dl>
-        <dt>Purpose</dt>
-        <dd>Submit resource setting and definition to APICURON. It takes the list and definition of activity terms and
-          the corresponding scores. Badges and medals definitions and rules and a short text describing the resource
-        </dd>
-        <dt>Return</dt>
-        <dd>A confirmation JSON objects</dd>
-      </dl>
-
-      <strong>Request fields</strong>
-      <table class="tw-w-full tw-max-w-full tw-mb-4 tw-bg-transparent tw-p-1 tw-table-striped tw-text-xs">
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Subfield</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-
-          <tr>
-            <td>resource_uri</td>
-            <td></td>
-            <td>This is the identifier used to identify the resource and activity terms (see submit activity)</td>
-          </tr>
-
-          <tr>
-            <td>resource_url</td>
-            <td></td>
-            <td>Resource URL</td>
-          </tr>
-
-          <tr>
-            <td>resource_name</td>
-            <td></td>
-            <td>Resource name</td>
-          </tr>
-
-          <tr>
-            <td>resource_long_name</td>
-            <td></td>
-            <td>Resource full name</td>
-          </tr>
-
-          <tr>
-            <td>resource_description</td>
-            <td></td>
-            <td>Text describing the resource shown in the APICURON database pages</td>
-          </tr>
-
-          <tr>
-            <td>terms_def</td>
-            <td></td>
-            <td>
-              The definition of an activity term. Each activity term has the following fields. See tables below
-            </td>
-          </tr>
-
-          <!-- activity terms subfields -->
-          <tr>
-            <td></td>
-            <td>activity_term</td>
-            <td>Activity term identifier</td>
-          </tr>
-
-          <tr>
-            <td></td>
-            <td>activity_name</td>
-            <td>Activity term name</td>
-          </tr>
-
-          <tr>
-            <td></td>
-            <td>activity_category</td>
-            <td>Activity term category. Either "generation", "revision" or "invalidation"</td>
-          </tr>
-
-          <tr>
-            <td></td>
-            <td>score</td>
-            <td>An interger number representing the effort or importance of the curation activity</td>
-          </tr>
-
-          <tr>
-            <td></td>
-            <td>description</td>
-            <td>A human readable description of the activity term</td>
-          </tr>
-
-
-          <tr>
-            <td>achievements_def</td>
-            <td></td>
-            <td>
-              The definition of achievements and parameters for their calculation. See tables below
-            </td>
-          </tr>
-
-          <!-- achievements subfields -->
-          <tr>
-            <td></td>
-            <td>type</td>
-            <td>Either "badge or "medal"</td>
-          </tr>
-
-          <tr>
-            <td></td>
-            <td>category</td>
-            <td>A number to identify a group of related badges/medals</td>
-          </tr>
-
-          <tr>
-            <td></td>
-            <td>name</td>
-            <td>Human readable name of the badge/medal</td>
-          </tr>
-
-          <tr>
-            <td></td>
-            <td>list_terms</td>
-            <td>The list of activity terms to be considered to assign the badge/medal</td>
-          </tr>
-
-          <tr>
-            <td></td>
-            <td>color</td>
-            <td>
-              The hexadecimal color code or color name used ot visualize the badge/medal.
-              You can se gold/silver/bronze for a metal effect
-            </td>
-          </tr>
-
-          <tr>
-            <td></td>
-            <td>count_threshold</td>
-            <td><strong>Only badges</strong>. The count threshold to assign the badge</td>
-          </tr>
-
-          <tr>
-            <td></td>
-            <td>score_relative</td>
-            <td>
-              <strong>Only medals</strong>. The ranking over other database curators to assign the medal. The ranking is
-              calculated by multiplying the
-              activities listed in "list_terms" with the corresponding score
-            </td>
-          </tr>
-
-          <tr>
-            <td></td>
-            <td>first_day</td>
-            <td><strong>Only medals</strong>. Consider activity terms from this date</td>
-          </tr>
-
-          <tr>
-            <td></td>
-            <td>last_day</td>
-            <td><strong>Only medals</strong>. Consider activity terms to this date</td>
-          </tr>
-
-
-        </tbody>
-      </table>
-
-      <strong>Example</strong>
-      <pre class="tw-style-code tw-mb-5 tw-mt-3">{{submit['description'] | json}}</pre>
-
-
-
-
-
-
-
-      <!-- API submit_description -->
-      <h4 class="tw-pb-2 tw-mt-3" #submit_activity="">Submit activity</h4>
-      <div class="tw-relative tw-inline-flex tw-align-middle">
-        <label
-          class="tw-inline-block tw-align-middle tw-text-center tw-select-none tw-border tw-font-normal tw-whitespace-no-wrap tw-rounded tw-py-1 tw-px-3 tw-leading-normal tw-no-underline tw-bg-blue-600 tw-text-white hover:tw-bg-blue-600">POST</label>
-        <a href="{{wsname}}submit_activity"
-          class="tw-inline-block tw-align-middle tw-text-center tw-select-none tw-border tw-font-normal tw-whitespace-no-wrap tw-rounded tw-py-1 tw-px-3 tw-leading-normal tw-no-underline tw-btn-outline-primary-input tw-mb-2">{{wsname}}<strong>submit_activity</strong></a>
-      </div>
-
-      <dl>
-        <dt>Purpose</dt>
-        <dd>Submit curation activities to APICURON</dd>
-        <dt>Return</dt>
-        <dd>A confirmation JSON objects</dd>
-      </dl>
-
-      <strong>Request fields</strong>
-      <table class="tw-w-full tw-max-w-full tw-mb-4 tw-bg-transparent tw-p-1 tw-table-striped tw-text-xs">
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th></th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-
-          <tr>
-            <td>resource_uri</td>
-            <td></td>
-            <td>Unique resource identifier</td>
-          </tr>
-
-          <tr>
-            <td>reports</td>
-            <td></td>
-            <td>The list of curation activity objects that are stored in APICURON</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>activity_term</td>
-            <td>The curation activity term identifier</td>
-          </tr>
-
-          <tr>
-            <td></td>
-            <td>resource_uri</td>
-            <td>The database identifier</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>timestamp</td>
-            <td>The date and time of the curation activity</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>curator_orcid</td>
-            <td>The <a href="https://orcid.org/" target="_blank">ORCID</a> identifier of the biocurator</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>entity_uri</td>
-            <td>The identifier of the curated object in the source database</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <strong>Example</strong>
-      <pre class="tw-style-code tw-mb-5 tw-mt-3">{{submit['activity'] | json}}</pre>
-
-
-
-
-
-      <!-- API delete_activity -->
-      <h4 class="tw-pb-2 tw-mt-3" #delete_activity="">Delete activity</h4>
-      <div class="tw-relative tw-inline-flex tw-align-middle">
-        <label
-          class="tw-inline-block tw-align-middle tw-text-center tw-select-none tw-border tw-font-normal tw-whitespace-no-wrap tw-rounded tw-py-1 tw-px-3 tw-leading-normal tw-no-underline tw-bg-blue-600 tw-text-white hover:tw-bg-blue-600">POST</label>
-        <a href="{{wsname}}delete_activity"
-          class="tw-inline-block tw-align-middle tw-text-center tw-select-none tw-border tw-font-normal tw-whitespace-no-wrap tw-rounded tw-py-1 tw-px-3 tw-leading-normal tw-no-underline tw-btn-outline-primary-input tw-mb-2">{{wsname}}<strong>delete_activity</strong></a>
-      </div>
-
-      <dl>
-        <dt>Purpose</dt>
-        <dd>Delete curation activities to APICURON. Useful if some activities are submited by mistake or if the
-          member database changes the tracked curation activities</dd>
-        <dt>Return</dt>
-        <dd>A confirmation JSON objects</dd>
-      </dl>
-
-      <strong>Request fields</strong>
+      <h2 class="tw-pt-3 tw-mb-3 tw-mt-5" id="widget" #widget>Widget</h2>
       <p>
-        Same format of one object as defined in the "reports" field of the submit_activity endpoint
+        APICURON offers Widgets to allow resources (curation platforms) to acknowledge their biocurators on their
+        platform directly.<br>
+        Currently APICURON's main widget is the leaderboard, documentation can be found <a
+          href="/docs/dev/widgets.html#web-components-and-widgets">here</a>
+
+      </p>
+      <h2 class="tw-pt-3 tw-mb-3 tw-mt-5">Open Collaboration and Feedback</h2>
+
+      <p>
+        APICURON encourages open collaboration and welcomes user feedback to improve its functionality and usability.
+        Users can contribute to the development of the database by <strong>providing suggestions</strong>,
+        <strong>reporting bugs</strong>, or <strong>sharing their experiences</strong>. This collaborative approach
+        ensures that the database meets the evolving needs of the user community and fosters continuous improvement.<br>
+
+        You can share share your feedback directly By reporting it on <a
+          href="https://github.com/BioComputingUP/apicuron-issue-tracker">APICURON's issue tracker</a>
+        <br>
+        writing to: <a href="mailto:apicuron@ngp-net.bio.unipd.it">apicuron@ngp-net.bio.unipd.it</a>
+
       </p>
 
-
     </div>
-
-
 
   </div>
 </div>

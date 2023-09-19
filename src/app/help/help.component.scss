@@ -15,6 +15,9 @@
   display: block;
   word-wrap: break-word;
 }
+p, h2, h2, h4, li {
+  @apply tw-text-gray-700 tw-leading-relaxed tw-text-justify;
+}
 
 h1{
   @apply tw-text-4xl tw-font-semibold tw-font-dm-sans

@@ -11,11 +11,15 @@ import { Data } from "plotly.js-dist-min";
 import * as Plotly from "plotly.js-dist-min";
 import * as Moment from "moment";
 import { extendMoment } from "moment-range";
+import { ReportFilter } from "src/app/reports/interfaces/report-filter.interface";
 import {
-  ReportFilter,
-} from "src/app/reports/interfaces/report-filter.interface";
-import { BehaviorSubject, Observable, Subscription, combineLatest } from "rxjs";
-import { map } from "rxjs/operators";
+  BehaviorSubject,
+  Observable,
+  Subject,
+  Subscription,
+  combineLatest,
+} from "rxjs";
+import { map, takeUntil } from "rxjs/operators";
 import { ReportsModule } from "src/app/reports/reports.module";
 import {
   ReportsByResourceId,
@@ -42,24 +46,25 @@ const moment = extendMoment(Moment);
   styleUrls: ["./reports-by-date-chart.component.scss"],
 })
 export class ReportsByDateChartComponent implements OnDestroy, AfterViewInit {
-  plot$: Subscription;
+  destroy$ = new Subject<Boolean>();
 
   constructor(
     protected reports: ReportsService,
     protected resourceService: ResourcesService
-  ) {}
+  ) {
+  }
 
   ngAfterViewInit(): void {
-    this.plot$ = combineLatest([this.plotData$, this.plotLayout$]).subscribe(
-      ([plotData, plotLayout]: [Data[], Plotly.Layout]) => {
+    combineLatest([this.plotData$, this.plotLayout$])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(([plotData, plotLayout]: [Data[], Plotly.Layout]) => {
         return Plotly.newPlot(this.Graph.nativeElement, plotData, plotLayout, {
           responsive: true,
         });
-      }
-    );
+      });
   }
   ngOnDestroy(): void {
-    this.plot$.unsubscribe();
+    this.destroy$.next(true);
   }
 
   @ViewChild("Graph")

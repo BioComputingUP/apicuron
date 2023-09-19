@@ -1,9 +1,10 @@
 <div *ngIf="(loggedIn$ | async) && user$ | async as user" class="tw-relative tw-inline-block tw-text-left">
     <div>
-        <button [popper]="dropdown" [popperTrigger]="'hover'" [popperDisableAnimation]="false" [popperPlacement]="'bottom-start'" [popperApplyClass]="'tw-duration-200 tw-transition-opacity'"
+        <button [popper]="dropdown" [popperTrigger]="'hover'" [popperDisableAnimation]="false"
+            [popperPlacement]="'bottom-start'" [popperApplyClass]="'tw-duration-200 tw-transition-opacity'"
             class="tw-text-gray-700 hover:tw-text-gray-800 dark:tw-text-gray-100 tw-flex tw-flex-row tw-items-center dark:hover:tw-text-white nav-item tw-relative dark:before:tw-bg-white before:tw-bg-gray-700 hover-underline-animation">
-            <img [src]="generate_avatar(user.displayedName)"
-                class="tw-inline tw-w-6 tw-h-6 tw-mr-1 tw-bg-white tw-rounded-full" alt="">
+            <img [src]="user.generate_avatar().href" class="tw-inline tw-w-6 tw-h-6 tw-mr-1 tw-bg-white tw-rounded-full"
+                alt="">
             <span class="tw-font-bold">{{ user.displayedName }}</span>
             <ng-container *ngIf="notifications$ | async as notifications">
                 <span *ngIf="notifications &&  notifications.length > 0"
@@ -81,11 +82,16 @@
                         <img class="tw-justify-self-center" src="../assets/APICURON.svg">
                         <h2 class="tw-text-xl tw-text-gray-900 tw-font-bold tw-text-center tw-w-full sm:tw-mb-8">Login
                         </h2>
-                        <a style="background-color: #A6CE39;" [href]="login_link"
+
+                        <a style="background-color: #A6CE39;" (click)="login()"
                             class="tw-w-full tw-cursor-pointer hover:tw-text-white tw-text-center tw-py-2 tw-text-white tw-font-bold">Continue
                             with ORCID</a>
                         <button class="tw-w-full tw-py-2 tw-text-gray-700 tw-font-bold tw-bg-gray-300"
                             (click)="show_login = false">Cancel</button>
+
+                        <small class="tw-text-xs tw-text-gray-500 tw-font-light">By logging-In, you agree to the Terms
+                            of use of APICURON and the <a [routerLink]="['/about']" fragment="privacy" class="tw-underline hover:tw-text-blue-500">Privacy Policy</a>
+                        </small>
                     </div>
                 </div>
             </div>

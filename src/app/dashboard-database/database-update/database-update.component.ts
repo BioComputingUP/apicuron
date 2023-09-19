@@ -1,26 +1,20 @@
 import { HttpErrorResponse } from "@angular/common/http";
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   OnDestroy,
-  OnInit,
-  QueryList,
-  SecurityContext,
   ViewChild,
-  ViewChildren,
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, ParamMap } from "@angular/router";
-import { ToastrService } from "ngx-toastr";
 import {
+  BehaviorSubject,
   Observable,
+  Subject,
   Subscription,
   combineLatest,
-  fromEvent,
-  interval,
-  merge,
-  of,
 } from "rxjs";
 import {
   catchError,
@@ -29,7 +23,7 @@ import {
   shareReplay,
   startWith,
   switchMap,
-  take,
+  takeUntil,
   tap,
 } from "rxjs/operators";
 import { ResourcesService } from "../../resource/service/resources.service";
@@ -44,14 +38,23 @@ import { MessageService } from "primeng/api";
   host: {
     class: "tw-flex-auto",
   },
+  // changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DatabaseUpdateComponent {
+export class DatabaseUpdateComponent implements OnDestroy {
   resource_id$: Observable<string>;
   resource$: Observable<Object>;
+
+  JSON = JSON;
+
   form: FormGroup;
-  fileInputSubscription$: Subscription;
+
   logoLink$: Observable<SafeUrl | string>;
-  blocked: Boolean = false;
+
+  blocked$ = new BehaviorSubject<Boolean>(false);
+  destroy$ = new Subject<Boolean>();
+
+  // @ViewChild("fileUploadElement", { static: false })
+  // fileInputElement: ElementRef<HTMLInputElement>;
 
   constructor(
     protected route: ActivatedRoute,
@@ -136,9 +139,17 @@ export class DatabaseUpdateComponent {
     );
   }
 
+  // selectFile() {
+  //   this.fileInputElement.nativeElement.click();
+  // }
+
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+  }
+
   submit() {
     const formValue: FormData = this.form.value;
-    this.blocked = true;
+    this.blocked$.next(true);
     this.resourceService
       .updateResource(
         new Resource().deserialize(formValue),
@@ -168,6 +179,7 @@ export class DatabaseUpdateComponent {
           // return 'handled'
         }),
         tap(() => {
+          this.blocked$.next(false);
           this.messageService.add({
             severity: "success",
             summary: "Resource Updated Sucessfully",
@@ -175,18 +187,19 @@ export class DatabaseUpdateComponent {
             life: 5000,
           });
         }),
-        finalize(() => {
-          this.blocked = false;
-        })
+        takeUntil(this.destroy$)
       )
       .subscribe(() => {});
-
   }
 
-  async onFileSelected(event: { files: File[] }) {
-    console.log({ event });
-    const file: File = event.files[0];
-    this.form.controls["logo"].setValue(file);
+  async onFileSelected(event) {
+    if (event.currentTarget) {
+      const fileInput: HTMLInputElement = event.currentTarget;
+      if (fileInput.files.length > 0) {
+        this.form.get("logo").setValue(fileInput.files[0]);
+        this.form.get("logo").markAsDirty();
+      }
+    }
   }
 
   get resource_uri() {

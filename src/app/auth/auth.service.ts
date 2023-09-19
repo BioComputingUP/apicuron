@@ -1,23 +1,32 @@
 import { Router } from "@angular/router";
-import { defaultIfEmpty, filter, map, pluck, shareReplay, switchMap } from "rxjs/operators";
+import {
+  catchError,
+  filter,
+  map,
+  pluck,
+  shareReplay,
+  switchMap,
+  tap,
+} from "rxjs/operators";
 import { environment } from "../../environments/environment";
 import {
   BehaviorSubject,
   combineLatest,
-  concat,
   Observable,
   of,
-  Subscriber,
+  Subscription,
 } from "rxjs";
 import {
   HttpClient,
+  HttpErrorResponse,
   HttpEvent,
   HttpHandler,
   HttpInterceptor,
   HttpRequest,
 } from "@angular/common/http";
-import { Component, OnInit, Injectable } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { User } from "src/app/models/User.model";
+import * as _ from "lodash";
 
 @Injectable({
   providedIn: "root",
@@ -25,6 +34,7 @@ import { User } from "src/app/models/User.model";
 export class AuthService implements HttpInterceptor {
   private logoutUrl = environment.ws + "logout";
   private authUrl = environment.ws + "profile";
+  login_link = environment.auth_ws + "/auth/orcid";
 
   loginData = new BehaviorSubject<object>({
     authorized: false,
@@ -36,96 +46,167 @@ export class AuthService implements HttpInterceptor {
     orcid_id: null,
   });
 
+  orcidToken$: BehaviorSubject<string | null> = new BehaviorSubject(null);
+  jwtToken$: BehaviorSubject<string | null> = new BehaviorSubject(null);
+
+  private readonly jwtPrefix = "bearer";
+  private readonly jwtHeader = "authorization";
+  private readonly orcidHeader = "orcid-token";
+
+  private requestHeaders$: Observable<any>;
+
   user$: Observable<any>;
 
-  loggedIn$ = new BehaviorSubject<Boolean>(false);
+  loggedIn$: Observable<Boolean>;
 
   // authentication JWT token key and value
-  token_key = "authorization";
+  orcidPopup: Window;
+  destroy$: any;
 
   constructor(public router: Router, private http: HttpClient) {
-    this.token_value = this.get_auth_token();
-    this.user$ = this.set_user_data();
-  }
+    this.getTokens();
 
-  private set_user_data(): Observable<User> {
-    // request to get the current user
-    const user_data$: Observable<User> = this.http.get(
-      environment.ws + "/auth/profile",
-      {
-        headers: {
-          authorization: this.token_value,
-        },
-      }
-    ).pipe(
+    this.requestHeaders$ = combineLatest([
+      this.orcidToken$,
+      this.jwtToken$,
+    ]).pipe(
+      map(([orcidToken, jwtToken]: [string, string]) => {
+        let headers = {};
+        if (orcidToken) {
+          headers[this.orcidHeader] = orcidToken;
+        }
+        if (jwtToken) {
+          headers[this.jwtHeader] = this.jwtPrefix + " " + jwtToken;
+        }
+
+        return headers;
+      })
+    );
+
+    this.loggedIn$ = this.requestHeaders$.pipe(
+      map((headers: any) => {
+        return Object.keys(headers).length > 0;
+      })
+    );
+
+    // this.token_value = this.get_auth_token();
+    this.user$ = this.requestHeaders$.pipe(
+      filter((headers) => {
+        return !_.isEmpty(headers);
+      }),
+      switchMap((headers) => {
+        return this.http.get(environment.ws + "/auth/profile", {
+          headers: {
+            ...headers,
+          },
+        });
+      }),
       shareReplay(),
       map((user: User) => new User().deserialize(user))
-    )
+    );
 
-    // request to get the user current notifications
-    // const user_notifications$: Observable<Array<any>> = this.http
-    //   .get(environment.ws + "/notifications", {
-    //     headers: {
-    //       authorization: this.token_value,
-    //       version: "2",
-    //     },
-    //   })
-      // .pipe(shareReplay(), pluck("data"));
-    return user_data$
-    // // combine the two data into one and push it to the user subject
-    // return combineLatest([user_data$, user_notifications$]).pipe(
-    //   map(([user_data, user_notifications]: [Object, Array<any>]) => {
-    //     return { ...user_data, notifications: user_notifications };
-    //   })
-    // );
+    const windowMessageEventListener = (event: MessageEvent) => {
+      const allowedOrigins = [
+        new URL(environment.host).origin,
+        new URL(environment.ws).origin,
+      ];
+
+      if (allowedOrigins.includes(event.origin)) {
+        if (_.isObject(event.data) && event.data["access_token"]) {
+          const access_token = event.data["access_token"];
+          if (access_token) {
+            this.setOrcidToken(access_token);
+            window.addEventListener("message", windowMessageEventListener);
+          }
+        }
+      }
+    };
+    window.addEventListener("message", windowMessageEventListener);
+  }
+
+  public setOrcidToken(orcidToken: string | null) {
+    this.orcidToken$.next(orcidToken);
+    orcidToken
+      ? localStorage.setItem(this.orcidHeader, orcidToken)
+      : localStorage.removeItem(this.orcidHeader);
+  }
+
+  loadJwtToken(): Observable<string> {
+    return this.jwtToken$.pipe(
+      switchMap((token) => {
+        if (token) {
+          return of(token);
+        } else {
+          const url = new URL("auth/token", environment.ws + "/");
+          const request: Observable<Object> = this.http.get(url.href);
+          return request;
+        }
+      }),
+      pluck("token"),
+      map((token: string) => {
+        const [prefix, key] = token.split(" ");
+        return key;
+      })
+    );
+  }
+
+  private getTokens() {
+    const jwtToken = localStorage.getItem(this.jwtHeader);
+    if (jwtToken) {
+      this.jwtToken$.next(jwtToken);
+    }
+    const orcidToken = localStorage.getItem(this.orcidHeader);
+    if (orcidToken) {
+      this.orcidToken$.next(orcidToken);
+    }
+  }
+
+  private dropTokens(){
+    localStorage.removeItem(this.jwtHeader);
+    localStorage.removeItem(this.orcidHeader);
+    this.orcidToken$.next(null)
+    this.jwtToken$.next(null)
   }
 
   get token_value() {
-    return localStorage.getItem(this.token_key);
+    return this.jwtToken$.getValue();
   }
 
   set token_value(value: string | null) {
-    if (value) {
-      localStorage.setItem(this.token_key, value);
-      this.loggedIn$.next(true);
-    } else {
-      localStorage.removeItem(this.token_key);
-      this.loggedIn$.next(false);
-    }
+    this.jwtToken$.next(value);
+    value
+      ? localStorage.setItem(this.jwtHeader, value)
+      : localStorage.removeItem(this.jwtHeader);
   }
+  // Old method to extract token from cookies
+  // private get_token_from_cookies(): string | null {
+  //   // we check in the cookies for the token
+  //   const cookies = document.cookie.split("; ");
+  //   // get the cookie value
+  //   const authorization_cookie = cookies.find((x: string) =>
+  //     x.startsWith(this.jwtHeader)
+  //   );
 
-  private get_auth_token(): string | null {
-    const token_key = "authorization";
-    const auth_token = localStorage.getItem(token_key);
-    if (auth_token) {
-      return auth_token;
+  //   // if the cookie value is there
+  //   if (authorization_cookie) {
+  //     // we remove it from the cookies and add it to the localStorage
+  //     document.cookie = ` ${this.jwtHeader}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
+
+  //     // extract the jwt token value
+  //     const [_, token_value] = authorization_cookie.split("=");
+  //     return decodeURI(token_value);
+  //   } else {
+  //     return null;
+  //   }
+  // }
+
+  public openOauthDialog() {
+    if (!this.orcidPopup) {
+      this.orcidPopup = window.open(this.login_link, "popup", "popup=true");
     } else {
-      const token_value = this.get_token_from_cookies();
-      if (token_value) {
-        return token_value;
+      if (this.orcidPopup.closed) {
+        this.orcidPopup = window.open(this.login_link, "popup", "popup=true");
       }
-    }
-    return null;
-  }
-
-  private get_token_from_cookies(): string | null {
-    // we check in the cookies for the token
-    const cookies = document.cookie.split("; ");
-    // get the cookie value
-    const authorization_cookie = cookies.find((x: string) =>
-      x.startsWith(this.token_key)
-    );
-
-    // if the cookie value is there
-    if (authorization_cookie) {
-      // we remove it from the cookies and add it to the localStorage
-      document.cookie = ` ${this.token_key}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
-
-      // extract the jwt token value
-      const [_, token_value] = authorization_cookie.split("=");
-      return decodeURI(token_value);
-    } else {
-      return null;
     }
   }
 
@@ -136,16 +217,28 @@ export class AuthService implements HttpInterceptor {
     // if we have the token_value
     // we add the authorization JWT token to the request headers
 
-    if (this.token_value && req.url.startsWith(environment.ws)) {
-      // cloning the request and getting the headers
-      const cloned = req.clone({
-        headers: req.headers.set(this.token_key, this.token_value),
-      });
-      // returning the cloned request
-      return next.handle(cloned);
-    } else {
-      return next.handle(req);
-    }
+    return this.requestHeaders$.pipe(
+      switchMap((authHeaders: any) => {
+        if (
+          req.url.startsWith(environment.ws) &&
+          !!authHeaders &&
+          !_.isEmpty(authHeaders)
+        ) {
+          const cloned = req.clone({
+            setHeaders: authHeaders,
+          });
+          return next.handle(cloned).pipe(catchError((err: HttpErrorResponse) => {
+            if(err.status == 401){
+              this.dropTokens();
+              return next.handle(req);
+            }
+          }));
+        } else {
+          return next.handle(req);
+        }
+      }),
+    );
+
   }
 
   GetLogOut(): Observable<any> {
@@ -156,24 +249,8 @@ export class AuthService implements HttpInterceptor {
     return this.http.get(this.authUrl, { responseType: "json" });
   }
 
-  authentication(): Promise<object> {
-    return new Promise((resolve, reject) => {
-      this.GetAuth().subscribe(
-        (result) => {
-          this.loginData.next(result);
-        },
-        (error1) => {},
-        () => {
-          console.log("authentication");
-          // console.log(this.loginData.value);
-          resolve(this.loginData);
-        }
-      );
-    });
-  }
-
   logout(): void {
-    this.token_value = null;
+    this.dropTokens();
     this.router.navigate([""]);
   }
 }

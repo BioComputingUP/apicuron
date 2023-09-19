@@ -44,7 +44,7 @@
     </div>
 
     <div class="tw-mt-auto tw-flex tw-flex-row tw-justify-center tw-py-2" *ngIf="reportsWithTerms$ | async as reports">
-        <pagination [totalItems]="reports.count" [itemsPerPage]="reports.data.length"
+        <pagination [totalItems]="reports.total" [itemsPerPage]="15"
             [(ngModel)]="currentPage" (pageChanged)="update_page($event.page)" [maxSize]="5"></pagination>
     </div>
 

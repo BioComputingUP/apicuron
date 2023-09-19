@@ -4,9 +4,11 @@ import {
   filter,
   map,
   shareReplay,
+  startWith,
   switchMap,
   tap,
 } from "rxjs/operators";
+import { combineLatest } from "rxjs";
 import { AuthService } from "../../auth/auth.service";
 import * as moment from "moment";
 import { ReportFilter } from "src/app/reports/interfaces/report-filter.interface";
@@ -44,17 +46,21 @@ export class DatabaseOverviewComponent implements OnInit {
       to: [new Date(), [Validators.required]],
     });
 
+    const reportGraphForm$ = this.reportGraphForm.valueChanges.pipe(
+      startWith(this.reportGraphForm.value)
+    )
+
     this.resource$ = this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
         const resource_id = params.get("resource_id");
         return this.databaseService.get_resource(resource_id);
       }),
       shareReplay(1),
-      tap(console.log)
     );
 
-    this.reportFilter$ = this.resource$.pipe(
-      map(({ resource_id }: Resource) => {
+    this.reportFilter$ = combineLatest([reportGraphForm$, this.resource$]).pipe(
+      tap(console.log),
+      map(([changes, { resource_id }]: [any, Resource]) => {
         return ReportFilter.create({
           resource_id,
           from: this.reportGraphForm.get("from").value,
@@ -62,7 +68,6 @@ export class DatabaseOverviewComponent implements OnInit {
           groupBy: "date",
         });
       }),
-      tap(console.log)
     );
     this.user$ = this.authService.user$;
 

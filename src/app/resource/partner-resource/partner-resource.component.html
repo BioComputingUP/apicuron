@@ -1,16 +1,16 @@
 <div class="tw-border-2 tw-border-gray-400 tw-bg-white tw-rounded-md tw-p-2 md:tw-p-4 focus:tw-shadow-2xl tw-h-full">
     <div class="tw-flex tw-flex-row tw-justify-between">
         <a target="_blank" class="tw-text-xl tw-font-bold hover:tw-underline tw-text-gray-800 tw-cursor-pointer"
-            [href]="resource_url">{{ name }}</a>
+            [href]="resource.resource_url">{{ resource.resource_name }}</a>
         <a class="tw-text-lg tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer hover:tw-underline"
-            [routerLink]="['/databases',resource_id]">View
+            [routerLink]="['/databases',resource.resource_id]">View
             Details</a>
 
     </div>
-    <span class="tw-text-gray-400 tw-font-semibold tw-text-left tw-font-dm-sans">{{ short_description}}</span>
+    <span class="tw-text-gray-400 tw-font-semibold tw-text-left tw-font-dm-sans">{{ resource.resource_long_name}}</span>
     <p class="tw-font-medium tw-text-gray-800 tw-pt-2 md:tw-pt-4 tw-overflow-ellipsis">{{ description_formatted }}</p>
     <div class="tw-pt-4 tw-flex tw-flex-row tw-justify-end">
         <!-- <svg-icon [src]="logo_src" svgClass="tw-w-1/3" viewBox="auto" [applyClass]="true" [svgAriaLabel]="'Logo of ' + name"></svg-icon> -->
-        <img src="{{ logo_src }}" [alt]="'Logo of ' + name" class="tw-h-24">
+        <img [src]="resource.logo" [alt]="'Logo of ' + resource.resource_name" class="tw-h-24">
     </div>
 </div>

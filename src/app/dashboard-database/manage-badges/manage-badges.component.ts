@@ -25,7 +25,6 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
 
   constructor(
     protected route: ActivatedRoute,
-    // protected achievmentsDefService: AchievmentsDefService,
     protected badgeDefService: BadgeDefService,
     protected formBuilder: FormBuilder,
     protected toastr: ToastrService,

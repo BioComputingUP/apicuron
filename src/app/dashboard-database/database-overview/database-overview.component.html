@@ -1,5 +1,5 @@
 <div class="tw-p-2" *ngIf="user$ | async as user">
-    <h2 class="tw-text-2xl tw-font-dm-sans tw-font-bold">Welcome, {{ user.displayedName }} !</h2>
+    <h2 class="tw-text-xl tw-font-dm-sans tw-font-bold">{{ (resource$ | async)?.resource_name }}'s Overview</h2>
     <div class="tw-w-full tw-flex tw-flex-row" *ngIf="resource$ | async as resource">
         <div class="tw-w-full sm:tw-w-2/3" *ngIf="graphReportData$ | async as graphReportData">
             <div class="tw-flex tw-flex-col tw-bg-white tw-p-1 sm:tw-p-2">

@@ -1,20 +1,20 @@
-<form [formGroup]="form" class="tw-shadow-md tw-flex tw-flex-row sm:tw-p-1 tw-bg-white tw-rounded">
-    <div class="tw-w-1/6 tw-flex tw-flex-col tw-items-start tw-pr-2">
+<form [formGroup]="form" class="tw-shadow-md tw-flex tw-flex-row tw-flex-wrap md:tw-flex-nowrap sm:tw-p-1 tw-bg-white tw-rounded tw-p-1 md:tw-p-2">
+    <div class="tw-w-1/2 md:tw-w-1/6 tw-flex tw-flex-col tw-items-start tw-pb-2 md:tw-pb-0 tw-pr-0 md:tw-pr-2">
         <span class="tw-text-sm tw-font-bold tw-tracking-wide tw-text-gray-700">From</span>
         <input type="date" name="" id="" class="tw-w-full tw-h-6 tw-grow focus:tw-outline-none"
             formControlName="from">
     </div>
-    <div class="tw-w-1/6 tw-flex tw-flex-col tw-items-start tw-pr-2">
+    <div class="tw-w-1/2 md:tw-w-1/6 tw-flex tw-flex-col tw-items-start tw-pb-2 md:tw-pb-0 tw-pr-0 md:tw-pr-2">
         <span class="tw-text-sm tw-font-bold tw-tracking-wide tw-text-gray-700">To</span>
         <input type="date" name="" id="" class="tw-w-full tw-h-6 tw-grow focus:tw-outline-none"
             formControlName="to">
     </div>
-    <div class="tw-w-1/3 tw-flex tw-flex-col tw-items-start tw-pr-2">
+    <div class="tw-w-full md:tw-w-1/3 tw-flex tw-flex-col tw-items-start tw-pb-2 md:tw-pb-0 tw-pr-0 md:tw-pr-2">
         <span class="tw-text-sm tw-font-bold tw-tracking-wide tw-text-gray-700">Filter By Activity</span>
         <select-multiple class="tw-w-full" [completeSet]="itemizedTerms" formControlName="activity_terms"
             hintText="Select Activities to filter By"></select-multiple>
     </div>
-    <div class="tw-w-1/6 tw-flex tw-flex-col tw-items-start">
+    <div class="tw-w-1/2 md:tw-w-1/6 tw-flex tw-flex-col tw-items-start tw-pb-2 md:tw-pb-0 tw-pr-0 md:tw-pr-2">
         <span class="tw-text-sm tw-font-bold tw-tracking-wide tw-text-gray-700">Sort By</span>
         <select name="" id="" class="tw-bg-white tw-p-1 tw-text-gray-700 tw-grow focus:tw-outline-none"
             formControlName="sortBy">
@@ -23,14 +23,14 @@
                 {{ field.text }}</option>
         </select>
     </div>
-    <div class="tw-w-1/6 tw-flex tw-flex-col tw-items-start">
+    <div class="tw-w-1/2 md:tw-w-1/6 tw-flex tw-flex-col tw-items-start tw-pb-2 md:tw-pb-0 tw-pr-0 md:tw-pr-2">
         <span class="tw-text-sm tw-font-bold tw-tracking-wide tw-text-gray-700">Sort Order</span>
         <select name="" id="" class="tw-bg-white tw-p-1 tw-text-gray-700 tw-grow focus:tw-outline-none"
             formControlName="sortOrder">
             <option class="tw-text-sm tw-tracking-wide tw-text-gray-700 tw-whitespace-break-spaces"
-                value="desc">
+                [value]="-1">
                 Decending</option>
-            <option class="tw-text-sm tw-tracking-wide tw-text-gray-700 tw-whitespace-break-spaces" value="asc">
+            <option class="tw-text-sm tw-tracking-wide tw-text-gray-700 tw-whitespace-break-spaces" [value]="1">
                 Ascending</option>
 
         </select>

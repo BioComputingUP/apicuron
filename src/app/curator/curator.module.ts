@@ -15,6 +15,7 @@ import { CuratorProfileComponent } from '../components/curator-profile/curator-p
 import { CuratorStatCardComponent } from 'src/app/components/curator-stat-card/curator-stat-card.component';
 import { CuratorStatisticsModule } from 'src/app/curator-statistics/curator-statistics.module';
 import { AchievementsModule } from 'src/app/achievements/achievements.module';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { AchievementsModule } from 'src/app/achievements/achievements.module';
   ],
   imports: [
     SvgModule,
+    HttpClientModule,
     PaginationComponent,
     CuratorProfileComponent,
     CuratorStatCardComponent,

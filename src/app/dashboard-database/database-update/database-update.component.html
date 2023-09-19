@@ -71,16 +71,27 @@
 
                     <label>Upload Resource Logo</label>
 
-                    <p-fileUpload #fubauto mode="advanced" name="logo" accept="image/*" maxFileSize="1000000"
+                    <!-- <p-fileUpload #fubauto mode="advanced" name="logo" accept="image/*" maxFileSize="1000000"
                         [customUpload]="true" (uploadHandler)="onFileSelected($event)" [auto]="true"
                         chooseLabel="Load Image" uploadIcon="" [multiple]="false">
-                    </p-fileUpload>
-                    <div>
-                        <span class="tw-text-base tw-font-bold tw-text-gray-700 tw-my-1 sm:tw-my-2">
-                            Current Logo:
-                        </span>
-                        <div class="tw-flex tw-justify-center tw-items-center " *ngIf="logoLink$ | async as logoLink">
-                            <img class="tw-max-w-full tw-w-32 sm:tw-w-48 xl:tw-w-64" [src]="logoLink" alt="">
+                    </p-fileUpload> -->
+                    
+                    <div class="tw-flex tw-flex-row tw-gap-2">
+                        <div class="">
+                            <input #fileInput type="file" class="tw-hidden" (change)="onFileSelected($event)" id="">
+                            <button type="button" (click)="fileInput.click()"
+                                class="tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded-md tw-text-gray-200 tw-bg-apicuron-bright-purple">
+                                <span>Upload Image</span>
+                            </button>
+                        </div>
+                        <div class="tw-w-1/2">
+                            <span class="tw-text-base tw-font-bold tw-text-gray-700 tw-my-1 sm:tw-my-2">
+                                Logo Preview:
+                            </span>
+                            <div class="tw-flex tw-justify-center tw-items-center tw-m-1"
+                                *ngIf="logoLink$ | async as logoLink">
+                                <img class="tw-max-w-full tw-w-32 sm:tw-w-48 xl:tw-w-64" [src]="logoLink" alt="">
+                            </div>
                         </div>
                     </div>
 
@@ -92,9 +103,9 @@
 
             <div class="tw-w-full tw-flex tw-justify-center tw-py-1 sm:tw-py-2">
                 <div class="tw-flex tw-justify-center">
-                    <input type="submit" [value]="'Update ' + resource.resource_name" [disabled]="form.invalid"
-                        [ngClass]="{'tw-bg-gray-300 tw-text-gray-600':form.invalid, 'tw-bg-apicuron-purple tw-text-white tw-shadow-md tw-pointer-cursor': !form.invalid}"
-                        class=" tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded-md" />
+                    <input type="submit" [value]="'Update ' + resource.resource_name"
+                        [disabled]="form.invalid || !form.dirty"
+                        class=" tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded-md disabled:tw-bg-gray-300 disabled:tw-text-gray-600 enabled:tw-bg-apicuron-purple enabled:tw-text-white enabled:tw-shadow-md enabled:tw-cursor-pointer" />
                 </div>
             </div>
         </form>
@@ -103,7 +114,7 @@
 
 </div>
 
-<p-blockUI [blocked]="blocked"></p-blockUI>
+<!-- <p-blockUI [blocked]="(blocked$ | async)"></p-blockUI>
 <p-progressSpinner class="tw-absolute tw-z-40 tw-left-1/2 tw-top-1/2 -tw-translate-y-1/2 -tw-translate-x-1/2"
-    [ngClass]="{'tw-hidden': !blocked}"></p-progressSpinner>
-    <p-toast></p-toast>
+    [ngClass]="{'tw-hidden': !(blocked$ | async)}"></p-progressSpinner> -->
+<p-toast></p-toast>

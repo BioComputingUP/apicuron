@@ -1,9 +1,5 @@
 import {
-  AfterViewInit,
   Component,
-  ElementRef,
-  OnInit,
-  ViewChild,
 } from "@angular/core";
 import { Observable, combineLatest } from "rxjs";
 import { AuthService } from "src/app/auth/auth.service";
@@ -17,8 +13,6 @@ import {
   FormBuilder,
   FormControl,
   FormGroup,
-  ValidatorFn,
-  Validators,
 } from "@angular/forms";
 import { CuratorStatistics } from "../../models/statistics.model";
 @Component({
@@ -28,7 +22,7 @@ import { CuratorStatistics } from "../../models/statistics.model";
 })
 
 
-export class UserOverviewComponent implements OnInit, AfterViewInit {
+export class UserOverviewComponent {
   user$: Observable<User>;
   chartReports$: Observable<ReportsByResourceId>;
   resources$: Observable<Resource[]>;
@@ -70,22 +64,4 @@ export class UserOverviewComponent implements OnInit, AfterViewInit {
     this.currResourceStat$ = this.page.currResourceStat$;
   }
 
-  // @ViewChild('fromDatepicker', { static: false }) set fromDatepicker(value: ElementRef) {
-  //     if(value){
-  //         console.log(Datepicker)
-  //         new Datepicker(value.nativeElement, {});
-  //     }
-  // }
-  // @ViewChild('toDatepicker', { static: false }) set toDatepicker(value: ElementRef) {
-  //     if(value){
-  //         new Datepicker(value.nativeElement, {});
-  //     }
-  // }
-
-  ngAfterViewInit(): void {
-    // new Datepicker(this.fromDatepicker.nativeElement, {});
-    // new Datepicker(this.toDatepicker.nativeElement, {});
-  }
-  ngOnInit(): void {
-  }
 }

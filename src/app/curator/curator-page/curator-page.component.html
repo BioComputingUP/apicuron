@@ -3,12 +3,8 @@
     <curator-profile [curator]="curator"></curator-profile>
     <div>
       <div class="tw-flex tw-flex-col tw-gap-4">
-        <div *ngFor="let stats of statsWithResource$ | async">
-          <curator-stat-card
-            [statistics]="stats.curatorStatistics"
-            [resource]="stats.resource"
-            [curator]="curator"
-          ></curator-stat-card>
+        <div *ngFor="let stats of statistics$ | async">
+          <curator-stat-card [statistics]="stats" [curator]="curator"></curator-stat-card>
         </div>
       </div>
     </div>
