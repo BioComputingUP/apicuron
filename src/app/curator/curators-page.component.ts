@@ -52,14 +52,15 @@ export class CuratorsPageComponent implements OnInit, OnDestroy {
 
     const users_list_response$ = this.query_params$.pipe(
       switchMap((query_params) => {
+        
+        const skip = ((query_params['page'] || 1) - 1) * this.limit
 
-        const skip = query_params['page'] * this.limit
         return this.curatorService.search_curators(
           new HttpParams({
             
-            fromObject: { skip, limit: this.limit },
+            fromObject: {...query_params, skip, limit: this.limit },
           })
-        );
+        ).pipe(shareReplay())
       }),
       shareReplay()
     );

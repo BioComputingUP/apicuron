@@ -3,8 +3,9 @@ import { Component, Input, OnInit } from "@angular/core";
 import { User } from '../../models/User.model' ;
 import { OrcidService } from "src/app/orcid/services/orcid.service";
 import { OrcidModule } from "src/app/orcid/orcid.module";
-import { Observable } from "rxjs";
+import { Observable, merge } from "rxjs";
 import { OrcidProfileLink } from "src/app/orcid/types/orcid";
+import { map } from "rxjs/operators";
 
 @Component({
     standalone: true,
@@ -17,6 +18,8 @@ export class CuratorProfileComponent implements OnInit {
     profileLinks$: Observable<OrcidProfileLink[]>;
     keywords$: Observable<string[]>;
     biography$: Observable<string>;
+
+    userInfo$: Observable<Boolean>;
     
     constructor(protected orcidService: OrcidService) {}
 
@@ -27,6 +30,10 @@ export class CuratorProfileComponent implements OnInit {
         this.biography$ = this.orcidService.get_biography(this.curator.orcid_id)
         this.keywords$ = this.orcidService.get_keywords(this.curator.orcid_id)
         this.profileLinks$ = this.orcidService.get_profile_links(this.curator.orcid_id)
+
+        this.userInfo$ = merge(this.biography$, this.keywords$, this.profileLinks$, 3).pipe(
+            map((k) => !!k )
+        )
     }
 
 

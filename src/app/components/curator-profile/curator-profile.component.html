@@ -1,4 +1,4 @@
-<div class="tw-py-2 sm:tw-py-4 tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
+<div class="tw-py-2 sm:tw-py-4 tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap" [ngClass]="{'tw-justify-center': !(userInfo$ | async)}">
     <div class="sm:tw-flex-none tw-flex-1 tw-flex tw-flex-col tw-px-4 tw-w-full sm:tw-w-auto">
         <img [src]="curator.generate_avatar()"
             class="tw-w-24 tw-h-24 tw-mx-auto tw-rounded-full tw-bg-gray-50 tw-border-2 tw-border-gray-150" alt="">
@@ -9,11 +9,6 @@
             <a [href]="curator.orcid_url()">
                 <img class="tw-w-6 tw-mx-auto" src="https://orcid.org/assets/vectors/orcid.logo.icon.svg" alt="" srcset="">
             </a>
-            <!-- <ng-container *ngIf="profileLinks$ | async as orcid_links">
-                <a *ngFor="let link of orcid_links" [href]="link.value">
-                    <img class="tw-w-6 tw-mx-auto" [src]="link.value.origin + '/favicon.ico'" alt="" srcset="">
-                </a>
-            </ng-container> -->
         </div>
         
 
@@ -55,7 +50,7 @@
             </tr>
         </tbody>
     </table> -->
-    <ng-container *ngIf="(keywords$ | async) || (biography$ | async)">
+    <ng-container *ngIf="userInfo$ | async">
         <div class="tw-grid tw-grid-cols-1 tw-gap-4 sm:tw-mb-4 sm:tw-px-2">
             <div *ngIf="biography$ | async as biography"
                 class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">

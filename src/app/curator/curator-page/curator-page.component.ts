@@ -26,7 +26,9 @@ export class CuratorPageComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private curatorPageService: CuratorPageService
-  ) {
+  ) {}
+
+  ngOnInit() {
     this.orcidId$ = this.route.paramMap.pipe(
       map((params: ParamMap) => {
         return params.get("orcid_id");
@@ -35,12 +37,5 @@ export class CuratorPageComponent implements OnInit {
     this.curatorPageService.init(this.orcidId$);
     this.curator$ = this.curatorPageService.getCurator();
     this.statistics$ = this.curatorPageService.getStatistics();
-    // this.statsWithResource$ = this.curatorPageService.getStatisticsWithResource();
   }
-
-  // getResourceMedals(resource_id) {
-  //   return this.curatorPageService.getResourceMedals(resource_id)
-  // }
-
-  ngOnInit() {}
 }
