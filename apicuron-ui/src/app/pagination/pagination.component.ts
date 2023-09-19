@@ -51,7 +51,7 @@ export class PaginationComponent implements OnInit, OnDestroy {
   constructor() {
 
     this.maxPage$ = combineLatest([this.totalCount$, this.itemsPerPage$]).pipe(
-      map(([totalCount, itemsPerPage]) => Math.round(totalCount / itemsPerPage)),
+      map(([totalCount, itemsPerPage]) => Math.floor(totalCount / itemsPerPage)),
     )
 
     this.pageList$ = combineLatest([
