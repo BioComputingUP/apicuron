@@ -12,28 +12,36 @@
               <div class="tw-flex-auto tw-p-6">
                 <h6> <a routerLink="." fragment="top">About</a></h6>
                 <ul>
+                  <li><a routerLink="." fragment="how-to-cite">How to Cite</a></li>
+                  <li><a routerLink="." fragment="license">License</a></li>
                   <li><a routerLink="." fragment="intro">Introduction to APICURON</a></li>
-                  <ul>
+                  <!-- <ul>
                     <li><a routerLink="." fragment="activities">Biocuration activities</a></li>
 
                     <li><a routerLink="." fragment="gamification">Badges and scores</a></li>
-                  </ul>
+                  </ul> -->
+                  <li><a routerLink="." fragment="activities">Biocuration activities</a></li>
+
+                  <li><a routerLink="." fragment="gamification">Badges and scores</a></li>
+
                   <li><a routerLink="." fragment="becomemember">Become a member</a></li>
-                  <li><a routerLink="." fragment="license">License</a></li>
-                  <ul>
-                    <li><a routerLink="." fragment="elsi-policy">ELSI Policy and Equal Opportunity Research Support</a>
-                    </li>
-                  </ul>
                   <li><a routerLink="." fragment="contact">Contact</a></li>
-                  <li><a routerLink="." fragment="privacy">Privacy notice</a></li>
                   <li><a routerLink="." fragment="governance">Governance</a></li>
                   <ul>
                     <li><a routerLink="." fragment="team">APICURON Team</a></li>
-                    <li><a routerLink="." fragment="qa-life-cycle-plan">QA Life Cycle Plan</a></li>
-                    <li><a routerLink="." fragment="sab">SAB</a></li>
-
+                    <li><a routerLink="." fragment="funding">Funding</a></li>
                   </ul>
-                  <li><a routerLink="." fragment="funding">Funding</a></li>
+                  <li><a routerLink="." fragment="qa-life-cycle-plan">QA Life Cycle Plan</a></li>
+                  <li><a routerLink="." fragment="sab">SAB</a></li>
+                  <li><a routerLink="." fragment="elsi-policy">ELSI Policy and Equal Opportunity Research Support</a>
+                  </li>
+                  <li><a routerLink="." fragment="privacy">Privacy notice</a></li>
+                  <!-- <ul>
+                  </ul>
+                  
+                  <ul>
+
+                  </ul> -->
                 </ul>
 
               </div>
@@ -46,7 +54,7 @@
       <h1 id="top">About APICURON</h1>
       <div class="tw-flex tw-flex-wrap">
         <div class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1">
-          <h2 class="tw-pt-3 tw-pb-2" id="intro">How to cite</h2>
+          <h2 class="tw-pt-3 tw-pb-2" id="how-to-cite">How to cite</h2>
           <p class="tw-text-justify">
             <span class="tw-font-bold">APICURON: a database to credit and acknowledge the work of biocurators</span>
             <br>
@@ -58,7 +66,26 @@
 
           </p>
 
-          <h2 class="tw-pt-3 tw-pb-2" #intro="">Introduction</h2>
+          <div class="tw-flex tw-flex-wrap" id="license">
+            <div class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1">
+              <h2 class="tw-pt-3 tw-pb-2">License</h2>
+              <div class="tw-self-center">
+                <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
+                  <img alt="Creative Commons License" style="border-width:0"
+                    src="https://i.creativecommons.org/l/by/4.0/88x31.png">
+                </a>
+                This work is licensed under a
+                <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
+                  Creative Commons Attribution 4.0 International License
+                </a>
+
+              </div>
+
+
+            </div>
+          </div>
+
+          <h2 class="tw-pt-3 tw-pb-2" id="intro">Introduction</h2>
           <p class="tw-text-justify">
             Biocuration plays an essential role in making research data available to the scientific community and
             shareable, therefore increasing their intrinsic value. However, the contribution and effort of biocurators
@@ -97,7 +124,7 @@
           </div>
 
 
-          <h4 class="tw-mt-4" id="activities">Biocuration activities</h4>
+          <h2 class="tw-mt-4" id="activities">Biocuration activities</h2>
           <p class="tw-text-justify">The description of a curation event in APICURON is provided by four key components:
             entity, activity, agent and timestamp. These key elements fulfill the recommendations of
             <a href="https://datascience.codata.org/articles/10.5334/dsj-2019-054/">Thessen et al.</a>
@@ -128,7 +155,7 @@
           </ul>
           A list of the entity and activity terms for each one of our partner databases is available.
 
-          <h4 class="tw-mt-2" id="gamification">Badges and scores</h4>
+          <h2 class="tw-mt-2" id="gamification">Badges and scores</h2>
           <p class="tw-text-justify">
             Gamification is a trending topic that consists of providing motivational affordances and “gameful”
             experiences
@@ -169,107 +196,208 @@
 
         </div>
       </div>
-      <div class="tw-flex tw-flex-wrap" id="license">
-        <div class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1">
-          <h2 class="tw-pt-3 tw-pb-2">License</h2>
-          <div class="tw-self-center">
-            <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
-              <img alt="Creative Commons License" style="border-width:0"
-                src="https://i.creativecommons.org/l/by/4.0/88x31.png">
-            </a>
-            This work is licensed under a
-            <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
-              Creative Commons Attribution 4.0 International License
-            </a>
 
-          </div>
-
-          <div id="elsi-policy" class="tw-ml-2 sm:tw-ml-4">
-            <h4 class="tw-pt-4 tw-pb-2">
-              <strong>ELSI Policy and Equal Opportunity</strong>
-            </h4>
-            <p class="tw-whitespace-pre-line">
-              APICURON is committed to upholding ethical, legal, and social implications (ELSI) policies and providing
-              equal opportunity research support. These principles ensure that the resource operates in a fair and
-              inclusive manner, taking into account the ethical considerations and promoting equal access and
-              opportunity for all users and researchers.</p>
-
-            <h5>ELSI Policy</h5>
-            <ul>
-              <li>
-                <strong>Data Privacy and Consent: </strong>APICURON adheres to strict data privacy guidelines and respects
-                user consent. Any personal or sensitive data collected is handled securely and in compliance with
-                applicable data protection regulations.
-              </li>
-              <li>
-                <strong>Ethical Use of Data: </strong>The resource promotes the ethical use of data and encourages
-                collaborators and curators to consider the potential implications and societal impact of their work. Guidelines are
-                provided to ensure that data usage aligns with ethical standards and legal requirements.
-              </li>
-              <li>
-                <strong>Responsible Data Sharing: </strong>APICURON encourages responsible data sharing practices,
-                promoting open access while respecting intellectual property rights and providing proper attribution to
-                data sources.
-              </li>
-              <li>
-                <strong>Bias Mitigation: </strong>Efforts are made to mitigate biases in data collection, analysis, and
-                representation. Steps are taken to ensure that the database content is diverse, inclusive, and
-                representative of different populations and research domains.
-              </li>
-            </ul>
-
-            <h5>Equal Opportunity Research Support</h5>
-            <ul>
-              <li>
-                <strong>Accessibility: </strong>APICURON strives to provide an accessible platform for users with
-                disabilities. Efforts are made to ensure compatibility with assistive technologies and compliance with
-                web accessibility standards.
-              </li>
-              <li>
-                <strong>User Support and Training: </strong> APICURON provides user support and training resources to
-                assist researchers in utilizing the resource effectively. This support is offered to users regardless of
-                their background, institution, or research experience, ensuring equal opportunity for all.
-              </li>
-              <li>
-                <strong>Collaboration and Networking Opportunities: </strong>The resource promotes collaboration and
-                networking among researchers, fostering an environment where individuals from different backgrounds can
-                connect, share knowledge, and engage in interdisciplinary research.
-              </li>
-            </ul>
-
-            <h5>Diversity and Inclusion</h5>
-            <ul>
-              <li>
-                <strong>Accessibility: </strong>APICURON values diversity and inclusion and strives to ensure
-                representation across various dimensions, including gender, ethnicity, geography, and research fields.
-                Efforts are made to include underrepresented groups and promote balanced representation in the resource's
-                content.
-              </li>
-              <li>
-                <strong>Sensitivity and Cultural Considerations: </strong>The resource recognizes the importance of
-                cultural sensitivity in research and content representation. Guidelines are provided to address cultural
-                considerations and avoid any form of discrimination or misrepresentation.
-              </li>
-              <li>
-                <strong>Equal Opportunity for Contributions: </strong>APICURON encourages scientific or biological databases from all backgrounds
-                to contribute and benefit from APICURON as a platform that promotes fairness and equal opportunity, providing a level
-                playing field for curators and various contributors to showcase their work and contribute to the advancement of knowledge in biology and science.
-              </li>
-            </ul>
-
-            <p>By implementing an ELSI policy and providing equal opportunity research support, APICURON aims to create a
-              welcoming and inclusive environment for users, researchers and institutions. These principles ensure that the resource
-              operates ethically, respects user privacy, and provides equal opportunities for researchers to engage,
-              contribute, and benefit from the resources and knowledge available on the platform.</p>
-          </div>
-        </div>
-      </div>
 
       <h2 id="contact" class="tw-pt-3 tw-pb-2">Contact</h2>
 
       <p>
-        If you wish to get in touch with our team, we offer several channels. You can reach out to us through <a href="http://https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w">Slack</a>, where we maintain an active presence for real-time communication. Alternatively, you may choose to contact us via <a href="mailto:apicuron@ngp-net.bio.unipd.it">email</a>, and we will promptly respond to your inquiries. <br> For more technical discussions or to report issues, our <a href="https://github.com/BioComputingUP/apicuron-issue-tracker">Issue Tracker</a> is at your disposal. We appreciate your interest and look forward to assisting you in the best way possible.
+        If you wish to get in touch with our team, we offer several channels. You can reach out to us through <a
+          href="http://https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w">Slack</a>,
+        where we maintain an active presence for real-time communication. Alternatively, you may choose to contact us
+        via <a href="mailto:apicuron@ngp-net.bio.unipd.it">email</a>, and we will promptly respond to your inquiries.
+        <br> For more technical discussions or to report issues, our <a
+          href="https://github.com/BioComputingUP/apicuron-issue-tracker">Issue Tracker</a> is at your disposal. We
+        appreciate your interest and look forward to assisting you in the best way possible.
       </p>
+
+      <!-- Governance -->
+      <div id="governance">
+        <h2>Governance</h2>
+
+        <!-- APICURON Team -->
+        <div class="tw-ml-4" id="team">
+          <h4>APICURON Team</h4>
+          <p class="tw-whitespace-pre-wrap ">The <strong>APICURON</strong> resource is maintained at the <a
+              href="https://biocomputingup.it/">BioComputingUP</a> lab, <a href="https://www.unipd.it/en/dsb">Department
+              of Biomedical Sciences</a>, <a href="https://www.unipd.it/">University of Padova</a> - italy
+
+            <br>
+            <span class="tw-font-bold">Team members</span>
+          <ul>
+            <li>Silvio CE Tosatto - Team leader (Full Professor)</li>
+            <li>Damiano Piovesan - Team leader & software developer (Associate Professor)</li>
+            <li>Bouhraoua Kamel Eddine Adel - Web Developer (PhD Student)</li>
+            <li>Ivan Micetic - System administrator & support</li>
+          </ul>
+
+          <span class="tw-font-bold tw-text-gray-700">Previous contributors</span>
+          <ul>
+            <li>András Hatos - Web Developer (PhD Student)</li>
+          </ul>
+
+        </div>
+
+      </div>
+
+      <!-- Funding -->
+      <div id="funding" class="tw-ml-4">
+        <h4>Funding</h4>
+        <p class="tw-whitespace-pre-line">
+          APICURON is currently supported by the University of Padova, which provides the necessary hardware
+          infrastructure and personnel for software maintenance, both via its core funding and ELIXIR-Italy funding.
+          In
+          addition, APICURON has received support from ELIXIR's Data Platform, which has provided funding to improve
+          integration with core data resources and to enhance guidelines and standardization processes for connecting
+          resources.<br><br>
+
+          To ensure the long-term sustainability of APICURON, we plan to pursue additional funding opportunities from
+          both public and private sources. We will also explore partnerships with relevant organizations and
+          stakeholders to increase the visibility and impact of the platform.<br><br>
+          Additionally, we plan to explore potential revenue streams, such as charging for premium features or
+          offering
+          consulting services, to supplement existing funding sources; especially for private entities such as
+          pharmaceutical companies building their private datasets. Finally, we will continue to prioritize
+          sustainable
+          software development practices to ensure that the platform remains stable, secure, and efficient.
+
+        </p>
+
+      </div>
+
+
+
+      <!-- QA Life Cycle Plan -->
+      <div id="qa-life-cycle-plan">
+        <h2>QA Life Cycle Plan</h2>
+        <p class="tw-whitespace-pre-wrap">The goal of the Quality Assurance (QA) Life Cycle Plan is to ensure the
+          continuous improvement, reliability, and accuracy of APICURON, focusing on the implementation of
+          effective QA and QC practices. The document outlines the standard operating procedures (SOPs), roadmap,
+          resource improvement plan, and QA/QC implementation strategies for maintaining the quality of APICURON.
+          <br>
+          <br>
+
+          The QA Life Cycle Plan for APICURON serves as a roadmap for ensuring the ongoing quality and reliability of
+          the database. By following the defined SOPs, adhering to the roadmap, implementing the resource improvement
+          plan, and executing effective QA/QC practices, we aim to provide users with a robust and accurate resource
+          for contribution (curation) recognition. Regular reviews, internal audits, and continuous
+          improvement efforts will be integral to maintaining the high standards expected from APICURON.
+          <br>
+          <a href="https://docs.google.com/document/d/1kJxmbaMwzrbKhNa6i7ntdkzg2G7rt6B3pGcr8ZZWQF4/edit?usp=sharing">Quality
+            Assurance Life Cycle Plan document
+            <svg-icon src="assets/svg/document-text.svg" alt="Quality Assurance Life Cycle Plan Document"
+              svgClass="tw-h-5 tw-w-5 tw-inline " class="tw-align-text-bottom"></svg-icon>
+          </a>
+        </p>
+
+      </div>
+
+      <!-- SAB -->
+      <div class="tw-ml-4" id="sab">
+        <h2>SAB</h2>
+        <p class="tw-whitespace-pre-line">APICURON does not currently have a separate Scientific Advisory Board, it is
+          reviewed through the SAB of <a href="https://elixir-italy.org/about/sab/">the Italian ELIXIR node</a>.
+          Moreover, it is involved in the ELIXIR Biocuration Focus Group and linked to the International Society for
+          Biocuration (ISB). These connections to the broader biocuration community provide valuable guidance and
+          feedback to help ensure that the platform operates in accordance with best practices and standards.</p>
+
+      </div>
+
+      <!-- elsi policy -->
+      <div id="elsi-policy">
+        <h2 class="tw-pt-4 tw-pb-2">
+          ELSI Policy and Equal Opportunity
+        </h2>
+        <p class="tw-whitespace-pre-line">
+          APICURON is committed to upholding ethical, legal, and social implications (ELSI) policies and
+          providing
+          equal opportunity research support. These principles ensure that the resource operates in a fair and
+          inclusive manner, taking into account the ethical considerations and promoting equal access and
+          opportunity for all users and researchers.</p>
+
+        <h5>ELSI Policy</h5>
+        <ul>
+          <li>
+            <strong>Data Privacy and Consent: </strong>APICURON adheres to strict data privacy guidelines and
+            respects
+            user consent. Any personal or sensitive data collected is handled securely and in compliance with
+            applicable data protection regulations.
+          </li>
+          <li>
+            <strong>Ethical Use of Data: </strong>The resource promotes the ethical use of data and encourages
+            collaborators and curators to consider the potential implications and societal impact of their work.
+            Guidelines are
+            provided to ensure that data usage aligns with ethical standards and legal requirements.
+          </li>
+          <li>
+            <strong>Responsible Data Sharing: </strong>APICURON encourages responsible data sharing practices,
+            promoting open access while respecting intellectual property rights and providing proper attribution
+            to
+            data sources.
+          </li>
+          <li>
+            <strong>Bias Mitigation: </strong>Efforts are made to mitigate biases in data collection, analysis,
+            and
+            representation. Steps are taken to ensure that the database content is diverse, inclusive, and
+            representative of different populations and research domains.
+          </li>
+        </ul>
+
+        <h5>Equal Opportunity Research Support</h5>
+        <ul>
+          <li>
+            <strong>Accessibility: </strong>APICURON strives to provide an accessible platform for users with
+            disabilities. Efforts are made to ensure compatibility with assistive technologies and compliance
+            with
+            web accessibility standards.
+          </li>
+          <li>
+            <strong>User Support and Training: </strong> APICURON provides user support and training resources
+            to
+            assist researchers in utilizing the resource effectively. This support is offered to users
+            regardless of
+            their background, institution, or research experience, ensuring equal opportunity for all.
+          </li>
+          <li>
+            <strong>Collaboration and Networking Opportunities: </strong>The resource promotes collaboration and
+            networking among researchers, fostering an environment where individuals from different backgrounds
+            can
+            connect, share knowledge, and engage in interdisciplinary research.
+          </li>
+        </ul>
+
+        <h5>Diversity and Inclusion</h5>
+        <ul>
+          <li>
+            <strong>Accessibility: </strong>APICURON values diversity and inclusion and strives to ensure
+            representation across various dimensions, including gender, ethnicity, geography, and research
+            fields.
+            Efforts are made to include underrepresented groups and promote balanced representation in the
+            resource's
+            content.
+          </li>
+          <li>
+            <strong>Sensitivity and Cultural Considerations: </strong>The resource recognizes the importance of
+            cultural sensitivity in research and content representation. Guidelines are provided to address
+            cultural
+            considerations and avoid any form of discrimination or misrepresentation.
+          </li>
+          <li>
+            <strong>Equal Opportunity for Contributions: </strong>APICURON encourages scientific or biological
+            databases from all backgrounds
+            to contribute and benefit from APICURON as a platform that promotes fairness and equal opportunity,
+            providing a level
+            playing field for curators and various contributors to showcase their work and contribute to the
+            advancement of knowledge in biology and science.
+          </li>
+        </ul>
+
+        <p>By implementing an ELSI policy and providing equal opportunity research support, APICURON aims to
+          create a
+          welcoming and inclusive environment for users, researchers and institutions. These principles ensure
+          that the resource
+          operates ethically, respects user privacy, and provides equal opportunities for researchers to engage,
+          contribute, and benefit from the resources and knowledge available on the platform.</p>
+      </div>
 
       <!-- Privacy Notice -->
       <div>
@@ -378,91 +506,9 @@
         </ul>
       </div>
 
-      <!-- Governance -->
-      <div id="governance">
-        <h2>Governance</h2>
-
-        <!-- APICURON Team -->
-        <div class="tw-ml-4" id="team">
-          <h4>APICURON Team</h4>
-          <p class="tw-whitespace-pre-wrap ">The <strong>APICURON</strong> resource is maintained at the <a
-              href="https://biocomputingup.it/">BioComputingUP</a> lab, <a href="https://www.unipd.it/en/dsb">Department
-              of Biomedical Sciences</a>, <a href="https://www.unipd.it/">University of Padova</a> - italy
-
-            <br>
-            <span class="tw-font-bold">Team members</span>
-          <ul>
-            <li>Silvio CE Tosatto - Team leader (Full Professor)</li>
-            <li>Damiano Piovesan - Team leader & software developer (Associate Professor)</li>
-            <li>Bouhraoua Kamel Eddine Adel - Web Developer (PhD Student)</li>
-            <li>Ivan Micetic - System administrator & support</li>
-          </ul>
-
-          <span class="tw-font-bold tw-text-gray-700">Previous contributors</span>
-          <ul>
-            <li>András Hatos - Web Developer (PhD Student)</li>
-          </ul>
-
-        </div>
-
-        <!-- QA Life Cycle Plan -->
-        <div class="tw-ml-4" id="qa-life-cycle-plan">
-          <h4>QA Life Cycle Plan</h4>
-          <p class="tw-whitespace-pre-wrap">The goal of the Quality Assurance (QA) Life Cycle Plan is to ensure the
-            continuous improvement, reliability, and accuracy of APICURON, focusing on the implementation of
-            effective QA and QC practices. The document outlines the standard operating procedures (SOPs), roadmap,
-            resource improvement plan, and QA/QC implementation strategies for maintaining the quality of APICURON.
-            <br>
-            <br>
-
-            The QA Life Cycle Plan for APICURON serves as a roadmap for ensuring the ongoing quality and reliability of
-            the database. By following the defined SOPs, adhering to the roadmap, implementing the resource improvement
-            plan, and executing effective QA/QC practices, we aim to provide users with a robust and accurate resource
-            for contribution (curation) recognition. Regular reviews, internal audits, and continuous
-            improvement efforts will be integral to maintaining the high standards expected from APICURON.
-            <br>
-            <a href="https://docs.google.com/document/d/1kJxmbaMwzrbKhNa6i7ntdkzg2G7rt6B3pGcr8ZZWQF4/edit?usp=sharing">Quality
-              Assurance Life Cycle Plan document
-              <svg-icon src="assets/svg/document-text.svg" alt="Quality Assurance Life Cycle Plan Document"
-                svgClass="tw-h-5 tw-w-5 tw-inline " class="tw-align-text-bottom"></svg-icon>
-            </a>
-          </p>
-
-        </div>
 
 
-        <!-- SAB -->
-        <div class="tw-ml-4" id="sab">
-          <h4>SAB</h4>
-          <p class="tw-whitespace-pre-line">APICURON does not currently have a separate Scientific Advisory Board, it is
-            reviewed through the SAB of <a href="https://elixir-italy.org/about/sab/">the Italian ELIXIR node</a>.
-            Moreover, it is involved in the ELIXIR Biocuration Focus Group and linked to the International Society for
-            Biocuration (ISB). These connections to the broader biocuration community provide valuable guidance and
-            feedback to help ensure that the platform operates in accordance with best practices and standards.</p>
 
-        </div>
-      </div>
-
-      <div id="funding">
-        <h2>Funding</h2>
-        <p class="tw-whitespace-pre-line">
-          APICURON is currently supported by the University of Padova, which provides the necessary hardware
-          infrastructure and personnel for software maintenance, both via its core funding and ELIXIR-Italy funding. In
-          addition, APICURON has received support from ELIXIR's Data Platform, which has provided funding to improve
-          integration with core data resources and to enhance guidelines and standardization processes for connecting
-          resources.<br><br>
-
-          To ensure the long-term sustainability of APICURON, we plan to pursue additional funding opportunities from
-          both public and private sources. We will also explore partnerships with relevant organizations and
-          stakeholders to increase the visibility and impact of the platform.<br><br>
-          Additionally, we plan to explore potential revenue streams, such as charging for premium features or offering
-          consulting services, to supplement existing funding sources; especially for private entities such as
-          pharmaceutical companies building their private datasets. Finally, we will continue to prioritize sustainable
-          software development practices to ensure that the platform remains stable, secure, and efficient.
-
-        </p>
-
-      </div>
     </div>
   </div>
 </div>

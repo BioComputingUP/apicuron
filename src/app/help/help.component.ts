@@ -8,10 +8,10 @@ import { environment } from "../../environments/environment";
 })
 export class HelpComponent implements OnInit {
   navigation_panel = [
-    { text: "Web interface", href: "#gui" },
-    { text: "API", href: "#api" },
-    { text: "Widget", href: "#widget" },
-    { text: "Open Collaboration and Feedback", href: "#feedback" },
+    { text: "Web interface", href: "gui" },
+    { text: "API", href: "api" },
+    { text: "Widget", href: "widget" },
+    { text: "Open Collaboration and Feedback", href: "feedback" },
   ];
   codeWidget = `<apicuron-widget database="disprot"></apicuron-widget>
 <script type="text/javascript" src="https://apicuron.org/assets/apicuron-widget.js"></script>`;

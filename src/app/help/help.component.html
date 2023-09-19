@@ -9,7 +9,7 @@
           </div>
           <div class="tw-flex-auto tw-p-6">
 
-            <a class="tw-block" [href]="link.href" *ngFor="let link of navigation_panel">{{
+            <a class="tw-block" routerLink="." [fragment]="link.href" *ngFor="let link of navigation_panel">{{
               link.text }}</a>
 
           </div>
@@ -29,97 +29,39 @@
       <h2 class="tw-pt-3 tw-mb-3 tw-mt-5" id="gui" #gui>Web interface</h2>
 
       <p class="tw-mb-3">
-        This page describes APICURON website use.
-      </p>
-      <p class="tw-mb-3">
         The APICURON graphical user interface allows easy access to the biocuration activities of our partner databases
-        in
-        a graphical way. Biocurators can be searched from the <a routerLink="/curators">Curators page</a> or from the
-        search box
-        on the <a routerLink="/">Home page</a>.
+        in a graphical way. Further details can be found <a href="/docs/main/guide/#the-web-interface">here</a>
       </p>
 
 
       <h4 class="tw-mt-2" #databases id="databases">Databases page</h4>
       <p class="tw-mb-3">
-        The <a routerLink="/databases">Databases page</a> lists all member databases registered to APICURON.
-        Member databases periodically push curation activities and APICURON synchronously
-        calculates achievements and leaderboards.
+        The <a routerLink="/databases">Databases page</a> lists all member databases registered to APICURON. It's use
+        and details are futher exaplained <a href="/docs/main/guide/#databases-page">here</a>
       </p>
 
-      <h4 class="tw-mt-2" #database id="database">Database specific page</h4>
-        <p>
-          By clicking on a card in the <a routerLink="/databases">Databases page</a>, you get redirected to a
-          page dedicated to a specific resource.
-        </p>
-      <ol class="tw-mb-3">
-        <li>
-          <strong>Database description</strong>
-          as provided by the database project manager
-        </li>
-        <li>
-          <strong>Leaderboard</strong>
-          the ranking of curators based on the total amount of curation activities weighted by the corresponding
-          score
-        </li>
-        <li>
-          <strong>Available badges</strong>
-          and the corresponding definition
-        </li>
-        <li>
-          <strong>Available medals</strong>
-          and the corresponding definition
-        </li>
-        <li>
-          <strong>Curation activity records</strong>
-          the full list of curation activities submitted to APICURON
-        </li>
-      </ol>
+      <h4 class="tw-mt-2" #database id="database">Single Database page</h4>
+      <p>
+        The single Database page displays details regarding one database only, further details explained <a
+          href="/docs/main/guide/#single-database-page">here</a>
+      </p>
 
 
       <h4 class="tw-mt-2" #browse id="browse">Curators page</h4>
-      The <a routerLink="/curators">Curators page</a> is composed of a result tw-table, a sidebar and a search bar.
-      <ul class="tw-mb-3">
-        <li>
-          <strong>Table</strong>
-          By default it shows the first entries of the database
-          sorted alphabetically. You can change the tw-table sorting by clicking on column headers.
-        </li>
 
-        <li>
-          <strong>Search box</strong>
-          It offers a free text search against all entry values.
-          Alternatively, it allows users to specify the field to search against, e.g. biocurator name,
-          resource identifier, ORCID, etc.
-        </li>
-      </ul>
+      <p>
+
+        <a routerLink="/curators">The curators page</a> shows a list of curators, further details can be found <a
+          href="/docs/main/guide/#curators-page">here</a>
+      </p>
 
 
       <h4 class="tw-mt-2" #biocurator id="biocurator">Personal profile page</h4>
       <p>
-        By clicking on a row of the curators tw-table in the <a routerLink="/curators">Curators page</a> or
-        from the search box in the <a routerLink="/">Home page</a>, you get redirected to the
-        personal profile page of a biocurator. The profile page features different sections.
+        Each curator registered on APICURON has a personal profile page, further details can be found <a
+          href="/docs/main/guide/#single-curator-page">here</a>
 
       </p>
-      <ol class="tw-mb-5">
-        <li>
-          <strong>Personal information</strong> name and ORCID
-        </li>
-        <li>
-          <strong>Biocuration statistics</strong> number of generated/revised/invalidated entitities
-        </li>
-        <li>
-          <strong>Achievements</strong>
-          Badges and medals earned
-
-        </li>
-        <li>
-          <strong>Biocuration events</strong>
-          This section include a search bar (above) and a tw-table (below) listing all the
-          entity identifiers, activity terms and timestamps.
-        </li>
-      </ol>
       <h2 class="tw-pt-3 tw-mb-3 tw-mt-5" id="api" #api>Application Programming Interface (API)</h2>
 
       <p>API Documentation can be found <a [href]="wsname">here</a>.</p>
@@ -132,7 +74,7 @@
           href="/docs/dev/widgets.html#web-components-and-widgets">here</a>
 
       </p>
-      <h2 class="tw-pt-3 tw-mb-3 tw-mt-5">Open Collaboration and Feedback</h2>
+      <h2 class="tw-pt-3 tw-mb-3 tw-mt-5" id="feedback">Open Collaboration and Feedback</h2>
 
       <p>
         APICURON encourages open collaboration and welcomes user feedback to improve its functionality and usability.
@@ -140,10 +82,12 @@
         <strong>reporting bugs</strong>, or <strong>sharing their experiences</strong>. This collaborative approach
         ensures that the database meets the evolving needs of the user community and fosters continuous improvement.<br>
 
-        You can share share your feedback directly By reporting it on <a
+        You can share share your feedback directly By reporting it on: <a
           href="https://github.com/BioComputingUP/apicuron-issue-tracker">APICURON's issue tracker</a>
         <br>
-        writing to: <a href="mailto:apicuron@ngp-net.bio.unipd.it">apicuron@ngp-net.bio.unipd.it</a>
+        By writing to: <a href="mailto:apicuron@ngp-net.bio.unipd.it">apicuron@ngp-net.bio.unipd.it</a>
+        <br>
+        Or Joining the <a href="https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w">APICURON Slack</a>
 
       </p>
 
