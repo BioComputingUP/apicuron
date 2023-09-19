@@ -1,0 +1,6 @@
+[submodule "apicuron2-ws"]
+	path = apicuron-ws
+	url = git@stige:apicuron2-ws.git
+[submodule "apicuron-ui"]
+	path = apicuron-ui
+	url = git@stige:apicuron-ui.git
