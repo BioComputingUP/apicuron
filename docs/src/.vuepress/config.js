@@ -85,7 +85,7 @@ module.exports = {
     lastUpdated: false,
     nav: [
       {
-        text: "General Guide",
+        text: "User Guide",
         link: "/main/guide/",
       },
       {
@@ -108,6 +108,11 @@ module.exports = {
           collapsable: false,
           children: ["/main/guide/"],
         },
+      ],
+
+      "/main/": [
+        ['/dev/', 'Developer Guide'],
+        ['/main/guide/', 'User Guide'],
       ],
       "/dev/": [
         ["/dev/", "Intro"],
