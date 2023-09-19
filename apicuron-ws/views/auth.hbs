@@ -90,6 +90,11 @@
             display: block;
             margin: auto;
         }
+        #redirection_tab{
+            display: none;
+            text-align: center;
+            padding-bottom: 1rem;
+        }
     </style>
 </head>
 
@@ -98,8 +103,10 @@
         <img class="logo" src="/assets/APICURON.svg" alt="">
         <div class="icon">✓</div>
         <h1>Login Successful</h1>
-        {{!-- <h1>{{ message }}</h1> --}}
         <div class="message">You have successfully logged in!</div>
+        <div id="redirection_tab">
+            You will be redirected to APICURON homepage in 
+        </div>
         <button onclick="self.close();" class="btn">Close</button>
     </div>
 
@@ -114,10 +121,34 @@
             const msg = {
                 access_token: accessTokenElement.content,
             };
-            console.log(msg);
+
+            function setCounter(element, number){
+                element.innerHTML = "You will be redirected to APICURON homepage in " + number+ ' <br> if redirection fails, <a href="/">click here</a>';
+
+            }
 
             // window.opener?.postMessage('oauthsetup', window.location.origin);
-            window.opener?.postMessage(msg, window.location.origin);
+            if(window.opener){
+                window.opener?.postMessage(msg, window.location.origin);           
+            }else{
+
+                const redirectionBlock = document.body.querySelector('#redirection_tab')
+                let intervalCount = 5
+                setCounter(redirectionBlock, intervalCount)
+                redirectionBlock.style.display = "block"
+                
+                const interVId = setInterval(() => {
+                    intervalCount--;
+                    setCounter(redirectionBlock, intervalCount)
+                    if(intervalCount == 0){
+                        clearInterval(interVId)
+                    }
+                }, 1000)
+
+                localStorage.setItem('orcid-token',msg.access_token)
+                //window.location.href = '/'
+            }
+            
         }
 
 
