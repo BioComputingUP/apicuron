@@ -88,9 +88,8 @@ module.exports = {
     nav: [
       {
         text: "Home",
-        link: "/../",
-        rel: "external",
-        target:"_self"
+        target: '_self',
+        link: "https://dev.apicuron.org",
       },
       {
         text: "User Guide",
