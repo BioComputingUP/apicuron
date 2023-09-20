@@ -79,11 +79,19 @@ module.exports = {
     // TODO: Enable in the future
     // search: true,
     repo: "",
+    logo: "/../assets/APICURON_white.svg",
+    title: '',
     editLinks: false,
     docsDir: "docs",
     editLinkText: "",
     lastUpdated: false,
     nav: [
+      {
+        text: "Home",
+        link: "/../",
+        rel: "external",
+        target:"_self"
+      },
       {
         text: "User Guide",
         link: "/main/guide/",
