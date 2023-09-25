@@ -3,7 +3,6 @@ import { BehaviorSubject, Observable, Subject, combineLatest, of } from "rxjs";
 import { filter, map, pluck, shareReplay, switchMap, takeUntil } from "rxjs/operators";
 import { User } from "../../../../../src/app/models/User.model";
 import { Resource } from "../../../../../src/app/models/resource.model";
-import { environment } from "src/environments/environment";
 import { Paginated } from "../../../../../src/app/interfaces/paginated";
 import { FormControl } from "@angular/forms";
 import { CuratorStatistics } from "../../../../../src/app/models/statistics.model";
@@ -61,7 +60,7 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
     tableColumns: string[] = ['medals_count', 'badges_count', 'generation_count', 'invalidation_count', 'revision_count', 'total_score'];
 
 
-    apicuronURL = environment.host;
+    apicuronURL = 'https://apicuron.org';
     stats$: Observable<Paginated<CuratorStatistics>>;
     statsMeta$: Observable<{ pagination: { total: number; start: number; limit: number; }; }>;
 
@@ -70,7 +69,33 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
     page: FormControl
     destroy$ = new Subject();
 
-    constructor(protected mainService: MainService) {
+    constructor(protected mainService: MainService) {}
+    ngOnDestroy(): void {
+        this.destroy$.next(true)
+    }
+
+    @Input('resource')
+    set resource_id(value: string) {
+        this.leaderboardQuery$.next({ ...this.leaderboardQuery$.value, resource_id: value });
+    }
+
+    @Input('env')
+    set env(value: string){
+        this.apicuronURL = value != 'dev' ? 'https://apicuron.org' : 'https://dev.apicuron.org'
+    }
+
+
+    @Input('columns')
+    set columns(value: string) {
+        this.tableColumns = value.split(',').filter((val) => Object.keys(leaderboardColumns).includes(val))
+    }
+
+
+    getColumnProps(col: string) {
+        return leaderboardColumns[col]
+    }
+
+    ngOnInit(): void {
 
         this.resource$ = this.leaderboardQuery$.pipe(
             filter((query) => !!query.resource_id),
@@ -139,32 +164,6 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
                 })
             }),
         )
-
-
-    }
-    ngOnDestroy(): void {
-        this.destroy$.next(true)
-    }
-
-    @Input('resource')
-    set resource_id(value: string) {
-        this.leaderboardQuery$.next({ ...this.leaderboardQuery$.value, resource_id: value });
-    }
-
-
-    @Input('columns')
-    set columns(value: string) {
-        this.tableColumns = value.split(',').filter((val) => Object.keys(leaderboardColumns).includes(val))
-    }
-
-
-    getColumnProps(col: string) {
-        return leaderboardColumns[col]
-    }
-
-    ngOnInit(): void {
-
-
 
 
 
