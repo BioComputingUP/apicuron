@@ -4,17 +4,24 @@ import {
 	Logger,
 	Query,
 	Param,
+	Res,
+	Req,
 	UseInterceptors,
 } from '@nestjs/common';
 import { AchievementsService } from '../../achievements/achievements.service';
 import { ParseUnsignedIntPipe } from '../../shared/pipes/unsigned-int-validation.pipe';
 import { TransformInterceptor } from '../../shared/transformer/transform.interceptor';
-// import { TransformerService } from '../../shared/transformer/transformer.service';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { GetStatisticsDto } from '../dto/get-statistics.dto';
 import { StatisticsService } from '../statistics.service';
 import { ApiHeader, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { VersionHeader } from '../../config/swagger';
+import { VersionHeader } from '../../swagger/config';
+import { UsersService } from '../../auth/users/users.service';
+import * as _ from 'lodash';
+import { Request, Response } from 'express';
+import { plainToInstance } from 'class-transformer';
+import { paginate } from '../../pagination/paginator';
+import { PaginateDto } from '../../pagination/dto/paginate.dto';
 
 @ApiTags('Statistics')
 @ApiHeader(VersionHeader)
@@ -28,6 +35,7 @@ export class StatisticsController {
 		protected statService: StatisticsService,
 		protected partnerResourceService: PartnerResourcesService,
 		protected achievementsService: AchievementsService,
+		protected userService: UsersService
 	) {}
 
 	private readonly logger = new Logger(StatisticsController.name);
@@ -41,14 +49,15 @@ export class StatisticsController {
 	@Get('leaderboard/:resource_id')
 	async get_resource_leaderboard(
 		@Param('resource_id') resource_id: string,
-		@Query('page', ParseUnsignedIntPipe) page: number,
-		@Query('page_size', ParseUnsignedIntPipe) page_size: number,
+		@Query() pagination: PaginateDto,
 	) {
-		return await this.statService.get_resource_leaderboard(
+
+		
+		return await this.statService.getResourceLeaderboard(
 			resource_id,
-			page,
-			page_size,
+			pagination
 		);
+
 	}
 	
 
@@ -60,8 +69,20 @@ export class StatisticsController {
 		summary: 'get a single user statistics for all the Partner Resources they are concerned by'
 	})
 	@Get('user/:orcid_id')
-	async get_user_statistics(@Param('orcid_id') orcid_id:string){
-		return this.statService.get_user_statistics(orcid_id)
+	async get_user_statistics(@Param('orcid_id') orcid_id: string, @Req() req){
+		
+		const exists = await this.userService.user_exists(orcid_id)
+		if(exists){
+			return await this.statService.get_public_user_statistics(orcid_id)
+		}else{
+			if(!req.user){
+				return await this.statService.get_public_user_statistics(orcid_id)
+			}
+
+			const resource_ids = (req.user.resources || []).map(res => res.resource_id)
+			return await this.statService.get_all_user_statistics(orcid_id, resource_ids) 	
+		}
+
 	}
 
 	@ApiOperation({
@@ -72,13 +93,8 @@ export class StatisticsController {
 	})
 	@Get()
 	async findAll(@Query() query: GetStatisticsDto) {
-		return await this.statService.get_all_statistics(
-			query.query,
-			query.filter_field,
-			query.resources,
-			query.page,
-			query.page_size,
-		);
+		const getStatDtoInstance = plainToInstance(GetStatisticsDto, query)
+		return await this.statService.get_all_statistics(getStatDtoInstance);
 	}
 	
 }
@@ -87,19 +103,45 @@ export class StatisticsController {
 @Controller()
 export class OldStatisticsController {
 
-	constructor(protected statService: StatisticsService) {}
+	constructor(protected statService: StatisticsService, protected userService: UsersService) {}
 
 	@Get('/leaderboards')
 	async leaderboard(
 		@Query('resource') resource_id: string,
 		@Query('page', ParseUnsignedIntPipe) page: number,
 		@Query('page_size', ParseUnsignedIntPipe) page_size: number,
+		@Res() res: Response
 	){
-		return await this.statService.get_resource_leaderboard(
+		const pagination = new PaginateDto();
+		pagination.limit = page_size;
+		pagination.skip = ( page - 1 ) * pagination.limit;
+
+		const { data, meta } = await this.statService.getResourceLeaderboard(
 			resource_id,
 			// in the old version, the pages are 0 indexed
-			page + 1,
-			page_size,
-		);	
+			pagination
+		);
+		
+		const orcid_list = _.uniq(_.map(data, 'curator_orcid'))
+		const user_list_promises = orcid_list.map(orcid => this.userService.get_by_orcid(orcid))
+		const user_list = await Promise.all(user_list_promises)
+		const orcid_to_user = _.keyBy(user_list, 'orcid_id')
+
+		const orcid_to_names = _.mapValues(orcid_to_user, ({ displayedName }) => {
+			const [given_name, family_name] = displayedName.split(' ')
+			return {
+				given_name,
+				family_name
+			}
+		})
+		const leaderboard = data.map((stat) => {
+			return {
+				...stat,
+				...orcid_to_names[stat['curator_orcid']]
+			}
+		})
+		res.setHeader('count', String(meta.pagination.total))
+		res.send(leaderboard)
+		// return 	leaderboard
 	}
 }

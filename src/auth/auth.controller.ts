@@ -3,9 +3,8 @@ import {
 	Get,
 	Logger,
 	Req,
-	Redirect,
 	UseGuards,
-	Res,
+	Render,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
@@ -13,14 +12,14 @@ import {
 	ApiExcludeEndpoint,
 	ApiHeader,
 	ApiOkResponse,
+	ApiSecurity,
 	ApiTags,
 } from '@nestjs/swagger';
-import { AuthorizationHeader } from '../config/swagger';
+import { OrcidGuard } from './guards/orcid.guard';
 import { AuthService } from './auth.service';
 import { Roles } from './decorators/roles.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { RoleGuard } from './guards/role.guard';
-import { User } from './users/schemas/user.schema';
 import { UsersService } from './users/users.service';
 
 @Controller({
@@ -38,29 +37,41 @@ export class AuthController {
 	// redirect to orcid
 	@ApiExcludeEndpoint()
 	@Get('orcid')
-	@UseGuards(AuthGuard('orcid'))
+	@UseGuards(OrcidGuard)
 	authenticate_orcid() {}
 
 	@ApiExcludeEndpoint()
 	@Get('orcid_permission')
-	@UseGuards(AuthGuard('orcid'))
+	@UseGuards(OrcidGuard)
 	orcid_permission() {}
 
 	@ApiExcludeEndpoint()
 	@Get('orcid/redirect')
-	@Redirect('/orcid/', 301)
-	@UseGuards(AuthGuard('orcid'))
-	async orcid_redirect(@Req() req, @Res() res) {
-		// console.log('redirect request', req)
+	// @Redirect('/orcid/', 301)
+	@Render('auth')
+	@UseGuards(OrcidGuard)
+	orcid_redirect(@Req() req) {
 		const user = req.user;
-		const { header, token } = await this.authService.generate_jwt_token(user);
-		res.cookie(header, token);
-		res.set(header, token);
 		return {
-			url:
-				this.configService.get('FRONTEND_HOST') + 'curators/' + user.orcid_id,
-			statusCode: 301,
+			access_token: user.orcid_permission,
+			refresh_token: user.refresh_token,
+			message: 'testing message',
 		};
+	}
+
+	@ApiExcludeEndpoint()
+	@Get('token')
+	@UseGuards(LocalAuthGuard)
+	async get_jwt_token(@Req() req) {
+		if (req.headers['authorization'] && !req.headers['orcid-token']) {
+			return {
+				token: req.headers['authorization'],
+			};
+		}
+		const { header, token } = await this.authService.generate_jwt_token(
+			req.user,
+		);
+		return { token };
 	}
 
 	@ApiExcludeEndpoint()
@@ -73,7 +84,7 @@ export class AuthController {
 
 	// swagger documentation decorators
 	@ApiTags('Users')
-	@ApiHeader(AuthorizationHeader)
+	@ApiSecurity('basic')
 	// TODO: finish implementation of the docs
 	@ApiOkResponse({
 		description: 'An Object describing the current User and his information',
@@ -82,7 +93,9 @@ export class AuthController {
 	@Get('profile')
 	@UseGuards(LocalAuthGuard)
 	async get_user_profile(@Req() request) {
-		const user = await this.userService.get_by_orcid(request.user.orcid_id);
+		const user = await this.userService.getPrivateUser({
+			orcid_id: request.user.orcid_id,
+		});
 		return user;
 	}
 }

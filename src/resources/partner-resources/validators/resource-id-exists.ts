@@ -10,8 +10,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { PartnerResource } from '../../schemas/partner-resources.schema';
-import { PartnerResourceDocument } from 'src/resources/schemas/partner-resources.schema';
+import { PartnerResource, PartnerResourceDocument } from '../../../core/schemas/resource.schema';
 
 
 // create custom validator according to class-validator standards

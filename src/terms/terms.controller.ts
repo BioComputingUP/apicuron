@@ -1,9 +1,9 @@
 import { Query, Controller, Get, Post, Param, Put, Delete, Body, UseGuards, Req, ForbiddenException, ValidationPipe } from '@nestjs/common';
-import { ApiHeader, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiHeader, ApiOkResponse, ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { HasAResourceGuard } from '../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
-import { AuthorizationHeader, VersionHeader } from '../config/swagger';
+import { AuthorizationHeader, VersionHeader } from '../swagger/config';
 import { CreateTermDto } from './dto/createTerm.dto';
 import { DeleteTermDto } from './dto/deleteTerm.dto';
 import { TermDto, TermFilterDto } from './dto/term.dto';
@@ -51,7 +51,7 @@ export class TermsController {
         description: 'Confirmation object of the created Term',
         type: CreateTermDto
     })
-    @ApiHeader(AuthorizationHeader)
+    @ApiSecurity('basic')
     // nestjs decorators
     @Post('')
     @UseGuards(LocalAuthGuard, HasAResourceGuard)
@@ -68,7 +68,7 @@ export class TermsController {
         description: 'Confirmation object of the edited Term',
         type: CreateTermDto
     })
-    @ApiHeader(AuthorizationHeader)
+    @ApiSecurity('basic')
     // nestjs decorators
     @Put('edit')
     @UseGuards(LocalAuthGuard, HasAResourceGuard)
@@ -85,7 +85,7 @@ export class TermsController {
         description: 'A Boolean confirming the deletion of the Term',
         type: CreateTermDto
     })
-    @ApiHeader(AuthorizationHeader)
+    @ApiSecurity('basic')
     @Delete(':activity_term/partner-resource/:resource_id')
     @UseGuards(LocalAuthGuard, HasAResourceGuard)
     delete_term(@Param() delete_term: DeleteTermDto, @Req() req){

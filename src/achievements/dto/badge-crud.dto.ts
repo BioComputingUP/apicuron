@@ -1,10 +1,17 @@
 import { IsNotEmpty, IsOptional, Matches, Min, Validate } from "class-validator";
+import { PaginateDto } from "../../pagination/dto/paginate.dto";
 import { ResourceIdExists } from "../../resources/partner-resources/validators/resource-id-exists";
 import { ActivityTermExists } from "../../terms/validators/activity-term-exists";
 import { BadgeUnique } from "../validators/achievement-exists";
 
 
-export class BadgeFilter {
+export class BadgeFilter extends PaginateDto {
+
+	static create (obj: any) {
+        const filter = new BadgeFilter();
+        Object.assign(filter, obj);
+        return filter;
+    }
 
     @IsOptional()
     @Validate(ResourceIdExists)

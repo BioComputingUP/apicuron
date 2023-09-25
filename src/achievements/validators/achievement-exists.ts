@@ -2,7 +2,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface} from "class-validator";
 import mongoose, { Model } from "mongoose";
 import { NotFoundException } from '@nestjs/common'
-import { AchievementDef, AchievementDefDocument } from "../schemas/achievement-def.schema";
+import { AchievementDef, AchievementDefDocument } from "../../core/schemas/achievement-def.schema";
 
 
 @ValidatorConstraint({ name: 'AchievementExists', async: true })

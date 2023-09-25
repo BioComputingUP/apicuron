@@ -23,12 +23,14 @@ class DisprotUpdateTask(Task):
         apicuron_db = Database.apicuron_db
         curation_db = Database.get_db(curation_database)
 
+        self.logger.info(f'Updating the following database: {apicuron_database} from the following database: {curation_database}')
+
         # setup the terms list to classify the reports based on their category
         terms = apicuron_db['terms_def'].find({
             'resource_uri': resource_uri
         })
         terms_dict = {term['activity_term']: term['activity_category'] for term in terms}
-        # self.logger.info('terms_dict' , terms_dict)
+        self.logger.info(f'Checking the following terms: {terms_dict.keys()}')
         # return
         # Request the reports
 
@@ -62,7 +64,7 @@ class DisprotUpdateTask(Task):
                 # keep the ids of the treated reports in a set
                 processed_document_ids.add(report.pop('_id'))
 
-                if terms_dict[report['activity_term']] != 'revision':
+                if terms_dict.get(report['activity_term']) != 'revision':
                     report_dict = {**report, **
                                 report_group['_id'], 'resource_uri': resource_uri}
                     apicuron_db[apicuron_collection].insert_one(report_dict)

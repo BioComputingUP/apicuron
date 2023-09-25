@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, PipelineStage, QueryOptions } from 'mongoose';
-import { User, UserDocument } from '../auth/users/schemas/user.schema';
+import { User, UserDocument } from '../core/schemas/user.schema';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import { TermsService } from '../terms/terms.service';
-import { ReportFilterDto } from './dto/report-filter.dto';
+import {
+	ReportFilterDto,
+	ReportFilterGroupedDto,
+} from './dto/report-filter.dto';
 import { ReportDto } from './dto/report.dto';
-import { Report, ReportDocument, ReportSchema } from './reports.schema';
+import { Report, ReportDocument, ReportSchema } from '../core/schemas/reports.schema';
 import * as _ from 'lodash';
-import { plainToClass } from 'class-transformer';
-import { writeFileSync } from 'fs';
+import { paginate } from '../pagination/paginator';
+import { PaginationAggregation } from '../pagination/interfaces/pagination-aggregation';
 
 @Injectable()
 export class ReportsService {
@@ -17,7 +20,7 @@ export class ReportsService {
 		@InjectModel(Report.name)
 		private reportModel: Model<ReportDocument, {}, {}, {}, typeof ReportSchema>,
 		@InjectModel(User.name) private userModel: Model<UserDocument>,
-		protected partnerResourceService: PartnerResourcesService,
+		protected partnerResourcesService: PartnerResourcesService,
 		protected termsService: TermsService,
 	) {}
 
@@ -87,7 +90,8 @@ export class ReportsService {
 	}
 
 	/**
-	 *
+	 *import { BasicGroupByOptions } from 'rxjs';
+
 	 * @param resource_id the resource_id concerned
 	 * @param orcid_id the orcid of the user
 	 * @description returns a cursor to the user reports on the resource_id done by the user with the specified orcid_id
@@ -100,67 +104,62 @@ export class ReportsService {
 		});
 	}
 
-	async get_reports(reportFilter: ReportFilterDto, with_terms = false) {
-		const { resource_id } = reportFilter;
+	async getReports(reportFilter: ReportFilterDto) {
 		const { filter, options } = this.buildReportsQuery(reportFilter);
 
-		if (!reportFilter.groupBy) {
-			console.log(options)
-			const reports = await this.reportModel.find(filter, {}, options).lean();
-			let data = reports;
+		const reports = await this.reportModel.find(filter, {}, options).lean();
+		let data = reports;
 
-			if (with_terms) {
-				const activity_term_list = [
-					...new Set(reports.map((report) => report.activity_term)),
-				];
+		if (reportFilter.extend.includes('term')) {
+			const { resource_id } = reportFilter;
 
-				const terms_list = await this.termsService.get_terms(
-					activity_term_list,
-					resource_id,
+			const activity_term_list = [
+				...new Set(reports.map((report) => report.activity_term)),
+			];
+
+			const terms_list = await this.termsService.get_terms(
+				activity_term_list,
+				resource_id,
+			);
+
+			const reports_with_terms = reports.map((report) => {
+				report['term'] = terms_list.find(
+					(term) => term.activity_term == report.activity_term,
 				);
-
-				const reports_with_terms = reports.map((report) => {
-					report['term'] = terms_list.find(
-						(term) => term.activity_term == report.activity_term,
-					);
-					return report;
-				});
-				data = reports_with_terms;
-			}
-
-			const reports_count = await this.reportModel.count(filter);
-
-			return {
-				data,
-				total_count: reports_count,
-				page: reportFilter.page,
-				page_size: reportFilter.page_size,
-			};
-		} else {
-			const paginationPipeline = this.queryOptionsToPipeline(options);
-			const groupByAggregation = this.buildReportGroupAggregation(reportFilter.groupBy)
-
-			console.log(paginationPipeline)
-
-			const aggregationPipeline: PipelineStage[] = [
-				{ $match: filter },
-				...groupByAggregation,
-				...paginationPipeline
-			]
-			const data$ = this.reportModel.aggregate(aggregationPipeline);
-			const reports_count$ = this.reportModel.aggregate([
-				...aggregationPipeline.filter(stage => !stage['$limit']), // remove the stage that limits the data for counting
-				{ $count: 'total_count' }
-			]);
-			
-			const [data, reports_count] = await Promise.all([data$, reports_count$]);
-			return {
-				data,
-				total_count: reports_count[0]['total_count'],
-				page: reportFilter.get_page(),
-				page_size: reportFilter.get_page_size(),
-			};
+				return report;
+			});
+			data = reports_with_terms;
 		}
+
+		const reports_count: number = await this.reportModel.count(filter);
+
+		return paginate(data, reportFilter, reports_count);
+	}
+
+	async getGroupedReports(reportFilter: ReportFilterGroupedDto) {
+		const { filter, options } = this.buildReportsQuery(reportFilter);
+
+		const [paginationPipeline, limitAggregation]: PaginationAggregation =
+			reportFilter.getMongoAggregation();
+		const groupByAggregation: PipelineStage[] =
+			this.buildReportGroupAggregation(reportFilter);
+
+		const aggregationPipeline: PipelineStage[] = [
+			{ $match: filter },
+			...groupByAggregation,
+			paginationPipeline,
+		];
+		const data$ = this.reportModel.aggregate(aggregationPipeline);
+		const reports_count$ = this.reportModel.aggregate([
+			...aggregationPipeline.filter((stage) => !stage['$limit']), // remove the stage that limits the data for counting
+			{ $count: 'total_count' },
+		]);
+
+		const [data, reports_count] = await Promise.all([data$, reports_count$]);
+
+		const totalCount: number = reports_count[0]?.['total_count'] || 0;
+
+		return paginate(data, reportFilter, totalCount);
 	}
 
 	async report_statistics() {}
@@ -170,12 +169,8 @@ export class ReportsService {
 	}
 
 	async delete_all_resource_reports(resource_id: string) {
-		const resource_uri = await this.partnerResourceService.retrieve_uri(
-			resource_id,
-		);
-
 		return await this.reportModel.deleteMany({
-			$or: [{ resource_uri }, { resource_id }],
+			resource_id,
 		});
 	}
 
@@ -187,8 +182,12 @@ export class ReportsService {
 			'entity_uri',
 			'curator_orcid',
 			'resource_id',
-			'activity_term',
 		]);
+		if (dto.activity_terms && dto.activity_terms.length > 0) {
+			filter.activity_term = {
+				$in: dto.activity_terms,
+			};
+		}
 
 		// timestamp filter object
 		// pick the keys from the dto and rename them if they're defined
@@ -220,11 +219,7 @@ export class ReportsService {
 			sort,
 		};
 
-		// pagination objects
-		if(dto.get_page_size()){
-			options['limit'] = dto.get_page_size()
-			options['skip'] = (dto.get_page() - 1) * options['limit'];	
-		}
+		Object.assign(options, dto.getMongoQueryOptions());
 
 		return {
 			filter,
@@ -250,56 +245,108 @@ export class ReportsService {
 		return pipelineArray;
 	}
 
-	private buildReportGroupAggregation(
-		groupBy: string,
-	): PipelineStage[] {
+	private buildReportGroupAggregation({
+		groupBy,
+		sortOrder,
+	}: ReportFilterGroupedDto): PipelineStage[] {
+		const t: PipelineStage.Sort = {
+			$sort: {
+				groupKey: 1,
+			},
+		};
+
 		const converter = {
-			'date': [
+			day: [
 				{
 					$group: {
 						_id: { $dateToString: { date: '$timestamp', format: '%Y-%m-%d' } },
-						activity_terms: { $addToSet: '$activity_term' },
-						resource_ids: { $addToSet: '$resource_id' },
-						curator_orcids: { $addToSet: '$curator_orcid' },
-						timestamps: { $addToSet: '$timestamp' },
-						count: { $sum: 1 }
+						reports: {
+							$push: {
+								activity_term: '$activity_term',
+								resource_id: '$resource_id',
+								curator_orcid: '$curator_orcid',
+								timestamp: '$timestamp',
+								entity_uri: '$entity_uri',
+							},
+						},
+						count: { $sum: 1 },
 					},
 				},
 				{
 					$project: {
-						date: '$_id',
+						groupKey: '$_id',
 						_id: 0,
-						activity_terms: 1,
-						resource_ids: 1,
-						curator_orcids: 1,
-						timestamps: 1,
-						count: 1
+						reports: 1,
+						count: 1,
+					},
+				},
+				{
+					$sort: {
+						groupKey: sortOrder as any,
 					},
 				},
 			],
-			'activity_term': [
+			month: [
 				{
 					$group: {
-						_id: '$activity_term',
-						timestamps: { $addToSet: '$timestamp' },
-						resource_ids: { $addToSet: '$resource_id' },
-						curator_orcids: { $addToSet: '$curator_orcid' },
-						count: { $sum: 1 }
+						_id: { $dateToString: { date: '$timestamp', format: '%Y-%m' } },
+						reports: {
+							$push: {
+								activity_term: '$activity_term',
+								resource_id: '$resource_id',
+								curator_orcid: '$curator_orcid',
+								timestamp: '$timestamp',
+								entity_uri: '$entity_uri',
+							},
+						},
+						count: { $sum: 1 },
 					},
 				},
 				{
 					$project: {
+						groupKey: '$_id',
 						_id: 0,
-						activity_term: '$_id',
-						timestamps: 1,
-						resource_ids: 1,
-						curator_orcids: 1,
-						count: 1
+						reports: 1,
+						count: 1,
+					},
+				},
+				{
+					$sort: {
+						groupKey: sortOrder as any,
+					},
+				},
+			],
+			activity_term: [
+				{
+					$group: {
+						_id: '$activity_term',
+						reports: {
+							$push: {
+								activity_term: '$activity_term',
+								resource_id: '$resource_id',
+								curator_orcid: '$curator_orcid',
+								timestamp: '$timestamp',
+								entity_uri: '$entity_uri',
+							},
+						},
+						count: { $sum: 1 },
+					},
+				},
+				{
+					$project: {
+						groupKey: '$_id',
+						_id: 0,
+						reports: 1,
+						count: 1,
+					},
+				},
+				{
+					$sort: {
+						groupKey: sortOrder as any,
 					},
 				},
 			],
 		};
-
 		return converter[groupBy];
 	}
 }

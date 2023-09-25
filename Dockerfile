@@ -1,7 +1,7 @@
 # Global Arguments for all build stages
 ARG APP_DIR=/home/node/app
-ARG UID=1002
-ARG GID=1002
+ARG UID
+ARG GID
 ###################
 # BUILD FOR LOCAL DEVELOPMENT
 ###################
@@ -9,8 +9,11 @@ ARG GID=1002
 FROM node:16.14.2-buster-slim As development
 
 ARG APP_DIR
-ARG UID=1002
-ARG GID=1002
+ARG UID
+ARG GID
+
+# install ps command for hot reload
+RUN apt-get update && apt-get install -y procps && rm -rf /var/lib/apt/lists/*
 
 # change node uid and gid to the defined one
 RUN groupmod -g ${GID} node && \
@@ -29,8 +32,8 @@ WORKDIR ${APP_DIR}
 # Copying this first prevents re-running npm install on every code change.
 COPY --chown=node:node package*.json ./
 
-# Install app dependencies using the `npm ci` command instead of `npm install`
-RUN npm ci
+# # Install app dependencies using the `npm ci` command instead of `npm install`
+# RUN npm ci
 
 # Bundle app source
 COPY --chown=node:node . .

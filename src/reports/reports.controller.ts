@@ -12,31 +12,40 @@ import {
 	Logger,
 	ForbiddenException,
 	InternalServerErrorException,
-	Inject,
+	BadRequestException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
+	ApiBearerAuth,
 	ApiConsumes,
 	ApiHeader,
 	ApiOkResponse,
 	ApiOperation,
+	ApiQuery,
+	ApiSecurity,
 	ApiTags,
 } from '@nestjs/swagger';
 
-import { createReadStream } from 'fs';
 import { SchedulerClientService } from '../scheduler-client/services/scheduler-client.service';
 import { HasAResourceGuard } from '../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
-import { AuthorizationHeader, VersionHeader } from '../config/swagger';
-import { ParseUnsignedIntPipe } from '../shared/pipes/unsigned-int-validation.pipe';
+import { VersionHeader } from '../swagger/config';
 import { ReportDto } from './dto/report.dto';
 import { SubmitBulkDto, SubmitReportDto } from './dto/submit-report.dto';
 import { ReportsService } from './reports.service';
-import { ComputeStatisticsTask } from '../reports/tasks/compute_statistics.task';
-import { ReportFilterDto } from './dto/report-filter.dto';
+import {
+	ReportFilterDto,
+	ReportFilterGroupedDto,
+} from './dto/report-filter.dto';
 import * as _ from 'lodash';
-import { plainToClass, plainToInstance } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
+import { Model } from 'mongoose';
+import {
+	Statistics,
+	StatisticsDocument,
+} from '../core/schemas/statistics.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
@@ -45,9 +54,8 @@ export class ReportsController {
 	constructor(
 		private reportService: ReportsService,
 		private schedulerService: SchedulerClientService,
-		@Inject('task:compute_statistics')
-		private computeStatistics: ComputeStatisticsTask,
-		private config: ConfigService,
+		@InjectModel(Statistics.name) private statModel: Model<StatisticsDocument>,
+		private resourceService: PartnerResourcesService
 	) {}
 
 	logger = new Logger(ReportsController.name);
@@ -67,33 +75,31 @@ export class ReportsController {
 		}
 	}
 
-	// @Get('statistics')
-	// async report_statistics(@Query() reportFilter: ReportFilterDto){
-	// 	const { filter, options } = this.reportService.buildReportsQuery(reportFilter)
-	// 	return await this.reportService.group_reports_by_date(filter, options)
-	// }
-
 	@Get()
-	async get_reports(@Query() reportFilter: ReportFilterDto) {
-		return await this.reportService.get_reports(plainToInstance(ReportFilterDto, reportFilter));
+	async get_reports(@Query() reportFilter: ReportFilterDto, @Request() req) {
+		const reportFilterInstance: ReportFilterDto = plainToInstance(
+			ReportFilterDto,
+			reportFilter,
+		);
+		return await this.reportService.getReports(reportFilterInstance);
 	}
 
-	@Get('resource/:resource_id/orcid_id/:orcid_id')
-	async get_user_reports(
-		@Param('orcid_id') orcid_id: string,
-		@Param('resource_id') resource_id: string,
-		@Query('page', ParseUnsignedIntPipe) page = 1,
-		@Query('page_size', ParseUnsignedIntPipe) page_size = 10,
+	@Get('group-by/:groupBy')
+	async getGroupedReports(
+		@Query() filter: ReportFilterDto,
+		@Param() groupBy: Pick<ReportFilterGroupedDto, 'groupBy'>,
 	) {
-		const reportFilter = new ReportFilterDto();
-		_.assign(reportFilter, {
-			curator_orcid: orcid_id,
-			resource_id,
-			page,
-			page_size,
-		});
-		return await this.reportService.get_reports(reportFilter);
+		// const filterInstance: ReportFilterDto = plainToInstance(ReportFilterDto, filter);
+		const groupByInstance: ReportFilterGroupedDto = plainToInstance(
+			ReportFilterGroupedDto,
+			{ ...filter, ...groupBy },
+		);
+
+		return await this.reportService.getGroupedReports(groupByInstance);
 	}
+
+
+	
 
 	@ApiOperation({
 		summary: 'Submit reports in bulk as a JSON file',
@@ -101,7 +107,15 @@ export class ReportsController {
 	@ApiOkResponse({
 		description: 'Return message confirming the reception of the reports',
 	})
-	@ApiHeader(AuthorizationHeader)
+	@ApiQuery({
+		description: 'A list of Resource Ids where the database manager specifies which resources he wishes to delete all the previous reports (effectively resubmitting everything through this bulk update)',
+		name: 'delete-all',
+		type: 'string',
+		isArray: true,
+		example: ['disprot'],
+		required: false
+	})
+	@ApiSecurity('basic')
 	@ApiConsumes('multipart/form-data')
 	@Post('bulk')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
@@ -114,56 +128,37 @@ export class ReportsController {
 		@UploadedFile() reports: Express.Multer.File,
 		@Request() req,
 		@Body() body: SubmitBulkDto,
+		@Query('delete-all') deleteAll: string[] | string,
 	) {
-		// importing the formData package
-		var FormData = require('form-data');
-
-		// getting environment variables to configure the job parameters
-		const database_host = this.config.get<string>('db_host');
-		const database = this.config.get<string>('database');
-
-		const formData = new FormData();
-
-		// append multiple field values to the formData
-		formData.append('task_name', 'apicuron_tasks');
-		formData.append('database_host', database_host);
-		formData.append('task', 'submit_report');
-		formData.append('database', database);
-
-		// if the delete_all exists we add it to the arguments otherwise we only send the orcid
-		if (body.delete_all) {
-			formData.append(
-				'task_arguments',
-				`${req.user.orcid_id} ${body.delete_all.join(',')}`,
-			);
+		let delete_all = [];
+		const deleteAllInput = deleteAll ?? body.delete_all;
+		if (typeof deleteAllInput == 'string') {
+			delete_all = [deleteAllInput];
 		} else {
-			formData.append('task_arguments', req.user.orcid_id);
+			if (_.isArray(deleteAllInput)) {
+				delete_all = deleteAllInput;
+			}
 		}
 
-		// append a file to the formData
-		formData.append('task_file_argument', createReadStream(reports.path), {
-			filename: reports.originalname,
-			contentType: reports.mimetype,
-			knownLength: reports.size,
-		});
+		// handle if a resource_id that is passed does not exist
+		const existsPromises = delete_all.map((res_id) => this.resourceService.exists(res_id))
+		const exists = await Promise.all(existsPromises)
+		const i = exists.findIndex((v) => !v)
+		if(i != -1){
+			throw new BadRequestException(`Resource id ${delete_all[i]} does not exist !`)
+		}
 
-		// send the request
-		formData.submit('https://scheduler.biocomputingup.it/task/', (err, res) => {
-			if (err) {
-				this.logger.error(
-					'An error occurred after submitting a job to the biocomp scheduler',
-				);
-				this.logger.error(err);
 
-				throw new InternalServerErrorException('An internal error occured.');
-			}
-		});
+		const response = await this.schedulerService.submit_reports(
+			reports,
+			req.user.orcid_id,
+			delete_all || [],
+		);
 
-		if (body.delete_all) {
-			body.delete_all.forEach(async (resource_id) => {
-				await this.schedulerService.compute_achievements(resource_id);
-				this.schedulerService.compute_statistics(resource_id);
-			});
+		if (response instanceof Error) {
+			throw new InternalServerErrorException(
+				'An Error has occured when submitting the reports',
+			);
 		}
 
 		return {
@@ -179,7 +174,7 @@ export class ReportsController {
 		description: 'Confirmation Object of the created report',
 		type: ReportDto,
 	})
-	@ApiHeader(AuthorizationHeader)
+	@ApiSecurity('basic')
 	@Post('single')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	async submit_report(@Body() report: SubmitReportDto, @Request() req) {
@@ -188,12 +183,14 @@ export class ReportsController {
 		// const resource_uri = await this.partnerResourceService.retrieve_uri(report.resource_id)
 		const report_confirmation = await this.reportService.insertReport(report);
 
-		await this.computeStatistics.run_task(
+		await this.schedulerService.compute_achievements(
 			report.resource_id,
 			report.curator_orcid,
 		);
-		// await this.schedulerService.compute_achievements(report.resource_id, report.curator_orcid);
-		// await this.schedulerService.compute_statistics(report.resource_id, report.curator_orcid);
+		await this.schedulerService.compute_statistics(
+			report.resource_id,
+			report.curator_orcid,
+		);
 		return report_confirmation;
 	}
 }

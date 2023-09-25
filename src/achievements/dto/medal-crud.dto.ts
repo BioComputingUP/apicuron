@@ -1,4 +1,6 @@
 import { IsDate, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, MaxDate, Min, MinDate, Validate } from "class-validator";
+import * as _ from "lodash";
+import { PaginateDto } from "../../pagination/dto/paginate.dto";
 import { ResourceIdExists } from "../../resources/partner-resources/validators/resource-id-exists";
 import { ActivityTermExists } from "../../terms/validators/activity-term-exists";
 import { MedalUnique } from "../validators/achievement-exists";
@@ -7,9 +9,9 @@ import { MaxDateField, MinDateField } from "../validators/date-comparison";
 
 export class CreateMedalDto {
 
-    @IsNotEmpty()
-    @IsString()
-	category: string;
+    // @IsNotEmpty()
+    // @IsString()
+	// category: string;
 
     @IsNotEmpty()
     @IsString()
@@ -44,16 +46,24 @@ export class CreateMedalDto {
     @IsOptional()
     @IsDateString()
     @MaxDateField(['last_day'])
-    first_day: Date;
+    first_day?: Date;
 
     @IsOptional()
     @IsDateString()
 	@MinDateField(['first_day'])
-    last_day: Date;
+    last_day?: Date;
 
 }
 
-export class MedalsFilter {
+export class MedalsFilter extends PaginateDto {
+
+    static create (obj: any) {
+        const filter = new MedalsFilter();
+        Object.assign(filter, obj);
+        return filter;
+    }
+
+
     @IsOptional()
     @IsDateString()
     @MaxDateField(['last_day'])
@@ -90,9 +100,9 @@ export class DeleteMedalDto {
 export class UpdateMedalDto extends DeleteMedalDto {
 
 
-    @IsOptional()
-    @IsString()
-	category: string;
+    // @IsOptional()
+    // @IsString()
+	// category: string;
 
     @IsOptional()
     @Validate(ActivityTermExists, [{ each: true }])

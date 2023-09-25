@@ -1,0 +1,89 @@
+name: deploy-to-persefone
+
+on:
+  workflow_call
+  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # clone repo
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      # setup env variables
+      - name: setting up env variables
+        run: |
+          echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
+        id: env-setup
+      # install nodejs
+      - name: installing nodejs
+        uses: 'actions/setup-node@v2.5.2'
+        with:
+          node-version: ${{ steps.env-setup.outputs.NODE_VERSION }}
+      # building dist
+      - name: building dist
+        run: |
+          npm ci
+          npm run build
+      # install openvpn and connect to it
+      - name: Install OpenVPN
+        env: 
+          cert_adel_geras_key: ${{ secrets.CERT_ADEL_GERAS_KEY }}
+          cert_adel_geras_crt: ${{ secrets.CERT_ADEL_GERAS_CRT }}
+          cert_export_geras_crt: ${{ secrets.CERT_EXPORT_GERAS_CRT }}
+        run: |
+          sudo apt update
+          sudo apt install -y openvpn openvpn-systemd-resolved
+          echo $cert_adel_geras_key > cert_export_adel@geras.key
+          echo $cert_adel_geras_crt > cert_export_adel@geras.crt
+          echo $cert_export_geras_crt > cert_export_geras.crt
+          chmod 775 cert_export_adel@geras.key cert_export_adel@geras.crt cert_export_geras.crt
+      - name: Connect to VPN
+        uses: 'kota65535/github-openvpn-connect-action@v2'
+        with:
+          config_file: .github/workflows/client.ovpn
+          username: ${{ secrets.OVPN_USERNAME }}
+          password: ${{ secrets.OVPN_PASSWORD }}
+          client_key: ${{ secrets.USER_KEY }}
+
+      - name: Write SSH key to file
+        uses: lukasa1993/secret-file-action@v1.0.3
+        id: write-secret-to-file
+        with:
+          secret: ${{ secrets.RSA_PRIVATE_KEY }}
+          b64-decode: true
+      - name: rsyncing dist to persefone
+        run: |
+          rsync -avh --delete -e 'ssh -i ${{ steps.write-secret-to-file.outputs.file }}'  dist/* nodejs@persefone:/var/local/webservers/apps/apicuron/dist/ 
+          rsync -avh --delete -e 'ssh -i ${{ steps.write-secret-to-file.outputs.file }}' node_modules/* nodejs@persefone:/var/local/webservers/apps/apicuron/node_modules/
+
+
+      # # push changes to webserver
+      # - name: rsyncing dist to persefone
+      #   uses: contention/rsync-deployments@v2.0.0
+      #     with:
+      #       FLAGS: -avh --delete
+      #       USER: nodejs
+      #       HOST: persefone
+      #       LOCALPATH: dist
+      #       REMOTEPATH: /var/local/webservers/apps/apicuron/dist/
+      #       DEPLOY_KEY: ${{ secrets.RSA_PRIVATE_KEY }}
+      # # push node_modules changes to webserver
+      # - name: rsyncing node_modules to persefone
+      #   uses: contention/rsync-deployments@v2.0.0
+      #     with:
+      #       FLAGS: -avh --delete
+      #       USER: nodejs
+      #       HOST: persefone
+      #       LOCALPATH: node_modules
+      #       REMOTEPATH: /var/local/webservers/apps/apicuron/node_modules/
+      #       DEPLOY_KEY: {{ secrets.RSA_PRIVATE_KEY }}
+        # run: |
+        #   rsync -avh --delete dist/* nodejs@persefone:/var/local/webservers/apps/apicuron/dist/ 
+        #   rsync -avh --delete node_modules/* nodejs@persefone:/var/local/webservers/apps/apicuron/node_modules/
+      # restart webserver
+      - name: restart server
+        run: ssh -i ${{ steps.write-secret-to-file.outputs.file }} nodejs@persefone 'sudo systemctl restart node-apicuron'

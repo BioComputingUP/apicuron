@@ -25,7 +25,7 @@ import { json_to_tsv } from './json-tsv';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { RoleGuard } from '../guards/role.guard';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
-import { AuthorizationHeader, VersionHeader } from '../../config/swagger';
+import { AuthorizationHeader, VersionHeader } from '../../swagger/config';
 
 @ApiTags('First Version')
 @Controller('')
@@ -39,7 +39,7 @@ export class UsersController {
   create_or_update_user(@Body() userData: UpdateUserDto, @Res() res) {
     // console.log(`Received message: ${userData}`);
     this.usersService
-      .upsert_user(userData.orcid_id, userData)
+      .createOrUpdateUser(userData)
       .then((response) => {
         this.usersControllerLogger.log(response);
         res.status(HttpStatus.ACCEPTED).send({

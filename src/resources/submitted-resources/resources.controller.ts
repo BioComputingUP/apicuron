@@ -19,7 +19,7 @@ import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 import { SvgSanitationValidationPipe } from '../../shared/pipes/svg-sanitation.pipe';
 import * as mime from 'mime-types'
-import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiExcludeEndpoint, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
 import { RoleGuard } from '../../auth/guards/role.guard';
 import { MakePartner } from '../dto/make-partner.dto';
@@ -92,7 +92,7 @@ export class SubmittedResourcesController {
 		);
 	}
 
-
+	@ApiExcludeEndpoint(true)
 	@Post('make_partner')
 	@SetMetadata('roles', ['admin'])
 	@UseGuards(LocalAuthGuard, RoleGuard)

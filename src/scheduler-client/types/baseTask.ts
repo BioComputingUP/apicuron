@@ -7,7 +7,14 @@
 
 
 export type TaskSubmit = {
-    task: string,
+    task_name: string,
     task_arguments?: string,
     file?: Express.Multer.File,
+    parent_job?: string
+}
+
+
+export type TaskArgument ={
+    file?: string,
+    arguments: any[]
 }
