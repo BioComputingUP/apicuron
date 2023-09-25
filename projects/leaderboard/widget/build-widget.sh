@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# Script meant to be ran from the root directory of the project
 
 if [ "$1" = "dev" ];
 then
