@@ -56,16 +56,15 @@ const routes: Routes = [
     loadChildren: () =>
       import("./dashboard/dashboard.module").then((m) => m.DashboardModule),
   },
-  // {
-  //   path: "docs",
-  //   redirectTo: '/docs/'
-  //   // Old Version of the docs
-  //   // component: MainLayoutComponent,
-  //   // loadChildren: () =>
-  //   //   import("./documentation/documentation.module").then(
-  //   //     (m) => m.DocumentationModule
-  //   //   ),
-  // },
+  {
+    path: "docs",
+    // Old Version of the docs
+    component: MainLayoutComponent,
+    loadChildren: () =>
+      import("./documentation/documentation.module").then(
+        (m) => m.DocumentationModule
+      ),
+  },
   { path: "docs", redirectTo: "/docs/" },
   { path: "api", redirectTo: "/api/" },
   {

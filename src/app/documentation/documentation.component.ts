@@ -1,17 +1,19 @@
 import {
   Component,
   Inject,
+  OnDestroy,
   OnInit,
   Renderer2,
   ViewEncapsulation,
 } from "@angular/core";
 import { ActivatedRoute, Router, UrlSegment } from "@angular/router";
-import { Observable, ReplaySubject } from "rxjs";
-import { map, tap } from "rxjs/operators";
+import { Observable, ReplaySubject, Subject, fromEvent } from "rxjs";
+import { filter, map, switchMap, take, takeUntil, tap } from "rxjs/operators";
 import { environment } from "src/environments/environment";
 import { MarkdownService } from "ngx-markdown";
 import { DOCUMENT, ViewportScroller } from "@angular/common";
 import AnchorJS from "anchor-js";
+import { HttpClient } from "@angular/common/http";
 
 @Component({
   selector: "app-documentation",
@@ -19,7 +21,7 @@ import AnchorJS from "anchor-js";
   styleUrls: ["./documentation.component.scss"],
   encapsulation: ViewEncapsulation.Emulated,
 })
-export class DocumentationComponent implements OnInit {
+export class DocumentationComponent implements OnInit, OnDestroy {
   markdownPath$: Observable<string>;
   display_toc = true;
 
@@ -29,40 +31,23 @@ export class DocumentationComponent implements OnInit {
   anchors: any;
 
   loadedLibraries: { [url: string]: ReplaySubject<void> } = {};
-
-  loadScript(url: string): Observable<void> {
-    if (this.loadedLibraries[url]) {
-      return this.loadedLibraries[url].asObservable();
-    }
-
-    this.loadedLibraries[url] = new ReplaySubject();
-
-    const script = this.document.createElement("script");
-    script.type = "text/javascript";
-    script.src = url;
-    script.onload = () => {
-      this.loadedLibraries[url].next();
-      this.loadedLibraries[url].complete();
-    };
-
-    this.document.body.appendChild(script);
-
-    return this.loadedLibraries[url].asObservable();
-  }
+  destroy$ = new Subject<boolean>();
+  toc$: Observable<any>;
+  markdownContent$: Observable<any>;
 
   constructor(
     protected route: ActivatedRoute,
     protected markdownService: MarkdownService,
     protected viewport: ViewportScroller,
-    @Inject(DOCUMENT) private readonly document: Document
+    protected http: HttpClient,
   ) {
-      
-      ["/marked-script.js",
-      "/prism-script.js",
-      "/prism-script-json.js",
-      "/prism-script-bash.js"].map((link) => this.loadScript(link))
+    
 
-    this.anchors = new AnchorJS();
+    this.anchors = new AnchorJS({
+      icon: '#',
+      placement: 'left',
+      class: 'tw-text-apicuron-purple'
+    });
     this.markdownPath$ = this.route.url.pipe(
       // tap(console.log),
       map((segments: Array<UrlSegment>) => {
@@ -78,6 +63,23 @@ export class DocumentationComponent implements OnInit {
         return "assets/docs/" + path + ".md";
       })
     );
+
+    this.markdownPath$.pipe(
+      take(1),
+      switchMap((path: string) => {
+        return this.http.get(path)
+      }),
+      tap(console.log)
+    ).subscribe(() => {})
+
+    // this.toc$ = this.markdownPath$.pipe(
+    //   switchMap(() => {
+
+    //   })
+    // )
+  }
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
   }
 
   onLoad($event) {

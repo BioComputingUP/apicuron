@@ -1,4 +1,4 @@
-<div class="tw-w-screen tw-flex tw-flex-row tw-flex-wrap tw-justify-between" *ngIf="markdownPath$ | async as markdownPath">
+<!-- <div class="tw-w-screen tw-flex tw-flex-row tw-flex-wrap tw-justify-between" *ngIf="markdownPath$ | async as markdownPath">
   <div class="tw-px-2 sm:tw-px-4 tw-w-full tw-max-h-screen sm:tw-w-1/4 2xl:tw-w-1/4">
     <div class="sm:tw-fixed">
       <div class="tw-flex tw-justify-between">
@@ -16,10 +16,36 @@
 
   </div>
   <main
-    class="tw-w-full tw-block sm:tw-w-3/4 2xl:tw-w-1/2 tw-p-2 sm:tw-px-4"
+    class="tw-w-full tw-block tw-max-w-5xl tw-p-2 sm:tw-px-4"
   >
     <markdown [src]="markdownPath" (load)="onLoad($event)" (ready)="onDocumentReady()" class="tw-prose prose-a:tw-text-blue-500 prose-strong:tw-text-apicuron-purple dark:prose-invert prose-img:sm:tw-block"> </markdown>
   </main>
   <div class="tw-px-2 tw-w-0 tw-max-h-screen 2xl:tw-w-1/4">
   </div>
+</div> -->
+
+
+<div class="tw-flex tw-justify-start tw-flex-row sm:tw-flex-nowrap tw-items-stretch">
+  <!-- sidebar -->
+  <aside
+    class="tw-relative tw-left-0 tw-bottom-0 tw-w-80 tw-bg-white tw-border-r tw-border-slate-300 tw-pt-6 tw-pl-2 sm:tw-pl-8">
+    <div class="tw-sticky tw-top-40">
+      <markdown [ngClass]="{'tw-hidden': !display_toc}" src="assets/docs/table_of_contents.md"
+        class="sm:tw-block tw-prose tw-prose-slate prose-headings:tw-text-base prose-headings:tw-text-slant-700 prose-headings:tw-font-bold prose-ul:tw-list-none prose-a:tw-pb-2 prose-a:tw-pt-1 prose-a:tw-m-0 prose-a:tw-pl-2 prose-a:tw-no-underline prose-a:tw-border-gray-200 hover:prose-a:tw-border-slant-700 prose-a:tw-text-gray-700 hover:prose-a:tw-text-slant-700">
+      </markdown>
+
+    </div>
+
+  </aside>
+  <!-- main page -->
+  <main class="tw-block tw-pb-2 tw-flex-grow">
+
+    <!-- page content -->
+    <div class="tw-max-w-screen-lg tw-mx-auto tw-my-0 tw-py-8 tw-px-10" *ngIf="markdownPath$ | async as markdownPath">
+      <markdown [src]="markdownPath" (load)="onLoad($event)" (ready)="onDocumentReady()"
+        class="tw-prose tw-prose-slate prose-strong:tw-text-apicuron-purple dark:prose-invert prose-img:sm:tw-block">
+      </markdown>
+    </div>
+
+  </main>
 </div>

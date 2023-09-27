@@ -18,3 +18,12 @@
 - [Curation Terms](/api/#/Achievements%20Definition)
 - [Reports](/api/#/Reports)
 - [Statistics](/api/#/Statistics)
+
+
+# API
+- [Swagger UI](/api/)
+- [Partner Resources](/api/#/Partner%20Resources)
+- [Curation Terms](/api/#/Curation%20Terms)
+- [Curation Terms](/api/#/Achievements%20Definition)
+- [Reports](/api/#/Reports)
+- [Statistics](/api/#/Statistics)
