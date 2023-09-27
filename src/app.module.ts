@@ -1,4 +1,4 @@
-import { HttpException, Module } from '@nestjs/common';
+import { HttpException, Module, Logger } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -24,6 +24,8 @@ import { TransformInterceptor } from './shared/transformer/transform.interceptor
 import { SentryInterceptor, SentryModule } from '@ntegral/nestjs-sentry';
 import { EmailModule } from './email/email.module';
 import { CoreApicuronModule } from './core/core.module';
+
+const logger = new Logger('AppModule');
 
 @Module({
 	imports: [
@@ -60,8 +62,10 @@ import { CoreApicuronModule } from './core/core.module';
 				const db_host = configService.get<string>('db_host')
 				const database = configService.get<string>('database')
 				const port = configService.get<number>('db_port')
+				const uri = `mongodb://${db_host}:${port}/${database}`;
+				logger.log(`MongoDB Connection setup uri: ${uri}`)
 				return ({
-					uri: `mongodb://${db_host}:${port}/${database}`,
+					uri
 				})
 			},
 		}),
