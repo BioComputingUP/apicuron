@@ -38,4 +38,4 @@ lerna-debug.log*
 public/*
 private/*
 
-src/config/*
+src/config/config.*.ts
