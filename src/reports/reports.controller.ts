@@ -13,6 +13,8 @@ import {
 	ForbiddenException,
 	InternalServerErrorException,
 	BadRequestException,
+	Inject,
+	Res,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -31,7 +33,11 @@ import { HasAResourceGuard } from '../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { VersionHeader } from '../swagger/config';
 import { ReportDto } from './dto/report.dto';
-import { SubmitBulkDto, SubmitReportDto } from './dto/submit-report.dto';
+import {
+	SubmitBulkDto,
+	SubmitReportDto,
+	SubmitReportsDto,
+} from './dto/submit-report.dto';
 import { ReportsService } from './reports.service';
 import {
 	ReportFilterDto,
@@ -40,12 +46,17 @@ import {
 import * as _ from 'lodash';
 import { plainToInstance } from 'class-transformer';
 import { Model } from 'mongoose';
-import {
-	Statistics,
-	StatisticsDocument,
-} from '../core/schemas/statistics.schema';
+// import {
+// 	Statistics,
+// 	StatisticsDocument,
+// } from '../core/schemas/statistics.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
+import { Report, ReportDocument } from '../core/schemas/reports.schema';
+import { SchedulerService } from 'src/scheduler/services/scheduler.service';
+import { ComputeAchievementsTask } from '../scheduler/tasks/compute_achievements.task';
+import { ComputeStatisticsTask } from '../scheduler/tasks/compute_statistics.task';
+import { Response } from 'express';
 
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
@@ -53,9 +64,13 @@ import { PartnerResourcesService } from '../resources/partner-resources/partner-
 export class ReportsController {
 	constructor(
 		private reportService: ReportsService,
-		private schedulerService: SchedulerClientService,
-		@InjectModel(Statistics.name) private statModel: Model<StatisticsDocument>,
-		private resourceService: PartnerResourcesService
+		private schedulerClientService: SchedulerClientService,
+		@Inject('task:compute_achievements')
+		private computeAchievements: ComputeAchievementsTask,
+		@Inject('task:compute_statistics')
+		private computeStatistics: ComputeStatisticsTask,
+		@InjectModel(Report.name) private reportModel: Model<ReportDocument>,
+		private resourceService: PartnerResourcesService,
 	) {}
 
 	logger = new Logger(ReportsController.name);
@@ -70,7 +85,7 @@ export class ReportsController {
 		// if it doesn't, we respond with  a 403 exception
 		if (!resource_found) {
 			throw new ForbiddenException(
-				`You either do not have the authorization to update the terms of the (${resource_id}) resource or the resource does not exist`,
+				`You either do not have the authorization to perform CRUD operation on the reports of the (${resource_id}) resource or the resource does not exist`,
 			);
 		}
 	}
@@ -98,9 +113,6 @@ export class ReportsController {
 		return await this.reportService.getGroupedReports(groupByInstance);
 	}
 
-
-	
-
 	@ApiOperation({
 		summary: 'Submit reports in bulk as a JSON file',
 	})
@@ -108,12 +120,13 @@ export class ReportsController {
 		description: 'Return message confirming the reception of the reports',
 	})
 	@ApiQuery({
-		description: 'A list of Resource Ids where the database manager specifies which resources he wishes to delete all the previous reports (effectively resubmitting everything through this bulk update)',
+		description:
+			'A list of Resource Ids where the database manager specifies which resources he wishes to delete all the previous reports (effectively resubmitting everything through this bulk update)',
 		name: 'delete-all',
 		type: 'string',
 		isArray: true,
 		example: ['disprot'],
-		required: false
+		required: false,
 	})
 	@ApiSecurity('basic')
 	@ApiConsumes('multipart/form-data')
@@ -141,15 +154,18 @@ export class ReportsController {
 		}
 
 		// handle if a resource_id that is passed does not exist
-		const existsPromises = delete_all.map((res_id) => this.resourceService.exists(res_id))
-		const exists = await Promise.all(existsPromises)
-		const i = exists.findIndex((v) => !v)
-		if(i != -1){
-			throw new BadRequestException(`Resource id ${delete_all[i]} does not exist !`)
+		const existsPromises = delete_all.map((res_id) =>
+			this.resourceService.exists(res_id),
+		);
+		const exists = await Promise.all(existsPromises);
+		const i = exists.findIndex((v) => !v);
+		if (i != -1) {
+			throw new BadRequestException(
+				`Resource id ${delete_all[i]} does not exist !`,
+			);
 		}
 
-
-		const response = await this.schedulerService.submit_reports(
+		const response = await this.schedulerClientService.submit_reports(
 			reports,
 			req.user.orcid_id,
 			delete_all || [],
@@ -183,14 +199,79 @@ export class ReportsController {
 		// const resource_uri = await this.partnerResourceService.retrieve_uri(report.resource_id)
 		const report_confirmation = await this.reportService.insertReport(report);
 
-		await this.schedulerService.compute_achievements(
+		// TODO: Add Event listener on the statistics and achievements module and Remove these function calls
+		await this.schedulerClientService.compute_achievements(
 			report.resource_id,
 			report.curator_orcid,
 		);
-		await this.schedulerService.compute_statistics(
+		await this.schedulerClientService.compute_statistics(
 			report.resource_id,
 			report.curator_orcid,
 		);
 		return report_confirmation;
+	}
+
+	@ApiOperation({
+		summary: 'Submit a JSON array of reports',
+	})
+	@ApiOkResponse({
+		description: 'Confirmation Object of the created reports',
+	})
+	@ApiSecurity('basic')
+	@Post()
+	@UseGuards(LocalAuthGuard, HasAResourceGuard)
+	async post_reports(
+		@Body() reportSubmission: SubmitReportsDto,
+		@Request() req,
+		@Res() res: Response,
+	) {
+		const resourcesConcerned = await reportSubmission.reports.reduce(
+			(prev, curr) => {
+				if (!prev.includes(curr.resource_id)) {
+					prev.push(curr.resource_id);
+				}
+				return prev;
+			},
+			[],
+		);
+		resourcesConcerned.map((res_id: string) =>
+			this.can_edit_resource(req.user, res_id),
+		);
+
+		const response = { deletedReports: null, insertedCount: 0 };
+
+		if (reportSubmission.delete_all) {
+			response.deletedReports =
+				await this.reportService.deleteAllResourcesReports(
+					reportSubmission.delete_all,
+				);
+		}
+
+		const { insertedCount } = await this.reportService.insertReports(
+			reportSubmission.reports,
+		);
+		response.insertedCount = insertedCount;
+
+		// send the insertion response
+		res.send(response);
+
+		// start computing the scores and achievements after
+		const computePromises$ = resourcesConcerned.map(
+			async (resource_id: string) => {
+				await this.computeAchievements.run_task({
+					arguments: [resource_id],
+					logLevel: ['error'],
+				});
+
+				await this.computeStatistics.run_task({
+					arguments: [resource_id],
+					logLevel: ['error'],
+				});
+			},
+		);
+
+		await Promise.all(computePromises$);
+
+		return;
 	}
 }

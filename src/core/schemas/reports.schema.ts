@@ -19,14 +19,16 @@ export class Report {
 	entity_uri: string;
 
 	@Prop({ required: false })
-	resource_uri: string;
+	resource_uri?: string;
 
 	@Prop({ required: true })
 	resource_id: string;
 
-	@Prop({ required: true })
+	@Prop({
+		required: true,
+		type: Date,
+	})
 	timestamp: Date;
-
 }
 
 const ReportSchema = SchemaFactory.createForClass(Report);

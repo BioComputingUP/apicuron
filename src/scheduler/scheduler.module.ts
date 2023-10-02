@@ -15,10 +15,17 @@ import { ResourcesModule } from '../resources/resources.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { OrcidSubmissionTask } from './tasks/orcid-submission.task';
 @Module({
-  imports: [HttpModule, CoreApicuronModule, NotificationsModule, ResourcesModule, AuthModule],
-  providers: [SchedulerService,
+	imports: [
+		HttpModule,
+		CoreApicuronModule,
+		NotificationsModule,
+		ResourcesModule,
+		AuthModule,
+	],
+	providers: [
+		SchedulerService,
 
-    {
+		{
 			provide: 'task:submit_report',
 			useClass: SubmitBulkTask,
 		},
@@ -40,29 +47,53 @@ import { OrcidSubmissionTask } from './tasks/orcid-submission.task';
 		},
 		{
 			provide: 'task:compute_all_metrics',
-			useClass: ComputeAllMetricsTask
+			useClass: ComputeAllMetricsTask,
 		},
 		{
 			provide: 'task:submit-orcid',
-			useClass: OrcidSubmissionTask
-		}
-  ],
-  exports: [
-  ],
-  controllers: [],
+			useClass: OrcidSubmissionTask,
+		},
+	],
+	exports: [
+		{
+			provide: 'task:submit_report',
+			useClass: SubmitBulkTask,
+		},
+		{
+			provide: 'task:compute_badges',
+			useClass: ComputeBadgesTask,
+		},
+		{
+			provide: 'task:compute_medals',
+			useClass: ComputeMedalsTask,
+		},
+		{
+			provide: 'task:compute_achievements',
+			useClass: ComputeAchievementsTask,
+		},
+		{
+			provide: 'task:compute_statistics',
+			useClass: ComputeStatisticsTask,
+		},
+		{
+			provide: 'task:compute_all_metrics',
+			useClass: ComputeAllMetricsTask,
+		},
+		{
+			provide: 'task:submit-orcid',
+			useClass: OrcidSubmissionTask,
+		},
+	],
+	controllers: [],
 })
 export class SchedulerModule {
-
-  // dynamic modules explained here
-  // https://dev.to/nestjs/providing-providers-to-dynamic-nestjs-modules-1i6n
-  static registerTasks(tasks: Provider[]) {
-    return {
-      module: SchedulerModule,
-      providers: [
-        ...tasks,
-        HttpModule,
-      ],
-      exports: [SchedulerService]
-    }
-  }
+	// dynamic modules explained here
+	// https://dev.to/nestjs/providing-providers-to-dynamic-nestjs-modules-1i6n
+	static registerTasks(tasks: Provider[]) {
+		return {
+			module: SchedulerModule,
+			providers: [...tasks, HttpModule],
+			exports: [SchedulerService],
+		};
+	}
 }

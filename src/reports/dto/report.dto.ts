@@ -1,19 +1,17 @@
-import { IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 export class ReportDto {
+	@IsNotEmpty()
+	activity_term: string;
 
-    @IsNotEmpty()
-    activity_term: string;
-
-    @IsNotEmpty()
+	@IsNotEmpty()
 	curator_orcid: string;
 
-    @IsNotEmpty()
+	@IsNotEmpty()
 	entity_uri: string;
 
-    @IsNotEmpty()
-    resource_id: string;
+	@IsNotEmpty()
+	resource_id: string;
 
-    @IsNotEmpty()
+	@IsNotEmpty()
 	timestamp: Date;
-
 }

@@ -19,12 +19,11 @@ import { NotificationsModule } from '../notifications/notifications.module';
 // import { ComputeAllMetricsTask } from './tasks/compute_all_metrics.task';
 import { EntityUriValid } from './validators/entity-uri';
 import { CoreApicuronModule } from '../core/core.module';
+import { SchedulerModule } from '../scheduler/scheduler.module';
 
 @Module({
-	controllers: [ReportsController,],
-	providers: [ReportsService, EntityUriValid,
-		
-	],
+	controllers: [ReportsController],
+	providers: [ReportsService, EntityUriValid],
 	imports: [
 		HttpModule,
 		CoreApicuronModule,
@@ -62,9 +61,9 @@ import { CoreApicuronModule } from '../core/core.module';
 		// 	}
 		// ]),
 		SchedulerClientModule,
-		StatisticsModule
+		SchedulerModule,
+		StatisticsModule,
 	],
-	exports: [ReportsService]
+	exports: [ReportsService],
 })
-export class ReportsModule { }
-
+export class ReportsModule {}

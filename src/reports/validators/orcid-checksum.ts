@@ -20,8 +20,16 @@ export class OrcidChecksum implements ValidatorConstraintInterface {
 
 
 	async validate(orcid_id: string, args: ValidationArguments) {
+
+		// first we verify that the length of the orcid id is correct
+		if(orcid_id.split('-').join('').length != 16){
+			return false;
+		}
+
+
 		try {
-			const orcid_digits = orcid_id.split('').filter((char) => char != '-');
+			// obtain the individual digits of the orcid id in an array (split by dash. regroup and then split entire string)
+			const orcid_digits: string[] = orcid_id.split('-').join('').split('');
 			const [digits, checksum]: [number[], string] = [
 				orcid_digits.slice(0, -1).map((x) => parseInt(x)),
 				orcid_digits.slice(-1)[0],

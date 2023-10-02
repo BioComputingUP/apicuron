@@ -1,20 +1,30 @@
 import {
+	ArrayMaxSize,
+	ArrayMinSize,
+	IsArray,
+	IsDate,
 	IsDateString,
 	IsEmpty,
+	IsISO8601,
 	IsNotEmpty,
 	IsOptional,
 	IsString,
+	MaxDate,
 	Validate,
+	ValidateNested,
 } from 'class-validator';
-import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
-import { ResourceIdExists } from '../../resources/partner-resources/validators/resource-id-exists';
+// import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
+// import { ResourceIdExists } from '../../resources/partner-resources/validators/resource-id-exists';
 import { OrcidChecksum } from '../validators/orcid-checksum';
 import { ApiProperty } from '@nestjs/swagger';
-import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
+import {
+	EntriesExistRule,
+	EntryExistsRule,
+} from '../../shared/validators/entry-exists.validator';
 import { Term } from '../../core/schemas/terms.schema';
 import { PartnerResource } from '../../core/schemas/resource.schema';
 import { EntityUriValid } from '../validators/entity-uri';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 export class SubmitReportDto {
 	@Validate(
 		EntryExistsRule,
@@ -55,9 +65,17 @@ export class SubmitReportDto {
 	@IsNotEmpty()
 	resource_id: string;
 
+	// This configuration is lenient and tolerates mistakes in the string specification
+	@MaxDate(() => new Date(Date.now()), {
+		message:
+			'timestamp: The timestamp of a report cannot be set to a future date',
+	})
+	@IsDate()
 	@Type(() => Date)
-	@IsDateString()
-	@IsNotEmpty()
+	// this is a more strict approach with better approach although we need to keep the instance a string
+	// @IsISO8601()
+	// @IsString()
+	// @IsNotEmpty()
 	timestamp: Date;
 }
 
@@ -74,7 +92,7 @@ export class SubmitBulkDto {
 		required: false,
 	})
 	// @IsArray()
-    @IsString({ each: true })
+	@IsString({ each: true })
 	delete_all: Array<string>;
 
 	// swagger docs entry
@@ -86,4 +104,27 @@ export class SubmitBulkDto {
 	})
 	@IsEmpty()
 	reports: string;
+}
+
+export class SubmitReportsDto {
+	@IsArray()
+	@ValidateNested({ each: true })
+	@ArrayMaxSize(50)
+	@ArrayMinSize(0)
+	@IsNotEmpty()
+	@Type(() => SubmitReportDto)
+	reports: SubmitReportDto[];
+
+	@IsArray()
+	@Validate(EntriesExistRule, [
+		PartnerResource.name,
+		({ delete_all }) => {
+			return {
+				resource_id: delete_all,
+			};
+		},
+	])
+	@IsString({ each: true })
+	@IsOptional()
+	delete_all: Array<string>;
 }

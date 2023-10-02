@@ -1,33 +1,43 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, PipelineStage, QueryOptions } from 'mongoose';
-import { User, UserDocument } from '../core/schemas/user.schema';
+import {
+	FilterQuery,
+	InsertManyResult,
+	Model,
+	PipelineStage,
+	QueryOptions,
+} from 'mongoose';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import { TermsService } from '../terms/terms.service';
 import {
 	ReportFilterDto,
 	ReportFilterGroupedDto,
 } from './dto/report-filter.dto';
-import { ReportDto } from './dto/report.dto';
-import { Report, ReportDocument, ReportSchema } from '../core/schemas/reports.schema';
+import { Report, ReportDocument } from '../core/schemas/reports.schema';
 import * as _ from 'lodash';
 import { paginate } from '../pagination/paginator';
 import { PaginationAggregation } from '../pagination/interfaces/pagination-aggregation';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import {
+	REPORTS_DELETED_ALL_RESOURCE,
+	REPORTS_INSERTED,
+	REPORT_INSERTED,
+} from './constants';
+import { ReportDto } from './dto/report.dto';
+import { DeleteResult } from 'mongodb';
 
 @Injectable()
 export class ReportsService {
 	constructor(
 		@InjectModel(Report.name)
-		private reportModel: Model<ReportDocument, {}, {}, {}, typeof ReportSchema>,
-		@InjectModel(User.name) private userModel: Model<UserDocument>,
+		private reportModel: Model<ReportDocument>,
+		// @InjectModel(User.name) private userModel: Model<UserDocument>,
 		protected partnerResourcesService: PartnerResourcesService,
 		protected termsService: TermsService,
+		private eventEmitter: EventEmitter2,
 	) {}
 
-	private checkOrcidId(orcid_id: string): Boolean {
-		// TODO: This needs to be implemented
-		return true;
-	}
+	logger = new Logger(ReportsService.name);
 
 	async getUserReports(orcid_id: string): Promise<Report[]> {
 		return await this.reportModel.find({
@@ -36,7 +46,36 @@ export class ReportsService {
 	}
 
 	async insertReport(report: ReportDto) {
-		return await this.reportModel.insertMany(report);
+		try {
+			const instance = new this.reportModel(report);
+			await instance.save();
+			this.eventEmitter.emit(REPORT_INSERTED, report as ReportDto);
+			return instance;
+		} catch (e: any) {
+			this.logger.error(e.message, e.stack, 'insertReport');
+			throw new Error(`Failed to save Report ${report}`);
+		}
+	}
+
+	async insertReports(
+		reports: ReportDto[],
+	): Promise<Omit<InsertManyResult<Report>, 'insertedIds'>> {
+		try {
+			const { insertedCount, acknowledged } = await this.reportModel.insertMany(
+				reports,
+				{ rawResult: true },
+			);
+			this.eventEmitter.emit(REPORTS_INSERTED, reports as ReportDto[]);
+			return {
+				insertedCount,
+				acknowledged,
+			};
+		} catch (e: any) {
+			this.logger.error(e.message, e.stack, 'insertReports');
+			this.logger.error(
+				`A MongoBulkWriteException occurred when inserting Reports, but there are successfully processed documents.`,
+			);
+		}
 	}
 
 	/**
@@ -162,16 +201,37 @@ export class ReportsService {
 		return paginate(data, reportFilter, totalCount);
 	}
 
-	async report_statistics() {}
-
 	async all_reports_count() {
 		return await this.reportModel.count();
 	}
 
-	async delete_all_resource_reports(resource_id: string) {
-		return await this.reportModel.deleteMany({
+	async deleteAllResourceReports(resource_id: string): Promise<DeleteResult> {
+		const { deletedCount, acknowledged } = await this.reportModel.deleteMany({
 			resource_id,
 		});
+		this.eventEmitter.emit(REPORTS_DELETED_ALL_RESOURCE, {
+			resource_id,
+			deletedCount,
+			acknowledged,
+		});
+		return { deletedCount, acknowledged };
+	}
+
+	async deleteAllResourcesReports(
+		resource_ids: string[],
+	): Promise<{ [key: string]: DeleteResult }> {
+		// delete all the reports of all resources in order
+		const deleteResponses$ = resource_ids.map(async (resource_id: string) => {
+			return await this.deleteAllResourceReports(resource_id);
+		});
+
+		// await for all promises in order
+		const deleteResponses = await Promise.all(deleteResponses$);
+		// Create an object where each key is a resource id and the value is the response object;
+		return resource_ids.reduce((prev, curr, index) => {
+			prev[curr] = deleteResponses[index];
+			return prev;
+		}, {});
 	}
 
 	private buildReportsQuery(dto: ReportFilterDto): {
@@ -191,7 +251,7 @@ export class ReportsService {
 
 		// timestamp filter object
 		// pick the keys from the dto and rename them if they're defined
-		let timestamp: any = _.mapKeys(
+		const timestamp: any = _.mapKeys(
 			_.pick(dto, ['from', 'to']),
 			(value, key) => {
 				const rename = { from: '$gte', to: '$lte' };
@@ -206,7 +266,7 @@ export class ReportsService {
 			};
 		}
 
-		let sort = {};
+		const sort = {};
 		const converter = {
 			desc: -1,
 			asc: 1,
@@ -215,7 +275,7 @@ export class ReportsService {
 		};
 		sort[dto.sortBy] = converter[dto.sortOrder];
 
-		let options: QueryOptions<Report> = {
+		const options: QueryOptions<Report> = {
 			sort,
 		};
 
@@ -228,7 +288,7 @@ export class ReportsService {
 	}
 
 	private queryOptionsToPipeline(options: QueryOptions<Report>) {
-		let pipelineArray: PipelineStage[] = [];
+		const pipelineArray: PipelineStage[] = [];
 
 		if (options.sort) {
 			pipelineArray.push({ $sort: options.sort });
@@ -249,12 +309,6 @@ export class ReportsService {
 		groupBy,
 		sortOrder,
 	}: ReportFilterGroupedDto): PipelineStage[] {
-		const t: PipelineStage.Sort = {
-			$sort: {
-				groupKey: 1,
-			},
-		};
-
 		const converter = {
 			day: [
 				{
