@@ -19,6 +19,7 @@ import { ComputeStatisticsTask } from './compute_statistics.task';
 import { InjectModel } from '@nestjs/mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Model } from 'mongoose';
+import { plainToClass } from 'class-transformer';
 
 export type ValidatedReport = {
 	report: SubmitReportDto;
@@ -323,13 +324,15 @@ export class SubmitBulkTask {
 	}
 
 	private convert_object_to_report(obj: SubmitReportDto) {
-		const report = new SubmitReportDto();
-		report.activity_term = obj.activity_term;
-		report.curator_orcid = obj.curator_orcid;
-		report.entity_uri = obj.entity_uri;
-		report.timestamp = obj.timestamp;
-		report.resource_id = obj.resource_id;
 
-		return report;
+		return plainToClass(SubmitReportDto, obj);
+		// const report = new SubmitReportDto();
+		// report.activity_term = obj.activity_term;
+		// report.curator_orcid = obj.curator_orcid;
+		// report.entity_uri = obj.entity_uri;
+		// report.timestamp = new Date(obj.timestamp);
+		// report.resource_id = obj.resource_id;
+
+		// return report;
 	}
 }

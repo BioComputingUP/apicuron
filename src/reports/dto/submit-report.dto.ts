@@ -80,7 +80,6 @@ export class SubmitReportDto {
 }
 
 export class SubmitBulkDto {
-	@IsOptional()
 	@ApiProperty({
 		type: 'array',
 		items: {
@@ -93,6 +92,7 @@ export class SubmitBulkDto {
 	})
 	// @IsArray()
 	@IsString({ each: true })
+	@IsOptional()
 	delete_all: Array<string>;
 
 	// swagger docs entry
