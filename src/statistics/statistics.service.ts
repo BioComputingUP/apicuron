@@ -40,6 +40,7 @@ export class StatisticsService {
 		if (await this.userModel.exists({ orcid_id: curator_orcid })) {
 			return await this.statisticsModel.find({
 				curator_orcid,
+				privacy: 'public',
 			});
 		} else {
 			throw new NotFoundException('User not found');
@@ -52,6 +53,7 @@ export class StatisticsService {
 	) {
 		return await this.statisticsModel.find({
 			curator_orcid,
+			privacy: 'public',
 			resource_id: { $in: resource_ids },
 		});
 	}
@@ -88,11 +90,13 @@ export class StatisticsService {
 							'stats.resource_uri': {
 								$in: resource_uris,
 							},
+							'stats.privacy': 'public',
 						},
 						{
 							'stats.resource_id': {
 								$in: resource_ids,
 							},
+							'stats.privacy': 'public',
 						},
 					],
 				};
@@ -165,6 +169,7 @@ export class StatisticsService {
 			{
 				$match: {
 					resource_id,
+					privacy: 'public',
 				},
 			},
 			{

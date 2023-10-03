@@ -5,9 +5,6 @@ import { StatisticsTerms } from './statistics-terms.schema';
 export type StatisticsDocument = Statistics & Document;
 @Schema({
 	collection: 'statistics',
-
-	// toJSON: { virtuals: true },
-	// toObject: { virtuals: true },
 })
 export class Statistics {
 	@Prop({ required: true, default: () => 0 })
@@ -69,6 +66,8 @@ export class Statistics {
 	@Prop({ required: true, default: 'contribution' })
 	type?: 'contribution' | 'paid' = 'contribution';
 }
+
+
 
 const StatisticsSchema = SchemaFactory.createForClass(Statistics);
 

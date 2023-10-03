@@ -62,14 +62,14 @@ const logger = new Logger('AppModule');
 		MongooseModule.forRootAsync({
 			inject: [ConfigService],
 			useFactory: async (configService: ConfigService) => {
-				const db_host = configService.get<string>('db_host')
-				const database = configService.get<string>('database')
-				const port = configService.get<number>('db_port')
+				const db_host = configService.get<string>('db_host');
+				const database = configService.get<string>('database');
+				const port = configService.get<number>('db_port');
 				const uri = `mongodb://${db_host}:${port}/${database}`;
-				logger.log(`MongoDB Connection setup uri: ${uri}`)
-				return ({
-					uri
-				})
+				logger.log(`MongoDB Connection setup uri: ${uri}`);
+				return {
+					uri,
+				};
 			},
 		}),
 		// in here we load the Serve static module to serve static files

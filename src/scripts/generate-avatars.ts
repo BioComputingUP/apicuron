@@ -13,6 +13,8 @@ export async function bootstrap(app: INestApplicationContext) {
 
 	const logger = new Logger('GenerateAvatarScript');
 
+	// await userModel.updateMany({}, { $unset: { avatar: '' }})
+
 	const usersCursor = userModel.find({
 		orcid_id: { $exists: true },
 		avatar: { $exists: false },

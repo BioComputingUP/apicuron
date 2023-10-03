@@ -5,7 +5,6 @@ import { Term } from './terms.schema';
 
 export type PartnerResourceDocument = HydratedDocument<PartnerResource>;
 
-
 // this class defines a partnerResource that has been validated and has the ability to have Models, Badges and so on
 @Schema()
 export class PartnerResource {
@@ -34,12 +33,10 @@ export class PartnerResource {
 	logo: string;
 
 	@Prop()
-	color: string
-
+	color: string;
 
 	state: string;
 }
-
 
 export class ResourceSummary extends PartnerResource {
 	badges: AchievementDef[];
@@ -49,8 +46,6 @@ export class ResourceSummary extends PartnerResource {
 
 export const PartnerResourceSchema =
 	SchemaFactory.createForClass(PartnerResource);
-
-
 
 export type SubmittedResourceDocument = HydratedDocument<SubmittedResource>;
 
@@ -93,15 +88,16 @@ export class SubmittedResource {
 	state: string;
 }
 
-
-export const SubmittedResourceSchema = SchemaFactory.createForClass(SubmittedResource);
+export const SubmittedResourceSchema =
+	SchemaFactory.createForClass(SubmittedResource);
 
 export type ResourceDocument = HydratedDocument<Resource>;
 
 // this class defines a partnerResource that has been validated and has the ability to have Models, Badges and so on
 @Schema({
-	collection: 'resources_def', discriminatorKey: 'state',
-	virtuals: true
+	collection: 'resources_def',
+	discriminatorKey: 'state',
+	virtuals: true,
 })
 export class Resource {
 	// @Prop({ required: true, unique: true })
@@ -132,7 +128,7 @@ export class Resource {
 		type: String,
 		required: true,
 		default: SubmittedResource.name,
-		enum: [SubmittedResource.name, PartnerResource.name]
+		enum: [SubmittedResource.name, PartnerResource.name],
 	})
 	state: string;
 
@@ -144,30 +140,28 @@ export class Resource {
 	// terms: Term[]
 }
 
-
 export const ResourceSchema = SchemaFactory.createForClass(Resource);
 
 ResourceSchema.virtual('terms', {
 	ref: Term.name,
 	localField: 'resource_id',
 	foreignField: 'resource_id',
-})
+});
 
 ResourceSchema.virtual('badges', {
 	ref: AchievementDef.name,
 	localField: 'resource_id',
 	foreignField: 'resource_id',
-	match: { type: 'badge' }
-})
+	match: { type: 'badge' },
+});
 
 ResourceSchema.virtual('medals', {
 	ref: AchievementDef.name,
 	localField: 'resource_id',
 	foreignField: 'resource_id',
-	match: { type: 'medal' }
-})
+	match: { type: 'medal' },
+});
 // export { ResourceSchema }
 // function get_valid_resources_only(next) {
 // 	this.where('valid').equals(true);
 // }
-
