@@ -4,33 +4,30 @@ import { Term } from "src/app/models/term.model";
 import { Report } from "../../models/report.model";
 import * as _ from "lodash";
 import { NgxPopperModule } from "ngx-popper";
+import { AngularSvgIconModule } from "angular-svg-icon";
 
 @Component({
-    standalone: true,
-    imports: [CommonModule, NgxPopperModule],
-    selector: 'report-card',
-    templateUrl: './report-card.component.html'
+  standalone: true,
+  imports: [CommonModule, AngularSvgIconModule, NgxPopperModule],
+  selector: "report-card",
+  templateUrl: "./report-card.component.html",
 })
 export class ReportCardComponent {
+  constructor() {}
 
-    constructor() {
-    }
+  @Input() report: Report;
 
-    @Input() report: Report;
+  @Input() term: Term;
 
-    @Input() term: Term;
+  @Input() truncate_description: Boolean = true;
 
-    @Input() truncate_description: Boolean = true;
+  categoryColor() {
+    const converter = {
+      "tw-text-green-100 tw-bg-generation": "generation",
+      "tw-text-orange-100 tw-bg-revision": "revision",
+      "tw-text-red-100 tw-bg-invalidation": "invalidation",
+    };
 
-
-    categoryColor() {
-        const converter = {
-            'tw-text-green-100 tw-bg-generation': 'generation',
-            'tw-text-orange-100 tw-bg-revision': 'revision',
-            'tw-text-red-100 tw-bg-invalidation': 'invalidation',
-        }
-
-        return _.mapValues(converter, (category) => category == this.term.category)
-    }
-
+    return _.mapValues(converter, (category) => category == this.term.category);
+  }
 }

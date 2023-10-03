@@ -1,46 +1,30 @@
 <div
-  class="tw-bg-white tw-rounded-md tw-shadow-md tw-shadow-gray-400 tw-p-2 tw-h-full tw-flex tw-flex-col tw-overflow-hidden"
->
-  <h3
-    class="tw-text-gray-800 tw-font-dm-sans tw-text-sm sm:tw-text-base tw-font-semibold sm:tw-mb-2"
-  >
-    {{ term.name }}
+  class="tw-bg-white tw-rounded-md tw-shadow-md tw-shadow-gray-400 tw-p-2 tw-h-full tw-flex tw-flex-col tw-overflow-hidden">
+  <h3 class="tw-text-gray-800 tw-font-dm-sans tw-text-sm sm:tw-text-base tw-font-semibold sm:tw-mb-2 hover:tw-underline">
+    <a [href]="report.entity_uri">{{ term.name }} <svg-icon src="assets/svg/external-link.svg" svgClass="tw-text-gray-800 tw-h-3 tw-w-3 tw-inline"></svg-icon></a>
   </h3>
   <span class="tw-text-xs sm:tw-text-sm tw-text-gray-400 tw-font-bold tw-font-dm-sans">{{
     report.formattedDate
-  }}</span>
-  <p
-    class="tw-text-gray-500 tw-font-medium sm:tw-mb-2 tw-text-xs sm:tw-text-sm"
-    [ngClass]="{ 'tw-truncate': truncate_description }"
-    [popper]="term.description"
-    [popperTrigger]="'hover'"
-    [popperDisableStyle]="false"
-    [popperPlacement]="'top'"
-    [popperApplyClass]="'tw-bg-white'"
-  >
+    }}</span>
+  <p class="tw-text-gray-500 tw-font-medium sm:tw-mb-2 tw-text-xs sm:tw-text-sm"
+    [ngClass]="{ 'tw-truncate': truncate_description }" [popper]="term.description" [popperTrigger]="'hover'"
+    [popperDisableStyle]="false" [popperPlacement]="'top'" [popperApplyClass]="'tw-bg-white'">
     {{ term.description }}
   </p>
-  <div
-    class="tw-flex tw-flex-row tw-items-center tw-justify-between tw-mt-auto"
-  >
+  <div class="tw-flex tw-flex-row tw-items-center tw-justify-between tw-mt-auto">
     <div class="tw-flex tw-flex-row tw-items-center">
-      <div
-        [title]="'score value for ' + term.name"
+      <div [title]="'score value for ' + term.name"
         class="tw-rounded-full tw-h-5 tw-w-5 tw-flex tw-items-center tw-justify-center tw-mr-1"
-        [ngClass]="categoryColor()"
-      >
+        [ngClass]="categoryColor()">
         <span class="tw-font-bold tw-text-xs tw-cursor-default">{{
           term.score
-        }}</span>
+          }}</span>
       </div>
       <!-- <span class="tw-text-gray-600">Score</span> -->
     </div>
     <div>
-      <span
-        class="tw-text-sm tw-font-bold tw-rounded-full tw-px-1 sm:tw-px-2 sm:tw-py-1"
-        [ngClass]="categoryColor()"
-        >{{ term.category }}</span
-      >
+      <span class="tw-text-sm tw-font-bold tw-rounded-full tw-px-1 sm:tw-px-2 sm:tw-py-1" [ngClass]="categoryColor()">{{
+        term.category }}</span>
     </div>
   </div>
 </div>
