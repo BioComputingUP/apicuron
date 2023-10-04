@@ -57,7 +57,8 @@ services:
     image: "nginx:latest"
     volumes:
       - "./nginx.conf:/etc/nginx/conf.d/default.conf"
-      - "./proxy/error.log:/var/log/nginx/error.log"
+      # - "./proxy/error.log:/var/log/nginx/error.log" TODO: Fix Bind mount issue,
+      # nginx  automatically creates an error.log folder on ./proxy instead of a file and then fails to read it
     networks:
       - apicuron-network
     depends_on:

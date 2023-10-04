@@ -1,0 +1,38 @@
+{
+    "reports": [
+		{
+			"resource_id": "disprot",
+			"entity_uri": "http://disprot.org",
+			"curator_orcid": "0000-0002-2472-5685",
+			"activity_term": "region_statement_generation",
+			"timestamp": "2023-09-29T16:04:27.469Z"
+		},
+		{
+			"resource_id": "disprot",
+			"entity_uri": "http://disprot.org",
+			"curator_orcid": "0000-0002-2472-5685",
+			"activity_term": "region_statement_generation",
+			"timestamp": "2023-09-29T16:04:27.469Z"
+		},
+		{
+			"resource_id": "disprot",
+			"entity_uri": "http://disprot.org",
+			"curator_orcid": "0000-0002-2472-5685",
+			"activity_term": "region_statement_generation",
+			"timestamp": "2023-09-29T16:04:27.469Z"
+		},
+		{
+			"resource_id": "disprot",
+			"entity_uri": "http://disprot.org",
+			"curator_orcid": "0000-0002-2472-5685",
+			"activity_term": "region_statement_generation",
+			"timestamp": "2023-09-29T16:04:27.469Z"
+		},{
+			"resource_id": "disprot",
+			"entity_uri": "http://disprot.org",
+			"curator_orcid": "0000-0002-2472-5685",
+			"activity_term": "region_statement_generation",
+			"timestamp": "2023-09-29T16:04:27.469Z"
+		}
+	]
+}
