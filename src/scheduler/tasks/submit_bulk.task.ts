@@ -127,7 +127,7 @@ export class SubmitBulkTask {
 		let successful_reports_count = 0;
 		let total_report_count = 0;
 
-		let affected_resource_ids = new Set<string>();
+		const affected_resource_ids = new Set<string>();
 		return new Promise((resolve, reject) => {
 			reportsStream.on('data', async ({ errors, report }: ValidatedReport) => {
 				total_report_count++;
@@ -279,6 +279,8 @@ export class SubmitBulkTask {
 			const validation_errors: ValidationError[] = await validate(report);
 			if (validation_errors.length > 0) {
 				console.error(`Errors found in Report validation\n`, report);
+				console.error('test error message');
+				console.error('Validation Errors: ', validation_errors);
 			}
 			return {
 				report,
@@ -324,7 +326,6 @@ export class SubmitBulkTask {
 	}
 
 	private convert_object_to_report(obj: SubmitReportDto) {
-
 		return plainToClass(SubmitReportDto, obj);
 		// const report = new SubmitReportDto();
 		// report.activity_term = obj.activity_term;

@@ -29,7 +29,8 @@ export class SchedulerClientService {
 	async submit_task(task: TaskSubmit): Promise<AxiosResponse> {
 		const form = this.base_form();
 
-		if (this.config.get('environment') != 'production') {
+		// TODO: this condition was set to fit the features of the dev.scheduler on local. Now it is rendered useless because dev.scheduler.it isn't running
+		if (this.config.get('environment') == 'dev_scheduler') {
 			form.append('task_name', task.task_name);
 
 			// parent job only available to the dev version of scheduler
@@ -206,12 +207,12 @@ export class SchedulerClientService {
 
 	@Cron(CronExpression.EVERY_DAY_AT_2AM)
 	private async daily_periodic_compute() {
-        const currentEnv = this.config.get('environment')
-		if(currentEnv == 'production') {
+		const currentEnv = this.config.get('environment');
+		if (currentEnv == 'production') {
 			await this.compute_all_metrics();
 			return;
 		}
-		if(currentEnv == 'development'){
+		if (currentEnv == 'development') {
 			// update disprot
 			await this.disprot_update();
 
