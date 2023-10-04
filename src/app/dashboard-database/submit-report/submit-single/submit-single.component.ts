@@ -27,38 +27,36 @@ export class SubmitSingleComponent implements OnInit {
     private dashboardService: DashboardService,
     private termsService: TermsService
   ) {
+    this.form = this.formBuilder.group(
+      {
+        activity_term: ["", [Validators.required]],
+        curator_orcid: [
+          "",
+          [
+            Validators.required,
+            Validators.pattern(
+              /[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}([0-9]|X)/gm
+            ),
+            orcidIdValidator(),
+          ],
+        ],
+        entity_uri: [
+          "",
+          [
+            Validators.required,
+            Validators.pattern(
+              /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
+            ),
+          ],
+        ],
+        date: ["", [Validators.required]],
+        time: ["", [Validators.required]],
+      },
+      { validators: [dateTimeValidator()] }
+    );
   }
 
   ngOnInit(): void {
-    this.resource$.subscribe((resource) => {
-      this.form = this.formBuilder.group(
-        {
-          activity_term: ["", [Validators.required]],
-          curator_orcid: [
-            "",
-            [
-              Validators.required,
-              Validators.pattern(
-                /[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}([0-9]|X)/gm
-              ),
-              orcidIdValidator(),
-            ],
-          ],
-          entity_uri: [
-            "",
-            [
-              Validators.required,
-              Validators.pattern(
-                /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
-              ),
-            ],
-          ],
-          date: ["", [Validators.required]],
-          time: ["", [Validators.required]],
-        },
-        { validators: [dateTimeValidator()] }
-      );
-    });
 
     this.terms$ = this.resource$.pipe(
       switchMap((resource) => {
