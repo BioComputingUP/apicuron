@@ -1,6 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
-import { PartnerResource } from '../../core/schemas/resource.schema';
+import {
+	PartnerResource,
+	PartnerResourceDocument,
+} from '../../core/schemas/resource.schema';
 import { Badge, BadgeDocument } from '../../core/schemas/badges.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cursor, Model } from 'mongoose';
@@ -11,6 +14,11 @@ import {
 	AchievementDefDocument,
 } from '../../core/schemas/achievement-def.schema';
 import { User, UserDocument } from '../../core/schemas/user.schema';
+import { OnEvent } from '@nestjs/event-emitter';
+import {
+	COMPUTE_RESOURCE_BADGES_TASK,
+	COMPUTE_USER_BADGES_TASK,
+} from '../contants';
 
 @Injectable()
 export class ComputeBadgesTask {
@@ -46,7 +54,7 @@ export class ComputeBadgesTask {
 
 			const user = await this.userModel.findOne({ orcid_id });
 			if (user) {
-				await this.computeUserBadges(resource_id, orcid_id);
+				await this.computeUserBadges({ resource, user: { orcid_id } });
 			} else {
 				this.logger.error(`User ${orcid_id} Not found !!`);
 			}
@@ -57,7 +65,9 @@ export class ComputeBadgesTask {
 		}
 	}
 
-	public async computeResourceBadges({ resource_id }: PartnerResource) {
+	@OnEvent(COMPUTE_RESOURCE_BADGES_TASK, { async: true })
+	public async computeResourceBadges(resource: PartnerResourceDocument) {
+		const { resource_id } = resource;
 		await this.badgeModel.deleteMany({ resource_id });
 
 		const curators: Cursor<any, never> = this.reportModel
@@ -75,7 +85,10 @@ export class ComputeBadgesTask {
 		await curators.eachAsync((doc) => {
 			const orcid_id: string = doc._id;
 
-			const badgeComputePromise = this.computeUserBadges(resource_id, orcid_id);
+			const badgeComputePromise = this.computeUserBadges({
+				resource,
+				user: { orcid_id },
+			});
 			userBadgesPromises.push(badgeComputePromise);
 		});
 
@@ -86,7 +99,15 @@ export class ComputeBadgesTask {
 		return await Promise.all(userBadgesPromises);
 	}
 
-	public async computeUserBadges(resource_id: string, curator_orcid: string) {
+	@OnEvent(COMPUTE_USER_BADGES_TASK, { async: true })
+	public async computeUserBadges(payload: {
+		resource: PartnerResourceDocument;
+		user: { orcid_id: string };
+	}) {
+		const {
+			resource: { resource_id },
+			user: { orcid_id: curator_orcid },
+		} = payload;
 		// Iterate Over reports from the oldest to newest
 		const userReportsIterator = this.reportModel
 			.find({ resource_id, curator_orcid }, {}, { $sort: { timestamp: 1 } })

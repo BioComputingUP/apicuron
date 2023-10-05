@@ -14,6 +14,16 @@ import { StatisticsTerms } from '../../core/schemas/statistics-terms.schema';
 import { BadgeDocument } from '../../core/schemas/badges.schema';
 import { MedalDocument } from '../../core/schemas/medals.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
+import { OnEvent } from '@nestjs/event-emitter';
+import {
+	Resource,
+	PartnerResourceDocument,
+} from 'src/core/schemas/resource.schema';
+import {
+	COMPUTE_CURATOR_STATISTICS_TASK,
+	COMPUTE_RESOURCE_STATISTICS_TASK,
+} from '../contants';
+import { User } from '@sentry/node';
 
 @Injectable()
 export class ComputeStatisticsTask {
@@ -46,7 +56,7 @@ export class ComputeStatisticsTask {
 		if (orcid_id) {
 			const user = await this.userModel.findOne({ orcid_id });
 			if (user) {
-				await this.compute_user_statistics(resource, user);
+				await this.compute_user_statistics({ resource, user });
 				return;
 			} else {
 				this.logger.error(`User ${orcid_id} not found ! Aborting`);
@@ -55,7 +65,11 @@ export class ComputeStatisticsTask {
 		await this.compute_resource_statistics(resource);
 	}
 
-	async compute_resource_statistics({ resource_id, resource_uri }) {
+	@OnEvent(COMPUTE_RESOURCE_STATISTICS_TASK, { async: true })
+	async compute_resource_statistics({ resource_id }: { resource_id: string }) {
+		const { resource_uri } = await this.partnerResourceService.get_resource(
+			resource_id,
+		);
 		const users_reports = this.group_resource_reports_by_terms(resource_id);
 
 		const deletion_response = await this.statModel.deleteMany({ resource_id });
@@ -230,7 +244,16 @@ export class ComputeStatisticsTask {
 			.sort({ total_score: -1 });
 	}
 
-	async compute_user_statistics({ resource_id, resource_uri }, { orcid_id }) {
+	@OnEvent(COMPUTE_CURATOR_STATISTICS_TASK, { async: true })
+	async compute_user_statistics(payload: {
+		resource: PartnerResourceDocument;
+		user: UserDocument;
+	}) {
+		const {
+			resource: { resource_id, resource_uri },
+			user: { orcid_id },
+		} = payload;
+
 		const user_reports = this.group_user_reports_by_terms(
 			resource_id,
 			orcid_id,

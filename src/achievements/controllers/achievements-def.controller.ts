@@ -1,4 +1,4 @@
-import { Controller, Delete, Req, Put, ForbiddenException, Get, Param, Body, Post, Query, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Req, Put, ForbiddenException, Get, Param, Body, Post, Query, UseGuards, Res } from '@nestjs/common';
 import { ApiHeader, ApiOperation, ApiOkResponse, ApiTags, ApiSecurity } from '@nestjs/swagger';
 import { AuthService } from '../../auth/auth.service';
 import { HasAResourceGuard } from '../../auth/guards/belongs-to-resource.guard';
@@ -9,6 +9,9 @@ import { AchievementsDefService } from '../achievements-def.service';
 import { ResourceAchievmentsDef } from '../dto/achievement-def.dto';
 import { UpdateBadgeDto, DeleteBadgeDto, CreateBadgeDto, BadgeFilter } from '../dto/badge-crud.dto';
 import { CreateMedalDto, DeleteMedalDto, MedalsFilter, UpdateMedalDto } from '../dto/medal-crud.dto';
+import { Response } from 'express';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { COMPUTE_RESOURCE_BADGES_TASK, COMPUTE_RESOURCE_MEDALS_TASK, COMPUTE_RESOURCE_STATISTICS_TASK } from '../../scheduler/contants';
 
 @ApiTags('Define Achievements')
 @ApiHeader(VersionHeader)
@@ -49,17 +52,10 @@ export class AchievementsDefController {
 })
 export class BadgesDefController {
 
-	constructor(protected achievementsDefService: AchievementsDefService) {}
+	constructor(protected achievementsDefService: AchievementsDefService, protected authService: AuthService, protected eventEmitter: EventEmitter2) {}
 
 	private can_edit_resource(user, resource_id){
-        // get the resources list that belong to the current user
-        const user_resources: Array<{ resource_id: string}> = user.resources
-        // check if the resource belongs to the user
-        const resource_found = user_resources.find(resource => resource.resource_id == resource_id)
-        // if it doesn't, we respond with  a 403 exception
-        if(!resource_found){
-            throw new ForbiddenException(`You either do not have the authorization to update the terms of the (${resource_id}) resource or the resource does not exist`);
-        }
+		return this.authService.user_has_resource(user, resource_id);
     }
 
 	@ApiOperation({
@@ -103,9 +99,15 @@ export class BadgesDefController {
 	@ApiSecurity('basic')
 	@Put('edit')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
-	async update_badge(@Body() update_badge: UpdateBadgeDto, @Req() req){
+	async update_badge(@Body() update_badge: UpdateBadgeDto, @Req() req, @Res() res){
 		this.can_edit_resource(req.user, update_badge.resource_id)
-		return await this.achievementsDefService.update_badge(update_badge)
+		const response = await this.achievementsDefService.update_badge(update_badge)
+
+		res.send({ data: response})
+
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_BADGES_TASK, { resource_id: update_badge.resource_id })
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, { resource_id: update_badge.resource_id })
+
 	}
 
 	@ApiOperation({
@@ -118,10 +120,16 @@ export class BadgesDefController {
 	@ApiSecurity('basic')
 	@Delete(':name/partner-resource/:resource_id')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
-	async delete_badge(@Param() delete_badge: DeleteBadgeDto, @Req() req){
+	async delete_badge(@Param() delete_badge: DeleteBadgeDto, @Req() req, @Res() res){
 		this.can_edit_resource(req.user, delete_badge.resource_id);
 
-		return await this.achievementsDefService.delete_badge(delete_badge)
+		const response = await this.achievementsDefService.delete_badge(delete_badge)
+
+		res.send({ data: response})
+
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_BADGES_TASK, { resource_id: delete_badge.resource_id })
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, { resource_id: delete_badge.resource_id })
+
 	}
 	
 
@@ -136,7 +144,7 @@ export class BadgesDefController {
 })
 export class MedalsDefController {
 
-	constructor(protected achievementsDefService: AchievementsDefService, protected authService: AuthService) {}
+	constructor(protected achievementsDefService: AchievementsDefService, protected authService: AuthService, protected eventEmitter: EventEmitter2) {}
 
 	private can_edit_resource(user, resource_id){
 		return this.authService.user_has_resource(user, resource_id);
@@ -152,9 +160,14 @@ export class MedalsDefController {
 	@ApiSecurity('basic')
 	@Post()
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
-	async create_medal(@Body() medal: CreateMedalDto, @Req() req){
+	async create_medal(@Body() medal: CreateMedalDto, @Req() req, @Res() res: Response){
 		this.can_edit_resource(req.user, medal.resource_id);
-		return await this.achievementsDefService.create_medal(medal);
+		const response = await this.achievementsDefService.create_medal(medal);
+
+		res.send({ data: response});
+
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_MEDALS_TASK, { resource_id: medal.resource_id })
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, { resource_id: medal.resource_id })
 	}
 
 	@ApiOperation({
@@ -182,9 +195,15 @@ export class MedalsDefController {
 	@ApiSecurity('basic')
 	@Put('edit')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
-	async update_medal(@Body() update_medal: UpdateMedalDto, @Req() req){
+	async update_medal(@Body() update_medal: UpdateMedalDto, @Req() req, @Res() res: Response){
 		this.can_edit_resource(req.user, update_medal.resource_id)
-		return await this.achievementsDefService.update_medal(update_medal)
+		const response = await this.achievementsDefService.update_medal(update_medal)
+
+		res.send({ data: response});
+
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_MEDALS_TASK, { resource_id: update_medal.resource_id })
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, { resource_id: update_medal.resource_id })
+
 	}
 
 

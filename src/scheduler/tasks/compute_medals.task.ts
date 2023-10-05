@@ -9,6 +9,12 @@ import {
 	AchievementDefDocument,
 } from '../../core/schemas/achievement-def.schema';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
+import {
+	PartnerResourceDocument,
+	ResourceDocument,
+} from 'src/core/schemas/resource.schema';
+import { OnEvent } from '@nestjs/event-emitter';
+import { COMPUTE_RESOURCE_MEDALS_TASK } from '../contants';
 
 @Injectable()
 export class ComputeMedalsTask {
@@ -37,10 +43,11 @@ export class ComputeMedalsTask {
 		}
 		this.logger.log(`Computing medals for resource ${resource_id}`);
 		// we first compute the medals for the resource`)
-		await this.compute_resource_medals(resource_id);
+		await this.compute_resource_medals(resource);
 	}
 
-	async compute_resource_medals(resource_id: string) {
+	@OnEvent(COMPUTE_RESOURCE_MEDALS_TASK, { async: true })
+	async compute_resource_medals({ resource_id }: { resource_id: string }) {
 		const deletionResponse = await this.medalModel.deleteMany({ resource_id });
 		this.logger.log(
 			`Deleted ${deletionResponse.deletedCount} medals for resource ${resource_id}`,
@@ -53,7 +60,7 @@ export class ComputeMedalsTask {
 			type: 'medal',
 		});
 
-		let medal_saves_promises = [];
+		const medal_saves_promises = [];
 
 		for (let i = 0; i < medalDefs.length; i++) {
 			// for each medal definition in the list, we add the medal to the user
@@ -96,7 +103,7 @@ export class ComputeMedalsTask {
 	private medal_reports_aggregation(medal: AchievementDef) {
 		// first we first filter all the reports by the resource
 		// and the terms that are concerned by the medals
-		let match_dict = {
+		const match_dict = {
 			resource_id: medal.resource_id,
 			activity_term: {
 				$in: medal.list_terms,

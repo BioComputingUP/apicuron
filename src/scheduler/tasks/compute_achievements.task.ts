@@ -2,6 +2,12 @@ import { Injectable, Logger, Inject } from '@nestjs/common';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { ComputeBadgesTask } from './compute_badges.task';
 import { ComputeMedalsTask } from './compute_medals.task';
+import { PartnerResourceDocument } from 'src/core/schemas/resource.schema';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import {
+	COMPUTE_RESOURCE_BADGES_TASK,
+	COMPUTE_RESOURCE_MEDALS_TASK,
+} from '../contants';
 
 @Injectable()
 export class ComputeAchievementsTask {
@@ -10,6 +16,7 @@ export class ComputeAchievementsTask {
 		protected computeBadgesTask: ComputeBadgesTask,
 		@Inject('task:compute_medals')
 		protected computeMedalsTask: ComputeMedalsTask,
+		private eventEmitter: EventEmitter2,
 	) {}
 
 	public async run_task(task_arg: TaskArgument) {
@@ -22,5 +29,10 @@ export class ComputeAchievementsTask {
 			const medalsPromise = this.computeMedalsTask.run_task(task_arg);
 			await Promise.all([badgesPromise, medalsPromise]);
 		}
+	}
+
+	public async computeResourceAchievements(resource: PartnerResourceDocument) {
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_BADGES_TASK, resource);
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_MEDALS_TASK, resource);
 	}
 }

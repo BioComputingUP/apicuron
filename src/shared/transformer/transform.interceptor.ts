@@ -21,17 +21,15 @@ export class TransformInterceptor implements NestInterceptor {
 	// constructor(protected transformerService: TransformerService) {}
 	intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
 		const req = context.switchToHttp().getRequest();
-		if(req.get('version') != '2'){
-			return next.handle()
+		if (req.get('version') != '2') {
+			return next.handle();
 		}
 		return next.handle().pipe(
-			
-			map(
-				(response) => {
+			map((response) => {
 				// return
 				// return x
 				const req = context.switchToHttp().getRequest();
-				let meta: object = req.meta_attributes || {};
+				const meta: object = req.meta_attributes || {};
 				if (req.warnings && Object.keys(req.warnings).length > 0) {
 					meta['warnings'] = req.warnings;
 				}

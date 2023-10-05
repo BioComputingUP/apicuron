@@ -12,39 +12,38 @@ import { PipelineStage, QueryOptions } from 'mongoose';
 import { PaginationAggregation } from '../interfaces/pagination-aggregation';
 
 export class PaginateDto {
-	@IsOptional()
-	@Transform(({ value }) => parseInt(value))
-	@IsInt()
 	@Min(0)
-	skip: number = 0;
-
+	@IsInt()
 	@IsOptional()
 	@Transform(({ value }) => parseInt(value))
-	@IsInt()
-	@Min(1)
+	skip = 0;
+
 	@Max(100)
-	limit: number = 10;
+	@Min(1)
+	@IsInt()
+	@IsOptional()
+	@Transform(({ value }) => parseInt(value))
+	limit = 10;
 
 	getMongoQueryOptions<T>(): QueryOptions<T> {
-
 		return {
 			limit: this.limit,
 			skip: this.skip,
-		}
+		};
 	}
 
 	getMongoAggregation(): PaginationAggregation {
 		return [
-					{
-						$skip: this.skip,
-					},
-					{
-						$limit: this.limit,
-					},
-			  ]
+			{
+				$skip: this.skip,
+			},
+			{
+				$limit: this.limit,
+			},
+		];
 	}
 
 	omitPagination(): Omit<this, 'skip' | 'limit'> {
-		return _.omit(this, ['skip', 'limit'])
+		return _.omit(this, ['skip', 'limit']);
 	}
 }
