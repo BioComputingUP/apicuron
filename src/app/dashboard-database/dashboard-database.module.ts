@@ -30,6 +30,7 @@ import { BlockUIModule } from "primeng/blockui";
 import { ToastModule } from "primeng/toast";
 import { MessageService } from "primeng/api";
 import { SpinnerComponent } from "../components/utils/spinner/spinner.component";
+import { BadgeFormComponent } from "../components/badge-form/badge-form.component";
 @NgModule({
   declarations: [
     DatabaseUpdateComponent,
@@ -56,11 +57,11 @@ import { SpinnerComponent } from "../components/utils/spinner/spinner.component"
     CalendarModule,
     FileUploadModule,
     MultiSelectModule,
-    SvgModule,
     ReportsByDateChartComponent,
     ProgressSpinnerModule,
     SpinnerComponent,
     ToastModule,
+    BadgeFormComponent
   ],
 })
 export class DashboardDatabaseModule {}

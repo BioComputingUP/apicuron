@@ -1,6 +1,6 @@
 import { HttpClientModule } from "@angular/common/http";
 import { NgModule } from "@angular/core";
-import { TermsService } from "src/app/terms/services/terms.service";
+import { TermsService } from "./services/terms.service";
 
 
 

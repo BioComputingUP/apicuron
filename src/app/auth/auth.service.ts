@@ -161,11 +161,11 @@ export class AuthService implements HttpInterceptor {
     }
   }
 
-  private dropTokens(){
+  private dropTokens() {
     localStorage.removeItem(this.jwtHeader);
     localStorage.removeItem(this.orcidHeader);
-    this.orcidToken$.next(null)
-    this.jwtToken$.next(null)
+    this.orcidToken$.next(null);
+    this.jwtToken$.next(null);
   }
 
   get token_value() {
@@ -227,18 +227,20 @@ export class AuthService implements HttpInterceptor {
           const cloned = req.clone({
             setHeaders: authHeaders,
           });
-          return next.handle(cloned).pipe(catchError((err: HttpErrorResponse) => {
-            if(err.status == 401){
-              this.dropTokens();
-              return next.handle(req);
-            }
-          }));
+          return next.handle(cloned).pipe(
+            catchError((err: HttpErrorResponse, caught) => {
+              if (err.status == 401) {
+                this.dropTokens();
+                return next.handle(req);
+              }
+              throw err;
+            })
+          );
         } else {
           return next.handle(req);
         }
-      }),
+      })
     );
-
   }
 
   GetLogOut(): Observable<any> {

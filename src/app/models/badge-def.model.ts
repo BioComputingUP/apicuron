@@ -21,8 +21,8 @@ export class BadgeDef extends AcheivementDef implements Deserializable, Serializ
     }
 
     // image?: string
-    color_code?: string
-    count_threshold: number
+    color_code?: string = ''
+    count_threshold: number = 1;
 
 
     getRelatedTerms(terms: Term[]) {
