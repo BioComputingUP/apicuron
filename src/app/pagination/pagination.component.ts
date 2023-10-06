@@ -39,13 +39,10 @@ export class PaginationComponent implements OnInit, OnDestroy {
     }
   }
 
-  @Input("ngModel")
-  set currentPage(value: number) {
+  @Input("page")
+  set page(value) {
     this.currentPage$.next(value);
   }
-
-  @Output("ngModelChange") currentPageChange = new EventEmitter();
-
   @Output() pageChanged = new EventEmitter();
 
   @Input() maxSize = 5;
@@ -70,7 +67,7 @@ export class PaginationComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.maxPage$ = combineLatest([this.totalCount$, this.itemsPerPage$]).pipe(
-      map(([totalCount, itemsPerPage]) => Math.floor(totalCount / itemsPerPage))
+      map(([totalCount, itemsPerPage]) => Math.floor(totalCount / itemsPerPage) + 1)
     );
 
     this.pageList$ = combineLatest([this.currentPage$, this.maxPage$]).pipe(
@@ -95,7 +92,6 @@ export class PaginationComponent implements OnInit, OnDestroy {
     this.currentPage$
       .pipe(takeUntil(this.destroy$))
       .subscribe((value: number) => {
-        this.currentPageChange.emit(value);
         this.pageChanged.emit({ page: value });
       });
 

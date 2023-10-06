@@ -68,9 +68,6 @@ export class CuratorReportsDetailsComponent implements OnInit {
     const filter = this.reportFilter$.value;
     return filter.skip / filter.limit + 1;
   }
-  set currentPage(value) {
-    this.update_page(value);
-  }
 
   update_page(page) {
     const filter = this.reportFilter$.value;

@@ -4,7 +4,7 @@ import { CommonModule } from "@angular/common";
 import { DatabaseUpdateComponent } from "./database-update/database-update.component";
 import { DatabasesModule } from "../databases/databases.module";
 import { SubmitReportComponent } from "./submit-report/submit-report.component";
-import { ReactiveFormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { DashboardService } from "./services/dashboard.service";
 import { SubmitSingleComponent } from "./submit-report/submit-single/submit-single.component";
 import { SubmitBulkComponent } from "./submit-report/submit-bulk/submit-bulk.component";
@@ -31,6 +31,7 @@ import { ToastModule } from "primeng/toast";
 import { MessageService } from "primeng/api";
 import { SpinnerComponent } from "../components/utils/spinner/spinner.component";
 import { BadgeFormComponent } from "../components/badge-form/badge-form.component";
+import { PaginationComponent } from "../pagination/pagination.component";
 @NgModule({
   declarations: [
     DatabaseUpdateComponent,
@@ -48,6 +49,7 @@ import { BadgeFormComponent } from "../components/badge-form/badge-form.componen
     DashboardDatabaseRoutingModule,
     SlideOverPanelComponent,
     AuthDropdownComponent,
+    FormsModule,
     ReactiveFormsModule,
     DatabasesModule,
     AngularSvgIconModule,
@@ -61,7 +63,8 @@ import { BadgeFormComponent } from "../components/badge-form/badge-form.componen
     ProgressSpinnerModule,
     SpinnerComponent,
     ToastModule,
-    BadgeFormComponent
+    BadgeFormComponent,
+    PaginationComponent
   ],
 })
 export class DashboardDatabaseModule {}
