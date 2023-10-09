@@ -43,6 +43,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
   resourceId$: Observable<string>;
 
   resource$: Observable<Resource>;
+  termList$: Observable<any>;
   terms$: Observable<any>;
 
   badges$: Observable<Paginated<BadgeDef>>;
@@ -80,28 +81,32 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
       shareReplay()
     );
 
-    this.terms$ = this.resource$.pipe(
+    this.termList$ = this.resource$.pipe(
       switchMap(({ resource_id }: Resource) => {
         return this.termsService.getTerms({ resource_id });
       }),
-      // map((terms: Term[]) => {
-      //   const groupValues = ["generation", "invalidation", "revision"].map(
-      //     (category: string) => {
-      //       return { label: category, value: category, items: [] };
-      //     }
-      //   );
-      //   terms.forEach((term: Term) => {
-      //     const concernedCategory = groupValues.find(
-      //       (cat) => cat.value == term.category
-      //     );
-      //     concernedCategory.items.push({
-      //       label: term.activity_name,
-      //       value: term.activity_term,
-      //     });
-      //   });
-      //   return groupValues;
-      // })
     );
+
+    this.terms$ = this.termList$.pipe(
+      map((terms: Term[]) => {
+        const groupValues = ["generation", "invalidation", "revision"].map(
+          (category: string) => {
+            return { label: category, value: category, items: [] };
+          }
+        );
+        terms.forEach((term: Term) => {
+          const concernedCategory = groupValues.find(
+            (cat) => cat.value == term.category
+          );
+          concernedCategory.items.push({
+            label: term.activity_name,
+            value: term.activity_term,
+          });
+        });
+        return groupValues;
+      })
+
+    )
 
     this.badgeFilter$ = combineLatest([this.resource$, this.page$]).pipe(
       tap(console.log),
