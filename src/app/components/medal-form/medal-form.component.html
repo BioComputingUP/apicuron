@@ -1,0 +1,85 @@
+<form [formGroup]="form" (submit)="submit()">
+    <div
+        class="tw-bg-white tw-grid tw-grid-flow-row tw-grid-cols-1 tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4">
+
+        <!-- for the update term form -->
+        <h2 *ngIf="type == 'create'" class="tw-text-xl tw-text-center tw-font-bold">Create a new
+            Medal "{{
+            this.form.get('name').value
+            }}"</h2>
+        <h2 *ngIf="type == 'update'" class="tw-text-xl tw-text-center tw-font-bold">Updating
+            Medal "{{
+            this.form.get('name').value
+            }}"</h2>
+
+        <ng-container *ngIf="type == 'create'">
+            <div class="form-control-element">
+                <label for="medal_name">Medal Name</label>
+                <input type="text" name="medal_name" id="" formControlName="name">
+            </div>
+
+
+        </ng-container>
+
+
+        <div class="tw-w-full tw-my-2 tw-px-2 tw-py-1">
+            <label for="list_terms">List of Terms</label>
+
+            <p-multiSelect [options]="terms" [group]="true" formControlName="list_terms"
+                defaultLabel="Select an activity Term" scrollHeight="250px" display="chip">
+                <ng-template let-group pTemplate="group">
+                    <div class="tw-flex tw-items-center">
+                        <span class="tw-capitalize">{{group.label}} Terms</span>
+                    </div>
+                </ng-template>
+            </p-multiSelect>
+        </div>
+
+        <div class="form-control-element">
+            <label for="color">Color Code</label>
+            <div class="tw-flex tw-flex-row tw-gap-2 tw-items-center">
+                <input type="text" name="color" placeholder="Input Hex Code or any valid CSS color"
+                    formControlName="color" class="tw-grow">
+                <div class="tw-h-4 tw-w-4 tw-rounded-md tw-p-5"
+                    [ngStyle]="{ 'background-color': form.get('color').value }"></div>
+            </div>
+
+            <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                *ngIf="form.get('color').hasError('pattern') && form.get('color').touched">
+                Color Code should be either a hex code (eg #333), "bronze", "silver" or "gold"
+            </small>
+        </div>
+
+        <div class="tw-my-2 tw-px-2 tw-py-1">
+            <label> Start Date</label>
+            <p-calendar formControlName="first_day" [showIcon]="true" [maxDate]="form.get('last_day').value" [showClear]="true"
+                [readonlyInput]="true"></p-calendar>
+            <small>This field indicates when the medal period begins.</small>
+        </div>
+
+        <div class="tw-my-2 tw-px-2 tw-py-1">
+            <label> End Date</label>
+            <p-calendar formControlName="last_day" [showIcon]="true" [minDate]="form.get('first_day').value"
+                [showClear]="true" [readonlyInput]="true"></p-calendar>
+            <small>This field indicates when the medal period ends.</small>
+
+        </div>
+
+        <div class="form-control-element">
+            <label for="score">Medal Recipients</label>
+            <input type="number" min="1" name="score" formControlName="score_relative" id="">
+            <small>This field determines the number of recipients who will be awarded the medal.</small>
+            <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                *ngIf="form.get('score_relative').hasError('min') && form.get('score_relative').touched">
+                Minimum value of a count threshold is 1
+            </small>
+        </div>
+
+
+        <input type="submit"
+            class="tw-w-full tw-p-2 tw-mx-1 tw-bg-green-500 tw-text-white tw-capitalize tw-cursor-pointer"
+            value="submit">
+
+
+    </div>
+</form>

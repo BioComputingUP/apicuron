@@ -32,6 +32,7 @@ import { MessageService } from "primeng/api";
 import { SpinnerComponent } from "../components/utils/spinner/spinner.component";
 import { BadgeFormComponent } from "../components/badge-form/badge-form.component";
 import { PaginationComponent } from "../pagination/pagination.component";
+import { MedalFormComponent } from "../components/medal-form/medal-form.component";
 @NgModule({
   declarations: [
     DatabaseUpdateComponent,
@@ -64,6 +65,7 @@ import { PaginationComponent } from "../pagination/pagination.component";
     SpinnerComponent,
     ToastModule,
     BadgeFormComponent,
+    MedalFormComponent,
     PaginationComponent
   ],
 })

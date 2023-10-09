@@ -255,6 +255,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
     if (operation == "create") {
       this.createBadge(badge);
     }
+    this.manageForm$.next({ badge: null, show: false, type: "create" });
   }
 
   delete_badge(badge) {

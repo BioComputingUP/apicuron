@@ -25,8 +25,8 @@ export class MedalDef extends AcheivementDef implements Deserializable, Serializ
         return this
     }
 
-    first_day: Date
-    last_day: Date
-    name: string
-    score_relative: number
+    first_day: Date = null
+    last_day: Date = null
+    name: string = '';
+    score_relative: number = 1
 }
