@@ -17,6 +17,7 @@ import { ResourceIdExists } from '../../resources/partner-resources/validators/r
 import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
 import { MedalUnique } from '../validators/achievement-exists';
 import { MaxDateField, MinDateField } from '../validators/date-comparison';
+import { Type } from 'class-transformer';
 
 export class CreateMedalDto {
 	// @IsNotEmpty()
@@ -52,14 +53,16 @@ export class CreateMedalDto {
 	@Min(1)
 	score_relative: number;
 
-	@IsOptional()
-	@IsDateString()
 	@MaxDateField(['last_day'])
+	@IsDate()
+	@IsOptional()
+	@Type(() => Date)
 	first_day?: Date;
 
-	@IsOptional()
-	@IsDateString()
 	@MinDateField(['first_day'])
+	@IsDate()
+	@IsOptional()
+	@Type(() => Date)
 	last_day?: Date;
 }
 
@@ -70,14 +73,16 @@ export class MedalsFilter extends PaginateDto {
 		return filter;
 	}
 
-	@IsOptional()
-	@IsDateString()
 	@MaxDateField(['last_day'])
+	@IsDate()
+	@IsOptional()
+	@Type(() => Date)
 	first_day?: Date;
 
-	@IsOptional()
-	@IsDateString()
 	@MinDateField(['first_day'])
+	@IsDate()
+	@IsOptional()
+	@Type(() => Date)
 	last_day?: Date;
 
 	@IsOptional()
@@ -112,25 +117,27 @@ export class UpdateMedalDto extends DeleteMedalDto {
 	@Validate(ActivityTermExists, [{ each: true }])
 	list_terms: string[];
 
-	@IsOptional()
 	@Matches(/(^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$)|^bronze$|^gold$|^silver$/, {
 		message:
 			'a medal color has to be either a color hexcode, "bronze", "gold" or "silver"',
 	})
+	@IsOptional()
 	color: string;
 
-	@IsOptional()
-	@IsNumber()
 	@Min(1)
+	@IsNumber()
+	@IsNotEmpty()
 	score_relative: number;
 
-	@IsOptional()
-	@IsDateString()
 	@MaxDateField(['last_day'])
+	@IsDate()
+	@IsOptional()
+	@Type(() => Date)
 	first_day: Date;
 
-	@IsOptional()
-	@IsDateString()
 	@MinDateField(['first_day'])
+	@IsDate()
+	@IsOptional()
+	@Type(() => Date)
 	last_day: Date;
 }

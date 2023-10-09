@@ -17,12 +17,12 @@ export class BadgeFilter extends PaginateDto {
 		return filter;
 	}
 
-	@IsOptional()
 	@Validate(ResourceIdExists)
+	@IsOptional()
 	resource_id?: string;
 
-	@IsOptional()
 	@Validate(BadgeUnique, [{ reverse: true }])
+	@IsOptional()
 	name?: string;
 }
 
@@ -48,20 +48,20 @@ export class CreateBadgeDto {
 	@IsNotEmpty()
 	color_code: string;
 
-	@IsNotEmpty()
 	@Min(1)
+	@IsNotEmpty()
 	count_threshold: number;
 
-	@IsNotEmpty()
 	@Validate(BadgeUnique)
+	@IsNotEmpty()
 	name: string;
 
-	@IsNotEmpty()
 	@Validate(ResourceIdExists)
+	@IsNotEmpty()
 	resource_id: string;
 
-	@IsNotEmpty()
 	@Validate(ActivityTermExists, [{ each: true }])
+	@IsNotEmpty()
 	list_terms: string[];
 }
 
@@ -69,27 +69,27 @@ export class UpdateBadgeDto {
 	@IsOptional()
 	category: string;
 
-	@IsOptional()
 	// matches that the color is either a hex code or bronze, gold or silver
 	@Matches(/(^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$)|bronze|gold|silver/, {
 		message:
 			'a badge color has to be either a color hexcode, "bronze", "gold" or "silver"',
 	})
+	@IsOptional()
 	color_code: string;
 
-	@IsOptional()
 	@Min(1)
+	@IsOptional()
 	count_threshold: number;
 
-	@IsOptional()
 	@Validate(BadgeUnique, [{ reverse: true }])
+	@IsOptional()
 	name: string;
 
-	@IsOptional()
 	@Validate(ResourceIdExists)
+	@IsOptional()
 	resource_id: string;
 
-	@IsOptional()
 	@Validate(ActivityTermExists, [{ each: true }])
+	@IsOptional()
 	list_terms: string[];
 }
