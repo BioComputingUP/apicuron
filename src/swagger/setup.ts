@@ -12,7 +12,7 @@ export function setupSwagger(app: INestApplication, docs_prefix = '') {
 			in: 'header',
 			name: 'authorization',
 			description:
-				'Specify the token value with the `idtoken` prefix, e.g. "idtoken MYTOKEN"',
+				'Specify the token value with the `bearer` prefix, e.g. "bearer MYTOKEN"',
 		})
 		.setVersion('2.0')
 		.addTag('Resources')
