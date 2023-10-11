@@ -13,11 +13,10 @@ export class TermsService {
   constructor(protected http: HttpClient) {}
 
   getTerms(termsFilter: TermsFilter): Observable<Term[]> {
-
     const params = new HttpParams({ fromObject: { ...termsFilter } });
 
     return this.http
-      .get(this. url, {
+      .get(this.url, {
         headers: {
           version: "2",
         },

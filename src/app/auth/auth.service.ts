@@ -1,4 +1,4 @@
-import { Router } from "@angular/router";
+import { Router, UrlTree } from "@angular/router";
 import {
   catchError,
   filter,
@@ -59,6 +59,16 @@ export class AuthService implements HttpInterceptor {
 
   loggedIn$: Observable<Boolean>;
 
+  // this variable describes the initial location where the user attempted to authenticate, defaults to home
+  // By using this variable we can identify where did the user authenticate from
+  source$ = new BehaviorSubject<string>("home");
+
+  // Source to target mapper, maps sources to target redirection urls
+  loginUrlMapper = new Map<string, string[]>([
+    ["home", ["/"]],
+    ["curator", ["/curators"]],
+  ]);
+
   // authentication JWT token key and value
   orcidPopup: Window;
   destroy$: any;
@@ -116,6 +126,7 @@ export class AuthService implements HttpInterceptor {
           const access_token = event.data["access_token"];
           if (access_token) {
             this.setOrcidToken(access_token);
+            this.redirectAfterAuth();
             window.addEventListener("message", windowMessageEventListener);
           }
         }
@@ -161,22 +172,17 @@ export class AuthService implements HttpInterceptor {
     }
   }
 
-  private dropTokens(){
+  private dropTokens() {
     localStorage.removeItem(this.jwtHeader);
     localStorage.removeItem(this.orcidHeader);
-    this.orcidToken$.next(null)
-    this.jwtToken$.next(null)
+    this.orcidToken$.next(null);
+    this.jwtToken$.next(null);
   }
 
-  get token_value() {
-    return this.jwtToken$.getValue();
-  }
+  redirectAfterAuth() {
+    const source = this.source$.value;
 
-  set token_value(value: string | null) {
-    this.jwtToken$.next(value);
-    value
-      ? localStorage.setItem(this.jwtHeader, value)
-      : localStorage.removeItem(this.jwtHeader);
+    this.router.navigate(this.loginUrlMapper.get(source));
   }
   // Old method to extract token from cookies
   // private get_token_from_cookies(): string | null {
@@ -200,7 +206,10 @@ export class AuthService implements HttpInterceptor {
   //   }
   // }
 
-  public openOauthDialog() {
+  public openOauthDialog(source?: string) {
+    if (source) {
+      this.source$.next(source);
+    }
     if (!this.orcidPopup) {
       this.orcidPopup = window.open(this.login_link, "popup", "popup=true");
     } else {
@@ -227,26 +236,20 @@ export class AuthService implements HttpInterceptor {
           const cloned = req.clone({
             setHeaders: authHeaders,
           });
-          return next.handle(cloned).pipe(catchError((err: HttpErrorResponse) => {
-            if(err.status == 401){
-              this.dropTokens();
-              return next.handle(req);
-            }
-          }));
+          return next.handle(cloned).pipe(
+            catchError((err: HttpErrorResponse, caught) => {
+              if (err.status == 401) {
+                this.dropTokens();
+                return next.handle(req);
+              }
+              throw err;
+            })
+          );
         } else {
           return next.handle(req);
         }
-      }),
+      })
     );
-
-  }
-
-  GetLogOut(): Observable<any> {
-    return this.http.get(this.logoutUrl, { responseType: "json" });
-  }
-
-  GetAuth(): Observable<any> {
-    return this.http.get(this.authUrl, { responseType: "json" });
   }
 
   logout(): void {

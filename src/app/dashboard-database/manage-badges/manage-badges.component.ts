@@ -2,17 +2,37 @@ import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
-import { BehaviorSubject, Observable, Subscription } from "rxjs";
-import { map, shareReplay, switchMap } from "rxjs/operators";
-// import { uniqueNameValidator } from "../validators/unique-name.validator";
+import {
+  BehaviorSubject,
+  Observable,
+  Subject,
+  Subscription,
+  combineLatest,
+  of,
+} from "rxjs";
+import {
+  catchError,
+  map,
+  shareReplay,
+  startWith,
+  switchMap,
+  take,
+  takeUntil,
+  tap,
+} from "rxjs/operators";
 import { TermsService } from "../../terms/services/terms.service";
 import { ResourcesService } from "../../resource/service/resources.service";
 import { Resource } from "../../models/resource.model";
-// import { TermsFilter } from "../../terms/models/terms-filter";
 import { Term } from "../../models/term.model";
 import { BadgeDefService } from "../../achievements-def/services/badge-def.service";
 import { BadgeDefFilter } from "../../achievements-def/interfaces/badge-def.filter";
 import { BadgeDef } from "../../models/badge-def.model";
+import { Paginated } from "src/app/interfaces/paginated";
+
+type BadgeListUpdate = {
+  badge: BadgeDef;
+  operation: "update" | "delete" | "create";
+};
 
 @Component({
   selector: "manage-badges",
@@ -20,13 +40,30 @@ import { BadgeDef } from "../../models/badge-def.model";
   styleUrls: ["./manage-badges.component.scss"],
 })
 export class ManageBadgesComponent implements OnInit, OnDestroy {
-    resourceId$: Observable<string>;
-    badgesSubscription: Subscription;
+  resourceId$: Observable<string>;
+
+  resource$: Observable<Resource>;
+  termList$: Observable<any>;
+  terms$: Observable<any>;
+
+  badges$: Observable<Paginated<BadgeDef>>;
+  manageForm$ = new BehaviorSubject<{
+    badge: BadgeDef;
+    show: boolean;
+    type: "create" | "update";
+  }>({ badge: null, show: false, type: "create" });
+
+  badgeFilter$: Observable<BadgeDefFilter>;
+  page$ = new BehaviorSubject<number>(1);
+  limit: number = 15;
+  destroy$ = new Subject<boolean>();
+  updateBadge$ = new Subject<BadgeListUpdate>();
+  badgesList$: Observable<Paginated<BadgeDef>>;
 
   constructor(
     protected route: ActivatedRoute,
     protected badgeDefService: BadgeDefService,
-    protected formBuilder: FormBuilder,
+    // protected formBuilder: FormBuilder,
     protected toastr: ToastrService,
     protected termsService: TermsService,
     protected resourceService: ResourcesService
@@ -38,190 +75,187 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
     );
 
     this.resource$ = this.resourceId$.pipe(
-        switchMap((resource_id: string) => {
-            return this.resourceService.get_resource(resource_id);
-        })
+      switchMap((resource_id: string) => {
+        return this.resourceService.get_resource(resource_id);
+      }),
+      shareReplay()
+    );
+
+    this.termList$ = this.resource$.pipe(
+      switchMap(({ resource_id }: Resource) => {
+        return this.termsService.getTerms({ resource_id });
+      }),
+    );
+
+    this.terms$ = this.termList$.pipe(
+      map((terms: Term[]) => {
+        const groupValues = ["generation", "invalidation", "revision"].map(
+          (category: string) => {
+            return { label: category, value: category, items: [] };
+          }
+        );
+        terms.forEach((term: Term) => {
+          const concernedCategory = groupValues.find(
+            (cat) => cat.value == term.category
+          );
+          concernedCategory.items.push({
+            label: term.activity_name,
+            value: term.activity_term,
+          });
+        });
+        return groupValues;
+      })
+
     )
 
-    this.terms$ = this.resource$.pipe(
-        switchMap(({ resource_id }: Resource) => {
-            return this.termsService.getTerms({ resource_id })
-        }),
-        shareReplay(),
-        map((terms: Term[]) => {
-            const groupValues = ["generation", "invalidation", "revision"].map(
-              (category: string) => {
-                return { label: category, value: category, items: [] };
-              }
+    this.badgeFilter$ = combineLatest([this.resource$, this.page$]).pipe(
+      tap(console.log),
+      map(([{ resource_id }, page]: [Resource, number]) => {
+        return BadgeDefFilter.create({
+          resource_id,
+          skip: (page - 1) * this.limit,
+          limit: this.limit,
+        });
+      })
+    );
+    this.badgesList$ = this.badgeFilter$.pipe(
+      switchMap((badgeFilter: BadgeDefFilter) => {
+        return this.badgeDefService.getBadgeDefs(badgeFilter);
+      }),
+      shareReplay(),
+      map((paginatedBadges: Paginated<BadgeDef>) => {
+        paginatedBadges.data = paginatedBadges.data.map((badge: BadgeDef) => {
+          return new BadgeDef().deserialize(badge);
+        });
+        return paginatedBadges;
+      })
+    );
+
+    this.badges$ = combineLatest([
+      this.updateBadge$.pipe(startWith(<string>null)),
+      this.badgesList$,
+    ]).pipe(
+      map(([update, badges]: [BadgeListUpdate, Paginated<BadgeDef>]) => {
+        if (update != null) {
+          if (update.operation == "create") {
+            badges.data = [...badges.data, update.badge];
+          }
+          if (update.operation == "update") {
+            const index = badges.data.findIndex(
+              ({ name, resource_id }) =>
+                name == update.badge.name &&
+                update.badge.resource_id == resource_id
             );
-            terms.forEach((term: Term) => {
-              const concernedCategory = groupValues.find(
-                (cat) => cat.value == term.category
-              );
-              concernedCategory.items.push({
-                label: term.activity_name,
-                value: term.activity_term,
-              });
-            });
-            return groupValues;
-          })
-    )
+            if (index != -1) {
+              badges.data[index] = update.badge;
+            }
+          }
+          if (update.operation == "delete") {
+            badges.data = badges.data.filter(
+              (badge) => badge.name != update.badge.name
+            );
+          }
+        }
 
-    this.badgesSubscription = this.resource$
+        return badges;
+      })
+    );
+  }
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+  }
+
+  ngOnInit(): void {}
+
+  private updateBadgeUI(badge: BadgeDef) {
+    this.updateBadge$.next({
+      operation: "update",
+      badge,
+    });
+  }
+
+  update_page(page) {
+    this.page$.next(page);
+  }
+
+  private addBadgeToUI(badge) {
+    this.updateBadge$.next({ operation: "create", badge });
+  }
+
+  open_form(badge) {
+    this.manageForm$.next({
+      badge,
+      type: "update",
+      show: true,
+    });
+  }
+
+  createBadge(badgeDef: BadgeDef) {
+    this.badgeDefService.createBadgeDef(badgeDef).subscribe(
+      ({ data }: { data: BadgeDef }) => {
+        if (data) {
+          this.toastr.success(
+            `Badge ${data.name} sucessfully Created`,
+            "Badge Creation Sucessfull"
+          );
+          this.addBadgeToUI(data);
+        }
+      },
+      (error) => {
+        this.toastr.error(
+          `An error occured while creating the badge ${badgeDef.name}`,
+          "Badge Creation Failed"
+        );
+      }
+    );
+  }
+
+  updateBadge(badgeDef: BadgeDef) {
+    this.badgeDefService
+      .updateBadgeDef(badgeDef)
       .pipe(
-        switchMap(({resource_id }: Resource) => {
-          return this.badgeDefService.getBadgeDefs(BadgeDefFilter.create({ resource_id }));
+        take(1),
+        catchError((error, caught) => {
+          this.toastr.error(
+            `An error occured while updating the badge ${badgeDef.name}`,
+            "Badge Update Failed"
+          );
+          throw error;
         })
       )
-      .subscribe((badges: any) => {
-        this.badges$.next(badges);
+      .subscribe(({ data }: { data: BadgeDef }) => {
+        if (data) {
+          this.toastr.success(
+            `Badge ${data.name} sucessfully Updated`,
+            "Badge Update Sucessfull"
+          );
+          this.updateBadgeUI(data);
+        }
       });
   }
-    ngOnDestroy(): void {
-        this.badgesSubscription.unsubscribe();
+
+  open_create_form(resource_id) {
+    this.manageForm$.next({
+      badge: new BadgeDef().deserialize({ resource_id }),
+      type: "create",
+      show: true,
+    });
+  }
+
+  formSubmit({
+    badge,
+    operation,
+  }: {
+    badge: BadgeDef;
+    operation: "create" | "update";
+  }) {
+    if (operation == "update") {
+      this.updateBadge(badge);
     }
-
-  resource$: Observable<Resource>;
-  terms$: Observable<any>;
-
-  show_edit_form = false;
-  show_create_form = false;
-  badges$ = new BehaviorSubject<Array<any>>([]);
-  edit_form: FormGroup;
-  create_form: FormGroup;
-
-  ngOnInit(): void {
-    
-  }
-
-  private update_badge(badge_update) {
-    const badges = this.badges$.value;
-    const update_index = badges.findIndex(
-      (badge) => badge.name == badge_update.name
-    );
-    badges[update_index] = badge_update;
-    this.badges$.next(badges);
-  }
-
-  private create_badge(badge) {
-    const badges = this.badges$.value;
-    this.badges$.next([badge, ...badges]);
-  }
-
-  open_edit_modal(badge) {
-    this.edit_form = this.formBuilder.group({
-      name: [badge.name, [Validators.required]],
-      color_code: [
-        badge.color_code,
-        [
-          Validators.required,
-          Validators.pattern(
-            /(^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$)|^bronze$|^gold$|^silver$/
-          ),
-        ],
-      ],
-      count_threshold: [
-        badge.count_threshold,
-        [Validators.required, Validators.min(1)],
-      ],
-      list_terms: [badge.list_terms, [Validators.required]],
-    });
-    this.show_edit_form = true;
-  }
-
-  edit_form_submit() {
-    const data = this.edit_form.value;
-    this.resource$
-      .pipe(
-        map(({ resource_id, resource_uri }: any) => {
-          return {
-            ...data,
-            resource_id,
-            resource_uri,
-          };
-        }),
-        switchMap((badge_data: any) => {
-          return this.badgeDefService.updateBadgeDef(badge_data);
-        })
-      )
-      .subscribe(
-        (response) => {
-          if (response["data"]) {
-            this.toastr.success(
-              `Badge ${data.name} sucessfully update`,
-              "Badge Update Sucessfull"
-            );
-            this.update_badge(data);
-          }
-        },
-        (error) => {
-          this.toastr.error(
-            `An error occured while updating the badge ${data.name}`,
-            "Badge Update Failed"
-          );
-        }
-      );
-  }
-
-  open_create_modal() {
-    this.create_form = this.formBuilder.group({
-      name: ["", [Validators.required]],
-      color_code: [
-        "",
-        [
-          Validators.required,
-          Validators.pattern(
-            /(^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$)|^bronze$|^gold$|^silver$/
-          ),
-        ],
-      ],
-      count_threshold: [1, [Validators.required, Validators.min(1)]],
-      list_terms: [[], [Validators.required]],
-    });
-    this.show_create_form = true;
-  }
-
-  create_form_submit() {
-    const data = this.create_form.value;
-    this.resource$
-      .pipe(
-        map(({ resource_id, resource_uri }: any) => {
-          return {
-            ...data,
-            resource_id,
-            resource_uri,
-          };
-        }),
-        switchMap((badge_data: any) => {
-            const badgeDef = new BadgeDef().deserialize(badge_data);
-            return this.badgeDefService.createBadgeDef(badgeDef);
-        })
-      )
-      .subscribe(
-        (response) => {
-          if (response["data"]) {
-            this.toastr.success(
-              `Badge ${data.name} sucessfully Created`,
-              "Badge Creation Sucessfull"
-            );
-            this.create_badge(response["data"]);
-          }
-        },
-        (error) => {
-          this.toastr.error(
-            `An error occured while updating the badge ${data.name}`,
-            "Badge Update Failed"
-          );
-        }
-      );
-  }
-
-  get edit_form_color_code() {
-    return this.edit_form.get("color_code");
-  }
-
-  get create_form_color_code() {
-    return this.create_form.get("color_code");
+    if (operation == "create") {
+      this.createBadge(badge);
+    }
+    this.manageForm$.next({ badge: null, show: false, type: "create" });
   }
 
   delete_badge(badge) {
@@ -229,18 +263,16 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
       (response) => {
         if (response["data"]) {
           this.toastr.success(
-            `Badge ${badge.name} sucessfully Created`,
-            "Badge Creation Sucessfull"
+            `Badge ${badge.name} sucessfully Deleted`,
+            "Badge Deletion Sucessfull"
           );
-          const badges = this.badges$.value;
-          const filtered_badges = badges.filter((x) => x.name != badge.name);
-          this.badges$.next(filtered_badges);
+          this.updateBadge$.next({ operation: "delete", badge });
         }
       },
       (error) => {
         this.toastr.error(
-          `An error occured while updating the badge ${badge.name}`,
-          "Badge Update Failed"
+          `An error occured while deleting the badge ${badge.name}`,
+          "Badge Deletion Failed"
         );
       }
     );

@@ -4,7 +4,7 @@ import { CommonModule } from "@angular/common";
 import { DatabaseUpdateComponent } from "./database-update/database-update.component";
 import { DatabasesModule } from "../databases/databases.module";
 import { SubmitReportComponent } from "./submit-report/submit-report.component";
-import { ReactiveFormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { DashboardService } from "./services/dashboard.service";
 import { SubmitSingleComponent } from "./submit-report/submit-single/submit-single.component";
 import { SubmitBulkComponent } from "./submit-report/submit-bulk/submit-bulk.component";
@@ -30,6 +30,9 @@ import { BlockUIModule } from "primeng/blockui";
 import { ToastModule } from "primeng/toast";
 import { MessageService } from "primeng/api";
 import { SpinnerComponent } from "../components/utils/spinner/spinner.component";
+import { BadgeFormComponent } from "../components/badge-form/badge-form.component";
+import { PaginationComponent } from "../pagination/pagination.component";
+import { MedalFormComponent } from "../components/medal-form/medal-form.component";
 @NgModule({
   declarations: [
     DatabaseUpdateComponent,
@@ -47,6 +50,7 @@ import { SpinnerComponent } from "../components/utils/spinner/spinner.component"
     DashboardDatabaseRoutingModule,
     SlideOverPanelComponent,
     AuthDropdownComponent,
+    FormsModule,
     ReactiveFormsModule,
     DatabasesModule,
     AngularSvgIconModule,
@@ -56,11 +60,13 @@ import { SpinnerComponent } from "../components/utils/spinner/spinner.component"
     CalendarModule,
     FileUploadModule,
     MultiSelectModule,
-    SvgModule,
     ReportsByDateChartComponent,
     ProgressSpinnerModule,
     SpinnerComponent,
     ToastModule,
+    BadgeFormComponent,
+    MedalFormComponent,
+    PaginationComponent
   ],
 })
 export class DashboardDatabaseModule {}

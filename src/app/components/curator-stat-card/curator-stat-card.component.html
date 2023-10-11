@@ -49,7 +49,7 @@
               Details</button>
 
           </div>
-          <div class="tw-w-full tw-flex tw-flex-row tw-items-start tw-grow tw-flex-wrap tw-@container">
+          <div class="tw-w-full tw-flex tw-flex-row tw-items-start tw-grow tw-flex-wrap tw-@container" [ngClass]="{ 'tw-items-stretch': badges.data.length == 4 }">
             <div class="@2xl:tw-w-1/4 tw-w-1/2 tw-flex-shrink tw-p-2" *ngFor="let badge of badges.data">
               <badge-card [badge]="badge" [terms]="(terms$ | async)"></badge-card>
             </div>
