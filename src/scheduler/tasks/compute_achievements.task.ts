@@ -3,8 +3,9 @@ import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { ComputeBadgesTask } from './compute_badges.task';
 import { ComputeMedalsTask } from './compute_medals.task';
 import { PartnerResourceDocument } from 'src/core/schemas/resource.schema';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import {
+	COMPUTE_RESOURCE_ACHIEVEMENTS_TASK,
 	COMPUTE_RESOURCE_BADGES_TASK,
 	COMPUTE_RESOURCE_MEDALS_TASK,
 } from '../contants';
@@ -31,6 +32,7 @@ export class ComputeAchievementsTask {
 		}
 	}
 
+	@OnEvent(COMPUTE_RESOURCE_ACHIEVEMENTS_TASK, { async: true })
 	public async computeResourceAchievements(resource: PartnerResourceDocument) {
 		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_BADGES_TASK, resource);
 		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_MEDALS_TASK, resource);

@@ -11,16 +11,19 @@ import {
 	AchievementDef,
 	AchievementDefDocument,
 } from '../core/schemas/achievement-def.schema';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { TERM_DELETED } from './constants';
 
 @Injectable()
 export class TermsService {
 	constructor(
 		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-		@InjectModel(AchievementDef.name)
-		protected achievementDefModel: Model<AchievementDefDocument>,
+		// @InjectModel(AchievementDef.name)
+		// protected achievementDefModel: Model<AchievementDefDocument>,
+		protected eventEmitter: EventEmitter2,
 		protected resourceService: PartnerResourcesService,
-	) { }
+	) {}
 
 	/**
 	 *
@@ -35,7 +38,7 @@ export class TermsService {
 	}
 
 	async get_term(activity_term: string, resource_id: string) {
-		return await this.termModel.findOne({ activity_term, resource_id })
+		return await this.termModel.findOne({ activity_term, resource_id });
 	}
 
 	async get_resource_terms(term_filter: TermFilterDto) {
@@ -65,18 +68,9 @@ export class TermsService {
 	}
 
 	async delete_term(term: DeleteTermDto) {
-		const achievementsPromise = this.achievementDefModel.updateMany(
-			{
-				resource_id: term.resource_id,
-			},
-			{
-				$pull: { list_terms: term.activity_term },
-			},
-		);
+		const response = await this.termModel.deleteOne(term);
 
-		const responsePromise = this.termModel.deleteOne(term);
-
-		const [achievements, response] = await Promise.all([achievementsPromise, responsePromise]);
+		await this.eventEmitter.emitAsync(TERM_DELETED, term);
 
 		if (response.deletedCount == 1) {
 			return true;

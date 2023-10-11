@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
-import { useContainer } from 'class-validator';
+import { getMetadataStorage, useContainer } from 'class-validator';
 import { TransformInterceptor } from './shared/transformer/transform.interceptor';
 import { setupSwagger } from './swagger/setup';
 import { bootstrap as generateAllAvatars } from './scripts/generate-avatars';
@@ -64,14 +64,11 @@ async function bootstrap() {
 	app.useStaticAssets(join(__dirname, '..', 'public'));
 	app.setBaseViewsDir(join(__dirname, '..', 'views'));
 	app.setViewEngine('hbs');
-	console.log('test');
 
 	generateAllAvatars(app);
 
 	// starting to listen to requests
 	await app.listen(port, host);
-
-	// await taskAwait;
 }
 
 bootstrap();

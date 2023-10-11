@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { UsersService } from './auth/users/users.service';
 import { ReportsService } from './reports/reports.service';
 import { PartnerResourcesService } from './resources/partner-resources/partner-resources.service';
+import { getMetadataStorage } from 'class-validator';
 
 @Controller()
 export class AppController {
@@ -41,5 +42,16 @@ export class AppController {
 			report_count,
 			achievement_count,
 		};
+	}
+
+	@Get('jsonschema')
+	async getJsonSchema() {
+		// const { defaultMetadataStorage } = require('class-transformer/cjs/storage');
+		// return validationMetadatasToSchemas({
+		// 	classValidatorMetadataStorage: getMetadataStorage(),
+		// });
+		const storage = getMetadataStorage();
+		console.log(storage);
+		return storage;
 	}
 }

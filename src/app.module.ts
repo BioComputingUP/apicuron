@@ -1,5 +1,5 @@
-import { HttpException, Module, Logger } from '@nestjs/common';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { HttpException, Module, Logger, ValidationPipe } from '@nestjs/common';
+import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -28,6 +28,7 @@ import { SentryInterceptor, SentryModule } from '@ntegral/nestjs-sentry';
 import { EmailModule } from './email/email.module';
 import { CoreApicuronModule } from './core/core.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { getMetadataStorage } from 'class-validator';
 
 const logger = new Logger('AppModule');
 
@@ -111,7 +112,7 @@ const logger = new Logger('AppModule');
 							type: HttpException,
 							filter: (exception: HttpException) => {
 								return (
-									exception.getStatus() == 403 || exception.getStatus() > 500
+									exception.getStatus() == 403 || exception.getStatus() >= 500
 								);
 							},
 						},

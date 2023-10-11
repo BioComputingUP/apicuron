@@ -1,0 +1,1 @@
+export const TERM_DELETED = 'term.deleted';

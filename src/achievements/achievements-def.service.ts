@@ -18,6 +18,8 @@ import {
 	AchievementDef,
 	AchievementDefDocument,
 } from '../core/schemas/achievement-def.schema';
+import { OnEvent } from '@nestjs/event-emitter';
+import { TERM_DELETED } from '../terms/constants';
 @Injectable()
 export class AchievementsDefService {
 	constructor(
@@ -162,6 +164,25 @@ export class AchievementsDefService {
 			type: 'medal',
 		});
 		return delete_confirmation.deletedCount;
+	}
+
+	@OnEvent(TERM_DELETED, { async: true })
+	async removeTermFromAchievements({
+		resource_id,
+		activity_term,
+	}: {
+		resource_id: string;
+		activity_term: string;
+	}) {
+		return await this.achievementDefModel.updateMany(
+			{
+				resource_id,
+				list_terms: activity_term,
+			},
+			{
+				$pull: { list_terms: activity_term },
+			},
+		);
 	}
 
 	async count() {
