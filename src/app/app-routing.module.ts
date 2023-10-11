@@ -5,6 +5,8 @@ import { IndexComponent } from "./index/index.component";
 import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
 import { MainLayoutComponent } from "./main-layout/main-layout.component";
 import { environment } from "../environments/environment";
+import { RedirectGuard } from "./guards/redirect.guard";
+import { AppComponent } from "./app.component";
 
 const routes: Routes = [
   {
@@ -67,7 +69,7 @@ const routes: Routes = [
   //   //   ),
   // },
   { path: "docs", redirectTo: "/docs/" },
-  { path: "api", redirectTo: "/api/" },
+  { path: "api", canActivate: [RedirectGuard], component: AppComponent, data: { externalUrl: '/api/'} },
   {
     path: "",
     component: MainLayoutComponent,
