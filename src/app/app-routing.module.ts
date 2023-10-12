@@ -66,9 +66,17 @@ const routes: Routes = [
       import("./documentation/documentation.module").then(
         (m) => m.DocumentationModule
       ),
+    data: {
+      disableGrowingNav: true,
+    },
   },
   { path: "docs", redirectTo: "/docs/" },
-  { path: "api", canActivate: [RedirectGuard], component: AppComponent, data: { externalUrl: '/api/'} },
+  {
+    path: "api",
+    canActivate: [RedirectGuard],
+    component: AppComponent,
+    data: { externalUrl: "/api/" },
+  },
   {
     path: "",
     component: MainLayoutComponent,

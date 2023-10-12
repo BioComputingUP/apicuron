@@ -1,12 +1,12 @@
 @import "../../../node_modules/prismjs/themes/prism-okaidia.css";
 
-:target::before {
-  content: "";
-  display: block;
-  margin-top: -5rem;
-  height: 5rem;
-  width: 1px;
-}
+// :target::before {
+//   content: "";
+//   display: block;
+//   margin-top: -5rem;
+//   height: 5rem;
+//   width: 1px;
+// }
 
 
 a::after ::ng-deep

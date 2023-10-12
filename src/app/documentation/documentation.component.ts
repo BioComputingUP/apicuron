@@ -6,7 +6,7 @@ import {
   Renderer2,
   ViewEncapsulation,
 } from "@angular/core";
-import { ActivatedRoute, Router, UrlSegment } from "@angular/router";
+import { ActivatedRoute, Router, UrlSegment, UrlTree } from "@angular/router";
 import { Observable, ReplaySubject, Subject, fromEvent } from "rxjs";
 import { filter, map, switchMap, take, takeUntil, tap } from "rxjs/operators";
 import { environment } from "src/environments/environment";
@@ -14,6 +14,18 @@ import { MarkdownService } from "ngx-markdown";
 import { DOCUMENT, ViewportScroller } from "@angular/common";
 import AnchorJS from "anchor-js";
 import { HttpClient } from "@angular/common/http";
+
+type TocElement =
+  | {
+      text: string;
+      routerLink: UrlTree;
+      children?: TocElement[];
+    }
+  | {
+      text: string;
+      href: string;
+      children?: TocElement[];
+    };
 
 @Component({
   selector: "app-documentation",
@@ -34,22 +46,21 @@ export class DocumentationComponent implements OnInit, OnDestroy {
   destroy$ = new Subject<boolean>();
   toc$: Observable<any>;
   markdownContent$: Observable<any>;
+  tableOfContents: TocElement[];
 
   constructor(
     protected route: ActivatedRoute,
     protected markdownService: MarkdownService,
     protected viewport: ViewportScroller,
-    protected http: HttpClient,
+    protected http: HttpClient
   ) {
-    
-
     this.anchors = new AnchorJS({
-      icon: '#',
-      placement: 'left',
-      class: 'tw-text-apicuron-purple'
+      icon: "#",
+      placement: "left",
+      class: "tw-text-apicuron-purple",
     });
+
     this.markdownPath$ = this.route.url.pipe(
-      // tap(console.log),
       map((segments: Array<UrlSegment>) => {
         if (segments.length == 0) {
           return "index";
@@ -64,19 +75,15 @@ export class DocumentationComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.markdownPath$.pipe(
-      take(1),
-      switchMap((path: string) => {
-        return this.http.get(path)
-      }),
-      tap(console.log)
-    ).subscribe(() => {})
-
-    // this.toc$ = this.markdownPath$.pipe(
-    //   switchMap(() => {
-
-    //   })
-    // )
+    // this.markdownContent$ = this.markdownPath$
+    //   .pipe(
+    //     take(1),
+    //     switchMap((path: string) => {
+    //       return this.http.get(path);
+    //     }),
+    //     tap(console.log)
+    //   )
+      // .subscribe(() => {});
   }
   ngOnDestroy(): void {
     this.destroy$.next(true);

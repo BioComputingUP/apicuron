@@ -1,142 +1,48 @@
-# Documentation
+<h1 style="text-align:center;">APICURON Documentation</h1>
 
-### Welcome  👋
+## Introduction
 
-The **APICURON  main documentation**, this section will contain all the necessary steps to integrate your **Curation Resource** with **APICURON**.
+APICURON is a Webserver that can allow you to recognize contributions to your resource which can be a Database, Registry or a Respository any identifiable using URI can be a Resource.
 
-### Integration process
+Current APICURON implementation is geared towards scientific resources and offers representations and tools that can help you integrate easily like ORCID (opens new window)to identify curators and reward them.
 
-In the process of integrating APICURON into your system you will go through the following Steps.
+<!-- a good starting point to integrate your Resource is visiting the [Getting Started Page](/main/) -->
 
-1. Create an account on APICURON by [logging-in](/api/auth/orcid) 
-2. while logged-in, define your **Resource** by filling the following *[form](/databases/create)*
-3. Your submission will then go through an *approval process*
-4. After your Approval we will link your APICURON Account with the Created **Resource**
-5. Then you will Have access to all the *features* APICURON has to offer.
+A brief explanation of [How APICURON works](/docs#how-apicuron-works) can be found below
 
+## Concept
 
-### Defining your Resource
-
-This is the first Part of the integration process. and it consists of filling this *[form](/databases/create)*
-
-A resource is defined by the following fields:
- - *resource id*: the string identifier that uniquely identifies a resource
- - *resource name*: the Name of the resource that is used when displaying the resource
- - *resource long name*: A more descriptive name of the resource
- - *resource URI*: the Unified Resource identifier of tha resource
- - *resource URL*: the link that leads to the resource
- - *resource Description*: A description of the Resource
- - *resource Logo*: An image of the Resource Logo (svg, png and jpeg formats are accepted)
+Biocuration plays an essential role in making research data available to the scientific community and shareable, therefore increasing their intrinsic value. However, the contribution and effort of **biocurators** are extremely difficult to quantify and to acknowledge. This is relevant not only in the case of hired-curators but especially in the case of databases relying on community curation. **APICURON** provides partner biological databases with an automatic tracking system of the biocuration activities, allowing them to acknowledge and recognize the work of their **biocurators**. **APICURON** is based on the key concept of <u>**gamification**</u>, therefore relying on a system of *badges* and *scores* that are used to recognize the work of **biocurators** and at the same time encourage and motivate them.
 
 
-There are some **Caveats** to consider:
- - The *Resource_id* that you choose is not public but should be semantically relevant as it will be part of the endpoints you're going to use
- - You can upload either a png, jpeg or svg Logo. We recommend SVG as it is usually smaller in size and can offer a transparent background that makes the UI cleaner
- - The Resource Long Name is usually the full name of the resource that describes the resource slightly better than the Name but less extensively than the Description.
+## How APICURON works
+
+**APICURON** serves as an external tracker of biocuration activities of each one of its partner resource, playing a crucial role not only in well-known and established databases but also in smaller, newer manually curated resources and, behind a firewall, also for non-academic institutions and research companies where biocuration is required with the aim of properly crediting the work of **biocurators**, raising awareness to the crucial role played by biocuration in scientific research and promoting good practices.
+
+Registered resources (Member databases) submit biocuration events to the **APICURON** web server. **APICURON** stores biocuration activities and calculates achievements (*medals*, *badges*) and leaderboards on the fly. Results are served through a public API. **APICURON** can be cross-referenced by **ORCID**. Third-party databases can use **APICURON** to monitor **biocurators** work and human users can visit the **APICURON** website to see **biocurators** achievements and ranking.
+
+![How APICURON works](/assets/apicuron%20workflow_transparent.png)
+
+## Biocuration Activities
+
+The description of a curation event in **APICURON** is provided by four key components: **entity**, **activity**, **agent** and **timestamp**. These key elements fulfill the recommendations of [Thessen et al](https://doi.org/10.5334/dsj-2019-054). In Addition APICURON implements a scoring system that is adjustable by curation platforms, and therefore in addition to the previously mentionned four key components APICURON adds a **score**
+
+- **Entity**: it corresponds to the curated data object, which is identified by using the identifiers.org resolving system.
+- **Activity**: this is the actual curation activity, such as *“entry_creation”* or *“evidence_update”*. Although different databases can define different activities, those need to be mapped to term is a <u>W3C</u> recommendation that provides a way to define the life cycle of an object. terms are: **generation**, **revision** and **invalidation**.
+- **Agent**: the biocurator that has performed the biocuration activity. In **APICURON**, biocurators are identified by their **ORCID**, allowing them to make their contributions citable.
+- **Timestamp**: it provides the information, i.e. the date and time of the day, of when a biocuration activity was performed. Each curation report is accessible by users via API.
+- **Score**: it associates a numercial value to an activity reflecting the value of the activity in relation to other activities defined by the same curation platform
+
+A list of the entity and activity terms for each one of our partner databases is available.
+
+## Become a member
+
+We welcome all manually curated resources or biocuration organizations, especially those relying on community curation, to become **APICURON partners**. **Becoming an APICURON partner is free of charge**. Each registered resource can directly submit data through the [APICURON API](http://dev.apicuron.org/api/) after receiving credentials. We provide support for the definition of the biocuration activities, associated scores, badges and medals. We encourage the submission through the API but we are still open to include small or brand new resources that do not have enough resources to implement a web server able to push data. In that case APICURON developers will take care of collecting (pulling) curation activities manually directly from the connecting resource.
+
+To become an APICURON member database you can follow integration steps [here](integration) if you face any issues you can join the [APICURON Slack](https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w) and contact us by email at [apicuron@ngp-net.bio.unipd.it](apicuron@ngp-net.bio.unipd.it)
 
 
-<img alt="Resource Definition" src="/assets/docs/images/screenshot_databses_create.png" class="tw-mx-auto">
 
-
-## Defining your Terms
-
-Terms Are what you consider the atomic aspect of contribution for your resource, A term is defined by the following fields:
- - *Activity term*: The string identifier that uniquely identifiers a term in a resource
- - *Activity name*: The clean name of the Term that is displayed
- - *Activity Category*: The category in which the term falls among these three categories:
-   - Generation
-   - Invalidation
-   - Revision
- - *Score*: the numerical value describing how the resource estimates the Activity
- - *Description*: A short text describing the in and outs of the Term
-
-<img src="/assets/docs/images/screenshot_term_fields.png" class="tw-mx-auto">
-<!-- ![Term Fields]() -->
-
-
-## Submitting Curation Data (Reports)
-
-There are two major ways to submit curation data (aka, reports) in APICURON, in real-time or in bulk.
-
-### Real Time Submission
-
-Real time submission can be tested on the UI Dashboard, using the following UI.
-
-A single report contains the following fields:
- - *Activity term*: the activity term related to the reported curation effort
- - *Curator ORCID*: the orcid of the curator that made the effort
- - *Entity URI*: a URI that links to the page showcasing Entity that the Curator contributed to
- - *Timestamp*: the time and date of the effort submission to the resource
-
-<img alt="Single Submission" src="/assets/docs/images/screenshot_single_submission.png" class="tw-mx-auto">
-
-
-### Bulk Submission
-
-The bulk submission is a way for resources to submit their curation data in bulk\
-Instead of sending multiple requests the resource can send a large JSON file that contains many curation reports at once\
-In JSON format, a single submission report contains these fields:
-
-```json
-{
-  "activity_term": "region_first_generation",
-  "resource_id": "disprot",
-  "timestamp": "2016-08-11T09:59:17.000Z",
-  "curator_orcid": "0000-0002-0341-4888",
-  "entity_uri": "https://identifiers.org/disprot:DP00034"
-}
-
-```
-
-The JSON file to be uploaded when doing a bulk upload follows the structure specified underneath
-
-```json
-{
-  ...
-  "reports": [
-    {
-      "activity_term": "region_first_generation",
-      "resource_id": "disprot",
-      "timestamp": "2016-08-11T09:59:17.000Z",
-      "curator_orcid": "0000-0002-0341-4888",
-      "entity_uri": "https://identifiers.org/disprot:DP00034"
-    }
-    ...
-  ]
-}
-
-```
-Where the *reports* array contains a list of reports.\
-An additional feature is to specify **global fields**
-
-<img alt="Bulk Submission" src="/assets/docs/images/screenshot_bulk_submission.png" class="tw-mx-auto">
-
-#### Global fields
-
-Global fields in Bulk submissions are fields that are placed outside of the reports array, they are meant to reduce redundancy across the file to avoid repeating them  the most common example among the report fields is the *resource_id* field.
-Instead of repeating the field across the entire array of reports you can specify it once outisde of the reports array.
-
-```json
-
-{
-  "resource_id": "disprot",
-  "reports": [
-    {
-      "activity_term": "region_first_generation",
-      "timestamp": "2016-08-11T09:59:17.000Z",
-      "curator_orcid": "0000-0002-0341-4888",
-      "entity_uri": "https://identifiers.org/disprot:DP00034"
-    },
-
-    {
-      "activity_term": "region_first_generation",
-      "timestamp": "2016-08-11T09:59:17.000Z",
-      "curator_orcid": "0000-0002-0341-4888",
-      "entity_uri": "https://identifiers.org/disprot:DP00034",
-      "resource_id": "another_resource" // override the global field for this specific entry 
-    }
-    
-  ]
-}
-
-```
+| <span style="font-size: 2rem">🔬</span> | <span style="font-size: 2rem">👨‍💻</span> |
+|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| The [General Guide](/main/guide/) is aimed at explaining how APICURON can benefit curators and contributos of organizations that use APICURON and elaborates on how the tool works | The [Developer Documentation](/dev/) is aimed at explaining how APICURON works for Developers and interested organizations who might be interested in integrating APICURON with their resource  |

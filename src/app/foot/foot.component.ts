@@ -1,8 +1,13 @@
 import { Component, OnInit } from "@angular/core";
 import { environment } from "../../environments/environment";
+import { CommonModule } from "@angular/common";
+import { AngularSvgIconModule } from "angular-svg-icon";
+import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-foot",
+  standalone: true,
+  imports: [CommonModule, AngularSvgIconModule, RouterModule],
   templateUrl: "./foot.component.html",
   styleUrls: ["./foot.component.scss"],
 })

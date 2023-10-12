@@ -8,8 +8,15 @@ import {
 } from "@angular/core";
 import { BehaviorSubject, Observable, Subject, fromEvent } from "rxjs";
 import { AuthModule } from "../auth/auth.module";
-import { RouterModule } from "@angular/router";
-import { delay, filter, shareReplay, takeUntil } from "rxjs/operators";
+import { ActivatedRoute, RouterModule, UrlSegment } from "@angular/router";
+import {
+  delay,
+  filter,
+  shareReplay,
+  switchMap,
+  takeUntil,
+  tap,
+} from "rxjs/operators";
 import { AuthDropdownComponent } from "src/app/components/auth-dropdown/auth-dropdown.component";
 import { AngularSvgIconModule } from "angular-svg-icon";
 @Component({
@@ -34,7 +41,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   destroy$ = new Subject<Boolean>();
 
-  constructor() {
+  constructor(protected route: ActivatedRoute) {
     this.isCollapsed$ = this.isCollapsed.asObservable();
   }
 
@@ -46,7 +53,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
     // );
 
     fromEvent(window, "scroll")
-      .pipe(delay(200), shareReplay(1), takeUntil(this.destroy$))
+      .pipe(
+        filter(() => {
+          const routeData = this.route.data as BehaviorSubject<any>;
+          return !routeData.value['disableGrowingNav']
+        }),
+        delay(200),
+        shareReplay(1),
+        takeUntil(this.destroy$)
+      )
       .subscribe(() => {
         this.isCollapsed.next(document.documentElement.scrollTop <= 40);
       });
