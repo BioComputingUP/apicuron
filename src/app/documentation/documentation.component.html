@@ -29,11 +29,11 @@
   }
 </style>
 
-<div class="tw-flex tw-justify-start tw-flex-row sm:tw-flex-nowrap tw-items-stretch tw-h-screen">
+<div class="tw-flex tw-justify-start tw-flex-row sm:tw-flex-nowrap tw-items-stretch">
   <!-- sidebar -->
   <aside
-    class="tw-w-80 tw-bg-white tw-border-r tw-border-slate-300 tw-pt-6 tw-pl-2 sm:tw-pl-8 tw-h-full">
-    <div class="">
+    class="tw-w-80   ">
+    <div class="tw-fixed tw-top-16 tw-pt-6 tw-px-2 sm:tw-pl-8 tw-bg-white tw-border-r tw-border-slate-300 tw-h-full">
       <markdown [ngClass]="{'tw-hidden': !display_toc}" src="assets/docs/table_of_contents.md"
         class="tw-w-full sm:tw-block tw-prose tw-prose-sm tw-prose-slate prose-headings:tw-text-base prose-headings:tw-text-slant-800 prose-headings:tw-font-bold prose-ul:tw-list-none prose-a:tw-pb-2 prose-a:tw-pt-1 prose-a:tw-m-0 prose-a:tw-pl-2 prose-a:tw-no-underline prose-a:tw-border-gray-200 hover:prose-a:tw-border-slant-700 prose-a:tw-text-gray-700 hover:prose-a:tw-text-slant-700">
       </markdown>
@@ -42,7 +42,7 @@
 
   </aside>
   <!-- main page -->
-  <main class="tw-block tw-pb-2 tw-flex-grow tw-overflow-y-auto">
+  <main class="tw-block tw-pb-2 tw-flex-grow">
 
     <!-- page content -->
     <div class="tw-max-w-screen-lg tw-mx-auto tw-my-0 tw-py-8 tw-px-10" *ngIf="markdownPath$ | async as markdownPath">
