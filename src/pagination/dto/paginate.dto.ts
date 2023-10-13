@@ -19,28 +19,33 @@ export class PaginateDto {
 	skip = 0;
 
 	@Max(100)
-	@Min(1)
+	@Min(-1)
 	@IsInt()
 	@IsOptional()
 	@Transform(({ value }) => parseInt(value))
 	limit = 10;
 
 	getMongoQueryOptions<T>(): QueryOptions<T> {
-		return {
-			limit: this.limit,
-			skip: this.skip,
-		};
+		if (this.limit < 0) {
+			return {
+				skip: this.skip,
+			};
+		} else {
+			return {
+				limit: this.limit,
+				skip: this.skip,
+			};
+		}
 	}
 
 	getMongoAggregation(): PaginationAggregation {
-		return [
-			{
-				$skip: this.skip,
-			},
-			{
+		const agg: PaginationAggregation = [{ $skip: this.skip }];
+		if (this.limit > 0) {
+			agg.push({
 				$limit: this.limit,
-			},
-		];
+			});
+		}
+		return agg;
 	}
 
 	omitPagination(): Omit<this, 'skip' | 'limit'> {

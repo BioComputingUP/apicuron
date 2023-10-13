@@ -92,6 +92,7 @@ export class ReportsController {
 
 	@Get()
 	async get_reports(@Query() reportFilter: ReportFilterDto, @Request() req) {
+		// TODO: Add resource ownership control and add it to allowed resources when querying reports
 		const reportFilterInstance: ReportFilterDto = plainToInstance(
 			ReportFilterDto,
 			reportFilter,
