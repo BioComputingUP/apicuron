@@ -121,6 +121,7 @@ export class UserOverviewPageService {
             curator_orcid: user.orcid_id,
             to: form.to || this.reportsBarChartsForm.controls.to.value, // either the value changed so we take the new one or we keep the old value;
             from: form.from || this.reportsBarChartsForm.controls.from.value, // either the value changed so we take the new one or we keep the old value;
+            limit: -1
           });
         }
       )
