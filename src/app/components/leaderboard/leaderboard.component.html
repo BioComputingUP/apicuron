@@ -1,26 +1,37 @@
-<h2>test</h2>
 <div class="tw-bg-white tw-rounded-md tw-shadow-lg tw-p-1 md:tw-p-2 tw-text-gray-700" style="font-family: system-ui;"
     *ngIf="resource$ | async as resource">
-    <h2 class="tw-font-bold tw-text-xl md:tw-text-2xl">
-        {{ resource.resource_name }} Leaderboard
-    </h2>
     <div class="tw-flex tw-flex-col tw-overflow-x-auto" *ngIf="statsWithUsers$ | async as statsWithUsers">
 
         <table class="tw-table-auto">
             <thead>
                 <tr class="tw-divide-x tw-divide-gray-200">
+                    <th>Ranking</th>
                     <th colspan="2">Curator</th>
                     <th *ngFor="let column of tableColumns">
-                        {{ getColumnProps(column).name }}
+                        <span>
+
+                            {{ getColumnProps(column).name }}
+                            <ng-container *ngIf="column == 'medals_count'">
+                                <svg-icon src="assets/medal_icon.svg"
+                                    svgClass="tw-inline tw-w-4 tw-h-4 tw-text-gray-700"></svg-icon>
+                            </ng-container>
+
+                            <ng-container *ngIf="column == 'badges_count'">
+                                <svg-icon src="assets/badge_icon.svg"
+                                    svgClass="tw-inline tw-w-4 tw-h-4 tw-text-gray-700"></svg-icon>
+                            </ng-container>
+
+                        </span>
                     </th>
 
                 </tr>
             </thead>
             <tbody class="tw-divide-y tw-divide-gray-200">
-                <tr *ngFor="let entry of statsWithUsers" class="odd:tw-bg-gray-50">
+                <tr *ngFor="let entry of statsWithUsers;let indexOfelement=index;" class="odd:tw-bg-gray-50">
+                    <td class="tw-text-center tw-font-bold">{{indexOfelement + 1}}</td>
                     <td>
-                        <div
-                            class="tw-overflow-hidden tw-w-12 tw-h-12 tw-rounded-full tw-border-2 tw-border-apicuron-bright-purple">
+                        <div class="tw-overflow-hidden tw-w-12 tw-h-12 tw-rounded-full tw-border-2 tw-border-apicuron-bright-purple"
+                            [ngStyle]="{ borderColor: resource.color}">
                             <img [src]="entry.user.generate_avatar()" class="tw-w-full" alt="">
                         </div>
                     </td>
@@ -70,13 +81,14 @@
         <div *ngIf="statsMeta$ | async as statsMeta">
             <span>
                 Total Contributors: <span
-                    class="tw-bg-apicuron-bright-purple tw-text-white tw-font-bold tw-rounded-md tw-px-1">{{ statsMeta.pagination.total }}</span>
+                    class="tw-bg-apicuron-bright-purple tw-text-white tw-font-bold tw-rounded-md tw-px-1">{{
+                    statsMeta.pagination.total }}</span>
             </span>
         </div>
         <!-- pagination -->
-        <div *ngIf="statsMeta$ | async as meta">
-            <div class="tw-inline-flex tw-justify-center tw-gap-1">
-                <button (click)="prevPage()" [disabled]="page.value == 1"
+        <div *ngIf="maxPage$ | async as maxPage">
+            <div class="tw-inline-flex tw-justify-center tw-gap-1" *ngIf="page$ | async as page">
+                <button (click)="prevPage()" [disabled]="page == 1"
                     class="tw-inline-flex tw-h-8 disabled:tw-text-gray-400 tw-w-8 tw-items-center tw-justify-center tw-rounded tw-border tw-border-gray-100 tw-bg-white tw-text-gray-900 rtl:tw-rotate-180">
                     <span class="tw-sr-only">Prev Page</span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-3 tw-w-3 tw-text-inherit" viewBox="0 0 20 20"
@@ -90,14 +102,13 @@
                 <div>
                     <label for="PaginationPage" class="tw-sr-only">Page</label>
 
-                    <input type="number" [formControl]="page"
-                        class="tw-h-8 tw-w-12 tw-rounded tw-border tw-border-gray-100 tw-bg-white tw-p-0 tw-text-center tw-text-xs tw-font-medium tw-text-gray-900 moz-appearance:tw-_textfield] webkit-inner-spin-button]:tw-m-0 webkit-inner-spin-button]:tw-appearance-none webkit-outer-spin-button]:tw-m-0 webkit-outer-spin-button]:tw-appearance-none tw-outline-none"
-                        min="1" [max]="meta.pagination.total / meta.pagination.limit">
+                    <div type="number" class="tw-text-gray-700 tw-px-2 tw-py-1 tw-rounded tw-border tw-border-gray-300">
+                        {{ page }}
+                    </div>
                 </div>
 
-                <button (click)="nextPage()"
-                    [disabled]="page.value >= meta.pagination.total / meta.pagination.limit"
-                    class="tw-inline-flex tw-h-8 tw-w-8 tw-items-center tw-justify-center tw-rounded tw-border tw-border-gray-100 tw-bg-white tw-text-gray-900 rtl:tw-rotate-180">
+                <button (click)="nextPage()" [disabled]="page >= maxPage"
+                    class="tw-inline-flex tw-h-8 disabled:tw-text-gray-400 tw-w-8 tw-items-center tw-justify-center tw-rounded tw-border tw-border-gray-100 tw-bg-white tw-text-gray-900 rtl:tw-rotate-180">
                     <span class="tw-sr-only">Next Page</span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-3 tw-w-3" viewBox="0 0 20 20"
                         fill="currentColor">
@@ -109,7 +120,8 @@
             </div>
         </div>
         <a href="https://apicuron.org">
-            <img class="tw-w-48 tw-transition-transform hover:tw-scale-110 " src="https://apicuron.org/assets/APICURON.svg" alt="">
+            <img class="tw-w-48 tw-transition-transform hover:tw-scale-110 "
+                src="https://apicuron.org/assets/APICURON.svg" alt="">
         </a>
     </div>
 </div>

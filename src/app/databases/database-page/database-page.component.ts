@@ -96,25 +96,28 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
       shareReplay()
     );
 
-    this.leaderboard$ = this.stats$.pipe(
-      switchMap(({ data }: any) => {
-        const users_stats$: Array<Observable<any>> = data.map((stat) => {
-          return this.curatorService.get_curator(stat.curator_orcid).pipe(
-            map((curator) => {
-              return { curator: new User().deserialize(curator), stats: [stat] };
-            })
-          );
-        });
-        return combineLatest(users_stats$);
-      }),
-      shareReplay()
-    );
+    // this.leaderboard$ = this.stats$.pipe(
+    //   switchMap(({ data }: any) => {
+    //     const users_stats$: Array<Observable<any>> = data.map((stat) => {
+    //       return this.curatorService.get_curator(stat.curator_orcid).pipe(
+    //         map((curator) => {
+    //           return {
+    //             curator: new User().deserialize(curator),
+    //             stats: [stat],
+    //           };
+    //         })
+    //       );
+    //     });
+    //     return combineLatest(users_stats$);
+    //   }),
+    //   shareReplay()
+    // );
 
-    this.leaderboardLoaded$ = this.leaderboard$.pipe(
-      map((leaderboard: Array<any>): Boolean => {
-        return !!leaderboard && leaderboard.length > 0;
-      })
-    );
+    // this.leaderboardLoaded$ = this.leaderboard$.pipe(
+    //   map((leaderboard: Array<any>): Boolean => {
+    //     return !!leaderboard && leaderboard.length > 0;
+    //   })
+    // );
 
     this.resource$ = this.resourceId$.pipe(
       switchMap((resource_id: string) => {
@@ -127,7 +130,7 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
     this.firstBadges$ = this.resource$.pipe(
       switchMap(({ resource_id }: Resource) => {
         return this.badgeDefService.getBadgeDefs(
-          BadgeDefFilter.create({ resource_id, limit: 6 })
+          BadgeDefFilter.create({ resource_id, limit: 8 })
         );
       })
     );
@@ -135,7 +138,7 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
     this.lastBadges$ = this.resource$.pipe(
       switchMap(({ resource_id }: Resource) => {
         return this.badgeDefService.getBadgeDefs(
-          BadgeDefFilter.create({ resource_id, skip: 6 })
+          BadgeDefFilter.create({ resource_id, skip: 8 })
         );
       }),
       shareReplay()
@@ -144,7 +147,7 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
     this.firstMedals$ = this.resource$.pipe(
       switchMap(({ resource_id }: Resource) => {
         return this.medalDefService.getMedalDefs(
-          MedalDefFilter.create({ resource_id, limit: 6 })
+          MedalDefFilter.create({ resource_id, limit: 8 })
         );
       }),
       shareReplay()
@@ -153,7 +156,7 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
     this.lastMedals$ = this.resource$.pipe(
       switchMap(({ resource_id }: Resource) => {
         return this.medalDefService.getMedalDefs(
-          MedalDefFilter.create({ resource_id, skip: 6 })
+          MedalDefFilter.create({ resource_id, skip: 8 })
         );
       }),
       shareReplay()

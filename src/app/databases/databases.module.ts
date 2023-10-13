@@ -17,6 +17,7 @@ import { ListExpandComponent } from "../components/utils/list-expand/list-expand
 import { MedalDefCardComponent } from "../components/medal-def-card/medal-def-card.component";
 import { AchievementsDefModule } from "../achievements-def/achievements-def.module";
 import { TermsModule } from "../terms/terms.module";
+import { LeaderboardComponent } from "../components/leaderboard/leaderboard.component";
 @NgModule({
   declarations: [
     DatabasesPageComponent,
@@ -39,6 +40,7 @@ import { TermsModule } from "../terms/terms.module";
     MedalDefCardComponent,
     TermsModule,
     AchievementsDefModule,
+    LeaderboardComponent
   ],
   providers:[DatabasesService],
   exports: [DatabasesPageComponent],
