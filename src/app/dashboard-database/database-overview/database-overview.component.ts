@@ -66,6 +66,7 @@ export class DatabaseOverviewComponent implements OnInit {
           from: this.reportGraphForm.get("from").value,
           to: this.reportGraphForm.get("to").value,
           groupBy: "date",
+          limit: 100
         });
       }),
     );

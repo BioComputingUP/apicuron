@@ -25,7 +25,7 @@
               "anchor-js",
               "ordinal"
             ],
-            "outputPath": "dist/apicuron-ui",
+            "outputPath": "dist/apicuron-ui/browser",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -120,16 +120,6 @@
                   "maximumWarning": "600kb"
                 }
               ]
-            },
-            "build-auth-response": {
-              "outputPath": "dist/oauth-response",
-              "index": "src/auth-confirmation/index.html",
-              "main": "src/scripts/build-auth-confirmation.ts",
-              "vendorChunk": true,
-              "extractLicenses": false,
-              "buildOptimizer": false,
-              "optimization": false,
-              "namedChunks": true
             }
           },
           "defaultConfiguration": ""
@@ -179,6 +169,91 @@
               "src/assets"
             ]
           }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist/apicuron-ui/server",
+            "main": "server.ts",
+            "tsConfig": "src/tsconfig.server.json",
+            "optimization": false,
+            "sourceMap": true,
+            "extractLicenses": false,
+            "vendorChunk": true
+          },
+          "configurations": {
+            "production": {
+              "outputHashing": "media",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "sourceMap": {
+                "scripts": true
+              },
+              "extractLicenses": true,
+              "vendorChunk": false
+            },
+            "development": {
+              "outputHashing": "media",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.dev.ts"
+                }
+              ],
+              "optimization": true,
+              "sourceMap": true,
+              "extractLicenses": true,
+              "vendorChunk": false
+            },
+            "build-auth-response": {
+              "optimization": false,
+              "extractLicenses": false,
+              "vendorChunk": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve-ssr": {
+          "builder": "@nguniversal/builders:ssr-dev-server",
+          "configurations": {
+            "development": {
+              "browserTarget": "apicuron-ui:build:development",
+              "serverTarget": "apicuron-ui:server:development"
+            },
+            "production": {
+              "browserTarget": "apicuron-ui:build:production",
+              "serverTarget": "apicuron-ui:server:production"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "prerender": {
+          "builder": "@nguniversal/builders:prerender",
+          "options": {
+            "routes": [
+              "/docs",
+              "/docs",
+              "/docs/developer-guide/index",
+              "/docs/developer-guide/integration",
+              "/docs/developer-guide/privacy"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "apicuron-ui:build:production",
+              "serverTarget": "apicuron-ui:server:production"
+            },
+            "development": {
+              "browserTarget": "apicuron-ui:build:development",
+              "serverTarget": "apicuron-ui:server:development"
+            }
+          },
+          "defaultConfiguration": "production"
         }
       }
     },
@@ -265,7 +340,6 @@
                 }
               ]
             },
-            
             "local": {
               "buildOptimizer": false,
               "optimization": false,

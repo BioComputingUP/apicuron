@@ -18,6 +18,7 @@ import { NotificationsDataModule } from "./notifications-data/notifications-data
 import { NgxPopperModule } from "ngx-popper";
 import { SentryModuleConfig } from "../config/sentry.config";
 import { BannerService } from "./main-layout/banner.service";
+import { TransferHttpCacheModule } from '@nguniversal/common';
 @NgModule({
   declarations: [
     AppComponent,
@@ -32,7 +33,8 @@ import { BannerService } from "./main-layout/banner.service";
     AuthDropdownComponent,
     ToastrModule.forRoot(),
     IndexModule,
-    BrowserModule,
+    BrowserModule.withServerTransition({ appId: 'serverApp' }),
+    // TransferHttpCacheModule,
     BrowserAnimationsModule,
     // ReactiveFormsModule,
     // FormsModule,
