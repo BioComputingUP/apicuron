@@ -29,6 +29,7 @@ export class User implements Deserializable {
     family_name?: string;
     given_name?: string;
     avatar?: string;
+    privacy: 'private' | 'public';
 
 
 

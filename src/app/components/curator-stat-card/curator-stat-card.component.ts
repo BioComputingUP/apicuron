@@ -29,11 +29,13 @@ import { CuratorMedalsDetailsComponent } from "src/app/components/curator-medals
 import { Paginated } from "src/app/interfaces/paginated";
 import { CuratorBadgesDetailsComponent } from "src/app/components/curator-badges-details/curator-badges-details.component";
 import { ResourcesService } from "../../resource/service/resources.service";
+import { RouterModule } from "@angular/router";
 @Component({
   selector: "curator-stat-card",
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     RewardCardComponent,
     ReportsModule,
     ReportCardComponent,

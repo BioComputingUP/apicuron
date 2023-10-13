@@ -64,9 +64,14 @@ export class CuratorReportsDetailsComponent implements OnInit {
   reportFilter$: BehaviorSubject<ReportFilter> =
     new BehaviorSubject<ReportFilter>(null);
 
+  page$ = new BehaviorSubject<number>(1);
+
   get currentPage() {
     const filter = this.reportFilter$.value;
-    return filter.skip / filter.limit + 1;
+    if(!filter){
+      return 1
+    }
+    return Math.floor(filter.skip / filter.limit + 1);
   }
 
   update_page(page) {

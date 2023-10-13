@@ -1,6 +1,4 @@
-import {
-  Component,
-} from "@angular/core";
+import { Component } from "@angular/core";
 import { Observable, combineLatest } from "rxjs";
 import { AuthService } from "src/app/auth/auth.service";
 import { User } from "src/app/models/User.model";
@@ -20,8 +18,6 @@ import { CuratorStatistics } from "../../models/statistics.model";
   templateUrl: "./user-overview.component.html",
   styleUrls: ["./user-overview.component.scss"],
 })
-
-
 export class UserOverviewComponent {
   user$: Observable<User>;
   chartReports$: Observable<ReportsByResourceId>;
@@ -63,5 +59,4 @@ export class UserOverviewComponent {
     this.selectedResource = this.page.selectedResource;
     this.currResourceStat$ = this.page.currResourceStat$;
   }
-
 }

@@ -26,6 +26,7 @@ import { AngularSvgIconModule } from "angular-svg-icon";
 import { Paginated } from "../../interfaces/paginated";
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { ResourceModule } from "src/app/resource/resource.module";
+import { RouterModule } from "@angular/router";
 
 const leaderboardColumns = {
   medals_count: {
@@ -71,6 +72,7 @@ export type LeaderboardQuery = {
   selector: "leaderboard",
   imports: [
     CommonModule,
+    RouterModule,
     CuratorStatisticsModule,
     ResourceModule,
     CuratorModule,

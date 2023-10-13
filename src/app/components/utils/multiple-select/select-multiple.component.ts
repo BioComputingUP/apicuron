@@ -58,6 +58,7 @@ export class SelectMultipleComponent implements ControlValueAccessor {
     // select term is a UI event listener
     selectItem(item: { text: string, value: any }) {
 
+
         const selected = this.itemIsSelected(item)
         if(selected){
             this.markAsTouched()
@@ -77,7 +78,7 @@ export class SelectMultipleComponent implements ControlValueAccessor {
     // property that holds the onChange function, can be private
     private onChange = (data) => { };
 
-    // This will will write the value to the view if the the value changes occur on the model programmatically
+    // This will write the value to the view if the the value changes occur on the model programmatically
     writeValue(obj: any): void {
         this.selectedItems = obj
     }

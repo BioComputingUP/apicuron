@@ -19,13 +19,13 @@
                                         <label class="tw-text-sm tw-font-bold tw-text-gray-700 tw-mr-1"
                                             for="from">from</label>
                                         <p-calendar p-datepicker="tw-bg-white tw-rounded tw-shadow-gray-700"
-                                            formControlName="from"
+                                            formControlName="from" dateFormat="dd/mm/yy"
                                             [maxDate]="reportsChartForm.controls.to.value"></p-calendar>
                                     </div>
                                     <div>
                                         <label class="tw-text-sm tw-font-bold tw-text-gray-700 tw-mr-1"
                                             for="to">to</label>
-                                        <p-calendar formControlName="to" [maxDate]="maxTo"
+                                        <p-calendar formControlName="to" [maxDate]="maxTo" dateFormat="dd/mm/yy"
                                             [minDate]="reportsChartForm.controls.from.value"></p-calendar>
                                     </div>
                                 </form>

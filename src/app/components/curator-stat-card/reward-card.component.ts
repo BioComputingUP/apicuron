@@ -14,7 +14,7 @@ import { AngularSvgIconModule } from "angular-svg-icon";
         <svg-icon
           class="sm:tw-order-last"
           [src]="icon_src"
-          svgClass="tw-w-8 tw-h-12 sm:tw-w-12 sm:tw-h-12"
+          svgClass="tw-w-8 tw-h-12 sm:tw-w-10 sm:tw-h-10 sm:tw-ml-2"
           [svgStyle]="{ color: color }"
         ></svg-icon>
         <span class="tw-text-base sm:tw-text-xl tw-font-bold tw-pl-1" [ngStyle]="{ color: color }">{{

@@ -1,8 +1,8 @@
 import { CommonModule } from "@angular/common";
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from "@angular/core";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
-import { BehaviorSubject, Observable } from "rxjs";
-import { filter, map, startWith, switchMap } from "rxjs/operators";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { filter, map, startWith, switchMap, takeUntil } from "rxjs/operators";
 import { SelectMultipleComponent } from "src/app/components/utils/multiple-select/select-multiple.component";
 import { User } from "src/app/models/User.model";
 import { Resource } from "src/app/models/resource.model";
@@ -22,7 +22,7 @@ export class ReportFilterFormComponent implements OnInit, OnDestroy {
 
     @Input() resource: Resource;
     @Input() curator: User;
-    formValueSubscription;
+    destroy$ = new Subject<boolean>();
 
     constructor(protected formBuilder: FormBuilder) {
         this.form = this.formBuilder.group({})
@@ -30,7 +30,7 @@ export class ReportFilterFormComponent implements OnInit, OnDestroy {
 
 
     ngOnDestroy(): void {
-        this.formValueSubscription.unsubscribe()
+        this.destroy$.next(true);
     }
 
 
@@ -44,20 +44,21 @@ export class ReportFilterFormComponent implements OnInit, OnDestroy {
             from: [null],
             to: [new Date()],
             sortBy: ['timestamp', Validators.pattern(/^(timestamp|activity_term)$/)],
-            sortOrder: [-1, Validators.pattern(/^(1|0)$/)],
+            sortOrder: [-1, Validators.pattern(/^(1|-1)$/)],
             activity_terms: [[]],
             limit: [20],
             skip: [1]
         })
 
         
-        this.formValueSubscription = this.form.valueChanges.pipe(
+        this.form.valueChanges.pipe(
             // but it will always start with this.form
             startWith(this.form),
             // and later switch to the form Observable
             switchMap(() => this.form$),
             filter((form: FormGroup) => form.valid),
-            map((form: FormGroup) => ReportFilter.create(form.value))
+            map((form: FormGroup) => ReportFilter.create(form.value)),
+            takeUntil(this.destroy$)
         ).subscribe((reportFilter: ReportFilter) => {
             this.reportFilter.emit(reportFilter)
         })

@@ -5,8 +5,8 @@
     <!-- top Title bar -->
     <div class="tw-flex tw-flex-row tw-w-full tw-flex-wrap sm:tw-flex-nowrap tw-items-center tw-justify-between">
       <div class="tw-flex tw-flex-col tw-items-start sm:tw-w-1/4">
-        <a class="tw-font-bold tw-text-lg sm:tw-text-xl tw-font-dm-sans sm:tw-pr-2"
-          [routerLink]="['databases', resource.color]" [ngStyle]="{ color: resource.color }">{{
+        <a class="tw-font-bold tw-text-lg sm:tw-text-xl tw-font-dm-sans sm:tw-pr-2 hover:tw-underline"
+          [routerLink]="['/databases', resource.resource_id]" [ngStyle]="{ color: resource.color }">{{
           resource.resource_name }}</a>
         <span
           class="tw-block tw-text-gray-500 tw-font-bold tw-font-dm-sans tw-text-xs sm:tw-text-sm tw-ml-1 sm:tw-ml-0 tw-align-middle">{{
