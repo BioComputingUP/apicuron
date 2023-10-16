@@ -1,7 +1,70 @@
+<div class="tw-flex tw-flex-col tw-p-2 sm:tw-p-4">
+    <h2 class="tw-text-2xl tw-text-gray-800 tw-font-bold">Edit Profile</h2>
+    <form class="tw-flex tw-w-full tw-flex-row tw-flex-wrap" [formGroup]="form" (submit)="submitForm()">
+        <div class="tw-w-full tw-pb-2 sm:tw-pb-4 form-control-element">
+            <label for="email">Email Address:</label>
+            <input type="email" name="" id="" class="tw-bg-white tw-rounded tw-border-gray-500" formControlName="email">
+            <small class="tw-text-sm tw-text-red-500 tw-font-thin" *ngIf="email.errors?.['email'] && (email.dirty || email.touched)">Please enter a valid email address.</small>
+        </div>
+        <div class="tw-w-full tw-pb-2 sm:tw-pb-4 tw-mr-auto">
+            <label for="privacy">Privacy Setting:</label>
 
-<div class="tw-flex tw-flex-row tw-flex-wrap">
-    <!-- TODO: Implement -->
-    <div class="tw-block">
-        <img src="" alt="">
-    </div>
+            <fieldset class="tw-grid tw-grid-cols-2 tw-gap-4 tw-items-stretch">
+
+                <div class="tw-inline">
+                    <input type="radio" name="privacy" value="private" id="private" class="peer/private tw-hidden"
+                        formControlName="privacy" />
+
+                    <label for="private" (click)="selectRadio('private')"
+                        class="tw-block tw-cursor-pointer tw-h-full tw-rounded-lg tw-border-2 tw-border-gray-100 tw-bg-white tw-p-4 tw-text-sm tw-font-medium tw-shadow-sm hover:tw-border-gray-200"
+                        [ngClass]="{'tw-border-2 tw-border-apicuron-bright-purple hover:tw-border-apicuron-bright-purple': privacy == 'private', 'tw-border-gray-100': privacy != 'private'}">
+                        <div class="tw-flex tw-items-center tw-justify-between">
+                            <p class="tw-text-gray-700">Private
+
+
+                            </p>
+                            <svg class="tw-h-5 tw-w-5 tw-text-apicuron-bright-purple" [ngClass]="{'tw-hidden': privacy != 'private'}"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+
+                        <p class="tw-mt-1 tw-text-sm tw-text-gray-600 tw-text-justify">Make your personal data private on APICURON and
+                            only accessible/visible by you</p>
+                    </label>
+                </div>
+
+                <div>
+                    <input type="radio" name="privacy" value="public" id="public" class="peer/public tw-hidden"
+                        formControlName="privacy" />
+
+                    <label for="Public" (click)="selectRadio('public')"
+                        class="tw-block tw-cursor-pointer tw-h-full tw-rounded-lg tw-border-2  tw-bg-white tw-p-4 tw-text-sm tw-font-medium tw-shadow-sm hover:tw-border-gray-200"
+                        [ngClass]="{'tw-border-2 tw-border-apicuron-bright-purple hover:tw-border-apicuron-bright-purple': privacy == 'public', 'tw-border-gray-100': privacy != 'public'}">
+                        <div class="tw-flex tw-items-center tw-justify-between">
+                            <p class="tw-text-gray-700">Public
+
+
+                            </p>
+                            <svg class="tw-h-5 tw-w-5 tw-text-apicuron-bright-purple" [ngClass]="{'tw-hidden': privacy != 'public'}"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+
+                        <p class="tw-mt-1 tw-text-sm tw-text-gray-600 tw-text-justify">Make your personal data public on APICURON and
+                            publicly accessible/visible by everyone</p>
+                    </label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="tw-flex tw-w-full tw-flex-row tw-justify-center tw-py-2">
+            <input type="submit" value="submit" class="tw-cursor-pointer tw-p-2 tw-mx-1 tw-bg-apicuron-bright-purple tw-shadow-lg tw-text-white tw-capitalize">
+        </div>
+    </form>
 </div>

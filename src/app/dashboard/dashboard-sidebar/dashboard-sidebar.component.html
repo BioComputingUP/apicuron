@@ -13,14 +13,15 @@
                     class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item list-item-colors">
                     General
                 </a>
+                
 
-                <!-- <a [routerLink]="['/dashboard', 'profile']"
+                <a [routerLink]="['/dashboard', 'profile']"
                     routerLinkActive="list-item-active"
                     [routerLinkActiveOptions]="{ exact: true }"
 
                     class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item list-item-colors">
                     Edit Profile
-                </a> -->
+                </a>
             </li>
 
             <ng-container *ngIf="links$ | async as resourcesLinks">

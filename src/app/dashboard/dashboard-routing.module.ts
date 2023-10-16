@@ -4,6 +4,7 @@ import { AuthGuard } from "../auth/auth.guard";
 import { AuthModule } from "../auth/auth.module";
 import { UserDashboardComponent } from "./user-dashboard/user-dashboard.component";
 import { UserOverviewComponent } from "src/app/dashboard/user-overview/user-overview.component";
+import { ProfileUpdateComponent } from "./profile-update/profile-update.component";
 // import { ProfileUpdateComponent } from './profile-update/profile-update.component';
 
 const routes: Routes = [
@@ -13,8 +14,7 @@ const routes: Routes = [
     component: UserDashboardComponent,
     children: [
       { path: "", component: UserOverviewComponent, title: 'Dashboard Overview' },
-      // TODO: Implement
-      // { path: 'profile', component: ProfileUpdateComponent }
+      { path: 'profile', component: ProfileUpdateComponent }
     ],
   },
   {
