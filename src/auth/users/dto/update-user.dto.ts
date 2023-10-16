@@ -1,32 +1,65 @@
-import { IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+	IsEmail,
+	IsIn,
+	IsNotEmpty,
+	IsOptional,
+	IsString,
+	Validate,
+} from 'class-validator';
+import { User } from '../../../core/schemas/user.schema';
+import { OrcidChecksum } from '../../../reports/validators/orcid-checksum';
+import { EntryExistsRule } from '../../../shared/validators/entry-exists.validator';
 export class UpdateUserDto {
-  @IsOptional()
-  @IsEmail()
-  gmail?: string;
+	@IsOptional()
+	@IsEmail()
+	gmail?: string;
 
-  @IsNotEmpty()
-  orcid_id: string;
+	@IsNotEmpty()
+	orcid_id: string;
 
-  biography?: string;
+	biography?: string;
 
-  displayedName: string;
+	displayedName: string;
 
-  @IsOptional()
-  @IsEmail()
-  email?: string;
+	@IsOptional()
+	@IsEmail()
+	email?: string;
 
-  @IsOptional()
-  employment?: string;
+	@IsOptional()
+	employment?: string;
 
-  family_name?: string;
-  given_name?: string;
+	family_name?: string;
+	given_name?: string;
 
-  full_name: string;
+	full_name: string;
 
-  institution?: string;
+	institution?: string;
 
-  keywords?: string;
+	keywords?: string;
 
-  username?: string;
-  
+	username?: string;
+}
+
+export class UpdateProfileDto {
+	@Validate(EntryExistsRule, [
+		User.name,
+		({ orcid_id }) => {
+			return {
+				orcid_id,
+			};
+		},
+	])
+	@Validate(OrcidChecksum)
+	@IsNotEmpty()
+	orcid_id: string;
+
+	@IsEmail()
+	@IsString()
+	@IsOptional()
+	email: string;
+
+	@IsIn(['private', 'public'])
+	@IsString()
+	@IsOptional()
+	privacy: 'private' | 'public';
 }

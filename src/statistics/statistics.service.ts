@@ -12,6 +12,8 @@ import { GetStatisticsDto } from './dto/get-statistics.dto';
 import { paginate } from '../pagination/paginator';
 import { PaginateDto } from '../pagination/dto/paginate.dto';
 import { ReportDocument } from '../core/schemas/reports.schema';
+import { OnEvent } from '@nestjs/event-emitter';
+import { UPDATE_USER_STAT_PRIVACY } from './constants';
 
 @Injectable()
 export class StatisticsService {
@@ -36,6 +38,26 @@ export class StatisticsService {
 		}
 	}
 
+	@OnEvent(UPDATE_USER_STAT_PRIVACY, { async: true })
+	async setUserStatsPrivacy({
+		orcid_id,
+		privacy,
+	}: {
+		orcid_id: string;
+		privacy: 'public' | 'private';
+	}) {
+		return await this.statisticsModel.updateMany(
+			{
+				curator_orcid: orcid_id,
+			},
+			{
+				$set: {
+					privacy,
+				},
+			},
+		);
+	}
+
 	async get_public_user_statistics(curator_orcid: string) {
 		if (await this.userModel.exists({ orcid_id: curator_orcid })) {
 			return await this.statisticsModel.find({
@@ -50,15 +72,22 @@ export class StatisticsService {
 	async get_all_user_statistics(
 		curator_orcid: string,
 		resource_ids: string[] = [],
+		privacy: any = 'public',
 	) {
-		return await this.statisticsModel.find({
+		const query = {
 			curator_orcid,
-			privacy: 'public',
-			resource_id: { $in: resource_ids },
-		});
+			privacy,
+		};
+		if (resource_ids) {
+			query['resource_id'] = { $in: resource_ids };
+		}
+		return await this.statisticsModel.find(query);
 	}
 
-	async get_all_statistics(getStatDto: GetStatisticsDto) {
+	async get_all_statistics(
+		getStatDto: GetStatisticsDto,
+		privacy: 'public' | 'private' = 'public',
+	) {
 		const {
 			resources: resource_ids,
 			query: passed_query,
@@ -103,6 +132,10 @@ export class StatisticsService {
 			}
 		}
 
+		if (privacy == 'public') {
+			query['privacy'] = 'public';
+		}
+
 		const userStatsAggregation = [
 			{
 				// remove fields we don't need
@@ -110,6 +143,9 @@ export class StatisticsService {
 					role: 0,
 					__v: 0,
 					last_update: 0,
+					orcid_permission: 0,
+					refresh_token: 0,
+					orcid_work_put_codes: 0,
 				},
 			},
 			{

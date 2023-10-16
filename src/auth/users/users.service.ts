@@ -14,19 +14,16 @@ export class UsersService {
 		protected configService: ConfigService,
 	) {}
 
-	public async user_exists(orcid_id: string): Promise<Boolean> {
+	public async user_exists(orcid_id: string): Promise<boolean> {
 		return !!(await this.userModel.exists({
 			orcid_id,
 		}));
 	}
 
 	async getPrivateUser(query: Partial<User>): Promise<User> {
-		const user_promise = this.userModel.findOne(
-			query,
-			{
-				stats: 0,
-			},
-		);
+		const user_promise = this.userModel.findOne(query, {
+			stats: 0,
+		});
 
 		return await user_promise;
 	}
@@ -39,7 +36,24 @@ export class UsersService {
 			{
 				stats: 0,
 				orcid_permission: 0,
-				refresh_token: 0
+				refresh_token: 0,
+				orcid_work_put_codes: 0,
+			},
+		);
+
+		return await user_promise;
+	}
+
+	async getPublicUser(orcid_id: string) {
+		const user_promise = this.userModel.findOne(
+			{
+				orcid_id,
+				privacy: 'public',
+			},
+			{
+				stats: 0,
+				orcid_permission: 0,
+				refresh_token: 0,
 			},
 		);
 

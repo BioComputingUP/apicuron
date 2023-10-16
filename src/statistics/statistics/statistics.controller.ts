@@ -7,6 +7,8 @@ import {
 	Res,
 	Req,
 	UseInterceptors,
+	UseGuards,
+	NotFoundException,
 } from '@nestjs/common';
 import { AchievementsService } from '../../achievements/achievements.service';
 import { ParseUnsignedIntPipe } from '../../shared/pipes/unsigned-int-validation.pipe';
@@ -27,6 +29,8 @@ import { Response } from 'express';
 import { plainToInstance } from 'class-transformer';
 // import { paginate } from '../../pagination/paginator';
 import { PaginateDto } from '../../pagination/dto/paginate.dto';
+import { Public } from '../../auth/decorators/public.decorator';
+import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
 
 @ApiTags('Statistics')
 @ApiHeader(VersionHeader)
@@ -72,24 +76,41 @@ export class StatisticsController {
 		summary:
 			'get a single user statistics for all the Partner Resources they are concerned by',
 	})
+	@UseGuards(LocalAuthGuard)
+	@Public()
 	@Get('user/:orcid_id')
 	async get_user_statistics(@Param('orcid_id') orcid_id: string, @Req() req) {
 		const exists = await this.userService.user_exists(orcid_id);
-		if (exists) {
+		// if the user doesn't exist we reply with 404
+		if (!exists) {
+			throw new NotFoundException(`User with orcid id:${orcid_id} not found `);
+		}
+		// if the user is a public user, we return public stats
+		if (!req.user) {
 			return await this.statService.get_public_user_statistics(orcid_id);
-		} else {
-			if (!req.user) {
-				return await this.statService.get_public_user_statistics(orcid_id);
-			}
+		}
+		// if the user is the owner of the stats, we return all statistics, private or public
+		if (req.user.orcid_id == orcid_id) {
+			return await this.statService.get_all_user_statistics(orcid_id, null, {
+				$in: ['private', 'public'],
+			});
+		}
 
+		// if the user manages some resources, he gets all the data related to those resources (private or public)
+		if (req.user.resources) {
 			const resource_ids = (req.user.resources || []).map(
 				(res) => res.resource_id,
 			);
 			return await this.statService.get_all_user_statistics(
 				orcid_id,
 				resource_ids,
+				{
+					$in: ['private', 'public'],
+				},
 			);
 		}
+		// if none of these cases above apply, we return public statistics normally
+		return await this.statService.get_public_user_statistics(orcid_id);
 	}
 
 	@ApiOperation({
@@ -99,10 +120,15 @@ export class StatisticsController {
 		description:
 			'List of aggregated user statistics regarding each Partner Resource they contributed in',
 	})
+	@UseGuards(LocalAuthGuard)
+	@Public()
 	@Get()
-	async findAll(@Query() query: GetStatisticsDto) {
+	async findAll(@Query() query: GetStatisticsDto, @Req() req) {
 		const getStatDtoInstance = plainToInstance(GetStatisticsDto, query);
-		return await this.statService.get_all_statistics(getStatDtoInstance);
+		return await this.statService.get_all_statistics(
+			getStatDtoInstance,
+			'public',
+		);
 	}
 }
 

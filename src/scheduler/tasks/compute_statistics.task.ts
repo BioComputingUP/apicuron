@@ -15,15 +15,11 @@ import { BadgeDocument } from '../../core/schemas/badges.schema';
 import { MedalDocument } from '../../core/schemas/medals.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
 import { OnEvent } from '@nestjs/event-emitter';
-import {
-	Resource,
-	PartnerResourceDocument,
-} from 'src/core/schemas/resource.schema';
+import { PartnerResourceDocument } from 'src/core/schemas/resource.schema';
 import {
 	COMPUTE_CURATOR_STATISTICS_TASK,
 	COMPUTE_RESOURCE_STATISTICS_TASK,
 } from '../contants';
-import { User } from '@sentry/node';
 
 @Injectable()
 export class ComputeStatisticsTask {
@@ -150,9 +146,7 @@ export class ComputeStatisticsTask {
 					resource_id,
 					curator_orcid,
 				}),
-				privacy: (await this.userModel.exists({ curator_orcid }))
-					? 'public'
-					: 'private',
+				privacy: (await this.userModel.findOne({ curator_orcid })).privacy,
 				// type: 'contribution'
 			};
 
@@ -273,9 +267,7 @@ export class ComputeStatisticsTask {
 			curator_orcid: orcid_id,
 			medals_count: 0,
 			badges_count: 0,
-			privacy: (await this.userModel.exists({ orcid_id }))
-				? 'public'
-				: 'private',
+			privacy: (await this.userModel.findOne({ orcid_id })).privacy,
 		};
 
 		for await (const report of user_reports) {

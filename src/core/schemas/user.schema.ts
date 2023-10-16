@@ -11,7 +11,7 @@ export interface UserResource {
 
 export interface UserResourcePutCode {
 	resource_id: string;
-	putCode: string
+	putCode: string;
 }
 
 @Schema({
@@ -22,7 +22,7 @@ export interface UserResourcePutCode {
 	// methods: {
 	// 	hasResourcePutCode: function (resource_id: string): Boolean {
 	// 		return this.orcid_work_put_codes.findIndex((item) => item.resource_id == resource_id) != -1;
-	// 	},	
+	// 	},
 	// 	getResourcePutCode: function (resource_id: string): string {
 	// 		return this.orcid_work_put_codes.find((item) => item.resource_id == resource_id).putCode;
 	// 	}
@@ -51,7 +51,7 @@ export class User {
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop({
 		required: false,
-		type: SchemaTypes.String
+		type: SchemaTypes.String,
 	})
 	employment?: string;
 
@@ -68,7 +68,7 @@ export class User {
 	gmail?: string;
 
 	@Prop({
-		required: false
+		required: false,
 	})
 	institution?: string;
 
@@ -100,12 +100,12 @@ export class User {
 	orcid_permission: string;
 
 	@Prop({
-		required: false
+		required: false,
 	})
 	orcid_scope?: string;
 
 	@Prop({
-		required: false
+		required: false,
 	})
 	orcid_work_put_codes: UserResourcePutCode[] = [];
 
@@ -126,9 +126,16 @@ export class User {
 	@Prop({ required: true })
 	avatar: string;
 
-	hasResourcePutCode: (resource_id: string)=> boolean;
-	getResourcePutCode: (resource_id: string)=> string;
+	@Prop({
+		required: true,
+		default: 'public',
+		type: String,
+		enum: ['public', 'private'],
+	})
+	privacy: 'public' | 'private';
 
+	hasResourcePutCode: (resource_id: string) => boolean;
+	getResourcePutCode: (resource_id: string) => string;
 }
 
 const UserSchema = SchemaFactory.createForClass(User);
@@ -139,17 +146,25 @@ UserSchema.virtual('reports', {
 	foreignField: 'curator_orcid',
 });
 
-UserSchema.method('hasResourcePutCode', function (resource_id: string): boolean {
-	return this.orcid_work_put_codes.findIndex((item) => item.resource_id == resource_id) != -1;
-})
+UserSchema.method(
+	'hasResourcePutCode',
+	function (resource_id: string): boolean {
+		return (
+			this.orcid_work_put_codes.findIndex(
+				(item) => item.resource_id == resource_id,
+			) != -1
+		);
+	},
+);
 
 UserSchema.method('getResourcePutCode', function (resource_id: string): string {
-	return this.orcid_work_put_codes.find((item) => item.resource_id == resource_id).putCode;
-})
+	return this.orcid_work_put_codes.find(
+		(item) => item.resource_id == resource_id,
+	).putCode;
+});
 
 // UserSchema.methods.hasResourcePutCode = function (resource_id: string): Boolean {
 // return this.orcid_work_put_codes.find((item) => item.resource_id == resource_id) != -1;
 // }
-
 
 export { UserSchema };

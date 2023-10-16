@@ -9,6 +9,7 @@ import { setupSwagger } from './swagger/setup';
 import { bootstrap as generateAllAvatars } from './scripts/generate-avatars';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import { addPrivacyField } from './scripts/add-privacy-field';
 
 async function bootstrap() {
 	// App creation
@@ -66,6 +67,8 @@ async function bootstrap() {
 	app.setViewEngine('hbs');
 
 	generateAllAvatars(app);
+
+	addPrivacyField(app);
 
 	// starting to listen to requests
 	await app.listen(port, host);

@@ -16,10 +16,11 @@ export enum FilterField {
 }
 
 export class GetStatisticsDto extends PaginateDto {
-
-	@IsEnum(FilterField,{
-        message: `filter field can only be one of these values ${Object.values(FilterField)}`
-    })
+	@IsEnum(FilterField, {
+		message: `filter field can only be one of these values ${Object.values(
+			FilterField,
+		)}`,
+	})
 	@IsOptional()
 	filter_field: FilterField;
 
@@ -30,5 +31,4 @@ export class GetStatisticsDto extends PaginateDto {
 	@IsArray()
 	@IsOptional()
 	resources: Array<string>;
-
 }

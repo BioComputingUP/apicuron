@@ -31,6 +31,7 @@ async function bootstrap() {
 
 		logger.log(`processing achievement ${achievement.name} `);
 
+		// for each term, we check if the term exists
 		const termsExist$ = list_terms.map(async (term) => {
 			const exists = await termsModel.exists({
 				resource_id,
@@ -38,16 +39,18 @@ async function bootstrap() {
 			});
 			memoize[term] = exists;
 		});
-
+		// we store the terms that exist
 		const termsExist = await Promise.all(termsExist$);
+		// we filter the terms that exist, keeping the ones that don't exist
 		const filteredTerms = list_terms.filter((val, index) => {
 			return termsExist[index];
 		});
 
-		logger.log({
-			oldTerms: achievement.list_terms,
-			newTerms: filteredTerms,
-		});
+		logger.log(
+			`Deleted ${
+				achievement.list_terms.length - filteredTerms.length
+			} terms that don't exist`,
+		);
 		achievement.list_terms = filteredTerms;
 		await achievement.save();
 	}

@@ -7,10 +7,8 @@ import {
 	Render,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AuthGuard } from '@nestjs/passport';
 import {
 	ApiExcludeEndpoint,
-	ApiHeader,
 	ApiOkResponse,
 	ApiSecurity,
 	ApiTags,
@@ -38,11 +36,13 @@ export class AuthController {
 	@ApiExcludeEndpoint()
 	@Get('orcid')
 	@UseGuards(OrcidGuard)
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	authenticate_orcid() {}
 
 	@ApiExcludeEndpoint()
 	@Get('orcid_permission')
 	@UseGuards(OrcidGuard)
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	orcid_permission() {}
 
 	@ApiExcludeEndpoint()
