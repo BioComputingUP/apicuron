@@ -11,9 +11,9 @@ import {
 	StatisticsDocument,
 } from '../../core/schemas/statistics.schema';
 import { StatisticsTerms } from '../../core/schemas/statistics-terms.schema';
-import { BadgeDocument } from '../../core/schemas/badges.schema';
-import { MedalDocument } from '../../core/schemas/medals.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
+import { Badge, BadgeDocument } from '../../core/schemas/badges.schema';
+import { Medal, MedalDocument } from '../../core/schemas/medals.schema';
+import { User, UserDocument } from '../../core/schemas/user.schema';
 import { OnEvent } from '@nestjs/event-emitter';
 import { PartnerResourceDocument } from 'src/core/schemas/resource.schema';
 import {
@@ -27,9 +27,9 @@ export class ComputeStatisticsTask {
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		@InjectModel(Statistics.name)
 		protected statModel: Model<StatisticsDocument>,
-		@InjectModel('badge') protected badgeModel: Model<BadgeDocument>,
-		@InjectModel('medal') protected medalModel: Model<MedalDocument>,
-		@InjectModel('User') protected userModel: Model<UserDocument>,
+		@InjectModel(Badge.name) protected badgeModel: Model<BadgeDocument>,
+		@InjectModel(Medal.name) protected medalModel: Model<MedalDocument>,
+		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 		protected partnerResourceService: PartnerResourcesService,
 	) {}
 

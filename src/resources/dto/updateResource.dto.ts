@@ -1,42 +1,53 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsEmpty, IsNotEmpty, IsOptional, IsString, IsUrl, Matches, Max, MaxLength, MinLength, Validate } from "class-validator";
-
+import { ApiProperty } from '@nestjs/swagger';
+import {
+	IsEmpty,
+	IsNotEmpty,
+	IsOptional,
+	IsString,
+	IsUrl,
+	Matches,
+	MaxLength,
+	Validate,
+} from 'class-validator';
+import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
+import { PartnerResource } from '../../core/schemas/resource.schema';
 
 export class UpdatePartnerResourceDto {
-
-    @IsString()
-    @IsNotEmpty()
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ resource_id }) => ({ resource_id }),
+	])
+	@IsString()
+	@IsNotEmpty()
 	resource_id: string;
 
-    @IsOptional()
-    @IsString()
-	resource_description: string;  
+	@IsString()
+	@IsOptional()
+	resource_description: string;
 
-    @IsOptional()
-    @IsString()
-    @MaxLength(60)
+	@MaxLength(60)
+	@IsString()
+	@IsOptional()
 	resource_long_name: string;
 
-
-    @IsOptional()
-    @IsString()
-    @MaxLength(20)
+	@MaxLength(20)
+	@IsString()
+	@IsOptional()
 	resource_name: string;
-    
-    @IsOptional()
-    @IsString()
-    @IsUrl()
+
+	@IsUrl()
+	@IsString()
+	@IsOptional()
 	resource_url: string;
 
-    @IsEmpty()
-    @ApiProperty({ type: 'file', format: 'jpeg/png/svg' })
-    logo: string
+	@IsEmpty()
+	@ApiProperty({ type: 'file', format: 'jpeg/png/svg' })
+	logo: string;
 
-
-    @IsString()
-    @IsOptional()
-    @Matches(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, {
-        message: 'The resource color has to be a color hexcode'
-    })
-    color: string
+	@Matches(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, {
+		message: 'The resource color has to be a color hexcode',
+	})
+	@IsString()
+	@IsOptional()
+	color: string;
 }

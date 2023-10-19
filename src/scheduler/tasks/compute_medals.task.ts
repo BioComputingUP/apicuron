@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { MedalDocument } from '../../core/schemas/medals.schema';
+import { Medal, MedalDocument } from '../../core/schemas/medals.schema';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import {
 	AchievementDef,
@@ -22,7 +22,7 @@ export class ComputeMedalsTask {
 		protected partnerResourceService: PartnerResourcesService,
 		@InjectModel(AchievementDef.name)
 		protected achievementDefModel: Model<AchievementDefDocument>,
-		@InjectModel('medal') protected medalModel: Model<MedalDocument>,
+		@InjectModel(Medal.name) protected medalModel: Model<MedalDocument>,
 		@InjectModel(Report.name) private reportModel: Model<ReportDocument>,
 	) {}
 

@@ -85,7 +85,7 @@ export class LocalAuthGuard extends AuthGuard('jwt') implements CanActivate {
 			return await jwtAuth$;
 		} catch (e) {
 			// if an error occurs (Unauthorized, silently return false but log error to console)
-			this.localAuthGuardLogger.error(e);
+			// this.localAuthGuardLogger.error(e);
 			return false;
 		}
 	}

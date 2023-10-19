@@ -27,7 +27,6 @@ import { DeleteTermDto } from './dto/deleteTerm.dto';
 import { TermFilterDto } from './dto/term.dto';
 import { UpdateTermDto } from './dto/updateTerm.dto';
 import { TermsService } from './terms.service';
-import { Paginated } from '../pagination/interfaces/paginated';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
 	COMPUTE_RESOURCE_ACHIEVEMENTS_TASK,

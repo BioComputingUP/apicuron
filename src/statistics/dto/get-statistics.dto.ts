@@ -1,12 +1,8 @@
-import { Type } from 'class-transformer';
 import {
 	IsArray,
 	IsEnum,
-	IsInt,
-	IsNumber,
 	IsOptional,
 	IsString,
-	Min,
 	ValidateIf,
 } from 'class-validator';
 import { PaginateDto } from '../../pagination/dto/paginate.dto';

@@ -28,7 +28,6 @@ import { SentryInterceptor, SentryModule } from '@ntegral/nestjs-sentry';
 import { EmailModule } from './email/email.module';
 import { CoreApicuronModule } from './core/core.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { getMetadataStorage } from 'class-validator';
 
 const logger = new Logger('AppModule');
 

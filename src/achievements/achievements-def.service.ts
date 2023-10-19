@@ -3,10 +3,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import {
-	UpdateBadgeDto,
-	CreateBadgeDto,
-	BadgeFilter,
-	DeleteBadgeDto,
+	UpdateBadgeDefDto,
+	CreateBadgeDefDto,
+	BadgeDefFilter,
+	DeleteBadgeDefDto,
 } from './dto/badge-crud.dto';
 import {
 	CreateMedalDto,
@@ -23,8 +23,6 @@ import { TERM_DELETED } from '../terms/constants';
 @Injectable()
 export class AchievementsDefService {
 	constructor(
-		// @InjectModel('badge') private badgeModel: Model<BadgeDefDocument>,
-		// @InjectModel('medal') private medalModel: Model<MedalDefDocument>,
 		@InjectModel(AchievementDef.name)
 		private achievementDefModel: Model<AchievementDefDocument>,
 		protected partnerResourceService: PartnerResourcesService,
@@ -50,7 +48,7 @@ export class AchievementsDefService {
 		return await this.achievementDefModel.find({ type: 'badge' });
 	}
 
-	async create_badge(badge: CreateBadgeDto) {
+	async create_badge(badge: CreateBadgeDefDto) {
 		const newBadge = new this.achievementDefModel({
 			...badge,
 			type: 'badge',
@@ -62,7 +60,7 @@ export class AchievementsDefService {
 		return await newBadge.save();
 	}
 
-	async get_badges(badgeFilter: BadgeFilter) {
+	async get_badges(badgeFilter: BadgeDefFilter) {
 		const filterQuery: FilterQuery<AchievementDef> = {
 			...badgeFilter.omitPagination(),
 			type: 'badge',
@@ -82,7 +80,7 @@ export class AchievementsDefService {
 		};
 	}
 
-	async update_badge(badge_update: UpdateBadgeDto) {
+	async update_badge(badge_update: UpdateBadgeDefDto) {
 		const { resource_id, name, ...updates } = badge_update;
 		await this.achievementDefModel.updateOne(
 			{
@@ -99,7 +97,7 @@ export class AchievementsDefService {
 		});
 	}
 
-	async delete_badge(delete_badge: DeleteBadgeDto) {
+	async delete_badge(delete_badge: DeleteBadgeDefDto) {
 		const delete_confirmation = await this.achievementDefModel.deleteOne({
 			...delete_badge,
 			type: 'badge',

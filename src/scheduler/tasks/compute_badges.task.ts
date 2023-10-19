@@ -25,7 +25,7 @@ export class ComputeBadgesTask {
 	constructor(
 		protected partnerResourceService: PartnerResourcesService,
 		@InjectModel(User.name) protected userModel: Model<UserDocument>,
-		@InjectModel('badge') protected badgeModel: Model<BadgeDocument>,
+		@InjectModel(Badge.name) protected badgeModel: Model<BadgeDocument>,
 		@InjectModel(AchievementDef.name)
 		private achievementDefModel: Model<AchievementDefDocument>,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,

@@ -1,33 +1,30 @@
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty } from 'class-validator';
 
 export class MedalDto {
-    
-    @IsNotEmpty()
+	@IsNotEmpty()
 	name: string;
 
-    @IsNotEmpty()
-    resource_uri: string;
+	@IsNotEmpty()
+	resource_uri: string;
 
-    @IsNotEmpty()
-    category: string;
+	@IsNotEmpty()
+	category: string;
 
-    @IsNotEmpty()
-    color: string;
+	@IsNotEmpty()
+	color: string;
 
-    @IsNotEmpty()
-    first_day: string;
+	@IsNotEmpty()
+	first_day: string;
 
-    @IsNotEmpty()
-    last_day: string;
+	@IsNotEmpty()
+	last_day: string;
 
-    @IsNotEmpty()
-    list_terms:[string];
+	@IsNotEmpty()
+	list_terms: [string];
 
-    @IsNotEmpty()
-    score_relative: number;
+	@IsNotEmpty()
+	score_relative: number;
 
-    @IsNotEmpty()
-    type: string;
-
-
+	@IsNotEmpty()
+	type: string;
 }

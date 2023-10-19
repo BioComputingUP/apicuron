@@ -3,13 +3,11 @@ import { AppModule } from './app.module';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
-import { getMetadataStorage, useContainer } from 'class-validator';
+import { useContainer } from 'class-validator';
 import { TransformInterceptor } from './shared/transformer/transform.interceptor';
 import { setupSwagger } from './swagger/setup';
-import { bootstrap as generateAllAvatars } from './scripts/generate-avatars';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
-import { addPrivacyField } from './scripts/add-privacy-field';
 
 async function bootstrap() {
 	// App creation
@@ -47,6 +45,7 @@ async function bootstrap() {
 			transform: true,
 			forbidUnknownValues: false,
 			skipMissingProperties: false,
+			whitelist: true,
 		}),
 	);
 
@@ -66,9 +65,9 @@ async function bootstrap() {
 	app.setBaseViewsDir(join(__dirname, '..', 'views'));
 	app.setViewEngine('hbs');
 
-	generateAllAvatars(app);
+	// generateAllAvatars(app);
 
-	addPrivacyField(app);
+	// addPrivacyField(app);
 
 	// starting to listen to requests
 	await app.listen(port, host);

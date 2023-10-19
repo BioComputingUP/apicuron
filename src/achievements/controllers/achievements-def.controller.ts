@@ -1,5 +1,24 @@
-import { Controller, Delete, Req, Put, ForbiddenException, Get, Param, Body, Post, Query, UseGuards, Res } from '@nestjs/common';
-import { ApiHeader, ApiOperation, ApiOkResponse, ApiTags, ApiSecurity } from '@nestjs/swagger';
+import {
+	Controller,
+	Delete,
+	Req,
+	Put,
+	ForbiddenException,
+	Get,
+	Param,
+	Body,
+	Post,
+	Query,
+	UseGuards,
+	Res,
+} from '@nestjs/common';
+import {
+	ApiHeader,
+	ApiOperation,
+	ApiOkResponse,
+	ApiTags,
+	ApiSecurity,
+} from '@nestjs/swagger';
 import { AuthService } from '../../auth/auth.service';
 import { HasAResourceGuard } from '../../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
@@ -7,11 +26,25 @@ import { paginate } from '../../pagination/paginator';
 import { AuthorizationHeader, VersionHeader } from '../../swagger/config';
 import { AchievementsDefService } from '../achievements-def.service';
 import { ResourceAchievmentsDef } from '../dto/achievement-def.dto';
-import { UpdateBadgeDto, DeleteBadgeDto, CreateBadgeDto, BadgeFilter } from '../dto/badge-crud.dto';
-import { CreateMedalDto, DeleteMedalDto, MedalsFilter, UpdateMedalDto } from '../dto/medal-crud.dto';
+import {
+	UpdateBadgeDefDto as UpdateBadgeDefDto,
+	DeleteBadgeDefDto,
+	CreateBadgeDefDto,
+	BadgeDefFilter,
+} from '../dto/badge-crud.dto';
+import {
+	CreateMedalDto,
+	DeleteMedalDto,
+	MedalsFilter,
+	UpdateMedalDto,
+} from '../dto/medal-crud.dto';
 import { Response } from 'express';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { COMPUTE_RESOURCE_BADGES_TASK, COMPUTE_RESOURCE_MEDALS_TASK, COMPUTE_RESOURCE_STATISTICS_TASK } from '../../scheduler/contants';
+import {
+	COMPUTE_RESOURCE_BADGES_TASK,
+	COMPUTE_RESOURCE_MEDALS_TASK,
+	COMPUTE_RESOURCE_STATISTICS_TASK,
+} from '../../scheduler/contants';
 
 @ApiTags('Define Achievements')
 @ApiHeader(VersionHeader)
@@ -20,28 +53,35 @@ import { COMPUTE_RESOURCE_BADGES_TASK, COMPUTE_RESOURCE_MEDALS_TASK, COMPUTE_RES
 	version: '2',
 })
 export class AchievementsDefController {
-
 	constructor(protected achievementsDefService: AchievementsDefService) {}
 
 	@ApiOperation({
-        summary: 'Get The list of Badge and Medal definitions for a specific Resource'
-    })
-    @ApiOkResponse({
-        description: 'an object that contains an array of badge definitions and an array of medal definitions',
-        type: ResourceAchievmentsDef
-    })
+		summary:
+			'Get The list of Badge and Medal definitions for a specific Resource',
+	})
+	@ApiOkResponse({
+		description:
+			'an object that contains an array of badge definitions and an array of medal definitions',
+		type: ResourceAchievmentsDef,
+	})
 	@Get('partner-resource/:resource_id')
-	async get_resource_achievements_def(@Param('resource_id') resource_id: string) {
-		const badges_promise = this.achievementsDefService.get_resource_badges(resource_id)
-		const medals_promise = this.achievementsDefService.get_resource_medals(resource_id)
+	async get_resource_achievements_def(
+		@Param('resource_id') resource_id: string,
+	) {
+		const badges_promise =
+			this.achievementsDefService.get_resource_badges(resource_id);
+		const medals_promise =
+			this.achievementsDefService.get_resource_medals(resource_id);
 
-		const [badges, medals] = await Promise.all([badges_promise, medals_promise])
+		const [badges, medals] = await Promise.all([
+			badges_promise,
+			medals_promise,
+		]);
 		return {
 			badges,
-			medals
-		}
-  	}
-
+			medals,
+		};
+	}
 }
 
 @ApiTags('Achievements Definition')
@@ -51,90 +91,109 @@ export class AchievementsDefController {
 	version: '2',
 })
 export class BadgesDefController {
+	constructor(
+		protected achievementsDefService: AchievementsDefService,
+		protected authService: AuthService,
+		protected eventEmitter: EventEmitter2,
+	) {}
 
-	constructor(protected achievementsDefService: AchievementsDefService, protected authService: AuthService, protected eventEmitter: EventEmitter2) {}
-
-	private can_edit_resource(user, resource_id){
+	private can_edit_resource(user, resource_id) {
 		return this.authService.user_has_resource(user, resource_id);
-    }
+	}
 
 	@ApiOperation({
-        summary: 'Create badge definition for a specified resource'
-    })
-    @ApiOkResponse({
-        description: 'Confirmation of the created Badge',
-        type: CreateBadgeDto
-    })
+		summary: 'Create badge definition for a specified resource',
+	})
+	@ApiOkResponse({
+		description: 'Confirmation of the created Badge',
+		type: CreateBadgeDefDto,
+	})
 	@ApiSecurity('basic')
 	// nest decorators
 	@Post()
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
-	async create_badge(@Body() badge: CreateBadgeDto, @Req() req){
+	async create_badge(@Body() badge: CreateBadgeDefDto, @Req() req) {
 		this.can_edit_resource(req.user, badge.resource_id);
 		return await this.achievementsDefService.create_badge(badge);
-
 	}
 
 	@ApiOperation({
-        summary: 'Get a list of badges based on a passed filter'
-    })
-    @ApiOkResponse({
-        description: 'A list of badges that correspond to the filter',
-        type: Array<CreateBadgeDto>
-    })
+		summary: 'Get a list of badges based on a passed filter',
+	})
+	@ApiOkResponse({
+		description: 'A list of badges that correspond to the filter',
+		type: [CreateBadgeDefDto],
+	})
 	@Get()
-	async get_badges(@Query() badges_filter: BadgeFilter){
-		const { data , count } =  await this.achievementsDefService.get_badges(badges_filter)
+	async get_badges(@Query() badges_filter: BadgeDefFilter) {
+		const { data, count } = await this.achievementsDefService.get_badges(
+			badges_filter,
+		);
 
 		return paginate(data, badges_filter, count);
 	}
 
 	@ApiOperation({
-        summary: 'Update badge definition for a specified resource'
-    })
-    @ApiOkResponse({
-        description: 'Confirmation of the updated Badge',
-        type: CreateBadgeDto
-    })
+		summary: 'Update badge definition for a specified resource',
+	})
+	@ApiOkResponse({
+		description: 'Confirmation of the updated Badge',
+		type: CreateBadgeDefDto,
+	})
 	@ApiSecurity('basic')
 	@Put('edit')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
-	async update_badge(@Body() update_badge: UpdateBadgeDto, @Req() req, @Res() res){
-		this.can_edit_resource(req.user, update_badge.resource_id)
-		const response = await this.achievementsDefService.update_badge(update_badge)
+	async update_badge(
+		@Body() update_badge: UpdateBadgeDefDto,
+		@Req() req,
+		@Res() res,
+	) {
+		this.can_edit_resource(req.user, update_badge.resource_id);
+		const response = await this.achievementsDefService.update_badge(
+			update_badge,
+		);
 
-		res.send({ data: response})
+		res.send({ data: response });
 
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_BADGES_TASK, { resource_id: update_badge.resource_id })
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, { resource_id: update_badge.resource_id })
-
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_BADGES_TASK, {
+			resource_id: update_badge.resource_id,
+		});
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, {
+			resource_id: update_badge.resource_id,
+		});
 	}
 
 	@ApiOperation({
-        summary: 'Delete a badge definition for a specified resource'
-    })
-    @ApiOkResponse({
-        description: 'A boolean confirmation of the successfull deletion',
-        type: Boolean
-    })
+		summary: 'Delete a badge definition for a specified resource',
+	})
+	@ApiOkResponse({
+		description: 'A boolean confirmation of the successfull deletion',
+		type: Boolean,
+	})
 	@ApiSecurity('basic')
 	@Delete(':name/partner-resource/:resource_id')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
-	async delete_badge(@Param() delete_badge: DeleteBadgeDto, @Req() req, @Res() res){
+	async delete_badge(
+		@Param() delete_badge: DeleteBadgeDefDto,
+		@Req() req,
+		@Res() res,
+	) {
 		this.can_edit_resource(req.user, delete_badge.resource_id);
 
-		const response = await this.achievementsDefService.delete_badge(delete_badge)
+		const response = await this.achievementsDefService.delete_badge(
+			delete_badge,
+		);
 
-		res.send({ data: response})
+		res.send({ data: response });
 
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_BADGES_TASK, { resource_id: delete_badge.resource_id })
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, { resource_id: delete_badge.resource_id })
-
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_BADGES_TASK, {
+			resource_id: delete_badge.resource_id,
+		});
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, {
+			resource_id: delete_badge.resource_id,
+		});
 	}
-	
-
 }
-
 
 @ApiTags('Achievements Definition')
 @ApiHeader(VersionHeader)
@@ -143,84 +202,102 @@ export class BadgesDefController {
 	version: '2',
 })
 export class MedalsDefController {
+	constructor(
+		protected achievementsDefService: AchievementsDefService,
+		protected authService: AuthService,
+		protected eventEmitter: EventEmitter2,
+	) {}
 
-	constructor(protected achievementsDefService: AchievementsDefService, protected authService: AuthService, protected eventEmitter: EventEmitter2) {}
-
-	private can_edit_resource(user, resource_id){
+	private can_edit_resource(user, resource_id) {
 		return this.authService.user_has_resource(user, resource_id);
-    }
-	
+	}
+
 	@ApiOperation({
-        summary: 'Create Medal definition for a specified resource'
-    })
-    @ApiOkResponse({
-        description: 'Confirmation of the Created Medal',
-        type: CreateMedalDto
-    })
+		summary: 'Create Medal definition for a specified resource',
+	})
+	@ApiOkResponse({
+		description: 'Confirmation of the Created Medal',
+		type: CreateMedalDto,
+	})
 	@ApiSecurity('basic')
 	@Post()
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
-	async create_medal(@Body() medal: CreateMedalDto, @Req() req, @Res() res: Response){
+	async create_medal(
+		@Body() medal: CreateMedalDto,
+		@Req() req,
+		@Res() res: Response,
+	) {
 		this.can_edit_resource(req.user, medal.resource_id);
 		const response = await this.achievementsDefService.create_medal(medal);
 
-		res.send({ data: response});
+		res.send({ data: response });
 
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_MEDALS_TASK, { resource_id: medal.resource_id })
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, { resource_id: medal.resource_id })
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_MEDALS_TASK, {
+			resource_id: medal.resource_id,
+		});
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, {
+			resource_id: medal.resource_id,
+		});
 	}
 
 	@ApiOperation({
-        summary: 'Get a list of medals based on a passed filter'
-    })
-    @ApiOkResponse({
-        description: 'A list of medals that correspond to the filter',
-        type: Array<CreateMedalDto>
-    })
+		summary: 'Get a list of medals based on a passed filter',
+	})
+	@ApiOkResponse({
+		description: 'A list of medals that correspond to the filter',
+		type: [CreateMedalDto],
+	})
 	@ApiSecurity('basic')
 	@Get()
-	async get_medals(@Query() medals_filter: MedalsFilter){
-		const {data, count} = await this.achievementsDefService.get_medals(medals_filter)
+	async get_medals(@Query() medals_filter: MedalsFilter) {
+		const { data, count } = await this.achievementsDefService.get_medals(
+			medals_filter,
+		);
 		return paginate(data, medals_filter, count);
 	}
 
-
 	@ApiOperation({
-        summary: 'Update Medal definition for a specified resource'
-    })
-    @ApiOkResponse({
-        description: 'Confirmation of the Updated Medal',
-        type: CreateMedalDto
-    })
+		summary: 'Update Medal definition for a specified resource',
+	})
+	@ApiOkResponse({
+		description: 'Confirmation of the Updated Medal',
+		type: CreateMedalDto,
+	})
 	@ApiSecurity('basic')
 	@Put('edit')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
-	async update_medal(@Body() update_medal: UpdateMedalDto, @Req() req, @Res() res: Response){
-		this.can_edit_resource(req.user, update_medal.resource_id)
-		const response = await this.achievementsDefService.update_medal(update_medal)
+	async update_medal(
+		@Body() update_medal: UpdateMedalDto,
+		@Req() req,
+		@Res() res: Response,
+	) {
+		this.can_edit_resource(req.user, update_medal.resource_id);
+		const response = await this.achievementsDefService.update_medal(
+			update_medal,
+		);
 
-		res.send({ data: response});
+		res.send({ data: response });
 
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_MEDALS_TASK, { resource_id: update_medal.resource_id })
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, { resource_id: update_medal.resource_id })
-
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_MEDALS_TASK, {
+			resource_id: update_medal.resource_id,
+		});
+		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, {
+			resource_id: update_medal.resource_id,
+		});
 	}
 
-
 	@ApiOperation({
-        summary: 'Delete Medal definition for a specified resource'
-    })
-    @ApiOkResponse({
-        description: 'Boolean Confirmation of the Deleted Medal',
-        type: Boolean
-    })
+		summary: 'Delete Medal definition for a specified resource',
+	})
+	@ApiOkResponse({
+		description: 'Boolean Confirmation of the Deleted Medal',
+		type: Boolean,
+	})
 	@ApiSecurity('basic')
 	@Delete(':name/partner-resource/:resource_id')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
-	async delete_medal(@Param() delete_medal: DeleteMedalDto, @Req() req){
+	async delete_medal(@Param() delete_medal: DeleteMedalDto, @Req() req) {
 		this.can_edit_resource(req.user, delete_medal.resource_id);
-		return await this.achievementsDefService.delete_medal(delete_medal)
+		return await this.achievementsDefService.delete_medal(delete_medal);
 	}
-	
-
 }

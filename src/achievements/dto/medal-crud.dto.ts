@@ -1,56 +1,59 @@
 import {
 	IsDate,
-	IsDateString,
 	IsNotEmpty,
 	IsNumber,
 	IsOptional,
 	IsString,
 	Matches,
-	MaxDate,
 	Min,
-	MinDate,
 	Validate,
 } from 'class-validator';
-import * as _ from 'lodash';
 import { PaginateDto } from '../../pagination/dto/paginate.dto';
 import { ResourceIdExists } from '../../resources/partner-resources/validators/resource-id-exists';
 import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
 import { MedalUnique } from '../validators/achievement-exists';
 import { MaxDateField, MinDateField } from '../validators/date-comparison';
 import { Type } from 'class-transformer';
+import { UniqueRule } from '../../shared/validators/unique.validator';
+import { MedalDef } from '../../core/schemas/medal-def.schema';
+import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
+import { PartnerResource } from '../../core/schemas/resource.schema';
 
 export class CreateMedalDto {
-	// @IsNotEmpty()
-	// @IsString()
-	// category: string;
-
-	@IsNotEmpty()
+	@Validate(UniqueRule, [
+		MedalDef.name,
+		({ name, resource_id }) => {
+			return { name, resource_id };
+		},
+	])
 	@IsString()
-	@Validate(MedalUnique)
+	@IsNotEmpty()
 	name: string;
 
-	// @IsOptional()
-	// resource_uri: string;
-
-	@IsNotEmpty()
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ resource_id }) => {
+			return { resource_id };
+		},
+	])
 	@IsString()
-	@Validate(ResourceIdExists)
+	@IsNotEmpty()
 	resource_id: string;
 
-	@IsNotEmpty()
 	@Validate(ActivityTermExists, [{ each: true }])
+	@IsNotEmpty()
 	list_terms: string[];
 
-	@IsNotEmpty()
 	@Matches(/(^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$)|^bronze$|^gold$|^silver$/, {
 		message:
 			'a medal color has to be either a color hexcode, "bronze", "gold" or "silver"',
 	})
+	@IsNotEmpty()
 	color: string;
 
-	@IsNotEmpty()
-	@IsNumber()
 	@Min(1)
+	@IsNumber()
+	@IsNotEmpty()
 	score_relative: number;
 
 	@MaxDateField(['last_day'])
@@ -97,24 +100,30 @@ export class MedalsFilter extends PaginateDto {
 }
 
 export class DeleteMedalDto {
-	@IsNotEmpty()
+	@Validate(UniqueRule, [
+		MedalDef.name,
+		({ name, resource_id }) => {
+			return { name, resource_id };
+		},
+	])
 	@IsString()
-	@Validate(MedalUnique, [{ reverse: true }])
+	@IsNotEmpty()
 	name: string;
 
-	@IsNotEmpty()
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ resource_id }) => {
+			return { resource_id };
+		},
+	])
 	@IsString()
-	@Validate(ResourceIdExists)
+	@IsNotEmpty()
 	resource_id: string;
 }
 
 export class UpdateMedalDto extends DeleteMedalDto {
-	// @IsOptional()
-	// @IsString()
-	// category: string;
-
-	@IsOptional()
 	@Validate(ActivityTermExists, [{ each: true }])
+	@IsOptional()
 	list_terms: string[];
 
 	@Matches(/(^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$)|^bronze$|^gold$|^silver$/, {

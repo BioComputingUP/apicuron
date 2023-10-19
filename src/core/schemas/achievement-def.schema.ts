@@ -1,10 +1,10 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type AchievementDefDocument = AchievementDef & Document;
 
-
 @Schema({
-	collection: 'achievements_def', discriminatorKey: 'type'
+	collection: 'achievements_def',
+	discriminatorKey: 'type',
 })
 export class AchievementDef {
 	@Prop()
@@ -25,16 +25,15 @@ export class AchievementDef {
 	@Prop()
 	resource_uri: string;
 
-
 	@Prop({
-		type: Array<String>,
-		required: true
+		type: [String],
+		required: true,
 	})
 	resource_id: string;
 
 	@Prop({
-		type: Array<String>,
-		required: true
+		type: [String],
+		required: true,
 	})
 	list_terms: string[];
 
@@ -42,7 +41,7 @@ export class AchievementDef {
 	@Prop({
 		type: String,
 		required: true,
-		enum: ['badge', 'medal']
+		enum: ['badge', 'medal'],
 	})
 	type: string;
 
@@ -50,23 +49,22 @@ export class AchievementDef {
 	@Prop({
 		type: String,
 		required() {
-			return this.type == 'badge'
-		}
+			return this.type == 'badge';
+		},
 	})
 	color_code?: string;
-
 
 	// medal fields
 	@Prop({
 		type: Number,
 		required() {
-			return this.type == 'medal'
-		}
+			return this.type == 'medal';
+		},
 	})
 	score_relative?: number;
 
 	@Prop({
-		required: false
+		required: false,
 	})
 	first_day?: Date;
 
@@ -76,7 +74,5 @@ export class AchievementDef {
 	last_day?: Date;
 }
 
-export const AchievementDefSchema = SchemaFactory.createForClass(AchievementDef);
-
-
-
+export const AchievementDefSchema =
+	SchemaFactory.createForClass(AchievementDef);

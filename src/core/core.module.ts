@@ -15,14 +15,23 @@ import {
 	NotificationSchema,
 } from './schemas/notification.schema';
 import { Term, TermSchema } from './schemas/terms.schema';
-import { Statistics, StatisticsSchema } from './schemas/statistics.schema';
+import {
+	PrivateStatistics,
+	PrivateStatisticsSchema,
+	PublicStatistics,
+	PublicStatisticsSchema,
+	Statistics,
+	StatisticsSchema,
+} from './schemas/statistics.schema';
 import {
 	AchievementDef,
 	AchievementDefSchema,
 } from './schemas/achievement-def.schema';
 import { Achievement, AchievementSchema } from './schemas/achievements.schema';
-import { BadgeSchema } from './schemas/badges.schema';
-import { MedalSchema } from './schemas/medals.schema';
+import { Badge, BadgeSchema } from './schemas/badges.schema';
+import { Medal, MedalSchema } from './schemas/medals.schema';
+import { BadgeDef, BadgeDefSchema } from './schemas/badge-def.schema';
+import { MedalDef, MedalDefSchema } from './schemas/medal-def.schema';
 
 @Module({
 	imports: [
@@ -60,17 +69,33 @@ import { MedalSchema } from './schemas/medals.schema';
 			{
 				name: Statistics.name,
 				schema: StatisticsSchema,
+				discriminators: [
+					{
+						name: PublicStatistics.name,
+						schema: PublicStatisticsSchema,
+						value: 'public',
+					},
+					{
+						name: PrivateStatistics.name,
+						schema: PrivateStatisticsSchema,
+						value: 'private',
+					},
+				],
 			},
 			{
 				name: AchievementDef.name,
 				schema: AchievementDefSchema,
+				discriminators: [
+					{ name: BadgeDef.name, schema: BadgeDefSchema, value: 'badge' },
+					{ name: MedalDef.name, schema: MedalDefSchema, value: 'medal' },
+				],
 			},
 			{
 				name: Achievement.name,
 				schema: AchievementSchema,
 				discriminators: [
-					{ name: 'badge', schema: BadgeSchema },
-					{ name: 'medal', schema: MedalSchema },
+					{ name: Badge.name, schema: BadgeSchema, value: 'badge' },
+					{ name: Medal.name, schema: MedalSchema, value: 'medal' },
 				],
 			},
 		]),

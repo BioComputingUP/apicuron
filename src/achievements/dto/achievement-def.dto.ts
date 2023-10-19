@@ -1,7 +1,7 @@
-import { CreateBadgeDto } from "./badge-crud.dto"
-import { CreateMedalDto } from "./medal-crud.dto"
+import { CreateBadgeDefDto } from './badge-crud.dto';
+import { CreateMedalDto } from './medal-crud.dto';
 
 export class ResourceAchievmentsDef {
-    medals: CreateMedalDto[]
-    badges: CreateBadgeDto[]
+	medals: CreateMedalDto[];
+	badges: CreateBadgeDefDto[];
 }

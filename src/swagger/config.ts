@@ -5,7 +5,7 @@ const { JWT_HEADER, JWT_PREFIX } = env();
 
 export const VersionHeader = {
 	name: 'version',
-	description: 'The header describing the API version, default version is 2',
+	description: 'The header describing the API version, set the version as: 2',
 	allowEmptyValue: false,
 	default: '2',
 };

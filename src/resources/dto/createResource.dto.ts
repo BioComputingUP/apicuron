@@ -1,74 +1,79 @@
-import { IsEmpty, IsNotEmpty, IsOptional, IsString, IsUrl, Matches, Max, MaxLength, MinLength, Validate } from "class-validator";
-import { UniqueRule } from "../../shared/validators/unique.validator";
-import { Resource } from "../../core/schemas/resource.schema";
-import { UniqueResourceIdRule } from "../validators/unique-resource-id"
-import { UniqueResourceURIRule } from "../validators/unique-resource-uri"
-
+import {
+	IsEmpty,
+	IsNotEmpty,
+	IsString,
+	IsUrl,
+	Matches,
+	MaxLength,
+	Validate,
+} from 'class-validator';
+import { UniqueRule } from '../../shared/validators/unique.validator';
+import { Resource } from '../../core/schemas/resource.schema';
+import { UniqueResourceIdRule } from '../validators/unique-resource-id';
+import { UniqueResourceURIRule } from '../validators/unique-resource-uri';
 
 export class CreateResourceDto {
-    
-    @IsString()
-    @IsNotEmpty()
+	@IsString()
+	@IsNotEmpty()
 	resource_description: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @Validate(UniqueResourceIdRule)
+	@Validate(UniqueResourceIdRule)
+	@IsString()
+	@IsNotEmpty()
 	resource_id: string;
 
-    @IsString()
-    @MaxLength(60)
-    @IsNotEmpty()
-    @Validate(UniqueRule, [
-        Resource.name,
-        (resource_long_name) => {
-            return {
-                resource_long_name
-            }
-        } 
-    ])
+	@Validate(UniqueRule, [
+		Resource.name,
+		({ resource_long_name }) => {
+			return {
+				resource_long_name,
+			};
+		},
+	])
+	@MaxLength(60)
+	@IsString()
+	@IsNotEmpty()
 	resource_long_name: string;
 
-
-    @IsString()
-    @MaxLength(20)
-    @IsNotEmpty()
-    @Validate(UniqueRule, [
-        Resource.name,
-        (resource_name) => {
-            return {
-                resource_name
-            }
-        }
-    ])
+	@Validate(UniqueRule, [
+		Resource.name,
+		({ resource_name }) => {
+			return {
+				resource_name,
+			};
+		},
+	])
+	@MaxLength(25)
+	@IsString()
+	@IsNotEmpty()
 	resource_name: string;
 
-    @IsString()
-    @IsUrl()
-    @IsNotEmpty()
-    @Validate(UniqueResourceURIRule)
+	@Validate(UniqueResourceURIRule)
+	@IsUrl()
+	@IsString()
+	@IsNotEmpty()
 	resource_uri: string;
-    
-    @IsString()
-    @IsUrl()
-    @IsNotEmpty()
-    @Validate(UniqueRule, [
-        Resource.name,
-        (resource_url) => {
-            return {
-                resource_url
-            }
-        } 
-    ])
+
+	@Validate(UniqueRule, [
+		Resource.name,
+		({ resource_url }) => {
+			return {
+				resource_url,
+			};
+		},
+	])
+	@IsUrl()
+	@IsString()
+	@IsNotEmpty()
 	resource_url: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @Matches(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, {
-        message: 'The resource color has to be a color hexcode'
-    })
-    color: string;
+	@Matches(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, {
+		message: 'The resource color has to be a color hexcode',
+	})
+	@IsString()
+	@IsNotEmpty()
+	color: string;
 
-    @IsEmpty()
-    logo: string;
+	@IsEmpty()
+	logo: string;
 }

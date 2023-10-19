@@ -5,6 +5,7 @@ import { StatisticsTerms } from './statistics-terms.schema';
 export type StatisticsDocument = Statistics & Document;
 @Schema({
 	collection: 'statistics',
+	discriminatorKey: 'privacy',
 })
 export class Statistics {
 	@Prop({ required: true, default: () => 0 })
@@ -67,8 +68,6 @@ export class Statistics {
 	type?: 'contribution' | 'paid' = 'contribution';
 }
 
-
-
 const StatisticsSchema = SchemaFactory.createForClass(Statistics);
 
 StatisticsSchema.virtual('user', {
@@ -78,4 +77,60 @@ StatisticsSchema.virtual('user', {
 	justOne: true,
 });
 
-export { StatisticsSchema };
+// Public Statistics !
+export type PublicStatisticsDocument = PublicStatistics & Document;
+@Schema({
+	collection: 'statistics',
+})
+export class PublicStatistics {
+	badges_count: number;
+	curator_orcid: string;
+	generation_count: number;
+	generation_score: number;
+	generation_terms: StatisticsTerms[];
+	invalidation_count: number;
+	invalidation_score: number;
+	invalidation_terms: StatisticsTerms[];
+	medals_count: number;
+	ranking: number;
+	resource_uri: string;
+	resource_id: string;
+	revision_count: number;
+	revision_score: number;
+	revision_terms: StatisticsTerms[];
+	total_count: number;
+	total_score: number;
+	type?: 'contribution' | 'paid' = 'contribution';
+}
+
+const PublicStatisticsSchema = SchemaFactory.createForClass(PublicStatistics);
+
+// Private Statistics !
+export type PrivateStatisticsDocument = PrivateStatistics & Document;
+@Schema({
+	collection: 'statistics',
+})
+export class PrivateStatistics {
+	badges_count: number;
+	curator_orcid: string;
+	generation_count: number;
+	generation_score: number;
+	generation_terms: StatisticsTerms[];
+	invalidation_count: number;
+	invalidation_score: number;
+	invalidation_terms: StatisticsTerms[];
+	medals_count: number;
+	ranking: number;
+	resource_uri: string;
+	resource_id: string;
+	revision_count: number;
+	revision_score: number;
+	revision_terms: StatisticsTerms[];
+	total_count: number;
+	total_score: number;
+	type?: 'contribution' | 'paid' = 'contribution';
+}
+
+const PrivateStatisticsSchema = SchemaFactory.createForClass(PrivateStatistics);
+
+export { StatisticsSchema, PublicStatisticsSchema, PrivateStatisticsSchema };

@@ -2,16 +2,14 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 
 export type StatisticsTermsDocument = StatisticsTerms & Document;
 
-
-
 @Schema({
-    autoCreate: false
+	autoCreate: false,
 })
 export class StatisticsTerms {
-    @Prop({
+	@Prop({
 		type: String,
 		required: true,
-		enum: ['generation', 'invalidation', 'revision']
+		enum: ['generation', 'invalidation', 'revision'],
 	})
 	activity_category: string;
 	activity_name: string;
@@ -24,5 +22,5 @@ export class StatisticsTerms {
 	sum: number;
 }
 
-export const StatisticsTermsSchema = SchemaFactory.createForClass(StatisticsTerms);
-
+export const StatisticsTermsSchema =
+	SchemaFactory.createForClass(StatisticsTerms);

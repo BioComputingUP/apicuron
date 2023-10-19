@@ -1,51 +1,49 @@
-import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { Allow, IsNotEmpty, IsString, IsUrl } from 'class-validator';
 import { BadgeDto } from '../../achievements/dto/badge.dto';
 import { MedalDto } from '../../achievements/dto/medal.dto';
 import { TermDto } from '../../terms/dto/term.dto';
 
 export class SelectPartnerResourceDto {
-    @IsNotEmpty()
-    @IsString()
+	@IsString()
+	@IsNotEmpty()
 	resource_id: string;
 }
 export class PartnerResourceDto extends SelectPartnerResourceDto {
-
-    @IsNotEmpty()
-    @IsString()
+	@IsNotEmpty()
+	@IsString()
 	resource_description: string;
 
-    // @IsNotEmpty()
-    // @IsString()
+	// @IsNotEmpty()
+	// @IsString()
 	// resource_id: string;
 
-    @IsNotEmpty()
-    @IsString()
+	@IsString()
+	@IsNotEmpty()
 	resource_long_name: string;
 
-    @IsNotEmpty()
-    @IsString()
-    resource_name: string;
+	@IsString()
+	@IsNotEmpty()
+	resource_name: string;
 
-    @IsNotEmpty()
-    @IsString()
-    resource_uri: string;
+	@IsString()
+	@IsNotEmpty()
+	resource_uri: string;
 
-    @IsNotEmpty()
-    @IsString()
-    @IsUrl()
+	@IsUrl()
+	@IsString()
+	@IsNotEmpty()
 	resource_url: string;
 
-    @IsNotEmpty()
-    @IsString()
+	@IsNotEmpty()
+	@IsString()
 	logo: string;
-
 }
 
-
 export class PartnerResourceSummaryDto extends PartnerResourceDto {
-
-    badges:BadgeDto[]
-    medals:MedalDto[]
-    terms:TermDto[]
-
+	@Allow()
+	badges: BadgeDto[];
+	@Allow()
+	medals: MedalDto[];
+	@Allow()
+	terms: TermDto[];
 }

@@ -3,9 +3,7 @@ import {
 	ArrayMinSize,
 	IsArray,
 	IsDate,
-	IsDateString,
 	IsEmpty,
-	IsISO8601,
 	IsNotEmpty,
 	IsOptional,
 	IsString,
@@ -24,7 +22,7 @@ import {
 import { Term } from '../../core/schemas/terms.schema';
 import { PartnerResource } from '../../core/schemas/resource.schema';
 import { EntityUriValid } from '../validators/entity-uri';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 export class SubmitReportDto {
 	@Validate(
 		EntryExistsRule,
@@ -65,6 +63,10 @@ export class SubmitReportDto {
 	@IsNotEmpty()
 	resource_id: string;
 
+	@ApiProperty({
+		description:
+			'The Date of the activity performed by the contributor, has to be compliant with ISO8601',
+	})
 	// This configuration is lenient and tolerates mistakes in the string specification
 	@MaxDate(() => new Date(Date.now()), {
 		message:

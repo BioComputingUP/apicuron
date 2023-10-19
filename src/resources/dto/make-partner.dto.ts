@@ -1,18 +1,17 @@
-import { IsNotEmpty, IsString, Validate } from "class-validator";
-import { EntryExistsRule } from "../../shared/validators/entry-exists.validator";
-import { SubmittedResource } from "../../core/schemas/resource.schema";
+import { IsNotEmpty, IsString, Validate } from 'class-validator';
+import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
+import { SubmittedResource } from '../../core/schemas/resource.schema';
 
 export class MakePartner {
-    
-    @IsNotEmpty()
-    @IsString()
-    @Validate(EntryExistsRule, [
-        SubmittedResource.name,
-        ({ resource_id }) => {
-            return {
-                resource_id
-            }
-        }
-    ])
-    resource_id:string
+	@Validate(EntryExistsRule, [
+		SubmittedResource.name,
+		({ resource_id }) => {
+			return {
+				resource_id,
+			};
+		},
+	])
+	@IsString()
+	@IsNotEmpty()
+	resource_id: string;
 }

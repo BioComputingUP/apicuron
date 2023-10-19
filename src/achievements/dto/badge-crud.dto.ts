@@ -10,9 +10,9 @@ import { ResourceIdExists } from '../../resources/partner-resources/validators/r
 import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
 import { BadgeUnique } from '../validators/achievement-exists';
 
-export class BadgeFilter extends PaginateDto {
+export class BadgeDefFilter extends PaginateDto {
 	static create(obj: any) {
-		const filter = new BadgeFilter();
+		const filter = new BadgeDefFilter();
 		Object.assign(filter, obj);
 		return filter;
 	}
@@ -26,7 +26,7 @@ export class BadgeFilter extends PaginateDto {
 	name?: string;
 }
 
-export class DeleteBadgeDto {
+export class DeleteBadgeDefDto {
 	@IsNotEmpty()
 	@Validate(ResourceIdExists)
 	resource_id: string;
@@ -36,7 +36,7 @@ export class DeleteBadgeDto {
 	name: string;
 }
 
-export class CreateBadgeDto {
+export class CreateBadgeDefDto {
 	@IsOptional()
 	category: string;
 
@@ -65,7 +65,7 @@ export class CreateBadgeDto {
 	list_terms: string[];
 }
 
-export class UpdateBadgeDto {
+export class UpdateBadgeDefDto {
 	@IsOptional()
 	category: string;
 

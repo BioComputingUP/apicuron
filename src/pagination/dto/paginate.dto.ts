@@ -8,7 +8,7 @@ import {
 	Min,
 } from 'class-validator';
 import * as _ from 'lodash';
-import { PipelineStage, QueryOptions } from 'mongoose';
+import { QueryOptions } from 'mongoose';
 import { PaginationAggregation } from '../interfaces/pagination-aggregation';
 
 export class PaginateDto {
@@ -16,14 +16,14 @@ export class PaginateDto {
 	@IsInt()
 	@IsOptional()
 	@Transform(({ value }) => parseInt(value))
-	skip = 0;
+	skip;
 
 	@Max(100)
 	@Min(-1)
 	@IsInt()
 	@IsOptional()
 	@Transform(({ value }) => parseInt(value))
-	limit = 10;
+	limit;
 
 	getMongoQueryOptions<T>(): QueryOptions<T> {
 		if (this.limit < 0) {

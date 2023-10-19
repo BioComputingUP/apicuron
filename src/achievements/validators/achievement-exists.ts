@@ -1,48 +1,66 @@
-import { InjectModel } from "@nestjs/mongoose";
-import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface} from "class-validator";
-import mongoose, { Model } from "mongoose";
-import { NotFoundException } from '@nestjs/common'
-import { AchievementDef, AchievementDefDocument } from "../../core/schemas/achievement-def.schema";
-
+import { InjectModel } from '@nestjs/mongoose';
+import {
+	ValidationArguments,
+	ValidatorConstraint,
+	ValidatorConstraintInterface,
+} from 'class-validator';
+import mongoose, { Model } from 'mongoose';
+import { NotFoundException } from '@nestjs/common';
+import {
+	AchievementDef,
+	AchievementDefDocument,
+} from '../../core/schemas/achievement-def.schema';
 
 @ValidatorConstraint({ name: 'AchievementExists', async: true })
 class AbstractAchievementUnique implements ValidatorConstraintInterface {
+	constructor(
+		@InjectModel(AchievementDef.name)
+		private achievementDefModel: Model<AchievementDefDocument>,
+	) {}
 
-    constructor(@InjectModel(AchievementDef.name) private achievementDefModel: Model<AchievementDefDocument>) {}
+	type: string;
 
-    type: string
+	async achievement_def_exists(
+		name: string,
+		resource_id: string,
+	): Promise<boolean> {
+		if (this.type) {
+			return !!(await this.achievementDefModel.exists({
+				name,
+				type: this.type,
+				resource_id,
+			}));
+		} else {
+			throw new Error(
+				'Type attribute missing from class ' + this.constructor.name,
+			);
+		}
+	}
 
-    async achievement_def_exists(name: string, resource_id: string): Promise<boolean> {
-        if(this.type){
-            return !! await this.achievementDefModel.exists({ name, type: this.type, resource_id })
-        }else{
-            throw new Error('Type attribute missing from class ' + this.constructor.name)
-        }
-    }
+	async validate(value: any, args?: ValidationArguments): Promise<boolean> {
+		const exists = await this.achievement_def_exists(
+			value,
+			args.object['resource_id'],
+		);
+		if (args.constraints && args.constraints.find((x) => x.reverse == true)) {
+			if (!exists) {
+				throw new NotFoundException(`${this.type} named (${value}) Not found`);
+			}
+			return exists;
+		}
+		return !exists;
+	}
 
-    async validate(value: any, args?: ValidationArguments): Promise<boolean> {
-        const exists = await this.achievement_def_exists(value, args.object['resource_id'])
-        if(args.constraints && args.constraints.find(x => x.reverse == true)){
-            if(!exists) {
-                throw new NotFoundException(`${this.type} named (${value}) Not found`)
-            }
-            return exists
-        }
-        return ! exists
-    }
+	defaultMessage(args?: ValidationArguments): string {
+		let error_snippet = 'already exists';
 
+		if (args.constraints && args.constraints.find((x) => x.reverse == true)) {
+			error_snippet = 'does not Exist';
+		}
 
-    defaultMessage(args?: ValidationArguments): string {
-        let error_snippet = 'already exists'
-        
-        if(args.constraints && args.constraints.find(x => x.reverse == true)){
-            error_snippet = 'does not Exist'
-        }
-
-        return `${this.type} named ${args.value} ${error_snippet} for resource ${args.object['resource_id']}`
-    }
+		return `${this.type} named ${args.value} ${error_snippet} for resource ${args.object['resource_id']}`;
+	}
 }
-
 
 /**
  * @Param {*[]} constraints
@@ -50,15 +68,12 @@ class AbstractAchievementUnique implements ValidatorConstraintInterface {
  * Validator that checks if the badge name does NOT exist for specified resource
  * Requires a resource_id parameter to be present in the validated object
  * behavior can be reversed by passing { reverse: true } in the constraints array
- * 
+ *
  */
 @ValidatorConstraint({ name: 'BadgeExists', async: true })
 export class BadgeUnique extends AbstractAchievementUnique {
-
-    type = 'badge'
-
+	type = 'badge';
 }
-
 
 /**
  * @Param {*[]} constraints
@@ -66,11 +81,9 @@ export class BadgeUnique extends AbstractAchievementUnique {
  * Validator that checks if the medal name does Not exist for specified resource
  * Requires a resource_id parameter to be present in the validated object
  * behavior can be reversed by passing { reverse: true } in the constraints array
- * 
+ *
  */
 @ValidatorConstraint({ name: 'MedalExists', async: true })
 export class MedalUnique extends AbstractAchievementUnique {
-
-    type = 'medal'
-
+	type = 'medal';
 }
