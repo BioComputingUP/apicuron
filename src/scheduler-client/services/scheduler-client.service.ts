@@ -134,7 +134,7 @@ export class SchedulerClientService {
 		orcid_id = '',
 		parent_job = null,
 	) {
-		let task = {
+		const task = {
 			task_name: 'compute_statistics',
 			task_arguments: `${resource_id} ${orcid_id}`,
 		};
@@ -158,7 +158,7 @@ export class SchedulerClientService {
 		orcid_id = '',
 		parent_job = null,
 	) {
-		let task = {
+		const task = {
 			task_name: 'compute_achievements',
 			task_arguments: `${resource_id} ${orcid_id}`,
 		};
