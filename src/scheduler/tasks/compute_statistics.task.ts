@@ -1,8 +1,6 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Aggregate, Model } from 'mongoose';
-import { AchievementsService } from '../../achievements/achievements.service';
-import { UsersService } from '../../auth/users/users.service';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
@@ -267,8 +265,11 @@ export class ComputeStatisticsTask {
 			curator_orcid: orcid_id,
 			medals_count: 0,
 			badges_count: 0,
-			privacy: (await this.userModel.findOne({ orcid_id })).privacy,
+			privacy:
+				(await this.userModel.findOne({ orcid_id })).privacy || 'private',
 		};
+
+		let reportCount = 0;
 
 		for await (const report of user_reports) {
 			const activity_category = report['activity_category'];
@@ -278,15 +279,32 @@ export class ComputeStatisticsTask {
 				resource_id,
 				resource_uri,
 			});
-			user_stats[`${activity_category}_count`] += 1;
+			user_stats[`${activity_category}_count`] += report['count'];
 			user_stats[`${activity_category}_score`] += report['sum'];
+
+			reportCount += 1;
 		}
+
+		this.logger.log(
+			`User ${orcid_id} has ${reportCount} Reports for resource ${resource_id} !`,
+		);
+
+		['generation', 'invalidation', 'revision'].forEach((cat: string) => {
+			this.logger.log(
+				`User ${orcid_id} for resource ${resource_id} earned \n ${cat} score: ${
+					user_stats[cat + '_score']
+				} with ${user_stats[cat + '_count']} Contributions`,
+			);
+		});
 
 		user_stats.medals_count = await this.medalModel.count({
 			resource_id,
 			curator_orcid: orcid_id,
 		});
-		user_stats.badges_count = await this.badgeModel.count({ resource_id });
+		user_stats.badges_count = await this.badgeModel.count({
+			resource_id,
+			curator_orcid: orcid_id,
+		});
 
 		return await this.statModel.updateOne(
 			{

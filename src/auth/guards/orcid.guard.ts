@@ -18,7 +18,6 @@ export class OrcidGuard extends AuthGuard('orcid') implements CanActivate {
 	canActivate(
 		context: ExecutionContext,
 	): boolean | Promise<boolean> | Observable<boolean> {
-		console.log('here');
 		return super.canActivate(context);
 	}
 }

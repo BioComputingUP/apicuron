@@ -53,10 +53,14 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import { Report, ReportDocument } from '../core/schemas/reports.schema';
-import { SchedulerService } from 'src/scheduler/services/scheduler.service';
-import { ComputeAchievementsTask } from '../scheduler/tasks/compute_achievements.task';
-import { ComputeStatisticsTask } from '../scheduler/tasks/compute_statistics.task';
 import { Response } from 'express';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import {
+	COMPUTE_CURATOR_STATISTICS_TASK,
+	COMPUTE_RESOURCE_ACHIEVEMENTS_TASK,
+	COMPUTE_RESOURCE_STATISTICS_TASK,
+	COMPUTE_USER_BADGES_TASK,
+} from '../scheduler/contants';
 
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
@@ -64,11 +68,8 @@ import { Response } from 'express';
 export class ReportsController {
 	constructor(
 		private reportService: ReportsService,
+		private eventEmitter: EventEmitter2,
 		private schedulerClientService: SchedulerClientService,
-		@Inject('task:compute_achievements')
-		private computeAchievements: ComputeAchievementsTask,
-		@Inject('task:compute_statistics')
-		private computeStatistics: ComputeStatisticsTask,
 		@InjectModel(Report.name) private reportModel: Model<ReportDocument>,
 		private resourceService: PartnerResourcesService,
 	) {}
@@ -200,15 +201,23 @@ export class ReportsController {
 		// const resource_uri = await this.partnerResourceService.retrieve_uri(report.resource_id)
 		const report_confirmation = await this.reportService.insertReport(report);
 
+		const resource = await this.resourceService.get_resource(
+			report_confirmation.resource_id,
+		);
+
 		// TODO: Add Event listener on the statistics and achievements module and Remove these function calls
-		await this.schedulerClientService.compute_achievements(
-			report.resource_id,
-			report.curator_orcid,
-		);
-		await this.schedulerClientService.compute_statistics(
-			report.resource_id,
-			report.curator_orcid,
-		);
+
+		this.logger.verbose(`Computing Badges for user "${report.curator_orcid}"`);
+		await this.eventEmitter.emitAsync(COMPUTE_USER_BADGES_TASK, {
+			resource,
+			user: { orcid_id: report.curator_orcid },
+		});
+
+		this.logger.verbose(`Computing Stats for user "${report.curator_orcid}"`);
+		await this.eventEmitter.emitAsync(COMPUTE_CURATOR_STATISTICS_TASK, {
+			resource,
+			user: { orcid_id: report.curator_orcid },
+		});
 		return report_confirmation;
 	}
 
@@ -259,15 +268,13 @@ export class ReportsController {
 		// start computing the scores and achievements after
 		const computePromises$ = resourcesConcerned.map(
 			async (resource_id: string) => {
-				await this.computeAchievements.run_task({
-					arguments: [resource_id],
-					logLevel: ['error'],
+				await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_ACHIEVEMENTS_TASK, {
+					resource_id,
 				});
-
-				await this.computeStatistics.run_task({
-					arguments: [resource_id],
-					logLevel: ['error'],
-				});
+				return await this.eventEmitter.emitAsync(
+					COMPUTE_RESOURCE_STATISTICS_TASK,
+					{ resource_id },
+				);
 			},
 		);
 
