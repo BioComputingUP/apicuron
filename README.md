@@ -1,7 +1,7 @@
 # APICURON Technical Documentation
 
 <p align="center">
-  <img src="apicuron-ui/src/assets/APICURON.svg" />
+  <img src="https://raw.githubusercontent.com/BioComputingUP/apicuron-ui/master/src/assets/APICURON.svg?token=GHSAT0AAAAAACISPHUXNF5TWXEEYAVTLGTSZKDRAKA" />
 </p>
 
 
