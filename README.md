@@ -1,5 +1,10 @@
 # APICURON Technical Documentation
 
+<p align="center">
+  <img src="apicuron-ui/src/assets/APICURON.svg" />
+</p>
+
+
 APICURON is currently composed of two elements
 - The backend uses nestjs has a fairly modular implementation that has some nice features
 - The frontend is an Angular app. The implementation is quite chaotically organized
@@ -7,8 +12,8 @@ APICURON is currently composed of two elements
 
 ## Table of Contents
 
-- [The frontend](/#the-frontend)
-- [The backend](/#the-backend)
+- [The frontend](#the-frontend)
+- [The backend](#the-backend)
 
 
 ## The frontend
