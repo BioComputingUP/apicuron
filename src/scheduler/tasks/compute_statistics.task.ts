@@ -251,6 +251,9 @@ export class ComputeStatisticsTask {
 			orcid_id,
 		);
 
+		const userPrivacy =
+			(await this.userModel.findOne({ orcid_id })).privacy || 'private';
+
 		const user_stats = {
 			generation_terms: [],
 			revision_terms: [],
@@ -265,8 +268,7 @@ export class ComputeStatisticsTask {
 			curator_orcid: orcid_id,
 			medals_count: 0,
 			badges_count: 0,
-			privacy:
-				(await this.userModel.findOne({ orcid_id })).privacy || 'private',
+			privacy: userPrivacy,
 		};
 
 		let reportCount = 0;

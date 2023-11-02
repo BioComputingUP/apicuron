@@ -5,6 +5,7 @@ import {
 	Header,
 	Headers,
 	HttpStatus,
+	NotFoundException,
 	Param,
 	Patch,
 	Post,
@@ -15,13 +16,11 @@ import {
 	UnauthorizedException,
 	UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { UpdateProfileDto, UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { Logger } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { Roles } from '../decorators/roles.decorator';
-import { createReadStream } from 'fs';
 import { json_to_tsv } from './json-tsv';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { RoleGuard } from '../guards/role.guard';
@@ -38,7 +37,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { UPDATE_USER_STAT_PRIVACY } from '../../statistics/constants';
+import { UPDATE_USER_PRIVACY } from '../../statistics/constants';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { OrcidGuard } from '../guards/orcid.guard';
 import { Public } from '../decorators/public.decorator';
@@ -131,8 +130,9 @@ export class UserControllerV2 {
 	@UseGuards(LocalAuthGuard)
 	@Public()
 	async get_curator(@Param('orcid_id') orcid_id: string, @Req() req) {
+		let user = null;
 		if (req.user) {
-			return this.userModel.findOne(
+			user = this.userModel.findOne(
 				{
 					$or: [
 						{
@@ -152,8 +152,15 @@ export class UserControllerV2 {
 				},
 			);
 		} else {
-			return await this.usersService.getPublicUser(orcid_id);
+			user = await this.usersService.getPublicUser(orcid_id);
 		}
+
+		if (!user) {
+			throw new NotFoundException(
+				`The User with orcid ${orcid_id} does not exist on APICURON`,
+			);
+		}
+		return user;
 	}
 
 	@ApiSecurity('basic')
@@ -184,7 +191,7 @@ export class UserControllerV2 {
 				},
 			);
 			if (updateData.privacy) {
-				await this.eventEmitter.emitAsync(UPDATE_USER_STAT_PRIVACY, {
+				await this.eventEmitter.emitAsync(UPDATE_USER_PRIVACY, {
 					orcid_id,
 					privacy: updateData.privacy,
 				});

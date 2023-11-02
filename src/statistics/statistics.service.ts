@@ -4,6 +4,7 @@ import { Document, Model } from 'mongoose';
 // import { TransformerService } from '../shared/transformer/transformer.service';
 import { User, UserDocument } from '../core/schemas/user.schema';
 import {
+	PublicStatistics,
 	Statistics,
 	StatisticsDocument,
 } from '../core/schemas/statistics.schema';
@@ -13,13 +14,15 @@ import { paginate } from '../pagination/paginator';
 import { PaginateDto } from '../pagination/dto/paginate.dto';
 import { ReportDocument } from '../core/schemas/reports.schema';
 import { OnEvent } from '@nestjs/event-emitter';
-import { UPDATE_USER_STAT_PRIVACY } from './constants';
+import { UPDATE_USER_PRIVACY } from './constants';
 
 @Injectable()
 export class StatisticsService {
 	constructor(
 		@InjectModel(Statistics.name)
 		protected statisticsModel: Model<StatisticsDocument>,
+		@InjectModel(PublicStatistics.name)
+		protected publicStatModel: Model<PublicStatistics>,
 		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 		protected partnerResourceService: PartnerResourcesService,
 	) {}
@@ -38,7 +41,7 @@ export class StatisticsService {
 		}
 	}
 
-	@OnEvent(UPDATE_USER_STAT_PRIVACY, { async: true })
+	@OnEvent(UPDATE_USER_PRIVACY, { async: true })
 	async setUserStatsPrivacy({
 		orcid_id,
 		privacy,
@@ -46,7 +49,11 @@ export class StatisticsService {
 		orcid_id: string;
 		privacy: 'public' | 'private';
 	}) {
-		return await this.statisticsModel.updateMany(
+		this.logger.log(
+			`Handling Update user stat privacy event in statistics service ${orcid_id} ${privacy} !`,
+		);
+
+		const result = await this.statisticsModel.updateMany(
 			{
 				curator_orcid: orcid_id,
 			},
@@ -55,7 +62,13 @@ export class StatisticsService {
 					privacy,
 				},
 			},
+			{
+				overwriteDiscriminatorKey: true,
+			},
 		);
+
+		this.logger.log(result);
+		return result;
 	}
 
 	async get_public_user_statistics(curator_orcid: string) {
@@ -200,48 +213,13 @@ export class StatisticsService {
 			throw new NotFoundException(`Resource ${resource_id} does not Exist`);
 		}
 
-		const leaderboardPromise = this.statisticsModel.aggregate([
-			// get the users with the corresponding resource_id
+		const leaderboardPromise = this.statisticsModel.find(
 			{
-				$match: {
-					resource_id,
-					privacy: 'public',
-				},
+				resource_id,
 			},
-			{
-				$lookup: {
-					from: 'users',
-					localField: 'curator_orcid',
-					foreignField: 'orcid_id',
-					as: 'user',
-				},
-			},
-			{
-				$unwind: {
-					path: '$user',
-				},
-			},
-			{
-				$match: {
-					user: { $exists: true },
-				},
-			},
-			{
-				$project: {
-					user: 0,
-					generation_terms: 0,
-					invalidation_terms: 0,
-					revision_terms: 0,
-				},
-			},
-			// sort by the total score
-			{
-				$sort: {
-					total_score: -1,
-				},
-			},
-			...pagination.getMongoAggregation(),
-		]);
+			{ generation_terms: 0, invalidation_terms: 0, revision_terms: 0 },
+			{ ...pagination.getMongoQueryOptions(), sort: { total_score: -1 } },
+		);
 
 		const query = { resource_id };
 		const countPromise = this.statisticsModel.count(query);
@@ -250,5 +228,19 @@ export class StatisticsService {
 			countPromise,
 		]);
 		return paginate(leaderboard, pagination, count);
+	}
+
+	async getPublicResourceLeaderboard(
+		resource_id: string,
+		pagination: PaginateDto,
+	) {
+		const data = await this.publicStatModel.find(
+			{ resource_id },
+			{ generation_terms: 0, invalidation_terms: 0, revision_terms: 0 },
+			{ ...pagination.getMongoQueryOptions(), sort: { total_score: -1 } },
+		);
+		const count = await this.publicStatModel.count({ resource_id });
+
+		return paginate(data, pagination, count);
 	}
 }

@@ -57,12 +57,31 @@ export class StatisticsController {
 		description:
 			'A paginated list of user statistics sorted by the highest score to the lowest',
 	})
+	@UseGuards(LocalAuthGuard)
+	@Public()
 	@Get('leaderboard/:resource_id')
 	async get_resource_leaderboard(
 		@Param('resource_id') resource_id: string,
 		@Query() pagination: PaginateDto,
+		@Req() req: any,
 	) {
-		return await this.statService.getResourceLeaderboard(
+		const resourceExists = await this.partnerResourceService.exists(
+			resource_id,
+		);
+		if (!resourceExists) {
+			throw new NotFoundException(`Resource ${resource_id} Not found !`);
+		}
+
+		if (req.user) {
+			// user is loggedIn
+			// check for resource ownership
+
+			if (!!req.user.resources.find((res) => res.resource_id == resource_id)) {
+				return this.statService.getResourceLeaderboard(resource_id, pagination);
+			}
+		}
+
+		return await this.statService.getPublicResourceLeaderboard(
 			resource_id,
 			pagination,
 		);
@@ -114,7 +133,7 @@ export class StatisticsController {
 	}
 
 	@ApiOperation({
-		summary: 'Get Multiple statistics regarding multiple',
+		summary: 'Get Multiple statistics regarding multiple users',
 	})
 	@ApiOkResponse({
 		description:
