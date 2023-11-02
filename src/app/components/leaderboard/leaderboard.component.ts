@@ -22,7 +22,7 @@ import { Resource } from "../../models/resource.model";
 import { CuratorStatistics } from "../../models/statistics.model";
 import { ResourcesService } from "../../resource/service/resources.service";
 import { environment } from "src/environments/environment";
-import { AngularSvgIconModule } from "angular-svg-icon";
+import { AngularSvgIconModule, SvgIconRegistryService } from "angular-svg-icon";
 import { Paginated } from "../../interfaces/paginated";
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { ResourceModule } from "src/app/resource/resource.module";
@@ -112,8 +112,12 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
   constructor(
     protected statService: CuratorStatisticsService,
     protected curatorService: CuratorService,
-    protected resourceService: ResourcesService
-  ) {}
+    protected resourceService: ResourcesService,
+    protected svgRegistry: SvgIconRegistryService
+  ) {
+    // preloading the loading svg icon
+    this.svgRegistry.loadSvg("assets/svg/loading-spinner.svg").subscribe();
+  }
   ngOnDestroy(): void {
     this.destroy$.next(true);
   }
@@ -166,11 +170,12 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
 
     this.statsWithUsers$ = this.statsList$.pipe(
       switchMap((stats: CuratorStatistics[]) => {
-        const users$List = stats.map(({ curator_orcid }) =>
-          this.curatorService
+        const users$List = stats.map(({ curator_orcid }) => {
+          console.log({ curator_orcid });
+          return this.curatorService
             .get_curator(curator_orcid)
-            .pipe(map((user: any) => new User().deserialize(user)))
-        );
+            .pipe(map((user: any) => new User().deserialize(user)));
+        });
         const usersList$ = combineLatest(users$List);
         return combineLatest([usersList$, of(stats)]);
       }),

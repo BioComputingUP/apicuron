@@ -10,7 +10,7 @@
     "build": "rm -rf dist/* && ng build apicuron-ui --configuration production --source-map && npm run sentry:sourcemaps",
     "build-widget-dev": "./projects/leaderboard/widget/build-widget.sh dev",
     "build-widget": "./projects/leaderboard/widget/build-widget.sh prod",
-    "build-dev": "rm -rf dist/* && ng build apicuron-ui --configuration development --source-map && npm run sentry:sourcemaps",
+    "build-dev": "rm -rf dist/* && ng build apicuron-ui --configuration development --source-map",
     "deploy-dev": "(colC='\\033[0;36m';colN='\\033[0m'; echo ${colC}Running npm build-dev ...${colN} && npm run build-dev && echo ${colC}Rsyncing dist ...${colN} && rsync -avzh --delete dist biocomp@persefone:/var/www/apicuron-dev/ && echo ${colC}Done with deploy-dev!${colC})",
     "deploy-prod": "(colC='\\033[0;36m';colN='\\033[0m'; echo ${colC}Running npm build ...${colN} && npm run build && echo ${colC}Rsyncing dist ...${colN} && rsync -avh --delete dist biocomp@persefone:/var/www/apicuron/ && echo ${colC}Done with deploy-prod!${colC})",
     "test": "ng test",

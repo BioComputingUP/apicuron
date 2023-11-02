@@ -6,9 +6,10 @@ import {
   RouterStateSnapshot,
 } from "@angular/router";
 import { CuratorService } from "./curator.service";
-import { catchError, map } from "rxjs/operators";
+import { catchError, map, switchMap } from "rxjs/operators";
 import { AuthService } from "../auth/auth.service";
-import { combineLatest } from "rxjs";
+import { combineLatest, of } from "rxjs";
+import { User } from "../models/User.model";
 export const CuratorExistsGuard: CanActivateFn = function (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
@@ -19,21 +20,23 @@ export const CuratorExistsGuard: CanActivateFn = function (
 
   return combineLatest([
     curatorService.get_curator(orcid_id as string),
-    authService.user$,
+    authService.loggedIn$,
   ]).pipe(
-    map(([user, connectedUser]) => {
-      console.log({
-        user,
-        connectedUser,
-      });
-      if (
-        user &&
-        (user.privacy == "public" || user.orcid_id == connectedUser.orcid_id)
-      ) {
-        return true;
+    switchMap(([user, loggedIn]) => {
+      if (loggedIn) {
+        return combineLatest([of(user), authService.user$]);
       } else {
-        return inject(Router).parseUrl("");
+        return combineLatest([of(user), of(null)]);
       }
+    }),
+    map(([user, connectedUser]: [User, User?]) => {
+      if (user && user.privacy == "public") {
+        return true;
+      }
+      if (connectedUser) {
+        return connectedUser.orcid_id == user.orcid_id;
+      }
+      return false;
     })
   );
 };
