@@ -6,6 +6,7 @@ import {
   pluck,
   shareReplay,
   switchMap,
+  takeUntil,
   tap,
 } from "rxjs/operators";
 import { environment } from "../../environments/environment";
@@ -14,6 +15,7 @@ import {
   combineLatest,
   Observable,
   of,
+  Subject,
   Subscription,
 } from "rxjs";
 import {
@@ -24,16 +26,14 @@ import {
   HttpInterceptor,
   HttpRequest,
 } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, OnDestroy } from "@angular/core";
 import { User } from "src/app/models/User.model";
 import * as _ from "lodash";
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root'
 })
-export class AuthService implements HttpInterceptor {
-  private logoutUrl = environment.ws + "logout";
-  private authUrl = environment.ws + "profile";
+export class AuthService implements OnDestroy {
   login_link = environment.auth_ws + "/auth/orcid";
 
   loginData = new BehaviorSubject<object>({
@@ -53,11 +53,11 @@ export class AuthService implements HttpInterceptor {
   private readonly jwtHeader = "authorization";
   private readonly orcidHeader = "orcid-token";
 
-  private requestHeaders$: Observable<any>;
+  public requestHeaders$: Observable<[string, string][]>;
 
   user$: Observable<any>;
 
-  loggedIn$: Observable<Boolean>;
+  loggedIn$: Observable<boolean>; // = new BehaviorSubject(false);
 
   // this variable describes the initial location where the user attempted to authenticate, defaults to home
   // By using this variable we can identify where did the user authenticate from
@@ -71,43 +71,45 @@ export class AuthService implements HttpInterceptor {
 
   // authentication JWT token key and value
   orcidPopup: Window;
-  destroy$: any;
+  destroy$ = new Subject<boolean>();
 
   constructor(public router: Router, private http: HttpClient) {
-    this.getTokens();
+    this.loadTokens();
 
     this.requestHeaders$ = combineLatest([
       this.orcidToken$,
       this.jwtToken$,
     ]).pipe(
       map(([orcidToken, jwtToken]: [string, string]) => {
-        let headers = {};
+        const headers: [string, string][] = [];
         if (orcidToken) {
-          headers[this.orcidHeader] = orcidToken;
+          headers.push([this.orcidHeader, orcidToken]);
         }
         if (jwtToken) {
-          headers[this.jwtHeader] = this.jwtPrefix + " " + jwtToken;
+          headers.push([this.jwtHeader, this.jwtPrefix + " " + jwtToken]);
         }
 
-        return headers;
+
+        return headers || null;
       })
     );
 
-    this.loggedIn$ = this.requestHeaders$.pipe(
-      map((headers: any) => {
-        return Object.keys(headers).length > 0;
+    this.loggedIn$ = combineLatest([this.orcidToken$, this.jwtToken$]).pipe(
+      map(([orcid, jwt]: [string, string]) => {
+        const val = !!orcid || !!jwt;
+
+        return val;
       })
     );
 
-    // this.token_value = this.get_auth_token();
     this.user$ = this.requestHeaders$.pipe(
-      filter((headers) => {
-        return !_.isEmpty(headers);
+      filter((headers: [string, string][]) => {
+        return headers.length > 0;
       }),
-      switchMap((headers) => {
+      switchMap((headers: [string, string][]) => {
         return this.http.get(environment.ws + "/auth/profile", {
           headers: {
-            ...headers,
+            ..._.fromPairs(headers),
           },
         });
       }),
@@ -134,12 +136,17 @@ export class AuthService implements HttpInterceptor {
     };
     window.addEventListener("message", windowMessageEventListener);
   }
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+  }
 
   public setOrcidToken(orcidToken: string | null) {
     this.orcidToken$.next(orcidToken);
-    orcidToken
-      ? localStorage.setItem(this.orcidHeader, orcidToken)
-      : localStorage.removeItem(this.orcidHeader);
+    if (orcidToken) {
+      localStorage.setItem(this.orcidHeader, orcidToken);
+    } else {
+      localStorage.removeItem(this.orcidHeader);
+    }
   }
 
   loadJwtToken(): Observable<string> {
@@ -161,7 +168,7 @@ export class AuthService implements HttpInterceptor {
     );
   }
 
-  private getTokens() {
+  private loadTokens() {
     const jwtToken = localStorage.getItem(this.jwtHeader);
     if (jwtToken) {
       this.jwtToken$.next(jwtToken);
@@ -172,7 +179,7 @@ export class AuthService implements HttpInterceptor {
     }
   }
 
-  private dropTokens() {
+  public dropTokens() {
     localStorage.removeItem(this.jwtHeader);
     localStorage.removeItem(this.orcidHeader);
     this.orcidToken$.next(null);
@@ -184,27 +191,6 @@ export class AuthService implements HttpInterceptor {
 
     this.router.navigate(this.loginUrlMapper.get(source));
   }
-  // Old method to extract token from cookies
-  // private get_token_from_cookies(): string | null {
-  //   // we check in the cookies for the token
-  //   const cookies = document.cookie.split("; ");
-  //   // get the cookie value
-  //   const authorization_cookie = cookies.find((x: string) =>
-  //     x.startsWith(this.jwtHeader)
-  //   );
-
-  //   // if the cookie value is there
-  //   if (authorization_cookie) {
-  //     // we remove it from the cookies and add it to the localStorage
-  //     document.cookie = ` ${this.jwtHeader}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
-
-  //     // extract the jwt token value
-  //     const [_, token_value] = authorization_cookie.split("=");
-  //     return decodeURI(token_value);
-  //   } else {
-  //     return null;
-  //   }
-  // }
 
   public openOauthDialog(source?: string) {
     if (source) {
@@ -217,39 +203,6 @@ export class AuthService implements HttpInterceptor {
         this.orcidPopup = window.open(this.login_link, "popup", "popup=true");
       }
     }
-  }
-
-  intercept(
-    req: HttpRequest<any>,
-    next: HttpHandler
-  ): Observable<HttpEvent<any>> {
-    // if we have the token_value
-    // we add the authorization JWT token to the request headers
-
-    return this.requestHeaders$.pipe(
-      switchMap((authHeaders: any) => {
-        if (
-          req.url.startsWith(environment.ws) &&
-          !!authHeaders &&
-          !_.isEmpty(authHeaders)
-        ) {
-          const cloned = req.clone({
-            setHeaders: authHeaders,
-          });
-          return next.handle(cloned).pipe(
-            catchError((err: HttpErrorResponse, caught) => {
-              if (err.status == 401) {
-                this.dropTokens();
-                return next.handle(req);
-              }
-              throw err;
-            })
-          );
-        } else {
-          return next.handle(req);
-        }
-      })
-    );
   }
 
   logout(): void {

@@ -1,12 +1,6 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { BehaviorSubject, Observable, Subject } from "rxjs";
-import {
-  filter,
-  map,
-  pluck,
-  switchMap,
-  takeUntil,
-} from "rxjs/operators";
+import { catchError, filter, map, pluck, switchMap, takeUntil } from "rxjs/operators";
 import { Notification } from "./models/Notification";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "../../environments/environment";
@@ -35,14 +29,12 @@ export class NotificationService implements OnDestroy {
                 version: "2",
               },
             })
-            .pipe(
-              pluck("data"),
-              map((notifications: any[]) => {
-                return notifications.map((notif) =>
-                  new Notification().deserialize(notif)
-                );
-              })
-            );
+        }),
+        pluck("data"),
+        map((notifications: any[]) => {
+          return notifications.map((notif) =>
+            new Notification().deserialize(notif)
+          );
         })
       )
       .subscribe((notifications) => {

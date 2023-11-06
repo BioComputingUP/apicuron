@@ -26,7 +26,6 @@ import { AngularSvgIconModule } from "angular-svg-icon";
   imports: [
     RouterModule,
     CommonModule,
-    AuthModule,
     AuthDropdownComponent,
     AngularSvgIconModule,
   ],

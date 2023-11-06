@@ -29,7 +29,6 @@ import _ from "lodash";
   templateUrl: "./auth-dropdown.component.html",
   styleUrls: ["./auth-dropdown.component.scss"],
   imports: [
-    AuthModule,
     CommonModule,
     RouterModule,
     AngularSvgIconModule,
@@ -52,6 +51,7 @@ export class AuthDropdownComponent {
     protected notificationService: NotificationService,
     protected toastr: ToastrService
   ) {
+
     this.login_link = environment.auth_ws + "/auth/orcid";
     this.loggedIn$ = this.authService.loggedIn$;
     this.user$ = this.authService.user$;
