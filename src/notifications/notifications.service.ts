@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { Notification } from '../core/schemas/notification.schema';
 import { NotificationFilter } from './dto/notification-filter.dto';
+import { paginate } from '../pagination/paginator';
 
 @Injectable()
 export class NotificationsService {
@@ -12,7 +13,7 @@ export class NotificationsService {
 	) {}
 
 	async getNotifications(orcid_id: string, filter: NotificationFilter) {
-		return await this.notificationModel.find(
+		const data = await this.notificationModel.find(
 			{
 				orcid_id,
 				...filter.omitPagination(),
@@ -20,6 +21,13 @@ export class NotificationsService {
 			{},
 			{ ...filter.getMongoQueryOptions() },
 		);
+
+		const count = await this.notificationModel.count({
+			orcid_id,
+			...filter.omitPagination(),
+		});
+
+		return paginate(data, filter, count);
 	}
 
 	async get_new_user_notification(orcid_id: string) {

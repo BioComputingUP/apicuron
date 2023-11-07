@@ -15,14 +15,14 @@ export class PaginateDto {
 	@Min(0)
 	@IsInt()
 	@IsOptional()
-	@Transform(({ value }) => parseInt(value))
+	@Transform(({ value }) => parseInt(value) || null)
 	skip;
 
 	@Max(100)
 	@Min(-1)
 	@IsInt()
 	@IsOptional()
-	@Transform(({ value }) => parseInt(value))
+	@Transform(({ value }) => parseInt(value) || null)
 	limit;
 
 	getMongoQueryOptions<T>(): QueryOptions<T> {

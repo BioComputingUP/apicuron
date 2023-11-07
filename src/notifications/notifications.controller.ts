@@ -35,7 +35,10 @@ export class NotificationsController {
 		@User() user: UserModel,
 		@Query() filter: NotificationFilter,
 	) {
-		console.log({ pagination: filter.getMongoQueryOptions() });
+		console.log({
+			pagination: filter.getMongoQueryOptions(),
+			seen: filter.seen,
+		});
 		return await this.notificationService.getNotifications(
 			user.orcid_id,
 			filter,
@@ -70,12 +73,20 @@ export class NotificationsController {
 	@Delete(':notification_id')
 	@AuthProtected()
 	async delete_notification(
-		@Req() request,
+		@User() user: UserModel,
 		@Param('notification_id') notification_id: mongoose.Types.ObjectId,
+		@Query('hard-delete') hardDelete: boolean,
 	) {
-		return await this.notificationService.set_notification_as_seen(
-			notification_id,
-			request.user.orcid_id,
-		);
+		if (hardDelete) {
+			await this.notificationService.delete_notification(
+				notification_id,
+				user.orcid_id,
+			);
+		} else {
+			return await this.notificationService.set_notification_as_seen(
+				notification_id,
+				user.orcid_id,
+			);
+		}
 	}
 }
