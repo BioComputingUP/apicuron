@@ -27,12 +27,16 @@
                 </div>
                 <div class="tw-flex tw-items-center tw-gap-2">
                     <button
-                        class="tw-bg-apicuron-purple tw-capitalize tw-text-gray-200 tw-font-normal tw-p-1 tw-rounded"
-                        (click)="details_elem.open = !details_elem.open">
+                        class="tw-bg-apicuron-purple tw-capitalize tw-text-gray-200 tw-font-bold tw-p-1 tw-rounded"
+                        (click)="toggleVisibility()">
                         {{ toggle_text$ | async }}
                     </button>
                     <button (click)="set_notification_as_seen(notification.id)" *ngIf="!notification.seen"
-                        class="tw-bg-gray-300 tw-text-gray-800 tw-font-normal tw-p-1 tw-rounded">Mark as seen
+                        class="tw-bg-gray-300 tw-text-gray-800 tw-font-bold tw-p-1 tw-rounded">Mark as seen
+                    </button>
+
+                    <button (click)="deleteNotification()" *ngIf="notification.seen"
+                        class="tw-bg-red-500 tw-text-gray-100 tw-font-bold tw-p-1 tw-rounded">Delete
                     </button>
                 </div>
 

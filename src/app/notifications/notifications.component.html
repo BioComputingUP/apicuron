@@ -9,15 +9,41 @@
 
         <ng-container *ngIf="!notifications || notifications.length === 0">
             <div class="tw-flex tw-flex-col tw-w-full tw-items-center">
-                <img class="tw-w-1/3 tw-h-auto" src="assets/svg/no_data.svg" alt="">
+                <img class="tw-w-32 tw-h-auto" src="assets/svg/no_data.svg" alt="">
                 <span class="tw-block tw-text-lg tw-gray-800">You have no current notifications</span>
             </div>
         </ng-container>
 
     </div>
+    <ng-template #loadingOrError>
+
+    </ng-template>
+
+
+    <div>
+        <h3 class="tw-text-2xl tw-font-bold">Seen notifications</h3>
+
+        <div class="tw-flex tw-flex-row tw-flex-wrap tw-w-full tw-justify-center" *ngIf="seenNotifications$ | async as seenNotifications; else loading">
+
+            <div class="tw-w-full tw-p-2" *ngFor="let notification of seenNotifications.data">
+                <notification [notification]="notification" (deleteNotification)="deleteNotification($event)"></notification>
+            </div>
+            <div class="tw-p-2" *ngIf="seenNotifications && seenNotifications.data.length > 0">
+                <pagination class="tw-mx-auto" [totalItems]="seenNotifications.meta.pagination.total" [itemsPerPage]="(notificationPagination$ | async).limit"
+                [(ngModel)]="currentPage" (pageChanged)="update_page($event.page)" [maxSize]="5"></pagination>
+            </div>
+
+            <ng-container *ngIf="!seenNotifications || seenNotifications.data.length === 0">
+                <div class="tw-flex tw-flex-col tw-w-full tw-items-center">
+                    <img class="tw-w-32 tw-h-auto" src="assets/svg/no_data.svg" alt="">
+                    <span class="tw-block tw-text-lg tw-gray-700 tw-py-4" >You have no Seen notifications</span>
+                </div>
+            </ng-container>
+        </div>
+
+        <ng-template #loading>
+            <div class="tw-text-2xl tw-font-bold tw-text-black tw-text-center">LOADING....</div>
+        </ng-template>
+    </div>
 
 </div>
-
-<ng-template #loadingOrError>
-
-</ng-template>
