@@ -1,13 +1,24 @@
-import { Controller, Get, UseGuards, Req, Delete, Param } from '@nestjs/common';
+import {
+	Controller,
+	Get,
+	UseGuards,
+	Req,
+	Delete,
+	Param,
+	Query,
+} from '@nestjs/common';
 import { ApiHeader, ApiOperation, ApiTags, ApiSecurity } from '@nestjs/swagger';
 import mongoose from 'mongoose';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { AuthorizationHeader, VersionHeader } from '../swagger/config';
 import { NotificationsService } from './notifications.service';
+import { User } from '../auth/decorators/applyUser.decorator';
+import { User as UserModel } from '../core/schemas/user.schema';
+import { NotificationFilter } from './dto/notification-filter.dto';
+import { AuthProtected } from '../auth/decorators/auth.decorator';
 
 @ApiTags('Notifications')
 @ApiHeader(VersionHeader)
-@ApiSecurity('basic')
 @Controller({
 	path: 'notifications',
 	version: '2',
@@ -15,11 +26,19 @@ import { NotificationsService } from './notifications.service';
 export class NotificationsController {
 	constructor(private notificationService: NotificationsService) {}
 
+	@ApiOperation({
+		description: 'Get the list of notifications for the loggedIn User',
+	})
 	@Get()
-	@UseGuards(LocalAuthGuard)
-	async get_user_notification(@Req() request) {
-		return await this.notificationService.get_new_user_notification(
-			request.user.orcid_id,
+	@AuthProtected()
+	async getNotifications(
+		@User() user: UserModel,
+		@Query() filter: NotificationFilter,
+	) {
+		console.log({ pagination: filter.getMongoQueryOptions() });
+		return await this.notificationService.getNotifications(
+			user.orcid_id,
+			filter,
 		);
 	}
 
@@ -27,7 +46,7 @@ export class NotificationsController {
 		description: 'Get the number of unseen notifications',
 	})
 	@Get('count')
-	@UseGuards(LocalAuthGuard)
+	@AuthProtected()
 	async get_new_notification_count(@Req() request) {
 		return await this.notificationService.get_new_notification_count(
 			request.user.orcid_id,
@@ -38,7 +57,7 @@ export class NotificationsController {
 		description: 'Delete all user notifications',
 	})
 	@Delete()
-	@UseGuards(LocalAuthGuard)
+	@AuthProtected()
 	async clear_notifications(@Req() request) {
 		return await this.notificationService.clear_user_notifications(
 			request.user.orcid_id,
@@ -49,7 +68,7 @@ export class NotificationsController {
 		description: 'Delete a specific notification',
 	})
 	@Delete(':notification_id')
-	@UseGuards(LocalAuthGuard)
+	@AuthProtected()
 	async delete_notification(
 		@Req() request,
 		@Param('notification_id') notification_id: mongoose.Types.ObjectId,

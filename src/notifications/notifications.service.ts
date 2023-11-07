@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { Notification } from '../core/schemas/notification.schema';
+import { NotificationFilter } from './dto/notification-filter.dto';
 
 @Injectable()
 export class NotificationsService {
@@ -9,6 +10,17 @@ export class NotificationsService {
 		@InjectModel(Notification.name)
 		protected notificationModel: Model<Notification>,
 	) {}
+
+	async getNotifications(orcid_id: string, filter: NotificationFilter) {
+		return await this.notificationModel.find(
+			{
+				orcid_id,
+				...filter.omitPagination(),
+			},
+			{},
+			{ ...filter.getMongoQueryOptions() },
+		);
+	}
 
 	async get_new_user_notification(orcid_id: string) {
 		const data = await this.notificationModel
