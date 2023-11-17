@@ -11,7 +11,6 @@ import {
   switchMap,
   take,
   takeUntil,
-  tap,
 } from "rxjs/operators";
 import { CuratorStatisticsModule } from "../../curator-statistics/curator-statistics.module";
 import { CuratorStatisticsService } from "../../curator-statistics/services/curator-statistics.service";
@@ -170,8 +169,10 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
 
     this.statsWithUsers$ = this.statsList$.pipe(
       switchMap((stats: CuratorStatistics[]) => {
+        if(stats.length == 0){
+          return of([[], []])
+        }
         const users$List = stats.map(({ curator_orcid }) => {
-          console.log({ curator_orcid });
           return this.curatorService
             .get_curator(curator_orcid)
             .pipe(map((user: any) => new User().deserialize(user)));

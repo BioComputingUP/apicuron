@@ -116,9 +116,9 @@
             </div>
         </ng-container>
 
-        <div #emptyList>
-
-        </div>
+        <ng-template #emptyList>
+            <div class="tw-text-center">{{ resource.name }} Has no available Leaderboard yet</div>
+        </ng-template>
     </ng-container>
 
     <ng-template #loading>

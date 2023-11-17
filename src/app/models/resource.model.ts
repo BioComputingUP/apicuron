@@ -21,6 +21,7 @@ export class Resource implements Deserializable, Serializable {
     this.resource_id = input.resource_id;
     this.resource_long_name = input.resource_long_name;
     this.resource_name = input.resource_name;
+    this.name = input.resource_name;
     this.resource_uri = new URL(input.resource_uri);
     this.resource_url = new URL(input.resource_url);
     this.color = input.color;
@@ -51,6 +52,7 @@ export class Resource implements Deserializable, Serializable {
   }
 
   resource_description: string;
+  name: string;
   resource_id: string;
   resource_long_name: string;
   resource_name: string;
