@@ -15,14 +15,18 @@ export class PaginateDto {
 	@Min(0)
 	@IsInt()
 	@IsOptional()
-	@Transform(({ value }) => parseInt(value) || null)
-	skip;
+	@Transform(({ value }) => {
+		return Number.isNaN(parseInt(value)) ? null : parseInt(value);
+	})
+	skip = 0;
 
 	@Max(100)
 	@Min(-1)
 	@IsInt()
 	@IsOptional()
-	@Transform(({ value }) => parseInt(value) || null)
+	@Transform(({ value }: { value: string }) =>
+		Number.isNaN(parseInt(value)) ? null : parseInt(value),
+	)
 	limit;
 
 	getMongoQueryOptions<T>(): QueryOptions<T> {
@@ -39,13 +43,16 @@ export class PaginateDto {
 	}
 
 	getMongoAggregation(): PaginationAggregation {
-		const agg: PaginationAggregation = [{ $skip: this.skip }];
-		if (this.limit > 0) {
+		const agg = [];
+		if (this.skip) {
+			agg.push({ $skip: this.skip });
+		}
+		if (this.limit && this.limit > 0) {
 			agg.push({
 				$limit: this.limit,
 			});
 		}
-		return agg;
+		return agg as PaginationAggregation;
 	}
 
 	omitPagination(): Omit<this, 'skip' | 'limit'> {
