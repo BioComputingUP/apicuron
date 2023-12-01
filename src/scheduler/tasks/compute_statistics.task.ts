@@ -144,7 +144,9 @@ export class ComputeStatisticsTask {
 					resource_id,
 					curator_orcid,
 				}),
-				privacy: (await this.userModel.findOne({ curator_orcid })).privacy,
+				privacy:
+					(await this.userModel.findOne({ curator_orcid })).privacy ||
+					'private',
 				// type: 'contribution'
 			};
 

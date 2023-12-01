@@ -128,7 +128,7 @@ export class User {
 
 	@Prop({
 		required: true,
-		default: 'public',
+		default: 'private',
 		type: String,
 		enum: ['public', 'private'],
 	})
