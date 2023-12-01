@@ -120,6 +120,14 @@ export class ComputeStatisticsTask {
 				0,
 			);
 
+			const privacy =
+				(await this.userModel.findOne({ orcid_id: curator_orcid }))?.privacy ||
+				'private';
+
+			this.logger.debug(
+				`User ${curator_orcid} has privacy set as "${privacy}"`,
+			);
+
 			const stat_entry: Statistics = {
 				curator_orcid,
 				resource_id,
@@ -144,9 +152,7 @@ export class ComputeStatisticsTask {
 					resource_id,
 					curator_orcid,
 				}),
-				privacy:
-					(await this.userModel.findOne({ curator_orcid })).privacy ||
-					'private',
+				privacy,
 				// type: 'contribution'
 			};
 
@@ -254,7 +260,7 @@ export class ComputeStatisticsTask {
 		);
 
 		const userPrivacy =
-			(await this.userModel.findOne({ orcid_id })).privacy || 'private';
+			(await this.userModel.findOne({ orcid_id }))?.privacy || 'private';
 
 		const user_stats = {
 			generation_terms: [],
