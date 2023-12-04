@@ -25,7 +25,7 @@ export class BadgeDef {
 	resource_uri: string;
 
 	@Prop({
-		type: [String],
+		type: String,
 		required: true,
 	})
 	resource_id: string;
