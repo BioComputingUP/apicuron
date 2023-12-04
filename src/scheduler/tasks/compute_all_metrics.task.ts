@@ -22,7 +22,7 @@ export class ComputeAllMetricsTask {
 				await this.computeAchievementsTask.run_task({
 					arguments: [resource_id],
 				});
-				return this.computeStatisticsTask.run_task({
+				return await this.computeStatisticsTask.run_task({
 					arguments: [resource_id],
 				});
 			},
