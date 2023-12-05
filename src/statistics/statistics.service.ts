@@ -1,20 +1,25 @@
 import { Injectable, Logger, NotFoundException, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Document, Model } from 'mongoose';
+import { Document, FilterQuery, Model, PipelineStage, mongo } from 'mongoose';
 // import { TransformerService } from '../shared/transformer/transformer.service';
-import { User, UserDocument } from '../core/schemas/user.schema';
+import { User, UserDocument, UserSchema } from '../core/schemas/user.schema';
 import {
 	PublicStatistics,
 	Statistics,
 	StatisticsDocument,
 } from '../core/schemas/statistics.schema';
 import { PartnerResourcesService } from '..//resources/partner-resources/partner-resources.service';
-import { GetStatisticsDto } from './dto/get-statistics.dto';
+import {
+	GetStatisticsDto,
+	statisticsSortByFields,
+} from './dto/get-statistics.dto';
 import { paginate } from '../pagination/paginator';
 import { PaginateDto } from '../pagination/dto/paginate.dto';
 import { ReportDocument } from '../core/schemas/reports.schema';
 import { OnEvent } from '@nestjs/event-emitter';
 import { UPDATE_USER_PRIVACY } from './constants';
+import { StatisticsFilter } from './dto/statistics-filter.dto';
+import { includes } from 'lodash';
 
 @Injectable()
 export class StatisticsService {
@@ -99,6 +104,7 @@ export class StatisticsService {
 
 	async get_all_statistics(
 		getStatDto: GetStatisticsDto,
+		allowedResources: string[] = [],
 		privacy: 'public' | 'private' = 'public',
 	) {
 		const {
@@ -108,13 +114,30 @@ export class StatisticsService {
 		} = getStatDto;
 
 		// query filter
-		let query = {};
+		const mongoQuery: FilterQuery<any> = {
+			$and: [
+				{
+					$or: [
+						// Either get the statistics from allowed Resources (meaning resources without private or public restrictions)
+						{
+							'stats.resource_id': {
+								$in: allowedResources,
+							},
+						},
+						{
+							// Or only get the stats with the specified privacy (default: public)
+							'stats.privacy': privacy,
+						},
+					],
+				},
+			],
+		};
 		// if there's a query passed
 		if (passed_query) {
 			// if there's no user_filter_field, default to displayedName
 			const field = !!user_filter_field ? user_filter_field : 'displayedName';
 			// pass query using regex, case insensitive
-			query[field] = { $regex: passed_query, $options: 'i' };
+			mongoQuery[field] = { $regex: passed_query, $options: 'i' };
 		}
 
 		if (resource_ids) {
@@ -124,42 +147,42 @@ export class StatisticsService {
 				.map(({ resource_uri }) => resource_uri);
 
 			if (resource_uris && resource_uris.length > 0) {
-				query = {
-					...query,
+				mongoQuery['$and'].push({
 					$or: [
-						// get both stats matching resource_uris and resource_ids
 						{
-							'stats.resource_uri': {
-								$in: resource_uris,
-							},
-							'stats.privacy': 'public',
+							'stats.resource_id': { $in: resource_ids },
 						},
 						{
-							'stats.resource_id': {
-								$in: resource_ids,
-							},
-							'stats.privacy': 'public',
+							'stats.resource_uri': { $in: resource_uris },
 						},
 					],
-				};
+				});
+			} else {
+				mongoQuery['$and'].push({
+					'stats.resource_id': { $in: resource_ids },
+				});
 			}
 		}
 
-		if (privacy == 'public') {
-			query['privacy'] = 'public';
-		}
+		const projectUserFields = {
+			role: 0,
+			_id: 0,
+			__v: 0,
+			last_update: 0,
+			orcid_permission: 0,
+			refresh_token: 0,
+			orcid_work_put_codes: 0,
+		};
+		const userFieldsToRemove = Object.keys(projectUserFields);
+
+		const userFieldsGroupStage = Object.keys(UserSchema.paths)
+			.filter((key) => !userFieldsToRemove.includes(key))
+			.reduce((obj, key) => ({ ...obj, [key]: { $first: '$' + key } }), {});
 
 		const userStatsAggregation = [
 			{
 				// remove fields we don't need
-				$project: {
-					role: 0,
-					__v: 0,
-					last_update: 0,
-					orcid_permission: 0,
-					refresh_token: 0,
-					orcid_work_put_codes: 0,
-				},
+				$project: projectUserFields,
 			},
 			{
 				// join with statistics
@@ -171,7 +194,22 @@ export class StatisticsService {
 				},
 			},
 			{
-				$match: query,
+				$unwind: {
+					path: '$stats',
+					preserveNullAndEmptyArrays: false,
+				},
+			},
+			{
+				$match: mongoQuery,
+			},
+			{
+				$group: {
+					_id: '$orcid_id',
+					...userFieldsGroupStage,
+					stats: {
+						$addToSet: '$stats',
+					},
+				},
 			},
 			{
 				$project: {
@@ -182,9 +220,25 @@ export class StatisticsService {
 			},
 		];
 
+		// sort aggregation
+		const sortAggregation = [];
+		if (!!getStatDto.sortBy && !!getStatDto.sortOrder) {
+			const obj = { $sort: {} };
+			// if the field belongs  to userFields it is directly used, otherwise it belongs to the
+			// statistics field and we append "stats."
+			const sortField = Object.keys(userFieldsGroupStage).includes(
+				getStatDto.sortBy,
+			)
+				? getStatDto.sortBy
+				: 'stats.' + getStatDto.sortBy;
+			obj.$sort[sortField] = getStatDto.sortOrder;
+			sortAggregation.push(obj);
+		}
+
 		// get the data aggregated
 		const dataPromise = this.userModel.aggregate([
 			...userStatsAggregation,
+			...sortAggregation,
 			...getStatDto.getMongoAggregation(),
 		]);
 
@@ -242,5 +296,34 @@ export class StatisticsService {
 		const count = await this.publicStatModel.count({ resource_id });
 
 		return paginate(data, pagination, count);
+	}
+
+	/**
+	 *
+	 * @param filter Dto Object that Filters Statistics
+	 * @param allowedResources A list of resource ids on which the privacy restriction doesn't apply
+	 * @param defaultPrivacy The default privacy requested
+	 * @returns {Statistics[]} A list of statistics fitting the filter criteria
+	 */
+	async getStatistics(
+		filter: StatisticsFilter,
+		allowedResources: string[],
+		defaultPrivacy: 'private' | 'public' = 'public',
+	) {
+		return await this.statisticsModel.find(
+			{
+				...filter.omitPagination(),
+				$or: [
+					{
+						resource_id: { $in: allowedResources },
+					},
+					{
+						privacy: defaultPrivacy,
+					},
+				],
+			},
+			null,
+			filter.getMongoQueryOptions(),
+		);
 	}
 }

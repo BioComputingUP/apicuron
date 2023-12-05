@@ -12,7 +12,7 @@ import mongoose from 'mongoose';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { AuthorizationHeader, VersionHeader } from '../swagger/config';
 import { NotificationsService } from './notifications.service';
-import { User } from '../auth/decorators/applyUser.decorator';
+import { UserReq } from '../auth/decorators/applyUser.decorator';
 import { User as UserModel } from '../core/schemas/user.schema';
 import { NotificationFilter } from './dto/notification-filter.dto';
 import { AuthProtected } from '../auth/decorators/auth.decorator';
@@ -32,7 +32,7 @@ export class NotificationsController {
 	@Get()
 	@AuthProtected()
 	async getNotifications(
-		@User() user: UserModel,
+		@UserReq() user: UserModel,
 		@Query() filter: NotificationFilter,
 	) {
 		console.log({
@@ -73,7 +73,7 @@ export class NotificationsController {
 	@Delete(':notification_id')
 	@AuthProtected()
 	async delete_notification(
-		@User() user: UserModel,
+		@UserReq() user: UserModel,
 		@Param('notification_id') notification_id: mongoose.Types.ObjectId,
 		@Query('hard-delete') hardDelete: boolean,
 	) {

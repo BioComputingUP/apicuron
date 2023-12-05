@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { achievements_v1_pipeline } from './aggregation-pipeline/achievements.pipeline';
@@ -7,12 +7,29 @@ import { User, UserDocument } from '../../core/schemas/user.schema';
 import { ConfigService } from '@nestjs/config';
 import { generateAvatar } from './generate_avatar';
 @Injectable()
-export class UsersService {
-	private readonly userServiceLogger = new Logger(UsersService.name);
+export class UsersService implements OnApplicationBootstrap {
+	private readonly logger = new Logger(UsersService.name);
 	constructor(
 		@InjectModel(User.name) private userModel: Model<UserDocument>,
 		protected configService: ConfigService,
 	) {}
+	async onApplicationBootstrap(): Promise<void> {
+		const result = await this.userModel.updateMany(
+			{
+				privacy: { $exists: false },
+			},
+			{
+				$set: {
+					privacy: 'private',
+				},
+			},
+		);
+
+		this.logger.log(
+			`OnApplicationBootstrap: set ${result.modifiedCount} privacy User entries to private`,
+		);
+		return;
+	}
 
 	public async user_exists(orcid_id: string): Promise<boolean> {
 		return !!(await this.userModel.exists({

@@ -132,25 +132,32 @@ export class UserControllerV2 {
 	async get_curator(@Param('orcid_id') orcid_id: string, @Req() req) {
 		let user = null;
 		if (req.user) {
-			user = this.userModel.findOne(
-				{
-					$or: [
-						{
-							orcid_id,
-							privacy: 'public',
-						},
-						{
-							orcid_id: req.user.orcid_id,
-						},
-					],
-				},
-				{
-					stats: 0,
-					orcid_permission: 0,
-					refresh_token: 0,
-					orcid_work_put_codes: 0,
-				},
-			);
+			if (req.user.resources && req.user.resources.length > 0) {
+				user = this.userModel.findOne(
+					{
+						orcid_id,
+					},
+					{
+						stats: 0,
+						orcid_permission: 0,
+						refresh_token: 0,
+						orcid_work_put_codes: 0,
+					},
+				);
+			} else {
+				user = this.userModel.findOne(
+					{
+						orcid_id,
+						privacy: 'public',
+					},
+					{
+						stats: 0,
+						orcid_permission: 0,
+						refresh_token: 0,
+						orcid_work_put_codes: 0,
+					},
+				);
+			}
 		} else {
 			user = await this.usersService.getPublicUser(orcid_id);
 		}
