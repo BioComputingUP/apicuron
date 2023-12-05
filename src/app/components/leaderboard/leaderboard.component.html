@@ -30,11 +30,11 @@
                     </thead>
                     <tbody class="tw-divide-y tw-divide-gray-200">
                         <tr *ngFor="let entry of statsWithUsers;let indexOfelement=index;" class="odd:tw-bg-gray-50">
-                            <td class="tw-text-center tw-font-bold">{{indexOfelement + 1}}</td>
+                            <td class="tw-text-center tw-font-bold">{{ entry.stat.ranking }}</td>
                             <td>
                                 <div class="tw-overflow-hidden tw-w-12 tw-h-12 tw-rounded-full tw-border-2 tw-border-apicuron-bright-purple"
                                     [ngStyle]="{ borderColor: resource.color}">
-                                    <img [src]="entry.user.generate_avatar()" class="tw-w-full" alt="">
+                                    <img [src]="entry.user.generate_avatar()"class="tw-w-full" alt="">
                                 </div>
                             </td>
 

@@ -5,12 +5,9 @@ import {
   filter,
   map,
   pluck,
-  share,
   shareReplay,
   startWith,
   switchMap,
-  take,
-  takeUntil,
 } from "rxjs/operators";
 import { CuratorStatisticsModule } from "../../curator-statistics/curator-statistics.module";
 import { CuratorStatisticsService } from "../../curator-statistics/services/curator-statistics.service";
@@ -23,9 +20,11 @@ import { ResourcesService } from "../../resource/service/resources.service";
 import { environment } from "src/environments/environment";
 import { AngularSvgIconModule, SvgIconRegistryService } from "angular-svg-icon";
 import { Paginated } from "../../interfaces/paginated";
-import { FormControl, ReactiveFormsModule } from "@angular/forms";
+import { ReactiveFormsModule } from "@angular/forms";
 import { ResourceModule } from "src/app/resource/resource.module";
 import { RouterModule } from "@angular/router";
+import { StatisticsFilter } from "../../curator-statistics/models/statistics-filter";
+import { CuratorWithStats } from "../../curator-statistics/models/curator-stats";
 
 const leaderboardColumns = {
   medals_count: {
@@ -60,12 +59,6 @@ const leaderboardColumns = {
   },
 };
 
-export type LeaderboardQuery = {
-  skip: number;
-  limit: number;
-  resource_id: string;
-};
-
 @Component({
   standalone: true,
   selector: "leaderboard",
@@ -82,7 +75,7 @@ export type LeaderboardQuery = {
   styleUrls: ["./leaderboard.component.scss"],
 })
 export class LeaderboardComponent implements OnInit, OnDestroy {
-  statsList$: Observable<CuratorStatistics[]>;
+  statsList$: Observable<CuratorWithStats[]>;
   statsWithUsers$: Observable<{ stat: CuratorStatistics; user: User }[]>;
   resource$: Observable<Resource>;
 
@@ -96,7 +89,7 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
   ];
 
   apicuronURL = environment.host;
-  stats$: Observable<Paginated<CuratorStatistics>>;
+  stats$: Observable<Paginated<CuratorWithStats>>;
   statsMeta$: Observable<{
     pagination: { total: number; start: number; limit: number };
   }>;
@@ -105,7 +98,7 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
 
   page$ = new BehaviorSubject<number>(1);
   limit = 10;
-  leaderboardQuery$: Observable<LeaderboardQuery>;
+  statFilter$: Observable<StatisticsFilter>;
   maxPage$: Observable<number>;
 
   constructor(
@@ -140,52 +133,48 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
       .get_resource(this.resource_id)
       .pipe(shareReplay());
 
-    this.leaderboardQuery$ = combineLatest([this.page$, this.resource$]).pipe(
+    this.statFilter$ = combineLatest([this.page$, this.resource$]).pipe(
       map(([page, resource]: [number, Resource]) => {
-        return {
-          limit: this.limit,
-          skip: (page - 1) * this.limit,
-          resource_id: resource.resource_id,
-        };
-      })
-    );
-
-    this.stats$ = this.leaderboardQuery$.pipe(
-      filter((query: LeaderboardQuery) => {
-        return !!query.resource_id;
-      }),
-      shareReplay(),
-      switchMap(({ resource_id, skip, limit }: LeaderboardQuery) => {
-        return this.statService.getResourceLeaderboard(
-          resource_id,
-          limit,
-          skip
-        );
+        const filter = new StatisticsFilter();
+        filter.limit = this.limit;
+        filter.skip = (page - 1) * this.limit;
+        filter.resources = [resource.resource_id];
+        filter.sortOrder = -1;
+        filter.sortBy = "ranking";
+        return filter;
       }),
       shareReplay()
     );
+
+    this.stats$ = this.statFilter$.pipe(
+      filter((filter: StatisticsFilter) => {
+        return !!filter.resources && filter.resources.length > 0;
+      }),
+      shareReplay(),
+      switchMap((filter: StatisticsFilter) => {
+        return this.statService.getStatistics(filter);
+      }),
+
+      shareReplay()
+    );
+
     this.statsList$ = this.stats$.pipe(pluck("data"));
     this.statsMeta$ = this.stats$.pipe(pluck("meta"));
 
-    this.statsWithUsers$ = this.statsList$.pipe(
-      switchMap((stats: CuratorStatistics[]) => {
-        if(stats.length == 0){
-          return of([[], []])
-        }
-        const users$List = stats.map(({ curator_orcid }) => {
-          return this.curatorService
-            .get_curator(curator_orcid)
-            .pipe(map((user: any) => new User().deserialize(user)));
-        });
-        const usersList$ = combineLatest(users$List);
-        return combineLatest([usersList$, of(stats)]);
-      }),
-      map(([users, stats]: [User[], CuratorStatistics[]]) => {
-        return stats.map((stat) => {
-          return {
-            stat,
-            user: users.find((user) => user.orcid_id == stat.curator_orcid),
-          };
+    this.statsWithUsers$ = combineLatest([
+      this.statsList$,
+      this.statFilter$,
+    ]).pipe(
+      map(([stats, filter]: [CuratorWithStats[], StatisticsFilter]) => {
+        return stats.map((entry: CuratorWithStats, index: number) => {
+          const stat = entry.stats.find(
+            (stat) => stat.resource_id == filter.resources[0]
+          );
+          stat.ranking = filter.skip + index + 1;
+
+          const user = new User().deserialize(entry);
+
+          return { user, stat };
         });
       })
     );
