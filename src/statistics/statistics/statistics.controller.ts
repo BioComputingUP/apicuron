@@ -137,6 +137,7 @@ export class StatisticsController {
 		return await this.statService.get_all_statistics(
 			getStatDtoInstance,
 			user?.resources.map((res) => res.resource_id),
+			user?.orcid_id,
 			'public',
 		);
 	}

@@ -105,6 +105,7 @@ export class StatisticsService {
 	async get_all_statistics(
 		getStatDto: GetStatisticsDto,
 		allowedResources: string[] = [],
+		request_orcid: string | null = null,
 		privacy: 'public' | 'private' = 'public',
 	) {
 		const {
@@ -113,25 +114,34 @@ export class StatisticsService {
 			filter_field: user_filter_field,
 		} = getStatDto;
 
+		const privacyFilters: FilterQuery<any>[] = [
+			// Either get the statistics from allowed Resources (meaning resources without private or public restrictions)
+			{
+				'stats.resource_id': {
+					$in: allowedResources,
+				},
+			},
+			{
+				// Or only get the stats with the specified privacy (default: public)
+				'stats.privacy': privacy,
+			},
+		];
+
+		if (!!request_orcid) {
+			privacyFilters.push({
+				'stats.curator_orcid': request_orcid,
+			});
+		}
+
 		// query filter
 		const mongoQuery: FilterQuery<any> = {
 			$and: [
 				{
-					$or: [
-						// Either get the statistics from allowed Resources (meaning resources without private or public restrictions)
-						{
-							'stats.resource_id': {
-								$in: allowedResources,
-							},
-						},
-						{
-							// Or only get the stats with the specified privacy (default: public)
-							'stats.privacy': privacy,
-						},
-					],
+					$or: privacyFilters,
 				},
 			],
 		};
+
 		// if there's a query passed
 		if (passed_query) {
 			// if there's no user_filter_field, default to displayedName
@@ -171,6 +181,8 @@ export class StatisticsService {
 			last_update: 0,
 			orcid_permission: 0,
 			refresh_token: 0,
+			resources: 0,
+			orcid_scope: 0,
 			orcid_work_put_codes: 0,
 		};
 		const userFieldsToRemove = Object.keys(projectUserFields);

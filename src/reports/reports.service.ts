@@ -155,18 +155,26 @@ export class ReportsService {
 
 	async getReports(
 		reportFilter: ReportFilterDto,
+		request_orcid: string | null = null,
 		allowedResources: string[] = [],
 	) {
 		const { filter, options } = this.buildReportsQuery(reportFilter);
+
+		const privacyFilters: FilterQuery<any>[] = [
+			{ resource_id: { $in: allowedResources } },
+			{ privacy: 'public' },
+		];
+		if (!!request_orcid) {
+			privacyFilters.push({
+				curator_orcid: request_orcid,
+			});
+		}
 
 		const query = {
 			$and: [
 				filter,
 				{
-					$or: [
-						{ resource_id: { $in: allowedResources } },
-						{ privacy: 'public' },
-					],
+					$or: privacyFilters,
 				},
 			],
 		};

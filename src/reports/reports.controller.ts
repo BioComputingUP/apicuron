@@ -109,6 +109,7 @@ export class ReportsController {
 			user?.resources.map(({ resource_id }) => resource_id) ?? [];
 		return await this.reportService.getReports(
 			reportFilterInstance,
+			user?.orcid_id,
 			allowedResources,
 		);
 	}
