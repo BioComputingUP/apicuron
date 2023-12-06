@@ -61,6 +61,9 @@ import {
 	COMPUTE_RESOURCE_STATISTICS_TASK,
 	COMPUTE_USER_BADGES_TASK,
 } from '../scheduler/contants';
+import { UserReq } from '../auth/decorators/applyUser.decorator';
+import { User } from '../core/schemas/user.schema';
+import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
@@ -90,15 +93,24 @@ export class ReportsController {
 			);
 		}
 	}
-
+	@UseGuards(LocalAuthGuard)
+	@Public()
 	@Get()
-	async get_reports(@Query() reportFilter: ReportFilterDto, @Request() req) {
+	async get_reports(
+		@Query() reportFilter: ReportFilterDto,
+		@UserReq() user: User,
+	) {
 		// TODO: Add resource ownership control and add it to allowed resources when querying reports
 		const reportFilterInstance: ReportFilterDto = plainToInstance(
 			ReportFilterDto,
 			reportFilter,
 		);
-		return await this.reportService.getReports(reportFilterInstance);
+		const allowedResources =
+			user?.resources.map(({ resource_id }) => resource_id) ?? [];
+		return await this.reportService.getReports(
+			reportFilterInstance,
+			allowedResources,
+		);
 	}
 
 	@Get('group-by/:groupBy')

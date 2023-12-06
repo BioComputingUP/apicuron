@@ -17,7 +17,7 @@ import { Report, ReportDocument } from '../core/schemas/reports.schema';
 import * as _ from 'lodash';
 import { paginate } from '../pagination/paginator';
 import { PaginationAggregation } from '../pagination/interfaces/pagination-aggregation';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import {
 	REPORTS_DELETED_ALL_RESOURCE,
 	REPORTS_INSERTED,
@@ -25,19 +25,29 @@ import {
 } from './constants';
 import { ReportDto } from './dto/report.dto';
 import { DeleteResult } from 'mongodb';
+import { UPDATE_USER_PRIVACY } from '../statistics/constants';
 
 @Injectable()
 export class ReportsService {
 	constructor(
 		@InjectModel(Report.name)
 		private reportModel: Model<ReportDocument>,
-		// @InjectModel(User.name) private userModel: Model<UserDocument>,
 		protected partnerResourcesService: PartnerResourcesService,
 		protected termsService: TermsService,
 		private eventEmitter: EventEmitter2,
 	) {}
 
 	logger = new Logger(ReportsService.name);
+
+	@OnEvent(UPDATE_USER_PRIVACY, { async: true })
+	async updateReportsPrivacy({ orcid_id, privacy }) {
+		const result = await this.reportModel.updateMany(
+			{ curator_orcid: orcid_id },
+			{ $set: { privacy } },
+		);
+
+		return result;
+	}
 
 	async getUserReports(orcid_id: string): Promise<Report[]> {
 		return await this.reportModel.find({
@@ -143,10 +153,25 @@ export class ReportsService {
 		});
 	}
 
-	async getReports(reportFilter: ReportFilterDto) {
+	async getReports(
+		reportFilter: ReportFilterDto,
+		allowedResources: string[] = [],
+	) {
 		const { filter, options } = this.buildReportsQuery(reportFilter);
 
-		const reports = await this.reportModel.find(filter, {}, options).lean();
+		const query = {
+			$and: [
+				filter,
+				{
+					$or: [
+						{ resource_id: { $in: allowedResources } },
+						{ privacy: 'public' },
+					],
+				},
+			],
+		};
+
+		const reports = await this.reportModel.find(query, {}, options).lean();
 		let data = reports;
 
 		if (reportFilter.extend.includes('term')) {
@@ -170,7 +195,7 @@ export class ReportsService {
 			data = reports_with_terms;
 		}
 
-		const reports_count: number = await this.reportModel.count(filter);
+		const reports_count: number = await this.reportModel.count(query);
 
 		return paginate(data, reportFilter, reports_count);
 	}

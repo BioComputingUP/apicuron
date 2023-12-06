@@ -1,6 +1,12 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import {
+	Document,
+	Model,
+	Schema as MongooseSchema,
+	SaveOptions,
+} from 'mongoose';
 import { Term } from './terms.schema';
+import { User } from './user.schema';
 
 export type ReportDocument = Report & Document;
 @Schema({
@@ -29,6 +35,11 @@ export class Report {
 		type: Date,
 	})
 	timestamp: Date;
+
+	@Prop({
+		type: String,
+	})
+	privacy: 'private' | 'public';
 }
 
 const ReportSchema = SchemaFactory.createForClass(Report);
@@ -40,5 +51,33 @@ const ReportSchema = SchemaFactory.createForClass(Report);
 // 	foreignField: 'activity_term',
 // 	justOne: true,
 // });
+function ReportSchemaFactory(userModel: Model<User>) {
+	ReportSchema.pre(
+		'insertMany',
+		async function (
+			next: (err?: NativeError) => void,
+			reports: ReportDocument[],
+		) {
+			const promises$ = reports.map(async (report: ReportDocument) => {
+				report.privacy =
+					(await userModel.findOne({ orcid_id: report.curator_orcid }))
+						?.privacy ?? 'private';
+				return;
+			});
 
-export { ReportSchema };
+			await promises$;
+			next();
+			return;
+		},
+	);
+
+	ReportSchema.pre('save', async function () {
+		this.privacy =
+			(await userModel.findOne({ orcid_id: this.curator_orcid }))?.privacy ??
+			'private';
+		return;
+	});
+
+	return ReportSchema;
+}
+export { ReportSchemaFactory };

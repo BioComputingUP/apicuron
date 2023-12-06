@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { User, UserSchema } from './schemas/user.schema';
-import { Report, ReportSchema } from './schemas/reports.schema';
+import { Report, ReportSchemaFactory } from './schemas/reports.schema';
 import {
 	PartnerResource,
 	PartnerResourceSchema,
@@ -39,10 +39,6 @@ import { MedalDef, MedalDefSchema } from './schemas/medal-def.schema';
 			{
 				name: User.name,
 				schema: UserSchema,
-			},
-			{
-				name: Report.name,
-				schema: ReportSchema,
 			},
 			{
 				name: Resource.name,
@@ -99,7 +95,18 @@ import { MedalDef, MedalDefSchema } from './schemas/medal-def.schema';
 				],
 			},
 		]),
+		MongooseModule.forFeatureAsync([
+			{
+				inject: [getModelToken(User.name)],
+				imports: [
+					MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+				],
+				name: Report.name,
+				useFactory: ReportSchemaFactory,
+			},
+		]),
 	],
+
 	exports: [MongooseModule],
 })
 export class CoreApicuronModule {}

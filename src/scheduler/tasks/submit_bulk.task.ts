@@ -10,8 +10,6 @@ import { pick } from 'stream-json/filters/Pick';
 import * as StreamArray from 'stream-json/streamers/StreamArray';
 import { validate, ValidationError } from 'class-validator';
 import { User, UserDocument } from '../../core/schemas/user.schema';
-import { ReportsService } from '../../reports/reports.service';
-import { UsersService } from '../../auth/users/users.service';
 import { NotificationsService } from '../../notifications/notifications.service';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { ComputeAchievementsTask } from './compute_achievements.task';
@@ -134,7 +132,7 @@ export class SubmitBulkTask {
 				if (errors.length == 0) {
 					successful_reports_count += 1;
 					try {
-						await this.reportModel.insertMany([report]);
+						await this.reportModel.create(report);
 						this.logger.log(
 							`Sucessfully inserted Report for ${report.resource_id} by ${report.curator_orcid}`,
 						);
@@ -194,7 +192,7 @@ export class SubmitBulkTask {
 				})
 				.join('\n');
 
-			let text = `
+			const text = `
             For Report:\n${JSON.stringify(
 							report.target,
 							null,

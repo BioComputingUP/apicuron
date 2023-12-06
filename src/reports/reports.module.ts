@@ -20,10 +20,11 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { EntityUriValid } from './validators/entity-uri';
 import { CoreApicuronModule } from '../core/core.module';
 import { SchedulerModule } from '../scheduler/scheduler.module';
+import { ReportServiceOnStartup } from './hooks/app-startup.service';
 
 @Module({
 	controllers: [ReportsController],
-	providers: [ReportsService, EntityUriValid],
+	providers: [ReportsService, ReportServiceOnStartup, EntityUriValid],
 	imports: [
 		HttpModule,
 		CoreApicuronModule,
