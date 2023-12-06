@@ -59,9 +59,11 @@ function ReportSchemaFactory(userModel: Model<User>) {
 			reports: ReportDocument[],
 		) {
 			const promises$ = reports.map(async (report: ReportDocument) => {
-				report.privacy =
-					(await userModel.findOne({ orcid_id: report.curator_orcid }))
-						?.privacy ?? 'private';
+				if (!report.privacy) {
+					report.privacy =
+						(await userModel.findOne({ orcid_id: report.curator_orcid }))
+							?.privacy ?? 'private';
+				}
 				return;
 			});
 
@@ -72,9 +74,11 @@ function ReportSchemaFactory(userModel: Model<User>) {
 	);
 
 	ReportSchema.pre('save', async function () {
-		this.privacy =
-			(await userModel.findOne({ orcid_id: this.curator_orcid }))?.privacy ??
-			'private';
+		if (!this.privacy) {
+			this.privacy =
+				(await userModel.findOne({ orcid_id: this.curator_orcid }))?.privacy ??
+				'private';
+		}
 		return;
 	});
 

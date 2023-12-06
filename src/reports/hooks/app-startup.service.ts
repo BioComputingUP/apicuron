@@ -26,12 +26,12 @@ export class ReportServiceOnStartup implements OnApplicationBootstrap {
 	async assignPrivacyFields() {
 		const dataCache = new Map<string, 'private' | 'public'>();
 		let updateCount = 0;
-		let cacheHitCount = 0;
+		let cacheHit = 0;
 		let cacheMiss = 0;
 		const reports$ = this.reportModel.find({ privacy: { $exists: false } });
 		for await (const report of reports$) {
 			if (dataCache.has(report.curator_orcid)) {
-				cacheHitCount += 1;
+				cacheHit += 1;
 				report.privacy = dataCache.get(report.curator_orcid);
 			} else {
 				cacheMiss += 1;
@@ -44,7 +44,8 @@ export class ReportServiceOnStartup implements OnApplicationBootstrap {
 			updateCount += 1;
 			await report.save();
 		}
-		const cacheHitRate = cacheHitCount / (cacheHitCount + cacheMiss);
+		const cacheHitRate =
+			updateCount > 0 ? cacheHit / (cacheMiss + cacheHit) : 0;
 		this.logger.log(
 			`Updated ${updateCount} reports privacy fields. Cache size: ${dataCache.size} With cache Hit Rate: ${cacheHitRate} `,
 		);
@@ -57,7 +58,7 @@ export class ReportServiceOnStartup implements OnApplicationBootstrap {
 
 		const savePromises$ = [];
 		const dataCache = new Map<string, string>();
-		let updatedCount = 0;
+		let updateCount = 0;
 		let cacheHit = 0;
 		let cacheMiss = 0;
 
@@ -75,7 +76,7 @@ export class ReportServiceOnStartup implements OnApplicationBootstrap {
 					report.resource_id = resource.resource_id;
 				}
 
-				updatedCount += 1;
+				updateCount += 1;
 				const savePromise$ = report.save();
 				savePromises$.push(savePromise$);
 			} else {
@@ -87,10 +88,11 @@ export class ReportServiceOnStartup implements OnApplicationBootstrap {
 
 		await Promise.all(savePromises$);
 
-		const cacheHitRate = cacheHit / (cacheMiss + cacheHit);
+		const cacheHitRate =
+			updateCount > 0 ? cacheHit / (cacheMiss + cacheHit) : 0;
 
 		this.logger.log(
-			`Fixed ${updatedCount} reports with missing resource_id field with Cache hit rate ${cacheHitRate}`,
+			`Fixed ${updateCount} reports with missing resource_id field with Cache hit rate ${cacheHitRate}`,
 		);
 	}
 }
