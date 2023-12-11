@@ -65,6 +65,9 @@ export class ComputeMedalsTask {
 		for (let i = 0; i < medalDefs.length; i++) {
 			// for each medal definition in the list, we add the medal to the user
 			const medalDef = medalDefs[i];
+
+			this.logger.debug(`Working on Medal ${medalDef.name}`);
+
 			const user_reports = this.medal_reports_aggregation(medalDef)
 				.limit(medalDef.score_relative)
 				.cursor();
@@ -76,6 +79,9 @@ export class ComputeMedalsTask {
 				if (user) {
 					const medalObject = medalDef.toObject();
 					delete medalObject['_id'];
+					this.logger.debug(
+						`Checking if user ${user['_id']['curator_orcid']} earned  ${medalDef.name}`,
+					);
 
 					const medal = new this.medalModel({
 						...medalObject,
