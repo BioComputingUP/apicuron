@@ -139,7 +139,7 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
         filter.limit = this.limit;
         filter.skip = (page - 1) * this.limit;
         filter.resources = [resource.resource_id];
-        filter.sortOrder = -1;
+        filter.sortOrder = 1;
         filter.sortBy = "ranking";
         return filter;
       }),
