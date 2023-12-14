@@ -320,21 +320,32 @@ export class StatisticsService {
 	async getStatistics(
 		filter: StatisticsFilter,
 		allowedResources: string[],
+		request_orcid: string | null = null,
 		defaultPrivacy: 'private' | 'public' = 'public',
 	) {
+		const privacyFilter: any = [
+			{
+				resource_id: { $in: allowedResources },
+			},
+			{
+				privacy: defaultPrivacy,
+			},
+		];
+		if (request_orcid) {
+			privacyFilter.push({
+				curator_orcid: request_orcid,
+			});
+		}
 		return await this.statisticsModel.find(
 			{
 				...filter.omitPagination(),
-				$or: [
-					{
-						resource_id: { $in: allowedResources },
-					},
-					{
-						privacy: defaultPrivacy,
-					},
-				],
+				$or: privacyFilter,
 			},
-			null,
+			{
+				generation_terms: 0,
+				invalidation_terms: 0,
+				revision_terms: 0,
+			},
 			filter.getMongoQueryOptions(),
 		);
 	}

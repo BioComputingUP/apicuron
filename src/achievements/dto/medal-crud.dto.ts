@@ -100,7 +100,7 @@ export class MedalsFilter extends PaginateDto {
 }
 
 export class DeleteMedalDto {
-	@Validate(UniqueRule, [
+	@Validate(EntryExistsRule, [
 		MedalDef.name,
 		({ name, resource_id }) => {
 			return { name, resource_id };

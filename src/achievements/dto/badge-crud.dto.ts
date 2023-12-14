@@ -9,6 +9,11 @@ import { PaginateDto } from '../../pagination/dto/paginate.dto';
 import { ResourceIdExists } from '../../resources/partner-resources/validators/resource-id-exists';
 import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
 import { BadgeUnique } from '../validators/achievement-exists';
+import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
+import { AchievementDef } from '../../core/schemas/achievement-def.schema';
+import { Badge } from '../../core/schemas/badges.schema';
+import { BadgeDef, BadgeDefSchema } from '../../core/schemas/badge-def.schema';
+import { PartnerResource } from '../../core/schemas/resource.schema';
 
 export class BadgeDefFilter extends PaginateDto {
 	static create(obj: any) {
@@ -21,7 +26,12 @@ export class BadgeDefFilter extends PaginateDto {
 	@IsOptional()
 	resource_id?: string;
 
-	@Validate(BadgeUnique, [{ reverse: true }])
+	@Validate(EntryExistsRule, [
+		AchievementDef.name,
+		({ name }) => {
+			return { name, type: 'badge' };
+		},
+	])
 	@IsOptional()
 	name?: string;
 }
@@ -32,7 +42,12 @@ export class DeleteBadgeDefDto {
 	resource_id: string;
 
 	@IsNotEmpty()
-	@Validate(BadgeUnique, [{ reverse: true }])
+	@Validate(EntryExistsRule, [
+		AchievementDef.name,
+		({ name }) => {
+			return { name, type: 'badge' };
+		},
+	])
 	name: string;
 }
 
@@ -81,11 +96,21 @@ export class UpdateBadgeDefDto {
 	@IsOptional()
 	count_threshold: number;
 
-	@Validate(BadgeUnique, [{ reverse: true }])
+	@Validate(EntryExistsRule, [
+		AchievementDef.name,
+		({ name }) => {
+			return { name, type: 'badge' };
+		},
+	])
 	@IsOptional()
 	name: string;
 
-	@Validate(ResourceIdExists)
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ resource_id }) => {
+			return { resource_id };
+		},
+	])
 	@IsOptional()
 	resource_id: string;
 

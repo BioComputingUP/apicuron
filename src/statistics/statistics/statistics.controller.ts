@@ -117,6 +117,8 @@ export class StatisticsController {
 		const stats = await this.statService.getStatistics(
 			statFilter,
 			user?.resources.map((res) => res.resource_id) ?? [],
+			user?.orcid_id,
+			'private',
 		);
 
 		return stats;
