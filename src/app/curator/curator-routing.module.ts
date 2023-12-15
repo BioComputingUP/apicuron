@@ -3,7 +3,7 @@ import { RouterModule, Routes } from "@angular/router";
 import { SvgModule } from "../svg/svg.module";
 import { CuratorPageComponent } from "./curator-page/curator-page.component";
 import { CuratorsPageComponent } from "./curators-page.component";
-import { CuratorExistsGuard } from "./curator-exists.guard";
+import { CuratorExistsGuard } from "./guards/curator-exists.guard";
 const routes: Routes = [
   { path: "", component: CuratorsPageComponent },
   {

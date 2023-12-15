@@ -5,11 +5,11 @@ import {
   Router,
   RouterStateSnapshot,
 } from "@angular/router";
-import { CuratorService } from "./curator.service";
+import { CuratorService } from "../curator.service";
 import { catchError, map, switchMap } from "rxjs/operators";
-import { AuthService } from "../auth/auth.service";
+import { AuthService } from "../../auth/auth.service";
 import { combineLatest, of } from "rxjs";
-import { User } from "../models/User.model";
+import { User } from "../../models/User.model";
 export const CuratorExistsGuard: CanActivateFn = function (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
