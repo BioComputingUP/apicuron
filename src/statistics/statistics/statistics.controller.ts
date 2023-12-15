@@ -118,7 +118,7 @@ export class StatisticsController {
 			statFilter,
 			user?.resources.map((res) => res.resource_id) ?? [],
 			user?.orcid_id,
-			'private',
+			'public',
 		);
 
 		return stats;

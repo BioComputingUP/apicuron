@@ -319,7 +319,7 @@ export class StatisticsService {
 	 */
 	async getStatistics(
 		filter: StatisticsFilter,
-		allowedResources: string[],
+		allowedResources: string[] = [],
 		request_orcid: string | null = null,
 		defaultPrivacy: 'private' | 'public' = 'public',
 	) {
