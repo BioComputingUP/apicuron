@@ -19,6 +19,7 @@ import { NgxPopperModule } from "ngx-popper";
 import { SentryModuleConfig } from "../config/sentry.config";
 import { BannerService } from "./main-layout/banner.service";
 import { TransferHttpCacheModule } from '@nguniversal/common';
+import { MatomoModule } from "ngx-matomo";
 @NgModule({
   declarations: [
     AppComponent,
@@ -46,6 +47,18 @@ import { TransferHttpCacheModule } from '@nguniversal/common';
     NgxPopperModule.forRoot({
       disableDefaultStyling: true,
       disableAnimation: false,
+    }),
+    MatomoModule.forRoot({
+      scriptUrl: "https://matomo.biocomputingup.it/matomo.js",
+      trackers: [
+        {
+          trackerUrl: "https://matomo.biocomputingup.it/matomo.php",
+          siteId: 10,
+        },
+      ],
+      routeTracking: {
+        enable: true,
+      },
     }),
   ],
   providers: [

@@ -56,6 +56,7 @@
     "moment": "^2.29.4",
     "moment-range": "^4.0.2",
     "ngx-markdown": "^15.1.2",
+    "ngx-matomo": "^1.1.0",
     "ngx-popper": "^7.0.0",
     "ngx-toastr": "^15.2.0",
     "npm": "^9.7.1",
