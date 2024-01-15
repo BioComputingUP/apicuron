@@ -1,0 +1,2 @@
+export const ON_BADGE_DELETE = 'ON_BADGE_DELETE';
+export const ON_MEDAL_DELETE = 'ON_MEDAL_DELETE';

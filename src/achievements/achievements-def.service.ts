@@ -18,14 +18,16 @@ import {
 	AchievementDef,
 	AchievementDefDocument,
 } from '../core/schemas/achievement-def.schema';
-import { OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { TERM_DELETED } from '../terms/constants';
+import { ON_BADGE_DELETE, ON_MEDAL_DELETE } from './constants';
 @Injectable()
 export class AchievementsDefService {
 	constructor(
 		@InjectModel(AchievementDef.name)
 		private achievementDefModel: Model<AchievementDefDocument>,
 		protected partnerResourceService: PartnerResourcesService,
+		protected eventEmitter: EventEmitter2,
 	) {}
 	async get_resource_medals(resource_id?: string, resource_uri?: string) {
 		if (resource_uri || resource_id) {
@@ -102,6 +104,8 @@ export class AchievementsDefService {
 			...delete_badge,
 			type: 'badge',
 		});
+
+		await this.eventEmitter.emitAsync(ON_BADGE_DELETE, delete_badge);
 		return delete_confirmation.deletedCount;
 	}
 
@@ -161,6 +165,8 @@ export class AchievementsDefService {
 			...delete_medal,
 			type: 'medal',
 		});
+
+		await this.eventEmitter.emitAsync(ON_MEDAL_DELETE, delete_medal);
 		return delete_confirmation.deletedCount;
 	}
 

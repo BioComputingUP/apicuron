@@ -26,6 +26,8 @@ import {
 import { ReportDto } from './dto/report.dto';
 import { DeleteResult } from 'mongodb';
 import { UPDATE_USER_PRIVACY } from '../statistics/constants';
+import { TERM_DELETED } from '../terms/constants';
+import { Term } from '../core/schemas/terms.schema';
 
 @Injectable()
 export class ReportsService {
@@ -435,5 +437,13 @@ export class ReportsService {
 			],
 		};
 		return converter[groupBy];
+	}
+
+	@OnEvent(TERM_DELETED, { async: true })
+	async deleteTermReports(term: Term) {
+		return await this.reportModel.deleteMany({
+			resource_id: term.resource_id,
+			activity_term: term.activity_term,
+		});
 	}
 }

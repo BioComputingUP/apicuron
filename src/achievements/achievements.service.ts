@@ -7,6 +7,10 @@ import { PartnerResourcesService } from '../resources/partner-resources/partner-
 import { Badge, BadgeDocument } from '../core/schemas/badges.schema';
 import { Medal, MedalDocument } from '../core/schemas/medals.schema';
 import { paginate } from '../pagination/paginator';
+import { OnEvent } from '@nestjs/event-emitter';
+import { ON_BADGE_DELETE, ON_MEDAL_DELETE } from './constants';
+import { DeleteBadgeDefDto } from './dto/badge-crud.dto';
+import { DeleteMedalDto } from './dto/medal-crud.dto';
 
 @Injectable()
 export class AchievementsService {
@@ -15,6 +19,22 @@ export class AchievementsService {
 		@InjectModel(Badge.name) protected badgeModel: Model<BadgeDocument>,
 		@InjectModel(Medal.name) protected medalModel: Model<MedalDocument>,
 	) {}
+
+	@OnEvent(ON_BADGE_DELETE, { async: true })
+	async onBadgeDefDelete({ resource_id, name }: DeleteBadgeDefDto) {
+		return await this.badgeModel.deleteMany({
+			resource_id,
+			name,
+		});
+	}
+
+	@OnEvent(ON_MEDAL_DELETE, { async: true })
+	async onMedalDefDelete({ resource_id, name }: DeleteMedalDto) {
+		return await this.medalModel.deleteMany({
+			resource_id,
+			name,
+		});
+	}
 
 	async getBadges(filter: AchievementFilter) {
 		const filterInstance = plainToInstance(AchievementFilter, filter);
