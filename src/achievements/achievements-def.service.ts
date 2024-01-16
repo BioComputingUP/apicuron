@@ -10,17 +10,22 @@ import {
 } from './dto/badge-crud.dto';
 import {
 	CreateMedalDto,
-	DeleteMedalDto,
+	DeleteMedalDefDto,
 	MedalsFilter,
-	UpdateMedalDto,
+	UpdateMedalDefDto,
 } from './dto/medal-crud.dto';
 import {
 	AchievementDef,
 	AchievementDefDocument,
 } from '../core/schemas/achievement-def.schema';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
-import { TERM_DELETED } from '../terms/constants';
-import { ON_BADGE_DELETE, ON_MEDAL_DELETE } from './constants';
+import { ON_TERM_DELETED } from '../terms/constants';
+import {
+	ON_BADGE_DEF_DELETE,
+	ON_BADGE_DEF_UPDATE,
+	ON_MEDAL_DEF_DELETE,
+	ON_MEDAL_DEF_UPDATE,
+} from './constants';
 @Injectable()
 export class AchievementsDefService {
 	constructor(
@@ -29,7 +34,7 @@ export class AchievementsDefService {
 		protected partnerResourceService: PartnerResourcesService,
 		protected eventEmitter: EventEmitter2,
 	) {}
-	async get_resource_medals(resource_id?: string, resource_uri?: string) {
+	async getResourceMedalDefs(resource_id?: string, resource_uri?: string) {
 		if (resource_uri || resource_id) {
 			const result = await this.achievementDefModel.find({
 				$or: [{ resource_uri }, { resource_id }],
@@ -40,7 +45,7 @@ export class AchievementsDefService {
 		return await this.achievementDefModel.find({ type: 'medal' });
 	}
 
-	async get_resource_badges(resource_id?: string, resource_uri?: string) {
+	async getResourceBadgeDefs(resource_id?: string, resource_uri?: string) {
 		if (resource_uri || resource_id) {
 			return await this.achievementDefModel.find({
 				$or: [{ resource_uri }, { resource_id }],
@@ -50,7 +55,7 @@ export class AchievementsDefService {
 		return await this.achievementDefModel.find({ type: 'badge' });
 	}
 
-	async create_badge(badge: CreateBadgeDefDto) {
+	async createBadgeDef(badge: CreateBadgeDefDto) {
 		const newBadge = new this.achievementDefModel({
 			...badge,
 			type: 'badge',
@@ -62,7 +67,7 @@ export class AchievementsDefService {
 		return await newBadge.save();
 	}
 
-	async get_badges(badgeFilter: BadgeDefFilter) {
+	async getbadgeDefs(badgeFilter: BadgeDefFilter) {
 		const filterQuery: FilterQuery<AchievementDef> = {
 			...badgeFilter.omitPagination(),
 			type: 'badge',
@@ -82,7 +87,7 @@ export class AchievementsDefService {
 		};
 	}
 
-	async update_badge(badge_update: UpdateBadgeDefDto) {
+	async updateBadgeDef(badge_update: UpdateBadgeDefDto) {
 		const { resource_id, name, ...updates } = badge_update;
 		await this.achievementDefModel.updateOne(
 			{
@@ -92,24 +97,28 @@ export class AchievementsDefService {
 			},
 			updates,
 		);
-		return await this.achievementDefModel.findOne({
+		const badge = await this.achievementDefModel.findOne({
 			resource_id,
 			name,
 			type: 'badge',
 		});
+
+		await this.eventEmitter.emitAsync(ON_BADGE_DEF_UPDATE, badge);
+
+		return badge;
 	}
 
-	async delete_badge(delete_badge: DeleteBadgeDefDto) {
+	async deleteBadgeDef(delete_badge: DeleteBadgeDefDto) {
 		const delete_confirmation = await this.achievementDefModel.deleteOne({
 			...delete_badge,
 			type: 'badge',
 		});
 
-		await this.eventEmitter.emitAsync(ON_BADGE_DELETE, delete_badge);
+		await this.eventEmitter.emitAsync(ON_BADGE_DEF_DELETE, delete_badge);
 		return delete_confirmation.deletedCount;
 	}
 
-	async create_medal(medal: CreateMedalDto) {
+	async createMedalDef(medal: CreateMedalDto) {
 		const newMedal = new this.achievementDefModel({
 			...medal,
 			type: 'medal',
@@ -121,7 +130,7 @@ export class AchievementsDefService {
 		return await newMedal.save();
 	}
 
-	async get_medals(medalFilter: MedalsFilter) {
+	async getMedalDefs(medalFilter: MedalsFilter) {
 		const filter = medalFilter.omitPagination();
 		const filterQuery: FilterQuery<AchievementDef> = {
 			...filter,
@@ -142,7 +151,7 @@ export class AchievementsDefService {
 		};
 	}
 
-	async update_medal(medal_update: UpdateMedalDto) {
+	async updateMedalDef(medal_update: UpdateMedalDefDto) {
 		const { resource_id, name, ...updates } = medal_update;
 		await this.achievementDefModel.updateOne(
 			{
@@ -153,24 +162,28 @@ export class AchievementsDefService {
 			updates,
 		);
 
-		return await this.achievementDefModel.findOne({
+		const medal = await this.achievementDefModel.findOne({
 			resource_id,
 			name,
 			type: 'medal',
 		});
+
+		await this.eventEmitter.emitAsync(ON_MEDAL_DEF_UPDATE, medal);
+
+		return medal;
 	}
 
-	async delete_medal(delete_medal: DeleteMedalDto) {
+	async deleteMedalDef(delete_medal: DeleteMedalDefDto) {
 		const delete_confirmation = await this.achievementDefModel.deleteOne({
 			...delete_medal,
 			type: 'medal',
 		});
 
-		await this.eventEmitter.emitAsync(ON_MEDAL_DELETE, delete_medal);
+		await this.eventEmitter.emitAsync(ON_MEDAL_DEF_DELETE, delete_medal);
 		return delete_confirmation.deletedCount;
 	}
 
-	@OnEvent(TERM_DELETED, { async: true })
+	@OnEvent(ON_TERM_DELETED, { async: true })
 	async removeTermFromAchievements({
 		resource_id,
 		activity_term,
@@ -193,10 +206,10 @@ export class AchievementsDefService {
 		return await this.achievementDefModel.count();
 	}
 
-	async medal_count() {
+	async medalDefCount() {
 		return await this.achievementDefModel.count({ type: 'medal' });
 	}
-	async badges_count() {
+	async badgeDefCount() {
 		return await this.achievementDefModel.count({ type: 'badge' });
 	}
 }

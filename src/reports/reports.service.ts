@@ -20,13 +20,13 @@ import { PaginationAggregation } from '../pagination/interfaces/pagination-aggre
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import {
 	REPORTS_DELETED_ALL_RESOURCE,
-	REPORTS_INSERTED,
-	REPORT_INSERTED,
+	ON_REPORTS_INSERT,
+	ON_REPORT_INSERT,
 } from './constants';
 import { ReportDto } from './dto/report.dto';
 import { DeleteResult } from 'mongodb';
 import { UPDATE_USER_PRIVACY } from '../statistics/constants';
-import { TERM_DELETED } from '../terms/constants';
+import { ON_TERM_DELETED } from '../terms/constants';
 import { Term } from '../core/schemas/terms.schema';
 
 @Injectable()
@@ -57,11 +57,16 @@ export class ReportsService {
 		});
 	}
 
-	async insertReport(report: ReportDto) {
+	async insertReport(report: ReportDto, preventEvents = false) {
 		try {
 			const instance = new this.reportModel(report);
 			await instance.save();
-			this.eventEmitter.emit(REPORT_INSERTED, report as ReportDto);
+			if (!preventEvents) {
+				await this.eventEmitter.emitAsync(
+					ON_REPORT_INSERT,
+					report as ReportDto,
+				);
+			}
 			return instance;
 		} catch (e: any) {
 			this.logger.error(e.message, e.stack, 'insertReport');
@@ -71,13 +76,19 @@ export class ReportsService {
 
 	async insertReports(
 		reports: ReportDto[],
+		preventEvents = false,
 	): Promise<Omit<InsertManyResult<Report>, 'insertedIds'>> {
 		try {
 			const { insertedCount, acknowledged } = await this.reportModel.insertMany(
 				reports,
 				{ rawResult: true },
 			);
-			this.eventEmitter.emit(REPORTS_INSERTED, reports as ReportDto[]);
+			if (!preventEvents) {
+				await this.eventEmitter.emitAsync(
+					ON_REPORTS_INSERT,
+					reports as ReportDto[],
+				);
+			}
 			return {
 				insertedCount,
 				acknowledged,
@@ -439,7 +450,7 @@ export class ReportsService {
 		return converter[groupBy];
 	}
 
-	@OnEvent(TERM_DELETED, { async: true })
+	@OnEvent(ON_TERM_DELETED, { async: true })
 	async deleteTermReports(term: Term) {
 		return await this.reportModel.deleteMany({
 			resource_id: term.resource_id,

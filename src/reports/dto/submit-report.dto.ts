@@ -2,6 +2,7 @@ import {
 	ArrayMaxSize,
 	ArrayMinSize,
 	IsArray,
+	IsBoolean,
 	IsDate,
 	IsEmpty,
 	IsNotEmpty,
@@ -22,7 +23,7 @@ import {
 import { Term } from '../../core/schemas/terms.schema';
 import { PartnerResource } from '../../core/schemas/resource.schema';
 import { EntityUriValid } from '../validators/entity-uri';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 export class SubmitReportDto {
 	@Validate(
 		EntryExistsRule,
@@ -43,6 +44,7 @@ export class SubmitReportDto {
 	activity_term: string;
 
 	@Validate(OrcidChecksum)
+	@IsString()
 	@IsNotEmpty()
 	curator_orcid: string;
 
@@ -79,6 +81,11 @@ export class SubmitReportDto {
 	// @IsString()
 	// @IsNotEmpty()
 	timestamp: Date;
+
+	@IsBoolean()
+	@IsOptional()
+	@Transform((val) => val ?? false)
+	paid: boolean;
 }
 
 export class SubmitBulkDto {

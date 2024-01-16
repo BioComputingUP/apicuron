@@ -99,7 +99,7 @@ export class MedalsFilter extends PaginateDto {
 	resource_id?: string;
 }
 
-export class DeleteMedalDto {
+export class DeleteMedalDefDto {
 	@Validate(EntryExistsRule, [
 		MedalDef.name,
 		({ name, resource_id }) => {
@@ -121,7 +121,7 @@ export class DeleteMedalDto {
 	resource_id: string;
 }
 
-export class UpdateMedalDto extends DeleteMedalDto {
+export class UpdateMedalDefDto extends DeleteMedalDefDto {
 	@Validate(ActivityTermExists, [{ each: true }])
 	@IsOptional()
 	list_terms: string[];

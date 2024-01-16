@@ -14,12 +14,16 @@ import { CoreApicuronModule } from '../core/core.module';
 import { ResourcesModule } from '../resources/resources.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { OrcidSubmissionTask } from './tasks/orcid-submission.task';
+import { StatisticsModule } from '../statistics/statistics.module';
+import { AchievementsModule } from '../achievements/achievements.module';
 @Module({
 	imports: [
 		HttpModule,
 		CoreApicuronModule,
 		NotificationsModule,
 		ResourcesModule,
+		AchievementsModule,
+		StatisticsModule,
 		AuthModule,
 	],
 	providers: [

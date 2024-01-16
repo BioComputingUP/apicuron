@@ -213,9 +213,6 @@ export class SchedulerClientService {
 			return;
 		}
 		if (currentEnv == 'development') {
-			// update disprot
-			await this.disprot_update();
-
 			// then we compute the achievements of all resources
 			const resources = await this.partnerResourceService.get_resources();
 

@@ -13,12 +13,10 @@ import {
 	ForbiddenException,
 	InternalServerErrorException,
 	BadRequestException,
-	Inject,
 	Res,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
-	ApiBearerAuth,
 	ApiConsumes,
 	ApiHeader,
 	ApiOkResponse,
@@ -55,15 +53,10 @@ import { PartnerResourcesService } from '../resources/partner-resources/partner-
 import { Report, ReportDocument } from '../core/schemas/reports.schema';
 import { Response } from 'express';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import {
-	COMPUTE_CURATOR_STATISTICS_TASK,
-	COMPUTE_RESOURCE_ACHIEVEMENTS_TASK,
-	COMPUTE_RESOURCE_STATISTICS_TASK,
-	COMPUTE_USER_BADGES_TASK,
-} from '../scheduler/contants';
 import { UserReq } from '../auth/decorators/applyUser.decorator';
 import { User } from '../core/schemas/user.schema';
 import { Public } from '../auth/decorators/public.decorator';
+import { ON_REPORTS_INSERT, ON_REPORT_INSERT } from './constants';
 
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
@@ -208,30 +201,22 @@ export class ReportsController {
 	@ApiSecurity('basic')
 	@Post('single')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
-	async submit_report(@Body() report: SubmitReportDto, @Request() req) {
+	async submit_report(
+		@Body() report: SubmitReportDto,
+		@Request() req,
+		@Res() res,
+	) {
 		this.can_edit_resource(req.user, report.resource_id);
 
 		// const resource_uri = await this.partnerResourceService.retrieve_uri(report.resource_id)
-		const report_confirmation = await this.reportService.insertReport(report);
-
-		const resource = await this.resourceService.get_resource(
-			report_confirmation.resource_id,
+		const report_confirmation = await this.reportService.insertReport(
+			report,
+			true,
 		);
 
-		// TODO: Add Event listener on the statistics and achievements module and Remove these function calls
+		res.send(report_confirmation);
 
-		this.logger.verbose(`Computing Badges for user "${report.curator_orcid}"`);
-		await this.eventEmitter.emitAsync(COMPUTE_USER_BADGES_TASK, {
-			resource,
-			user: { orcid_id: report.curator_orcid },
-		});
-
-		this.logger.verbose(`Computing Stats for user "${report.curator_orcid}"`);
-		await this.eventEmitter.emitAsync(COMPUTE_CURATOR_STATISTICS_TASK, {
-			resource,
-			user: { orcid_id: report.curator_orcid },
-		});
-		return report_confirmation;
+		await this.eventEmitter.emitAsync(ON_REPORT_INSERT, report as ReportDto);
 	}
 
 	@ApiOperation({
@@ -272,26 +257,17 @@ export class ReportsController {
 
 		const { insertedCount } = await this.reportService.insertReports(
 			reportSubmission.reports,
+			true,
 		);
 		response.insertedCount = insertedCount;
 
 		// send the insertion response
 		res.send(response);
 
-		// start computing the scores and achievements after
-		const computePromises$ = resourcesConcerned.map(
-			async (resource_id: string) => {
-				await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_ACHIEVEMENTS_TASK, {
-					resource_id,
-				});
-				return await this.eventEmitter.emitAsync(
-					COMPUTE_RESOURCE_STATISTICS_TASK,
-					{ resource_id },
-				);
-			},
+		await this.eventEmitter.emitAsync(
+			ON_REPORTS_INSERT,
+			reportSubmission.reports as ReportDto[],
 		);
-
-		await Promise.all(computePromises$);
 
 		return;
 	}

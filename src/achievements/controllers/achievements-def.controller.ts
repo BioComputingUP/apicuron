@@ -2,15 +2,13 @@ import {
 	Controller,
 	Delete,
 	Req,
-	Put,
-	ForbiddenException,
-	Get,
+	Put, Get,
 	Param,
 	Body,
 	Post,
 	Query,
 	UseGuards,
-	Res,
+	Res
 } from '@nestjs/common';
 import {
 	ApiHeader,
@@ -23,7 +21,7 @@ import { AuthService } from '../../auth/auth.service';
 import { HasAResourceGuard } from '../../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
 import { paginate } from '../../pagination/paginator';
-import { AuthorizationHeader, VersionHeader } from '../../swagger/config';
+import { VersionHeader } from '../../swagger/config';
 import { AchievementsDefService } from '../achievements-def.service';
 import { ResourceAchievmentsDef } from '../dto/achievement-def.dto';
 import {
@@ -34,17 +32,12 @@ import {
 } from '../dto/badge-crud.dto';
 import {
 	CreateMedalDto,
-	DeleteMedalDto,
+	DeleteMedalDefDto,
 	MedalsFilter,
-	UpdateMedalDto,
+	UpdateMedalDefDto,
 } from '../dto/medal-crud.dto';
 import { Response } from 'express';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import {
-	COMPUTE_RESOURCE_BADGES_TASK,
-	COMPUTE_RESOURCE_MEDALS_TASK,
-	COMPUTE_RESOURCE_STATISTICS_TASK,
-} from '../../scheduler/contants';
 
 @ApiTags('Define Achievements')
 @ApiHeader(VersionHeader)
@@ -69,9 +62,9 @@ export class AchievementsDefController {
 		@Param('resource_id') resource_id: string,
 	) {
 		const badges_promise =
-			this.achievementsDefService.get_resource_badges(resource_id);
+			this.achievementsDefService.getResourceBadgeDefs(resource_id);
 		const medals_promise =
-			this.achievementsDefService.get_resource_medals(resource_id);
+			this.achievementsDefService.getResourceMedalDefs(resource_id);
 
 		const [badges, medals] = await Promise.all([
 			badges_promise,
@@ -114,7 +107,7 @@ export class BadgesDefController {
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	async create_badge(@Body() badge: CreateBadgeDefDto, @Req() req) {
 		this.can_edit_resource(req.user, badge.resource_id);
-		return await this.achievementsDefService.create_badge(badge);
+		return await this.achievementsDefService.createBadgeDef(badge);
 	}
 
 	@ApiOperation({
@@ -126,7 +119,7 @@ export class BadgesDefController {
 	})
 	@Get()
 	async get_badges(@Query() badges_filter: BadgeDefFilter) {
-		const { data, count } = await this.achievementsDefService.get_badges(
+		const { data, count } = await this.achievementsDefService.getbadgeDefs(
 			badges_filter,
 		);
 
@@ -149,18 +142,11 @@ export class BadgesDefController {
 		@Res() res,
 	) {
 		this.can_edit_resource(req.user, update_badge.resource_id);
-		const response = await this.achievementsDefService.update_badge(
+		const response = await this.achievementsDefService.updateBadgeDef(
 			update_badge,
 		);
 
 		res.send({ data: response });
-
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_BADGES_TASK, {
-			resource_id: update_badge.resource_id,
-		});
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, {
-			resource_id: update_badge.resource_id,
-		});
 	}
 
 	@ApiOperation({
@@ -180,18 +166,11 @@ export class BadgesDefController {
 	) {
 		this.can_edit_resource(req.user, delete_badge.resource_id);
 
-		const response = await this.achievementsDefService.delete_badge(
+		const response = await this.achievementsDefService.deleteBadgeDef(
 			delete_badge,
 		);
 
 		res.send({ data: response });
-
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_BADGES_TASK, {
-			resource_id: delete_badge.resource_id,
-		});
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, {
-			resource_id: delete_badge.resource_id,
-		});
 	}
 }
 
@@ -228,16 +207,9 @@ export class MedalsDefController {
 		@Res() res: Response,
 	) {
 		this.can_edit_resource(req.user, medal.resource_id);
-		const response = await this.achievementsDefService.create_medal(medal);
+		const response = await this.achievementsDefService.createMedalDef(medal);
 
 		res.send({ data: response });
-
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_MEDALS_TASK, {
-			resource_id: medal.resource_id,
-		});
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, {
-			resource_id: medal.resource_id,
-		});
 	}
 
 	@ApiOperation({
@@ -250,7 +222,7 @@ export class MedalsDefController {
 	@ApiSecurity('basic')
 	@Get()
 	async get_medals(@Query() medals_filter: MedalsFilter) {
-		const { data, count } = await this.achievementsDefService.get_medals(
+		const { data, count } = await this.achievementsDefService.getMedalDefs(
 			medals_filter,
 		);
 		return paginate(data, medals_filter, count);
@@ -267,23 +239,16 @@ export class MedalsDefController {
 	@Put('edit')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	async update_medal(
-		@Body() update_medal: UpdateMedalDto,
+		@Body() update_medal: UpdateMedalDefDto,
 		@Req() req,
 		@Res() res: Response,
 	) {
 		this.can_edit_resource(req.user, update_medal.resource_id);
-		const response = await this.achievementsDefService.update_medal(
+		const response = await this.achievementsDefService.updateMedalDef(
 			update_medal,
 		);
 
 		res.send({ data: response });
-
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_MEDALS_TASK, {
-			resource_id: update_medal.resource_id,
-		});
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, {
-			resource_id: update_medal.resource_id,
-		});
 	}
 
 	@ApiOperation({
@@ -296,8 +261,8 @@ export class MedalsDefController {
 	@ApiSecurity('basic')
 	@Delete(':name/partner-resource/:resource_id')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
-	async delete_medal(@Param() delete_medal: DeleteMedalDto, @Req() req) {
+	async delete_medal(@Param() delete_medal: DeleteMedalDefDto, @Req() req) {
 		this.can_edit_resource(req.user, delete_medal.resource_id);
-		return await this.achievementsDefService.delete_medal(delete_medal);
+		return await this.achievementsDefService.deleteMedalDef(delete_medal);
 	}
 }

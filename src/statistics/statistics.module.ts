@@ -8,6 +8,7 @@ import { AuthModule } from '../auth/auth.module';
 import { ResourcesModule } from '../resources/resources.module';
 import { AchievementsModule } from '../achievements/achievements.module';
 import { CoreApicuronModule } from '../core/core.module';
+import { ComputeStatisticsService } from './compute-statistics.service';
 @Module({
 	imports: [
 		CoreApicuronModule,
@@ -18,7 +19,7 @@ import { CoreApicuronModule } from '../core/core.module';
 		// TransformerModule
 	],
 	controllers: [StatisticsController, OldStatisticsController],
-	providers: [StatisticsService],
-	exports: [],
+	providers: [StatisticsService, ComputeStatisticsService],
+	exports: [ComputeStatisticsService],
 })
 export class StatisticsModule {}

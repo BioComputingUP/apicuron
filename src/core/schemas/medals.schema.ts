@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type MedalDocument = Medal & Document;
 
-@Schema({ collection: 'achievements_def' })
+@Schema({ collection: 'achievements' })
 export class Medal {
 	// fields from Achievement
 	// @Prop({

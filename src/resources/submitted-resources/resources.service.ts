@@ -41,6 +41,10 @@ export class SubmittedResourcesService {
 		return res.toObject();
 	}
 
+	async list_submitted_resources() {
+		return await this.submittedResourceModel.find();
+	}
+
 	async resource_id_taken(resource_id: string): Promise<boolean> {
 		return await !!this.submittedResourceModel.exists({ resource_id });
 	}

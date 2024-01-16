@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
 import { ArgumentParser } from 'argparse';
 import { useContainer } from 'class-validator';
-import { spawn, spawnSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 
@@ -61,7 +61,7 @@ if (args.t == 'compute_all_metrics') {
 
 	// building argument array
 
-	let disprotUpdateArgs: string[] = process.argv.slice(2);
+	const disprotUpdateArgs: string[] = process.argv.slice(2);
 	// extracting index of task from current arg array (finding the option -t and taking the argument one step after)
 	const taskIndex = disprotUpdateArgs.findIndex((x) => x == '-t') + 1;
 

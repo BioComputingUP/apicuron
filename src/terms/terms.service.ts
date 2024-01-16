@@ -12,7 +12,7 @@ import {
 	AchievementDefDocument,
 } from '../core/schemas/achievement-def.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { TERM_DELETED } from './constants';
+import { ON_TERM_DELETED, ON_TERM_UPDATED } from './constants';
 
 @Injectable()
 export class TermsService {
@@ -55,7 +55,14 @@ export class TermsService {
 			{ resource_id, activity_term },
 			term,
 		);
-		return await this.termModel.findOne({ resource_id, activity_term });
+		const updated_term = await this.termModel.findOne({
+			resource_id,
+			activity_term,
+		});
+
+		await this.eventEmitter.emitAsync(ON_TERM_UPDATED, updated_term);
+
+		return updated_term;
 	}
 
 	async create_term(term: TermDto) {
@@ -70,7 +77,7 @@ export class TermsService {
 	async delete_term(term: DeleteTermDto) {
 		const response = await this.termModel.deleteOne(term);
 
-		await this.eventEmitter.emitAsync(TERM_DELETED, term);
+		await this.eventEmitter.emitAsync(ON_TERM_DELETED, term);
 
 		if (response.deletedCount == 1) {
 			return true;

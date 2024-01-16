@@ -18,7 +18,7 @@ export class Report {
 	})
 	activity_term: string;
 
-	@Prop({ required: true })
+	@Prop({ required: true, type: String })
 	curator_orcid: string;
 
 	@Prop({ required: true })

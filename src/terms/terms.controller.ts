@@ -28,10 +28,6 @@ import { TermFilterDto } from './dto/term.dto';
 import { UpdateTermDto } from './dto/updateTerm.dto';
 import { TermsService } from './terms.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import {
-	COMPUTE_RESOURCE_ACHIEVEMENTS_TASK,
-	COMPUTE_RESOURCE_STATISTICS_TASK,
-} from '../scheduler/contants';
 @ApiTags('Curation Terms')
 @ApiHeader(VersionHeader)
 @Controller({
@@ -109,14 +105,6 @@ export class TermsController {
 
 		const response = await this.termsService.update_term(term);
 		res.send(response);
-
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_ACHIEVEMENTS_TASK, {
-			resource_id: term.resource_id,
-		});
-
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, {
-			resource_id: term.resource_id,
-		});
 	}
 
 	@ApiOperation({
@@ -141,13 +129,5 @@ export class TermsController {
 		const response = await this.termsService.delete_term(delete_term);
 
 		res.send(response);
-
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_ACHIEVEMENTS_TASK, {
-			resource_id,
-		});
-
-		await this.eventEmitter.emitAsync(COMPUTE_RESOURCE_STATISTICS_TASK, {
-			resource_id,
-		});
 	}
 }
