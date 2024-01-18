@@ -4,12 +4,6 @@ export type BadgeDocument = Badge & Document;
 
 @Schema({
 	collection: 'achievements',
-	// toJSON: {
-	// 	transform: function (doc, ret) {
-	// 		delete ret._id;
-	// 		return ret
-	// 	},
-	// },
 })
 export class Badge {
 	// fields from Achievement
@@ -52,6 +46,14 @@ export class Badge {
 		type: Date,
 	})
 	earned_at: Date;
+
+	@Prop({
+		type: Boolean,
+	})
+	earned: boolean;
 }
 
 export const BadgeSchema = SchemaFactory.createForClass(Badge);
+
+export class EarnedBadge extends Badge {}
+export const EarnedBadgeSchema = SchemaFactory.createForClass(EarnedBadge);

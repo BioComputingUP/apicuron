@@ -27,9 +27,24 @@ import {
 	AchievementDef,
 	AchievementDefSchema,
 } from './schemas/achievement-def.schema';
-import { Achievement, AchievementSchema } from './schemas/achievements.schema';
-import { Badge, BadgeSchema } from './schemas/badges.schema';
-import { Medal, MedalSchema } from './schemas/medals.schema';
+import {
+	Achievement,
+	AchievementsSchemaFactory,
+	EarnedAchievement,
+	EarnedAchievementsSchemaFactory,
+} from './schemas/achievements.schema';
+import {
+	Badge,
+	BadgeSchema,
+	EarnedBadge,
+	EarnedBadgeSchema,
+} from './schemas/badges.schema';
+import {
+	EarnedMedal,
+	EarnedMedalSchema,
+	Medal,
+	MedalSchema,
+} from './schemas/medals.schema';
 import { BadgeDef, BadgeDefSchema } from './schemas/badge-def.schema';
 import { MedalDef, MedalDefSchema } from './schemas/medal-def.schema';
 
@@ -86,14 +101,14 @@ import { MedalDef, MedalDefSchema } from './schemas/medal-def.schema';
 					{ name: MedalDef.name, schema: MedalDefSchema, value: 'medal' },
 				],
 			},
-			{
-				name: Achievement.name,
-				schema: AchievementSchema,
-				discriminators: [
-					{ name: Badge.name, schema: BadgeSchema, value: 'badge' },
-					{ name: Medal.name, schema: MedalSchema, value: 'medal' },
-				],
-			},
+			// {
+			// 	name: Achievement.name,
+			// 	schema: AchievementSchema,
+			// 	discriminators: [
+			// 		{ name: Badge.name, schema: BadgeSchema, value: 'badge' },
+			// 		{ name: Medal.name, schema: MedalSchema, value: 'medal' },
+			// 	],
+			// },
 		]),
 		MongooseModule.forFeatureAsync([
 			{
@@ -103,6 +118,23 @@ import { MedalDef, MedalDefSchema } from './schemas/medal-def.schema';
 				],
 				name: Report.name,
 				useFactory: ReportSchemaFactory,
+			},
+			{
+				name: EarnedAchievement.name,
+				useFactory: EarnedAchievementsSchemaFactory,
+				discriminators: [
+					{ name: EarnedBadge.name, schema: EarnedBadgeSchema, value: 'badge' },
+					{ name: EarnedMedal.name, schema: EarnedMedalSchema, value: 'medal' },
+				],
+			},
+
+			{
+				name: Achievement.name,
+				useFactory: AchievementsSchemaFactory,
+				discriminators: [
+					{ name: Badge.name, schema: BadgeSchema, value: 'badge' },
+					{ name: Medal.name, schema: MedalSchema, value: 'medal' },
+				],
 			},
 		]),
 	],

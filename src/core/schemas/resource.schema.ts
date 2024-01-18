@@ -8,8 +8,6 @@ export type PartnerResourceDocument = HydratedDocument<PartnerResource>;
 // this class defines a partnerResource that has been validated and has the ability to have Models, Badges and so on
 @Schema()
 export class PartnerResource {
-	// @Prop({ required: true, unique: true })
-	// id: string;
 
 	@Prop()
 	resource_description: string;

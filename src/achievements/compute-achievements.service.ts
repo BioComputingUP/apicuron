@@ -13,6 +13,7 @@ import { User, UserDocument } from '../core/schemas/user.schema';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import { ON_TERM_DELETED, ON_TERM_UPDATED } from '../terms/constants';
 import {
+	ON_BADGES_UPDATE,
 	ON_BADGE_DEF_DELETE,
 	ON_BADGE_DEF_UPDATE,
 	ON_COMPUTE_RESOURCE_ACHIEVEMENTS,
@@ -26,7 +27,8 @@ import { ON_REPORTS_INSERT, ON_REPORT_INSERT } from '../reports/constants';
 import { ReportDto } from '../reports/dto/report.dto';
 import { DeleteBadgeDefDto } from './dto/badge-crud.dto';
 import { DeleteMedalDefDto } from './dto/medal-crud.dto';
-import _ from 'lodash';
+import * as _ from 'lodash';
+import { BadgeDef, BadgeDefDocument } from '../core/schemas/badge-def.schema';
 
 @Injectable()
 export class ComputeAchievementsService {
@@ -37,6 +39,7 @@ export class ComputeAchievementsService {
 		@InjectModel(Badge.name) protected badgeModel: Model<BadgeDocument>,
 		@InjectModel(AchievementDef.name)
 		private achievementDefModel: Model<AchievementDefDocument>,
+		@InjectModel(BadgeDef.name) private badgeDefModel: Model<BadgeDefDocument>,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		protected eventEmitter: EventEmitter2,
 	) {}
@@ -322,6 +325,70 @@ export class ComputeAchievementsService {
 		return computeResults;
 	}
 
+	public async incrementalBadgeCompute(report: Report) {
+		const { activity_term, curator_orcid, resource_id, privacy } = report;
+
+		const concernedBadges = await this.badgeDefModel.find({
+			list_terms: activity_term,
+			resource_id,
+		});
+
+		const updatePromises$ = concernedBadges.map(
+			async ({
+				name,
+				count_threshold,
+				resource_id,
+				category,
+				list_terms,
+				resource_uri,
+			}: BadgeDefDocument) => {
+				return await this.badgeModel.updateOne(
+					{
+						name,
+						count_threshold,
+						resource_id,
+						curator_orcid,
+					},
+					[
+						{
+							$set: {
+								name,
+								count_threshold,
+								resource_id,
+								curator_orcid,
+								category,
+								resource_uri,
+								list_terms,
+								type: 'badge',
+								earned: {
+									$gte: [{ $add: ['$count', 1] }, '$count_threshold'],
+								},
+								count: {
+									$add: ['$count', 1],
+								},
+							},
+						},
+					],
+					{ upsert: true },
+				);
+			},
+		);
+
+		await Promise.all(updatePromises$);
+
+		// TODO: Either separate badgeCount between different reports or group them
+		const badgeCount = await this.badgeModel.count({
+			curator_orcid,
+			resource_id,
+			earned: true,
+		});
+
+		await this.eventEmitter.emitAsync(ON_BADGES_UPDATE, {
+			resource_id,
+			curator_orcid,
+			badgeCount,
+		});
+	}
 	// event handling
 
 	@OnEvent(ON_TERM_UPDATED, { async: true })

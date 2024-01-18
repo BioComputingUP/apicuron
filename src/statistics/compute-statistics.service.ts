@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Report, ReportDocument } from '../core/schemas/reports.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Badge, BadgeDocument } from '../core/schemas/badges.schema';
@@ -9,14 +9,15 @@ import {
 	StatisticsDocument,
 } from '../core/schemas/statistics.schema';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
-import { Aggregate, Model } from 'mongoose';
+import { Aggregate, FilterQuery, Model } from 'mongoose';
 import { OnEvent } from '@nestjs/event-emitter';
 import { StatisticsTerms } from '../core/schemas/statistics-terms.schema';
 import {
 	ON_COMPUTE_RESOURCE_ACHIEVEMENTS,
 	ON_COMPUTE_USER_ACHIEVEMENTS,
 } from '../achievements/constants';
-
+import { Term, TermDocument } from '../core/schemas/terms.schema';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 @Injectable()
 export class ComputeStatisticsService {
 	logger = new Logger(ComputeStatisticsService.name);
@@ -27,7 +28,9 @@ export class ComputeStatisticsService {
 		@InjectModel(Badge.name) protected badgeModel: Model<BadgeDocument>,
 		@InjectModel(Medal.name) protected medalModel: Model<MedalDocument>,
 		@InjectModel(User.name) protected userModel: Model<UserDocument>,
+		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
 		protected partnerResourceService: PartnerResourcesService,
+		@Inject(CACHE_MANAGER) private cacheManager: Cache,
 	) {}
 
 	async computeResourceStatistics({ resource_id }: { resource_id: string }) {
@@ -123,7 +126,7 @@ export class ComputeStatisticsService {
 					curator_orcid,
 				}),
 				privacy,
-				// type: 'contribution'
+				type: 'contribution',
 			};
 
 			const update_promise = this.statModel.replaceOne(
@@ -136,6 +139,87 @@ export class ComputeStatisticsService {
 
 		await Promise.all(updates_promises);
 		this.logger.log(`Computed ${updates_promises.length} users statistics`);
+	}
+
+	private async retrieveUser(curator_orcid: string): Promise<User> {
+		const cached = (await this.cacheManager.get(curator_orcid)) as User | null;
+		if (cached) {
+			return cached;
+		}
+
+		const user = await this.userModel.findOne({ orcid_id: curator_orcid });
+		await this.cacheManager.set(curator_orcid, user);
+		return user;
+	}
+
+	private async retrieveTerm({
+		resource_id,
+		activity_term,
+	}: {
+		resource_id: string;
+		activity_term: string;
+	}): Promise<Term> {
+		const cacheId = resource_id + ':' + activity_term;
+		const cached = (await this.cacheManager.get(cacheId)) as Term | null;
+		if (cached) {
+			return cached;
+		}
+
+		const term = await this.termModel.findOne({ resource_id, activity_term });
+		await this.cacheManager.set(cacheId, term);
+		return term;
+	}
+
+	private async incrementalStatisticsCompute(report: Report) {
+		const { resource_id, curator_orcid, type, activity_term } = report;
+
+		const user = await this.retrieveUser(curator_orcid);
+
+		const term = await this.retrieveTerm({ resource_id, activity_term });
+
+		return await this.statModel.updateOne(
+			{
+				curator_orcid,
+				resource_id,
+				type,
+				privacy: user.privacy,
+			},
+			{
+				$set: {
+					curator_orcid,
+					resource_id,
+					type,
+					privacy: user.privacy,
+				},
+				$inc: {
+					[term.activity_category + '_count']: 1,
+					[term.activity_category + '_score']: term.score,
+					total_score: term.score,
+					total_count: 1,
+				},
+			},
+			{ upsert: true },
+		);
+	}
+
+	async computeStats(filter: FilterQuery<ReportDocument>) {
+		this.cacheManager.reset();
+		const commonFields = ['resource_id', 'type', 'privacy', 'curator_orcid'];
+
+		const statFilter = Object.fromEntries(
+			commonFields
+				.filter((field) => !!filter[field])
+				.map((field) => [field, filter[field]]),
+		);
+
+		// Deleting all previous Entries
+		await this.statModel.deleteMany(statFilter);
+
+		const reports = this.reportModel.find(filter);
+
+		for await (const report of reports) {
+			await this.incrementalStatisticsCompute(report);
+		}
 	}
 
 	private groupResourceReportsByTerms(
@@ -357,6 +441,18 @@ export class ComputeStatisticsService {
 	}
 
 	// events handling
+
+	@OnEvent(ON_ACHIEVEMENTS_UPDATE, { async: true})
+	async onAchievementsUpdate({ resource_id: string, curator_orcid: string}){
+		this.statModel.updateMany({
+			resource_id,
+			curator_orcid
+		}, {
+			$set: {
+				badges_count: this.badgeModel.
+			}
+		})
+	}
 
 	@OnEvent(ON_COMPUTE_RESOURCE_ACHIEVEMENTS, { async: true })
 	async onComputeResourceAchievements({

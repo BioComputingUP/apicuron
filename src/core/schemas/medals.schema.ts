@@ -22,12 +22,12 @@ export class Medal {
 	@Prop({
 		required: false,
 	})
-	count_relative_valid: Boolean;
+	count_relative_valid: boolean;
 
 	@Prop({
 		required: false,
 	})
-	count_threshold_valid: Boolean;
+	count_threshold_valid: boolean;
 
 	@Prop({
 		required: true,
@@ -80,7 +80,10 @@ export class Medal {
 	score_total: number;
 
 	@Prop()
-	list_terms: string[]
+	list_terms: string[];
 }
 
 export const MedalSchema = SchemaFactory.createForClass(Medal);
+
+export class EarnedMedal extends Medal {}
+export const EarnedMedalSchema = SchemaFactory.createForClass(EarnedMedal);

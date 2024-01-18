@@ -9,6 +9,9 @@ import { Term } from './terms.schema';
 import { User } from './user.schema';
 
 export type ReportDocument = Report & Document;
+
+export type ContributionType = 'contribution' | 'paid';
+export type PrivacyType = 'private' | 'public';
 @Schema({
 	collection: 'reports',
 })
@@ -39,7 +42,12 @@ export class Report {
 	@Prop({
 		type: String,
 	})
-	privacy: 'private' | 'public';
+	privacy: PrivacyType;
+
+	@Prop({
+		default: () => 'contribution',
+	})
+	type: ContributionType;
 }
 
 const ReportSchema = SchemaFactory.createForClass(Report);

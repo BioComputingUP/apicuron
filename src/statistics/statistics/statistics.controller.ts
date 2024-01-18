@@ -14,7 +14,7 @@ import { AchievementsService } from '../../achievements/achievements.service';
 import { ParseUnsignedIntPipe } from '../../shared/pipes/unsigned-int-validation.pipe';
 import { TransformInterceptor } from '../../shared/transformer/transform.interceptor';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
-import { FilterField, GetStatisticsDto } from '../dto/get-statistics.dto';
+import { GetStatisticsDto } from '../dto/get-statistics.dto';
 import { StatisticsService } from '../statistics.service';
 import {
 	ApiHeader,

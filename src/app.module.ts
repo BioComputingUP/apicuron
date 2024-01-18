@@ -1,16 +1,16 @@
-import { HttpException, Module, Logger, ValidationPipe } from '@nestjs/common';
-import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { HttpException, Module, Logger } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { loadConfig } from './config/load';
-import { MongooseModule } from '@nestjs/mongoose';
+import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 import { ReportsModule } from './reports/reports.module';
 import { ResourcesModule } from './resources/resources.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join, resolve } from 'path';
+import { resolve } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MulterModule } from '@nestjs/platform-express';
 import { AchievementsModule } from './achievements/achievements.module';
@@ -28,7 +28,6 @@ import { SentryInterceptor, SentryModule } from '@ntegral/nestjs-sentry';
 import { EmailModule } from './email/email.module';
 import { CoreApicuronModule } from './core/core.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-
 const logger = new Logger('AppModule');
 
 @Module({
@@ -61,7 +60,9 @@ const logger = new Logger('AppModule');
 		// due to the fact that this is the appmodule
 		MongooseModule.forRootAsync({
 			inject: [ConfigService],
-			useFactory: async (configService: ConfigService) => {
+			useFactory: async (
+				configService: ConfigService,
+			): Promise<MongooseModuleOptions> => {
 				const db_host = configService.get<string>('db_host');
 				const database = configService.get<string>('database');
 				const port = configService.get<number>('db_port');

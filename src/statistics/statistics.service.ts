@@ -1,6 +1,6 @@
-import { Injectable, Logger, NotFoundException, Inject } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Document, FilterQuery, Model, PipelineStage, mongo } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 // import { TransformerService } from '../shared/transformer/transformer.service';
 import { User, UserDocument, UserSchema } from '../core/schemas/user.schema';
 import {
@@ -9,17 +9,13 @@ import {
 	StatisticsDocument,
 } from '../core/schemas/statistics.schema';
 import { PartnerResourcesService } from '..//resources/partner-resources/partner-resources.service';
-import {
-	GetStatisticsDto,
-	statisticsSortByFields,
-} from './dto/get-statistics.dto';
+import { GetStatisticsDto } from './dto/get-statistics.dto';
 import { paginate } from '../pagination/paginator';
 import { PaginateDto } from '../pagination/dto/paginate.dto';
 import { ReportDocument } from '../core/schemas/reports.schema';
 import { OnEvent } from '@nestjs/event-emitter';
 import { UPDATE_USER_PRIVACY } from './constants';
 import { StatisticsFilter } from './dto/statistics-filter.dto';
-import { includes } from 'lodash';
 
 @Injectable()
 export class StatisticsService {
@@ -33,18 +29,6 @@ export class StatisticsService {
 	) {}
 
 	logger = new Logger(StatisticsService.name);
-
-	async incrementStatByReport(report: ReportDocument) {
-		const { resource_id, curator_orcid } = report;
-		const stat = await this.statisticsModel.findOne({
-			resource_id,
-			curator_orcid,
-		});
-
-		if (stat) {
-			stat;
-		}
-	}
 
 	@OnEvent(UPDATE_USER_PRIVACY, { async: true })
 	async setUserStatsPrivacy({

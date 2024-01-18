@@ -9,12 +9,17 @@ import { ResourcesModule } from '../resources/resources.module';
 import { AchievementsModule } from '../achievements/achievements.module';
 import { CoreApicuronModule } from '../core/core.module';
 import { ComputeStatisticsService } from './compute-statistics.service';
+import { CacheModule } from '@nestjs/cache-manager';
+
 @Module({
 	imports: [
 		CoreApicuronModule,
 		AuthModule,
 		ResourcesModule,
 		AchievementsModule,
+		CacheModule.register({
+			max: 100,
+		}),
 		// forwardRef(() => ReportsModule),
 		// TransformerModule
 	],

@@ -26,7 +26,36 @@ export class Achievement {
 	})
 	type: string;
 
-	
+	@Prop({
+		type: Boolean,
+		required: true,
+	})
+	earned: boolean;
 }
 
-export const AchievementSchema = SchemaFactory.createForClass(Achievement);
+export class EarnedAchievement extends Achievement {}
+
+export function EarnedAchievementsSchemaFactory() {
+	const AchievementSchema = SchemaFactory.createForClass(EarnedAchievement);
+	function setEarnedFilter(next) {
+		this.setQuery({
+			earned: true,
+		});
+
+		next();
+	}
+	AchievementSchema.pre('find', setEarnedFilter);
+
+	AchievementSchema.pre('findOne', setEarnedFilter);
+
+	AchievementSchema.pre('aggregate', function (next) {
+		this.pipeline().unshift({ $match: { earned: true } });
+		next();
+	});
+
+	return AchievementSchema;
+}
+
+export function AchievementsSchemaFactory() {
+	return SchemaFactory.createForClass(Achievement);
+}

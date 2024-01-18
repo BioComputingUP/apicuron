@@ -1,6 +1,7 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import { StatisticsTerms } from './statistics-terms.schema';
+import { ContributionType } from './reports.schema';
 
 export type StatisticsDocument = Statistics & Document;
 @Schema({
@@ -65,7 +66,7 @@ export class Statistics {
 	privacy?: 'private' | 'public' = 'private';
 
 	@Prop({ required: true, default: 'contribution' })
-	type?: 'contribution' | 'paid' = 'contribution';
+	type: ContributionType;
 }
 
 const StatisticsSchema = SchemaFactory.createForClass(Statistics);
