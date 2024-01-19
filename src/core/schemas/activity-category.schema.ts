@@ -1,23 +1,29 @@
 import { Prop } from '@nestjs/mongoose';
 import { Aggregate, HydratedDocument, Query, Schema } from 'mongoose';
 
-export const ContributionTypes = <const>['contribution', 'paid'];
-export const PrivacyTypes = <const>['private', 'public'];
+// export const ContributionTypes = <const>['community', 'professional'];
+export enum ContributionType {
+	community = 'community',
+	professional = 'professional',
+}
 
-export type ContributionType = typeof ContributionTypes[number];
-export type PrivacyType = typeof PrivacyTypes[number];
-
+export enum PrivacyType {
+	private = 'private',
+	public = 'public',
+}
 export type ActivityCategoryDocuemnt = HydratedDocument<ActivityCategory>;
 
 export class ActivityCategory {
 	@Prop({
 		type: String,
+		enum: PrivacyType,
 	})
 	privacy: PrivacyType;
 
 	@Prop({
-		default: (): ContributionType => 'contribution',
+		default: (): ContributionType => ContributionType.community,
 		type: String,
+		enum: ContributionType,
 	})
 	contribution_type: ContributionType;
 }

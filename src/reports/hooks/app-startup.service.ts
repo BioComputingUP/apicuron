@@ -7,6 +7,7 @@ import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../../core/schemas/resource.schema';
+import { PrivacyType } from '../../core/schemas/activity-category.schema';
 
 @Injectable()
 export class ReportServiceOnStartup implements OnApplicationBootstrap {
@@ -32,12 +33,12 @@ export class ReportServiceOnStartup implements OnApplicationBootstrap {
 		for await (const report of reports$) {
 			if (dataCache.has(report.curator_orcid)) {
 				cacheHit += 1;
-				report.privacy = dataCache.get(report.curator_orcid);
+				report.privacy = dataCache.get(report.curator_orcid) as PrivacyType;
 			} else {
 				cacheMiss += 1;
 				report.privacy =
 					(await this.userModel.findOne({ orcid_id: report.curator_orcid }))
-						?.privacy ?? 'private';
+						?.privacy ?? PrivacyType.private;
 				dataCache.set(report.curator_orcid, report.privacy);
 			}
 

@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, SchemaTypes, Types } from 'mongoose';
 import { Report } from './reports.schema';
+import { PrivacyType } from './activity-category.schema';
 
 export type UserDocument = User & Document;
 export interface UserResource {
@@ -128,11 +129,11 @@ export class User {
 
 	@Prop({
 		required: true,
-		default: 'private',
+		default: PrivacyType.private,
 		type: String,
-		enum: ['public', 'private'],
+		enum: PrivacyType,
 	})
-	privacy: 'public' | 'private';
+	privacy: PrivacyType;
 
 	hasResourcePutCode: (resource_id: string) => boolean;
 	getResourcePutCode: (resource_id: string) => string;

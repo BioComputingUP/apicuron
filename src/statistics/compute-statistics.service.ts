@@ -18,6 +18,10 @@ import {
 } from '../achievements/constants';
 import { Term, TermDocument } from '../core/schemas/terms.schema';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import {
+	ContributionType,
+	PrivacyType,
+} from '../core/schemas/activity-category.schema';
 @Injectable()
 export class ComputeStatisticsService {
 	logger = new Logger(ComputeStatisticsService.name);
@@ -93,9 +97,9 @@ export class ComputeStatisticsService {
 				0,
 			);
 
-			const privacy =
+			const privacy: PrivacyType =
 				(await this.userModel.findOne({ orcid_id: curator_orcid }))?.privacy ||
-				'private';
+				PrivacyType.private;
 
 			this.logger.debug(
 				`User ${curator_orcid} has privacy set as "${privacy}"`,
@@ -126,7 +130,7 @@ export class ComputeStatisticsService {
 					curator_orcid,
 				}),
 				privacy,
-				contribution_type: 'contribution',
+				contribution_type: ContributionType.community,
 			};
 
 			const update_promise = this.statModel.replaceOne(

@@ -1,3 +1,4 @@
+import { PrivacyType } from '../../core/schemas/activity-category.schema';
 import {
 	Statistics,
 	StatisticsActivityCategoryFactory,
@@ -7,6 +8,6 @@ export class PublicStatistics extends Statistics {}
 
 export function PublicStatisticsFactory() {
 	return StatisticsActivityCategoryFactory({
-		privacy: 'public',
+		privacy: PrivacyType.public,
 	});
 }
