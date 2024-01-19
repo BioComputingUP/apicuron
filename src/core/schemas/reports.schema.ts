@@ -1,21 +1,13 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import {
-	Document,
-	Model,
-	Schema as MongooseSchema,
-	SaveOptions,
-} from 'mongoose';
-import { Term } from './terms.schema';
-import { User } from './user.schema';
+import { Document } from 'mongoose';
+import { ActivityCategory } from './activity-category.schema';
 
 export type ReportDocument = Report & Document;
 
-export type ContributionType = 'contribution' | 'paid';
-export type PrivacyType = 'private' | 'public';
 @Schema({
 	collection: 'reports',
 })
-export class Report {
+export class Report extends ActivityCategory {
 	@Prop({
 		required: true,
 	})
@@ -38,58 +30,8 @@ export class Report {
 		type: Date,
 	})
 	timestamp: Date;
-
-	@Prop({
-		type: String,
-	})
-	privacy: PrivacyType;
-
-	@Prop({
-		default: () => 'contribution',
-	})
-	type: ContributionType;
 }
 
 const ReportSchema = SchemaFactory.createForClass(Report);
 
-// ReportSchema.virtual('term', {
-// 	ref: 'Term',
-// 	localField: 'activity_term',
-// 	path: 'activity_term',
-// 	foreignField: 'activity_term',
-// 	justOne: true,
-// });
-function ReportSchemaFactory(userModel: Model<User>) {
-	ReportSchema.pre(
-		'insertMany',
-		async function (
-			next: (err?: NativeError) => void,
-			reports: ReportDocument[],
-		) {
-			const promises$ = reports.map(async (report: ReportDocument) => {
-				if (!report.privacy) {
-					report.privacy =
-						(await userModel.findOne({ orcid_id: report.curator_orcid }))
-							?.privacy ?? 'private';
-				}
-				return;
-			});
-
-			await promises$;
-			next();
-			return;
-		},
-	);
-
-	ReportSchema.pre('save', async function () {
-		if (!this.privacy) {
-			this.privacy =
-				(await userModel.findOne({ orcid_id: this.curator_orcid }))?.privacy ??
-				'private';
-		}
-		return;
-	});
-
-	return ReportSchema;
-}
-export { ReportSchemaFactory };
+export { ReportSchema };

@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument, Query } from 'mongoose';
 
-export type AchievementDocument = Achievement & Document;
+export type AchievementDocument = HydratedDocument<Achievement>;
 
 @Schema({ collection: 'achievements', discriminatorKey: 'type' })
 export class Achievement {
@@ -37,8 +38,13 @@ export class EarnedAchievement extends Achievement {}
 
 export function EarnedAchievementsSchemaFactory() {
 	const AchievementSchema = SchemaFactory.createForClass(EarnedAchievement);
-	function setEarnedFilter(next) {
+	function setEarnedFilter(
+		this: Query<Achievement, AchievementDocument>,
+		next,
+	) {
+		const filter = this.getFilter();
 		this.setQuery({
+			...filter,
 			earned: true,
 		});
 

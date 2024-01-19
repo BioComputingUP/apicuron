@@ -1,14 +1,16 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import { StatisticsTerms } from './statistics-terms.schema';
-import { ContributionType } from './reports.schema';
+import {
+	ActivityCategory,
+	ActivityCategorySchemaFactory,
+} from './activity-category.schema';
 
 export type StatisticsDocument = Statistics & Document;
 @Schema({
 	collection: 'statistics',
-	discriminatorKey: 'privacy',
 })
-export class Statistics {
+export class Statistics extends ActivityCategory {
 	@Prop({ required: true, default: () => 0 })
 	badges_count: number;
 
@@ -62,76 +64,23 @@ export class Statistics {
 
 	@Prop({ required: true, default: () => 0 })
 	total_score: number;
-	@Prop({ required: true, default: 'private' })
-	privacy?: 'private' | 'public' = 'private';
-
-	@Prop({ required: true, default: 'contribution' })
-	type: ContributionType;
 }
 
-const StatisticsSchema = SchemaFactory.createForClass(Statistics);
+export function StatisticsSchemaFactory() {
+	const StatisticsSchema = SchemaFactory.createForClass(Statistics);
 
-StatisticsSchema.virtual('user', {
-	ref: User.name,
-	localField: 'curator_orcid',
-	foreignField: 'orcid_id',
-	justOne: true,
-});
-
-// Public Statistics !
-export type PublicStatisticsDocument = PublicStatistics & Document;
-@Schema({
-	collection: 'statistics',
-})
-export class PublicStatistics {
-	badges_count: number;
-	curator_orcid: string;
-	generation_count: number;
-	generation_score: number;
-	generation_terms: StatisticsTerms[];
-	invalidation_count: number;
-	invalidation_score: number;
-	invalidation_terms: StatisticsTerms[];
-	medals_count: number;
-	ranking: number;
-	resource_uri: string;
-	resource_id: string;
-	revision_count: number;
-	revision_score: number;
-	revision_terms: StatisticsTerms[];
-	total_count: number;
-	total_score: number;
-	type?: 'contribution' | 'paid' = 'contribution';
+	StatisticsSchema.virtual('user', {
+		ref: User.name,
+		localField: 'curator_orcid',
+		foreignField: 'orcid_id',
+		justOne: true,
+	});
+	return StatisticsSchema;
 }
 
-const PublicStatisticsSchema = SchemaFactory.createForClass(PublicStatistics);
-
-// Private Statistics !
-export type PrivateStatisticsDocument = PrivateStatistics & Document;
-@Schema({
-	collection: 'statistics',
-})
-export class PrivateStatistics {
-	badges_count: number;
-	curator_orcid: string;
-	generation_count: number;
-	generation_score: number;
-	generation_terms: StatisticsTerms[];
-	invalidation_count: number;
-	invalidation_score: number;
-	invalidation_terms: StatisticsTerms[];
-	medals_count: number;
-	ranking: number;
-	resource_uri: string;
-	resource_id: string;
-	revision_count: number;
-	revision_score: number;
-	revision_terms: StatisticsTerms[];
-	total_count: number;
-	total_score: number;
-	type?: 'contribution' | 'paid' = 'contribution';
+export function StatisticsActivityCategoryFactory(
+	activityCategory: Partial<ActivityCategory>,
+) {
+	const StatisticsSchema = SchemaFactory.createForClass(Statistics);
+	return ActivityCategorySchemaFactory(activityCategory, StatisticsSchema);
 }
-
-const PrivateStatisticsSchema = SchemaFactory.createForClass(PrivateStatistics);
-
-export { StatisticsSchema, PublicStatisticsSchema, PrivateStatisticsSchema };

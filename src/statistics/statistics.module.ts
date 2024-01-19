@@ -10,6 +10,11 @@ import { AchievementsModule } from '../achievements/achievements.module';
 import { CoreApicuronModule } from '../core/core.module';
 import { ComputeStatisticsService } from './compute-statistics.service';
 import { CacheModule } from '@nestjs/cache-manager';
+import { MongooseModule } from '@nestjs/mongoose';
+import {
+	PublicStatistics,
+	PublicStatisticsFactory,
+} from './schema/public-statistics.schema';
 
 @Module({
 	imports: [
@@ -20,8 +25,12 @@ import { CacheModule } from '@nestjs/cache-manager';
 		CacheModule.register({
 			max: 100,
 		}),
-		// forwardRef(() => ReportsModule),
-		// TransformerModule
+		MongooseModule.forFeatureAsync([
+			{
+				name: PublicStatistics.name,
+				useFactory: PublicStatisticsFactory,
+			},
+		]),
 	],
 	controllers: [StatisticsController, OldStatisticsController],
 	providers: [StatisticsService, ComputeStatisticsService],

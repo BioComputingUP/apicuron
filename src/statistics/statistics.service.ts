@@ -1,10 +1,8 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
-// import { TransformerService } from '../shared/transformer/transformer.service';
 import { User, UserDocument, UserSchema } from '../core/schemas/user.schema';
 import {
-	PublicStatistics,
 	Statistics,
 	StatisticsDocument,
 } from '../core/schemas/statistics.schema';
@@ -12,10 +10,10 @@ import { PartnerResourcesService } from '..//resources/partner-resources/partner
 import { GetStatisticsDto } from './dto/get-statistics.dto';
 import { paginate } from '../pagination/paginator';
 import { PaginateDto } from '../pagination/dto/paginate.dto';
-import { ReportDocument } from '../core/schemas/reports.schema';
 import { OnEvent } from '@nestjs/event-emitter';
 import { UPDATE_USER_PRIVACY } from './constants';
 import { StatisticsFilter } from './dto/statistics-filter.dto';
+import { PublicStatistics } from './schema/public-statistics.schema';
 
 @Injectable()
 export class StatisticsService {

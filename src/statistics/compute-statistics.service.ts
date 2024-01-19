@@ -126,7 +126,7 @@ export class ComputeStatisticsService {
 					curator_orcid,
 				}),
 				privacy,
-				type: 'contribution',
+				contribution_type: 'contribution',
 			};
 
 			const update_promise = this.statModel.replaceOne(
@@ -171,7 +171,8 @@ export class ComputeStatisticsService {
 	}
 
 	private async incrementalStatisticsCompute(report: Report) {
-		const { resource_id, curator_orcid, type, activity_term } = report;
+		const { resource_id, curator_orcid, contribution_type, activity_term } =
+			report;
 
 		const user = await this.retrieveUser(curator_orcid);
 
@@ -181,14 +182,14 @@ export class ComputeStatisticsService {
 			{
 				curator_orcid,
 				resource_id,
-				type,
+				type: contribution_type,
 				privacy: user.privacy,
 			},
 			{
 				$set: {
 					curator_orcid,
 					resource_id,
-					type,
+					type: contribution_type,
 					privacy: user.privacy,
 				},
 				$inc: {
@@ -442,17 +443,17 @@ export class ComputeStatisticsService {
 
 	// events handling
 
-	@OnEvent(ON_ACHIEVEMENTS_UPDATE, { async: true})
-	async onAchievementsUpdate({ resource_id: string, curator_orcid: string}){
-		this.statModel.updateMany({
-			resource_id,
-			curator_orcid
-		}, {
-			$set: {
-				badges_count: this.badgeModel.
-			}
-		})
-	}
+	// @OnEvent(ON_ACHIEVEMENTS_UPDATE, { async: true})
+	// async onAchievementsUpdate({ resource_id: string, curator_orcid: string}){
+	// 	this.statModel.updateMany({
+	// 		resource_id,
+	// 		curator_orcid
+	// 	}, {
+	// 		$set: {
+	// 			badges_count: this.badgeModel.
+	// 		}
+	// 	})
+	// }
 
 	@OnEvent(ON_COMPUTE_RESOURCE_ACHIEVEMENTS, { async: true })
 	async onComputeResourceAchievements({

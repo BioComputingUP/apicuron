@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule, getModelToken } from '@nestjs/mongoose';
+import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './schemas/user.schema';
-import { Report, ReportSchemaFactory } from './schemas/reports.schema';
+import { Report, ReportSchema } from './schemas/reports.schema';
 import {
 	PartnerResource,
 	PartnerResourceSchema,
@@ -16,12 +16,8 @@ import {
 } from './schemas/notification.schema';
 import { Term, TermSchema } from './schemas/terms.schema';
 import {
-	PrivateStatistics,
-	PrivateStatisticsSchema,
-	PublicStatistics,
-	PublicStatisticsSchema,
 	Statistics,
-	StatisticsSchema,
+	StatisticsSchemaFactory,
 } from './schemas/statistics.schema';
 import {
 	AchievementDef,
@@ -52,6 +48,10 @@ import { MedalDef, MedalDefSchema } from './schemas/medal-def.schema';
 	imports: [
 		MongooseModule.forFeature([
 			{
+				name: Report.name,
+				schema: ReportSchema,
+			},
+			{
 				name: User.name,
 				schema: UserSchema,
 			},
@@ -77,22 +77,7 @@ import { MedalDef, MedalDefSchema } from './schemas/medal-def.schema';
 				name: Term.name,
 				schema: TermSchema,
 			},
-			{
-				name: Statistics.name,
-				schema: StatisticsSchema,
-				discriminators: [
-					{
-						name: PublicStatistics.name,
-						schema: PublicStatisticsSchema,
-						value: 'public',
-					},
-					{
-						name: PrivateStatistics.name,
-						schema: PrivateStatisticsSchema,
-						value: 'private',
-					},
-				],
-			},
+
 			{
 				name: AchievementDef.name,
 				schema: AchievementDefSchema,
@@ -101,23 +86,11 @@ import { MedalDef, MedalDefSchema } from './schemas/medal-def.schema';
 					{ name: MedalDef.name, schema: MedalDefSchema, value: 'medal' },
 				],
 			},
-			// {
-			// 	name: Achievement.name,
-			// 	schema: AchievementSchema,
-			// 	discriminators: [
-			// 		{ name: Badge.name, schema: BadgeSchema, value: 'badge' },
-			// 		{ name: Medal.name, schema: MedalSchema, value: 'medal' },
-			// 	],
-			// },
 		]),
 		MongooseModule.forFeatureAsync([
 			{
-				inject: [getModelToken(User.name)],
-				imports: [
-					MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-				],
-				name: Report.name,
-				useFactory: ReportSchemaFactory,
+				name: Statistics.name,
+				useFactory: StatisticsSchemaFactory,
 			},
 			{
 				name: EarnedAchievement.name,
