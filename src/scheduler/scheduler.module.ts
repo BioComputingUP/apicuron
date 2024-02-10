@@ -16,12 +16,14 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { OrcidSubmissionTask } from './tasks/orcid-submission.task';
 import { StatisticsModule } from '../statistics/statistics.module';
 import { AchievementsModule } from '../achievements/achievements.module';
+import { ReportsModule } from '../reports/reports.module';
 @Module({
 	imports: [
 		HttpModule,
 		CoreApicuronModule,
 		NotificationsModule,
 		ResourcesModule,
+		ReportsModule,
 		AchievementsModule,
 		StatisticsModule,
 		AuthModule,

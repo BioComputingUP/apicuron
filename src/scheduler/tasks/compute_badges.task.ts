@@ -4,14 +4,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { User, UserDocument } from '../../core/schemas/user.schema';
-import { ComputeAchievementsService } from '../../achievements/compute-achievements.service';
+import { ComputeAchievementsService } from '../../achievements/services/compute-achievements.service';
+import { ComputeBadgesService } from '../../achievements/services/compute-badges.service';
 
 @Injectable()
 export class ComputeBadgesTask {
 	constructor(
 		protected partnerResourceService: PartnerResourcesService,
 		@InjectModel(User.name) protected userModel: Model<UserDocument>,
-		protected computeAchievements: ComputeAchievementsService,
+		protected computeBadges: ComputeBadgesService,
 	) {}
 
 	logger = new Logger(ComputeBadgesTask.name);
@@ -37,7 +38,7 @@ export class ComputeBadgesTask {
 
 			const user = await this.userModel.findOne({ orcid_id });
 			if (user) {
-				await this.computeAchievements.computeUserBadges({
+				await this.computeBadges.computeUserBadges({
 					resource,
 					user: { orcid_id },
 				});
@@ -47,7 +48,7 @@ export class ComputeBadgesTask {
 		} else {
 			this.logger.log(`Computing Badges for resource ${resource_id}`);
 
-			await this.computeAchievements.computeResourceBadges(resource);
+			await this.computeBadges.computeResourceBadges(resource);
 		}
 	}
 }

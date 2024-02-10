@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 import { ActivityTermExists } from '../validators/activity-term-exists';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
-import { PartnerResource } from '../../core/schemas/resource.schema';
+import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateTermDto {

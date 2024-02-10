@@ -1,18 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-	AchievementDef
-} from '../../core/schemas/achievement-def.schema';
+import { AchievementDef } from '../../core/schemas/achievement-def.schema';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
-import { ComputeAchievementsService } from '../../achievements/compute-achievements.service';
+import { ComputeMedalsService } from '../../achievements/services/compute-medals.service';
 
 @Injectable()
 export class ComputeMedalsTask {
 	constructor(
 		protected partnerResourceService: PartnerResourcesService,
 		@InjectModel(AchievementDef.name)
-		protected computeAchievements: ComputeAchievementsService,
+		protected computeMedals: ComputeMedalsService,
 	) {}
 
 	logger = new Logger(ComputeMedalsTask.name);
@@ -32,6 +30,6 @@ export class ComputeMedalsTask {
 		}
 		this.logger.log(`Computing medals for resource ${resource_id}`);
 		// we first compute the medals for the resource`)
-		await this.computeAchievements.computeResourceMedals(resource);
+		await this.computeMedals.computeResourceMedals(resource);
 	}
 }

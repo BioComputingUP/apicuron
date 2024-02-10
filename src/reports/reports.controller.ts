@@ -56,7 +56,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserReq } from '../auth/decorators/applyUser.decorator';
 import { User } from '../core/schemas/user.schema';
 import { Public } from '../auth/decorators/public.decorator';
-import { ON_REPORTS_INSERT, ON_REPORT_INSERT } from './constants';
+import { POST_REPORT_INSERT_MANY, POST_REPORT_INSERT } from './constants';
 
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
@@ -66,7 +66,6 @@ export class ReportsController {
 		private reportService: ReportsService,
 		private eventEmitter: EventEmitter2,
 		private schedulerClientService: SchedulerClientService,
-		@InjectModel(Report.name) private reportModel: Model<ReportDocument>,
 		private resourceService: PartnerResourcesService,
 	) {}
 
@@ -86,6 +85,7 @@ export class ReportsController {
 			);
 		}
 	}
+
 	@UseGuards(LocalAuthGuard)
 	@Public()
 	@Get()
@@ -208,15 +208,13 @@ export class ReportsController {
 	) {
 		this.can_edit_resource(req.user, report.resource_id);
 
-		// const resource_uri = await this.partnerResourceService.retrieve_uri(report.resource_id)
-		const report_confirmation = await this.reportService.insertReport(
-			report,
-			true,
-		);
+		const report_confirmation = await this.reportService.insertReport(report, {
+			preventEvents: true,
+		});
 
 		res.send(report_confirmation);
 
-		await this.eventEmitter.emitAsync(ON_REPORT_INSERT, report as ReportDto);
+		await this.eventEmitter.emitAsync(POST_REPORT_INSERT, report as ReportDto);
 	}
 
 	@ApiOperation({
@@ -257,7 +255,7 @@ export class ReportsController {
 
 		const { insertedCount } = await this.reportService.insertReports(
 			reportSubmission.reports,
-			true,
+			{ preventEvents: true },
 		);
 		response.insertedCount = insertedCount;
 
@@ -265,7 +263,7 @@ export class ReportsController {
 		res.send(response);
 
 		await this.eventEmitter.emitAsync(
-			ON_REPORTS_INSERT,
+			POST_REPORT_INSERT_MANY,
 			reportSubmission.reports as ReportDto[],
 		);
 

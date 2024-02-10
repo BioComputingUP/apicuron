@@ -28,6 +28,8 @@ import { SentryInterceptor, SentryModule } from '@ntegral/nestjs-sentry';
 import { EmailModule } from './email/email.module';
 import { CoreApicuronModule } from './core/core.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { MongoEventsModule } from './mongo-events/mongo-events.module';
+import { MongoEventsService } from './mongo-events/mongo-events.service';
 const logger = new Logger('AppModule');
 
 @Module({
@@ -44,6 +46,10 @@ const logger = new Logger('AppModule');
 			}),
 		}),
 
+		EventEmitterModule.forRoot({
+			wildcard: true,
+		}),
+
 		ScheduleModule.forRoot(),
 		AuthModule,
 		MulterModule.register({
@@ -55,13 +61,17 @@ const logger = new Logger('AppModule');
 			// ignoreEnvFile: true,
 			load: [loadConfig()],
 		}),
+
+		MongoEventsModule,
 		// in here we use the forRootAsync https://docs.nestjs.com/techniques/mongodb#async-configuration
 		// to be able to access the configService asnchronously because it cannot be loaded sooner
 		// due to the fact that this is the appmodule
 		MongooseModule.forRootAsync({
-			inject: [ConfigService],
+			inject: [ConfigService, MongoEventsService],
+			imports: [MongoEventsModule],
 			useFactory: async (
 				configService: ConfigService,
+				mongoEventsService: MongoEventsService,
 			): Promise<MongooseModuleOptions> => {
 				const db_host = configService.get<string>('db_host');
 				const database = configService.get<string>('database');
@@ -70,6 +80,10 @@ const logger = new Logger('AppModule');
 				logger.log(`MongoDB Connection setup uri: ${uri}`);
 				return {
 					uri,
+					connectionFactory(connection: any, name: string) {
+						connection.plugin(mongoEventsService.loadMongoosePlugin());
+						return connection;
+					},
 				};
 			},
 		}),
@@ -83,7 +97,6 @@ const logger = new Logger('AppModule');
 				},
 			],
 		}),
-		EventEmitterModule.forRoot(),
 		CoreApicuronModule,
 		ResourcesModule,
 		TermsModule,

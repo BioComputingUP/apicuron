@@ -11,9 +11,7 @@ import { ActivityTermExists } from '../../terms/validators/activity-term-exists'
 import { BadgeUnique } from '../validators/achievement-exists';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 import { AchievementDef } from '../../core/schemas/achievement-def.schema';
-import { Badge } from '../../core/schemas/badges.schema';
-import { BadgeDef, BadgeDefSchema } from '../../core/schemas/badge-def.schema';
-import { PartnerResource } from '../../core/schemas/resource.schema';
+import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 
 export class BadgeDefFilter extends PaginateDto {
 	static create(obj: any) {

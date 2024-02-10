@@ -28,7 +28,7 @@ export class StatisticsService {
 
 	logger = new Logger(StatisticsService.name);
 
-	@OnEvent(UPDATE_USER_PRIVACY, { async: true })
+	@OnEvent(UPDATE_USER_PRIVACY, { async: true, promisify: true })
 	async setUserStatsPrivacy({
 		orcid_id,
 		privacy,
@@ -46,7 +46,9 @@ export class StatisticsService {
 			},
 			{
 				$set: {
-					privacy,
+					activityClass: {
+						privacy,
+					},
 				},
 			},
 			{

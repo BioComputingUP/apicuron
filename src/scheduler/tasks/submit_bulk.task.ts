@@ -2,7 +2,7 @@ import { Injectable, Logger, Inject } from '@nestjs/common';
 import { SubmitReportDto } from '../../reports/dto/submit-report.dto';
 
 import * as StreamObject from 'stream-json/streamers/StreamObject';
-import { createReadStream } from 'fs';
+import { createReadStream, readFileSync, statSync } from 'fs';
 import { filter } from 'stream-json/filters/Filter';
 import { parser } from 'stream-json';
 import { Stream, chain } from 'stream-chain';
@@ -18,6 +18,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Model } from 'mongoose';
 import { plainToClass } from 'class-transformer';
+import * as _ from 'lodash';
+import { MongoBulkWriteError } from 'mongodb';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import {
+	POST_REPORT_INSERT,
+	POST_REPORT_INSERT_MANY,
+	PRE_REPORT_INSERT,
+	PRE_REPORT_INSERT_MANY,
+} from '../../reports/constants';
 
 export type ValidatedReport = {
 	report: SubmitReportDto;
@@ -41,6 +50,7 @@ export class SubmitBulkTask {
 		protected compute_achievements: ComputeAchievementsTask,
 		@Inject('task:compute_statistics')
 		protected compute_statistics: ComputeStatisticsTask,
+		protected eventEmitter: EventEmitter2,
 	) {}
 
 	logger = new Logger(SubmitBulkTask.name);
@@ -66,54 +76,232 @@ export class SubmitBulkTask {
 				);
 			}
 		}
-		return await this.main(file, orcid_id);
+		const fileStats = statSync(file);
+		if (fileStats.size > 1024 * 1024 * 200) {
+			return await this.main(file, orcid_id);
+		}
+		return await this.unbuffered_submission(file, orcid_id);
 	}
 
-	private async main(file: string, orcid_id: string) {
+	public async unbuffered_submission(file: string, submitter_orcid: string) {
+		const user = await this.userModel.findOne({ orcid_id: submitter_orcid });
+		// const allowedResources: string[] = user.resources.map(
+		// 	({ resource_id }) => resource_id,
+		// );
+
+		const rawData = await this.loadRawData(file, submitter_orcid);
+
+		const reports = this.loadReportsArray(rawData);
+		const defaultReport = this.loadDefaultReport(rawData);
+
+		const reportProcessing$ = reports.map(
+			async (reportEntry): Promise<ValidatedReport> => {
+				const report = { ...defaultReport, ...reportEntry };
+				const reportObj = plainToClass(SubmitReportDto, report);
+
+				const reportValidation: ValidatedReport = await this.validate_report(
+					reportObj,
+				);
+
+				const priviledgeValidation = this.check_submission_priviledge(
+					user,
+					report,
+				);
+				if (priviledgeValidation) {
+					reportValidation.errors.push(priviledgeValidation);
+				}
+				return reportValidation;
+			},
+		);
+
+		const processedReports = await Promise.allSettled(reportProcessing$);
+
+		const sucessfullyProcessedReports = (
+			processedReports.filter(
+				(reportOutcome) => reportOutcome.status === 'fulfilled',
+			) as PromiseFulfilledResult<ValidatedReport>[]
+		).map((reportOutcome) => reportOutcome.value);
+
+		const [validReports, invalidReports] = _.partition(
+			sucessfullyProcessedReports,
+			(validatedReport: ValidatedReport) => validatedReport.errors.length === 0,
+		);
+
+		this.logger.debug(`Processed ${processedReports.length} reports`);
+		this.logger.debug(`${validReports.length} Valid to be inserted, reports`);
+		this.logger.debug(`${invalidReports.length} Invalid, reports`);
+
+		const reportDocuments: ReportDocument[] = validReports.map(
+			(report) => new this.reportModel(report.report),
+		);
+
+		await this.eventEmitter.emitAsync(PRE_REPORT_INSERT_MANY, reportDocuments);
+
+		try {
+			const insertResult = await this.reportModel.insertMany(reportDocuments, {
+				rawResult: true,
+			});
+			this.logger.debug(`inserted ${insertResult.insertedCount} reports`);
+
+			await this.eventEmitter.emitAsync(
+				POST_REPORT_INSERT_MANY,
+				reportDocuments,
+			);
+
+			const successCount = validReports.length;
+			const errors = invalidReports
+				.map((outcome: ValidatedReport) => outcome.errors)
+				.flat();
+			const totalCount = processedReports.length;
+
+			const notification_body = this.build_notification_body(
+				errors,
+				successCount,
+				totalCount,
+			);
+
+			await this.notificationsService.create_user_notification(
+				'Submission report',
+				notification_body,
+				submitter_orcid,
+			);
+		} catch (err: any) {
+			if (err instanceof MongoBulkWriteError) {
+				this.logger.error(err.message, err.stack, err.name);
+				if (err.code === 11000) {
+					this.notificationsService.create_user_notification(
+						'Submission Failed',
+						'Error inserting reports ,Duplicate Reports Error',
+						submitter_orcid,
+					);
+					return;
+				}
+				this.notificationsService.create_user_notification(
+					'Submission Failed',
+					'Error inserting reports, Unknown Error Please contact us at info@apicuron.org for assistance',
+					submitter_orcid,
+				);
+			}
+		}
+	}
+
+	private async loadRawData(filePath: string, submitter_orcid: string) {
+		try {
+			const rawData = readFileSync(filePath);
+			const submission = JSON.parse(rawData.toString()); // Convert Buffer to string before parsing as JSON
+
+			return submission;
+		} catch (err: any) {
+			if (err instanceof SyntaxError) {
+				this.logger.error(
+					`Error Parsing JSON file ${filePath} submitted by ${submitter_orcid}`,
+				);
+				this.logger.error(err.message, err.stack, err.name);
+				await this.notificationsService.create_user_notification(
+					'Submission Failed',
+					`Error parsing submitted JSON file, invalid JSON`,
+					submitter_orcid,
+				);
+				throw new Error('Error Parsing JSON File');
+			}
+			if (err instanceof Error) {
+				this.logger.error(
+					`JSON file not found or invalid: ${filePath} submitted by ${submitter_orcid}`,
+				);
+				this.logger.error(err.message, err.stack, err.name);
+
+				await this.notificationsService.create_user_notification(
+					'Submission Failed',
+					`Internal Error occured, please contact us for assistance at info@apicuron.org`,
+					submitter_orcid,
+				);
+				throw new Error('JSON file not found or invalid');
+			}
+			this.logger.error('Unknown Error occured');
+			await this.notificationsService.create_user_notification(
+				'Submission Failed',
+				`Internal Error occured, please contact us for assistance at info@apicuron.org`,
+				submitter_orcid,
+			);
+			throw new Error(err);
+		}
+	}
+
+	private loadDefaultReport(data: any) {
+		const defaultReportKeys = Object.keys(data).filter(
+			(key: string) => key !== 'reports',
+		);
+
+		const result = {};
+		for (const key of defaultReportKeys) {
+			result[key] = data[key];
+		}
+
+		return result;
+	}
+
+	private loadReportsArray(data: any): any[] {
+		const reports = data['reports'];
+
+		if (reports instanceof Array) {
+			return reports;
+		}
+		this.logger.error(
+			`Reports key is of type ${typeof reports} when it should be an instance of Array`,
+		);
+		throw new Error('Invalid Report Array');
+	}
+
+	private async main(file: string, submitter_orcid: string) {
 		let reportStream = null;
 		try {
 			const defaultReport = await this.parse_default_report(file);
-			const user = await this.userModel.findOne({ orcid_id });
+			const user = await this.userModel.findOne({
+				orcid_id: submitter_orcid,
+			});
 			if (!user) {
-				throw new Error(`User with the ORCID ID ${orcid_id} does not exist`);
+				throw new Error(
+					`User with the ORCID ID ${submitter_orcid} does not exist`,
+				);
 			}
 			reportStream = this.build_report_stream(file, defaultReport, user);
 		} catch (e) {
 			await this.notificationsService.create_user_notification(
 				'Submission Failed',
 				`Error: ${e.message} `,
-				orcid_id,
+				submitter_orcid,
 			);
 
 			this.logger.error(`Error: ${e.message}`);
 		} finally {
-			if (reportStream) {
-				const { errors, success_count, total_report_count, resource_ids } =
-					await this.process_report_stream(reportStream);
+			if (!reportStream) {
+				return;
+			}
+			const { errors, success_count, total_report_count, resource_ids } =
+				await this.process_report_stream(reportStream);
 
-				const notification_body = this.build_notification_body(
-					errors,
-					success_count,
-					total_report_count,
-				);
+			const notification_body = this.build_notification_body(
+				errors,
+				success_count,
+				total_report_count,
+			);
 
-				await this.notificationsService.create_user_notification(
-					'Submission report',
-					notification_body,
-					orcid_id,
-				);
+			await this.notificationsService.create_user_notification(
+				'Submission report',
+				notification_body,
+				submitter_orcid,
+			);
 
-				for (const resource_id of resource_ids) {
-					this.logger.log(`Computing Achievements for ${resource_id}`);
-					await this.compute_achievements.run_task({
-						arguments: [resource_id],
-					});
+			for (const resource_id of resource_ids) {
+				this.logger.log(`Computing Achievements for ${resource_id}`);
+				await this.compute_achievements.run_task({
+					arguments: [resource_id],
+				});
 
-					this.logger.log(`Computing Statistics for ${resource_id}`);
-					await this.compute_statistics.run_task({
-						arguments: [resource_id],
-					});
-				}
+				this.logger.log(`Computing Statistics for ${resource_id}`);
+				await this.compute_statistics.run_task({
+					arguments: [resource_id],
+				});
 			}
 		}
 	}
@@ -132,7 +320,17 @@ export class SubmitBulkTask {
 				if (errors.length == 0) {
 					successful_reports_count += 1;
 					try {
-						await this.reportModel.create(report);
+						const reportDocument = new this.reportModel(report);
+						await this.eventEmitter.emitAsync(
+							PRE_REPORT_INSERT,
+							reportDocument,
+						);
+						await reportDocument.save();
+
+						await this.eventEmitter.emitAsync(
+							POST_REPORT_INSERT,
+							reportDocument,
+						);
 						this.logger.log(
 							`Sucessfully inserted Report for ${report.resource_id} by ${report.curator_orcid}`,
 						);
@@ -181,7 +379,7 @@ export class SubmitBulkTask {
 	}
 
 	private build_notification_body(
-		error_reports: Array<any>,
+		error_reports: ValidationError[],
 		success_count: number,
 		total_count: number,
 	) {
@@ -217,7 +415,7 @@ export class SubmitBulkTask {
 		return submission_report.join('\n');
 	}
 
-	private parse_default_report(file: string): Promise<Object> {
+	private parse_default_report(file: string): Promise<any> {
 		// create read stream from file
 		const objectStream = new StreamObject();
 		// const verifierStream = createReadStream(file).pipe(verifier())
@@ -273,53 +471,72 @@ export class SubmitBulkTask {
 	private async validate_report(
 		report: SubmitReportDto,
 	): Promise<ValidatedReport> {
+		const result = {
+			report,
+			errors: [] as ValidationError[],
+		};
 		try {
 			const validation_errors: ValidationError[] = await validate(report);
 			if (validation_errors.length > 0) {
-				console.error(`Errors found in Report validation\n`, report);
-				console.error('test error message');
-				console.error('Validation Errors: ', validation_errors);
+				this.logger.error(`Errors found in Report validation\n`, report);
+				this.logger.error('Validation Errors: ', validation_errors);
 			}
-			return {
-				report,
-				errors: validation_errors,
-			};
-		} catch (e: unknown) {
+			result.errors = validation_errors;
+		} catch (e: any) {
 			if (e) {
-				console.error('Error Validating report: \n', report);
+				this.logger.error('Error Validating report: \n', report);
+				if (e instanceof Error) {
+					this.logger.error(e.message, e.stack, e.name);
+				}
 			}
-			return {
-				report,
-				errors: [
-					{
-						target: report,
-						property: 'all',
-						constraints: {
-							ProcessingError: 'The report document is not processable',
-						},
+
+			result.errors = [
+				{
+					target: report,
+					property: 'all',
+					constraints: {
+						ProcessingError: 'The report document is not processable',
 					},
-				],
-			};
+				},
+			];
+		} finally {
+			return result;
 		}
 	}
 
-	private user_can_report(user) {
-		const user_resources = user.resources.map(({ resource_id }) => resource_id);
+	private user_can_report(
+		user,
+	): ({ report, errors }: ValidatedReport) => ValidatedReport {
 		return ({ report, errors }: ValidatedReport) => {
-			if (user_resources.includes(report.resource_id)) {
-				return { report, errors };
-			} else {
-				errors.push({
-					target: report,
-					property: 'resource_id',
-					value: report.resource_id,
-					constraints: {
-						UserSubmitPermission: `The user ${user.orcid_id} does not have permission to submit to the resource ${report.resource_id}`,
-					},
-					children: [],
-				});
-				return { report, errors };
+			const error = this.check_submission_priviledge(user, report);
+			if (error) {
+				errors.push(error);
 			}
+			return {
+				report,
+				errors,
+			};
+		};
+	}
+
+	private check_submission_priviledge(
+		user: User,
+		report: SubmitReportDto,
+	): ValidationError | null {
+		const allowedResources = user.resources.map(
+			({ resource_id }) => resource_id,
+		);
+		if (allowedResources.includes(report.resource_id)) {
+			return null;
+		}
+		return {
+			target: report,
+			property: 'resource_id',
+			value: report.resource_id,
+			constraints: {
+				UserSubmitPermission: `The user does not have permission to submit to the resource ${report.resource_id}`,
+			},
+			children: [],
 		};
 	}
 

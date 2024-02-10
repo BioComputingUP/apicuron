@@ -183,24 +183,24 @@ export class AchievementsDefService {
 		return delete_confirmation.deletedCount;
 	}
 
-	@OnEvent(ON_TERM_DELETED, { async: true })
-	async removeTermFromAchievements({
-		resource_id,
-		activity_term,
-	}: {
-		resource_id: string;
-		activity_term: string;
-	}) {
-		return await this.achievementDefModel.updateMany(
-			{
-				resource_id,
-				list_terms: activity_term,
-			},
-			{
-				$pull: { list_terms: activity_term },
-			},
-		);
-	}
+	// @OnEvent(ON_TERM_DELETED, { async: true })
+	// async removeTermFromAchievements({
+	// 	resource_id,
+	// 	activity_term,
+	// }: {
+	// 	resource_id: string;
+	// 	activity_term: string;
+	// }) {
+	// 	return await this.achievementDefModel.updateMany(
+	// 		{
+	// 			resource_id,
+	// 			list_terms: activity_term,
+	// 		},
+	// 		{
+	// 			$pull: { list_terms: activity_term },
+	// 		},
+	// 	);
+	// }
 
 	async count() {
 		return await this.achievementDefModel.count();

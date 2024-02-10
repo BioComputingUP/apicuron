@@ -5,7 +5,6 @@ import {
 } from 'class-validator';
 import {
 	Injectable,
-	Inject,
 	Logger,
 	InternalServerErrorException,
 } from '@nestjs/common';

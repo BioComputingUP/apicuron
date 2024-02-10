@@ -8,7 +8,7 @@ import {
 	Validate,
 } from 'class-validator';
 import { UniqueRule } from '../../shared/validators/unique.validator';
-import { Resource } from '../../core/schemas/resource.schema';
+import { Resource } from '../../core/schemas/resource/resource.schema';
 import { UniqueResourceIdRule } from '../validators/unique-resource-id';
 import { UniqueResourceURIRule } from '../validators/unique-resource-uri';
 

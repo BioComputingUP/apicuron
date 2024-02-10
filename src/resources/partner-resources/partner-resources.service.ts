@@ -1,22 +1,27 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import {
-	PartnerResource,
-	PartnerResourceDocument,
-} from '../../core/schemas/resource.schema';
+import { FilterQuery, Model } from 'mongoose';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 // import { TransformerService } from '../../shared/transformer/transformer.service';
 import { UpdatePartnerResourceDto } from '../dto/updateResource.dto';
+import { OnEvent } from '@nestjs/event-emitter';
+import {
+	PRE_REPORT_INSERT,
+	PRE_REPORT_INSERT_MANY,
+} from '../../reports/constants';
+import { ReportDocument } from '../../core/schemas/reports.schema';
 
 @Injectable()
 export class PartnerResourcesService {
 	constructor(
 		@InjectModel(PartnerResource.name)
-		private partnerResourceModel: Model<PartnerResourceDocument>,
-	) // protected transformService: TransformerService
-	{}
-	async get_resources(): Promise<PartnerResource[]> {
-		return await this.partnerResourceModel.find();
+		private partnerResourceModel: Model<PartnerResourceDocument>, // protected transformService: TransformerService
+	) {}
+	async get_resources(
+		filter: FilterQuery<PartnerResourceDocument> = {},
+	): Promise<PartnerResourceDocument[]> {
+		return await this.partnerResourceModel.find(filter);
 	}
 
 	async count() {
@@ -33,7 +38,7 @@ export class PartnerResourcesService {
 		}
 	}
 
-	async get_resource(resource_id: string) {
+	async get_resource(resource_id: string): Promise<PartnerResourceDocument> {
 		return await this.partnerResourceModel.findOne({ resource_id });
 	}
 
@@ -50,5 +55,47 @@ export class PartnerResourcesService {
 			{ resource_id },
 			resource_update,
 		);
+	}
+
+	@OnEvent(PRE_REPORT_INSERT, { async: true, promisify: true })
+	async onReportInsert(report: ReportDocument) {
+		// if (report.contribution_type) {
+		// 	return;
+		// }
+		// const { resource_id, curator_orcid } = report;
+		// const resource = await this.partnerResourceModel.findOne({ resource_id });
+		// report.contribution_type =
+		// 	resource.getCuratorContributionType(curator_orcid);
+
+		return;
+	}
+
+	@OnEvent(PRE_REPORT_INSERT_MANY, { async: true, promisify: true })
+	async preReportInsertMany(reports: ReportDocument[]) {
+		// const resource_ids = new Set(reports.map((report) => report.resource_id));
+		// const resources = await this.partnerResourceModel.find({
+		// 	resource_id: { $in: Array.from(resource_ids) },
+		// });
+
+		// const resourceMap = new Map(
+		// 	resources.map((resource) => [resource.resource_id, resource]),
+		// );
+
+		// for (const report of reports) {
+		// 	if (report.contribution_type) {
+		// 		continue;
+		// 	}
+		// 	const resource = resourceMap.get(report.resource_id);
+		// 	if (!resource) {
+		// 		throw new UnprocessableEntityException(
+		// 			`Resource with id ${report.resource_id} does not exist`,
+		// 		);
+		// 	}
+		// 	report.contribution_type = resource.getCuratorContributionType(
+		// 		report.curator_orcid,
+		// 	);
+		// }
+
+		return;
 	}
 }

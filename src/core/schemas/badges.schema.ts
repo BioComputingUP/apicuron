@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
 
-export type BadgeDocument = Badge & Document;
+export type BadgeDocument = HydratedDocument<Badge>;
 
 @Schema({
 	collection: 'achievements',
@@ -42,18 +43,13 @@ export class Badge {
 	@Prop()
 	list_terms: string[];
 
-	@Prop({
-		type: Date,
-	})
-	earned_at: Date;
-
-	@Prop({
-		type: Boolean,
-	})
-	earned: boolean;
+	isEarned(): boolean {
+		return this.count >= this.count_threshold;
+	}
 }
 
-export const BadgeSchema = SchemaFactory.createForClass(Badge);
+export const BadgeSchema = SchemaFactory.createForClass(Badge).loadClass(Badge);
 
 export class EarnedBadge extends Badge {}
-export const EarnedBadgeSchema = SchemaFactory.createForClass(EarnedBadge);
+export const EarnedBadgeSchema =
+	SchemaFactory.createForClass(EarnedBadge).loadClass(EarnedBadge);

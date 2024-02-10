@@ -21,7 +21,7 @@ import {
 	EntryExistsRule,
 } from '../../shared/validators/entry-exists.validator';
 import { Term } from '../../core/schemas/terms.schema';
-import { PartnerResource } from '../../core/schemas/resource.schema';
+import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 import { EntityUriValid } from '../validators/entity-uri';
 import { Transform, Type } from 'class-transformer';
 export class SubmitReportDto {
@@ -43,17 +43,29 @@ export class SubmitReportDto {
 	@IsNotEmpty()
 	activity_term: string;
 
+	@ApiProperty({
+		description:
+			'The ORCID of the contributor who performed the activity, has to be a valid ORCID',
+	})
 	@Validate(OrcidChecksum)
 	@IsString()
 	@IsNotEmpty()
 	curator_orcid: string;
 
+	@ApiProperty({
+		description:
+			'The URI of the entity where the activity was performed, this can be a protein, a gene, a complex, a pathway, etc.',
+	})
 	@Validate(EntityUriValid, [
 		({ resource_id }: SubmitReportDto): string => resource_id,
 	])
 	@IsNotEmpty()
 	entity_uri: string;
 
+	@ApiProperty({
+		description:
+			'The resource_id of the resource where the activity was performed',
+	})
 	@Validate(EntryExistsRule, [
 		PartnerResource.name,
 		({ resource_id }) => {

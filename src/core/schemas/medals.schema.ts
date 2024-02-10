@@ -1,14 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { AggregatedReportsMixin } from './components/aggregated-data.schema';
 
 export type MedalDocument = Medal & Document;
 
-@Schema({ collection: 'achievements' })
-export class Medal {
-	// fields from Achievement
-	// @Prop({
-	// 	required: false,
-	// })
-	// category: string;
+class BaseMedal {
 	@Prop({
 		required: false,
 	})
@@ -67,23 +62,29 @@ export class Medal {
 	@Prop({
 		required: false,
 	})
-	score_relative_valid: Boolean;
+	score_relative_valid: boolean;
 
 	@Prop({
 		required: false,
 	})
-	score_threshold_valid: Boolean;
+	score_threshold_valid: boolean;
 
 	@Prop({
 		required: true,
 	})
 	score_total: number;
 
-	@Prop()
+	@Prop({
+		required: false,
+	})
 	list_terms: string[];
 }
 
-export const MedalSchema = SchemaFactory.createForClass(Medal);
+@Schema({ collection: 'achievements' })
+export class Medal extends AggregatedReportsMixin(BaseMedal) {}
+
+export const MedalSchema = SchemaFactory.createForClass(Medal).loadClass(Medal);
 
 export class EarnedMedal extends Medal {}
-export const EarnedMedalSchema = SchemaFactory.createForClass(EarnedMedal);
+export const EarnedMedalSchema =
+	SchemaFactory.createForClass(EarnedMedal).loadClass(EarnedMedal);

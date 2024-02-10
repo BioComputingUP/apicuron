@@ -20,14 +20,17 @@ import { PaginationAggregation } from '../pagination/interfaces/pagination-aggre
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import {
 	REPORTS_DELETED_ALL_RESOURCE,
-	ON_REPORTS_INSERT,
-	ON_REPORT_INSERT,
+	POST_REPORT_INSERT_MANY,
+	POST_REPORT_INSERT,
+	PRE_REPORT_INSERT,
+	PRE_REPORT_INSERT_MANY,
 } from './constants';
 import { ReportDto } from './dto/report.dto';
 import { DeleteResult } from 'mongodb';
 import { UPDATE_USER_PRIVACY } from '../statistics/constants';
 import { ON_TERM_DELETED } from '../terms/constants';
 import { Term } from '../core/schemas/terms.schema';
+import { UsersService } from '../auth/users/users.service';
 
 @Injectable()
 export class ReportsService {
@@ -35,13 +38,14 @@ export class ReportsService {
 		@InjectModel(Report.name)
 		private reportModel: Model<ReportDocument>,
 		protected partnerResourcesService: PartnerResourcesService,
+		protected userService: UsersService,
 		protected termsService: TermsService,
 		private eventEmitter: EventEmitter2,
 	) {}
 
 	logger = new Logger(ReportsService.name);
 
-	@OnEvent(UPDATE_USER_PRIVACY, { async: true })
+	@OnEvent(UPDATE_USER_PRIVACY, { async: true, promisify: true })
 	async updateReportsPrivacy({ orcid_id, privacy }) {
 		const result = await this.reportModel.updateMany(
 			{ curator_orcid: orcid_id },
@@ -51,20 +55,63 @@ export class ReportsService {
 		return result;
 	}
 
+	// async getReportActivityClass({
+	// 	resource_id,
+	// 	curator_orcid,
+	// }: ReportDocument): Promise<ActivityMeta> {
+	// 	const resource = await this.partnerResourcesService.get_resource(
+	// 		resource_id,
+	// 	);
+	// 	const privacy = await this.userService.getUserPrivacy(curator_orcid);
+	// 	return new ActivityMeta({
+	// 		contribution_type: resource.hasProfessionalCurator(curator_orcid)
+	// 			? ContributionType.professional
+	// 			: ContributionType.community,
+	// 	});
+	// }
+
+	// async getReportsActivityClass(reports: ReportDocument[]) {
+	// 	const resource_ids = _.uniq(reports.map((report) => report.resource_id));
+	// 	const orcid_ids = _.uniq(reports.map((report) => report.curator_orcid));
+
+	// 	const resources = await this.partnerResourcesService.get_resources({
+	// 		resource_id: { $in: resource_ids },
+	// 	});
+	// 	const professionalCuratorsMap = new Map<string, string[]>(
+	// 		resources.map((resource) => [
+	// 			resource.resource_id,
+	// 			resource.professional_curators,
+	// 		]),
+	// 	);
+
+	// 	const users: [string, PrivacyType][] = (
+	// 		await this.userService.getUsers({ orcid_id: { $in: orcid_ids } })
+	// 	).map((user: UserDocument) => [user.orcid_id, user.privacy as PrivacyType]);
+
+	// 	const userPrivacyMap = new Map<string, PrivacyType>(users);
+	// }
+
 	async getUserReports(orcid_id: string): Promise<Report[]> {
 		return await this.reportModel.find({
 			curator_orcid: orcid_id,
 		});
 	}
 
-	async insertReport(report: ReportDto, preventEvents = false) {
+	async insertReport(report: ReportDto, options = { preventEvents: false }) {
 		try {
 			const instance = new this.reportModel(report);
+
+			await this.eventEmitter.emitAsync(
+				PRE_REPORT_INSERT,
+				report as ReportDocument,
+			);
+
 			await instance.save();
-			if (!preventEvents) {
+
+			if (!options.preventEvents) {
 				await this.eventEmitter.emitAsync(
-					ON_REPORT_INSERT,
-					report as ReportDto,
+					POST_REPORT_INSERT,
+					report as ReportDocument,
 				);
 			}
 			return instance;
@@ -76,16 +123,25 @@ export class ReportsService {
 
 	async insertReports(
 		reports: ReportDto[],
-		preventEvents = false,
+		options = { preventEvents: false },
 	): Promise<Omit<InsertManyResult<Report>, 'insertedIds'>> {
 		try {
+			const reportDocuments = reports.map(
+				(report: ReportDto) => new this.reportModel(report),
+			);
+
+			await this.eventEmitter.emitAsync(
+				PRE_REPORT_INSERT_MANY,
+				reportDocuments,
+			);
+
 			const { insertedCount, acknowledged } = await this.reportModel.insertMany(
-				reports,
+				reportDocuments,
 				{ rawResult: true },
 			);
-			if (!preventEvents) {
+			if (!options.preventEvents) {
 				await this.eventEmitter.emitAsync(
-					ON_REPORTS_INSERT,
+					POST_REPORT_INSERT_MANY,
 					reports as ReportDto[],
 				);
 			}
@@ -450,7 +506,7 @@ export class ReportsService {
 		return converter[groupBy];
 	}
 
-	@OnEvent(ON_TERM_DELETED, { async: true })
+	@OnEvent(ON_TERM_DELETED, { async: true, promisify: true })
 	async deleteTermReports(term: Term) {
 		return await this.reportModel.deleteMany({
 			resource_id: term.resource_id,

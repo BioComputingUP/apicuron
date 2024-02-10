@@ -17,7 +17,7 @@ import { Type } from 'class-transformer';
 import { UniqueRule } from '../../shared/validators/unique.validator';
 import { MedalDef } from '../../core/schemas/medal-def.schema';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
-import { PartnerResource } from '../../core/schemas/resource.schema';
+import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 
 export class CreateMedalDto {
 	@Validate(UniqueRule, [

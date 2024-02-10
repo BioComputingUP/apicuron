@@ -6,3 +6,5 @@ export const ON_COMPUTE_USER_ACHIEVEMENTS = 'ON_COMPUTE_USER_ACHIEVEMENTS';
 export const ON_COMPUTE_RESOURCE_ACHIEVEMENTS =
 	'ON_COMPUTE_RESOURCE_ACHIEVEMENTS';
 export const ON_BADGES_UPDATE = 'ON_BADGES_UPDATE';
+export const ON_USER_BADGES_UPDATE = 'achievements.badge.user.update';
+export const ON_RESOURCE_BADGES_UPDATE = 'achievements.badge.resource.update';

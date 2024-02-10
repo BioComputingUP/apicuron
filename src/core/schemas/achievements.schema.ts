@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Query } from 'mongoose';
+import { AchievementState, AchievementType } from '../enums';
+import { AggregatedReportsMixin } from './components/aggregated-data.schema';
 
 export type AchievementDocument = HydratedDocument<Achievement>;
 
-@Schema({ collection: 'achievements', discriminatorKey: 'type' })
-export class Achievement {
+class AchievementBase {
 	@Prop({
 		required: true,
 	})
@@ -23,17 +24,27 @@ export class Achievement {
 	@Prop({
 		type: String,
 		required: true,
-		enum: ['badge', 'medal'],
+		enum: AchievementType,
 	})
 	type: string;
 
 	@Prop({
-		type: Boolean,
+		type: String,
 		required: true,
 	})
-	earned: boolean;
+	earned: AchievementState;
 }
 
+@Schema({ collection: 'achievements', discriminatorKey: 'type' })
+export class Achievement extends AggregatedReportsMixin(AchievementBase) {}
+
+export function AchievementsSchemaFactory() {
+	const AchievementSchema = SchemaFactory.createForClass(Achievement);
+
+	return AchievementSchema;
+}
+
+@Schema({ collection: 'achievements', discriminatorKey: 'type' })
 export class EarnedAchievement extends Achievement {}
 
 export function EarnedAchievementsSchemaFactory() {
@@ -60,8 +71,4 @@ export function EarnedAchievementsSchemaFactory() {
 	});
 
 	return AchievementSchema;
-}
-
-export function AchievementsSchemaFactory() {
-	return SchemaFactory.createForClass(Achievement);
 }

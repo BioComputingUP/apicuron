@@ -20,7 +20,7 @@ export class AchievementsService {
 		@InjectModel(EarnedMedal.name) protected medalModel: Model<MedalDocument>,
 	) {}
 
-	@OnEvent(ON_BADGE_DEF_DELETE, { async: true })
+	@OnEvent(ON_BADGE_DEF_DELETE, { async: true, promisify: true })
 	async onBadgeDefDelete({ resource_id, name }: DeleteBadgeDefDto) {
 		return await this.badgeModel.deleteMany({
 			resource_id,
@@ -28,7 +28,7 @@ export class AchievementsService {
 		});
 	}
 
-	@OnEvent(ON_MEDAL_DEF_DELETE, { async: true })
+	@OnEvent(ON_MEDAL_DEF_DELETE, { async: true, promisify: true })
 	async onMedalDefDelete({ resource_id, name }: DeleteMedalDefDto) {
 		return await this.medalModel.deleteMany({
 			resource_id,

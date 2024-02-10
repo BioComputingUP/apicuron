@@ -7,12 +7,15 @@ import { basename, join } from 'path';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 // import { TransformerService } from '../../shared/transformer/transformer.service';
 import { CreateResourceDto } from '../dto/createResource.dto';
-import { Resource, ResourceDocument } from '../../core/schemas/resource.schema';
+import {
+	Resource,
+	ResourceDocument,
+} from '../../core/schemas/resource/resource.schema';
 import {
 	SubmittedResource,
 	SubmittedResourceDocument,
-} from '../../core/schemas/resource.schema';
-import { PartnerResource } from '../../core/schemas/resource.schema';
+} from '../../core/schemas/resource/submitted-resource.schema';
+import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 
 @Injectable()
 export class SubmittedResourcesService {

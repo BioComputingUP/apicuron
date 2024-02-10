@@ -11,7 +11,10 @@ import { BadgeUnique, MedalUnique } from './validators/achievement-exists';
 import { AuthModule } from '../auth/auth.module';
 import { ResourcesModule } from '../resources/resources.module';
 import { CoreApicuronModule } from '../core/core.module';
-import { ComputeAchievementsService } from './compute-achievements.service';
+import { ComputeAchievementsService } from './services/compute-achievements.service';
+import { ComputeMedalsService } from './services/compute-medals.service';
+import { ComputeBadgesService } from './services/compute-badges.service';
+import { AchievementEventHandlerService } from './services/achievements-event-handler.service';
 
 @Module({
 	providers: [
@@ -19,13 +22,18 @@ import { ComputeAchievementsService } from './compute-achievements.service';
 		AchievementsService,
 		BadgeUnique,
 		MedalUnique,
+		ComputeMedalsService,
+		ComputeBadgesService,
 		ComputeAchievementsService,
+		AchievementEventHandlerService,
 	],
 	imports: [CoreApicuronModule, AuthModule, ResourcesModule],
 	exports: [
 		AchievementsDefService,
 		AchievementsService,
 		ComputeAchievementsService,
+		ComputeMedalsService,
+		ComputeBadgesService,
 	],
 	controllers: [
 		AchievementsController,

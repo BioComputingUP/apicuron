@@ -1,11 +1,12 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { achievements_v1_pipeline } from './aggregation-pipeline/achievements.pipeline';
 import { browse_v1_pipeline } from './aggregation-pipeline/browse.pipeline';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 import { ConfigService } from '@nestjs/config';
 import { generateAvatar } from './generate_avatar';
+import { PrivacyType } from '../../core/enums';
 @Injectable()
 export class UsersService implements OnApplicationBootstrap {
 	private readonly logger = new Logger(UsersService.name);
@@ -139,5 +140,18 @@ export class UsersService implements OnApplicationBootstrap {
 
 	async count() {
 		return await this.userModel.count();
+	}
+
+	async getUserPrivacy(orcid_id: string): Promise<PrivacyType> {
+		const { privacy } = await this.userModel.findOne(
+			{ orcid_id },
+			{ privacy: 1 },
+		);
+
+		return privacy;
+	}
+
+	async getUsers(filter: FilterQuery<UserDocument>): Promise<UserDocument[]> {
+		return await this.userModel.find(filter);
 	}
 }

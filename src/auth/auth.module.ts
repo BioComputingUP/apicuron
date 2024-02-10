@@ -13,6 +13,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JWTStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CoreApicuronModule } from '../core/core.module';
+import { UsersEventHandlers } from './users/users-event-handlers.service';
 
 @Module({
 	providers: [
@@ -21,6 +22,7 @@ import { CoreApicuronModule } from '../core/core.module';
 		JWTStrategy,
 		JwtAuthGuard,
 		UsersService,
+		UsersEventHandlers,
 		OrcidExists,
 		OrcidGuard,
 	],

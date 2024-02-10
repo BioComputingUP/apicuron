@@ -1,33 +1,20 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, SchemaTypes, Types } from 'mongoose';
+import { HydratedDocument, SchemaTypes, Types } from 'mongoose';
 import { Report } from './reports.schema';
-import { PrivacyType } from './activity-category.schema';
-
-export type UserDocument = User & Document;
-export interface UserResource {
-	id: string;
-	name: string;
-	resource_id: string;
-}
-
-export interface UserResourcePutCode {
-	resource_id: string;
-	putCode: string;
-}
+import {
+	UserResourceSpecificSettings,
+	UserResourceSpecificSettingsSchema,
+} from './components/user-settings.schema';
+import { PrivacyType } from '../enums';
+import { UserResource } from '../interfaces/user-resource';
+import { UserResourcePutCode } from '../interfaces/user-resource-put-code';
+export type UserDocument = HydratedDocument<User>;
 
 @Schema({
 	collection: 'users',
 	toJSON: {
 		virtuals: true,
 	},
-	// methods: {
-	// 	hasResourcePutCode: function (resource_id: string): Boolean {
-	// 		return this.orcid_work_put_codes.findIndex((item) => item.resource_id == resource_id) != -1;
-	// 	},
-	// 	getResourcePutCode: function (resource_id: string): string {
-	// 		return this.orcid_work_put_codes.find((item) => item.resource_id == resource_id).putCode;
-	// 	}
-	// }
 })
 export class User {
 	@Prop({
@@ -128,6 +115,13 @@ export class User {
 	avatar: string;
 
 	@Prop({
+		type: Map,
+		of: UserResourceSpecificSettingsSchema,
+		default: () => new Map(),
+	})
+	resource_settings: Map<string, UserResourceSpecificSettings>;
+
+	@Prop({
 		required: true,
 		default: PrivacyType.private,
 		type: String,
@@ -135,37 +129,34 @@ export class User {
 	})
 	privacy: PrivacyType;
 
-	hasResourcePutCode: (resource_id: string) => boolean;
-	getResourcePutCode: (resource_id: string) => string;
+	hasResourcePutCode(resource_id: string): boolean {
+		return (
+			this.orcid_work_put_codes.findIndex(
+				(item) => item.resource_id == resource_id,
+			) != -1
+		);
+	}
+	getResourcePutCode(resource_id: string): string {
+		return this.orcid_work_put_codes.find(
+			(item) => item.resource_id == resource_id,
+		).putCode;
+	}
+
+	getResourceSettings(resource_id: string): UserResourceSpecificSettings {
+		return {
+			privacy: this.resource_settings.get(resource_id)?.privacy || this.privacy,
+		};
+	}
 }
 
-const UserSchema = SchemaFactory.createForClass(User);
+const UserSchema = SchemaFactory.createForClass(User).loadClass(User);
+
+UserSchema.loadClass(User);
 
 UserSchema.virtual('reports', {
 	ref: Report.name,
 	localField: 'orcid_id',
 	foreignField: 'curator_orcid',
 });
-
-UserSchema.method(
-	'hasResourcePutCode',
-	function (resource_id: string): boolean {
-		return (
-			this.orcid_work_put_codes.findIndex(
-				(item) => item.resource_id == resource_id,
-			) != -1
-		);
-	},
-);
-
-UserSchema.method('getResourcePutCode', function (resource_id: string): string {
-	return this.orcid_work_put_codes.find(
-		(item) => item.resource_id == resource_id,
-	).putCode;
-});
-
-// UserSchema.methods.hasResourcePutCode = function (resource_id: string): Boolean {
-// return this.orcid_work_put_codes.find((item) => item.resource_id == resource_id) != -1;
-// }
 
 export { UserSchema };

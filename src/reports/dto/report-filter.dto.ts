@@ -8,7 +8,7 @@ import {
 	Allow,
 } from 'class-validator';
 import { User } from '../../core/schemas/user.schema';
-import { PartnerResource } from '../../core/schemas/resource.schema';
+import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 import { DateAfter, DateBefore } from '../validators/date-comparison';
 import * as _ from 'lodash';

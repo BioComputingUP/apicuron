@@ -10,7 +10,7 @@ import {
 	Validate,
 } from 'class-validator';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
-import { PartnerResource } from '../../core/schemas/resource.schema';
+import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 
 export class UpdatePartnerResourceDto {
 	@Validate(EntryExistsRule, [

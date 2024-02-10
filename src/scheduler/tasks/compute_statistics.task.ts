@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { User, UserDocument } from '../../core/schemas/user.schema';
-import { ComputeStatisticsService } from '../../statistics/compute-statistics.service';
+import { ComputeStatisticsService } from '../../statistics/compute-statistics/compute-statistics.service';
 
 @Injectable()
 export class ComputeStatisticsTask {
@@ -31,17 +31,13 @@ export class ComputeStatisticsTask {
 			return;
 		}
 		if (orcid_id) {
-			const user = await this.userModel.findOne({ orcid_id });
-			if (user) {
-				await this.computeStatistics.computeUserStatistics({
-					resource,
-					user,
-				});
-				return;
-			} else {
-				this.logger.error(`User ${orcid_id} not found ! Aborting`);
-			}
+			await this.computeStatistics.computeStatistics({
+				resource_id: resource.resource_id,
+				curator_orcid: orcid_id,
+			});
 		}
-		await this.computeStatistics.computeResourceStatistics(resource);
+		await this.computeStatistics.computeStatistics({
+			resource_id: resource.resource_id,
+		});
 	}
 }

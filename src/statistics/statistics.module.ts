@@ -8,7 +8,7 @@ import { AuthModule } from '../auth/auth.module';
 import { ResourcesModule } from '../resources/resources.module';
 import { AchievementsModule } from '../achievements/achievements.module';
 import { CoreApicuronModule } from '../core/core.module';
-import { ComputeStatisticsService } from './compute-statistics.service';
+import { ComputeStatisticsService } from './compute-statistics/compute-statistics.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { MongooseModule } from '@nestjs/mongoose';
 import {

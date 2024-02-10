@@ -1,15 +1,19 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './schemas/user.schema';
-import { Report, ReportSchema } from './schemas/reports.schema';
 import {
-	PartnerResource,
-	PartnerResourceSchema,
-	Resource,
-	ResourceSchema,
+	Report,
+	ReportSchema,
+	// ReportSchemaFactory,
+} from './schemas/reports.schema';
+import { Resource, ResourceSchema } from './schemas/resource/resource.schema';
+
+import {
 	SubmittedResource,
 	SubmittedResourceSchema,
-} from './schemas/resource.schema';
+} from './schemas/resource/submitted-resource.schema';
+import { PartnerResourceSchema } from './schemas/resource/partner-resource.schema';
+import { PartnerResource } from './schemas/resource/partner-resource.schema';
 import {
 	Notification,
 	NotificationSchema,
@@ -43,9 +47,12 @@ import {
 } from './schemas/medals.schema';
 import { BadgeDef, BadgeDefSchema } from './schemas/badge-def.schema';
 import { MedalDef, MedalDefSchema } from './schemas/medal-def.schema';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AchievementType } from './enums';
 
 @Module({
 	imports: [
+		EventEmitterModule,
 		MongooseModule.forFeature([
 			{
 				name: Report.name,
@@ -93,22 +100,44 @@ import { MedalDef, MedalDefSchema } from './schemas/medal-def.schema';
 				useFactory: StatisticsSchemaFactory,
 			},
 			{
-				name: EarnedAchievement.name,
-				useFactory: EarnedAchievementsSchemaFactory,
-				discriminators: [
-					{ name: EarnedBadge.name, schema: EarnedBadgeSchema, value: 'badge' },
-					{ name: EarnedMedal.name, schema: EarnedMedalSchema, value: 'medal' },
-				],
-			},
-
-			{
 				name: Achievement.name,
 				useFactory: AchievementsSchemaFactory,
 				discriminators: [
-					{ name: Badge.name, schema: BadgeSchema, value: 'badge' },
-					{ name: Medal.name, schema: MedalSchema, value: 'medal' },
+					{
+						name: Badge.name,
+						schema: BadgeSchema,
+						value: AchievementType.badge,
+					},
+					{
+						name: Medal.name,
+						schema: MedalSchema,
+						value: AchievementType.medal,
+					},
 				],
 			},
+			{
+				name: EarnedAchievement.name,
+				useFactory: EarnedAchievementsSchemaFactory,
+				discriminators: [
+					{
+						name: EarnedBadge.name,
+						schema: EarnedBadgeSchema,
+						value: AchievementType.badge,
+					},
+					{
+						name: EarnedMedal.name,
+						schema: EarnedMedalSchema,
+						value: AchievementType.medal,
+					},
+				],
+			},
+
+			// {
+			// 	name: Report.name,
+			// 	useFactory: ReportSchemaFactory,
+			// 	inject: [EventEmitter2],
+			// 	imports: [EventEmitterModule],
+			// },
 		]),
 	],
 
