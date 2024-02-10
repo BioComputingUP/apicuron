@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { AchievementDef } from '../achievement-def.schema';
+import { AchievementDef } from '../achievements-def/achievement-def.schema';
 import { Term } from '../terms.schema';
 import { PartnerResource } from './partner-resource.schema';
 import { SubmittedResource } from './submitted-resource.schema';

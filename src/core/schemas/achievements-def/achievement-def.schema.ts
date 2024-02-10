@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
+import { AchievementType } from '../../enums';
 
-export type AchievementDefDocument = AchievementDef & Document;
+export type AchievementDefDocument = HydratedDocument<AchievementDef>;
 
 @Schema({
 	collection: 'achievements_def',
@@ -41,7 +43,7 @@ export class AchievementDef {
 	@Prop({
 		type: String,
 		required: true,
-		enum: ['badge', 'medal'],
+		enum: [AchievementType.badge, AchievementType.medal],
 	})
 	type: string;
 
@@ -49,7 +51,7 @@ export class AchievementDef {
 	@Prop({
 		type: String,
 		required() {
-			return this.type == 'badge';
+			return this.type == AchievementType.badge;
 		},
 	})
 	color_code?: string;
@@ -58,7 +60,7 @@ export class AchievementDef {
 	@Prop({
 		type: Number,
 		required() {
-			return this.type == 'medal';
+			return this.type == AchievementType.medal;
 		},
 	})
 	score_relative?: number;
@@ -72,6 +74,12 @@ export class AchievementDef {
 		required: false,
 	})
 	last_day?: Date;
+
+	@Prop({
+		required: true,
+		type: String,
+	})
+	league: string;
 }
 
 export const AchievementDefSchema =

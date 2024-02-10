@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { InjectModel } from '@nestjs/mongoose';
-import { AchievementDef } from '../../core/schemas/achievement-def.schema';
+import { AchievementDef } from '../../core/schemas/achievements-def/achievement-def.schema';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { ComputeMedalsService } from '../../achievements/services/compute-medals.service';
 

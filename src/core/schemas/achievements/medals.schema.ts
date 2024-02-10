@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { AggregatedReportsMixin } from './components/aggregated-data.schema';
+import { AggregatedReportsMixin } from '../components/aggregated-data.schema';
+import { HydratedDocument } from 'mongoose';
 
-export type MedalDocument = Medal & Document;
+export type MedalDocument = HydratedDocument<Medal>;
 
 class BaseMedal {
 	@Prop({
@@ -78,6 +79,8 @@ class BaseMedal {
 		required: false,
 	})
 	list_terms: string[];
+
+	league: string;
 }
 
 @Schema({ collection: 'achievements' })

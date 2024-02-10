@@ -7,7 +7,7 @@ import {
 	Validate,
 } from 'class-validator';
 import { User } from '../../../core/schemas/user.schema';
-import { OrcidChecksum } from '../../../reports/validators/orcid-checksum';
+import { OrcidChecksum } from '../../../submit-reports/validators/orcid-checksum';
 import { EntryExistsRule } from '../../../shared/validators/entry-exists.validator';
 export class UpdateUserDto {
 	@IsOptional()

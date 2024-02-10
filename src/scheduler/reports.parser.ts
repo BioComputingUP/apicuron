@@ -5,7 +5,7 @@ import { parser } from 'stream-json';
 import { Stream, chain } from 'stream-chain';
 import { pick } from 'stream-json/filters/Pick';
 import * as StreamArray from 'stream-json/streamers/StreamArray';
-import { SubmitReportDto } from '../reports/dto/submit-report.dto';
+import { SubmitReportDto } from '../submit-reports/dto/submit-report.dto';
 import { validate, ValidationError } from 'class-validator';
 import { User } from '../core/schemas/user.schema';
 import { Report } from '../core/schemas/reports.schema';

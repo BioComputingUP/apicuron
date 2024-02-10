@@ -1,12 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-	FilterQuery,
-	InsertManyResult,
-	Model,
-	PipelineStage,
-	QueryOptions,
-} from 'mongoose';
+import { FilterQuery, Model, PipelineStage, QueryOptions } from 'mongoose';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import { TermsService } from '../terms/terms.service';
 import {
@@ -17,16 +11,7 @@ import { Report, ReportDocument } from '../core/schemas/reports.schema';
 import * as _ from 'lodash';
 import { paginate } from '../pagination/paginator';
 import { PaginationAggregation } from '../pagination/interfaces/pagination-aggregation';
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
-import {
-	REPORTS_DELETED_ALL_RESOURCE,
-	POST_REPORT_INSERT_MANY,
-	POST_REPORT_INSERT,
-	PRE_REPORT_INSERT,
-	PRE_REPORT_INSERT_MANY,
-} from './constants';
-import { ReportDto } from './dto/report.dto';
-import { DeleteResult } from 'mongodb';
+import { OnEvent } from '@nestjs/event-emitter';
 import { UPDATE_USER_PRIVACY } from '../statistics/constants';
 import { ON_TERM_DELETED } from '../terms/constants';
 import { Term } from '../core/schemas/terms.schema';
@@ -40,7 +25,6 @@ export class ReportsService {
 		protected partnerResourcesService: PartnerResourcesService,
 		protected userService: UsersService,
 		protected termsService: TermsService,
-		private eventEmitter: EventEmitter2,
 	) {}
 
 	logger = new Logger(ReportsService.name);
@@ -55,106 +39,10 @@ export class ReportsService {
 		return result;
 	}
 
-	// async getReportActivityClass({
-	// 	resource_id,
-	// 	curator_orcid,
-	// }: ReportDocument): Promise<ActivityMeta> {
-	// 	const resource = await this.partnerResourcesService.get_resource(
-	// 		resource_id,
-	// 	);
-	// 	const privacy = await this.userService.getUserPrivacy(curator_orcid);
-	// 	return new ActivityMeta({
-	// 		contribution_type: resource.hasProfessionalCurator(curator_orcid)
-	// 			? ContributionType.professional
-	// 			: ContributionType.community,
-	// 	});
-	// }
-
-	// async getReportsActivityClass(reports: ReportDocument[]) {
-	// 	const resource_ids = _.uniq(reports.map((report) => report.resource_id));
-	// 	const orcid_ids = _.uniq(reports.map((report) => report.curator_orcid));
-
-	// 	const resources = await this.partnerResourcesService.get_resources({
-	// 		resource_id: { $in: resource_ids },
-	// 	});
-	// 	const professionalCuratorsMap = new Map<string, string[]>(
-	// 		resources.map((resource) => [
-	// 			resource.resource_id,
-	// 			resource.professional_curators,
-	// 		]),
-	// 	);
-
-	// 	const users: [string, PrivacyType][] = (
-	// 		await this.userService.getUsers({ orcid_id: { $in: orcid_ids } })
-	// 	).map((user: UserDocument) => [user.orcid_id, user.privacy as PrivacyType]);
-
-	// 	const userPrivacyMap = new Map<string, PrivacyType>(users);
-	// }
-
 	async getUserReports(orcid_id: string): Promise<Report[]> {
 		return await this.reportModel.find({
 			curator_orcid: orcid_id,
 		});
-	}
-
-	async insertReport(report: ReportDto, options = { preventEvents: false }) {
-		try {
-			const instance = new this.reportModel(report);
-
-			await this.eventEmitter.emitAsync(
-				PRE_REPORT_INSERT,
-				report as ReportDocument,
-			);
-
-			await instance.save();
-
-			if (!options.preventEvents) {
-				await this.eventEmitter.emitAsync(
-					POST_REPORT_INSERT,
-					report as ReportDocument,
-				);
-			}
-			return instance;
-		} catch (e: any) {
-			this.logger.error(e.message, e.stack, 'insertReport');
-			throw new Error(`Failed to save Report ${report}`);
-		}
-	}
-
-	async insertReports(
-		reports: ReportDto[],
-		options = { preventEvents: false },
-	): Promise<Omit<InsertManyResult<Report>, 'insertedIds'>> {
-		try {
-			const reportDocuments = reports.map(
-				(report: ReportDto) => new this.reportModel(report),
-			);
-
-			await this.eventEmitter.emitAsync(
-				PRE_REPORT_INSERT_MANY,
-				reportDocuments,
-			);
-
-			const { insertedCount, acknowledged } = await this.reportModel.insertMany(
-				reportDocuments,
-				{ rawResult: true },
-			);
-			if (!options.preventEvents) {
-				await this.eventEmitter.emitAsync(
-					POST_REPORT_INSERT_MANY,
-					reports as ReportDto[],
-				);
-			}
-			return {
-				insertedCount,
-				acknowledged,
-			};
-		} catch (e: any) {
-			this.logger.error(e.message, e.stack, 'insertReports');
-			this.logger.error(
-				`A MongoBulkWriteException occurred when inserting Reports, but there are successfully processed documents.`,
-			);
-		}
 	}
 
 	/**
@@ -305,35 +193,6 @@ export class ReportsService {
 
 	async all_reports_count() {
 		return await this.reportModel.count();
-	}
-
-	async deleteAllResourceReports(resource_id: string): Promise<DeleteResult> {
-		const { deletedCount, acknowledged } = await this.reportModel.deleteMany({
-			resource_id,
-		});
-		this.eventEmitter.emit(REPORTS_DELETED_ALL_RESOURCE, {
-			resource_id,
-			deletedCount,
-			acknowledged,
-		});
-		return { deletedCount, acknowledged };
-	}
-
-	async deleteAllResourcesReports(
-		resource_ids: string[],
-	): Promise<{ [key: string]: DeleteResult }> {
-		// delete all the reports of all resources in order
-		const deleteResponses$ = resource_ids.map(async (resource_id: string) => {
-			return await this.deleteAllResourceReports(resource_id);
-		});
-
-		// await for all promises in order
-		const deleteResponses = await Promise.all(deleteResponses$);
-		// Create an object where each key is a resource id and the value is the response object;
-		return resource_ids.reduce((prev, curr, index) => {
-			prev[curr] = deleteResponses[index];
-			return prev;
-		}, {});
 	}
 
 	private buildReportsQuery(dto: ReportFilterDto): {

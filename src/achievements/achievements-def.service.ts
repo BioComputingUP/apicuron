@@ -17,7 +17,7 @@ import {
 import {
 	AchievementDef,
 	AchievementDefDocument,
-} from '../core/schemas/achievement-def.schema';
+} from '../core/schemas/achievements-def/achievement-def.schema';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { ON_TERM_DELETED } from '../terms/constants';
 import {

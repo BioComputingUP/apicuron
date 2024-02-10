@@ -40,7 +40,6 @@ export class Report {
 	@Prop({
 		required: true,
 		type: String,
-		default: 'default',
 	})
 	league: string;
 

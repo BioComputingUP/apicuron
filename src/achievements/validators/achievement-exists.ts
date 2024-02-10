@@ -9,7 +9,7 @@ import { NotFoundException } from '@nestjs/common';
 import {
 	AchievementDef,
 	AchievementDefDocument,
-} from '../../core/schemas/achievement-def.schema';
+} from '../../core/schemas/achievements-def/achievement-def.schema';
 
 @ValidatorConstraint({ name: 'AchievementExists', async: true })
 class AbstractAchievementUnique implements ValidatorConstraintInterface {

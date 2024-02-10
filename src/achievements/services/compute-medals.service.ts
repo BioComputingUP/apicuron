@@ -1,17 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
-import { Medal, MedalDocument } from '../../core/schemas/medals.schema';
+import {
+	Medal,
+	MedalDocument,
+} from '../../core/schemas/achievements/medals.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../core/schemas/user.schema';
-import { Badge, BadgeDocument } from '../../core/schemas/badges.schema';
 import { Model } from 'mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { BadgeDefDocument } from '../../core/schemas/badge-def.schema';
 import {
-	AchievementDef,
-	AchievementDefDocument,
-} from '../../core/schemas/achievement-def.schema';
-import { MedalDef } from '../../core/schemas/medal-def.schema';
+	MedalDef,
+	MedalDefDocument,
+} from '../../core/schemas/achievements-def/medal-def.schema';
 
 @Injectable()
 export class ComputeMedalsService {
@@ -19,10 +19,7 @@ export class ComputeMedalsService {
 		@InjectModel(Medal.name) protected medalModel: Model<MedalDocument>,
 		protected partnerResourceService: PartnerResourcesService,
 		@InjectModel(User.name) protected userModel: Model<UserDocument>,
-		@InjectModel(Badge.name) protected badgeModel: Model<BadgeDocument>,
-		@InjectModel(AchievementDef.name)
-		private achievementDefModel: Model<AchievementDefDocument>,
-		@InjectModel(MedalDef.name) private medalDefModel: Model<BadgeDefDocument>,
+		@InjectModel(MedalDef.name) private medalDefModel: Model<MedalDefDocument>,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 	) {}
 
@@ -36,16 +33,14 @@ export class ComputeMedalsService {
 
 		// const { data: medalDefs } = await this.achievementsDefService.get_medals(MedalsFilter.create({ resource_id }))
 
-		const medalDefs = await this.achievementDefModel.find({
+		const medalDefs = await this.medalDefModel.find({
 			resource_id,
-			type: 'medal',
 		});
 
 		const medal_saves_promises = [];
 
-		for (let i = 0; i < medalDefs.length; i++) {
+		for await (const medalDef of medalDefs) {
 			// for each medal definition in the list, we add the medal to the user
-			const medalDef = medalDefs[i];
 
 			this.logger.debug(`Working on Medal ${medalDef.name}`);
 
@@ -88,7 +83,7 @@ export class ComputeMedalsService {
 		await Promise.all(medal_saves_promises);
 	}
 
-	private medalReportsAggregation(medal: AchievementDef) {
+	private medalReportsAggregation(medal: MedalDefDocument) {
 		// first we first filter all the reports by the resource
 		// and the terms that are concerned by the medals
 		const match_dict = {

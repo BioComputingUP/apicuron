@@ -10,7 +10,7 @@ import { ResourceIdExists } from '../../resources/partner-resources/validators/r
 import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
 import { BadgeUnique } from '../validators/achievement-exists';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
-import { AchievementDef } from '../../core/schemas/achievement-def.schema';
+import { AchievementDef } from '../../core/schemas/achievements-def/achievement-def.schema';
 import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 
 export class BadgeDefFilter extends PaginateDto {

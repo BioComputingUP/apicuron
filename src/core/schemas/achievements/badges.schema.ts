@@ -40,12 +40,12 @@ export class Badge {
 	})
 	count_threshold: number;
 
-	@Prop()
+	@Prop({
+		required: true,
+	})
 	list_terms: string[];
 
-	isEarned(): boolean {
-		return this.count >= this.count_threshold;
-	}
+	league: string;
 }
 
 export const BadgeSchema = SchemaFactory.createForClass(Badge).loadClass(Badge);

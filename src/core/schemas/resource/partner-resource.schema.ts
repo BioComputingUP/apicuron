@@ -1,12 +1,9 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { ContributionType } from '../../enums';
 import { HydratedDocument } from 'mongoose';
-import { AchievementDef } from '../achievement-def.schema';
+import { AchievementDef } from '../achievements-def/achievement-def.schema';
 import { Term } from '../terms.schema';
-import {
-	ResourceLeague,
-	defaultResourceLeague,
-} from '../league/resource-league.schema';
+import { League, LeagueSchema } from '../league/league.schema';
 
 export type PartnerResourceDocument = HydratedDocument<PartnerResource>;
 
@@ -42,9 +39,17 @@ export class PartnerResource {
 
 	@Prop({
 		required: true,
-		default: defaultResourceLeague,
+		type: [LeagueSchema],
+		default: () => [{ name: 'default', defaultMembers: [] }],
 	})
-	leagues: ResourceLeague;
+	leagues: League[];
+
+	@Prop({
+		required: true,
+		type: String,
+		default: () => 'default',
+	})
+	defaultLeague: string;
 
 	// getCuratorContributionType(curator_id: string): ContributionType {
 	// 	return this.professional_curators.includes(curator_id)

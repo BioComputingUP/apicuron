@@ -3,7 +3,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../app.module';
 import { getModelToken } from '@nestjs/mongoose';
-import { AchievementDef } from '../core/schemas/achievement-def.schema';
+import { AchievementDef } from '../core/schemas/achievements-def/achievement-def.schema';
 import { Model } from 'mongoose';
 import { Term } from '../core/schemas/terms.schema';
 import { Logger } from '@nestjs/common';

@@ -15,7 +15,7 @@ import { MedalUnique } from '../validators/achievement-exists';
 import { MaxDateField, MinDateField } from '../validators/date-comparison';
 import { Type } from 'class-transformer';
 import { UniqueRule } from '../../shared/validators/unique.validator';
-import { MedalDef } from '../../core/schemas/medal-def.schema';
+import { MedalDef } from '../../core/schemas/achievements-def/medal-def.schema';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 

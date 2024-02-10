@@ -30,6 +30,7 @@ import { CoreApicuronModule } from './core/core.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MongoEventsModule } from './mongo-events/mongo-events.module';
 import { MongoEventsService } from './mongo-events/mongo-events.service';
+import { SubmitReportModule } from './submit-reports/submit-reports.module';
 const logger = new Logger('AppModule');
 
 @Module({
@@ -101,6 +102,7 @@ const logger = new Logger('AppModule');
 		ResourcesModule,
 		TermsModule,
 		ReportsModule,
+		SubmitReportModule,
 		StatisticsModule,
 		AchievementsModule,
 		NotificationsModule,

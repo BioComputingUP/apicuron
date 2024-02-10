@@ -2,7 +2,6 @@ import {
 	ArrayMaxSize,
 	ArrayMinSize,
 	IsArray,
-	IsBoolean,
 	IsDate,
 	IsEmpty,
 	IsNotEmpty,
@@ -21,9 +20,13 @@ import {
 	EntryExistsRule,
 } from '../../shared/validators/entry-exists.validator';
 import { Term } from '../../core/schemas/terms.schema';
-import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
+import {
+	PartnerResource,
+	PartnerResourceDocument,
+} from '../../core/schemas/resource/partner-resource.schema';
 import { EntityUriValid } from '../validators/entity-uri';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
+import { FilterQuery } from 'mongoose';
 export class SubmitReportDto {
 	@Validate(
 		EntryExistsRule,
@@ -94,10 +97,18 @@ export class SubmitReportDto {
 	// @IsNotEmpty()
 	timestamp: Date;
 
-	@IsBoolean()
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ league, resource_id }): FilterQuery<PartnerResourceDocument> => {
+			return {
+				resource_id,
+				leagues: league,
+			};
+		},
+	])
+	@IsString()
 	@IsOptional()
-	@Transform((val) => val ?? false)
-	paid: boolean;
+	league: string;
 }
 
 export class SubmitBulkDto {

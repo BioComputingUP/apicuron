@@ -1,5 +1,5 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
-import { SubmitReportDto } from '../../reports/dto/submit-report.dto';
+import { SubmitReportDto } from '../../submit-reports/dto/submit-report.dto';
 
 import * as StreamObject from 'stream-json/streamers/StreamObject';
 import { createReadStream, readFileSync, statSync } from 'fs';

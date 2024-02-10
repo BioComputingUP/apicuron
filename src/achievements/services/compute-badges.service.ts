@@ -3,22 +3,23 @@ import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Cursor, FilterQuery, Model, UpdateQuery } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../core/schemas/user.schema';
-import { Badge, BadgeDocument } from '../../core/schemas/badges.schema';
+import {
+	Badge,
+	BadgeDocument,
+} from '../../core/schemas/achievements/badges.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { MongoServerError } from 'mongodb';
 import {
 	BadgeDef,
 	BadgeDefDocument,
-} from '../../core/schemas/badge-def.schema';
+} from '../../core/schemas/achievements-def/badge-def.schema';
 import {
 	AchievementDef,
 	AchievementDefDocument,
-} from '../../core/schemas/achievement-def.schema';
+} from '../../core/schemas/achievements-def/achievement-def.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ON_BADGES_UPDATE, ON_USER_BADGES_UPDATE } from '../constants';
+import { ON_BADGES_UPDATE } from '../constants';
 import { AchievementState } from '../../core/enums';
-import { Achievement } from '../../core/schemas/achievements.schema';
-import { cpSync } from 'fs';
 
 @Injectable()
 export class ComputeBadgesService {

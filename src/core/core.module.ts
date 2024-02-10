@@ -26,27 +26,21 @@ import {
 import {
 	AchievementDef,
 	AchievementDefSchema,
-} from './schemas/achievement-def.schema';
+} from './schemas/achievements-def/achievement-def.schema';
 import {
 	Achievement,
 	AchievementsSchemaFactory,
-	EarnedAchievement,
-	EarnedAchievementsSchemaFactory,
-} from './schemas/achievements.schema';
+} from './schemas/achievements/achievements.schema';
+import { Badge, BadgeSchema } from './schemas/achievements/badges.schema';
+import { Medal, MedalSchema } from './schemas/achievements/medals.schema';
 import {
-	Badge,
-	BadgeSchema,
-	EarnedBadge,
-	EarnedBadgeSchema,
-} from './schemas/badges.schema';
+	BadgeDef,
+	BadgeDefSchema,
+} from './schemas/achievements-def/badge-def.schema';
 import {
-	EarnedMedal,
-	EarnedMedalSchema,
-	Medal,
-	MedalSchema,
-} from './schemas/medals.schema';
-import { BadgeDef, BadgeDefSchema } from './schemas/badge-def.schema';
-import { MedalDef, MedalDefSchema } from './schemas/medal-def.schema';
+	MedalDef,
+	MedalDefSchema,
+} from './schemas/achievements-def/medal-def.schema';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AchievementType } from './enums';
 
@@ -115,22 +109,22 @@ import { AchievementType } from './enums';
 					},
 				],
 			},
-			{
-				name: EarnedAchievement.name,
-				useFactory: EarnedAchievementsSchemaFactory,
-				discriminators: [
-					{
-						name: EarnedBadge.name,
-						schema: EarnedBadgeSchema,
-						value: AchievementType.badge,
-					},
-					{
-						name: EarnedMedal.name,
-						schema: EarnedMedalSchema,
-						value: AchievementType.medal,
-					},
-				],
-			},
+			// {
+			// 	name: EarnedAchievement.name,
+			// 	useFactory: EarnedAchievementsSchemaFactory,
+			// 	discriminators: [
+			// 		{
+			// 			name: EarnedBadge.name,
+			// 			schema: EarnedBadgeSchema,
+			// 			value: AchievementType.badge,
+			// 		},
+			// 		{
+			// 			name: EarnedMedal.name,
+			// 			schema: EarnedMedalSchema,
+			// 			value: AchievementType.medal,
+			// 		},
+			// 	],
+			// },
 
 			// {
 			// 	name: Report.name,

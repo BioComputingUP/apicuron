@@ -1,7 +1,7 @@
 import { IsIn, IsOptional, IsString, Validate } from 'class-validator';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
-import { OrcidChecksum } from '../../reports/validators/orcid-checksum';
+import { OrcidChecksum } from '../../submit-reports/validators/orcid-checksum';
 import { PaginateDto } from '../../pagination/dto/paginate.dto';
 
 const sortByFields = [

@@ -1,11 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
 
-export type MedalDefDocument = MedalDef & Document;
+export type BadgeDefDocument = HydratedDocument<BadgeDef>;
 
 @Schema({
 	collection: 'achievements_def',
 })
-export class MedalDef {
+export class BadgeDef {
 	@Prop()
 	id: string;
 
@@ -36,24 +37,14 @@ export class MedalDef {
 	})
 	list_terms: string[];
 
-	// medal fields
+	// badge field
 	@Prop({
-		type: Number,
+		type: String,
 		required: true,
 	})
-	score_relative?: number;
+	color_code: string;
 
-	@Prop({
-		type: Date,
-		required: false,
-	})
-	first_day?: Date;
-
-	@Prop({
-		type: Date,
-		required: false,
-	})
-	last_day?: Date;
+	league: string;
 }
 
-export const MedalDefSchema = SchemaFactory.createForClass(MedalDef);
+export const BadgeDefSchema = SchemaFactory.createForClass(BadgeDef);

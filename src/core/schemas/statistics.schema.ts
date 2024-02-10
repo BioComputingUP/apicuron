@@ -67,6 +67,12 @@ export class Statistics {
 
 	@Prop({ required: true, default: () => 0 })
 	total_score: number;
+
+	@Prop({ required: true, type: String })
+	league: string;
+
+	@Prop({ required: true, type: String })
+	privacy: string;
 }
 
 export function StatisticsSchemaFactory() {

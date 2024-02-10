@@ -10,7 +10,7 @@ import { Report, ReportDocument } from '../core/schemas/reports.schema';
 import {
 	AchievementDef,
 	AchievementDefDocument,
-} from '../core/schemas/achievement-def.schema';
+} from '../core/schemas/achievements-def/achievement-def.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ON_TERM_DELETED, ON_TERM_UPDATED } from './constants';
 

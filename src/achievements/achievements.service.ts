@@ -4,8 +4,14 @@ import { plainToInstance } from 'class-transformer';
 import { Model } from 'mongoose';
 import { AchievementFilter } from './dto/achievement-filter.dto';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
-import { EarnedBadge, BadgeDocument } from '../core/schemas/badges.schema';
-import { EarnedMedal, MedalDocument } from '../core/schemas/medals.schema';
+import {
+	BadgeDocument,
+	Badge,
+} from '../core/schemas/achievements/badges.schema';
+import {
+	Medal,
+	MedalDocument,
+} from '../core/schemas/achievements/medals.schema';
 import { paginate } from '../pagination/paginator';
 import { OnEvent } from '@nestjs/event-emitter';
 import { ON_BADGE_DEF_DELETE, ON_MEDAL_DEF_DELETE } from './constants';
@@ -16,8 +22,8 @@ import { DeleteMedalDefDto } from './dto/medal-crud.dto';
 export class AchievementsService {
 	constructor(
 		protected partnerResourceService: PartnerResourcesService,
-		@InjectModel(EarnedBadge.name) protected badgeModel: Model<BadgeDocument>,
-		@InjectModel(EarnedMedal.name) protected medalModel: Model<MedalDocument>,
+		@InjectModel(Badge.name) protected badgeModel: Model<BadgeDocument>,
+		@InjectModel(Medal.name) protected medalModel: Model<MedalDocument>,
 	) {}
 
 	@OnEvent(ON_BADGE_DEF_DELETE, { async: true, promisify: true })
