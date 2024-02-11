@@ -6,6 +6,7 @@ import { ResourcesModule } from '../resources/resources.module';
 import { SubmitReportService } from './services/submit-reports.service';
 import { SchedulerClientModule } from '../scheduler-client/scheduler-client.module';
 import { EntityUriValid } from './validators/entity-uri';
+import { ReportMetaHandler } from './services/report-meta.handler';
 
 @Module({
 	imports: [
@@ -14,7 +15,8 @@ import { EntityUriValid } from './validators/entity-uri';
 		ResourcesModule,
 		SchedulerClientModule,
 	],
-	providers: [SubmitReportService, EntityUriValid],
+	providers: [SubmitReportService, EntityUriValid, ReportMetaHandler],
 	controllers: [SubmitReportsController],
+	exports: [SubmitReportService],
 })
 export class SubmitReportModule {}

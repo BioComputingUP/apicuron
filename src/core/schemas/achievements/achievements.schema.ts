@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Query } from 'mongoose';
-import { AchievementState, AchievementType } from '../../enums';
-import { AggregatedReportsMixin } from '../components/aggregated-data.schema';
+import { HydratedDocument } from 'mongoose';
+import { AchievementType } from '../../enums';
 
 export type AchievementDocument = HydratedDocument<Achievement>;
 

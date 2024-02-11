@@ -46,8 +46,8 @@ export class UsersService implements OnApplicationBootstrap {
 		return await user_promise;
 	}
 
-	async get_by_orcid(orcid_id: string): Promise<User> {
-		const user_promise = this.userModel.findOne(
+	async get_by_orcid(orcid_id: string): Promise<UserDocument> {
+		const user_promise = await this.userModel.findOne(
 			{
 				orcid_id,
 			},

@@ -1,4 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+	Injectable,
+	InternalServerErrorException,
+	Logger,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { InsertManyResult, Model } from 'mongoose';
@@ -13,12 +17,16 @@ import {
 } from '../../reports/constants';
 import { ReportDto } from '../../reports/dto/report.dto';
 import { DeleteResult } from 'mongodb';
+import { UsersService } from '../../auth/users/users.service';
+import { ReportMetaHandler } from './report-meta.handler';
 
 @Injectable()
 export class SubmitReportService {
 	constructor(
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		protected eventEmitter: EventEmitter2,
+		protected userService: UsersService,
+		protected reportMetaHandler: ReportMetaHandler,
 	) {}
 
 	logger = new Logger(SubmitReportService.name);
@@ -59,10 +67,7 @@ export class SubmitReportService {
 		try {
 			const instance = new this.reportModel(report);
 
-			await this.eventEmitter.emitAsync(
-				PRE_REPORT_INSERT,
-				report as ReportDocument,
-			);
+			await this.reportMetaHandler.handle(instance);
 
 			await instance.save();
 
@@ -88,10 +93,7 @@ export class SubmitReportService {
 				(report: ReportDto) => new this.reportModel(report),
 			);
 
-			await this.eventEmitter.emitAsync(
-				PRE_REPORT_INSERT_MANY,
-				reportDocuments,
-			);
+			await this.reportMetaHandler.handleMultiple(reportDocuments);
 
 			const { insertedCount, acknowledged } = await this.reportModel.insertMany(
 				reportDocuments,
@@ -108,10 +110,15 @@ export class SubmitReportService {
 				acknowledged,
 			};
 		} catch (e: any) {
-			this.logger.error(e.message, e.stack, 'insertReports');
-			this.logger.error(
-				`A MongoBulkWriteException occurred when inserting Reports, but there are successfully processed documents.`,
-			);
+			if (e instanceof Error) {
+				this.logger.error(e.message, e.stack, e.name);
+				this.logger.error(
+					`A MongoBulkWriteException occurred when inserting Reports, but there are successfully processed documents.`,
+				);
+				throw new InternalServerErrorException(
+					'An internal error occured when submitting the reports',
+				);
+			}
 		}
 	}
 }

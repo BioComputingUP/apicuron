@@ -1,6 +1,7 @@
 import {
 	IsNotEmpty,
 	IsOptional,
+	IsString,
 	Matches,
 	Min,
 	Validate,
@@ -11,7 +12,11 @@ import { ActivityTermExists } from '../../terms/validators/activity-term-exists'
 import { BadgeUnique } from '../validators/achievement-exists';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 import { AchievementDef } from '../../core/schemas/achievements-def/achievement-def.schema';
-import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
+import {
+	PartnerResource,
+	PartnerResourceDocument,
+} from '../../core/schemas/resource/partner-resource.schema';
+import { FilterQuery } from 'mongoose';
 
 export class BadgeDefFilter extends PaginateDto {
 	static create(obj: any) {
@@ -76,6 +81,19 @@ export class CreateBadgeDefDto {
 	@Validate(ActivityTermExists, [{ each: true }])
 	@IsNotEmpty()
 	list_terms: string[];
+
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ league, resource_id }): FilterQuery<PartnerResourceDocument> => {
+			return {
+				leagues: league,
+				resource_id,
+			};
+		},
+	])
+	@IsString()
+	@IsOptional()
+	league: string;
 }
 
 export class UpdateBadgeDefDto {
@@ -115,4 +133,17 @@ export class UpdateBadgeDefDto {
 	@Validate(ActivityTermExists, [{ each: true }])
 	@IsOptional()
 	list_terms: string[];
+
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ league, resource_id }): FilterQuery<PartnerResourceDocument> => {
+			return {
+				leagues: league,
+				resource_id,
+			};
+		},
+	])
+	@IsString()
+	@IsOptional()
+	league: string;
 }

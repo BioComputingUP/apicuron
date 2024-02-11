@@ -17,7 +17,11 @@ import { Type } from 'class-transformer';
 import { UniqueRule } from '../../shared/validators/unique.validator';
 import { MedalDef } from '../../core/schemas/achievements-def/medal-def.schema';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
-import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
+import {
+	PartnerResource,
+	PartnerResourceDocument,
+} from '../../core/schemas/resource/partner-resource.schema';
+import { FilterQuery } from 'mongoose';
 
 export class CreateMedalDto {
 	@Validate(UniqueRule, [
@@ -67,6 +71,19 @@ export class CreateMedalDto {
 	@IsOptional()
 	@Type(() => Date)
 	last_day?: Date;
+
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ league, resource_id }): FilterQuery<PartnerResourceDocument> => {
+			return {
+				leagues: league,
+				resource_id,
+			};
+		},
+	])
+	@IsString()
+	@IsOptional()
+	league: string;
 }
 
 export class MedalsFilter extends PaginateDto {
@@ -149,4 +166,17 @@ export class UpdateMedalDefDto extends DeleteMedalDefDto {
 	@IsOptional()
 	@Type(() => Date)
 	last_day: Date;
+
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ league, resource_id }): FilterQuery<PartnerResourceDocument> => {
+			return {
+				leagues: league,
+				resource_id,
+			};
+		},
+	])
+	@IsString()
+	@IsOptional()
+	league: string;
 }

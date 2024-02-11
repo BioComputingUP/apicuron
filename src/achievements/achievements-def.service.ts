@@ -18,14 +18,15 @@ import {
 	AchievementDef,
 	AchievementDefDocument,
 } from '../core/schemas/achievements-def/achievement-def.schema';
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
-import { ON_TERM_DELETED } from '../terms/constants';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
 	ON_BADGE_DEF_DELETE,
 	ON_BADGE_DEF_UPDATE,
 	ON_MEDAL_DEF_DELETE,
 	ON_MEDAL_DEF_UPDATE,
 } from './constants';
+import { BadgeDefDocument } from '../core/schemas/achievements-def/badge-def.schema';
+import { MedalDefDocument } from '../core/schemas/achievements-def/medal-def.schema';
 @Injectable()
 export class AchievementsDefService {
 	constructor(
@@ -67,9 +68,13 @@ export class AchievementsDefService {
 		return await newBadge.save();
 	}
 
-	async getbadgeDefs(badgeFilter: BadgeDefFilter) {
+	async getbadgeDefs(
+		badgeFilter: BadgeDefFilter,
+		queryFilter: FilterQuery<BadgeDefDocument> = {},
+	) {
 		const filterQuery: FilterQuery<AchievementDef> = {
 			...badgeFilter.omitPagination(),
+			...queryFilter,
 			type: 'badge',
 		};
 		const dataPromise = this.achievementDefModel.find(
@@ -130,10 +135,14 @@ export class AchievementsDefService {
 		return await newMedal.save();
 	}
 
-	async getMedalDefs(medalFilter: MedalsFilter) {
+	async getMedalDefs(
+		medalFilter: MedalsFilter,
+		queryFilter: FilterQuery<MedalDefDocument> = {},
+	) {
 		const filter = medalFilter.omitPagination();
 		const filterQuery: FilterQuery<AchievementDef> = {
 			...filter,
+			...queryFilter,
 			type: 'medal',
 		};
 		const dataPromise = this.achievementDefModel.find(

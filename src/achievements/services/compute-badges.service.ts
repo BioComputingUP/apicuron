@@ -36,6 +36,8 @@ export class ComputeBadgesService {
 
 	logger = new Logger(ComputeBadgesService.name);
 
+	// TODO: rewrite/update
+
 	public async computeResourceBadges(resource: { resource_id: string }) {
 		const { resource_id } = resource;
 		await this.badgeModel.deleteMany({ resource_id });

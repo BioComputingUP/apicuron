@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
@@ -59,42 +59,37 @@ export class PartnerResourcesService {
 
 	@OnEvent(PRE_REPORT_INSERT, { async: true, promisify: true })
 	async onReportInsert(report: ReportDocument) {
-		// if (report.contribution_type) {
-		// 	return;
-		// }
-		// const { resource_id, curator_orcid } = report;
-		// const resource = await this.partnerResourceModel.findOne({ resource_id });
-		// report.contribution_type =
-		// 	resource.getCuratorContributionType(curator_orcid);
-
+		if (report.league) {
+			return;
+		}
+		const resource = await this.get_resource(report.resource_id);
+		report.league = resource.defaultLeague;
 		return;
 	}
 
 	@OnEvent(PRE_REPORT_INSERT_MANY, { async: true, promisify: true })
 	async preReportInsertMany(reports: ReportDocument[]) {
-		// const resource_ids = new Set(reports.map((report) => report.resource_id));
-		// const resources = await this.partnerResourceModel.find({
-		// 	resource_id: { $in: Array.from(resource_ids) },
-		// });
+		const resource_ids = new Set(reports.map((report) => report.resource_id));
+		const resources = await this.partnerResourceModel.find({
+			resource_id: { $in: Array.from(resource_ids) },
+		});
 
-		// const resourceMap = new Map(
-		// 	resources.map((resource) => [resource.resource_id, resource]),
-		// );
+		const resourceMap = new Map(
+			resources.map((resource) => [resource.resource_id, resource]),
+		);
 
-		// for (const report of reports) {
-		// 	if (report.contribution_type) {
-		// 		continue;
-		// 	}
-		// 	const resource = resourceMap.get(report.resource_id);
-		// 	if (!resource) {
-		// 		throw new UnprocessableEntityException(
-		// 			`Resource with id ${report.resource_id} does not exist`,
-		// 		);
-		// 	}
-		// 	report.contribution_type = resource.getCuratorContributionType(
-		// 		report.curator_orcid,
-		// 	);
-		// }
+		for (const report of reports) {
+			if (report.league) {
+				continue;
+			}
+			const resource = resourceMap.get(report.resource_id);
+			if (!resource) {
+				throw new UnprocessableEntityException(
+					`Resource with id ${report.resource_id} does not exist`,
+				);
+			}
+			report.league = resource.getLeague(resource.defaultLeague).name;
+		}
 
 		return;
 	}

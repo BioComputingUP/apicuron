@@ -1,0 +1,100 @@
+import { Injectable } from '@nestjs/common';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
+import { PrivacyType } from '../../core/enums';
+import { ReportHandler } from '../interfaces/report.handler';
+import { ReportDocument } from '../../core/schemas/reports.schema';
+import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { UsersService } from '../../auth/users/users.service';
+import * as _ from 'lodash';
+import { ResourceDocument } from '../../core/schemas/resource/resource.schema';
+
+@Injectable()
+export class ReportMetaHandler implements ReportHandler {
+	constructor(
+		protected resourceService: PartnerResourcesService,
+		protected usersService: UsersService,
+	) {}
+	async handle(report: ReportDocument): Promise<ReportDocument> {
+		const resource = await this.resourceService.get_resource(
+			report.resource_id,
+		);
+		const user = await this.usersService.get_by_orcid(report.curator_orcid);
+		this.handleIndividualReport(report, resource, user);
+		return report;
+	}
+
+	async handleMultiple(reports: ReportDocument[]): Promise<ReportDocument[]> {
+		const [resMap, userMap] = await Promise.all([
+			this.loadResourcesMap(reports),
+			this.loadUsersMap(reports),
+		]);
+
+		for (const report of reports) {
+			this.handleIndividualReport(
+				report,
+				resMap.get(report.resource_id),
+				userMap.get(report.curator_orcid),
+			);
+		}
+
+		return reports;
+	}
+
+	private async loadResourcesMap(
+		reports: ReportDocument[],
+	): Promise<Map<string, PartnerResourceDocument>> {
+		const resource_ids = _.uniq(reports.map((r) => r.resource_id));
+		const resources = await this.resourceService.get_resources({
+			resource_id: { $in: resource_ids },
+		});
+
+		const resourceMap = new Map<string, PartnerResourceDocument>(
+			resources.map((r) => [r.resource_id, r]),
+		);
+		return resourceMap;
+	}
+
+	private async loadUsersMap(
+		reports: ReportDocument[],
+	): Promise<Map<string, UserDocument>> {
+		const orcid_ids = _.uniq(reports.map((r) => r.curator_orcid));
+		const users = await this.usersService.getUsers({
+			orcid_id: { $in: orcid_ids },
+		});
+
+		const usersMap = new Map(users.map((u) => [u.orcid_id, u]));
+		return usersMap;
+	}
+
+	private async handleIndividualReport(
+		report: ReportDocument,
+		resource: PartnerResourceDocument,
+		user: UserDocument,
+	) {
+		report.league = this.handleLeague(report, resource);
+		report.privacy = this.handlePrivacyField(resource, user, report);
+		return;
+	}
+
+	private handleLeague(
+		report: ReportDocument,
+		resource: PartnerResourceDocument,
+	): string {
+		return report.league ? report.league : resource.defaultLeague;
+	}
+
+	private handlePrivacyField(
+		resource: PartnerResourceDocument,
+		user: UserDocument | null,
+		report: ReportDocument,
+	): PrivacyType {
+		const { league } = report;
+		const leaguePrivacy = resource.getLeague(league).visibility;
+		const userPrivacy = user?.privacy ?? PrivacyType.private;
+		if ([leaguePrivacy, userPrivacy].includes(PrivacyType.private)) {
+			return PrivacyType.private;
+		}
+		return PrivacyType.public;
+	}
+}

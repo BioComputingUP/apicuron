@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { PrivacyType } from '../../enums';
 
 export type MedalDefDocument = HydratedDocument<MedalDef>;
 
@@ -57,6 +58,8 @@ export class MedalDef {
 	last_day?: Date;
 
 	league: string;
+	privacy: PrivacyType;
 }
 
-export const MedalDefSchema = SchemaFactory.createForClass(MedalDef);
+export const MedalDefSchema =
+	SchemaFactory.createForClass(MedalDef).loadClass(MedalDef);

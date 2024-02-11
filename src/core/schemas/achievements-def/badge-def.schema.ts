@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { PrivacyType } from '../../enums';
 
 export type BadgeDefDocument = HydratedDocument<BadgeDef>;
 
@@ -45,6 +46,8 @@ export class BadgeDef {
 	color_code: string;
 
 	league: string;
+	privacy: PrivacyType;
 }
 
-export const BadgeDefSchema = SchemaFactory.createForClass(BadgeDef);
+export const BadgeDefSchema =
+	SchemaFactory.createForClass(BadgeDef).loadClass(BadgeDef);

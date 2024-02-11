@@ -27,6 +27,7 @@ import {
 	PRE_REPORT_INSERT,
 	PRE_REPORT_INSERT_MANY,
 } from '../../reports/constants';
+import { SubmitReportService } from '../../submit-reports/services/submit-reports.service';
 
 export type ValidatedReport = {
 	report: SubmitReportDto;
@@ -51,6 +52,7 @@ export class SubmitBulkTask {
 		@Inject('task:compute_statistics')
 		protected compute_statistics: ComputeStatisticsTask,
 		protected eventEmitter: EventEmitter2,
+		protected submitReports: SubmitReportService,
 	) {}
 
 	logger = new Logger(SubmitBulkTask.name);
@@ -135,12 +137,13 @@ export class SubmitBulkTask {
 			(report) => new this.reportModel(report.report),
 		);
 
-		await this.eventEmitter.emitAsync(PRE_REPORT_INSERT_MANY, reportDocuments);
-
 		try {
-			const insertResult = await this.reportModel.insertMany(reportDocuments, {
-				rawResult: true,
-			});
+			const insertResult = await this.submitReports.insertReports(
+				reportDocuments,
+			);
+			// const insertResult = await this.reportModel.insertMany(reportDocuments, {
+			// 	rawResult: true,
+			// });
 			this.logger.debug(`inserted ${insertResult.insertedCount} reports`);
 
 			await this.eventEmitter.emitAsync(
@@ -321,16 +324,9 @@ export class SubmitBulkTask {
 					successful_reports_count += 1;
 					try {
 						const reportDocument = new this.reportModel(report);
-						await this.eventEmitter.emitAsync(
-							PRE_REPORT_INSERT,
-							reportDocument,
-						);
-						await reportDocument.save();
 
-						await this.eventEmitter.emitAsync(
-							POST_REPORT_INSERT,
-							reportDocument,
-						);
+						await this.submitReports.insertReport(reportDocument);
+
 						this.logger.log(
 							`Sucessfully inserted Report for ${report.resource_id} by ${report.curator_orcid}`,
 						);

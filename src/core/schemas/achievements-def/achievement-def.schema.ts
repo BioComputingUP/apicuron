@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { AchievementType } from '../../enums';
+import { AchievementType, PrivacyType } from '../../enums';
 
 export type AchievementDefDocument = HydratedDocument<AchievementDef>;
 
@@ -80,6 +80,12 @@ export class AchievementDef {
 		type: String,
 	})
 	league: string;
+
+	@Prop({
+		required: true,
+		type: String,
+	})
+	privacy: PrivacyType;
 }
 
 export const AchievementDefSchema =

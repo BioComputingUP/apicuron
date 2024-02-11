@@ -2,13 +2,14 @@ import {
 	Controller,
 	Delete,
 	Req,
-	Put, Get,
+	Put,
+	Get,
 	Param,
 	Body,
 	Post,
 	Query,
 	UseGuards,
-	Res
+	Res,
 } from '@nestjs/common';
 import {
 	ApiHeader,
@@ -38,6 +39,11 @@ import {
 } from '../dto/medal-crud.dto';
 import { Response } from 'express';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { AuthProtected } from '../../auth/decorators/auth.decorator';
+import { Public } from '../../auth/decorators/public.decorator';
+import { UserReq } from '../../auth/decorators/applyUser.decorator';
+import { User } from '../../core/schemas/user.schema';
+import { getPrivacyQueryFromUser } from '../../util/user.privacy';
 
 @ApiTags('Define Achievements')
 @ApiHeader(VersionHeader)
@@ -117,10 +123,17 @@ export class BadgesDefController {
 		description: 'A list of badges that correspond to the filter',
 		type: [CreateBadgeDefDto],
 	})
+	@AuthProtected()
+	@Public()
 	@Get()
-	async get_badges(@Query() badges_filter: BadgeDefFilter) {
+	async get_badges(
+		@Query() badges_filter: BadgeDefFilter,
+		@UserReq() user: User | null,
+	) {
+		const privacyQuery = user ? getPrivacyQueryFromUser(user) : {};
 		const { data, count } = await this.achievementsDefService.getbadgeDefs(
 			badges_filter,
+			privacyQuery,
 		);
 
 		return paginate(data, badges_filter, count);
@@ -220,10 +233,17 @@ export class MedalsDefController {
 		type: [CreateMedalDto],
 	})
 	@ApiSecurity('basic')
+	@AuthProtected()
+	@Public()
 	@Get()
-	async get_medals(@Query() medals_filter: MedalsFilter) {
+	async get_medals(
+		@Query() medals_filter: MedalsFilter,
+		@UserReq() user: User | null,
+	) {
+		const privacyQuery = user ? getPrivacyQueryFromUser(user) : {};
 		const { data, count } = await this.achievementsDefService.getMedalDefs(
 			medals_filter,
+			privacyQuery,
 		);
 		return paginate(data, medals_filter, count);
 	}
