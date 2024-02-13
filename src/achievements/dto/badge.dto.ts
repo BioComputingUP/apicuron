@@ -21,4 +21,7 @@ export class BadgeDto {
 
 	@IsNotEmpty()
 	type: string;
+
+	@IsNotEmpty()
+	league: string;
 }

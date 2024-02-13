@@ -1,4 +1,4 @@
-import { Transform } from 'class-transformer';
+import { Transform, TransformFnParams } from 'class-transformer';
 import {
 	IsInt,
 	IsNumberString,
@@ -24,9 +24,10 @@ export class PaginateDto {
 	@Min(-1)
 	@IsInt()
 	@IsOptional()
-	@Transform(({ value }: { value: string }) =>
-		Number.isNaN(parseInt(value)) ? null : parseInt(value),
-	)
+	@Transform(({ value, obj }: TransformFnParams) => {
+		console.log({ value, defLimit: obj.defaultLimit });
+		return Number.isNaN(parseInt(value)) ? obj.defaultLimit : parseInt(value);
+	})
 	limit;
 
 	getMongoQueryOptions<T>(): QueryOptions<T> {
@@ -58,4 +59,6 @@ export class PaginateDto {
 	omitPagination(): Omit<this, 'skip' | 'limit'> {
 		return _.omit(this, ['skip', 'limit']);
 	}
+
+	defaultLimit = -1;
 }

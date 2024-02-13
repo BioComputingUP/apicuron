@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, PipelineStage, QueryOptions } from 'mongoose';
 import { User, UserDocument, UserSchema } from '../core/schemas/user.schema';
 import {
 	Statistics,
@@ -8,11 +8,8 @@ import {
 } from '../core/schemas/statistics.schema';
 import { PartnerResourcesService } from '..//resources/partner-resources/partner-resources.service';
 import { GetStatisticsDto } from './dto/get-statistics.dto';
-import { paginate } from '../pagination/paginator';
-import { PaginateDto } from '../pagination/dto/paginate.dto';
 import { OnEvent } from '@nestjs/event-emitter';
 import { UPDATE_USER_PRIVACY } from './constants';
-import { StatisticsFilter } from './dto/statistics-filter.dto';
 import { PublicStatistics } from './schema/public-statistics.schema';
 
 @Injectable()
@@ -20,8 +17,6 @@ export class StatisticsService {
 	constructor(
 		@InjectModel(Statistics.name)
 		protected statisticsModel: Model<StatisticsDocument>,
-		@InjectModel(PublicStatistics.name)
-		protected publicStatModel: Model<PublicStatistics>,
 		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 		protected partnerResourceService: PartnerResourcesService,
 	) {}
@@ -60,37 +55,9 @@ export class StatisticsService {
 		return result;
 	}
 
-	async get_public_user_statistics(curator_orcid: string) {
-		if (await this.userModel.exists({ orcid_id: curator_orcid })) {
-			return await this.statisticsModel.find({
-				curator_orcid,
-				privacy: 'public',
-			});
-		} else {
-			throw new NotFoundException('User not found');
-		}
-	}
-
-	async get_all_user_statistics(
-		curator_orcid: string,
-		resource_ids: string[] = [],
-		privacy: any = 'public',
-	) {
-		const query = {
-			curator_orcid,
-			privacy,
-		};
-		if (resource_ids) {
-			query['resource_id'] = { $in: resource_ids };
-		}
-		return await this.statisticsModel.find(query);
-	}
-
 	async get_all_statistics(
 		getStatDto: GetStatisticsDto,
-		allowedResources: string[] = [],
-		request_orcid: string | null = null,
-		privacy: 'public' | 'private' = 'public',
+		filter: FilterQuery<StatisticsDocument>,
 	) {
 		const {
 			resources: resource_ids,
@@ -98,33 +65,8 @@ export class StatisticsService {
 			filter_field: user_filter_field,
 		} = getStatDto;
 
-		const privacyFilters: FilterQuery<any>[] = [
-			// Either get the statistics from allowed Resources (meaning resources without private or public restrictions)
-			{
-				'stats.resource_id': {
-					$in: allowedResources,
-				},
-			},
-			{
-				// Or only get the stats with the specified privacy (default: public)
-				'stats.privacy': privacy,
-			},
-		];
-
-		if (!!request_orcid) {
-			privacyFilters.push({
-				'stats.curator_orcid': request_orcid,
-			});
-		}
-
 		// query filter
-		const mongoQuery: FilterQuery<any> = {
-			$and: [
-				{
-					$or: privacyFilters,
-				},
-			],
-		};
+		const mongoQuery: FilterQuery<StatisticsDocument> = {};
 
 		// if there's a query passed
 		if (passed_query) {
@@ -135,27 +77,7 @@ export class StatisticsService {
 		}
 
 		if (resource_ids) {
-			// for backwards compatibility obtain resource_uris and add them in query
-			const resource_uris = (await this.partnerResourceService.get_resources())
-				.filter((x) => resource_ids.includes(x.resource_id))
-				.map(({ resource_uri }) => resource_uri);
-
-			if (resource_uris && resource_uris.length > 0) {
-				mongoQuery['$and'].push({
-					$or: [
-						{
-							'stats.resource_id': { $in: resource_ids },
-						},
-						{
-							'stats.resource_uri': { $in: resource_uris },
-						},
-					],
-				});
-			} else {
-				mongoQuery['$and'].push({
-					'stats.resource_id': { $in: resource_ids },
-				});
-			}
+			mongoQuery['stats.resource_id'] = { $in: resource_ids };
 		}
 
 		const projectUserFields = {
@@ -174,6 +96,12 @@ export class StatisticsService {
 		const userFieldsGroupStage = Object.keys(UserSchema.paths)
 			.filter((key) => !userFieldsToRemove.includes(key))
 			.reduce((obj, key) => ({ ...obj, [key]: { $first: '$' + key } }), {});
+
+		// add privacy fitlers to mongoQuery
+
+		const matchFilter: FilterQuery<StatisticsDocument> = {
+			$and: [mongoQuery, filter],
+		};
 
 		const userStatsAggregation = [
 			{
@@ -196,7 +124,7 @@ export class StatisticsService {
 				},
 			},
 			{
-				$match: mongoQuery,
+				$match: matchFilter,
 			},
 			{
 				$group: {
@@ -252,46 +180,34 @@ export class StatisticsService {
 		// extracting the count if available, otherwise it's an empty list and therefore 0
 		const count = aggregation_count?.[0]?.total_count || 0;
 
-		return paginate(data, getStatDto, count);
+		return { data, count };
 	}
 
-	async getResourceLeaderboard(resource_id: string, pagination: PaginateDto) {
+	async getResourceLeaderboard(
+		filter: FilterQuery<StatisticsDocument> & { resource_id: string },
+		options: QueryOptions<StatisticsDocument>,
+	) {
 		const resource = await this.partnerResourceService.get_resource(
-			resource_id,
+			filter.resource_id,
 		);
 		if (!resource) {
-			throw new NotFoundException(`Resource ${resource_id} does not Exist`);
+			throw new NotFoundException(
+				`Resource ${filter.resource_id} does not Exist`,
+			);
 		}
 
 		const leaderboardPromise = this.statisticsModel.find(
-			{
-				resource_id,
-			},
+			filter,
 			{ generation_terms: 0, invalidation_terms: 0, revision_terms: 0 },
-			{ ...pagination.getMongoQueryOptions(), sort: { total_score: -1 } },
+			{ ...options, sort: { total_score: -1 } },
 		);
 
-		const query = { resource_id };
-		const countPromise = this.statisticsModel.count(query);
-		const [leaderboard, count] = await Promise.all([
-			leaderboardPromise,
-			countPromise,
-		]);
-		return paginate(leaderboard, pagination, count);
-	}
-
-	async getPublicResourceLeaderboard(
-		resource_id: string,
-		pagination: PaginateDto,
-	) {
-		const data = await this.publicStatModel.find(
-			{ resource_id },
-			{ generation_terms: 0, invalidation_terms: 0, revision_terms: 0 },
-			{ ...pagination.getMongoQueryOptions(), sort: { total_score: -1 } },
-		);
-		const count = await this.publicStatModel.count({ resource_id });
-
-		return paginate(data, pagination, count);
+		const countPromise = this.statisticsModel.count(filter);
+		const [data, count] = await Promise.all([leaderboardPromise, countPromise]);
+		return {
+			data,
+			count,
+		};
 	}
 
 	/**
@@ -302,35 +218,17 @@ export class StatisticsService {
 	 * @returns {Statistics[]} A list of statistics fitting the filter criteria
 	 */
 	async getStatistics(
-		filter: StatisticsFilter,
-		allowedResources: string[] = [],
-		request_orcid: string | null = null,
-		defaultPrivacy: 'private' | 'public' = 'public',
+		filter: FilterQuery<StatisticsDocument>,
+		options: QueryOptions<StatisticsDocument>,
 	) {
-		const privacyFilter: any = [
-			{
-				resource_id: { $in: allowedResources },
-			},
-			{
-				privacy: defaultPrivacy,
-			},
-		];
-		if (request_orcid) {
-			privacyFilter.push({
-				curator_orcid: request_orcid,
-			});
-		}
 		return await this.statisticsModel.find(
-			{
-				...filter.omitPagination(),
-				$or: privacyFilter,
-			},
+			filter,
 			{
 				generation_terms: 0,
 				invalidation_terms: 0,
 				revision_terms: 0,
 			},
-			filter.getMongoQueryOptions(),
+			options,
 		);
 	}
 }

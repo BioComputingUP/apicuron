@@ -1,12 +1,13 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { PrivacyType } from '../enums';
+import { ResourceEntity } from './components/resource-entity.schema';
 
 export type ReportDocument = HydratedDocument<Report>;
 @Schema({
 	collection: 'reports',
 })
-export class Report {
+export class Report extends ResourceEntity {
 	@Prop({
 		required: true,
 	})
@@ -21,27 +22,11 @@ export class Report {
 	@Prop({ required: false })
 	resource_uri?: string;
 
-	@Prop({ required: true })
-	resource_id: string;
-
 	@Prop({
 		required: true,
 		type: Date,
 	})
 	timestamp: Date;
-
-	@Prop({
-		type: String,
-		required: true,
-		default: (): PrivacyType => PrivacyType.private,
-	})
-	privacy: PrivacyType;
-
-	@Prop({
-		required: true,
-		type: String,
-	})
-	league: string;
 
 	getMetaFields() {
 		return {

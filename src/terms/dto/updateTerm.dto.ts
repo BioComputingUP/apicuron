@@ -3,11 +3,14 @@ import {
 	IsNotEmpty,
 	IsNumber,
 	IsOptional,
+	IsString,
 	IsUrl,
 	Min,
 	Validate,
 } from 'class-validator';
 import { ActivityTermExists } from '../validators/activity-term-exists';
+import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
+import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 
 export class UpdateTermDto {
 	// fields from Achievement
@@ -46,4 +49,17 @@ export class UpdateTermDto {
 	})
 	@IsOptional()
 	score?: number;
+
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ league, resource_id }) => {
+			return {
+				leagues: league,
+				resource_id,
+			};
+		},
+	])
+	@IsString()
+	@IsOptional()
+	league: string;
 }

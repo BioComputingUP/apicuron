@@ -1,14 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { AchievementType } from '../../enums';
+import { AchievementState, AchievementType } from '../../enums';
+import { ResourceEntity } from '../components/resource-entity.schema';
 
 export type AchievementDocument = HydratedDocument<Achievement>;
 
 @Schema({ collection: 'achievements', discriminatorKey: 'type' })
-export class Achievement {
-	@Prop({
-		required: true,
-	})
+export class Achievement extends ResourceEntity {
 	curator_orcid: string;
 
 	@Prop({
@@ -31,7 +29,10 @@ export class Achievement {
 	@Prop({
 		type: String,
 		required: true,
+		enum: AchievementState,
 	})
+	state: AchievementState;
+
 	league: string;
 }
 

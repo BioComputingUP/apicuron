@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { AggregatedReportsMixin } from '../components/aggregated-data.schema';
 import { HydratedDocument } from 'mongoose';
+import { AchievementState, PrivacyType } from '../../enums';
+import { UserResourceEntity } from '../components/user-resource-entity.schema';
 
 export type MedalDocument = HydratedDocument<Medal>;
-
-class BaseMedal {
+@Schema({ collection: 'achievements' })
+export class Medal extends UserResourceEntity {
 	@Prop({
 		required: false,
 	})
@@ -30,9 +31,6 @@ class BaseMedal {
 	})
 	count_total: number;
 
-	@Prop({
-		required: true,
-	})
 	curator_orcid: string;
 
 	@Prop({
@@ -45,9 +43,6 @@ class BaseMedal {
 	})
 	resource_uri: string;
 
-	@Prop({
-		required: true,
-	})
 	resource_id: string;
 
 	@Prop({
@@ -81,10 +76,9 @@ class BaseMedal {
 	list_terms: string[];
 
 	league: string;
+	privacy: PrivacyType;
+	state: AchievementState;
 }
-
-@Schema({ collection: 'achievements' })
-export class Medal extends AggregatedReportsMixin(BaseMedal) {}
 
 export const MedalSchema = SchemaFactory.createForClass(Medal).loadClass(Medal);
 

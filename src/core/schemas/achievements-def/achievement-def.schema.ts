@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { AchievementType, PrivacyType } from '../../enums';
+import { ResourceEntity } from '../components/resource-entity.schema';
 
 export type AchievementDefDocument = HydratedDocument<AchievementDef>;
 
@@ -8,7 +9,7 @@ export type AchievementDefDocument = HydratedDocument<AchievementDef>;
 	collection: 'achievements_def',
 	discriminatorKey: 'type',
 })
-export class AchievementDef {
+export class AchievementDef extends ResourceEntity {
 	@Prop()
 	id: string;
 
@@ -26,12 +27,6 @@ export class AchievementDef {
 
 	@Prop()
 	resource_uri: string;
-
-	@Prop({
-		type: String,
-		required: true,
-	})
-	resource_id: string;
 
 	@Prop({
 		type: [String],
@@ -74,18 +69,6 @@ export class AchievementDef {
 		required: false,
 	})
 	last_day?: Date;
-
-	@Prop({
-		required: true,
-		type: String,
-	})
-	league: string;
-
-	@Prop({
-		required: true,
-		type: String,
-	})
-	privacy: PrivacyType;
 }
 
 export const AchievementDefSchema =

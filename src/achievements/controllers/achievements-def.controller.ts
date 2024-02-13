@@ -43,7 +43,7 @@ import { AuthProtected } from '../../auth/decorators/auth.decorator';
 import { Public } from '../../auth/decorators/public.decorator';
 import { UserReq } from '../../auth/decorators/applyUser.decorator';
 import { User } from '../../core/schemas/user.schema';
-import { getPrivacyQueryFromUser } from '../../util/user.privacy';
+import { resourceEntityPrivacyFilter } from '../../util/privacy.helper';
 
 @ApiTags('Define Achievements')
 @ApiHeader(VersionHeader)
@@ -63,19 +63,22 @@ export class AchievementsDefController {
 			'an object that contains an array of badge definitions and an array of medal definitions',
 		type: ResourceAchievmentsDef,
 	})
+	@AuthProtected()
+	@Public()
 	@Get('partner-resource/:resource_id')
 	async get_resource_achievements_def(
 		@Param('resource_id') resource_id: string,
+		@UserReq() user: User | null,
 	) {
-		const badges_promise =
-			this.achievementsDefService.getResourceBadgeDefs(resource_id);
-		const medals_promise =
-			this.achievementsDefService.getResourceMedalDefs(resource_id);
+		const privacyQuery = resourceEntityPrivacyFilter(user);
+		const query = {
+			resource_id,
+			...privacyQuery,
+		};
+		const badges$ = this.achievementsDefService.getResourceBadgeDefs(query);
+		const medals$ = this.achievementsDefService.getResourceMedalDefs(query);
 
-		const [badges, medals] = await Promise.all([
-			badges_promise,
-			medals_promise,
-		]);
+		const [badges, medals] = await Promise.all([badges$, medals$]);
 		return {
 			badges,
 			medals,
@@ -130,7 +133,7 @@ export class BadgesDefController {
 		@Query() badges_filter: BadgeDefFilter,
 		@UserReq() user: User | null,
 	) {
-		const privacyQuery = user ? getPrivacyQueryFromUser(user) : {};
+		const privacyQuery = user ? resourceEntityPrivacyFilter(user) : {};
 		const { data, count } = await this.achievementsDefService.getbadgeDefs(
 			badges_filter,
 			privacyQuery,
@@ -236,16 +239,23 @@ export class MedalsDefController {
 	@AuthProtected()
 	@Public()
 	@Get()
-	async get_medals(
-		@Query() medals_filter: MedalsFilter,
+	async getMedals(
+		@Query() medalFilter: MedalsFilter,
 		@UserReq() user: User | null,
 	) {
-		const privacyQuery = user ? getPrivacyQueryFromUser(user) : {};
-		const { data, count } = await this.achievementsDefService.getMedalDefs(
-			medals_filter,
+		const privacyQuery = resourceEntityPrivacyFilter(user);
+
+		const queryFilter = {
+			...medalFilter.omitPagination(),
 			privacyQuery,
+		};
+		const options = medalFilter.getMongoQueryOptions();
+
+		const { data, count } = await this.achievementsDefService.getMedalDefs(
+			queryFilter,
+			options,
 		);
-		return paginate(data, medals_filter, count);
+		return paginate(data, medalFilter, count);
 	}
 
 	@ApiOperation({

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, QueryOptions } from 'mongoose';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import {
 	UpdateBadgeDefDto,
@@ -27,6 +27,8 @@ import {
 } from './constants';
 import { BadgeDefDocument } from '../core/schemas/achievements-def/badge-def.schema';
 import { MedalDefDocument } from '../core/schemas/achievements-def/medal-def.schema';
+import { AchievementType } from '../core/enums';
+import { update } from 'lodash';
 @Injectable()
 export class AchievementsDefService {
 	constructor(
@@ -35,34 +37,39 @@ export class AchievementsDefService {
 		protected partnerResourceService: PartnerResourcesService,
 		protected eventEmitter: EventEmitter2,
 	) {}
-	async getResourceMedalDefs(resource_id?: string, resource_uri?: string) {
-		if (resource_uri || resource_id) {
-			const result = await this.achievementDefModel.find({
-				$or: [{ resource_uri }, { resource_id }],
-				type: 'medal',
-			});
-			return result;
-		}
-		return await this.achievementDefModel.find({ type: 'medal' });
+	async getResourceMedalDefs({
+		resource_id,
+		...filter
+	}: { resource_id: string } & FilterQuery<MedalDefDocument>) {
+		const result = await this.achievementDefModel.find({
+			resource_id,
+			...filter,
+			type: AchievementType.medal,
+		});
+		return result;
 	}
 
-	async getResourceBadgeDefs(resource_id?: string, resource_uri?: string) {
-		if (resource_uri || resource_id) {
-			return await this.achievementDefModel.find({
-				$or: [{ resource_uri }, { resource_id }],
-				type: 'badge',
-			});
-		}
-		return await this.achievementDefModel.find({ type: 'badge' });
+	async getResourceBadgeDefs({
+		resource_id,
+		...filter
+	}: { resource_id: string } & FilterQuery<BadgeDefDocument>) {
+		return await this.achievementDefModel.find({
+			resource_id,
+			...filter,
+			type: AchievementType.badge,
+		});
 	}
 
 	async createBadgeDef(badge: CreateBadgeDefDto) {
+		const resource = await this.partnerResourceService.get_resource(
+			badge.resource_id,
+		);
+		badge.league = badge.league ?? resource.defaultLeague;
+
 		const newBadge = new this.achievementDefModel({
 			...badge,
-			type: 'badge',
-			resource_uri: await this.partnerResourceService.retrieve_uri(
-				badge.resource_id,
-			),
+			type: AchievementType.badge,
+			resource_uri: resource.resource_uri,
 		});
 
 		return await newBadge.save();
@@ -75,7 +82,7 @@ export class AchievementsDefService {
 		const filterQuery: FilterQuery<AchievementDef> = {
 			...badgeFilter.omitPagination(),
 			...queryFilter,
-			type: 'badge',
+			type: AchievementType.badge,
 		};
 		const dataPromise = this.achievementDefModel.find(
 			filterQuery,
@@ -92,64 +99,71 @@ export class AchievementsDefService {
 		};
 	}
 
-	async updateBadgeDef(badge_update: UpdateBadgeDefDto) {
-		const { resource_id, name, ...updates } = badge_update;
-		await this.achievementDefModel.updateOne(
+	async updateBadgeDef(updateBadge: UpdateBadgeDefDto) {
+		const { resource_id, name, ...updates } = updateBadge;
+		const resource = await this.partnerResourceService.get_resource(
+			resource_id,
+		);
+
+		updateBadge.league = updateBadge.league ?? resource.defaultLeague;
+
+		const badge = await this.achievementDefModel.findOneAndUpdate(
 			{
 				resource_id,
 				name,
-				type: 'badge',
+				type: AchievementType.badge,
 			},
-			updates,
+			{
+				$set: updates,
+			},
+			{ new: true },
 		);
-		const badge = await this.achievementDefModel.findOne({
-			resource_id,
-			name,
-			type: 'badge',
-		});
 
 		await this.eventEmitter.emitAsync(ON_BADGE_DEF_UPDATE, badge);
 
 		return badge;
 	}
 
-	async deleteBadgeDef(delete_badge: DeleteBadgeDefDto) {
+	async deleteBadgeDef(deleteBadge: DeleteBadgeDefDto) {
+		const resource = await this.partnerResourceService.get_resource(
+			deleteBadge.resource_id,
+		);
+		deleteBadge.league = deleteBadge.league ?? resource.defaultLeague;
+
 		const delete_confirmation = await this.achievementDefModel.deleteOne({
-			...delete_badge,
-			type: 'badge',
+			...deleteBadge,
+			type: AchievementType.badge,
 		});
 
-		await this.eventEmitter.emitAsync(ON_BADGE_DEF_DELETE, delete_badge);
+		await this.eventEmitter.emitAsync(ON_BADGE_DEF_DELETE, deleteBadge);
 		return delete_confirmation.deletedCount;
 	}
 
 	async createMedalDef(medal: CreateMedalDto) {
+		const resource = await this.partnerResourceService.get_resource(
+			medal.resource_id,
+		);
+
+		medal.league = medal.league ?? resource.defaultLeague;
+
 		const newMedal = new this.achievementDefModel({
 			...medal,
-			type: 'medal',
-			resource_uri: await this.partnerResourceService.retrieve_uri(
-				medal.resource_id,
-			),
+			type: AchievementType.medal,
+			resource_uri: resource.resource_uri,
 		});
 
 		return await newMedal.save();
 	}
 
 	async getMedalDefs(
-		medalFilter: MedalsFilter,
 		queryFilter: FilterQuery<MedalDefDocument> = {},
+		options: QueryOptions<MedalDefDocument> = {},
 	) {
-		const filter = medalFilter.omitPagination();
 		const filterQuery: FilterQuery<AchievementDef> = {
-			...filter,
 			...queryFilter,
-			type: 'medal',
+			type: AchievementType.medal,
 		};
-		const dataPromise = this.achievementDefModel.find(
-			filterQuery,
-			{},
-			medalFilter.getMongoQueryOptions(),
-		);
+		const dataPromise = this.achievementDefModel.find(filterQuery, {}, options);
 		const countPromise = this.achievementDefModel.count(filterQuery);
 
 		const [data, count] = await Promise.all([dataPromise, countPromise]);
@@ -162,33 +176,39 @@ export class AchievementsDefService {
 
 	async updateMedalDef(medal_update: UpdateMedalDefDto) {
 		const { resource_id, name, ...updates } = medal_update;
-		await this.achievementDefModel.updateOne(
-			{
-				type: 'medal',
-				resource_id,
-				name,
-			},
-			updates,
-		);
 
-		const medal = await this.achievementDefModel.findOne({
-			resource_id,
-			name,
-			type: 'medal',
-		});
+		const medal: AchievementDefDocument =
+			await this.achievementDefModel.findOneAndUpdate(
+				{
+					type: AchievementType.medal,
+					resource_id,
+					name,
+				},
+				{
+					$set: updates,
+				},
+				{
+					new: true,
+				},
+			);
 
 		await this.eventEmitter.emitAsync(ON_MEDAL_DEF_UPDATE, medal);
 
 		return medal;
 	}
 
-	async deleteMedalDef(delete_medal: DeleteMedalDefDto) {
+	async deleteMedalDef(deleteMedal: DeleteMedalDefDto) {
+		const resource = await this.partnerResourceService.get_resource(
+			deleteMedal.resource_id,
+		);
+
+		deleteMedal.league = deleteMedal.league ?? resource.defaultLeague;
 		const delete_confirmation = await this.achievementDefModel.deleteOne({
-			...delete_medal,
-			type: 'medal',
+			...deleteMedal,
+			type: AchievementType.medal,
 		});
 
-		await this.eventEmitter.emitAsync(ON_MEDAL_DEF_DELETE, delete_medal);
+		await this.eventEmitter.emitAsync(ON_MEDAL_DEF_DELETE, deleteMedal);
 		return delete_confirmation.deletedCount;
 	}
 
@@ -216,9 +236,13 @@ export class AchievementsDefService {
 	}
 
 	async medalDefCount() {
-		return await this.achievementDefModel.count({ type: 'medal' });
+		return await this.achievementDefModel.count({
+			type: AchievementType.medal,
+		});
 	}
 	async badgeDefCount() {
-		return await this.achievementDefModel.count({ type: 'badge' });
+		return await this.achievementDefModel.count({
+			type: AchievementType.badge,
+		});
 	}
 }

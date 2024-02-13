@@ -26,10 +26,6 @@ export class MedalDef {
 	@Prop()
 	resource_uri: string;
 
-	@Prop({
-		type: String,
-		required: true,
-	})
 	resource_id: string;
 
 	@Prop({

@@ -25,12 +25,6 @@ import {
 		CacheModule.register({
 			max: 100,
 		}),
-		MongooseModule.forFeatureAsync([
-			{
-				name: PublicStatistics.name,
-				useFactory: PublicStatisticsFactory,
-			},
-		]),
 	],
 	controllers: [StatisticsController, OldStatisticsController],
 	providers: [StatisticsService, ComputeStatisticsService],

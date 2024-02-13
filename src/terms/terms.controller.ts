@@ -28,6 +28,11 @@ import { TermFilterDto } from './dto/term.dto';
 import { UpdateTermDto } from './dto/updateTerm.dto';
 import { TermsService } from './terms.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Public } from '../auth/decorators/public.decorator';
+import { AuthProtected } from '../auth/decorators/auth.decorator';
+import { UserReq } from '../auth/decorators/applyUser.decorator';
+import { User } from '../core/schemas/user.schema';
+import { resourceEntityPrivacyFilter } from '../util/privacy.helper';
 @ApiTags('Curation Terms')
 @ApiHeader(VersionHeader)
 @Controller({
@@ -40,7 +45,7 @@ export class TermsController {
 		private eventEmitter: EventEmitter2,
 	) {}
 
-	private can_edit_resource(user, resource_id) {
+	private canEditResource(user, resource_id) {
 		// get the resources list that belong to the current user
 		const user_resources: Array<{ resource_id: string }> = user.resources;
 		// check if the resource belongs to the user
@@ -64,9 +69,16 @@ export class TermsController {
 			'Get a list of Terms that describe minimal curation efforts in specific databases',
 	})
 	// nestjs decorators
+	@AuthProtected()
+	@Public()
 	@Get('')
-	get_terms(@Query() term_filter: TermFilterDto) {
-		return this.termsService.get_resource_terms(term_filter);
+	getTerms(@Query() termFilter: TermFilterDto, @UserReq() user: User | null) {
+		const privacyFilter = resourceEntityPrivacyFilter(user);
+		const filter = {
+			...termFilter.omitPagination(),
+			...privacyFilter,
+		};
+		return this.termsService.getResourceTerms(filter);
 	}
 
 	// swagger decorators
@@ -83,9 +95,9 @@ export class TermsController {
 	@Post('')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	create_term(@Body() term: CreateTermDto, @Req() req) {
-		this.can_edit_resource(req.user, term.resource_id);
+		this.canEditResource(req.user, term.resource_id);
 
-		return this.termsService.create_term(term);
+		return this.termsService.createTerm(term);
 	}
 
 	@ApiOperation({
@@ -101,9 +113,9 @@ export class TermsController {
 	@Put('edit')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	async update_term(@Body() term: UpdateTermDto, @Req() req, @Res() res) {
-		this.can_edit_resource(req.user, term.resource_id);
+		this.canEditResource(req.user, term.resource_id);
 
-		const response = await this.termsService.update_term(term);
+		const response = await this.termsService.updateTerm(term);
 		res.send(response);
 	}
 
@@ -119,14 +131,14 @@ export class TermsController {
 	@Delete(':activity_term/partner-resource/:resource_id')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	async delete_term(
-		@Param() delete_term: DeleteTermDto,
+		@Param() deleteTerm: DeleteTermDto,
 		@Req() req,
 		@Res() res,
 	) {
-		const { resource_id } = delete_term;
-		this.can_edit_resource(req.user, resource_id);
+		const { resource_id } = deleteTerm;
+		this.canEditResource(req.user, resource_id);
 
-		const response = await this.termsService.delete_term(delete_term);
+		const response = await this.termsService.deleteTerm(deleteTerm);
 
 		res.send(response);
 	}

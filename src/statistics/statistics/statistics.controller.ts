@@ -9,6 +9,7 @@ import {
 	UseInterceptors,
 	UseGuards,
 	NotFoundException,
+	BadRequestException,
 } from '@nestjs/common';
 import { AchievementsService } from '../../achievements/achievements.service';
 import { ParseUnsignedIntPipe } from '../../shared/pipes/unsigned-int-validation.pipe';
@@ -34,6 +35,10 @@ import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
 import { UserReq } from '../../auth/decorators/applyUser.decorator';
 import { User } from '../../core/schemas/user.schema';
 import { StatisticsFilter } from '../dto/statistics-filter.dto';
+import { AuthProtected } from '../../auth/decorators/auth.decorator';
+import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
+import { ValidationError, validate } from 'class-validator';
+import { paginate } from '../../pagination/paginator';
 
 @ApiTags('Statistics')
 @ApiHeader(VersionHeader)
@@ -60,13 +65,13 @@ export class StatisticsController {
 		description:
 			'A paginated list of user statistics sorted by the highest score to the lowest',
 	})
-	@UseGuards(LocalAuthGuard)
+	@AuthProtected()
 	@Public()
 	@Get('leaderboard/:resource_id')
-	async get_resource_leaderboard(
+	async getResourceLeaderboard(
 		@Param('resource_id') resource_id: string,
 		@Query() pagination: PaginateDto,
-		@Req() req: any,
+		@UserReq() user: User | null,
 	) {
 		const resourceExists = await this.partnerResourceService.exists(
 			resource_id,
@@ -75,19 +80,19 @@ export class StatisticsController {
 			throw new NotFoundException(`Resource ${resource_id} Not found !`);
 		}
 
-		if (req.user) {
-			// user is loggedIn
-			// check for resource ownership
+		const privacyFilter = userResourceEntityPrivacyFilter(user);
 
-			if (!!req.user.resources.find((res) => res.resource_id == resource_id)) {
-				return this.statService.getResourceLeaderboard(resource_id, pagination);
-			}
-		}
-
-		return await this.statService.getPublicResourceLeaderboard(
+		const filter = {
 			resource_id,
-			pagination,
+			...privacyFilter,
+		};
+
+		const { data, count } = await this.statService.getResourceLeaderboard(
+			filter,
+			pagination.getMongoQueryOptions(),
 		);
+
+		return paginate(data, pagination, count);
 	}
 
 	@ApiOkResponse({
@@ -114,11 +119,24 @@ export class StatisticsController {
 		const statFilter = new StatisticsFilter();
 		statFilter.curator_orcid = orcid_id;
 
+		const errors = await validate(statFilter);
+
+		if (errors.length > 0) {
+			const errorResponse = errors.map((error: ValidationError) => ({
+				property: error.property,
+				message: error.constraints[Object.keys(error.constraints)[0]],
+			}));
+			throw new BadRequestException(errorResponse);
+		}
+
+		const privacyFilter = userResourceEntityPrivacyFilter(user);
+
 		const stats = await this.statService.getStatistics(
-			statFilter,
-			user?.resources.map((res) => res.resource_id) ?? [],
-			user?.orcid_id,
-			'public',
+			{
+				...statFilter.omitPagination(),
+				...privacyFilter,
+			},
+			statFilter.getMongoQueryOptions(),
 		);
 
 		return stats;
@@ -136,12 +154,15 @@ export class StatisticsController {
 	@Get()
 	async findAll(@Query() query: GetStatisticsDto, @UserReq() user?: User) {
 		const getStatDtoInstance = plainToInstance(GetStatisticsDto, query);
-		return await this.statService.get_all_statistics(
+
+		const privacyFilter = userResourceEntityPrivacyFilter(user);
+
+		const { data, count } = await this.statService.get_all_statistics(
 			getStatDtoInstance,
-			user?.resources.map((res) => res.resource_id),
-			user?.orcid_id,
-			'public',
+			privacyFilter,
 		);
+
+		return paginate(data, getStatDtoInstance, count);
 	}
 }
 
@@ -153,22 +174,28 @@ export class OldStatisticsController {
 		protected userService: UsersService,
 	) {}
 
+	@AuthProtected()
+	@Public()
 	@Get('/leaderboards')
 	async leaderboard(
 		@Query('resource') resource_id: string,
 		@Query('page', ParseUnsignedIntPipe) page: number,
 		@Query('page_size', ParseUnsignedIntPipe) page_size: number,
+		@UserReq() user: User | null,
 		@Res() res: Response,
 	) {
 		const pagination = new PaginateDto();
 		pagination.limit = page_size;
 		pagination.skip = (page - 1) * pagination.limit;
 
-		const { data, meta } = await this.statService.getResourceLeaderboard(
-			resource_id,
+		const privacyFilter = userResourceEntityPrivacyFilter(user);
+		const { data, count } = await this.statService.getResourceLeaderboard(
+			{ resource_id, ...privacyFilter },
 			// in the old version, the pages are 0 indexed
-			pagination,
+			pagination.getMongoQueryOptions(),
 		);
+
+		const { meta } = paginate(data, pagination, count);
 
 		const orcid_list = _.uniq(_.map(data, 'curator_orcid'));
 		const user_list_promises = orcid_list.map((orcid) =>

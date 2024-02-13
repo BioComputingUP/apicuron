@@ -6,12 +6,15 @@ import {
 } from '../../core/schemas/achievements/medals.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../core/schemas/user.schema';
-import { Model } from 'mongoose';
+import { Model, MongooseError } from 'mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import {
 	MedalDef,
 	MedalDefDocument,
 } from '../../core/schemas/achievements-def/medal-def.schema';
+import { Term, TermDocument } from '../../core/schemas/terms.schema';
+import 'mongodb';
+import { AchievementState } from '../../core/enums';
 
 @Injectable()
 export class ComputeMedalsService {
@@ -21,6 +24,7 @@ export class ComputeMedalsService {
 		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 		@InjectModel(MedalDef.name) private medalDefModel: Model<MedalDefDocument>,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
+		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
 	) {}
 
 	logger = new Logger(ComputeMedalsService.name);
@@ -143,5 +147,136 @@ export class ComputeMedalsService {
 					score_sum: -1,
 				})
 		);
+	}
+
+	private async upsertMedalForReport(
+		medalDef: MedalDefDocument,
+		report: ReportDocument,
+		term: TermDocument,
+	) {
+		const { resource_id, curator_orcid } = report;
+		try {
+			return await this.medalModel.updateOne(
+				{
+					curator_orcid: curator_orcid,
+					resource_id: resource_id,
+					name: medalDef.name,
+				},
+				{
+					$setOnInsert: {
+						...medalDef.toObject(),
+					},
+					$inc: {
+						count_total: 1,
+						score_total: term.score,
+					},
+				},
+				{
+					upsert: true,
+				},
+			);
+		} catch (err: any) {
+			if (err.code && err.code === 11000) {
+				this.logger.debug(
+					`Medal ${medalDef.name} already exists for curator ${curator_orcid}`,
+				);
+
+				return await this.medalModel.updateOne(
+					{
+						curator_orcid: curator_orcid,
+						resource_id: resource_id,
+						name: medalDef.name,
+					},
+					{
+						$inc: {
+							count_total: 1,
+							score_total: term.score,
+						},
+					},
+				);
+			}
+			if (err instanceof Error) {
+				this.logger.error(err.message, err.stack, err.name);
+				throw new Error(
+					`An error occured while upserting medal ${medalDef.name} for curator ${curator_orcid} in resource ${resource_id}`,
+				);
+			}
+		}
+	}
+
+	async incrementalMedalCompute(report: ReportDocument) {
+		const { resource_id, activity_term, league } = report;
+		const term = await this.termModel.findOne({
+			resource_id: resource_id,
+			activity_term: activity_term,
+		});
+
+		const concernedMedalDefs = await this.medalDefModel.find({
+			list_terms: activity_term,
+			resource_id: resource_id,
+			league: league,
+			first_day: { $lte: report.timestamp },
+			last_day: { $gte: report.timestamp },
+		});
+
+		const medalupdates$ = concernedMedalDefs.map(async (medalDef) => {
+			return await this.upsertMedalForReport(medalDef, report, term);
+		});
+
+		await Promise.all(medalupdates$);
+
+		// for each concerned medalDef
+		const earningCompute$ = concernedMedalDefs.map(
+			async (medalDef: MedalDefDocument) => {
+				// get the lowest medal that is earned
+				const lowestMedalEarnedList = await this.medalModel
+					.find(
+						{
+							name: medalDef.name,
+							resource_id: medalDef.resource_id,
+							league: medalDef.league,
+						},
+						{},
+						{ sort: { score_total: -1 } },
+					)
+					.skip(medalDef.score_relative - 1)
+					.limit(1);
+
+				const lowestMedalEarned: MedalDocument = lowestMedalEarnedList[0];
+
+				this.logger.debug(
+					`Lowest Medal Earned ${lowestMedalEarned.score_total}`,
+				);
+
+				// update all medals that are lower than the lowest medal earned
+				const updateLower = this.medalModel.updateMany(
+					{
+						name: medalDef.name,
+						resource_id: medalDef.resource_id,
+						league: medalDef.league,
+						score_total: { $lt: lowestMedalEarned.score_total },
+					},
+					{ $set: { state: AchievementState.progress } },
+				);
+
+				// update all medals that are higher than the lowest medal earned
+				const updateHigher = this.medalModel.updateMany(
+					{
+						name: medalDef.name,
+						resource_id: medalDef.resource_id,
+						league: medalDef.league,
+						score_total: { $gt: lowestMedalEarned.score_total },
+					},
+					{ $set: { state: AchievementState.achieved } },
+				);
+
+				return await Promise.all([updateLower, updateHigher]);
+			},
+		);
+
+		const updateResults = await Promise.all(earningCompute$);
+		updateResults.flat().map((result) => {
+			console.log(`Updated ${result.modifiedCount} medals`);
+		});
 	}
 }

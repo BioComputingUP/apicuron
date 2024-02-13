@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { plainToInstance } from 'class-transformer';
-import { Model } from 'mongoose';
+import { FilterQuery, Model, QueryOptions } from 'mongoose';
 import { AchievementFilter } from './dto/achievement-filter.dto';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import {
@@ -17,6 +17,8 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { ON_BADGE_DEF_DELETE, ON_MEDAL_DEF_DELETE } from './constants';
 import { DeleteBadgeDefDto } from './dto/badge-crud.dto';
 import { DeleteMedalDefDto } from './dto/medal-crud.dto';
+import { MedalDefDocument } from '../core/schemas/achievements-def/medal-def.schema';
+import { AchievementDocument } from '../core/schemas/achievements/achievements.schema';
 
 @Injectable()
 export class AchievementsService {
@@ -42,42 +44,53 @@ export class AchievementsService {
 		});
 	}
 
-	async getBadges(filter: AchievementFilter) {
-		const filterInstance = plainToInstance(AchievementFilter, filter);
-		const dataPromise = this.badgeModel.find(
-			filterInstance.getQuery(),
-			{},
-			filterInstance.getMongoQueryOptions(),
-		);
-		const countPromise = this.badgeModel.count(filterInstance.getQuery());
+	async getBadges(
+		filter: FilterQuery<BadgeDocument>,
+		options: QueryOptions<BadgeDocument>,
+	) {
+		const dataPromise = this.badgeModel.find(filter, {}, options);
+		const countPromise = this.badgeModel.count(filter);
 
 		const [data, count] = await Promise.all([dataPromise, countPromise]);
-		return paginate(data, filterInstance, count);
+		return {
+			data,
+			count,
+		};
 	}
 
-	async getMedals(filter: AchievementFilter) {
-		const filterInstance = plainToInstance(AchievementFilter, filter);
-		const dataPromise = this.medalModel.find(
-			filterInstance.getQuery(),
-			{},
-			filterInstance.getMongoQueryOptions(),
-		);
-		const countPromise = this.medalModel.count(filterInstance.getQuery());
+	async getMedals(
+		filter: FilterQuery<MedalDocument>,
+		options: QueryOptions<MedalDocument>,
+	): Promise<{ data: MedalDocument[]; count: number }> {
+		const dataPromise = this.medalModel.find(filter, {}, options);
+		const countPromise = this.medalModel.count(filter);
 
 		const [data, count] = await Promise.all([dataPromise, countPromise]);
-		return paginate(data, filterInstance, count);
+		return {
+			data,
+			count,
+		};
 	}
 
-	async user_achievements(curator_orcid: string, resource_id: string) {
+	async user_achievements({
+		curator_orcid,
+		resource_id,
+		...filter
+	}: {
+		curator_orcid: string;
+		resource_id: string;
+	} & FilterQuery<AchievementDocument>) {
 		const resource_uri = await this.partnerResourceService.retrieve_uri(
 			resource_id,
 		);
 		const badgesPromise = this.badgeModel.find({
 			curator_orcid,
+			...filter,
 			$or: [{ resource_id }, { resource_uri }],
 		});
 		const medalsPromise = this.medalModel.find({
 			curator_orcid,
+			...filter,
 			$or: [{ resource_id }, { resource_uri }],
 		});
 		const [badges, medals] = await Promise.all([badgesPromise, medalsPromise]);

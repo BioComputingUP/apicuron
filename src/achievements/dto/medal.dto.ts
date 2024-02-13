@@ -27,4 +27,7 @@ export class MedalDto {
 
 	@IsNotEmpty()
 	type: string;
+
+	@IsNotEmpty()
+	league: string;
 }

@@ -19,6 +19,7 @@ import { plainToInstance } from 'class-transformer';
 import { UserReq } from '../auth/decorators/applyUser.decorator';
 import { User } from '../core/schemas/user.schema';
 import { Public } from '../auth/decorators/public.decorator';
+import { userResourceEntityPrivacyFilter } from '../util/privacy.helper';
 
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
@@ -40,12 +41,14 @@ export class ReportsController {
 			ReportFilterDto,
 			reportFilter,
 		);
-		const allowedResources =
-			user?.resources.map(({ resource_id }) => resource_id) ?? [];
+		// const allowedResources =
+		// 	user?.resources.map(({ resource_id }) => resource_id) ?? [];
+
+		const privacyFilter = userResourceEntityPrivacyFilter(user);
+
 		return await this.reportService.getReports(
 			reportFilterInstance,
-			user?.orcid_id,
-			allowedResources,
+			privacyFilter,
 		);
 	}
 

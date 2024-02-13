@@ -136,6 +136,19 @@ export class DeleteMedalDefDto {
 	@IsString()
 	@IsNotEmpty()
 	resource_id: string;
+
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ league, resource_id }): FilterQuery<PartnerResourceDocument> => {
+			return {
+				leagues: league,
+				resource_id,
+			};
+		},
+	])
+	@IsString()
+	@IsOptional()
+	league: string;
 }
 
 export class UpdateMedalDefDto extends DeleteMedalDefDto {

@@ -40,4 +40,6 @@ export class AchievementFilter extends PaginateDto {
 			'count_threshold',
 		]);
 	}
+
+	defaultLimit: 10;
 }

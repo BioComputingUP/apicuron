@@ -6,9 +6,10 @@ import {
 	IsIn,
 	ValidateIf,
 	Allow,
+	IsString,
 } from 'class-validator';
 import { User } from '../../core/schemas/user.schema';
-import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
+import { PartnerResource, PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 import {
 	DateAfter,
@@ -17,6 +18,7 @@ import {
 import * as _ from 'lodash';
 import { Term } from '../../core/schemas/terms.schema';
 import { PaginateDto } from '../../pagination/dto/paginate.dto';
+import { FilterQuery } from 'mongoose';
 
 export class ReportFilterDto extends PaginateDto {
 	@Validate(EntryExistsRule, [
@@ -49,6 +51,19 @@ export class ReportFilterDto extends PaginateDto {
 	@ValidateIf((o) => o.activity_terms.length > 0)
 	@IsOptional()
 	activity_terms?: string[] = [];
+
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ league, resource_id }): FilterQuery<PartnerResourceDocument> => {
+			return {
+				leagues: league,
+				resource_id,
+			};
+		},
+	])
+	@IsString()
+	@IsOptional()
+	league: string;
 
 	@IsOptional()
 	entity_uri?: string;

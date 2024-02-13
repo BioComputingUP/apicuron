@@ -10,8 +10,12 @@ import {
 } from 'class-validator';
 import { ActivityTermExists } from '../validators/activity-term-exists';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
-import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
+import {
+	PartnerResource,
+	PartnerResourceDocument,
+} from '../../core/schemas/resource/partner-resource.schema';
 import { ApiProperty } from '@nestjs/swagger';
+import { FilterQuery } from 'mongoose';
 
 export class CreateTermDto {
 	// fields from Achievement
@@ -84,4 +88,17 @@ export class CreateTermDto {
 	})
 	@IsNotEmpty()
 	score: number;
+
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ league, resource_id }): FilterQuery<PartnerResourceDocument> => {
+			return {
+				leagues: league,
+				resource_id,
+			};
+		},
+	])
+	@IsString()
+	@IsOptional()
+	league: string;
 }

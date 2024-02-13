@@ -6,14 +6,16 @@ import * as _ from 'lodash';
 import {
 	ReportsMeta,
 	ReportMetaSchema,
-	AggregatedReportsSchemaFactory,
+	AggregatedReportsSchemaFactory as UserResourceEntitySchemaFactory,
 } from './components/aggregated-data.schema';
+import { ResourceEntity } from './components/resource-entity.schema';
+import { UserResourceEntity } from './components/user-resource-entity.schema';
 
 export type StatisticsDocument = HydratedDocument<Statistics>;
 @Schema({
 	collection: 'statistics',
 })
-export class Statistics {
+export class Statistics extends ResourceEntity {
 	@Prop({ required: true, default: () => 0 })
 	badges_count: number;
 
@@ -48,9 +50,6 @@ export class Statistics {
 	@Prop({ required: false })
 	resource_uri: string;
 
-	@Prop({ required: true })
-	resource_id: string;
-
 	/// Multiple data types found: Float: 15.7%, Int: 84.3% out of 89 sampled entries
 	@Prop({ required: true, default: () => 0 })
 	revision_count: number;
@@ -67,12 +66,6 @@ export class Statistics {
 
 	@Prop({ required: true, default: () => 0 })
 	total_score: number;
-
-	@Prop({ required: true, type: String })
-	league: string;
-
-	@Prop({ required: true, type: String })
-	privacy: string;
 }
 
 export function StatisticsSchemaFactory() {
@@ -102,9 +95,9 @@ export function StatisticsSchemaFactory() {
 }
 
 export function StatisticsAggregatedReportsFactory(
-	aggregatedReports: Partial<ReportsMeta>,
+	aggregatedReports: Partial<UserResourceEntity>,
 ) {
 	const StatisticsSchema = SchemaFactory.createForClass(Statistics);
 
-	return AggregatedReportsSchemaFactory(StatisticsSchema, aggregatedReports);
+	return UserResourceEntitySchemaFactory(StatisticsSchema, aggregatedReports);
 }

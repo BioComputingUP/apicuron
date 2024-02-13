@@ -1,17 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { AchievementState, PrivacyType } from '../../enums';
+import { UserResourceEntity } from '../components/user-resource-entity.schema';
 
 export type BadgeDocument = HydratedDocument<Badge>;
 
 @Schema({
 	collection: 'achievements',
 })
-export class Badge {
+export class Badge extends UserResourceEntity {
 	// fields from Achievement
 	// id: string;
-	@Prop({
-		required: true,
-	})
+
 	curator_orcid: string;
 	@Prop({
 		required: true,
@@ -22,9 +22,6 @@ export class Badge {
 	})
 	resource_uri: string;
 
-	@Prop({
-		required: true,
-	})
 	resource_id: string;
 
 	@Prop({
@@ -45,7 +42,10 @@ export class Badge {
 	})
 	list_terms: string[];
 
+	state: AchievementState;
+
 	league: string;
+	privacy: PrivacyType;
 }
 
 export const BadgeSchema = SchemaFactory.createForClass(Badge).loadClass(Badge);

@@ -17,6 +17,7 @@ import {
 	PartnerResourceDocument,
 } from '../../core/schemas/resource/partner-resource.schema';
 import { FilterQuery } from 'mongoose';
+import { AchievementType } from '../../core/enums';
 
 export class BadgeDefFilter extends PaginateDto {
 	static create(obj: any) {
@@ -32,11 +33,24 @@ export class BadgeDefFilter extends PaginateDto {
 	@Validate(EntryExistsRule, [
 		AchievementDef.name,
 		({ name }) => {
-			return { name, type: 'badge' };
+			return { name, type: AchievementType.badge };
 		},
 	])
 	@IsOptional()
 	name?: string;
+
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ league, resource_id }): FilterQuery<PartnerResourceDocument> => {
+			return {
+				leagues: league,
+				resource_id,
+			};
+		},
+	])
+	@IsString()
+	@IsOptional()
+	league: string;
 }
 
 export class DeleteBadgeDefDto {
@@ -48,10 +62,23 @@ export class DeleteBadgeDefDto {
 	@Validate(EntryExistsRule, [
 		AchievementDef.name,
 		({ name }) => {
-			return { name, type: 'badge' };
+			return { name, type: AchievementType.badge };
 		},
 	])
 	name: string;
+
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ league, resource_id }): FilterQuery<PartnerResourceDocument> => {
+			return {
+				leagues: league,
+				resource_id,
+			};
+		},
+	])
+	@IsString()
+	@IsOptional()
+	league: string;
 }
 
 export class CreateBadgeDefDto {
@@ -114,8 +141,8 @@ export class UpdateBadgeDefDto {
 
 	@Validate(EntryExistsRule, [
 		AchievementDef.name,
-		({ name }) => {
-			return { name, type: 'badge' };
+		({ name, resource_id }) => {
+			return { name, resource_id, type: AchievementType.badge };
 		},
 	])
 	@IsOptional()

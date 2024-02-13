@@ -126,9 +126,7 @@ const logger = new Logger('AppModule');
 						{
 							type: HttpException,
 							filter: (exception: HttpException) => {
-								return (
-									exception.getStatus() == 403 || exception.getStatus() >= 500
-								);
+								return exception.getStatus() >= 500;
 							},
 						},
 					],

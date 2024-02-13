@@ -112,28 +112,20 @@ export class ReportsService {
 
 	async getReports(
 		reportFilter: ReportFilterDto,
-		request_orcid: string | null = null,
-		allowedResources: string[] = [],
+		privacyFilter: FilterQuery<Report> = {},
 	) {
 		const { filter, options } = this.buildReportsQuery(reportFilter);
 
-		const privacyFilters: FilterQuery<any>[] = [
-			{ resource_id: { $in: allowedResources } },
-			{ privacy: 'public' },
-		];
-		if (!!request_orcid) {
-			privacyFilters.push({
-				curator_orcid: request_orcid,
-			});
+		if (!reportFilter.league) {
+			const resource = await this.partnerResourcesService.get_resource(
+				reportFilter.resource_id,
+			);
+			reportFilter.league = resource.defaultLeague;
 		}
 
 		const query = {
-			$and: [
-				filter,
-				{
-					$or: privacyFilters,
-				},
-			],
+			$and: [filter, privacyFilter],
+			league: reportFilter.league,
 		};
 
 		const reports = await this.reportModel.find(query, {}, options).lean();
@@ -146,10 +138,10 @@ export class ReportsService {
 				...new Set(reports.map((report) => report.activity_term)),
 			];
 
-			const terms_list = await this.termsService.get_terms(
-				activity_term_list,
+			const terms_list = await this.termsService.getTerms(activity_term_list, {
 				resource_id,
-			);
+				league: reportFilter.league,
+			});
 
 			const reports_with_terms = reports.map((report) => {
 				report['term'] = terms_list.find(

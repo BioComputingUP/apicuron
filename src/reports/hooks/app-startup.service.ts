@@ -3,7 +3,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 import { Model } from 'mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { PartnerResource, PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import {
+	PartnerResource,
+	PartnerResourceDocument,
+} from '../../core/schemas/resource/partner-resource.schema';
 
 @Injectable()
 export class ReportServiceOnStartup implements OnApplicationBootstrap {
