@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { Cursor, FilterQuery, Model, UpdateQuery } from 'mongoose';
+import { Cursor, FilterQuery, Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 import {
@@ -13,18 +13,19 @@ import {
 	BadgeDef,
 	BadgeDefDocument,
 } from '../../core/schemas/achievements-def/badge-def.schema';
-import {
-	AchievementDef,
-	AchievementDefDocument,
-} from '../../core/schemas/achievements-def/achievement-def.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ON_BADGES_UPDATE } from '../constants';
 import { AchievementState } from '../../core/enums';
-import { privateDecrypt } from 'crypto';
+import { computePrivacyField } from '../../util/privacy.helper';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { AggregatedReportsByActivities } from '../types/aggregated-reports';
 import {
-	assignPrivacyField,
-	computePrivacyField,
-} from '../../util/privacy.helper';
+	IComputeBadgeManyEventPayload,
+	IincrementalBadgeComputeEventPayload,
+	onComputeManyBadges,
+	onComputeUserBadges,
+	onIncrementalBadgeCompute,
+} from '../events';
 
 @Injectable()
 export class ComputeBadgesService {
@@ -41,35 +42,14 @@ export class ComputeBadgesService {
 
 	public async computeResourceBadges(resource: { resource_id: string }) {
 		const { resource_id } = resource;
-		await this.badgeModel.deleteMany({ resource_id });
 
-		const curators: Cursor<any, never> = this.reportModel
-			.aggregate([
-				{
-					$group: {
-						_id: '$curator_orcid',
-					},
-				},
-			])
-			.cursor();
-
-		const userBadgesPromises: Promise<any>[] = [];
-
-		await curators.eachAsync((doc) => {
-			const orcid_id: string = doc._id;
-
-			const badgeComputePromise = this.computeUserBadges({
-				resource,
-				user: { orcid_id },
-			});
-			userBadgesPromises.push(badgeComputePromise);
+		await this.computeAllBadges({
+			resource_id,
 		});
 
-		// const orcid_ids = curators.map((entry) => entry._id);
-
-		// const userBadgesPromises = orcid_ids.map((orcid_id) => this.computeUserBadges(resource_id, orcid_id))
-
-		return await Promise.all(userBadgesPromises);
+		await this.eventEmitter.emitAsync(ON_BADGES_UPDATE, {
+			resource_id,
+		});
 	}
 
 	public async computeUserBadges(payload: {
@@ -85,81 +65,19 @@ export class ComputeBadgesService {
 			`Computing Badges for user ${curator_orcid} at resource ${resource_id}`,
 		);
 
-		const userReportsAggregation = await this.reportModel
-			.aggregate()
-			.match({
+		await this.computeAllBadges(
+			{
 				resource_id,
+			},
+			{
 				curator_orcid,
-			})
-			.group({
-				_id: {
-					activity_term: '$activity_term',
-					league: '$league',
-				},
-				curator_orcid: { $first: '$curator_orcid' },
-				resource_id: { $first: '$resource_id' },
-				activity_term: { $first: '$activity_term' },
-				league: { $first: '$league' },
-				count: {
-					$count: {},
-				},
-			});
-
-		const badgeDefs = await this.badgeDefModel.find(
-			{ resource_id },
-			{ batchSize: 50 },
+			},
 		);
 
-		const badgeUpdatePromises = [];
-
-		for (const badgeDef of badgeDefs) {
-			const concernedReports = userReportsAggregation.filter(
-				(report) =>
-					report.league === badgeDef.league &&
-					badgeDef.list_terms.includes(report.activity_term),
-			);
-
-			const count = concernedReports
-				.map((report) => report.count)
-				.reduce((a, b) => a + b, 0);
-
-			if (count >= badgeDef.count_threshold) {
-				this.logger.log(
-					`user ${curator_orcid} has earned the badge: ${badgeDef.name}`,
-				);
-				// badge is earned at this moment
-				const badgeObject = badgeDef.toObject();
-				delete badgeObject._id;
-
-				const badgeUpdatePromise = this.badgeModel.updateOne(
-					{ resource_id, curator_orcid, name: badgeDef.name },
-					{
-						$set: {
-							curator_orcid,
-							...badgeObject,
-							count,
-						},
-					},
-					{ upsert: true },
-				);
-
-				badgeUpdatePromises.push(badgeUpdatePromise);
-			}
-		}
-
-		const updatePromises$ = await Promise.all(badgeUpdatePromises);
-
-		// const badgeCount = await this.badgeModel.count({
-		// 	curator_orcid,
-		// 	resource_id,
-		// 	earned: true,
-		// });
-
-		// await this.eventEmitter.emitAsync(ON_USER_BADGES_UPDATE, {
-		// 	resource_id,
-		// 	curator_orcid,
-		// });
-		return updatePromises$;
+		await this.eventEmitter.emitAsync(onComputeUserBadges, {
+			resource_id,
+			curator_orcid,
+		});
 	}
 
 	public async incrementalBadgeCompute(report: ReportDocument) {
@@ -176,6 +94,11 @@ export class ComputeBadgesService {
 		});
 
 		await Promise.all(badges$);
+
+		await this.eventEmitter.emitAsync(
+			onIncrementalBadgeCompute,
+			report as IincrementalBadgeComputeEventPayload,
+		);
 	}
 
 	private async upsertBadge(
@@ -224,11 +147,6 @@ export class ComputeBadgesService {
 					upsert: true,
 				},
 			);
-
-			// this.logger.log(
-			// 	`Ran upsert on Badge ${badgeDef.name} for user ${report.curator_orcid}, updated: ${updateResponse.modifiedCount}, upserted: ${updateResponse.upsertedCount}`,
-			// );
-
 			return updateResponse;
 		} catch (err: any) {
 			if (!(err instanceof MongoServerError) || err.code != 11000) {
@@ -277,68 +195,124 @@ export class ComputeBadgesService {
 
 	public async computeAllBadges(
 		badgeDefFilter: FilterQuery<BadgeDefDocument> = {},
+		reportFilter: FilterQuery<ReportDocument> = {},
 	) {
-		await this.badgeModel.deleteMany({});
+		await this.badgeModel.deleteMany(badgeDefFilter);
 		const badgeDefs = this.badgeDefModel
 			.find(
 				badgeDefFilter,
 				{},
 				{
-					batchSize: 50,
-					sort: { resource_id: -1, league: -1, curator_orcid: -1 },
+					sort: { resource_id: -1, league: -1 },
 				},
 			)
-			.cursor();
+			.cursor({ batchSize: 50 });
 
-		const resources = await this.partnerResourceService.get_resources({});
-
-		const resourceMap = new Map(resources.map((r) => [r.resource_id, r]));
+		let currentResource: PartnerResourceDocument | null = null;
 
 		const badgeSaves = [];
 
 		for await (const badgeDef of badgeDefs) {
 			delete badgeDef._id;
-			const aggregation = await this.reportModel
-				.aggregate()
-				.match({
-					activity_term: { $in: badgeDef.list_terms },
-					league: badgeDef.league,
-					resource_id: badgeDef.resource_id,
-				})
-				.group({
-					_id: '$curator_orcid',
-					count: { $count: {} },
-					resource_id: { $first: '$resource_id' },
-					league: { $first: '$league' },
-					curator_orcid: { $first: '$curator_orcid' },
-				});
 
-			const badges$ = aggregation.map(async (report) => {
+			// load related resource if necessary
+			if (currentResource?.resource_id !== badgeDef.resource_id) {
+				currentResource = await this.partnerResourceService.get_resource(
+					badgeDef.resource_id,
+				);
+			}
+			const reportAggregationByUser = this.loadBadgeReportsByUser(
+				badgeDef,
+				reportFilter,
+			);
+
+			const badges$ = [];
+
+			for await (const report of reportAggregationByUser) {
 				const user = await this.userModel.findOne({
 					orcid_id: report.curator_orcid,
 				});
-				const badge = new this.badgeModel({
-					...badgeDef.toObject(),
-					_id: undefined,
-					curator_orcid: report.curator_orcid,
-					count: report.count,
-					state:
-						report.count >= badgeDef.count_threshold
-							? AchievementState.achieved
-							: AchievementState.progress,
-				});
-				computePrivacyField(resourceMap.get(report.resource_id), user, badge);
 
-				return badge.save();
-			});
+				const badge = this.buildBadgeFromAggregatedReports(
+					badgeDef,
+					report,
+					currentResource,
+					user,
+				);
+
+				badges$.push(badge.save());
+			}
 
 			badgeSaves.push(Promise.all(badges$));
 		}
 
 		await Promise.all(badgeSaves);
+
+		// await this.eventEmitter.emitAsync(onComputedBadgeMany, {
+		// 	badgeDefFilter,
+		// 	reportFilter,
+		// } as IComputeBadgeManyEventPayload);
 	}
 
-	public async incrementalBadgesCompute() {
+	private buildBadgeFromAggregatedReports(
+		badgeDef: BadgeDefDocument,
+		reportAgg: AggregatedReportsByActivities,
+		resource: PartnerResourceDocument,
+		user: UserDocument,
+	): BadgeDocument {
+		const badge = new this.badgeModel({
+			...badgeDef.toObject(),
+			_id: undefined,
+			curator_orcid: reportAgg.curator_orcid,
+			count: reportAgg.count,
+			state:
+				reportAgg.count >= badgeDef.count_threshold
+					? AchievementState.achieved
+					: AchievementState.progress,
+		});
+		computePrivacyField(resource, user, badge);
+		return badge;
+	}
+
+	/**
+	 * Loads badge reports by user based on the given badge definition.
+	 * @param badgeDef - The badge definition.
+	 * @returns A promise that resolves to the aggregated badge reports.
+	 */
+	private loadBadgeReportsByUser(
+		badgeDef: BadgeDefDocument,
+		reportFilter: FilterQuery<ReportDocument> = {},
+		cursorOptions: { batchSize: number } = { batchSize: 50 },
+	) {
+		const aggregation = this.reportModel
+			.aggregate()
+			.match({
+				...reportFilter,
+				activity_term: { $in: badgeDef.list_terms },
+				league: badgeDef.league,
+				resource_id: badgeDef.resource_id,
+			})
+			.group({
+				_id: '$curator_orcid',
+				count: { $count: {} },
+				resource_id: { $first: '$resource_id' },
+				activity_terms: { $addToSet: '$activity_term' },
+				league: { $first: '$league' },
+				curator_orcid: { $first: '$curator_orcid' },
+			})
+			.sort({
+				resource_id: -1,
+				league: -1,
+				curator_orcid: -1,
+			})
+			.cursor(cursorOptions);
+		return aggregation as Cursor<
+			AggregatedReportsByActivities,
+			typeof cursorOptions
+		>;
+	}
+
+	private async incrementalBadgesCompute() {
 		const reports = this.reportModel
 			.find({}, {}, { batchSize: 300 })
 			.sort({ resource_id: -1, curator_orcid: -1 });
