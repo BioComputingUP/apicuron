@@ -1,12 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import {
 	Medal,
 	MedalDocument,
 } from '../../core/schemas/achievements/medals.schema';
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../core/schemas/user.schema';
-import { Model, MongooseError } from 'mongoose';
+import { Connection, Cursor, FilterQuery, Model } from 'mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import {
 	MedalDef,
@@ -15,7 +15,16 @@ import {
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import 'mongodb';
 import { AchievementState } from '../../core/enums';
-
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { UpdateResult, MongoServerError } from 'mongodb';
+import { computePrivacyField } from '../../util/privacy.helper';
+import { AggregatedReportsByMedalDef } from '../types/aggregated-reports';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import {
+	IComputeResourceMedalsEventPayload,
+	onComputeResourceMedals,
+} from '../events';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 @Injectable()
 export class ComputeMedalsService {
 	constructor(
@@ -25,175 +34,360 @@ export class ComputeMedalsService {
 		@InjectModel(MedalDef.name) private medalDefModel: Model<MedalDefDocument>,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
+		@Inject(CACHE_MANAGER) private cacheManager: Cache,
+		private readonly eventEmitter: EventEmitter2,
 	) {}
 
 	logger = new Logger(ComputeMedalsService.name);
+	defaultCacheTTL = 5;
 
-	async computeResourceMedals({ resource_id }: { resource_id: string }) {
-		const deletionResponse = await this.medalModel.deleteMany({ resource_id });
-		this.logger.log(
-			`Deleted ${deletionResponse.deletedCount} medals for resource ${resource_id}`,
-		);
+	async computeResourceMedals({
+		resource_id,
+	}: {
+		resource_id: string;
+	}): Promise<number> {
+		const medalsComputeCount = await this.computeMedals({ resource_id });
 
-		// const { data: medalDefs } = await this.achievementsDefService.get_medals(MedalsFilter.create({ resource_id }))
-
-		const medalDefs = await this.medalDefModel.find({
+		await this.eventEmitter.emitAsync(onComputeResourceMedals, {
 			resource_id,
-		});
+		} as IComputeResourceMedalsEventPayload);
 
-		const medal_saves_promises = [];
-
-		for await (const medalDef of medalDefs) {
-			// for each medal definition in the list, we add the medal to the user
-
-			this.logger.debug(`Working on Medal ${medalDef.name}`);
-
-			const user_reports = this.medalReportsAggregation(medalDef)
-				.limit(medalDef.score_relative)
-				.cursor();
-
-			// user_reports is sorted based on their scores, we just need to load the 'n' first
-			// users where 'n' is the score_relative of the medal
-			let score_relative_index = 0;
-			for await (const user of user_reports) {
-				if (!user) {
-					continue;
-				}
-				const medalObject = medalDef.toObject();
-				delete medalObject['_id'];
-				this.logger.debug(
-					`Checking if user ${user['_id']['curator_orcid']} earned  ${medalDef.name}`,
-				);
-
-				const medal = new this.medalModel({
-					...medalObject,
-					_id: null,
-					curator_orcid: user['_id']['curator_orcid'],
-					count_total: user['count'],
-					score_total: user['score_sum'],
-					score_relative_index,
-					count_relative_valid: true,
-					count_threshold_valid: true,
-					score_threshold_valid: true,
-				});
-				score_relative_index++;
-				medal_saves_promises.push(medal.save());
-			}
-		}
-
-		this.logger.log(
-			`${medal_saves_promises.length} curators earned medals for resource ${resource_id}`,
-		);
-		await Promise.all(medal_saves_promises);
+		return medalsComputeCount;
 	}
 
-	private medalReportsAggregation(medal: MedalDefDocument) {
+	/**
+	 * Builds a report filter based on the given medal criteria.
+	 * @param medal - The medal definition to match against reports.
+	 * @returns The filter query object for matching related reports.
+	 */
+	private matchRelatedReports(
+		medal: MedalDefDocument,
+	): FilterQuery<ReportDocument> {
 		// first we first filter all the reports by the resource
 		// and the terms that are concerned by the medals
-		const match_dict = {
+		const reportFilter: FilterQuery<ReportDocument> = {
 			resource_id: medal.resource_id,
 			activity_term: {
 				$in: medal.list_terms,
 			},
+			league: medal.league,
 		};
 
 		// if the medal has a time constraint we make sure it's added to the filter
 		if (medal.first_day) {
-			match_dict['timestamp'] = { $gte: medal.first_day };
+			reportFilter['timestamp'] = { $gte: medal.first_day };
 		}
 
 		if (medal.last_day) {
 			// if the timestamp object doesn't exist, it is created otherwise it is updated
-			if (!match_dict['timestamp']) {
-				match_dict['timestamp'] = { $lte: medal.last_day };
+			if (!reportFilter['timestamp']) {
+				reportFilter['timestamp'] = { $lte: medal.last_day };
 			} else {
-				match_dict['timestamp'] = {
-					...match_dict['timestamp'],
+				reportFilter['timestamp'] = {
+					...reportFilter['timestamp'],
 					$lte: medal.last_day,
 				};
 			}
 		}
+
+		return reportFilter;
+	}
+
+	/**
+	 * Retrieves a cursor for aggregating medal reports.
+	 *
+	 * @param medal - The medal definition document.
+	 * @param cursorOptions - The options for the cursor (default: { batchSize: 50 }).
+	 * @returns A cursor for aggregating reports by medal definition.
+	 */
+	private medalReportsAggregationCursor(
+		medal: MedalDefDocument,
+		cursorOptions: { batchSize: number } = { batchSize: 50 },
+	): Cursor<AggregatedReportsByMedalDef> {
+		const reportFilter = this.matchRelatedReports(medal);
+
 		return (
 			this.reportModel
 				.aggregate()
-				.match(match_dict)
+				.match(reportFilter)
 				// # here we lookup and unwind from the terms_def collection to get the term score
 				.lookup({
-					from: 'terms_def',
+					from: this.termModel.collection.name,
 					localField: 'activity_term',
 					foreignField: 'activity_term',
-					as: 'result',
+					as: 'term',
 				})
-				.unwind({ path: '$result' })
+				.unwind({ path: '$term' })
 				.project({
 					curator_orcid: 1,
 					activity_term: 1,
-					score: '$result.score',
+					score: '$term.score',
+					resource_id: 1,
 				})
 				// # here we group by curator while computing the count and score sum
 				.group({
-					_id: {
-						curator_orcid: '$curator_orcid',
+					_id: '$curator_orcid',
+					curator_orcid: {
+						$first: '$curator_orcid',
+					},
+					activity_terms: {
+						$addToSet: '$activity_term',
+					},
+					resource_id: {
+						$first: '$resource_id',
 					},
 					count: {
 						$sum: 1,
 					},
-					score_sum: {
+					score_total: {
 						$sum: '$score',
 					},
 				})
-				// and we sort the output in decreasing order based on the score_sum
+				// and we sort the output in decreasing order based on the score_total
 				.sort({
-					score_sum: -1,
+					score_total: -1,
 				})
+				.cursor(cursorOptions)
 		);
 	}
 
+	/**
+	 * Computes the medals based on the given Medal Definition filter.
+	 * Returns the number of medals Earned that were computed.
+	 *
+	 * @param medalDefFilter The filter to apply on the MedalDefDocument.
+	 * @returns A promise that resolves to 0 when all medals are computed.
+	 */
+	async computeMedals(
+		medalDefFilter: FilterQuery<MedalDefDocument> = {},
+	): Promise<number> {
+		await this.medalModel.deleteMany(medalDefFilter);
+
+		const medalDefs = this.medalDefModel
+			.find(medalDefFilter)
+			.cursor({ batchSize: 50 });
+		const medalPromises$ = [];
+		for await (const medalDef of medalDefs) {
+			const medalPromise$ = this.computeMedalsForMedalDef(medalDef);
+			medalPromises$.push(medalPromise$);
+		}
+		const counts = await Promise.all(medalPromises$);
+
+		return counts.reduce((acc, val) => acc + val, 0);
+	}
+
+	/**
+	 * Retrieves a resource by its ID.
+	 * If the resource is found in the cache, it is returned from there.
+	 * Otherwise, it is fetched from the partner resource service and stored in the cache for future use.
+	 * @param resource_id The ID of the resource to retrieve.
+	 * @returns The retrieved resource.
+	 */
+	private async getResource(resource_id: string) {
+		const getResourceCacheKey = (resource_id: string) =>
+			`resource:${resource_id}`;
+		const key = getResourceCacheKey(resource_id);
+		const cachedResource = (await this.cacheManager.get(
+			key,
+		)) as PartnerResourceDocument;
+		if (cachedResource) {
+			return cachedResource;
+		}
+		const resource = await this.partnerResourceService.get_resource(
+			resource_id,
+		);
+		await this.cacheManager.set(
+			getResourceCacheKey(resource_id),
+			resource,
+			this.defaultCacheTTL,
+		);
+		return resource;
+	}
+
+	/**
+	 * Retrieves a user from the cache or the database based on the provided ORCID ID.
+	 * If the user is found in the cache, it is returned immediately.
+	 * Otherwise, the user is fetched from the database, stored in the cache, and returned.
+	 * @param orcid_id The ORCID ID of the user to retrieve.
+	 * @returns The user document if found, otherwise null.
+	 */
+	private async getUser(orcid_id: string) {
+		const getUserCacheKey = (orcid_id: string) => `user:${orcid_id}`;
+		const cachedUser = (await this.cacheManager.get(
+			getUserCacheKey(orcid_id),
+		)) as UserDocument;
+		if (cachedUser) {
+			return cachedUser;
+		}
+		const user = await this.userModel.findOne({ orcid_id });
+		await this.cacheManager.set(
+			getUserCacheKey(orcid_id),
+			user,
+			this.defaultCacheTTL,
+		);
+		return user;
+	}
+
+	private async computeMedalsForMedalDef(medalDef: MedalDefDocument) {
+		const reportsAgg = this.medalReportsAggregationCursor(medalDef);
+
+		const medalAsyncIterator = (async function* () {
+			let i = 0;
+			for await (const reportWithCount of reportsAgg) {
+				yield [reportWithCount, i] as [AggregatedReportsByMedalDef, number];
+				i++;
+			}
+			return;
+		})();
+
+		const aggReportsPromises$: Promise<number>[] = [];
+
+		for await (const [aggregatedReports, idx] of medalAsyncIterator) {
+			const aggReportsPromise$ = this.processAggregatedReportsByMedalDef(
+				medalDef,
+				aggregatedReports,
+				idx,
+			);
+			aggReportsPromises$.push(aggReportsPromise$);
+		}
+
+		const counts = await Promise.all(aggReportsPromises$);
+		return counts.reduce((acc, val) => acc + val, 0);
+	}
+
+	/**
+	 * Creates Medals by processing aggregated reports filtered by medal definition.
+	 *
+	 * @param medalDef - The medal definition document.
+	 * @param aggregatedReports - The aggregated reports by medal definition.
+	 * @param resource - The partner resource document.
+	 * @param rankIndex - The rank index.
+	 * @returns The number of earned medals.
+	 */
+	private async processAggregatedReportsByMedalDef(
+		medalDef: MedalDefDocument,
+		aggregatedReports: AggregatedReportsByMedalDef,
+		rankIndex: number,
+	): Promise<number> {
+		let earnedMedalsCount = 0;
+		const earned = rankIndex + 1 > medalDef.score_relative;
+
+		delete medalDef._id;
+
+		const medal = new this.medalModel({
+			...medalDef.toObject(),
+			curator_orcid: aggregatedReports.curator_orcid,
+			count_total: aggregatedReports.count,
+			score_total: aggregatedReports.score_total,
+			state: earned ? AchievementState.progress : AchievementState.achieved,
+			score_relative_valid: earned,
+		});
+		earnedMedalsCount += earned ? 1 : 0;
+		const user = await this.getUser(aggregatedReports.curator_orcid);
+		const resource = await this.getResource(medalDef.resource_id);
+		computePrivacyField(resource, user, medal);
+
+		rankIndex++;
+
+		try {
+			await medal.save();
+			return earnedMedalsCount;
+		} catch (err) {
+			if (err instanceof MongoServerError && err.code && err.code === 11000) {
+				this.logger.error(err.message, err.stack, err.name);
+				throw new Error(
+					`An error occured while upserting medal ${medalDef.name} for curator ${aggregatedReports.curator_orcid} in resource ${medalDef.resource_id}`,
+				);
+			}
+		}
+	}
+
+	// Unsafe method
 	private async upsertMedalForReport(
 		medalDef: MedalDefDocument,
-		report: ReportDocument,
+		report: ReportDocument & { count?: 1 },
 		term: TermDocument,
-	) {
+	): Promise<UpdateResult> {
 		const { resource_id, curator_orcid } = report;
+		const reportCount = report.count ?? 1;
+		const medalFilter = {
+			curator_orcid: curator_orcid,
+			resource_id: resource_id,
+			name: medalDef.name,
+			league: medalDef.league,
+		};
+		delete medalDef._id;
 		try {
 			return await this.medalModel.updateOne(
-				{
-					curator_orcid: curator_orcid,
-					resource_id: resource_id,
-					name: medalDef.name,
-				},
-				{
-					$setOnInsert: {
-						...medalDef.toObject(),
+				medalFilter,
+				[
+					{
+						$set: {
+							...medalDef.toObject(),
+							curator_orcid: report.curator_orcid,
+							count_total: {
+								$cond: [
+									{
+										$eq: ['$count_total', null],
+									},
+									reportCount,
+									{
+										$add: ['$count_total', reportCount],
+									},
+								],
+							},
+							score_total: {
+								$cond: [
+									{
+										$eq: ['$score_total', null],
+									},
+									term.score * reportCount,
+									{
+										$add: ['$score_total', term.score * reportCount],
+									},
+								],
+							},
+						},
 					},
-					$inc: {
-						count_total: 1,
-						score_total: term.score,
-					},
-				},
+				],
 				{
 					upsert: true,
 				},
 			);
 		} catch (err: any) {
-			if (err.code && err.code === 11000) {
+			if (err instanceof MongoServerError && err.code && err.code === 11000) {
 				this.logger.debug(
 					`Medal ${medalDef.name} already exists for curator ${curator_orcid}`,
 				);
 
-				return await this.medalModel.updateOne(
+				return await this.medalModel.updateOne(medalFilter, [
 					{
-						curator_orcid: curator_orcid,
-						resource_id: resource_id,
-						name: medalDef.name,
-					},
-					{
-						$inc: {
-							count_total: 1,
-							score_total: term.score,
+						$set: {
+							count_total: {
+								$cond: [
+									{
+										$eq: ['$count_total', null],
+									},
+									reportCount,
+									{
+										$add: ['$count_total', reportCount],
+									},
+								],
+							},
+							score_total: {
+								$cond: [
+									{
+										$eq: ['$score_total', null],
+									},
+									term.score * reportCount,
+									{
+										$add: ['$score_total', term.score * reportCount],
+									},
+								],
+							},
 						},
 					},
-				);
+				]);
 			}
 			if (err instanceof Error) {
 				this.logger.error(err.message, err.stack, err.name);
@@ -204,11 +398,97 @@ export class ComputeMedalsService {
 		}
 	}
 
+	private async updateMedalsEarnedState(
+		medalDef: MedalDefDocument,
+	): Promise<number> {
+		const earnedMedalsList = await this.medalModel
+			.find(
+				{
+					name: medalDef.name,
+					resource_id: medalDef.resource_id,
+					league: medalDef.league,
+				},
+				{},
+				{ sort: { score_total: -1 } },
+			)
+			.limit(medalDef.score_relative);
+
+		if (earnedMedalsList.length === 0) {
+			this.logger.debug(
+				`No medals earned for ${medalDef.name} for resource ${medalDef.resource_id}`,
+			);
+			return 0;
+		}
+
+		const lowestMedalEarned: MedalDocument =
+			earnedMedalsList[earnedMedalsList.length - 1];
+
+		this.logger.debug(
+			`Lowest Medal (${lowestMedalEarned.name}) Earned is by ${lowestMedalEarned.curator_orcid} has score ${lowestMedalEarned.score_total}`,
+		);
+
+		// update all medals that are lower than the lowest medal earned
+		const updateLower = this.medalModel.updateMany(
+			{
+				name: medalDef.name,
+				resource_id: medalDef.resource_id,
+				league: medalDef.league,
+				score_total: { $lt: lowestMedalEarned.score_total },
+			},
+			{ $set: { state: AchievementState.progress } },
+		);
+
+		// update all medals that are higher than the lowest medal earned
+
+		const updateEarnedPromises$ = earnedMedalsList.map(async (medal, idx) => {
+			medal.state = AchievementState.achieved;
+			medal.score_relative_index = idx;
+
+			return await medal.save();
+		});
+		const updateEearned$ = Promise.all(updateEarnedPromises$);
+
+		const [, higherUpdate] = await Promise.all([updateLower, updateEearned$]);
+
+		this.logger.debug(
+			`Medal ${medalDef.name} earned by ${higherUpdate.length} curators`,
+		);
+
+		return higherUpdate.length;
+	}
+
+	private async getTerm({ resource_id, activity_term, league }) {
+		const getTermKey = ({ resource_id, activity_term, league }) =>
+			`term:${resource_id}:${activity_term}:${league}`;
+
+		const cachedTerm = (await this.cacheManager.get(
+			getTermKey({ resource_id, activity_term, league }),
+		)) as TermDocument;
+
+		if (!cachedTerm) {
+			const term = await this.termModel.findOne({
+				resource_id,
+				activity_term,
+				league,
+			});
+
+			await this.cacheManager.set(
+				getTermKey({ resource_id, activity_term, league }),
+				term,
+				this.defaultCacheTTL,
+			);
+			return term;
+		}
+
+		return cachedTerm;
+	}
+
 	async incrementalMedalCompute(report: ReportDocument) {
 		const { resource_id, activity_term, league } = report;
-		const term = await this.termModel.findOne({
+		const term = await this.getTerm({
 			resource_id: resource_id,
 			activity_term: activity_term,
+			league,
 		});
 
 		const concernedMedalDefs = await this.medalDefModel.find({
@@ -226,57 +506,13 @@ export class ComputeMedalsService {
 		await Promise.all(medalupdates$);
 
 		// for each concerned medalDef
-		const earningCompute$ = concernedMedalDefs.map(
+		const computeEarnedMedals$ = concernedMedalDefs.map(
 			async (medalDef: MedalDefDocument) => {
 				// get the lowest medal that is earned
-				const lowestMedalEarnedList = await this.medalModel
-					.find(
-						{
-							name: medalDef.name,
-							resource_id: medalDef.resource_id,
-							league: medalDef.league,
-						},
-						{},
-						{ sort: { score_total: -1 } },
-					)
-					.skip(medalDef.score_relative - 1)
-					.limit(1);
-
-				const lowestMedalEarned: MedalDocument = lowestMedalEarnedList[0];
-
-				this.logger.debug(
-					`Lowest Medal Earned ${lowestMedalEarned.score_total}`,
-				);
-
-				// update all medals that are lower than the lowest medal earned
-				const updateLower = this.medalModel.updateMany(
-					{
-						name: medalDef.name,
-						resource_id: medalDef.resource_id,
-						league: medalDef.league,
-						score_total: { $lt: lowestMedalEarned.score_total },
-					},
-					{ $set: { state: AchievementState.progress } },
-				);
-
-				// update all medals that are higher than the lowest medal earned
-				const updateHigher = this.medalModel.updateMany(
-					{
-						name: medalDef.name,
-						resource_id: medalDef.resource_id,
-						league: medalDef.league,
-						score_total: { $gt: lowestMedalEarned.score_total },
-					},
-					{ $set: { state: AchievementState.achieved } },
-				);
-
-				return await Promise.all([updateLower, updateHigher]);
+				return await this.updateMedalsEarnedState(medalDef);
 			},
 		);
 
-		const updateResults = await Promise.all(earningCompute$);
-		updateResults.flat().map((result) => {
-			console.log(`Updated ${result.modifiedCount} medals`);
-		});
+		await Promise.all(computeEarnedMedals$);
 	}
 }

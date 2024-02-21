@@ -1,6 +1,7 @@
 {
     "version": "0.2.0",
     "configurations": [
+
         {
             "type": "node",
             "request": "attach",
@@ -20,15 +21,38 @@
             "runtimeArgs": [
                 "--nolazy",
                 "-r",
-                "ts-node/register",
-                "tsconfig-paths/register"
+                "ts-node/register"
             ],
             "sourceMaps": true,
             "envFile": "${workspaceFolder}/.env",
-            "runtimeExecutable": "/home/adel/.nvm/versions/node/v16.14.2/bin/node",
+            "runtimeExecutable": "node",
             "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",
             "protocol": "inspector"
-        }
+        },
+
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Compute Badges",
+            "outFiles": [],
+            "args": [
+                "${workspaceFolder}/src/scripts/compute-badges.ts"
+            ],
+            "runtimeArgs": [
+                "--nolazy",
+                "-r",
+                "ts-node/register"
+            ],
+            "sourceMaps": true,
+            "envFile": "${workspaceFolder}/.env",
+            "env": {
+                "NODE_ENV": "local"
+            },
+            "runtimeExecutable": "node",
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "protocol": "inspector"
+        },
     ]
   }

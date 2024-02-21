@@ -5,14 +5,10 @@ import {
 	OnApplicationBootstrap,
 } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
-import {
-	POST_REPORT_INSERT,
-	POST_REPORT_INSERT_MANY,
-} from '../../reports/constants';
 import { ComputeBadgesService } from './compute-badges.service';
 import { ComputeMedalsService } from './compute-medals.service';
 import * as _ from 'lodash';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
+import { ReportDocument } from '../../core/schemas/reports.schema';
 import {
 	Observable,
 	Subject,
@@ -23,8 +19,21 @@ import {
 	pipe,
 	switchMap,
 	takeUntil,
-	tap,
 } from 'rxjs';
+import {
+	IPostDeleteAllResourceReports,
+	IPostReportInsertManyEventPayload,
+	IPostReportInsertSingleEventPayload,
+	postDeleteAllResourceReports,
+	postReportInsertManyEvent,
+	postReportInsertSingleEvent,
+} from '../../submit-reports/events/events';
+import { InjectModel } from '@nestjs/mongoose';
+import {
+	Achievement,
+	AchievementDocument,
+} from '../../core/schemas/achievements/achievements.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class AchievementEventHandlerService
@@ -34,6 +43,8 @@ export class AchievementEventHandlerService
 		protected computeBadges: ComputeBadgesService,
 		protected computeMedals: ComputeMedalsService,
 		protected eventEmitter: EventEmitter2,
+		@InjectModel(Achievement.name)
+		protected achievementModel: Model<AchievementDocument>,
 	) {}
 	beforeApplicationShutdown(signal?: string) {
 		this.destroy$.next(signal);
@@ -44,18 +55,18 @@ export class AchievementEventHandlerService
 		this.logger.log('AchievementEventHandlerService initialized');
 		this.postReportInsertMany$ = fromEvent(
 			this.eventEmitter,
-			POST_REPORT_INSERT_MANY,
-		) as Observable<ReportDocument[]>;
+			postReportInsertManyEvent,
+		) as Observable<IPostReportInsertManyEventPayload>;
 
 		this.postReportInsert$ = fromEvent(
 			this.eventEmitter,
-			POST_REPORT_INSERT,
-		) as Observable<ReportDocument>;
+			postReportInsertSingleEvent,
+		) as Observable<IPostReportInsertSingleEventPayload>;
 
 		this.postReportInsertMany$
 			.pipe(
 				takeUntil(this.destroy$),
-				map((reports: ReportDocument[]) => {
+				map(({ reports }: IPostReportInsertManyEventPayload) => {
 					return _.uniq(reports.map((r) => r.resource_id));
 				}),
 				switchMap(async (resources: string[]) => {
@@ -81,7 +92,7 @@ export class AchievementEventHandlerService
 			)
 			.subscribe((resources: string[]) => {
 				this.logger.debug(
-					`Reacted to  POST_REPORT_INSERT_MANY, computed Resource badges & medals computed for ${resources.join(
+					`Reacted to  Event ${postReportInsertManyEvent}, computed Resource badges & medals computed for ${resources.join(
 						', ',
 					)}`,
 				);
@@ -90,44 +101,31 @@ export class AchievementEventHandlerService
 		this.postReportInsert$
 			.pipe(
 				takeUntil(this.destroy$),
-				tap(() => {
-					this.logger.debug('Intercepted POST_REPORT_INSERT event');
-				}),
+				map(({ report }: IPostReportInsertSingleEventPayload) => report),
 				this.debouncebyUserResource(),
-				tap(() => {
-					this.logger.debug(
-						'Intercepted POST_REPORT_INSERT event after debounce',
-					);
+				switchMap(async ({ report }: IPostReportInsertSingleEventPayload) => {
+					const { resource_id, curator_orcid } = report;
+					await this.computeBadges.computeUserBadges({
+						resource: {
+							resource_id,
+						},
+						user: {
+							orcid_id: curator_orcid,
+						},
+					});
+					return [resource_id, curator_orcid];
 				}),
-				switchMap(
-					async ({
-						resource_id,
-						curator_orcid,
-					}: {
-						resource_id: string;
-						curator_orcid: string;
-					}) => {
-						await this.computeBadges.computeUserBadges({
-							resource: {
-								resource_id,
-							},
-							user: {
-								orcid_id: curator_orcid,
-							},
-						});
-						return [resource_id, curator_orcid];
-					},
-				),
 			)
 			.subscribe(([resource_id, curator_orcid]) => {
 				this.logger.debug(
-					`Reacted to POST_REPORT_INSERT, computed ${resource_id}:${curator_orcid} User badges`,
+					`Reacted to ${postReportInsertSingleEvent}, computed ${resource_id}:${curator_orcid} User badges`,
 				);
 			});
 
 		this.postReportInsert$
 			.pipe(
 				takeUntil(this.destroy$),
+				map(({ report }: IPostReportInsertSingleEventPayload) => report),
 				this.debounceByResource(),
 				switchMap(async (resource_id: string) => {
 					await this.computeMedals.computeResourceMedals({
@@ -138,7 +136,7 @@ export class AchievementEventHandlerService
 			)
 			.subscribe((resource_id: string) => {
 				this.logger.debug(
-					`Reacted to POST_REPORT_INSERT, computed Medals for Resource: ${resource_id} `,
+					`Reacted to ${postReportInsertSingleEvent}, computed Medals for Resource: ${resource_id} `,
 				);
 			});
 	}
@@ -168,7 +166,17 @@ export class AchievementEventHandlerService
 		);
 	}
 
-	postReportInsert$: Observable<ReportDocument>;
+	postReportInsert$: Observable<IPostReportInsertSingleEventPayload>;
 
-	postReportInsertMany$: Observable<ReportDocument[]>;
+	postReportInsertMany$: Observable<IPostReportInsertManyEventPayload>;
+
+	@OnEvent(postDeleteAllResourceReports, { async: true, promisify: true })
+	async deleteAllResourceReportsHandler(
+		deleteAllResourceReportsPayload: IPostDeleteAllResourceReports,
+	) {
+		await this.achievementModel.deleteMany({
+			resource_id: deleteAllResourceReportsPayload.resource_id,
+		});
+		return;
+	}
 }

@@ -15,6 +15,7 @@ import { ComputeAchievementsService } from './services/compute-achievements.serv
 import { ComputeMedalsService } from './services/compute-medals.service';
 import { ComputeBadgesService } from './services/compute-badges.service';
 import { AchievementEventHandlerService } from './services/achievements-event-handler.service';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
 	providers: [
@@ -27,7 +28,15 @@ import { AchievementEventHandlerService } from './services/achievements-event-ha
 		ComputeAchievementsService,
 		AchievementEventHandlerService,
 	],
-	imports: [CoreApicuronModule, AuthModule, ResourcesModule],
+	imports: [
+		CoreApicuronModule,
+		CacheModule.register({
+			store: 'memory',
+			shouldCloneBeforeSet: false,
+		}),
+		AuthModule,
+		ResourcesModule,
+	],
 	exports: [
 		AchievementsDefService,
 		AchievementsService,

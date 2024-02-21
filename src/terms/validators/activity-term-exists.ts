@@ -11,6 +11,10 @@ import {
 import { Model } from 'mongoose';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { InjectModel } from '@nestjs/mongoose';
+import {
+	PartnerResource,
+	PartnerResourceDocument,
+} from '../../core/schemas/resource/partner-resource.schema';
 
 /**
  * @description This validator checks of the activity term already exists in the database
@@ -24,7 +28,11 @@ import { InjectModel } from '@nestjs/mongoose';
 export class ActivityTermExists implements ValidatorConstraintInterface {
 	exists_list;
 
-	constructor(@InjectModel(Term.name) private termModel: Model<TermDocument>) {}
+	constructor(
+		@InjectModel(Term.name) private termModel: Model<TermDocument>,
+		@InjectModel(PartnerResource.name)
+		private resourceModel: Model<PartnerResourceDocument>,
+	) {}
 
 	private logger = new Logger(ActivityTermExists.name);
 
@@ -54,10 +62,22 @@ export class ActivityTermExists implements ValidatorConstraintInterface {
 				// the validator is valid if they are all valid
 				exists = this.exists_list.every(Boolean);
 			} else {
+				// when Querying the term, we look if there's a mention of a league
+				// if there is, we add the league to the filter
+				// otherwise we retrieve the default league
+				let league = args.object['league'];
+				if (!league || typeof league != 'string') {
+					const resource = await this.resourceModel.findOne(
+						{ resource_id },
+						{ defaultLeague: 1 },
+					);
+					league = resource.defaultLeague;
+				}
 				// value expected is s single term, we check if it exists
 				exists = !!(await this.termModel.exists({
 					activity_term: value,
 					resource_id,
+					league,
 				}));
 			}
 

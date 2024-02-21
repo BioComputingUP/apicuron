@@ -1,16 +1,10 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, LeanDocument, Model } from 'mongoose';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
-// import { TransformerService } from '../../shared/transformer/transformer.service';
 import { UpdatePartnerResourceDto } from '../dto/updateResource.dto';
-import { OnEvent } from '@nestjs/event-emitter';
-import {
-	PRE_REPORT_INSERT,
-	PRE_REPORT_INSERT_MANY,
-} from '../../reports/constants';
-import { ReportDocument } from '../../core/schemas/reports.schema';
+import { League } from '../../core/schemas/league/league.schema';
 
 @Injectable()
 export class PartnerResourcesService {
@@ -57,40 +51,11 @@ export class PartnerResourcesService {
 		);
 	}
 
-	@OnEvent(PRE_REPORT_INSERT, { async: true, promisify: true })
-	async onReportInsert(report: ReportDocument) {
-		if (report.league) {
-			return;
-		}
-		const resource = await this.get_resource(report.resource_id);
-		report.league = resource.defaultLeague;
-		return;
-	}
-
-	@OnEvent(PRE_REPORT_INSERT_MANY, { async: true, promisify: true })
-	async preReportInsertMany(reports: ReportDocument[]) {
-		const resource_ids = new Set(reports.map((report) => report.resource_id));
-		const resources = await this.partnerResourceModel.find({
-			resource_id: { $in: Array.from(resource_ids) },
+	public getResourceLeagues(
+		resource: PartnerResourceDocument | LeanDocument<PartnerResource>,
+	): [PartnerResourceDocument | LeanDocument<PartnerResource>, League][] {
+		return resource.leagues.map((league) => {
+			return [resource, league];
 		});
-
-		const resourceMap = new Map(
-			resources.map((resource) => [resource.resource_id, resource]),
-		);
-
-		for (const report of reports) {
-			if (report.league) {
-				continue;
-			}
-			const resource = resourceMap.get(report.resource_id);
-			if (!resource) {
-				throw new UnprocessableEntityException(
-					`Resource with id ${report.resource_id} does not exist`,
-				);
-			}
-			report.league = resource.getLeague(resource.defaultLeague).name;
-		}
-
-		return;
 	}
 }

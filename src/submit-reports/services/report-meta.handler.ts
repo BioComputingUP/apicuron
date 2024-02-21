@@ -8,6 +8,7 @@ import { PartnerResourcesService } from '../../resources/partner-resources/partn
 import { UsersService } from '../../auth/users/users.service';
 import * as _ from 'lodash';
 import { ResourceDocument } from '../../core/schemas/resource/resource.schema';
+import { computePrivacyField } from '../../util/privacy.helper';
 
 @Injectable()
 export class ReportMetaHandler implements ReportHandler {
@@ -89,12 +90,6 @@ export class ReportMetaHandler implements ReportHandler {
 		user: UserDocument | null,
 		report: ReportDocument,
 	): PrivacyType {
-		const { league } = report;
-		const leaguePrivacy = resource.getLeague(league).visibility;
-		const userPrivacy = user?.privacy ?? PrivacyType.private;
-		if ([leaguePrivacy, userPrivacy].includes(PrivacyType.private)) {
-			return PrivacyType.private;
-		}
-		return PrivacyType.public;
+		return computePrivacyField(resource, user, report);
 	}
 }

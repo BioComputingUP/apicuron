@@ -8,14 +8,15 @@ import {
 	ReportMetaSchema,
 	AggregatedReportsSchemaFactory as UserResourceEntitySchemaFactory,
 } from './components/aggregated-data.schema';
-import { ResourceEntity } from './components/resource-entity.schema';
 import { UserResourceEntity } from './components/user-resource-entity.schema';
 
-export type StatisticsDocument = HydratedDocument<Statistics>;
+export type StatisticsDocument = HydratedDocument<
+	Statistics & UserResourceEntity
+>;
 @Schema({
 	collection: 'statistics',
 })
-export class Statistics extends ResourceEntity {
+export class Statistics extends UserResourceEntity {
 	@Prop({ required: true, default: () => 0 })
 	badges_count: number;
 
@@ -69,7 +70,7 @@ export class Statistics extends ResourceEntity {
 }
 
 export function StatisticsSchemaFactory() {
-	const StatisticsSchema = SchemaFactory.createForClass(Statistics);
+	const StatisticsSchema = SchemaFactory.createForClass(Statistics)
 
 	StatisticsSchema.virtual('user', {
 		ref: User.name,

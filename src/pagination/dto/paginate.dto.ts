@@ -1,12 +1,5 @@
 import { Transform, TransformFnParams } from 'class-transformer';
-import {
-	IsInt,
-	IsNumberString,
-	IsOptional,
-	IsPositive,
-	Max,
-	Min,
-} from 'class-validator';
+import { IsInt, IsOptional, Max, Min } from 'class-validator';
 import * as _ from 'lodash';
 import { QueryOptions } from 'mongoose';
 import { PaginationAggregation } from '../interfaces/pagination-aggregation';
@@ -25,7 +18,6 @@ export class PaginateDto {
 	@IsInt()
 	@IsOptional()
 	@Transform(({ value, obj }: TransformFnParams) => {
-		console.log({ value, defLimit: obj.defaultLimit });
 		return Number.isNaN(parseInt(value)) ? obj.defaultLimit : parseInt(value);
 	})
 	limit;

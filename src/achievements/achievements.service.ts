@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { plainToInstance } from 'class-transformer';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
-import { AchievementFilter } from './dto/achievement-filter.dto';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import {
 	BadgeDocument,
@@ -12,13 +10,15 @@ import {
 	Medal,
 	MedalDocument,
 } from '../core/schemas/achievements/medals.schema';
-import { paginate } from '../pagination/paginator';
 import { OnEvent } from '@nestjs/event-emitter';
-import { ON_BADGE_DEF_DELETE, ON_MEDAL_DEF_DELETE } from './constants';
-import { DeleteBadgeDefDto } from './dto/badge-crud.dto';
-import { DeleteMedalDefDto } from './dto/medal-crud.dto';
-import { MedalDefDocument } from '../core/schemas/achievements-def/medal-def.schema';
 import { AchievementDocument } from '../core/schemas/achievements/achievements.schema';
+import { AchievementState } from '../core/enums';
+import {
+	IBadgeDefDeleteEventPayload,
+	IMedalDefDeleteEventPayload,
+	onBadgeDefDelete,
+	onMedalDefDelete,
+} from './events/events';
 
 @Injectable()
 export class AchievementsService {
@@ -28,16 +28,18 @@ export class AchievementsService {
 		@InjectModel(Medal.name) protected medalModel: Model<MedalDocument>,
 	) {}
 
-	@OnEvent(ON_BADGE_DEF_DELETE, { async: true, promisify: true })
-	async onBadgeDefDelete({ resource_id, name }: DeleteBadgeDefDto) {
+	@OnEvent(onBadgeDefDelete, { async: true, promisify: true })
+	async onBadgeDefDelete({ badgeDef }: IBadgeDefDeleteEventPayload) {
+		const { resource_id, name } = badgeDef;
 		return await this.badgeModel.deleteMany({
 			resource_id,
 			name,
 		});
 	}
 
-	@OnEvent(ON_MEDAL_DEF_DELETE, { async: true, promisify: true })
-	async onMedalDefDelete({ resource_id, name }: DeleteMedalDefDto) {
+	@OnEvent(onMedalDefDelete, { async: true, promisify: true })
+	async onMedalDefDelete({ medalDef }: IMedalDefDeleteEventPayload) {
+		const { resource_id, name } = medalDef;
 		return await this.medalModel.deleteMany({
 			resource_id,
 			name,
@@ -48,6 +50,7 @@ export class AchievementsService {
 		filter: FilterQuery<BadgeDocument>,
 		options: QueryOptions<BadgeDocument>,
 	) {
+		filter.state = AchievementState.achieved;
 		const dataPromise = this.badgeModel.find(filter, {}, options);
 		const countPromise = this.badgeModel.count(filter);
 
@@ -62,6 +65,7 @@ export class AchievementsService {
 		filter: FilterQuery<MedalDocument>,
 		options: QueryOptions<MedalDocument>,
 	): Promise<{ data: MedalDocument[]; count: number }> {
+		filter.state = AchievementState.achieved;
 		const dataPromise = this.medalModel.find(filter, {}, options);
 		const countPromise = this.medalModel.count(filter);
 
@@ -123,10 +127,18 @@ export class AchievementsService {
 	}
 
 	public async user_badge_count(resource_id: string, curator_orcid: string) {
-		return await this.badgeModel.count({ resource_id, curator_orcid });
+		return await this.badgeModel.count({
+			resource_id,
+			curator_orcid,
+			state: AchievementState.achieved,
+		});
 	}
 
 	public async user_medal_count(resource_id: string, curator_orcid: string) {
-		return await this.medalModel.count({ resource_id, curator_orcid });
+		return await this.medalModel.count({
+			resource_id,
+			curator_orcid,
+			state: AchievementState.achieved,
+		});
 	}
 }

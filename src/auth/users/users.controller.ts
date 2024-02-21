@@ -2,17 +2,14 @@ import {
 	Body,
 	Controller,
 	Get,
-	Header,
 	Headers,
 	HttpStatus,
 	NotFoundException,
 	Param,
 	Patch,
 	Post,
-	Redirect,
 	Req,
 	Res,
-	StreamableFile,
 	UnauthorizedException,
 	UseGuards,
 } from '@nestjs/common';
@@ -32,15 +29,16 @@ import {
 	ApiSecurity,
 	ApiTags,
 } from '@nestjs/swagger';
-import { AuthorizationHeader, VersionHeader } from '../../swagger/config';
+import { VersionHeader } from '../../swagger/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { UPDATE_USER_PRIVACY } from '../../statistics/constants';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { OrcidGuard } from '../guards/orcid.guard';
 import { Public } from '../decorators/public.decorator';
+import {
+	IUserUpdatePrivacyEventPayload,
+	UserUpdatePrivacyEvent,
+} from './events/update-privacy';
 
 @ApiTags('First Version')
 @Controller('')
@@ -189,19 +187,22 @@ export class UserControllerV2 {
 	async updateProfile(@Req() req, @Body() updateProfile: UpdateProfileDto) {
 		const { orcid_id, ...updateData } = updateProfile;
 		if (req.user.orcid_id == orcid_id) {
-			await this.userModel.updateOne(
+			const updatedUser = await this.userModel.findOneAndUpdate(
 				{
 					orcid_id,
 				},
 				{
 					$set: updateData,
 				},
+				{
+					new: true,
+				},
 			);
 			if (updateData.privacy) {
-				await this.eventEmitter.emitAsync(UPDATE_USER_PRIVACY, {
-					orcid_id,
+				await this.eventEmitter.emitAsync(UserUpdatePrivacyEvent, {
+					user: updatedUser,
 					privacy: updateData.privacy,
-				});
+				} as IUserUpdatePrivacyEventPayload);
 			}
 		} else {
 			throw new UnauthorizedException('Cannot update the data of another User');

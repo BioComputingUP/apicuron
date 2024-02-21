@@ -8,8 +8,7 @@ import {
 	ValidateIf,
 } from 'class-validator';
 import { PaginateDto } from '../../pagination/dto/paginate.dto';
-import { FilterQuery, PipelineStage } from 'mongoose';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 export enum FilterField {
 	displayedName = 'displayedName',
 	orcid_id = 'orcid_id',

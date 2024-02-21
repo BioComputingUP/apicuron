@@ -1,9 +1,9 @@
 import { Prop } from '@nestjs/mongoose';
 import { PrivacyType } from '../../enums';
-import { HydratedDocument } from 'mongoose';
+import { Document, HydratedDocument } from 'mongoose';
 
 export type ResourceEntityDocument = HydratedDocument<ResourceEntity>;
-export class ResourceEntity {
+export class ResourceEntity extends Document {
 	@Prop({ required: true, type: String })
 	resource_id: string;
 

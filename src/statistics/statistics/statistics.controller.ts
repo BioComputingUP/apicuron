@@ -5,7 +5,6 @@ import {
 	Query,
 	Param,
 	Res,
-	Req,
 	UseInterceptors,
 	UseGuards,
 	NotFoundException,

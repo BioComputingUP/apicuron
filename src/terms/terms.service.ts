@@ -2,27 +2,25 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
 import { DeleteTermDto } from './dto/deleteTerm.dto';
-import { TermDto, TermFilterDto } from './dto/term.dto';
 import { UpdateTermDto } from './dto/updateTerm.dto';
 import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
 import { Term, TermDocument } from '../core/schemas/terms.schema';
 import { Report, ReportDocument } from '../core/schemas/reports.schema';
-import {
-	AchievementDef,
-	AchievementDefDocument,
-} from '../core/schemas/achievements-def/achievement-def.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ON_TERM_DELETED, ON_TERM_UPDATED } from './constants';
 import { CreateTermDto } from './dto/createTerm.dto';
 import { ResourceEntity } from '../core/schemas/components/resource-entity.schema';
+import {
+	ITermDeletedEventPayload,
+	ITermUpdatedEventPayload,
+	onTermDeletedEvent,
+	onTermUpdatedEvent,
+} from './events/events';
 
 @Injectable()
 export class TermsService {
 	constructor(
 		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-		// @InjectModel(AchievementDef.name)
-		// protected achievementDefModel: Model<AchievementDefDocument>,
 		protected eventEmitter: EventEmitter2,
 		protected resourceService: PartnerResourcesService,
 	) {}
@@ -70,17 +68,19 @@ export class TermsService {
 			term.league = resource.defaultLeague;
 		}
 
-		const updated_term = await this.termModel.findOneAndUpdate(
-			{ resource_id, activity_term },
+		const updatedTerm = await this.termModel.findOneAndUpdate(
+			{ resource_id, activity_term, league },
 			{
 				$set: term,
 			},
 			{ new: true },
 		);
 
-		await this.eventEmitter.emitAsync(ON_TERM_UPDATED, updated_term);
+		await this.eventEmitter.emitAsync(onTermUpdatedEvent, {
+			term: updatedTerm,
+		} as ITermUpdatedEventPayload);
 
-		return updated_term;
+		return updatedTerm;
 	}
 
 	async createTerm(term: CreateTermDto) {
@@ -103,7 +103,9 @@ export class TermsService {
 		}
 		const response = await this.termModel.deleteOne(term);
 
-		await this.eventEmitter.emitAsync(ON_TERM_DELETED, term);
+		await this.eventEmitter.emitAsync(onTermDeletedEvent, {
+			term,
+		} as ITermDeletedEventPayload);
 
 		if (response.deletedCount == 1) {
 			return true;

@@ -21,13 +21,11 @@ import { plainToClass } from 'class-transformer';
 import * as _ from 'lodash';
 import { MongoBulkWriteError } from 'mongodb';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import {
-	POST_REPORT_INSERT,
-	POST_REPORT_INSERT_MANY,
-	PRE_REPORT_INSERT,
-	PRE_REPORT_INSERT_MANY,
-} from '../../reports/constants';
 import { SubmitReportService } from '../../submit-reports/services/submit-reports.service';
+import {
+	IPostReportInsertManyEventPayload,
+	postReportInsertManyEvent,
+} from '../../submit-reports/events/events';
 
 export type ValidatedReport = {
 	report: SubmitReportDto;
@@ -146,10 +144,9 @@ export class SubmitBulkTask {
 			// });
 			this.logger.debug(`inserted ${insertResult.insertedCount} reports`);
 
-			await this.eventEmitter.emitAsync(
-				POST_REPORT_INSERT_MANY,
-				reportDocuments,
-			);
+			await this.eventEmitter.emitAsync(postReportInsertManyEvent, {
+				reports: reportDocuments,
+			} as IPostReportInsertManyEventPayload);
 
 			const successCount = validReports.length;
 			const errors = invalidReports

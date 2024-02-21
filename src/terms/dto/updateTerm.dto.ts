@@ -29,7 +29,7 @@ export class UpdateTermDto {
 	// is only valid when the ActivityTerm doesn't exist in the database
 	@Validate(ActivityTermExists)
 	@IsNotEmpty()
-	activity_term?: string;
+	activity_term: string;
 
 	@IsOptional()
 	description?: string;
@@ -39,7 +39,7 @@ export class UpdateTermDto {
 	resource_uri?: string;
 
 	@IsNotEmpty()
-	resource_id?: string;
+	resource_id: string;
 
 	@Min(1)
 	@IsNumber({

@@ -11,7 +11,6 @@ import {
 import {
 	CreateMedalDto,
 	DeleteMedalDefDto,
-	MedalsFilter,
 	UpdateMedalDefDto,
 } from './dto/medal-crud.dto';
 import {
@@ -19,16 +18,21 @@ import {
 	AchievementDefDocument,
 } from '../core/schemas/achievements-def/achievement-def.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import {
-	ON_BADGE_DEF_DELETE,
-	ON_BADGE_DEF_UPDATE,
-	ON_MEDAL_DEF_DELETE,
-	ON_MEDAL_DEF_UPDATE,
-} from './constants';
 import { BadgeDefDocument } from '../core/schemas/achievements-def/badge-def.schema';
 import { MedalDefDocument } from '../core/schemas/achievements-def/medal-def.schema';
 import { AchievementType } from '../core/enums';
-import { update } from 'lodash';
+import { ComputeMedalsService } from './services/compute-medals.service';
+import { ComputeBadgesService } from './services/compute-badges.service';
+import {
+	IBadgeDefDeleteEventPayload,
+	IBadgeDefUpdateEventPayload,
+	IMedalDefDeleteEventPayload,
+	IMedalDefUpdateEventPayload,
+	onBadgeDefDelete,
+	onBadgeDefUpdate,
+	onMedalDefDelete,
+	onMedalDefUpdate,
+} from './events/events';
 @Injectable()
 export class AchievementsDefService {
 	constructor(
@@ -36,6 +40,8 @@ export class AchievementsDefService {
 		private achievementDefModel: Model<AchievementDefDocument>,
 		protected partnerResourceService: PartnerResourcesService,
 		protected eventEmitter: EventEmitter2,
+		protected computeMedals: ComputeMedalsService,
+		protected computeBadges: ComputeBadgesService,
 	) {}
 	async getResourceMedalDefs({
 		resource_id,
@@ -119,7 +125,9 @@ export class AchievementsDefService {
 			{ new: true },
 		);
 
-		await this.eventEmitter.emitAsync(ON_BADGE_DEF_UPDATE, badge);
+		await this.eventEmitter.emitAsync(onBadgeDefUpdate, {
+			badgeDef: badge,
+		} as IBadgeDefUpdateEventPayload);
 
 		return badge;
 	}
@@ -135,7 +143,9 @@ export class AchievementsDefService {
 			type: AchievementType.badge,
 		});
 
-		await this.eventEmitter.emitAsync(ON_BADGE_DEF_DELETE, deleteBadge);
+		await this.eventEmitter.emitAsync(onBadgeDefDelete, {
+			badgeDef: deleteBadge,
+		} as IBadgeDefDeleteEventPayload);
 		return delete_confirmation.deletedCount;
 	}
 
@@ -192,7 +202,9 @@ export class AchievementsDefService {
 				},
 			);
 
-		await this.eventEmitter.emitAsync(ON_MEDAL_DEF_UPDATE, medal);
+		await this.eventEmitter.emitAsync(onMedalDefUpdate, {
+			medalDef: medal,
+		} as IMedalDefUpdateEventPayload);
 
 		return medal;
 	}
@@ -208,28 +220,11 @@ export class AchievementsDefService {
 			type: AchievementType.medal,
 		});
 
-		await this.eventEmitter.emitAsync(ON_MEDAL_DEF_DELETE, deleteMedal);
+		await this.eventEmitter.emitAsync(onMedalDefDelete, {
+			medalDef: deleteMedal,
+		} as IMedalDefDeleteEventPayload);
 		return delete_confirmation.deletedCount;
 	}
-
-	// @OnEvent(ON_TERM_DELETED, { async: true })
-	// async removeTermFromAchievements({
-	// 	resource_id,
-	// 	activity_term,
-	// }: {
-	// 	resource_id: string;
-	// 	activity_term: string;
-	// }) {
-	// 	return await this.achievementDefModel.updateMany(
-	// 		{
-	// 			resource_id,
-	// 			list_terms: activity_term,
-	// 		},
-	// 		{
-	// 			$pull: { list_terms: activity_term },
-	// 		},
-	// 	);
-	// }
 
 	async count() {
 		return await this.achievementDefModel.count();

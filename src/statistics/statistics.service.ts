@@ -1,16 +1,13 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, PipelineStage, QueryOptions } from 'mongoose';
-import { User, UserDocument, UserSchema } from '../core/schemas/user.schema';
+import { FilterQuery, Model, QueryOptions } from 'mongoose';
+import { User, UserDocument } from '../core/schemas/user.schema';
 import {
 	Statistics,
 	StatisticsDocument,
 } from '../core/schemas/statistics.schema';
 import { PartnerResourcesService } from '..//resources/partner-resources/partner-resources.service';
 import { GetStatisticsDto } from './dto/get-statistics.dto';
-import { OnEvent } from '@nestjs/event-emitter';
-import { UPDATE_USER_PRIVACY } from './constants';
-import { PublicStatistics } from './schema/public-statistics.schema';
 
 @Injectable()
 export class StatisticsService {
@@ -22,38 +19,6 @@ export class StatisticsService {
 	) {}
 
 	logger = new Logger(StatisticsService.name);
-
-	@OnEvent(UPDATE_USER_PRIVACY, { async: true, promisify: true })
-	async setUserStatsPrivacy({
-		orcid_id,
-		privacy,
-	}: {
-		orcid_id: string;
-		privacy: 'public' | 'private';
-	}) {
-		this.logger.log(
-			`Handling Update user stat privacy event in statistics service ${orcid_id} ${privacy} !`,
-		);
-
-		const result = await this.statisticsModel.updateMany(
-			{
-				curator_orcid: orcid_id,
-			},
-			{
-				$set: {
-					activityClass: {
-						privacy,
-					},
-				},
-			},
-			{
-				overwriteDiscriminatorKey: true,
-			},
-		);
-
-		this.logger.log(result);
-		return result;
-	}
 
 	async get_all_statistics(
 		getStatDto: GetStatisticsDto,
@@ -86,16 +51,20 @@ export class StatisticsService {
 			__v: 0,
 			last_update: 0,
 			orcid_permission: 0,
+			cookie_token: 0,
+			resource_settings: 0,
 			refresh_token: 0,
 			resources: 0,
 			orcid_scope: 0,
 			orcid_work_put_codes: 0,
 		};
-		const userFieldsToRemove = Object.keys(projectUserFields);
 
-		const userFieldsGroupStage = Object.keys(UserSchema.paths)
-			.filter((key) => !userFieldsToRemove.includes(key))
-			.reduce((obj, key) => ({ ...obj, [key]: { $first: '$' + key } }), {});
+		const userFieldsGroupStageFields = {
+			avatar: { $first: '$avatar' },
+			orcid_id: { $first: '$orcid_id' },
+			displayedName: { $first: '$displayedName' },
+			biography: { $first: '$biography' },
+		};
 
 		// add privacy fitlers to mongoQuery
 
@@ -129,7 +98,7 @@ export class StatisticsService {
 			{
 				$group: {
 					_id: '$orcid_id',
-					...userFieldsGroupStage,
+					...userFieldsGroupStageFields,
 					stats: {
 						$addToSet: '$stats',
 					},
@@ -150,7 +119,7 @@ export class StatisticsService {
 			const obj = { $sort: {} };
 			// if the field belongs  to userFields it is directly used, otherwise it belongs to the
 			// statistics field and we append "stats."
-			const sortField = Object.keys(userFieldsGroupStage).includes(
+			const sortField = Object.keys(userFieldsGroupStageFields).includes(
 				getStatDto.sortBy,
 			)
 				? getStatDto.sortBy

@@ -46,6 +46,6 @@ export class UniqueRule implements ValidatorConstraintInterface {
 	}
 
 	defaultMessage({ property, value }: ValidationArguments) {
-		return `The ${property} "${value}" Already taken`;
+		return `The ${property} "${value}" is Already taken`;
 	}
 }

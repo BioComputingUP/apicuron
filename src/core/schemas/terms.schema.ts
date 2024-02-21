@@ -36,4 +36,4 @@ export class Term extends ResourceEntity {
 	score: number;
 }
 
-export const TermSchema = SchemaFactory.createForClass(Term);
+export const TermSchema = SchemaFactory.createForClass(Term).loadClass(Term);

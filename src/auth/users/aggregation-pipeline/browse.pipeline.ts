@@ -1,4 +1,4 @@
-import { PipelineStage } from "mongoose";
+import { PipelineStage } from 'mongoose';
 
 export function browse_v1_pipeline({
 	curator_name,
@@ -6,41 +6,39 @@ export function browse_v1_pipeline({
 	orcid_filter,
 	achievements,
 	resource_uri,
-    sort_field = '$total_score',
-    sort_value,
-    page_size,
-    page
+	sort_field = '$total_score',
+	sort_value,
+	page_size,
+	page,
 }: {
 	curator_name?: string;
 	orcid_id?: string;
 	orcid_filter?: string;
 	resource_uri?: string;
 	achievements?: string | Array<string>;
-    sort_field?: string;
-    sort_value?: string;
-    page_size?: number
-    page?: number
-
+	sort_field?: string;
+	sort_value?: string;
+	page_size?: number;
+	page?: number;
 }): PipelineStage[] {
+	// building the first match object of the aggregation pipeline
+	// curator_name filter
 
-    // building the first match object of the aggregation pipeline
-    // curator_name filter
+	const first_match_obj = {};
+	if (!!curator_name) {
+		first_match_obj['full_name'] = {
+			$regex: `.*${curator_name}.*`,
+			$options: 'i',
+		};
+	}
+	if (!!curator_orcid) {
+		first_match_obj['orcid_id'] = {
+			$regex: `.*${curator_orcid}.*`,
+			$options: 'i',
+		};
+	}
 
-    let first_match_obj = {}
-    if(!!curator_name){
-        first_match_obj['full_name'] = {
-                $regex: `.*${curator_name}.*`, $options: 'i'
-            }
-    }
-    if(!!curator_orcid){
-        first_match_obj['orcid_id']= {
-            $regex: `.*${curator_orcid}.*`, $options: 'i'
-        }
-    }
-
-
-    
-    // building the match object in the middle of the aggregation pipeline
+	// building the match object in the middle of the aggregation pipeline
 	let achievements_filter: any = achievements;
 	if (Array.isArray(achievements) && achievements.length > 0) {
 		achievements_filter = {
@@ -59,30 +57,30 @@ export function browse_v1_pipeline({
 		};
 	}
 
-    // setting the sort_field, sort direction ans skip/limit values
-    const column_list = [
-        'curator_orcid',
-        'family_name',
-        'given_name',
-        'total_score',
-        'generation_count',
-        'revision_count',
-        'invalidation_count',
-        'generation_score',
-        'revision_score',
-        'invalidation_score',
-        'badges_count',
-        'medals_count',
-        'ranking'
-    ];
+	// setting the sort_field, sort direction ans skip/limit values
+	const column_list = [
+		'curator_orcid',
+		'family_name',
+		'given_name',
+		'total_score',
+		'generation_count',
+		'revision_count',
+		'invalidation_count',
+		'generation_score',
+		'revision_score',
+		'invalidation_score',
+		'badges_count',
+		'medals_count',
+		'ranking',
+	];
 
-    if(sort_field != '$total_score' && !column_list.includes(sort_field)){
-        sort_field = '$total_score'
-    }
+	if (sort_field != '$total_score' && !column_list.includes(sort_field)) {
+		sort_field = '$total_score';
+	}
 
-    const sort_direction = sort_value === 'asc' ? 1 : -1;
-    const limit = !!page_size ? page_size : 10;
-    const skip = !!page ? page : 0;
+	const sort_direction = sort_value === 'asc' ? 1 : -1;
+	const limit = !!page_size ? page_size : 10;
+	const skip = !!page ? page : 0;
 
 	return [
 		{

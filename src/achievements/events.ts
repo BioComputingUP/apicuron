@@ -23,4 +23,10 @@ export const onIncrementalBadgeCompute = 'on.compute.badges.incremental';
 export interface IincrementalBadgeComputeEventPayload {
 	resource_id: string;
 	curator_orcid: string;
+	league: string;
+}
+
+export const onComputeResourceMedals = 'on.compute.medals.resource';
+export interface IComputeResourceMedalsEventPayload {
+	resource_id: string;
 }

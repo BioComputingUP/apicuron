@@ -39,7 +39,7 @@ export class Medal extends UserResourceEntity {
 	name: string;
 
 	@Prop({
-		required: true,
+		required: false,
 	})
 	resource_uri: string;
 

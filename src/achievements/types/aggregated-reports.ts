@@ -5,3 +5,7 @@ export type AggregatedReportsByActivities = {
 	league: string;
 	curator_orcid: string;
 };
+
+export type AggregatedReportsByMedalDef = AggregatedReportsByActivities & {
+	score_total: number;
+};

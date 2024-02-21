@@ -24,6 +24,7 @@ import {
 		AchievementsModule,
 		CacheModule.register({
 			max: 100,
+			shouldCloneBeforeSet: false,
 		}),
 	],
 	controllers: [StatisticsController, OldStatisticsController],

@@ -8,17 +8,18 @@ import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { InsertManyResult, Model } from 'mongoose';
 import { SubmitReportDto } from '../dto/submit-report.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import {
-	PRE_REPORT_INSERT,
-	POST_REPORT_INSERT,
-	PRE_REPORT_INSERT_MANY,
-	POST_REPORT_INSERT_MANY,
-	REPORTS_DELETED_ALL_RESOURCE,
-} from '../../reports/constants';
 import { ReportDto } from '../../reports/dto/report.dto';
 import { DeleteResult } from 'mongodb';
 import { UsersService } from '../../auth/users/users.service';
 import { ReportMetaHandler } from './report-meta.handler';
+import {
+	IPostDeleteAllResourceReports,
+	IPostReportInsertManyEventPayload,
+	IPostReportInsertSingleEventPayload,
+	postDeleteAllResourceReports,
+	postReportInsertManyEvent,
+	postReportInsertSingleEvent,
+} from '../events/events';
 
 @Injectable()
 export class SubmitReportService {
@@ -52,11 +53,9 @@ export class SubmitReportService {
 		const { deletedCount, acknowledged } = await this.reportModel.deleteMany({
 			resource_id,
 		});
-		this.eventEmitter.emit(REPORTS_DELETED_ALL_RESOURCE, {
+		await this.eventEmitter.emitAsync(postDeleteAllResourceReports, {
 			resource_id,
-			deletedCount,
-			acknowledged,
-		});
+		} as IPostDeleteAllResourceReports);
 		return { deletedCount, acknowledged };
 	}
 
@@ -72,10 +71,9 @@ export class SubmitReportService {
 			await instance.save();
 
 			if (!options.preventEvents) {
-				await this.eventEmitter.emitAsync(
-					POST_REPORT_INSERT,
-					report as ReportDocument,
-				);
+				await this.eventEmitter.emitAsync(postReportInsertSingleEvent, {
+					report,
+				} as IPostReportInsertSingleEventPayload);
 			}
 			return instance;
 		} catch (e: any) {
@@ -100,10 +98,9 @@ export class SubmitReportService {
 				{ rawResult: true },
 			);
 			if (!options.preventEvents) {
-				await this.eventEmitter.emitAsync(
-					POST_REPORT_INSERT_MANY,
-					reports as ReportDto[],
-				);
+				await this.eventEmitter.emitAsync(postReportInsertManyEvent, {
+					reports,
+				} as IPostReportInsertManyEventPayload);
 			}
 			return {
 				insertedCount,

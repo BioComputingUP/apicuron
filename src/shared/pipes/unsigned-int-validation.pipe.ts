@@ -21,7 +21,7 @@ export class ParseUnsignedIntPipe implements PipeTransform {
 				} else {
 					throw new BadRequestException(
 						'Validation Error: numeric string received is either < 1 or is a float',
-						metadata.data
+						metadata.data,
 					);
 				}
 			}

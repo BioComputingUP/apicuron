@@ -29,8 +29,8 @@ import { EmailModule } from './email/email.module';
 import { CoreApicuronModule } from './core/core.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MongoEventsModule } from './mongo-events/mongo-events.module';
-import { MongoEventsService } from './mongo-events/mongo-events.service';
 import { SubmitReportModule } from './submit-reports/submit-reports.module';
+import { CacheModule } from '@nestjs/cache-manager';
 const logger = new Logger('AppModule');
 
 @Module({
@@ -45,6 +45,11 @@ const logger = new Logger('AppModule');
 				logLevels: ['debug', 'error', 'log', 'error', 'warn'],
 				release: '2.0.0',
 			}),
+		}),
+
+		CacheModule.register({
+			store: 'memory',
+			shouldCloneBeforeSet: false,
 		}),
 
 		EventEmitterModule.forRoot({
@@ -68,23 +73,18 @@ const logger = new Logger('AppModule');
 		// to be able to access the configService asnchronously because it cannot be loaded sooner
 		// due to the fact that this is the appmodule
 		MongooseModule.forRootAsync({
-			inject: [ConfigService, MongoEventsService],
+			inject: [ConfigService],
 			imports: [MongoEventsModule],
 			useFactory: async (
 				configService: ConfigService,
-				mongoEventsService: MongoEventsService,
 			): Promise<MongooseModuleOptions> => {
 				const db_host = configService.get<string>('db_host');
 				const database = configService.get<string>('database');
 				const port = configService.get<number>('db_port');
-				const uri = `mongodb://${db_host}:${port}/${database}`;
+				const uri = `mongodb://${db_host}:${port}/${database}?retryWrites=true&w=majority`;
 				logger.log(`MongoDB Connection setup uri: ${uri}`);
 				return {
 					uri,
-					connectionFactory(connection: any, name: string) {
-						connection.plugin(mongoEventsService.loadMongoosePlugin());
-						return connection;
-					},
 				};
 			},
 		}),

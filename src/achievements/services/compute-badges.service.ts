@@ -14,15 +14,15 @@ import {
 	BadgeDefDocument,
 } from '../../core/schemas/achievements-def/badge-def.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ON_BADGES_UPDATE } from '../constants';
 import { AchievementState } from '../../core/enums';
 import { computePrivacyField } from '../../util/privacy.helper';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { AggregatedReportsByActivities } from '../types/aggregated-reports';
 import {
-	IComputeBadgeManyEventPayload,
+	IComputeResourceBadgesEventPayload,
+	IComputeUserBadgesEventPayload,
 	IincrementalBadgeComputeEventPayload,
-	onComputeManyBadges,
+	onComputeResourceBadges,
 	onComputeUserBadges,
 	onIncrementalBadgeCompute,
 } from '../events';
@@ -47,9 +47,9 @@ export class ComputeBadgesService {
 			resource_id,
 		});
 
-		await this.eventEmitter.emitAsync(ON_BADGES_UPDATE, {
+		await this.eventEmitter.emitAsync(onComputeResourceBadges, {
 			resource_id,
-		});
+		} as IComputeResourceBadgesEventPayload);
 	}
 
 	public async computeUserBadges(payload: {
@@ -77,9 +77,13 @@ export class ComputeBadgesService {
 		await this.eventEmitter.emitAsync(onComputeUserBadges, {
 			resource_id,
 			curator_orcid,
-		});
+		} as IComputeUserBadgesEventPayload);
 	}
 
+	/**
+	 * Computes incremental badges based on the provided report.
+	 * @param report - The report document containing information for badge computation.
+	 */
 	public async incrementalBadgeCompute(report: ReportDocument) {
 		const { activity_term, resource_id, league } = report;
 
@@ -101,6 +105,14 @@ export class ComputeBadgesService {
 		);
 	}
 
+	/**
+	 * Upserts a badge into the database using the report as an increment
+	 *
+	 * @param badgeDef - The badge definition document.
+	 * @param report - The report document.
+	 * @returns The update response from the database.
+	 * @throws Error if the update fails.
+	 */
 	private async upsertBadge(
 		badgeDef: BadgeDefDocument,
 		report: ReportDocument,
@@ -221,7 +233,7 @@ export class ComputeBadgesService {
 					badgeDef.resource_id,
 				);
 			}
-			const reportAggregationByUser = this.loadBadgeReportsByUser(
+			const reportAggregationByUser = this.aggregateBadgeReportsByUser(
 				badgeDef,
 				reportFilter,
 			);
@@ -254,6 +266,14 @@ export class ComputeBadgesService {
 		// } as IComputeBadgeManyEventPayload);
 	}
 
+	/**
+	 * Builds a BadgeDocument object based on the provided parameters.
+	 * @param badgeDef - The BadgeDefDocument object defining the badge.
+	 * @param reportAgg - The AggregatedReportsByActivities object containing aggregated reports.
+	 * @param resource - The PartnerResourceDocument object representing the resource.
+	 * @param user - The UserDocument object representing the user.
+	 * @returns The built BadgeDocument object.
+	 */
 	private buildBadgeFromAggregatedReports(
 		badgeDef: BadgeDefDocument,
 		reportAgg: AggregatedReportsByActivities,
@@ -279,7 +299,7 @@ export class ComputeBadgesService {
 	 * @param badgeDef - The badge definition.
 	 * @returns A promise that resolves to the aggregated badge reports.
 	 */
-	private loadBadgeReportsByUser(
+	private aggregateBadgeReportsByUser(
 		badgeDef: BadgeDefDocument,
 		reportFilter: FilterQuery<ReportDocument> = {},
 		cursorOptions: { batchSize: number } = { batchSize: 50 },
@@ -294,7 +314,7 @@ export class ComputeBadgesService {
 			})
 			.group({
 				_id: '$curator_orcid',
-				count: { $count: {} },
+				count: { $sum: 1 },
 				resource_id: { $first: '$resource_id' },
 				activity_terms: { $addToSet: '$activity_term' },
 				league: { $first: '$league' },

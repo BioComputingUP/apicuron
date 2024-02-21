@@ -12,10 +12,11 @@ import * as _ from 'lodash';
 import { paginate } from '../pagination/paginator';
 import { PaginationAggregation } from '../pagination/interfaces/pagination-aggregation';
 import { OnEvent } from '@nestjs/event-emitter';
-import { UPDATE_USER_PRIVACY } from '../statistics/constants';
-import { ON_TERM_DELETED } from '../terms/constants';
-import { Term } from '../core/schemas/terms.schema';
 import { UsersService } from '../auth/users/users.service';
+import {
+	ITermDeletedEventPayload,
+	onTermDeletedEvent,
+} from '../terms/events/events';
 
 @Injectable()
 export class ReportsService {
@@ -28,16 +29,6 @@ export class ReportsService {
 	) {}
 
 	logger = new Logger(ReportsService.name);
-
-	@OnEvent(UPDATE_USER_PRIVACY, { async: true, promisify: true })
-	async updateReportsPrivacy({ orcid_id, privacy }) {
-		const result = await this.reportModel.updateMany(
-			{ curator_orcid: orcid_id },
-			{ $set: { privacy } },
-		);
-
-		return result;
-	}
 
 	async getUserReports(orcid_id: string): Promise<Report[]> {
 		return await this.reportModel.find({
@@ -357,8 +348,8 @@ export class ReportsService {
 		return converter[groupBy];
 	}
 
-	@OnEvent(ON_TERM_DELETED, { async: true, promisify: true })
-	async deleteTermReports(term: Term) {
+	@OnEvent(onTermDeletedEvent, { async: true, promisify: true })
+	async deleteTermReports({ term }: ITermDeletedEventPayload) {
 		return await this.reportModel.deleteMany({
 			resource_id: term.resource_id,
 			activity_term: term.activity_term,

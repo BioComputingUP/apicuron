@@ -23,10 +23,6 @@ import {
 } from '@nestjs/swagger';
 import { HasAResourceGuard } from '../../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
-import {
-	POST_REPORT_INSERT,
-	POST_REPORT_INSERT_MANY,
-} from '../../reports/constants';
 import { ReportDto } from '../../reports/dto/report.dto';
 import {
 	SubmitBulkDto,
@@ -41,6 +37,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import _ from 'lodash';
 import { SchedulerClientService } from '../../scheduler-client/services/scheduler-client.service';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import {
+	IPostReportInsertManyEventPayload,
+	IPostReportInsertSingleEventPayload,
+	postReportInsertManyEvent,
+	postReportInsertSingleEvent,
+} from '../events/events';
 
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
@@ -161,7 +163,9 @@ export class SubmitReportsController {
 
 		res.send(report_confirmation);
 
-		await this.eventEmitter.emitAsync(POST_REPORT_INSERT, report as ReportDto);
+		await this.eventEmitter.emitAsync(postReportInsertSingleEvent, {
+			report,
+		} as IPostReportInsertSingleEventPayload);
 	}
 
 	@ApiOperation({
@@ -209,10 +213,9 @@ export class SubmitReportsController {
 		// send the insertion response
 		res.send(response);
 
-		await this.eventEmitter.emitAsync(
-			POST_REPORT_INSERT_MANY,
-			reportSubmission.reports as ReportDto[],
-		);
+		await this.eventEmitter.emitAsync(postReportInsertManyEvent, {
+			reports: reportSubmission.reports,
+		} as IPostReportInsertManyEventPayload);
 
 		return;
 	}

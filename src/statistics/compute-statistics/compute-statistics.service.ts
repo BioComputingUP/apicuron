@@ -7,16 +7,12 @@ import {
 	StatisticsDocument,
 } from '../../core/schemas/statistics.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
-import { Aggregate, FilterQuery, Model, UpdateWriteOpResult } from 'mongoose';
+import { FilterQuery, LeanDocument, Model } from 'mongoose';
 import { MongoServerError } from 'mongodb';
-// import { StatisticsTerms } from '../../core/schemas/statistics-terms.schema';
-// import {
-// 	ON_COMPUTE_RESOURCE_ACHIEVEMENTS,
-// 	ON_COMPUTE_USER_ACHIEVEMENTS,
-// } from '../../achievements/constants';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
-import * as _ from 'lodash';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { computePrivacyField } from '../../util/privacy.helper';
 @Injectable()
 export class ComputeStatisticsService {
 	logger = new Logger(ComputeStatisticsService.name);
@@ -29,138 +25,152 @@ export class ComputeStatisticsService {
 		protected partnerResourceService: PartnerResourcesService,
 		@Inject(CACHE_MANAGER) private cacheManager: Cache,
 	) {}
-
-	private async retrieveTerm({
-		resource_id,
-		activity_term,
-	}: {
-		resource_id: string;
-		activity_term: string;
-	}): Promise<Term> {
-		const cacheId = `term: ${resource_id}:${activity_term}`;
-		const cached = (await this.cacheManager.get(cacheId)) as Term | null;
-		if (cached) {
-			return cached;
+	defaultCacheTTl = 10;
+	private async getTerm(
+		termFilter: FilterQuery<TermDocument>,
+	): Promise<TermDocument> {
+		const { resource_id, activity_term, league } = termFilter;
+		const termCacheKey = `term: ${resource_id}:${activity_term}:${league}`;
+		const cachedTerm = (await this.cacheManager.get(
+			termCacheKey,
+		)) as TermDocument | null;
+		if (cachedTerm) {
+			return cachedTerm;
 		}
 
 		const term = await this.termModel.findOne({ resource_id, activity_term });
-		await this.cacheManager.set(cacheId, term);
+		await this.cacheManager.set(termCacheKey, term, this.defaultCacheTTl);
 		return term;
 	}
 
-	// async updateStatByReport(
-	// 	report: ReportDocument,
-	// ): Promise<UpdateWriteOpResult> {
-	// 	const { resource_id, curator_orcid, activity_term } = report;
+	private getRelatedStatsFilter(
+		report: ReportDocument | Report | LeanDocument<Report>,
+	): FilterQuery<StatisticsDocument> {
+		const { curator_orcid, resource_id, league } = report;
+		return {
+			curator_orcid,
+			resource_id,
+			league: league,
+		};
+	}
 
-	// 	const term = await this.retrieveTerm({ resource_id, activity_term });
-	// 	if (!term) {
-	// 		this.logger.warn(
-	// 			`Warning, report found with term ${activity_term} but no corresponding term was found, deleting report`,
-	// 		);
+	private getRelatedTermFilter(
+		report: ReportDocument | Report | LeanDocument<Report>,
+	): FilterQuery<TermDocument> {
+		const { resource_id, activity_term, league } = report;
+		return {
+			resource_id,
+			activity_term,
+			league,
+		};
+	}
 
-	// 		await this.reportModel.deleteMany({
-	// 			activity_term: report.activity_term,
-	// 		});
-	// 		return {
-	// 			upsertedCount: 0,
-	// 			upsertedId: null,
-	// 			modifiedCount: 0,
-	// 			acknowledged: false,
-	// 			matchedCount: 0,
-	// 		};
-	// 	}
+	async upsertStatByReport(
+		report: (ReportDocument | Report | LeanDocument<Report>) & {
+			count?: number;
+		},
+	): Promise<void> {
+		const { resource_id, curator_orcid, activity_term, league } = report;
+		const reportCount = report.count ?? 1;
 
-	// 	const activityClass = report.activityClass;
+		if (!reportCount) {
+			this.logger.error(
+				'ReportCount was found null or undefined' + reportCount,
+			);
+		}
 
-	// 	try {
-	// 		const updateResponse = await this.statModel.updateOne(
-	// 			// const updateResponse = await this.statModel.findOneAndUpdate(
-	// 			{
-	// 				curator_orcid,
-	// 				resource_id,
-	// 				activityClass: activityClass,
-	// 			},
-	// 			{
-	// 				$setOnInsert: {
-	// 					curator_orcid,
-	// 					resource_id,
-	// 					activityClass: activityClass,
-	// 				},
-	// 				$inc: {
-	// 					[term.activity_category + '_count']: 1,
-	// 					[term.activity_category + '_score']: term.score,
-	// 					total_score: term.score,
-	// 					total_count: 1,
-	// 				},
-	// 			},
-	// 			{
-	// 				upsert: true,
-	// 			},
-	// 		);
+		const term = await this.getTerm(this.getRelatedTermFilter(report));
+		if (!term) {
+			this.logger.warn(
+				`Warning, report found with term ${activity_term} but no corresponding term was found, deleting report`,
+			);
 
-	// 		return updateResponse;
-	// 	} catch (err: any) {
-	// 		if (!(err instanceof MongoServerError) || err.code != 11000) {
-	// 			this.logger.error(err.message, err.stack, err.name);
-	// 			throw new Error(
-	// 				`Failed to update statistics for user: ${curator_orcid} at the resource ${resource_id} `,
-	// 			);
-	// 		}
-	// 		this.logger.verbose('Error upserting document update, attempt to update');
+			await this.reportModel.deleteMany({
+				activity_term: report.activity_term,
+			});
+			return null;
+		}
+		const scoreIncrement = term.score * reportCount;
 
-	// 		const updateResponse = await this.statModel.updateOne(
-	// 			{
-	// 				curator_orcid,
-	// 				resource_id,
-	// 				activityClass: activityClass,
-	// 			},
-	// 			{
-	// 				$inc: {
-	// 					[term.activity_category + '_count']: 1,
-	// 					[term.activity_category + '_score']: term.score,
-	// 					total_score: term.score,
-	// 					total_count: 1,
-	// 				},
-	// 			},
-	// 		);
+		try {
+			await this.statModel.findOneAndUpdate(
+				this.getRelatedStatsFilter(report),
+				{
+					$inc: {
+						[term.activity_category + '_count']: reportCount,
+						total_count: reportCount,
+						[term.activity_category + '_score']: scoreIncrement,
+						total_score: scoreIncrement,
+					},
+					$setOnInsert: {
+						curator_orcid,
+						resource_id,
+						league,
+					},
+				},
+				{
+					upsert: true,
+					rawResult: true,
+				},
+			);
 
-	// 		return updateResponse;
-	// 	}
-	// }
+			return;
+		} catch (err: any) {
+			if (!(err instanceof MongoServerError) || err.code != 11000) {
+				this.logger.error(err.message, err.stack, err.name);
+				throw new Error(
+					`Failed to update statistics for user: ${curator_orcid} at the resource ${resource_id} `,
+				);
+			}
+			this.logger.verbose('Error upserting document update, attempt to update');
 
-	// async testComputeStats() {
-	// 	await this.statModel.deleteMany({});
-	// 	const reports$ = this.reportModel.find({}, { batchSize: 100 });
+			await this.statModel.findOneAndUpdate(
+				this.getRelatedStatsFilter(report),
+				{
+					$inc: {
+						[term.activity_category + '_count']: reportCount,
+						total_count: reportCount,
+						[term.activity_category + '_score']: scoreIncrement,
+						total_score: scoreIncrement,
+					},
+				},
+			);
 
-	// 	const promises$ = [];
+			return;
+		}
+	}
 
-	// 	for await (const report of reports$) {
-	// 		const promise = this.updateStatByReport(report);
-	// 		promises$.push(promise);
-	// 	}
+	private reportIsRelatedToStat(
+		report: ReportDocument,
+		stat: StatisticsDocument,
+	): boolean {
+		return (
+			report.resource_id === stat.resource_id &&
+			report.curator_orcid === stat.curator_orcid &&
+			report.league === stat.league
+		);
+	}
 
-	// 	await Promise.all(promises$);
-	// }
+	async getResourceTerms(
+		resource_id: string,
+	): Promise<Map<string, LeanDocument<Term>>> {
+		const terms = await this.termModel.find({ resource_id }).lean();
+		const termsMap = new Map<string, LeanDocument<Term>>();
+		terms.forEach((term) => {
+			termsMap.set(`${term.league}:${term.activity_term}`, term);
+		});
+		return termsMap;
+	}
 
-	async computeStatistics(filter: FilterQuery<ReportDocument> = {}) {
-		await this.statModel.deleteMany({});
-		const reportsByTerms: Aggregate<
-			{
-				resource_id: string;
-				curator_orcid: string;
-				activity_term: string;
-				count;
-				number;
-			}[]
-		> = this.reportModel
+	private aggregateReportsByActivity(filter: FilterQuery<ReportDocument> = {}) {
+		return this.reportModel
 			.aggregate()
 			.match(filter)
 			.group({
 				_id: {
 					resource_id: '$resource_id',
 					curator_orcid: '$curator_orcid',
-					activityClass: '$activityClass',
+					league: '$league',
 					activity_term: '$activity_term',
 				},
 				resource_id: {
@@ -169,8 +179,8 @@ export class ComputeStatisticsService {
 				curator_orcid: {
 					$first: '$curator_orcid',
 				},
-				activityClass: {
-					$first: '$activityClass',
+				league: {
+					$first: '$league',
 				},
 				activity_term: {
 					$first: '$activity_term',
@@ -184,63 +194,69 @@ export class ComputeStatisticsService {
 				curator_orcid: -1,
 				ActivityClass: -1,
 			});
+	}
 
-		const identifierFields: readonly string[] = [
-			'resource_id',
-			'curator_orcid',
-			'activityClass',
-		] as const;
+	/**
+	 * Computes statistics based on the provided filter.
+	 * @param filter - The filter query to apply when fetching reports.
+	 * @returns {Promise<void>} - A promise that resolves when the statistics computation is complete.
+	 */
+	async computeStatistics(filter: FilterQuery<ReportDocument> = {}) {
+		const statFilter = this.getRelatedStatsFilter(new this.reportModel(filter));
+		await this.statModel.deleteMany(statFilter);
+		const reportsByTerms = this.aggregateReportsByActivity(filter).cursor({
+			batchSize: 100,
+		});
 
-		let current_terms = new Map<string, TermDocument>();
-		let currentStat: null | StatisticsDocument = null;
+		let currentStat: StatisticsDocument | null = null;
+		let currentResource: PartnerResourceDocument | null = null;
+		let currentUser: UserDocument | null = null;
+		let current_terms: Map<string, LeanDocument<Term>> = new Map();
+
+		const statSaves$ = [];
+
 		for await (const report of reportsByTerms) {
-			const reportIdentifiers = _.pick(report, identifierFields);
+			const relatedStat = this.getRelatedStatsFilter(report);
+
 			if (!currentStat) {
-				current_terms = new Map(
-					(
-						await this.termModel.find({
-							resource_id: reportIdentifiers.resource_id,
-						})
-					).map((term: TermDocument) => [term.activity_term, term]),
+				// instantiate a new stat object if the current stat is null
+				currentStat = new this.statModel(relatedStat);
+			}
+			if (!this.reportIsRelatedToStat(report, currentStat)) {
+				if (!currentResource) {
+					throw new Error('Derna diga');
+				}
+
+				computePrivacyField(currentResource, currentUser, currentStat);
+
+				const statSavePromise$ = currentStat.save();
+				statSaves$.push(statSavePromise$);
+				currentStat = new this.statModel(relatedStat);
+			}
+
+			if (
+				!currentResource ||
+				currentResource.resource_id !== report.resource_id
+			) {
+				const resource$ = this.partnerResourceService.get_resource(
+					report.resource_id,
 				);
-				currentStat = new this.statModel(reportIdentifiers);
+				const terms$ = this.getResourceTerms(report.resource_id);
+				[currentResource, current_terms] = await Promise.all([
+					resource$,
+					terms$,
+				]);
 			}
 
-			const currentStatIdentifiers = _.pick(
-				currentStat.toObject(),
-				identifierFields,
-			);
-			this.logger.debug(
-				`isEqual output ${_.isEqual(
-					currentStatIdentifiers,
-					reportIdentifiers,
-				)}`,
-			);
-			if (!_.isEqual(currentStatIdentifiers, reportIdentifiers)) {
-				try {
-					await currentStat.save();
-				} catch (e: any) {
-					this.logger.error('Failed to save stat');
-					this.logger.error(currentStat);
-					this.logger.error('Objects Comparison');
-					this.logger.error({ currentStatIdentifiers, reportIdentifiers });
-					throw new Error(e);
-				}
-				currentStat = new this.statModel(reportIdentifiers);
-				if (
-					currentStatIdentifiers.resource_id != reportIdentifiers.resource_id
-				) {
-					current_terms = new Map(
-						(
-							await this.termModel.find({
-								resource_id: reportIdentifiers.resource_id,
-							})
-						).map((term: TermDocument) => [term.activity_term, term]),
-					);
-				}
+			if (!currentUser || currentUser.orcid_id !== report.curator_orcid) {
+				currentUser = await this.userModel.findOne({
+					orcid_id: report.curator_orcid,
+				});
 			}
 
-			const term = current_terms.get(report.activity_term);
+			const term = current_terms.get(
+				report.league + ':' + report.activity_term,
+			);
 			const { activity_category, score } = term;
 
 			currentStat[`${activity_category}_count`] += report.count;
@@ -254,40 +270,58 @@ export class ComputeStatisticsService {
 				curator_orcid: currentStat.curator_orcid,
 				sum: report.count * score,
 			});
+
+			currentStat.total_count += report.count;
+			currentStat.total_score += report.count * score;
 		}
+
+		await Promise.all(statSaves$);
 	}
 
-	// events handling
+	async incrementStatByReport(
+		report: ReportDocument | Report | LeanDocument<Report>,
+	) {
+		const statFilter = await this.getRelatedStatsFilter(report);
 
-	// @OnEvent(ON_ACHIEVEMENTS_UPDATE, { async: true})
-	// async onAchievementsUpdate({ resource_id: string, curator_orcid: string}){
-	// 	this.statModel.updateMany({
-	// 		resource_id,
-	// 		curator_orcid
-	// 	}, {
-	// 		$set: {
-	// 			badges_count: this.badgeModel.
-	// 		}
-	// 	})
-	// }
+		const statExists = await this.statModel.exists(statFilter);
+		if (statExists) {
+			return await this.upsertStatByReport(report);
+		}
 
-	// 	@OnEvent(ON_COMPUTE_RESOURCE_ACHIEVEMENTS, { async: true })
-	// 	async onComputeResourceAchievements({
-	// 		resource_id,
-	// 	}: {
-	// 		resource_id: string;
-	// 	}) {
-	// 		return await this.computeResourceStatistics({ resource_id });
-	// 	}
+		const term$ = this.getTerm(this.getRelatedTermFilter(report)).then(
+			(term) => term.toObject() as LeanDocument<TermDocument>,
+		);
+		const resource$ = this.partnerResourceService.get_resource(
+			report.resource_id,
+		);
+		const user$ = this.userModel.findOne({
+			orcid_id: report.curator_orcid,
+		});
 
-	// 	@OnEvent(ON_COMPUTE_USER_ACHIEVEMENTS, { async: true })
-	// 	async onComputeUserAchievements({
-	// 		resource,
-	// 		user,
-	// 	}: {
-	// 		resource: { resource_id: string };
-	// 		user: { orcid_id: string };
-	// 	}) {
-	// 		return await this.computeUserStatistics({ resource, user });
-	// 	}
+		const [termObj, resource, user] = await Promise.all([
+			term$,
+			resource$,
+			user$,
+		]);
+
+		delete termObj._id;
+
+		const stat = new this.statModel({
+			...statFilter,
+			total_count: 1,
+			total_score: 1 * termObj.score,
+			[termObj.activity_category + '_count']: 1,
+			[termObj.activity_category + '_score']: 1 * termObj.score,
+			[termObj.activity_category + '_terms']: [
+				{
+					...termObj,
+					count: 1,
+					sum: termObj.score,
+				},
+			],
+		});
+		stat.privacy = computePrivacyField(resource, user, stat);
+
+		await stat.save();
+	}
 }
