@@ -82,6 +82,13 @@ export class ReportMetaHandler implements ReportHandler {
 		report: ReportDocument,
 		resource: PartnerResourceDocument,
 	): string {
+		// check if the user belongs to a league
+		for (const league of resource.leagues) {
+			if (league.defaultMembers.includes(report.curator_orcid)) {
+				return league.name;
+			}
+		}
+		// if not, use the default league
 		return report.league ? report.league : resource.defaultLeague;
 	}
 

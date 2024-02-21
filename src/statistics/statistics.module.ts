@@ -15,6 +15,7 @@ import {
 	PublicStatistics,
 	PublicStatisticsFactory,
 } from './schema/public-statistics.schema';
+import { StatisticsEventHandlerService } from './events/event-handler.service';
 
 @Module({
 	imports: [
@@ -28,7 +29,11 @@ import {
 		}),
 	],
 	controllers: [StatisticsController, OldStatisticsController],
-	providers: [StatisticsService, ComputeStatisticsService],
+	providers: [
+		StatisticsService,
+		ComputeStatisticsService,
+		StatisticsEventHandlerService,
+	],
 	exports: [ComputeStatisticsService],
 })
 export class StatisticsModule {}

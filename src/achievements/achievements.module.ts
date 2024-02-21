@@ -16,6 +16,7 @@ import { ComputeMedalsService } from './services/compute-medals.service';
 import { ComputeBadgesService } from './services/compute-badges.service';
 import { AchievementEventHandlerService } from './services/achievements-event-handler.service';
 import { CacheModule } from '@nestjs/cache-manager';
+import { AchievementsDefEventHandlerService } from './services/achievements-def-event-handler.service';
 
 @Module({
 	providers: [
@@ -27,6 +28,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 		ComputeBadgesService,
 		ComputeAchievementsService,
 		AchievementEventHandlerService,
+		AchievementsDefEventHandlerService,
 	],
 	imports: [
 		CoreApicuronModule,

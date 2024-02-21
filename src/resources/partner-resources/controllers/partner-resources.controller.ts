@@ -2,7 +2,6 @@ import {
 	Controller,
 	Get,
 	Param,
-	HttpCode,
 	Req,
 	UploadedFile,
 	Patch,
@@ -14,39 +13,35 @@ import {
 	InternalServerErrorException,
 	Logger,
 } from '@nestjs/common';
-import { SvgSanitationValidationPipe } from '../../shared/pipes/svg-sanitation.pipe';
+import { SvgSanitationValidationPipe } from '../../../shared/pipes/svg-sanitation.pipe';
 
-import { PartnerResourcesService } from './partner-resources.service';
-import { UpdatePartnerResourceDto } from '../dto/updateResource.dto';
-import { UsersService } from '../../auth/users/users.service';
-import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
-import { HasAResourceGuard } from '../../auth/guards/belongs-to-resource.guard';
+import { PartnerResourcesService } from '../partner-resources.service';
+import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
+import { UsersService } from '../../../auth/users/users.service';
+import { LocalAuthGuard } from '../../../auth/guards/local-auth.guard';
+import { HasAResourceGuard } from '../../../auth/guards/belongs-to-resource.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { rename } from 'fs';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import * as mime from 'mime-types';
 import {
 	ApiBody,
 	ApiConsumes,
-	ApiCreatedResponse,
 	ApiHeader,
 	ApiNotFoundResponse,
 	ApiOkResponse,
 	ApiOperation,
-	ApiProperty,
-	ApiResponse,
 	ApiSecurity,
 	ApiTags,
 } from '@nestjs/swagger';
-import { AuthorizationHeader, VersionHeader } from '../../swagger/config';
+import { VersionHeader } from '../../../swagger/config';
 import {
 	PartnerResourceDto,
 	SelectPartnerResourceDto,
-} from '../dto/partner-resources.dto';
-import { AuthService } from '../../auth/auth.service';
+} from '../../dto/partner-resources.dto';
+import { AuthService } from '../../../auth/auth.service';
 import * as mv from 'mv';
-import { ResourceLogoValidationPipe } from '../validators/logo-validation.pipe';
+import { ResourceLogoValidationPipe } from '../../validators/logo-validation.pipe';
 
 @ApiTags('Partner Resources')
 @ApiHeader(VersionHeader)
