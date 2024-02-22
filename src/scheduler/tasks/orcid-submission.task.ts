@@ -102,7 +102,7 @@ export class OrcidSubmissionTask {
 				},
 			);
 
-			if (response.status < 200 || response.status > 300) {
+			if (response.status < 200 || response.status >= 400) {
 				this.logger.error(`Error Status ${response.status}`);
 				this.logger.error(`Error Response Header ${response.headers}`);
 				this.logger.error(`Error Response Body ${response.data}`);

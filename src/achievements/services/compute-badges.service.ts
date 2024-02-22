@@ -259,11 +259,6 @@ export class ComputeBadgesService {
 		}
 
 		await Promise.all(badgeSaves);
-
-		// await this.eventEmitter.emitAsync(onComputedBadgeMany, {
-		// 	badgeDefFilter,
-		// 	reportFilter,
-		// } as IComputeBadgeManyEventPayload);
 	}
 
 	/**

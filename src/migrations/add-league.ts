@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../app.module';
 import { INestApplicationContext, Logger } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
-import { Resource } from '../core/schemas/resource/resource.schema';
 import {
 	PartnerResource,
 	PartnerResourceDocument,

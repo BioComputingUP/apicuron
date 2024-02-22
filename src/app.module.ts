@@ -31,6 +31,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MongoEventsModule } from './mongo-events/mongo-events.module';
 import { SubmitReportModule } from './submit-reports/submit-reports.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { OrcidClientModule } from './orcid-client/orcid-client.module';
 const logger = new Logger('AppModule');
 
 @Module({
@@ -98,6 +99,7 @@ const logger = new Logger('AppModule');
 				},
 			],
 		}),
+		OrcidClientModule,
 		CoreApicuronModule,
 		ResourcesModule,
 		TermsModule,
