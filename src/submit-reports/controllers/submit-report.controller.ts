@@ -43,7 +43,7 @@ import {
 	postReportInsertManyEvent,
 	postReportInsertSingleEvent,
 } from '../events/events';
-
+import { isArray } from 'lodash';
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
 @Controller({ path: 'reports', version: '2' })
@@ -105,7 +105,7 @@ export class SubmitReportsController {
 		if (typeof deleteAllInput == 'string') {
 			delete_all = [deleteAllInput];
 		} else {
-			if (_.isArray(deleteAllInput)) {
+			if (isArray(deleteAllInput)) {
 				delete_all = deleteAllInput;
 			}
 		}

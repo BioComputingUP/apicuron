@@ -17,7 +17,7 @@ import {
 	ITermDeletedEventPayload,
 	onTermDeletedEvent,
 } from '../terms/events/events';
-
+import { pick, mapKeys } from 'lodash';
 @Injectable()
 export class ReportsService {
 	constructor(
@@ -182,7 +182,7 @@ export class ReportsService {
 		filter: FilterQuery<Report>;
 		options: QueryOptions<Report>;
 	} {
-		let filter: FilterQuery<Report> = _.pick(dto, [
+		let filter: FilterQuery<Report> = pick(dto, [
 			'entity_uri',
 			'curator_orcid',
 			'resource_id',
@@ -195,13 +195,10 @@ export class ReportsService {
 
 		// timestamp filter object
 		// pick the keys from the dto and rename them if they're defined
-		const timestamp: any = _.mapKeys(
-			_.pick(dto, ['from', 'to']),
-			(value, key) => {
-				const rename = { from: '$gte', to: '$lte' };
-				return rename[key];
-			},
-		);
+		const timestamp: any = mapKeys(pick(dto, ['from', 'to']), (value, key) => {
+			const rename = { from: '$gte', to: '$lte' };
+			return rename[key];
+		});
 
 		if (Object.keys(timestamp).length > 0) {
 			filter = {

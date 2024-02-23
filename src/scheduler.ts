@@ -10,7 +10,7 @@ import { ConfigService } from '@nestjs/config';
 const parser = new ArgumentParser({
 	description: `Script to perform Database edits and fixes on APICURON,\n this script organizes database operations into tasks that can be executed together or independently
     Tasks to run:
-    - disprot_update: updates APICUROn with the latest version of the database from disprot
+    - disprot_update: updates APICURON with the latest version of the database from disprot
     - compute_achievements [resource_id,orcid_id?]: runs compute_medals and compute_badges
     - compute_statistics [resource_id,orcid_id?]: Computes statistics (meant to be ran after compute_achievements) for an entire resource or a single user when specifying optional orcid_id option
     - compute_medals: Computes medals for an entire resource or a single user when specifying optional orcid_id option

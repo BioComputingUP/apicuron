@@ -1,8 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsIn, IsInt, IsOptional, IsString, Min } from 'class-validator';
-import * as _ from 'lodash';
 import { PaginateDto } from '../../pagination/dto/paginate.dto';
-
+import { pick } from 'lodash';
 export class AchievementFilter extends PaginateDto {
 	@IsOptional()
 	@IsString()
@@ -33,7 +32,7 @@ export class AchievementFilter extends PaginateDto {
 	sortOrder?: '1' | '-1' | 'asc' | 'desc';
 
 	getQuery() {
-		return _.pick(this, [
+		return pick(this, [
 			'curator_orcid',
 			'resource_id',
 			'name',

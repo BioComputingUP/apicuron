@@ -2,13 +2,13 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import { StatisticsTerms } from './statistics-terms.schema';
 import { HydratedDocument } from 'mongoose';
-import * as _ from 'lodash';
 import {
 	ReportsMeta,
 	ReportMetaSchema,
 	AggregatedReportsSchemaFactory as UserResourceEntitySchemaFactory,
 } from './components/aggregated-data.schema';
 import { UserResourceEntity } from './components/user-resource-entity.schema';
+import { mapValues } from 'lodash';
 
 export type StatisticsDocument = HydratedDocument<
 	Statistics & UserResourceEntity
@@ -87,7 +87,7 @@ export function StatisticsSchemaFactory() {
 	);
 
 	// creating unique index, using fields from ActivityClass
-	const activityClassIndex = _.mapValues(ReportMetaSchema.paths, () => 1);
+	const activityClassIndex = mapValues(ReportMetaSchema.paths, () => 1);
 	StatisticsSchema.index(
 		{ resource_id: 1, curator_orcid: 1, ...activityClassIndex },
 		{ name: 'unique_index', unique: true },

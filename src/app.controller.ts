@@ -17,11 +17,6 @@ export class AppController {
 		protected achievementsService: AchievementsDefService,
 	) {}
 
-	@Get('/debug-sentry')
-	getHello(): string {
-		throw new InternalServerErrorException('Sentry debug test');
-		// return this.appService.getHello();
-	}
 	@ApiExcludeEndpoint()
 	@Get('/home')
 	async get_home_data() {
@@ -46,12 +41,8 @@ export class AppController {
 
 	@Get('jsonschema')
 	async getJsonSchema() {
-		// const { defaultMetadataStorage } = require('class-transformer/cjs/storage');
-		// return validationMetadatasToSchemas({
-		// 	classValidatorMetadataStorage: getMetadataStorage(),
-		// });
-		const storage = getMetadataStorage();
-		console.log(storage);
-		return storage;
+
+		console.log(test);
+		return 'hello';
 	}
 }
