@@ -6,10 +6,8 @@ import { ReportHandler } from '../interfaces/report.handler';
 import { ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { UsersService } from '../../auth/users/users.service';
-import * as _ from 'lodash';
-import { ResourceDocument } from '../../core/schemas/resource/resource.schema';
 import { computePrivacyField } from '../../util/privacy.helper';
-
+import { uniq } from 'lodash';
 @Injectable()
 export class ReportMetaHandler implements ReportHandler {
 	constructor(
@@ -45,7 +43,7 @@ export class ReportMetaHandler implements ReportHandler {
 	private async loadResourcesMap(
 		reports: ReportDocument[],
 	): Promise<Map<string, PartnerResourceDocument>> {
-		const resource_ids = _.uniq(reports.map((r) => r.resource_id));
+		const resource_ids = uniq(reports.map((r) => r.resource_id));
 		const resources = await this.resourceService.get_resources({
 			resource_id: { $in: resource_ids },
 		});
@@ -59,7 +57,7 @@ export class ReportMetaHandler implements ReportHandler {
 	private async loadUsersMap(
 		reports: ReportDocument[],
 	): Promise<Map<string, UserDocument>> {
-		const orcid_ids = _.uniq(reports.map((r) => r.curator_orcid));
+		const orcid_ids = uniq(reports.map((r) => r.curator_orcid));
 		const users = await this.usersService.getUsers({
 			orcid_id: { $in: orcid_ids },
 		});

@@ -1,9 +1,8 @@
 import { Transform, TransformFnParams } from 'class-transformer';
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
-import * as _ from 'lodash';
 import { QueryOptions } from 'mongoose';
 import { PaginationAggregation } from '../interfaces/pagination-aggregation';
-
+import { omit } from 'lodash';
 export class PaginateDto {
 	@Min(0)
 	@IsInt()
@@ -49,7 +48,7 @@ export class PaginateDto {
 	}
 
 	omitPagination(): Omit<this, 'skip' | 'limit'> {
-		return _.omit(this, ['skip', 'limit']);
+		return omit(this, ['skip', 'limit']);
 	}
 
 	defaultLimit = -1;

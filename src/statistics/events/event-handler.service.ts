@@ -41,7 +41,7 @@ import {
 } from '../../submit-reports/events/events';
 import { ComputeStatisticsService } from '../compute-statistics/compute-statistics.service';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import * as _ from 'lodash';
+import { uniq } from 'lodash';
 import {
 	ITermDeletedEventPayload,
 	ITermUpdatedEventPayload,
@@ -193,8 +193,8 @@ export class StatisticsEventHandlerService {
 	async insertManyReportsHandler({
 		reports,
 	}: IPostReportInsertManyEventPayload) {
-		const resourceIds = _.uniq(reports.map((report) => report.resource_id));
-		const orcidIds = _.uniq(reports.map((report) => report.curator_orcid));
+		const resourceIds = uniq(reports.map((report) => report.resource_id));
+		const orcidIds = uniq(reports.map((report) => report.curator_orcid));
 
 		await this.computeStats.computeStatistics({
 			resource_id: { $in: resourceIds },

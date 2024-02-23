@@ -1,13 +1,13 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { SubmitReportDto } from '../../submit-reports/dto/submit-report.dto';
 
-import * as StreamObject from 'stream-json/streamers/StreamObject';
+import StreamObject from 'stream-json/streamers/StreamObject';
 import { createReadStream, readFileSync, statSync } from 'fs';
 import { filter } from 'stream-json/filters/Filter';
 import { parser } from 'stream-json';
 import { Stream, chain } from 'stream-chain';
 import { pick } from 'stream-json/filters/Pick';
-import * as StreamArray from 'stream-json/streamers/StreamArray';
+import StreamArray from 'stream-json/streamers/StreamArray';
 import { validate, ValidationError } from 'class-validator';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 import { NotificationsService } from '../../notifications/notifications.service';
@@ -18,7 +18,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Model } from 'mongoose';
 import { plainToClass } from 'class-transformer';
-import * as _ from 'lodash';
 import { MongoBulkWriteError } from 'mongodb';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SubmitReportService } from '../../submit-reports/services/submit-reports.service';
@@ -37,6 +36,7 @@ export type ReportProcessReport = {
 	total_report_count: number;
 	resource_ids: string[];
 };
+import { partition } from 'lodash';
 
 @Injectable()
 export class SubmitBulkTask {
@@ -122,7 +122,7 @@ export class SubmitBulkTask {
 			) as PromiseFulfilledResult<ValidatedReport>[]
 		).map((reportOutcome) => reportOutcome.value);
 
-		const [validReports, invalidReports] = _.partition(
+		const [validReports, invalidReports] = partition(
 			sucessfullyProcessedReports,
 			(validatedReport: ValidatedReport) => validatedReport.errors.length === 0,
 		);

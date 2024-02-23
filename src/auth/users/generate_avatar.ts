@@ -1,8 +1,7 @@
 import { mkdir } from 'fs/promises';
-import * as _ from 'lodash';
 import { dirname, join } from 'path';
 import { v4 as uuid } from 'uuid';
-
+import { kebabCase } from 'lodash';
 export async function generateAvatar(
 	username: string,
 	publicFolderPath: string,
@@ -17,7 +16,7 @@ export async function generateAvatar(
 		radius: 50,
 	});
 
-	const filename = `${_.kebabCase(username)}-${uuid().split('-').shift()}.svg`;
+	const filename = `${kebabCase(username)}-${uuid().split('-').shift()}.svg`;
 
 	const avatarFilepath = join(publicFolderPath, 'users', filename);
 

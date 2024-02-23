@@ -7,7 +7,6 @@ import {
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { ComputeBadgesService } from './compute-badges.service';
 import { ComputeMedalsService } from './compute-medals.service';
-import * as _ from 'lodash';
 import { ReportDocument } from '../../core/schemas/reports.schema';
 import {
 	Observable,
@@ -34,7 +33,7 @@ import {
 	AchievementDocument,
 } from '../../core/schemas/achievements/achievements.schema';
 import { Model } from 'mongoose';
-
+import { isEqual, uniq } from 'lodash';
 @Injectable()
 export class AchievementEventHandlerService
 	implements OnApplicationBootstrap, BeforeApplicationShutdown
@@ -67,7 +66,7 @@ export class AchievementEventHandlerService
 			.pipe(
 				takeUntil(this.destroy$),
 				map(({ reports }: IPostReportInsertManyEventPayload) => {
-					return _.uniq(reports.map((r) => r.resource_id));
+					return uniq(reports.map((r) => r.resource_id));
 				}),
 				switchMap(async (resources: string[]) => {
 					const compteBadgesPromises$ = resources.map((resource_id) => {
@@ -103,18 +102,20 @@ export class AchievementEventHandlerService
 				takeUntil(this.destroy$),
 				map(({ report }: IPostReportInsertSingleEventPayload) => report),
 				this.debouncebyUserResource(),
-				switchMap(async ({ report }: IPostReportInsertSingleEventPayload) => {
-					const { resource_id, curator_orcid } = report;
-					await this.computeBadges.computeUserBadges({
-						resource: {
-							resource_id,
-						},
-						user: {
-							orcid_id: curator_orcid,
-						},
-					});
-					return [resource_id, curator_orcid];
-				}),
+				switchMap(
+					async (report: { resource_id: string; curator_orcid: string }) => {
+						const { resource_id, curator_orcid } = report;
+						await this.computeBadges.computeUserBadges({
+							resource: {
+								resource_id,
+							},
+							user: {
+								orcid_id: curator_orcid,
+							},
+						});
+						return [resource_id, curator_orcid];
+					},
+				),
 			)
 			.subscribe(([resource_id, curator_orcid]) => {
 				this.logger.debug(
@@ -162,7 +163,7 @@ export class AchievementEventHandlerService
 				};
 			}),
 			debounceTime(this.defaultDebounceTime),
-			distinctUntilChanged(_.isEqual),
+			distinctUntilChanged(isEqual),
 		);
 	}
 

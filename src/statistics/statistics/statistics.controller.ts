@@ -24,7 +24,6 @@ import {
 } from '@nestjs/swagger';
 import { VersionHeader } from '../../swagger/config';
 import { UsersService } from '../../auth/users/users.service';
-import * as _ from 'lodash';
 import { Response } from 'express';
 import { plainToInstance } from 'class-transformer';
 // import { paginate } from '../../pagination/paginator';
@@ -38,7 +37,7 @@ import { AuthProtected } from '../../auth/decorators/auth.decorator';
 import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
 import { ValidationError, validate } from 'class-validator';
 import { paginate } from '../../pagination/paginator';
-
+import { mapValues, uniq, map, keyBy } from 'lodash';
 @ApiTags('Statistics')
 @ApiHeader(VersionHeader)
 @Controller({
@@ -196,14 +195,14 @@ export class OldStatisticsController {
 
 		const { meta } = paginate(data, pagination, count);
 
-		const orcid_list = _.uniq(_.map(data, 'curator_orcid'));
+		const orcid_list = uniq(map(data, 'curator_orcid'));
 		const user_list_promises = orcid_list.map((orcid) =>
 			this.userService.get_by_orcid(orcid),
 		);
 		const user_list = await Promise.all(user_list_promises);
-		const orcid_to_user = _.keyBy(user_list, 'orcid_id');
+		const orcid_to_user = keyBy(user_list, 'orcid_id');
 
-		const orcid_to_names = _.mapValues(orcid_to_user, ({ displayedName }) => {
+		const orcid_to_names = mapValues(orcid_to_user, ({ displayedName }) => {
 			const [given_name, family_name] = displayedName.split(' ');
 			return {
 				given_name,

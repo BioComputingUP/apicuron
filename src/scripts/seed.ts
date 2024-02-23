@@ -5,61 +5,60 @@ import { Report } from '../core/schemas/reports.schema';
 import { faker } from '@faker-js/faker';
 import { Term } from '../core/schemas/terms.schema';
 import { Model } from 'mongoose';
-import * as _ from 'lodash';
 import { User } from '../core/schemas/user.schema';
-
+import { random } from 'lodash';
 async function bootstrap() {
-    const app = await NestFactory.createApplicationContext(AppModule)
+	const app = await NestFactory.createApplicationContext(AppModule);
 
-    const reportModel: Model<Report> = app.get(getModelToken(Report.name))
-    const userModel: Model<User> = app.get(getModelToken(User.name))
-    
-    const termModel: Model<Term> = app.get(getModelToken(Term.name))
+	const reportModel: Model<Report> = app.get(getModelToken(Report.name));
+	const userModel: Model<User> = app.get(getModelToken(User.name));
 
-    const resource=   'ped'
+	const termModel: Model<Term> = app.get(getModelToken(Term.name));
 
-    // get disprotTerms
-    const terms: string[] = await (await termModel.find({ resource_id: resource })).map((term:Term) => term.activity_term)
+	const resource = 'ped';
 
-    const userCount: number = await userModel.count()
+	// get disprotTerms
+	const terms: string[] = await (
+		await termModel.find({ resource_id: resource })
+	).map((term: Term) => term.activity_term);
 
+	const userCount: number = await userModel.count();
 
-    async function createReport() {
-        const randomUser = await userModel.findOne({}, {}, { skip: _.random(0, userCount- 1, false) })
+	async function createReport() {
+		const randomUser = await userModel.findOne(
+			{},
+			{},
+			{ skip: random(0, userCount - 1, false) },
+		);
 
-        const report = new reportModel({
-            activity_term: terms[_.random(0, terms.length -1 , false)],
+		const report = new reportModel({
+			activity_term: terms[random(0, terms.length - 1, false)],
 
-            curator_orcid: '0000-0002-2472-5685',
-        
-            entity_uri: faker.internet.url(),
-        
-            resource_uri: faker.internet.url(),
-        
-            resource_id: resource,
-        
-            timestamp: faker.date.recent({ days: 30 })
-        })
-    
+			curator_orcid: '0000-0002-2472-5685',
 
-        return report;
+			entity_uri: faker.internet.url(),
 
-    }
+			resource_uri: faker.internet.url(),
 
-    const savesPromise = []
+			resource_id: resource,
 
-    for (let index = 0; index < 50; index++) {
-        const report = await createReport()
+			timestamp: faker.date.recent({ days: 30 }),
+		});
 
-        savesPromise.push(report.save());
-    }
+		return report;
+	}
 
-    await Promise.all(savesPromise)
+	const savesPromise = [];
 
+	for (let index = 0; index < 50; index++) {
+		const report = await createReport();
 
-    await app.close();
+		savesPromise.push(report.save());
+	}
 
+	await Promise.all(savesPromise);
+
+	await app.close();
 }
-
 
 bootstrap();

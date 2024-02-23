@@ -4,7 +4,7 @@ import {
 	ValidatorConstraint,
 	ValidatorConstraintInterface,
 } from 'class-validator';
-import mongoose, { Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { NotFoundException } from '@nestjs/common';
 import {
 	AchievementDef,
@@ -12,7 +12,9 @@ import {
 } from '../../core/schemas/achievements-def/achievement-def.schema';
 
 @ValidatorConstraint({ name: 'AchievementExists', async: true })
-class AbstractAchievementUnique implements ValidatorConstraintInterface {
+abstract class AbstractAchievementUnique
+	implements ValidatorConstraintInterface
+{
 	constructor(
 		@InjectModel(AchievementDef.name)
 		private achievementDefModel: Model<AchievementDefDocument>,
