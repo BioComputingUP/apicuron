@@ -19,13 +19,9 @@ import { computePrivacyField } from '../../util/privacy.helper';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { AggregatedReportsByActivities } from '../types/aggregated-reports';
 import {
-	IComputeResourceBadgesEventPayload,
-	IComputeUserBadgesEventPayload,
-	IincrementalBadgeComputeEventPayload,
-	onComputeResourceBadges,
-	onComputeUserBadges,
-	onIncrementalBadgeCompute,
-} from '../events';
+	IBadgeCountChangeEventPayload,
+	onBadgesCompute,
+} from '../events/events';
 
 @Injectable()
 export class ComputeBadgesService {
@@ -46,10 +42,6 @@ export class ComputeBadgesService {
 		await this.computeAllBadges({
 			resource_id,
 		});
-
-		await this.eventEmitter.emitAsync(onComputeResourceBadges, {
-			resource_id,
-		} as IComputeResourceBadgesEventPayload);
 	}
 
 	public async computeUserBadges(payload: {
@@ -73,11 +65,6 @@ export class ComputeBadgesService {
 				curator_orcid,
 			},
 		);
-
-		await this.eventEmitter.emitAsync(onComputeUserBadges, {
-			resource_id,
-			curator_orcid,
-		} as IComputeUserBadgesEventPayload);
 	}
 
 	/**
@@ -87,11 +74,13 @@ export class ComputeBadgesService {
 	public async incrementalBadgeCompute(report: ReportDocument) {
 		const { activity_term, resource_id, league } = report;
 
-		const concernedBadges = await this.badgeDefModel.find({
+		const bageDefFilter: FilterQuery<BadgeDefDocument> = {
 			list_terms: activity_term,
 			resource_id,
 			league,
-		});
+		};
+
+		const concernedBadges = await this.badgeDefModel.find(bageDefFilter);
 
 		const badges$ = concernedBadges.map(async (badgeDef) => {
 			return await this.upsertBadge(badgeDef, report);
@@ -100,8 +89,8 @@ export class ComputeBadgesService {
 		await Promise.all(badges$);
 
 		await this.eventEmitter.emitAsync(
-			onIncrementalBadgeCompute,
-			report as IincrementalBadgeComputeEventPayload,
+			onBadgesCompute,
+			bageDefFilter as IBadgeCountChangeEventPayload,
 		);
 	}
 
@@ -260,10 +249,7 @@ export class ComputeBadgesService {
 
 		await Promise.all(badgeSaves);
 
-		// await this.eventEmitter.emitAsync(onComputedBadgeMany, {
-		// 	badgeDefFilter,
-		// 	reportFilter,
-		// } as IComputeBadgeManyEventPayload);
+		await this.eventEmitter.emitAsync(onBadgesCompute, badgeDefFilter);
 	}
 
 	/**

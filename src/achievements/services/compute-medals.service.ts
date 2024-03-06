@@ -4,9 +4,9 @@ import {
 	Medal,
 	MedalDocument,
 } from '../../core/schemas/achievements/medals.schema';
-import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../core/schemas/user.schema';
-import { Connection, Cursor, FilterQuery, Model } from 'mongoose';
+import { Cursor, FilterQuery, Model } from 'mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import {
 	MedalDef,
@@ -20,11 +20,8 @@ import { UpdateResult, MongoServerError } from 'mongodb';
 import { computePrivacyField } from '../../util/privacy.helper';
 import { AggregatedReportsByMedalDef } from '../types/aggregated-reports';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-import {
-	IComputeResourceMedalsEventPayload,
-	onComputeResourceMedals,
-} from '../events';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { onMedalsCompute } from '../events/events';
 @Injectable()
 export class ComputeMedalsService {
 	constructor(
@@ -47,10 +44,6 @@ export class ComputeMedalsService {
 		resource_id: string;
 	}): Promise<number> {
 		const medalsComputeCount = await this.computeMedals({ resource_id });
-
-		await this.eventEmitter.emitAsync(onComputeResourceMedals, {
-			resource_id,
-		} as IComputeResourceMedalsEventPayload);
 
 		return medalsComputeCount;
 	}
@@ -173,6 +166,8 @@ export class ComputeMedalsService {
 		}
 		const counts = await Promise.all(medalPromises$);
 		this.logger.debug(`Computed ${counts.length} medals`);
+
+		await this.eventEmitter.emitAsync(onMedalsCompute, medalDefFilter);
 
 		return counts.reduce((acc, val) => acc + val, 0);
 	}
