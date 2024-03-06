@@ -33,6 +33,7 @@ import {
 	onMedalDefDelete,
 	onMedalDefUpdate,
 } from './events/events';
+import { assignResourceEntityPrivacyField } from '../util/privacy.helper';
 @Injectable()
 export class AchievementsDefService {
 	constructor(
@@ -70,13 +71,14 @@ export class AchievementsDefService {
 		const resource = await this.partnerResourceService.get_resource(
 			badge.resource_id,
 		);
-		badge.league = badge.league ?? resource.defaultLeague;
-
 		const newBadge = new this.achievementDefModel({
 			...badge,
 			type: AchievementType.badge,
 			resource_uri: resource.resource_uri,
 		});
+		assignResourceEntityPrivacyField(resource, newBadge);
+
+		await this.computeBadges.computeAllBadges()
 
 		return await newBadge.save();
 	}
@@ -154,15 +156,15 @@ export class AchievementsDefService {
 			medal.resource_id,
 		);
 
-		medal.league = medal.league ?? resource.defaultLeague;
-
-		const newMedal = new this.achievementDefModel({
+		const newMedalDef = new this.achievementDefModel({
 			...medal,
 			type: AchievementType.medal,
 			resource_uri: resource.resource_uri,
 		});
 
-		return await newMedal.save();
+		assignResourceEntityPrivacyField(resource, newMedalDef);
+
+		return await newMedalDef.save();
 	}
 
 	async getMedalDefs(
@@ -173,10 +175,10 @@ export class AchievementsDefService {
 			...queryFilter,
 			type: AchievementType.medal,
 		};
-		const dataPromise = this.achievementDefModel.find(filterQuery, {}, options);
-		const countPromise = this.achievementDefModel.count(filterQuery);
+		const data$ = this.achievementDefModel.find(filterQuery, {}, options);
+		const count$ = this.achievementDefModel.count(filterQuery);
 
-		const [data, count] = await Promise.all([dataPromise, countPromise]);
+		const [data, count] = await Promise.all([data$, count$]);
 
 		return {
 			data,
