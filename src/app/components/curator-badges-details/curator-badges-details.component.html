@@ -18,7 +18,7 @@
     </div>
 
     <div class="tw-mt-auto tw-flex tw-flex-row tw-justify-center" *ngIf="badges$ | async as badges">
-        <pagination [totalItems]="badges.count" [itemsPerPage]="badges.data.length"
+        <pagination [totalItems]="badges.meta.pagination.total" [itemsPerPage]="badges.meta.pagination.limit"
             [(ngModel)]="currentPage" (pageChanged)="update_page($event.page)" [maxSize]="5"></pagination>
     </div>
 
