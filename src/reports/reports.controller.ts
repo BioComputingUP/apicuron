@@ -32,17 +32,14 @@ export class ReportsController {
 	@UseGuards(LocalAuthGuard)
 	@Public()
 	@Get()
-	async get_reports(
+	async getReports(
 		@Query() reportFilter: ReportFilterDto,
 		@UserReq() user: User,
 	) {
-		// TODO: Add resource ownership control and add it to allowed resources when querying reports
 		const reportFilterInstance: ReportFilterDto = plainToInstance(
 			ReportFilterDto,
 			reportFilter,
 		);
-		// const allowedResources =
-		// 	user?.resources.map(({ resource_id }) => resource_id) ?? [];
 
 		const privacyFilter = userResourceEntityPrivacyFilter(user);
 

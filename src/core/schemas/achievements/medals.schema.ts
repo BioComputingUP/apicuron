@@ -12,6 +12,11 @@ export class Medal extends UserResourceEntity {
 	color: string;
 
 	@Prop({
+		required: true,
+	})
+	resource_id: string;
+
+	@Prop({
 		required: false,
 	})
 	count_relative_index: number;

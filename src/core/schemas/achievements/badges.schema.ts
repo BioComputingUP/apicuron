@@ -22,6 +22,10 @@ export class Badge extends UserResourceEntity {
 	})
 	resource_uri: string;
 
+	// fields from Badge
+	@Prop({
+		required: true,
+	})
 	resource_id: string;
 
 	@Prop({
