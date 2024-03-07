@@ -103,12 +103,12 @@ export class AchievementsDefEventHandlerService {
 
 	@OnEvent(onBadgeDefUpdate, { async: true, promisify: true })
 	async onBadgeDefUpdate({ badgeDef }: IBadgeDefUpdateEventPayload) {
-		return await this.computeBadges.computeAllBadges(badgeDef.toObject());
+		return await this.computeBadges.computeBadges(badgeDef.toObject());
 	}
 
 	@OnEvent(onBadgeDefUpdate, { async: true, promisify: true })
 	async onBadgeDefCreate({ badgeDef }: IBadgeDefCreateEventPayload) {
-		return await this.computeBadges.computeAllBadges({
+		return await this.computeBadges.computeBadges({
 			name: badgeDef.name,
 			resource_id: badgeDef.resource_id,
 			league: badgeDef.league,

@@ -39,7 +39,7 @@ export class ComputeBadgesService {
 	public async computeResourceBadges(resource: { resource_id: string }) {
 		const { resource_id } = resource;
 
-		await this.computeAllBadges({
+		await this.computeBadges({
 			resource_id,
 		});
 	}
@@ -57,7 +57,7 @@ export class ComputeBadgesService {
 			`Computing Badges for user ${curator_orcid} at resource ${resource_id}`,
 		);
 
-		await this.computeAllBadges(
+		await this.computeBadges(
 			{
 				resource_id,
 			},
@@ -194,11 +194,14 @@ export class ComputeBadgesService {
 		}
 	}
 
-	public async computeAllBadges(
+	public async computeBadges(
 		badgeDefFilter: FilterQuery<BadgeDefDocument> = {},
 		reportFilter: FilterQuery<ReportDocument> = {},
 	) {
+		this.logger.debug(`Badge Def Filter: `, badgeDefFilter);
+
 		await this.badgeModel.deleteMany(badgeDefFilter);
+
 		const badgeDefs = this.badgeDefModel
 			.find(
 				badgeDefFilter,
@@ -245,9 +248,15 @@ export class ComputeBadgesService {
 			}
 
 			badgeSaves.push(Promise.all(badges$));
+
+			this.logger.log(
+				`Badge ${badgeDef.name} computed for ${badgeSaves.length} users`,
+			);
 		}
 
 		await Promise.all(badgeSaves);
+
+		this.logger.log(`Computed ${badgeSaves.length} badges`);
 
 		await this.eventEmitter.emitAsync(onBadgesCompute, badgeDefFilter);
 	}

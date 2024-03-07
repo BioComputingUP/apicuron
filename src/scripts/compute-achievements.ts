@@ -20,7 +20,7 @@ async function bootstrap() {
 
 	console.log('Computing Achievements');
 	await Promise.all([
-		compBadges.computeAllBadges(),
+		compBadges.computeBadges(),
 		compMedals.computeMedals(),
 	]);
 

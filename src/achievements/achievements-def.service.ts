@@ -78,7 +78,7 @@ export class AchievementsDefService {
 		});
 		assignResourceEntityPrivacyField(resource, newBadge);
 
-		await this.computeBadges.computeAllBadges()
+		await this.computeBadges.computeBadges()
 
 		return await newBadge.save();
 	}
