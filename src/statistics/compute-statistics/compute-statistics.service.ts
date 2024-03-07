@@ -13,6 +13,7 @@ import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { computePrivacyField } from '../../util/privacy.helper';
+import { pick } from 'lodash';
 @Injectable()
 export class ComputeStatisticsService {
 	logger = new Logger(ComputeStatisticsService.name);
@@ -46,12 +47,7 @@ export class ComputeStatisticsService {
 	private getRelatedStatsFilter(
 		report: ReportDocument | Report | LeanDocument<Report>,
 	): FilterQuery<StatisticsDocument> {
-		const { curator_orcid, resource_id, league } = report;
-		return {
-			curator_orcid,
-			resource_id,
-			league: league,
-		};
+		return pick(report, ['curator_orcid', 'resource_id', 'league']);
 	}
 
 	private getRelatedTermFilter(
@@ -186,13 +182,14 @@ export class ComputeStatisticsService {
 					$first: '$activity_term',
 				},
 				count: {
-					$count: {},
+					$sum: 1,
 				},
 			})
 			.sort({
 				resource_id: -1,
 				curator_orcid: -1,
-				ActivityClass: -1,
+				league: -1,
+				activity_term: -1,
 			});
 	}
 
@@ -203,7 +200,12 @@ export class ComputeStatisticsService {
 	 */
 	async computeStatistics(filter: FilterQuery<ReportDocument> = {}) {
 		const statFilter = this.getRelatedStatsFilter(new this.reportModel(filter));
-		await this.statModel.deleteMany(statFilter);
+		this.logger.debug(`statFilter:`, statFilter);
+
+		const delResponse = await this.statModel.deleteMany(statFilter);
+
+		this.logger.debug(`Deleted ${delResponse.deletedCount} documents`);
+
 		const reportsByTerms = this.aggregateReportsByActivity(filter).cursor({
 			batchSize: 100,
 		});
@@ -224,7 +226,7 @@ export class ComputeStatisticsService {
 			}
 			if (!this.reportIsRelatedToStat(report, currentStat)) {
 				if (!currentResource) {
-					throw new Error('Derna diga');
+					throw new Error('An error occured in the processing of the reports');
 				}
 
 				computePrivacyField(currentResource, currentUser, currentStat);
@@ -276,6 +278,8 @@ export class ComputeStatisticsService {
 		}
 
 		await Promise.all(statSaves$);
+
+		this.logger.debug(`Computed ${statSaves$.length} statistics`);
 	}
 
 	async incrementStatByReport(

@@ -70,7 +70,7 @@ export class Statistics extends UserResourceEntity {
 }
 
 export function StatisticsSchemaFactory() {
-	const StatisticsSchema = SchemaFactory.createForClass(Statistics)
+	const StatisticsSchema = SchemaFactory.createForClass(Statistics);
 
 	StatisticsSchema.virtual('user', {
 		ref: User.name,
@@ -87,9 +87,8 @@ export function StatisticsSchemaFactory() {
 	);
 
 	// creating unique index, using fields from ActivityClass
-	const activityClassIndex = mapValues(ReportMetaSchema.paths, () => 1);
 	StatisticsSchema.index(
-		{ resource_id: 1, curator_orcid: 1, ...activityClassIndex },
+		{ resource_id: 1, curator_orcid: 1, privacy: 1, league: 1 },
 		{ name: 'unique_index', unique: true },
 	);
 	return StatisticsSchema;
