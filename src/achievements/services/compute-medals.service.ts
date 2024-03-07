@@ -4,9 +4,9 @@ import {
 	Medal,
 	MedalDocument,
 } from '../../core/schemas/achievements/medals.schema';
-import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../core/schemas/user.schema';
-import { Connection, Cursor, FilterQuery, Model } from 'mongoose';
+import { Cursor, FilterQuery, Model } from 'mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import {
 	MedalDef,
@@ -20,11 +20,8 @@ import { UpdateResult, MongoServerError } from 'mongodb';
 import { computePrivacyField } from '../../util/privacy.helper';
 import { AggregatedReportsByMedalDef } from '../types/aggregated-reports';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-import {
-	IComputeResourceMedalsEventPayload,
-	onComputeResourceMedals,
-} from '../events';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { onMedalsCompute } from '../events/events';
 @Injectable()
 export class ComputeMedalsService {
 	constructor(
@@ -47,10 +44,6 @@ export class ComputeMedalsService {
 		resource_id: string;
 	}): Promise<number> {
 		const medalsComputeCount = await this.computeMedals({ resource_id });
-
-		await this.eventEmitter.emitAsync(onComputeResourceMedals, {
-			resource_id,
-		} as IComputeResourceMedalsEventPayload);
 
 		return medalsComputeCount;
 	}
@@ -172,6 +165,9 @@ export class ComputeMedalsService {
 			medalPromises$.push(medalPromise$);
 		}
 		const counts = await Promise.all(medalPromises$);
+		this.logger.debug(`Computed ${counts.length} medals`);
+
+		await this.eventEmitter.emitAsync(onMedalsCompute, medalDefFilter);
 
 		return counts.reduce((acc, val) => acc + val, 0);
 	}
@@ -211,7 +207,7 @@ export class ComputeMedalsService {
 	 * @param orcid_id The ORCID ID of the user to retrieve.
 	 * @returns The user document if found, otherwise null.
 	 */
-	private async getUser(orcid_id: string) {
+	private async getUser(orcid_id: string): Promise<UserDocument | null> {
 		const getUserCacheKey = (orcid_id: string) => `user:${orcid_id}`;
 		const cachedUser = (await this.cacheManager.get(
 			getUserCacheKey(orcid_id),
@@ -252,7 +248,9 @@ export class ComputeMedalsService {
 		}
 
 		const counts = await Promise.all(aggReportsPromises$);
-		return counts.reduce((acc, val) => acc + val, 0);
+		const count = counts.reduce((acc, val) => acc + val, 0);
+		this.logger.debug(`Computed ${count} medals for ${medalDef.name}`);
+		return count;
 	}
 
 	/**
@@ -270,33 +268,34 @@ export class ComputeMedalsService {
 		rankIndex: number,
 	): Promise<number> {
 		let earnedMedalsCount = 0;
-		const earned = rankIndex + 1 > medalDef.score_relative;
-
-		delete medalDef._id;
+		const earned = rankIndex + 1 >= medalDef.score_relative;
 
 		const medal = new this.medalModel({
 			...medalDef.toObject(),
+			_id: undefined,
 			curator_orcid: aggregatedReports.curator_orcid,
 			count_total: aggregatedReports.count,
 			score_total: aggregatedReports.score_total,
 			state: earned ? AchievementState.progress : AchievementState.achieved,
 			score_relative_valid: earned,
+			score_relative_index: rankIndex,
 		});
 		earnedMedalsCount += earned ? 1 : 0;
 		const user = await this.getUser(aggregatedReports.curator_orcid);
 		const resource = await this.getResource(medalDef.resource_id);
 		computePrivacyField(resource, user, medal);
 
-		rankIndex++;
-
 		try {
 			await medal.save();
+			this.logger.debug(
+				`Saved medal ${medalDef.name} for ${aggregatedReports.curator_orcid} earnedMedalsCount: ${earnedMedalsCount}`,
+			);
 			return earnedMedalsCount;
 		} catch (err) {
-			if (err instanceof MongoServerError && err.code && err.code === 11000) {
+			if (err instanceof Error) {
 				this.logger.error(err.message, err.stack, err.name);
 				throw new Error(
-					`An error occured while upserting medal ${medalDef.name} for curator ${aggregatedReports.curator_orcid} in resource ${medalDef.resource_id}`,
+					`An error occured while creating medal ${medalDef.name} for curator ${aggregatedReports.curator_orcid} in resource ${medalDef.resource_id}`,
 				);
 			}
 		}

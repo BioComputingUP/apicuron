@@ -27,6 +27,11 @@ export class Achievement extends ResourceEntity {
 	type: string;
 
 	@Prop({
+		required: true,
+	})
+	resource_id: string;
+
+	@Prop({
 		type: String,
 		required: true,
 		enum: AchievementState,

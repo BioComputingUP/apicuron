@@ -19,13 +19,9 @@ import { computePrivacyField } from '../../util/privacy.helper';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { AggregatedReportsByActivities } from '../types/aggregated-reports';
 import {
-	IComputeResourceBadgesEventPayload,
-	IComputeUserBadgesEventPayload,
-	IincrementalBadgeComputeEventPayload,
-	onComputeResourceBadges,
-	onComputeUserBadges,
-	onIncrementalBadgeCompute,
-} from '../events';
+	IBadgeCountChangeEventPayload,
+	onBadgesCompute,
+} from '../events/events';
 
 @Injectable()
 export class ComputeBadgesService {
@@ -43,13 +39,9 @@ export class ComputeBadgesService {
 	public async computeResourceBadges(resource: { resource_id: string }) {
 		const { resource_id } = resource;
 
-		await this.computeAllBadges({
+		await this.computeBadges({
 			resource_id,
 		});
-
-		await this.eventEmitter.emitAsync(onComputeResourceBadges, {
-			resource_id,
-		} as IComputeResourceBadgesEventPayload);
 	}
 
 	public async computeUserBadges(payload: {
@@ -65,7 +57,7 @@ export class ComputeBadgesService {
 			`Computing Badges for user ${curator_orcid} at resource ${resource_id}`,
 		);
 
-		await this.computeAllBadges(
+		await this.computeBadges(
 			{
 				resource_id,
 			},
@@ -73,11 +65,6 @@ export class ComputeBadgesService {
 				curator_orcid,
 			},
 		);
-
-		await this.eventEmitter.emitAsync(onComputeUserBadges, {
-			resource_id,
-			curator_orcid,
-		} as IComputeUserBadgesEventPayload);
 	}
 
 	/**
@@ -87,11 +74,13 @@ export class ComputeBadgesService {
 	public async incrementalBadgeCompute(report: ReportDocument) {
 		const { activity_term, resource_id, league } = report;
 
-		const concernedBadges = await this.badgeDefModel.find({
+		const bageDefFilter: FilterQuery<BadgeDefDocument> = {
 			list_terms: activity_term,
 			resource_id,
 			league,
-		});
+		};
+
+		const concernedBadges = await this.badgeDefModel.find(bageDefFilter);
 
 		const badges$ = concernedBadges.map(async (badgeDef) => {
 			return await this.upsertBadge(badgeDef, report);
@@ -100,8 +89,8 @@ export class ComputeBadgesService {
 		await Promise.all(badges$);
 
 		await this.eventEmitter.emitAsync(
-			onIncrementalBadgeCompute,
-			report as IincrementalBadgeComputeEventPayload,
+			onBadgesCompute,
+			bageDefFilter as IBadgeCountChangeEventPayload,
 		);
 	}
 
@@ -205,11 +194,14 @@ export class ComputeBadgesService {
 		}
 	}
 
-	public async computeAllBadges(
+	public async computeBadges(
 		badgeDefFilter: FilterQuery<BadgeDefDocument> = {},
 		reportFilter: FilterQuery<ReportDocument> = {},
 	) {
+		this.logger.debug(`Badge Def Filter: `, badgeDefFilter);
+
 		await this.badgeModel.deleteMany(badgeDefFilter);
+
 		const badgeDefs = this.badgeDefModel
 			.find(
 				badgeDefFilter,
@@ -256,9 +248,17 @@ export class ComputeBadgesService {
 			}
 
 			badgeSaves.push(Promise.all(badges$));
+
+			this.logger.log(
+				`Badge ${badgeDef.name} computed for ${badgeSaves.length} users`,
+			);
 		}
 
 		await Promise.all(badgeSaves);
+
+		this.logger.log(`Computed ${badgeSaves.length} badges`);
+
+		await this.eventEmitter.emitAsync(onBadgesCompute, badgeDefFilter);
 	}
 
 	/**

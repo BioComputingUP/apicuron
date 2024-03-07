@@ -15,12 +15,14 @@ import {
 } from '../../core/schemas/achievements-def/achievement-def.schema';
 import { Injectable } from '@nestjs/common';
 import {
+	IBadgeDefCreateEventPayload,
 	IBadgeDefDeleteEventPayload,
 	IBadgeDefUpdateEventPayload,
 	IMedalDefDeleteEventPayload,
 	IMedalDefUpdateEventPayload,
 	onBadgeDefDelete,
 	onBadgeDefUpdate,
+	onMedalDefCreate,
 	onMedalDefDelete,
 	onMedalDefUpdate,
 } from '../events/events';
@@ -101,6 +103,24 @@ export class AchievementsDefEventHandlerService {
 
 	@OnEvent(onBadgeDefUpdate, { async: true, promisify: true })
 	async onBadgeDefUpdate({ badgeDef }: IBadgeDefUpdateEventPayload) {
-		return await this.computeBadges.computeAllBadges(badgeDef.toObject());
+		return await this.computeBadges.computeBadges(badgeDef.toObject());
+	}
+
+	@OnEvent(onBadgeDefUpdate, { async: true, promisify: true })
+	async onBadgeDefCreate({ badgeDef }: IBadgeDefCreateEventPayload) {
+		return await this.computeBadges.computeBadges({
+			name: badgeDef.name,
+			resource_id: badgeDef.resource_id,
+			league: badgeDef.league,
+		});
+	}
+
+	@OnEvent(onMedalDefCreate, { async: true, promisify: true })
+	async onMedalDefCreate({ badgeDef }: IBadgeDefCreateEventPayload) {
+		return await this.computeMedals.computeMedals({
+			name: badgeDef.name,
+			resource_id: badgeDef.resource_id,
+			league: badgeDef.league,
+		});
 	}
 }

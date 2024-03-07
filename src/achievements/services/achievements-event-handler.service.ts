@@ -129,7 +129,7 @@ export class AchievementEventHandlerService
 				map(({ report }: IPostReportInsertSingleEventPayload) => report),
 				this.debounceByResource(),
 				switchMap(async (resource_id: string) => {
-					await this.computeMedals.computeResourceMedals({
+					await this.computeMedals.computeMedals({
 						resource_id,
 					});
 					return resource_id;

@@ -30,6 +30,7 @@ export function computePrivacyField(
 ): PrivacyType {
 	// if the resourceEntity has a specified league we use it otherwise we use the resource's default league
 	const league = userResourceEntity.league ?? resource.defaultLeague;
+	userResourceEntity.league = league;
 
 	// we retrieve both the league's privacy and the user's privacy setting
 	const leaguePrivacy = resource.getLeague(league).visibility;
@@ -45,19 +46,18 @@ export function computePrivacyField(
 	return userResourceEntity.privacy;
 }
 
-// @deprecated
 /**
  * Assigns the privacy field of a resource entity based on the provided resource and resource entity.
- * @deprecated This function is deprecated and will be removed in future versions. Please Do not use it
  * @param resource - The resource object.
  * @param resourceEntity - The resource entity object.
  * @returns The privacy type assigned to the resource entity.
  */
-export function assignPrivacyField(
+export function assignResourceEntityPrivacyField(
 	resource: PartnerResourceDocument | LeanDocument<PartnerResource>,
-	resourceEntity: LeanDocument<UserResourceEntity> | UserResourceEntityDocument,
+	resourceEntity: LeanDocument<ResourceEntityDocument> | ResourceEntityDocument,
 ): PrivacyType {
 	const league = resourceEntity.league ?? resource.defaultLeague;
+	resourceEntity.league = league;
 	resourceEntity.privacy = resource.getLeague(league).visibility;
 	return resourceEntity.privacy;
 }

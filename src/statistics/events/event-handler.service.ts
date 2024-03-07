@@ -1,22 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import {
-	IComputeResourceBadgesEventPayload,
-	IComputeResourceMedalsEventPayload,
-	IComputeUserBadgesEventPayload,
-	IincrementalBadgeComputeEventPayload,
-	onComputeResourceBadges,
-	onComputeResourceMedals,
-	onComputeUserBadges,
-	onIncrementalBadgeCompute,
-} from '../../achievements/events';
+	IMedalCountChangeEventPayload,
+	onMedalsCompute,
+} from '../../achievements/events/events';
 import { InjectModel } from '@nestjs/mongoose';
 import {
 	Badge,
 	BadgeDocument,
 } from '../../core/schemas/achievements/badges.schema';
-import { Model } from 'mongoose';
-import { AchievementState } from '../../core/enums';
+import { FilterQuery, Model } from 'mongoose';
 import {
 	Statistics,
 	StatisticsDocument,
@@ -48,6 +41,9 @@ import {
 	onTermDeletedEvent,
 	onTermUpdatedEvent,
 } from '../../terms/events/events';
+import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
+import { onBadgesCompute } from '../../achievements/events/events';
+import { AchievementState, AchievementType } from '../../core/enums';
 
 @Injectable()
 export class StatisticsEventHandlerService {
@@ -63,81 +59,95 @@ export class StatisticsEventHandlerService {
 
 	logger = new Logger(StatisticsEventHandlerService.name);
 
-	@OnEvent(onIncrementalBadgeCompute, { async: true, promisify: true })
-	async updateBadgeCount(payload: IincrementalBadgeComputeEventPayload) {
-		const badgeCount = await this.badgeModel.count({
-			...payload,
-			state: AchievementState.achieved,
-		});
+	@OnEvent(onBadgesCompute, { async: true, promisify: true })
+	async updateStatBadgeCount(badgeDefFilter: FilterQuery<BadgeDefDocument>) {
+		// retrieve stats linked to the affected badges
 
-		await this.statModel.updateOne(
-			{
-				...payload,
-			},
-			{
-				$set: {
-					badges_count: badgeCount,
+		const badgeCounts = this.badgeModel
+			.aggregate()
+			.match({
+				...badgeDefFilter,
+				type: AchievementType.badge,
+				state: AchievementState.achieved,
+			})
+			.group({
+				_id: {
+					resource_id: '$resource_id',
+					curator_orcid: '$curator_orcid',
+					league: '$league',
 				},
-			},
-		);
-	}
+				resource_id: { $first: '$resource_id' },
+				curator_orcid: { $first: '$curator_orcid' },
+				league: { $first: '$league' },
+				count: { $sum: 1 },
+			})
+			.cursor({ batchSize: 50 });
 
-	@OnEvent(onComputeUserBadges, { async: true, promisify: true })
-	async updateUserBadgeCount(payload: IComputeUserBadgesEventPayload) {
-		const stats = this.statModel.findOne(payload).cursor({ batchSize: 10 });
+		const statUpdates$ = [];
 
-		const statSaves$ = [];
-		for await (const stat of stats) {
-			stat.badges_count = await this.badgeModel.count({
-				resource_id: stat.resource_id,
-				curator_orcid: stat.curator_orcid,
-				league: stat.league,
-				state: AchievementState.achieved,
-			});
+		for await (const badgeCount of badgeCounts) {
+			const { resource_id, curator_orcid, league, count } = badgeCount;
+			const update$ = this.statModel.findOneAndUpdate(
+				{
+					resource_id,
+					curator_orcid,
+					league,
+				},
+				{
+					$set: {
+						badges_count: count,
+					},
+				},
+			);
 
-			statSaves$.push(stat.save());
+			statUpdates$.push(update$);
 		}
 
-		await Promise.all(statSaves$);
+		await Promise.all(statUpdates$);
+		return;
 	}
 
-	@OnEvent(onComputeResourceBadges, { async: true, promisify: true })
-	async updateResourceBadgeCount(payload: IComputeResourceBadgesEventPayload) {
-		const stats = this.statModel.findOne(payload).cursor({ batchSize: 50 });
-		const statSaves$ = [];
-
-		for await (const stat of stats) {
-			stat.badges_count = await this.badgeModel.count({
-				resource_id: stat.resource_id,
-				curator_orcid: stat.curator_orcid,
-				league: stat.league,
+	@OnEvent(onMedalsCompute, { async: true, promisify: true })
+	async updateMedalCount(medalDefFilter: IMedalCountChangeEventPayload) {
+		const medalCounts = this.medalModel
+			.aggregate()
+			.match({
+				...medalDefFilter,
+				type: AchievementType.medal,
 				state: AchievementState.achieved,
-			});
+			})
+			.group({
+				_id: {
+					resource_id: '$resource_id',
+					curator_orcid: '$curator_orcid',
+					league: '$league',
+				},
+				resource_id: { $first: '$resource_id' },
+				curator_orcid: { $first: '$curator_orcid' },
+				league: { $first: '$league' },
+				count: { $sum: 1 },
+			})
+			.cursor({ batchSize: 50 });
 
-			statSaves$.push(stat.save());
+		const statUpdates$ = [];
+		for await (const medalCount of medalCounts) {
+			const { resource_id, curator_orcid, league, count } = medalCount;
+			const update$ = this.statModel.updateOne(
+				{
+					resource_id,
+					curator_orcid,
+					league,
+				},
+				{
+					$set: {
+						medals_count: count,
+					},
+				},
+			);
+			statUpdates$.push(update$);
 		}
 
-		await Promise.all(statSaves$);
-	}
-
-	@OnEvent(onComputeResourceMedals, { async: true, promisify: true })
-	async updateResourceMedalCount(payload: IComputeResourceMedalsEventPayload) {
-		const stats = this.statModel.findOne(payload).cursor({ batchSize: 50 });
-		const statSaves$ = [];
-
-		for await (const stat of stats) {
-			stat.medals_count = await this.medalModel.count({
-				resource_id: stat.resource_id,
-				curator_orcid: stat.curator_orcid,
-				league: stat.league,
-				state: AchievementState.achieved,
-			});
-			statSaves$.push(stat.save());
-		}
-
-		const updates = await Promise.all(statSaves$);
-
-		return updates.length;
+		await Promise.all(statUpdates$);
 	}
 
 	@OnEvent(UserUpdatePrivacyEvent, { async: true, promisify: true })

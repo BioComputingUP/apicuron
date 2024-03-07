@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { AchievementType, PrivacyType } from '../../enums';
+import { AchievementType } from '../../enums';
 import { ResourceEntity } from '../components/resource-entity.schema';
 
 export type AchievementDefDocument = HydratedDocument<AchievementDef>;
