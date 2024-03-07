@@ -48,8 +48,6 @@ export class Medal extends UserResourceEntity {
 	})
 	resource_uri: string;
 
-	resource_id: string;
-
 	@Prop({
 		required: true,
 	})
