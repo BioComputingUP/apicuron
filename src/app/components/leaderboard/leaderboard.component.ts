@@ -139,8 +139,8 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
         filter.limit = this.limit;
         filter.skip = (page - 1) * this.limit;
         filter.resources = [resource.resource_id];
-        filter.sortOrder = 1;
-        filter.sortBy = "ranking";
+        filter.sortOrder = -1;
+        filter.sortBy = "total_score";
         return filter;
       }),
       shareReplay()
