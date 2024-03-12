@@ -136,10 +136,24 @@ export class User {
 			) != -1
 		);
 	}
-	getResourcePutCode(resource_id: string): string {
+	getResourcePutCode(resource_id: string): {
+		putCode: string;
+		resource_id: string;
+	} {
 		return this.orcid_work_put_codes.find(
 			(item) => item.resource_id == resource_id,
-		).putCode;
+		);
+	}
+
+	setResourcePutCode(resource_id: string, putCode: string): void {
+		if (this.hasResourcePutCode(resource_id)) {
+			this.getResourcePutCode(resource_id).putCode = putCode;
+		} else {
+			this.orcid_work_put_codes.push({
+				resource_id,
+				putCode,
+			});
+		}
 	}
 
 	getResourceSettings(resource_id: string): UserResourceSpecificSettings {

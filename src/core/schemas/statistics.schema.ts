@@ -17,6 +17,7 @@ export type StatisticsDocument = HydratedDocument<
 	collection: 'statistics',
 })
 export class Statistics extends UserResourceEntity {
+
 	@Prop({ required: true, default: () => 0 })
 	badges_count: number;
 
@@ -70,7 +71,8 @@ export class Statistics extends UserResourceEntity {
 }
 
 export function StatisticsSchemaFactory() {
-	const StatisticsSchema = SchemaFactory.createForClass(Statistics);
+	const StatisticsSchema =
+		SchemaFactory.createForClass(Statistics).loadClass(Statistics);
 
 	StatisticsSchema.virtual('user', {
 		ref: User.name,

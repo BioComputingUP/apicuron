@@ -66,7 +66,7 @@ export class OrcidSubmissionTask {
 
 		if (user.hasResourcePutCode(stat.resource_id)) {
 			// this is an update of a an existing work
-			const resourcePutCode = user.getResourcePutCode(stat.resource_id);
+			const resourcePutCode = user.getResourcePutCode(stat.resource_id).putCode;
 
 			const rawData = `
             <?xml version="1.0" encoding="UTF-8"?>
