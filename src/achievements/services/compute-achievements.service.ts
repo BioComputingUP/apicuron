@@ -2,6 +2,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ComputeMedalsService } from './compute-medals.service';
 import { ComputeBadgesService } from './compute-badges.service';
+import { FilterQuery } from 'mongoose';
+import { ReportDocument } from '../../core/schemas/reports.schema';
+import { MedalDefDocument } from '../../core/schemas/achievements-def/medal-def.schema';
+import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
 
 @Injectable()
 export class ComputeAchievementsService {
@@ -32,6 +36,17 @@ export class ComputeAchievementsService {
 		const computeResults = await Promise.all([
 			this.computeMedals.computeResourceMedals(resource),
 			this.computeBadges.computeResourceBadges(resource),
+		]);
+
+		return computeResults;
+	}
+
+	public async computeAchievements(
+		achFilter: FilterQuery<MedalDefDocument> & FilterQuery<BadgeDefDocument>,
+	) {
+		const computeResults = await Promise.all([
+			this.computeMedals.computeMedals(achFilter),
+			this.computeBadges.computeBadges(achFilter),
 		]);
 
 		return computeResults;

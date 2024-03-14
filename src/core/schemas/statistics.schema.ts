@@ -9,6 +9,7 @@ import {
 } from './components/aggregated-data.schema';
 import { UserResourceEntity } from './components/user-resource-entity.schema';
 import { mapValues } from 'lodash';
+import { PrivacyType } from '../enums';
 
 export type StatisticsDocument = HydratedDocument<
 	Statistics & UserResourceEntity
@@ -67,37 +68,40 @@ export class Statistics extends UserResourceEntity {
 
 	@Prop({ required: true, default: () => 0 })
 	total_score: number;
+
+	@Prop({ required: true, type: String })
+	resource_id: string;
+
+	@Prop({ required: true, type: String, enum: PrivacyType })
+	privacy: PrivacyType;
+
+	@Prop({ required: true })
+	league: string;
 }
 
-export function StatisticsSchemaFactory() {
-	const StatisticsSchema = SchemaFactory.createForClass(Statistics);
+export const StatisticsSchema =
+	SchemaFactory.createForClass(Statistics).loadClass(Statistics);
 
-	StatisticsSchema.virtual('user', {
-		ref: User.name,
-		localField: 'curator_orcid',
-		foreignField: 'orcid_id',
-		justOne: true,
-	});
+// export function StatisticsSchemaFactory() {
 
-	// creating indexes
-	StatisticsSchema.index({ resource_id: 1 }, { name: 'resource_id_index ' });
-	StatisticsSchema.index(
-		{ curator_orcid: 1 },
-		{ name: 'curator_orcid_index ' },
-	);
+// 	StatisticsSchema.virtual('user', {
+// 		ref: User.name,
+// 		localField: 'curator_orcid',
+// 		foreignField: 'orcid_id',
+// 		justOne: true,
+// 	});
 
-	// creating unique index, using fields from ActivityClass
-	StatisticsSchema.index(
-		{ resource_id: 1, curator_orcid: 1, privacy: 1, league: 1 },
-		{ name: 'unique_index', unique: true },
-	);
-	return StatisticsSchema;
-}
+// 	// creating indexes
+// 	StatisticsSchema.index({ resource_id: 1 }, { name: 'resource_id_index ' });
+// 	StatisticsSchema.index(
+// 		{ curator_orcid: 1 },
+// 		{ name: 'curator_orcid_index ' },
+// 	);
 
-export function StatisticsAggregatedReportsFactory(
-	aggregatedReports: Partial<UserResourceEntity>,
-) {
-	const StatisticsSchema = SchemaFactory.createForClass(Statistics);
-
-	return UserResourceEntitySchemaFactory(StatisticsSchema, aggregatedReports);
-}
+// 	// creating unique index, using fields from ActivityClass
+// 	StatisticsSchema.index(
+// 		{ resource_id: 1, curator_orcid: 1, privacy: 1, league: 1 },
+// 		{ name: 'unique_index', unique: true },
+// 	);
+// 	return StatisticsSchema;
+// }

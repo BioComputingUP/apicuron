@@ -68,7 +68,7 @@ const logger = new Logger('AppModule');
 			load: [loadConfig()],
 		}),
 
-		MongoEventsModule,
+		// MongoEventsModule,
 		// in here we use the forRootAsync https://docs.nestjs.com/techniques/mongodb#async-configuration
 		// to be able to access the configService asnchronously because it cannot be loaded sooner
 		// due to the fact that this is the appmodule
@@ -81,7 +81,7 @@ const logger = new Logger('AppModule');
 				const db_host = configService.get<string>('db_host');
 				const database = configService.get<string>('database');
 				const port = configService.get<number>('db_port');
-				const uri = `mongodb://${db_host}:${port}/${database}?retryWrites=true&w=majority`;
+				const uri = `mongodb://${db_host}:${port}/${database}`;
 				logger.log(`MongoDB Connection setup uri: ${uri}`);
 				return {
 					uri,

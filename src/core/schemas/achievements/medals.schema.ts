@@ -78,8 +78,22 @@ export class Medal extends UserResourceEntity {
 	})
 	list_terms: string[];
 
+	@Prop({
+		required: true,
+		type: String,
+	})
 	league: string;
+
+	@Prop({
+		required: true,
+		type: String,
+	})
 	privacy: PrivacyType;
+
+	@Prop({
+		required: true,
+		type: String,
+	})
 	state: AchievementState;
 }
 

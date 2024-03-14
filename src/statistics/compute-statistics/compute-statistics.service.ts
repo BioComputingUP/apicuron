@@ -47,7 +47,17 @@ export class ComputeStatisticsService {
 	private getRelatedStatsFilter(
 		report: ReportDocument | Report | LeanDocument<Report>,
 	): FilterQuery<StatisticsDocument> {
-		return pick(report, ['curator_orcid', 'resource_id', 'league']);
+		const statFilter: FilterQuery<StatisticsDocument> = {};
+		if (report.curator_orcid) {
+			statFilter.curator_orcid = report.curator_orcid;
+		}
+		if (report.resource_id) {
+			statFilter.resource_id = report.resource_id;
+		}
+		if (report.league) {
+			statFilter.league = report.league;
+		}
+		return statFilter;
 	}
 
 	private getRelatedTermFilter(
@@ -200,11 +210,15 @@ export class ComputeStatisticsService {
 	 */
 	async computeStatistics(filter: FilterQuery<ReportDocument> = {}) {
 		const statFilter = this.getRelatedStatsFilter(new this.reportModel(filter));
-		this.logger.debug(`statFilter:`, statFilter);
+		this.logger.debug(`statFilter:`, JSON.stringify(statFilter));
 
-		const delResponse = await this.statModel.deleteMany(statFilter);
+		const delResponse = await this.statModel.deleteMany({
+			resource_id: 'disprot',
+		});
 
-		this.logger.debug(`Deleted ${delResponse.deletedCount} documents`);
+		this.logger.debug(
+			`Deleted ${delResponse.deletedCount} documents, acknowledged ${delResponse.acknowledged} `,
+		);
 
 		const reportsByTerms = this.aggregateReportsByActivity(filter).cursor({
 			batchSize: 100,
@@ -231,7 +245,19 @@ export class ComputeStatisticsService {
 
 				computePrivacyField(currentResource, currentUser, currentStat);
 
-				const statSavePromise$ = currentStat.save();
+				const statSavePromise$ = currentStat
+					.save()
+					.then((val) => {
+						this.logger.debug(
+							`Saved stat: ${currentStat.resource_id}/${currentStat.curator_orcid}/${currentStat.league}`,
+						);
+					})
+					.catch((err) => {
+						this.logger.error(err);
+						this.logger.error(
+							`Duplicate stat: ${currentStat.resource_id}/${currentStat.curator_orcid}/${currentStat.league}`,
+						);
+					});
 				statSaves$.push(statSavePromise$);
 				currentStat = new this.statModel(relatedStat);
 			}
