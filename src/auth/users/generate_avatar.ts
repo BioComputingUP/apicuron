@@ -2,14 +2,14 @@ import { mkdir } from 'fs/promises';
 import { dirname, join } from 'path';
 import { v4 as uuid } from 'uuid';
 import { kebabCase } from 'lodash';
+import { createAvatar } from '@dicebear/core';
+import { identicon } from '@dicebear/collection';
+
 export async function generateAvatar(
 	username: string,
 	publicFolderPath: string,
 	publicUrlPath: string,
 ): Promise<string> {
-	const { createAvatar } = await import('@dicebear/core');
-	const { identicon } = await import('@dicebear/collection');
-
 	const avatar = createAvatar(identicon, {
 		seed: username,
 		scale: 80,
