@@ -109,6 +109,14 @@ export class StatisticsEventHandlerService {
 
 	@OnEvent(onMedalsCompute, { async: true, promisify: true })
 	async updateMedalCount(medalDefFilter: IMedalCountChangeEventPayload) {
+		this.logger.log('updating counts');
+
+		this.logger.log('filter object', {
+			...medalDefFilter,
+			type: AchievementType.medal,
+			state: AchievementState.achieved,
+		});
+
 		const medalCounts = this.medalModel
 			.aggregate()
 			.match({
@@ -132,18 +140,22 @@ export class StatisticsEventHandlerService {
 		const statUpdates$ = [];
 		for await (const medalCount of medalCounts) {
 			const { resource_id, curator_orcid, league, count } = medalCount;
-			const update$ = this.statModel.updateOne(
-				{
-					resource_id,
-					curator_orcid,
-					league,
-				},
-				{
-					$set: {
+			const update$ = this.statModel
+				.updateOne(
+					{
+						resource_id,
+						curator_orcid,
+						league,
+					},
+					{
 						medals_count: count,
 					},
-				},
-			);
+				)
+				.then((result) => {
+					this.logger.log(
+						`Updating medal count for stat ${resource_id}/${curator_orcid}/${league} with count ${count} modifiedCount: ${result.modifiedCount}!`,
+					);
+				});
 			statUpdates$.push(update$);
 		}
 

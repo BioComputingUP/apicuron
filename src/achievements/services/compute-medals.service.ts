@@ -268,7 +268,7 @@ export class ComputeMedalsService {
 		rankIndex: number,
 	): Promise<number> {
 		let earnedMedalsCount = 0;
-		const earned = rankIndex + 1 >= medalDef.score_relative;
+		const earned = rankIndex + 1 <= medalDef.score_relative;
 
 		const medal = new this.medalModel({
 			...medalDef.toObject(),

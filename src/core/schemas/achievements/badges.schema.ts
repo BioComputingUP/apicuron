@@ -46,6 +46,9 @@ export class Badge extends UserResourceEntity {
 	})
 	list_terms: string[];
 
+	@Prop({
+		required: true,
+	})
 	state: AchievementState;
 
 	league: string;
