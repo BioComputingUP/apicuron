@@ -302,6 +302,11 @@ export class ComputeStatisticsService {
 			currentStat.total_count += report.count;
 			currentStat.total_score += report.count * score;
 		}
+		if (!!currentStat && currentStat instanceof this.statModel) {
+			computePrivacyField(currentResource, currentUser, currentStat);
+
+			statSaves$.push(currentStat.save());
+		}
 
 		await Promise.all(statSaves$);
 
