@@ -7,7 +7,6 @@ import { OrcidApiUrl } from './constants';
 @Module({
 	imports: [HttpModule, ConfigModule],
 	providers: [
-		OrcidClientService,
 		{
 			provide: OrcidApiUrl,
 			inject: [ConfigService],
@@ -19,6 +18,8 @@ import { OrcidApiUrl } from './constants';
 				return orcidApiUrl;
 			},
 		},
+		OrcidClientService,
 	],
+	exports: [OrcidClientService],
 })
 export class OrcidClientModule {}

@@ -1,7 +1,11 @@
 import { HttpService } from '@nestjs/axios';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OrcidApiUrl } from './constants';
-import { OrcidEmailEntry, OrcidUser, OrcidWork } from './interfaces/orcid.interface';
+import {
+	OrcidEmailEntry,
+	OrcidUser,
+	OrcidWork,
+} from './interfaces/orcid.interface';
 import { buildExternalId } from './helpers/build-external-id';
 
 @Injectable()
@@ -48,11 +52,10 @@ export class OrcidClientService {
 		return emailsData;
 	}
 
-	async submitWork(user: OrcidUser, orcidWork: OrcidWork): Promise<string>{
-
+	async submitWork(user: OrcidUser, orcidWork: OrcidWork): Promise<string> {
 		const { externalIds, title, shortDescription, type } = orcidWork;
 		const putCode = orcidWork.putCode ? `put-code="${orcidWork.putCode}"` : '';
-		
+
 		const processedExternalIds = externalIds.map(buildExternalId).join('\n');
 
 		const rawData = `
@@ -73,22 +76,17 @@ export class OrcidClientService {
 		</work:work>
 		`;
 
-		const url = `${this.orcidUrl}${user.orcid_id}/work/${putCode}`
+		const url = `${this.orcidUrl}${user.orcid_id}/work/${putCode}`;
 
-		const response = await this.httpService.axiosRef.put(
-			url,
-			rawData.trim(),
-			{
-				headers: {
-					Accept: '*/*',
-					'Content-type': 'application/vnd.orcid+xml',
-					Authorization: `Bearer ${user.orcid_permission}`,
-				},
+		const response = await this.httpService.axiosRef.put(url, rawData.trim(), {
+			headers: {
+				Accept: '*/*',
+				'Content-type': 'application/vnd.orcid+xml',
+				Authorization: `Bearer ${user.orcid_permission}`,
 			},
-		);
+		});
 
 		if (response.status < 200 || response.status >= 400) {
-
 			if (response.status == 409) {
 				// a conflict, work already exists but we do not have the put-code
 				this.logger.error(
@@ -96,15 +94,18 @@ export class OrcidClientService {
 				);
 				this.logger.error(`response headers:\n${response.headers}`);
 				this.logger.error(`response data:\n${response.data}`);
-				throw new Error(`Failed to submit work ${title} for user ${user.orcid_id} \n Missing ORCID Put Code`);
+				throw new Error(
+					`Failed to submit work ${title} for user ${user.orcid_id} \n Missing ORCID Put Code`,
+				);
 			}
 			this.logger.error(`Error Status ${response.status}`);
 			this.logger.error(`Error Response Header ${response.headers}`);
 			this.logger.error(`Error Response Body ${response.data}`);
-			throw new Error(`Failed to submit work ${title} for user ${user.orcid_id}`);
+			throw new Error(
+				`Failed to submit work ${title} for user ${user.orcid_id}`,
+			);
 		}
 
-		
 		if (response.status == 201) {
 			// Work added successfully, we retrieve the put-code
 			const splitUrl = response.headers.location.split('/');

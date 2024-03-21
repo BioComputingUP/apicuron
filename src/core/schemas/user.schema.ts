@@ -8,6 +8,7 @@ import {
 import { PrivacyType } from '../enums';
 import { UserResource } from '../interfaces/user-resource';
 import { UserResourcePutCode } from '../interfaces/user-resource-put-code';
+import { UserEmailEntry, UserEmailEntrySchema } from './components/user-email.schema';
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({
@@ -35,6 +36,14 @@ export class User {
 
 	@Prop()
 	email?: string;
+
+	// Emails obtained from orcid
+	@Prop({
+		type: [UserEmailEntrySchema],
+		default: [],
+		required: true,
+	})
+	emails: UserEmailEntry[];
 
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop({

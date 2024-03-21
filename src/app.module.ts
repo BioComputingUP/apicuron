@@ -32,6 +32,7 @@ import { MongoEventsModule } from './mongo-events/mongo-events.module';
 import { SubmitReportModule } from './submit-reports/submit-reports.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { OrcidClientModule } from './orcid-client/orcid-client.module';
+import { OrcidSubmissionModule } from './orcid-submission/orcid-submission.module';
 const logger = new Logger('AppModule');
 
 @Module({
@@ -100,6 +101,7 @@ const logger = new Logger('AppModule');
 			],
 		}),
 		OrcidClientModule,
+		OrcidSubmissionModule,
 		CoreApicuronModule,
 		ResourcesModule,
 		TermsModule,
