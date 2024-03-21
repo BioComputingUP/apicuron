@@ -103,16 +103,22 @@ export class AchievementEventHandlerService
 				map(({ report }: IPostReportInsertSingleEventPayload) => report),
 				this.debouncebyUserResource(),
 				switchMap(
-					async (report: { resource_id: string; curator_orcid: string }) => {
-						const { resource_id, curator_orcid } = report;
-						await this.computeBadges.computeUserBadges({
-							resource: {
+					async (report: {
+						resource_id: string;
+						curator_orcid: string;
+						league: string;
+					}) => {
+						const { resource_id, curator_orcid, league } = report;
+						await this.computeBadges.computeBadges(
+							{
 								resource_id,
+								league,
 							},
-							user: {
-								orcid_id: curator_orcid,
+							{
+								curator_orcid,
+								league,
 							},
-						});
+						);
 						return [resource_id, curator_orcid];
 					},
 				),
@@ -160,6 +166,7 @@ export class AchievementEventHandlerService
 				return {
 					resource_id: report.resource_id,
 					curator_orcid: report.curator_orcid,
+					league: report.league,
 				};
 			}),
 			debounceTime(this.defaultDebounceTime),

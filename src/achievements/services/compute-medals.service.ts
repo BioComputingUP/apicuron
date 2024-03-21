@@ -53,7 +53,7 @@ export class ComputeMedalsService {
 	 * @param medal - The medal definition to match against reports.
 	 * @returns The filter query object for matching related reports.
 	 */
-	private matchRelatedReports(
+	public matchRelatedReports(
 		medal: MedalDefDocument,
 	): FilterQuery<ReportDocument> {
 		// first we first filter all the reports by the resource
@@ -276,7 +276,7 @@ export class ComputeMedalsService {
 			curator_orcid: aggregatedReports.curator_orcid,
 			count_total: aggregatedReports.count,
 			score_total: aggregatedReports.score_total,
-			state: earned ? AchievementState.progress : AchievementState.achieved,
+			state: earned ? AchievementState.achieved : AchievementState.progress,
 			score_relative_valid: earned,
 			score_relative_index: rankIndex,
 		});
