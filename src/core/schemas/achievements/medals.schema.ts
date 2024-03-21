@@ -4,8 +4,11 @@ import { AchievementState, PrivacyType } from '../../enums';
 import { UserResourceEntity } from '../components/user-resource-entity.schema';
 
 export type MedalDocument = HydratedDocument<Medal>;
-@Schema({ collection: 'achievements' })
+@Schema({ collection: 'achievements', timestamps: true })
 export class Medal extends UserResourceEntity {
+	createdAt: Date;
+	updatedAt: Date;
+
 	@Prop({
 		required: false,
 	})

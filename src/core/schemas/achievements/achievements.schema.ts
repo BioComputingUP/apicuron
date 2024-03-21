@@ -5,9 +5,16 @@ import { ResourceEntity } from '../components/resource-entity.schema';
 
 export type AchievementDocument = HydratedDocument<Achievement>;
 
-@Schema({ collection: 'achievements', discriminatorKey: 'type' })
+@Schema({
+	collection: 'achievements',
+	timestamps: true,
+	discriminatorKey: 'type',
+})
 export class Achievement extends ResourceEntity {
 	curator_orcid: string;
+
+	createdAt: Date;
+	updatedAt: Date;
 
 	@Prop({
 		required: true,
