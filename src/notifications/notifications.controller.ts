@@ -35,10 +35,6 @@ export class NotificationsController {
 		@UserReq() user: UserModel,
 		@Query() filter: NotificationFilter,
 	) {
-		console.log({
-			pagination: filter.getMongoQueryOptions(),
-			seen: filter.seen,
-		});
 		return await this.notificationService.getNotifications(
 			user.orcid_id,
 			filter,

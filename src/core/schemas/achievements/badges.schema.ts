@@ -7,10 +7,14 @@ export type BadgeDocument = HydratedDocument<Badge>;
 
 @Schema({
 	collection: 'achievements',
+	timestamps: true,
 })
 export class Badge extends UserResourceEntity {
 	// fields from Achievement
 	// id: string;
+
+	createdAt: Date;
+	updatedAt: Date;
 
 	curator_orcid: string;
 	@Prop({
