@@ -26,8 +26,9 @@ export class DefaultWorkBuilder implements OrcidWorkBuilder {
 			`${this.frontendHost}curators/${user.orcid_id}#${resource.resource_name}`,
 		);
 
-		const { putCode } = user.getResourcePutCode(resource.resource_id);
+		const putCodeEntry = user.getResourcePutCode(resource.resource_id);
 
+		const { putCode } = putCodeEntry ?? { putCode: null };
 		return {
 			externalIds: [
 				{

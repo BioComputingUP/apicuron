@@ -25,8 +25,8 @@ export class UpdateUserDto {
 	@IsEmail()
 	email?: string;
 
-	@IsOptional()
-	employment?: string;
+	// @IsOptional()
+	// employment?: string;
 
 	family_name?: string;
 	given_name?: string;
@@ -35,7 +35,7 @@ export class UpdateUserDto {
 
 	institution?: string;
 
-	keywords?: string;
+	// keywords?: string;
 
 	username?: string;
 }

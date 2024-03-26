@@ -14,6 +14,9 @@ import {
 import { OrcidWorkBuilderToken } from './constants';
 import { OrcidWorkBuilder } from './interfaces/orcid-submission.interface';
 import { OrcidWork } from '../orcid-client/interfaces/orcid.interface';
+import { responseHasCode } from '../orcid-client/helpers/response-with-code';
+import { inspect } from 'util';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class SubmitOrcidWork {
@@ -30,6 +33,7 @@ export class SubmitOrcidWork {
 	defaultBatchSize = 100;
 	logger = new Logger(SubmitOrcidWork.name);
 
+	@Cron(CronExpression.EVERY_DAY_AT_2AM)
 	async submitAllWorks(): Promise<any> {
 		const stats = this.statModel
 			.find({
@@ -40,13 +44,22 @@ export class SubmitOrcidWork {
 				curator_orcid: -1,
 			})
 			.cursor({ batchSize: this.defaultBatchSize });
-
+		async function* statIterator() {
+			for await (const stat of stats) {
+				await new Promise((r) => setTimeout(r, 1000));
+				yield stat;
+			}
+		}
 		let currentResource = null;
 
-		for await (const stat of stats) {
+		for await (const stat of statIterator()) {
 			const user = await this.userModel.findOne({
 				orcid_id: stat.curator_orcid,
+				orcid_permission: { $exists: true },
 			});
+			if (!user) {
+				continue;
+			}
 
 			if (!currentResource) {
 				currentResource = await this.resourceModel.findOne({
@@ -74,7 +87,18 @@ export class SubmitOrcidWork {
 			user,
 		);
 		try {
-			await this.orcidClientService.submitWork(user, work);
+			const submitResponse = await this.orcidClientService.submitWork(
+				user,
+				work,
+			);
+
+			if (responseHasCode(submitResponse)) {
+				this.logger.debug(
+					`received put code: ${submitResponse.putCode}, saving the user resource put code`,
+				);
+				user.setResourcePutCode(resource.resource_id, submitResponse.putCode);
+				await user.save();
+			}
 		} catch (err) {
 			if (err instanceof Error) {
 				this.logger.error('Error submitting work to ORCID');

@@ -24,3 +24,13 @@ export interface OrcidWork {
 	putCode?: string;
 	externalIds: OrcidExternalId[];
 }
+
+export type SubmitWorkReponseWithCode = {
+	status: 201;
+	putCode: string;
+};
+export type SubmitWorkResponeWithoutCode = { status: Exclude<number, 201> };
+
+export type SubmitWorkResponse =
+	| SubmitWorkReponseWithCode
+	| SubmitWorkResponeWithoutCode;

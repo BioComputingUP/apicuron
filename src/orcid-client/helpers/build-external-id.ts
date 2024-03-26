@@ -1,6 +1,6 @@
-import { OrcidExternalId } from "../interfaces/orcid.interface";
+import { OrcidExternalId } from '../interfaces/orcid.interface';
 
-export function buildExternalId(externalId: OrcidExternalId): string{
+export function buildExternalId(externalId: OrcidExternalId): string {
 	return `
 	<common:external-id>
 		<common:external-id-type>${externalId.type}</common:external-id-type>

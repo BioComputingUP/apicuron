@@ -12,7 +12,6 @@ import { ComputeStatisticsService } from './compute-statistics/compute-statistic
 import { CacheModule } from '@nestjs/cache-manager';
 import { StatisticsEventHandlerService } from './events/event-handler.service';
 import { OrcidClientModule } from '../orcid-client/orcid-client.module';
-import { OrcidSubmissionService } from './orcid-submission/submit-orcid.service';
 
 @Module({
 	imports: [
@@ -31,7 +30,6 @@ import { OrcidSubmissionService } from './orcid-submission/submit-orcid.service'
 		StatisticsService,
 		ComputeStatisticsService,
 		StatisticsEventHandlerService,
-		OrcidSubmissionService,
 	],
 	exports: [ComputeStatisticsService],
 })

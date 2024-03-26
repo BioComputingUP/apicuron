@@ -5,8 +5,10 @@ import {
 	OrcidEmailEntry,
 	OrcidUser,
 	OrcidWork,
+	SubmitWorkResponse,
 } from './interfaces/orcid.interface';
 import { buildExternalId } from './helpers/build-external-id';
+import { inspect } from 'util';
 
 @Injectable()
 export class OrcidClientService {
@@ -52,7 +54,10 @@ export class OrcidClientService {
 		return emailsData;
 	}
 
-	async submitWork(user: OrcidUser, orcidWork: OrcidWork): Promise<string> {
+	async submitWork(
+		user: OrcidUser,
+		orcidWork: OrcidWork,
+	): Promise<SubmitWorkResponse> {
 		const { externalIds, title, shortDescription, type } = orcidWork;
 		const putCode = orcidWork.putCode ? `put-code="${orcidWork.putCode}"` : '';
 
@@ -64,7 +69,7 @@ export class OrcidClientService {
 			xmlns:common="http://www.orcid.org/ns/common" xmlns:work="http://www.orcid.org/ns/work"
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:schemaLocation="http://www.orcid.org/ns/work /work-3.0.xsd"
-			${putCode}>	
+			${putCode}>
 			<work:title>
 				<common:title>${title}</common:title>
 			</work:title>
@@ -76,15 +81,27 @@ export class OrcidClientService {
 		</work:work>
 		`;
 
-		const url = `${this.orcidUrl}${user.orcid_id}/work/${putCode}`;
+		const urlPath = orcidWork.putCode
+			? `${user.orcid_id}/work/${orcidWork.putCode}`
+			: `${user.orcid_id}/work/`;
 
-		const response = await this.httpService.axiosRef.put(url, rawData.trim(), {
+		this.logger.debug(`URL:  ${urlPath}`);
+
+		const options = {
+			method: orcidWork.putCode ? 'PUT' : 'POST',
+			url: this.orcidUrl + urlPath,
 			headers: {
+				'Content-Type': 'application/xml',
+				Authorization: 'Bearer ' + user.orcid_permission,
 				Accept: '*/*',
-				'Content-type': 'application/vnd.orcid+xml',
-				Authorization: `Bearer ${user.orcid_permission}`,
 			},
-		});
+			data: rawData.trim(),
+			validateStatus: function (status) {
+				return status < 500; // Resolve only if the status code is less than 500
+			},
+		};
+
+		const response = await this.httpService.axiosRef.request(options);
 
 		if (response.status < 200 || response.status >= 400) {
 			if (response.status == 409) {
@@ -92,26 +109,48 @@ export class OrcidClientService {
 				this.logger.error(
 					`User ${user.orcid_id} has no put-code but work creation failed on code 409`,
 				);
-				this.logger.error(`response headers:\n${response.headers}`);
-				this.logger.error(`response data:\n${response.data}`);
+
+				// retry attempt, by retrieving the code from the response message
+				const putCodeMatch = response.data.toString().match(/put-code (\d+)/);
+				if (putCodeMatch && putCodeMatch.length > 1) {
+					// retry attempt
+					const response = await this.submitWork(user, {
+						...orcidWork,
+						putCode: putCodeMatch[1],
+					});
+					// if response is successful, return the validated put-code
+					if (response.status >= 200 && response.status < 400) {
+						return {
+							status: 201,
+							putCode: putCodeMatch[1],
+						};
+					}
+				}
+
 				throw new Error(
 					`Failed to submit work ${title} for user ${user.orcid_id} \n Missing ORCID Put Code`,
 				);
 			}
 			this.logger.error(`Error Status ${response.status}`);
-			this.logger.error(`Error Response Header ${response.headers}`);
-			this.logger.error(`Error Response Body ${response.data}`);
+			this.logger.error(`Error Response Header ${inspect(response.headers)}`);
+			this.logger.error(`Error Response Body ${inspect(response.data)}`);
 			throw new Error(
 				`Failed to submit work ${title} for user ${user.orcid_id}`,
 			);
 		}
+
+		this.logger.log(
+			`Work ${title} submitted successfully, status: ${response.status}`,
+		);
 
 		if (response.status == 201) {
 			// Work added successfully, we retrieve the put-code
 			const splitUrl = response.headers.location.split('/');
 
 			const retrievedPutCode = splitUrl[splitUrl.length - 1];
-			return retrievedPutCode;
+			return { status: response.status, putCode: retrievedPutCode };
 		}
+
+		return { status: response.status };
 	}
 }

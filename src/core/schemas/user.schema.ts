@@ -8,7 +8,11 @@ import {
 import { PrivacyType } from '../enums';
 import { UserResource } from '../interfaces/user-resource';
 import { UserResourcePutCode } from '../interfaces/user-resource-put-code';
-import { UserEmailEntry, UserEmailEntrySchema } from './components/user-email.schema';
+import {
+	UserEmailEntry,
+	UserEmailEntrySchema,
+} from './components/user-email.schema';
+import { UserEmployment } from '../interfaces/user-employment';
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({
@@ -48,9 +52,9 @@ export class User {
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop({
 		required: false,
-		type: SchemaTypes.String,
+		default: () => [],
 	})
-	employment?: string;
+	employment?: UserEmployment[] = [];
 
 	@Prop()
 	family_name?: string;
@@ -73,8 +77,12 @@ export class User {
 	jwt_token: string;
 
 	/// Could not determine type the field only had null or empty values in the sample set.
-	@Prop()
-	keywords?: string;
+	@Prop({
+		required: false,
+		default: () => [],
+		type: [String],
+	})
+	keywords?: string[];
 
 	@Prop({
 		default: Date.now(),
@@ -120,7 +128,7 @@ export class User {
 	@Prop({ required: false })
 	refresh_token?: string;
 
-	@Prop({ required: true })
+	@Prop({ required: true, type: String })
 	avatar: string;
 
 	@Prop({
