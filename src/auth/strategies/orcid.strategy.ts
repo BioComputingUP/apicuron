@@ -14,6 +14,7 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 		configService: ConfigService,
 		usersService: UsersService,
 	) {
+		const logger = new Logger(OrcidStrategy.name);
 		super(
 			{
 				authorizationURL: configService.get<string>('ORCID_AUTH_URL'),
@@ -44,7 +45,6 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 					const user = await usersService.getPrivateUser({ orcid_id });
 					done(null, user);
 				} catch (error) {
-					const logger = new Logger(OrcidStrategy.name);
 					logger.error(`Error Orcid Oauth for user ${orcid_id} ! `);
 					logger.error(error);
 					done(error, null);

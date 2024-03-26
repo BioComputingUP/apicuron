@@ -25,7 +25,11 @@ export class AuthService {
 	async generate_jwt_token(user: userJWT) {
 		const db_user = await this.userService.get_by_orcid(user.orcid_id);
 		const { orcid_id, username } = user;
-		let jwt_input: userJWT = { orcid_id, username, iat: new Date().getTime() };
+		const jwt_input: userJWT = {
+			orcid_id,
+			username,
+			iat: new Date().getTime(),
+		};
 		if (!!db_user && !!db_user.jwt_token) {
 			jwt_input['jwt_token'] = db_user.jwt_token;
 		}

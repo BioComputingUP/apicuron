@@ -18,6 +18,7 @@ export type StatisticsDocument = HydratedDocument<
 	collection: 'statistics',
 })
 export class Statistics extends UserResourceEntity {
+
 	@Prop({ required: true, default: () => 0 })
 	badges_count: number;
 

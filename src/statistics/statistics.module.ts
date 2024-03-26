@@ -11,6 +11,7 @@ import { CoreApicuronModule } from '../core/core.module';
 import { ComputeStatisticsService } from './compute-statistics/compute-statistics.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { StatisticsEventHandlerService } from './events/event-handler.service';
+import { OrcidClientModule } from '../orcid-client/orcid-client.module';
 
 @Module({
 	imports: [
@@ -18,6 +19,7 @@ import { StatisticsEventHandlerService } from './events/event-handler.service';
 		AuthModule,
 		ResourcesModule,
 		AchievementsModule,
+		OrcidClientModule,
 		CacheModule.register({
 			max: 100,
 			shouldCloneBeforeSet: false,

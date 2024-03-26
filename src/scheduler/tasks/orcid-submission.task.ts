@@ -66,7 +66,7 @@ export class OrcidSubmissionTask {
 
 		if (user.hasResourcePutCode(stat.resource_id)) {
 			// this is an update of a an existing work
-			const resourcePutCode = user.getResourcePutCode(stat.resource_id);
+			const resourcePutCode = user.getResourcePutCode(stat.resource_id).putCode;
 
 			const rawData = `
             <?xml version="1.0" encoding="UTF-8"?>
@@ -102,7 +102,7 @@ export class OrcidSubmissionTask {
 				},
 			);
 
-			if (response.status < 200 || response.status > 300) {
+			if (response.status < 200 || response.status >= 400) {
 				this.logger.error(`Error Status ${response.status}`);
 				this.logger.error(`Error Response Header ${response.headers}`);
 				this.logger.error(`Error Response Body ${response.data}`);

@@ -55,7 +55,6 @@ export class AuthController {
 		return {
 			access_token: user.orcid_permission,
 			refresh_token: user.refresh_token,
-			message: 'testing message',
 		};
 	}
 
