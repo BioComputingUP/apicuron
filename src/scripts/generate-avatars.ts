@@ -6,6 +6,8 @@ import { User, UserDocument } from '../core/schemas/user.schema';
 import { Model } from 'mongoose';
 import { generateAvatar } from '../auth/users/generate_avatar';
 import { ConfigService } from '@nestjs/config';
+import { existsSync } from 'fs';
+import { join } from 'path';
 
 export async function bootstrap(app: INestApplicationContext) {
 	const userModel: Model<UserDocument> = app.get(getModelToken(User.name));
@@ -17,7 +19,6 @@ export async function bootstrap(app: INestApplicationContext) {
 
 	const usersCursor = userModel.find({
 		orcid_id: { $exists: true },
-		avatar: { $exists: false },
 	});
 
 	const userSavePromises: Promise<UserDocument>[] = [];
@@ -28,6 +29,10 @@ export async function bootstrap(app: INestApplicationContext) {
 			config.get('PUBLIC_FILES_PATH'),
 			config.get('PUBLIC_FILES_URL_PATH'),
 		);
+
+		if (existsSync(join(config.get('PUBLIC_FILES_PATH'), user.avatar))) {
+			return null;
+		}
 
 		logger.log(
 			`Generated Avatar for user "${user.displayedName} saved in ${avatarPath}"`,
