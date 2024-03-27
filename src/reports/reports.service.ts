@@ -107,17 +107,17 @@ export class ReportsService {
 	) {
 		const { filter, options } = this.buildReportsQuery(reportFilter);
 
-		if (!reportFilter.league) {
+		const query: FilterQuery<ReportDocument> = {
+			$and: [filter, privacyFilter],
+		};
+
+		if (!reportFilter.league && !!reportFilter.resource_id) {
 			const resource = await this.partnerResourcesService.get_resource(
 				reportFilter.resource_id,
 			);
 			reportFilter.league = resource.defaultLeague;
+			query.league = reportFilter.league;
 		}
-
-		const query = {
-			$and: [filter, privacyFilter],
-			league: reportFilter.league,
-		};
 
 		const reports = await this.reportModel.find(query, {}, options).lean();
 		let data = reports;
