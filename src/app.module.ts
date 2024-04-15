@@ -33,6 +33,7 @@ import { SubmitReportModule } from './submit-reports/submit-reports.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { OrcidClientModule } from './orcid-client/orcid-client.module';
 import { OrcidSubmissionModule } from './orcid-submission/orcid-submission.module';
+import { ResourceManagerModule } from './resource-manager/resource-manager.module';
 const logger = new Logger('AppModule');
 
 @Module({
@@ -110,6 +111,7 @@ const logger = new Logger('AppModule');
 		StatisticsModule,
 		AchievementsModule,
 		NotificationsModule,
+		ResourceManagerModule,
 		SchedulerModule,
 		SchedulerClientModule,
 		EmailModule,

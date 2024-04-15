@@ -19,6 +19,7 @@ import * as _ from 'lodash';
 import { Term } from '../../core/schemas/terms.schema';
 import { PaginateDto } from '../../pagination/dto/paginate.dto';
 import { FilterQuery } from 'mongoose';
+import { ReportGroupBy } from '../types/group-by';
 
 export class ReportFilterDto extends PaginateDto {
 	@Validate(EntryExistsRule, [
@@ -112,7 +113,7 @@ export class ReportFilterDto extends PaginateDto {
 export class ReportFilterGroupedDto extends ReportFilterDto {
 	@IsIn(['day', 'month', 'activity_term'])
 	@IsOptional()
-	groupBy: 'day' | 'month' | 'activity_term';
+	groupBy: ReportGroupBy = 'day';
 
 	@Allow()
 	sortBy?;

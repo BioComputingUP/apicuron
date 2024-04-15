@@ -38,7 +38,7 @@ export class UsersService implements OnApplicationBootstrap {
 		}));
 	}
 
-	async getPrivateUser(query: Partial<User>): Promise<User> {
+	async getPrivateUser(query: Partial<User>): Promise<UserDocument> {
 		const user_promise = this.userModel.findOne(query, {
 			stats: 0,
 		});

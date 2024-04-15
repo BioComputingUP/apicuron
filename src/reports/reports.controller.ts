@@ -53,6 +53,7 @@ export class ReportsController {
 	async getGroupedReports(
 		@Query() filter: ReportFilterDto,
 		@Param() groupBy: Pick<ReportFilterGroupedDto, 'groupBy'>,
+		@UserReq() user: User,
 	) {
 		// const filterInstance: ReportFilterDto = plainToInstance(ReportFilterDto, filter);
 		const groupByInstance: ReportFilterGroupedDto = plainToInstance(
@@ -60,6 +61,11 @@ export class ReportsController {
 			{ ...filter, ...groupBy },
 		);
 
-		return await this.reportService.getGroupedReports(groupByInstance);
+		const privacyFilter = userResourceEntityPrivacyFilter(user);
+
+		return await this.reportService.getGroupedReports(
+			groupByInstance,
+			privacyFilter,
+		);
 	}
 }

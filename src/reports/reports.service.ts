@@ -148,7 +148,10 @@ export class ReportsService {
 		return paginate(data, reportFilter, reports_count);
 	}
 
-	async getGroupedReports(reportFilter: ReportFilterGroupedDto) {
+	async getGroupedReports(
+		reportFilter: ReportFilterGroupedDto,
+		baseReportFilter: FilterQuery<ReportDocument> = {},
+	) {
 		const { filter, options } = this.buildReportsQuery(reportFilter);
 
 		const [paginationPipeline, limitAggregation]: PaginationAggregation =
@@ -157,6 +160,7 @@ export class ReportsService {
 			this.buildReportGroupAggregation(reportFilter);
 
 		const aggregationPipeline: PipelineStage[] = [
+			{ $match: baseReportFilter },
 			{ $match: filter },
 			...groupByAggregation,
 			paginationPipeline,
@@ -255,15 +259,15 @@ export class ReportsService {
 				{
 					$group: {
 						_id: { $dateToString: { date: '$timestamp', format: '%Y-%m-%d' } },
-						reports: {
-							$push: {
-								activity_term: '$activity_term',
-								resource_id: '$resource_id',
-								curator_orcid: '$curator_orcid',
-								timestamp: '$timestamp',
-								entity_uri: '$entity_uri',
-							},
-						},
+						// reports: {
+						// 	$push: {
+						// 		activity_term: '$activity_term',
+						// 		resource_id: '$resource_id',
+						// 		curator_orcid: '$curator_orcid',
+						// 		timestamp: '$timestamp',
+						// 		entity_uri: '$entity_uri',
+						// 	},
+						// },
 						count: { $sum: 1 },
 					},
 				},
@@ -271,7 +275,7 @@ export class ReportsService {
 					$project: {
 						groupKey: '$_id',
 						_id: 0,
-						reports: 1,
+						// reports: 1,
 						count: 1,
 					},
 				},
