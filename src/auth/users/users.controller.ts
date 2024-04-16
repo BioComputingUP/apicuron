@@ -39,6 +39,7 @@ import {
 	IUserUpdatePrivacyEventPayload,
 	UserUpdatePrivacyEvent,
 } from './events/update-privacy';
+import { UserReq } from '../decorators/applyUser.decorator';
 
 @ApiTags('First Version')
 @Controller('')
@@ -127,10 +128,14 @@ export class UserControllerV2 {
 	@Get(':orcid_id')
 	@UseGuards(LocalAuthGuard)
 	@Public()
-	async get_curator(@Param('orcid_id') orcid_id: string, @Req() req) {
+	async get_curator(
+		@Param('orcid_id') orcid_id: string,
+		@UserReq() userReq?: User,
+	) {
 		let user = null;
-		if (req.user) {
-			if (req.user.resources && req.user.resources.length > 0) {
+
+		if (userReq) {
+			if (userReq.resources && userReq.resources.length > 0) {
 				user = this.userModel.findOne(
 					{
 						orcid_id,
@@ -146,7 +151,7 @@ export class UserControllerV2 {
 				user = this.userModel.findOne(
 					{
 						orcid_id,
-						privacy: 'public',
+						$or: [{ privacy: 'public' }, { orcid_id: userReq.orcid_id }],
 					},
 					{
 						stats: 0,
