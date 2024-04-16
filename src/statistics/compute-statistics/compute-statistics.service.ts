@@ -13,7 +13,6 @@ import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { computePrivacyField } from '../../util/privacy.helper';
-import { pick } from 'lodash';
 @Injectable()
 export class ComputeStatisticsService {
 	logger = new Logger(ComputeStatisticsService.name);
@@ -212,9 +211,7 @@ export class ComputeStatisticsService {
 		const statFilter = this.getRelatedStatsFilter(new this.reportModel(filter));
 		this.logger.debug(`statFilter:`, JSON.stringify(statFilter));
 
-		const delResponse = await this.statModel.deleteMany({
-			resource_id: 'disprot',
-		});
+		const delResponse = await this.statModel.deleteMany(statFilter);
 
 		this.logger.debug(
 			`Deleted ${delResponse.deletedCount} documents, acknowledged ${delResponse.acknowledged} `,
