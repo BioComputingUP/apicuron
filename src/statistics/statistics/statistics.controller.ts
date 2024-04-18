@@ -129,7 +129,7 @@ export class StatisticsController {
 
 		const privacyFilter = userResourceEntityPrivacyFilter(user);
 
-		const stats = await this.statService.getStatistics(
+		const stats = await this.statService.getUserStatistics(
 			{
 				...statFilter.omitPagination(),
 				...privacyFilter,

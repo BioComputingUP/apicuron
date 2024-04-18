@@ -290,9 +290,11 @@ export class ComputeStatisticsService {
 				currentStat[`${activity_category}_terms`] = [];
 			}
 			currentStat[`${activity_category}_terms`].push({
-				...term,
+				activity_category: term.activity_category,
+				activity_name: term.activity_name,
+				description: term.description,
+				activity_term: report.activity_term,
 				count: report.count,
-				curator_orcid: currentStat.curator_orcid,
 				sum: report.count * score,
 			});
 

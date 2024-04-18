@@ -186,7 +186,7 @@ export class StatisticsService {
 	 * @param defaultPrivacy The default privacy requested
 	 * @returns {Statistics[]} A list of statistics fitting the filter criteria
 	 */
-	async getStatistics(
+	async getUserStatistics(
 		filter: FilterQuery<StatisticsDocument>,
 		options: QueryOptions<StatisticsDocument>,
 	) {

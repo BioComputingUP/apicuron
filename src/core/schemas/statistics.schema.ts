@@ -1,14 +1,10 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { User } from './user.schema';
-import { StatisticsTerms } from './statistics-terms.schema';
-import { HydratedDocument } from 'mongoose';
 import {
-	ReportsMeta,
-	ReportMetaSchema,
-	AggregatedReportsSchemaFactory as UserResourceEntitySchemaFactory,
-} from './components/aggregated-data.schema';
+	StatisticsTerms,
+	StatisticsTermsSchema,
+} from './statistics-terms.schema';
+import { HydratedDocument } from 'mongoose';
 import { UserResourceEntity } from './components/user-resource-entity.schema';
-import { mapValues } from 'lodash';
 import { PrivacyType } from '../enums';
 
 export type StatisticsDocument = HydratedDocument<
@@ -18,7 +14,6 @@ export type StatisticsDocument = HydratedDocument<
 	collection: 'statistics',
 })
 export class Statistics extends UserResourceEntity {
-
 	@Prop({ required: true, default: () => 0 })
 	badges_count: number;
 
@@ -31,7 +26,7 @@ export class Statistics extends UserResourceEntity {
 	@Prop({ required: true, default: () => 0 })
 	generation_score: number;
 
-	@Prop({ required: true, default: () => [] })
+	@Prop({ required: true, default: () => [], type: [StatisticsTermsSchema] })
 	generation_terms: StatisticsTerms[];
 	/// Multiple data types found: Float: 28.1%, Int: 71.9% out of 89 sampled entries
 	@Prop({ required: true, default: () => 0 })
@@ -41,7 +36,7 @@ export class Statistics extends UserResourceEntity {
 	@Prop({ required: true, default: () => 0 })
 	invalidation_score: number;
 
-	@Prop({ required: true, default: () => [] })
+	@Prop({ required: true, default: () => [], type: [StatisticsTermsSchema] })
 	invalidation_terms: StatisticsTerms[];
 
 	@Prop({ required: true, default: () => 0 })
@@ -61,7 +56,7 @@ export class Statistics extends UserResourceEntity {
 	@Prop({ required: true, default: () => 0 })
 	revision_score: number;
 
-	@Prop({ required: true, default: () => [] })
+	@Prop({ required: true, default: () => [], type: [StatisticsTermsSchema] })
 	revision_terms: StatisticsTerms[];
 
 	@Prop({ required: false, default: () => 0 })

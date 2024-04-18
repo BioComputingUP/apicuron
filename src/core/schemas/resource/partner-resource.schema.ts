@@ -56,19 +56,6 @@ export class PartnerResource {
 	getLeague(leagueName: string) {
 		return this.leagues.find((league: League) => league.name == leagueName);
 	}
-
-	// getCuratorContributionType(curator_id: string): ContributionType {
-	// 	return this.professional_curators.includes(curator_id)
-	// 		? ContributionType.professional
-	// 		: ContributionType.community;
-	// }
-
-	// hasProfessionalCurator(
-	// 	this: PartnerResourceDocument,
-	// 	curator_orcid: string,
-	// ): boolean {
-	// 	return this.professional_curators.includes(curator_orcid);
-	// }
 }
 const PartnerResourceSchema =
 	SchemaFactory.createForClass(PartnerResource).loadClass(PartnerResource);
