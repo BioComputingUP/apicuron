@@ -17,9 +17,9 @@ import { AuthDropdownComponent } from "./components/auth-dropdown/auth-dropdown.
 import { NotificationsDataModule } from "./notifications-data/notifications-data.module";
 import { NgxPopperModule } from "ngx-popper";
 import { SentryModuleConfig } from "../config/sentry.config";
-import { BannerService } from "./main-layout/banner.service";
-import { TransferHttpCacheModule } from '@nguniversal/common';
 import { MatomoModule } from "ngx-matomo";
+import { DevBannerComponent } from "./banners/dev-banner/dev-banner.component";
+import { DowntimeBannerComponent } from "./banners/downtime-banner/downtime-banner.component";
 @NgModule({
   declarations: [
     AppComponent,
@@ -60,12 +60,13 @@ import { MatomoModule } from "ngx-matomo";
         enable: true,
       },
     }),
+    DevBannerComponent,
+    DowntimeBannerComponent,
   ],
   providers: [
     // *** Sentry ErrorHandler and Tracer Setup ***
     SentryModuleConfig,
     // *** end of sentry setup ***
-    BannerService
   ],
   bootstrap: [AppComponent],
   exports: [RouterModule],
