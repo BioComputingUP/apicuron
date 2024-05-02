@@ -7,7 +7,7 @@
     "start-dev-external": "ng serve --host 0.0.0.0 --disable-host-check",
     "start-prod": "ng serve --configuration production",
     "compodoc": "npx compodoc -p tsconfig.doc.json",
-    "build": "rm -rf dist/* && ng build apicuron-ui --configuration production --source-map && npm run sentry:sourcemaps",
+    "build": "rm -rf dist/* && ng build apicuron-ui --configuration production",
     "build-widget-dev": "./projects/leaderboard/widget/build-widget.sh dev",
     "build-widget": "./projects/leaderboard/widget/build-widget.sh prod",
     "build-dev": "rm -rf dist/* && ng build apicuron-ui --configuration development --source-map",
