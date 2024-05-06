@@ -6,18 +6,21 @@ import { OrcidModule } from "src/app/orcid/orcid.module";
 import { Observable, merge } from "rxjs";
 import { OrcidProfileLink } from "src/app/orcid/types/orcid";
 import { map } from "rxjs/operators";
+import { SafeUrl } from "@angular/platform-browser";
 
 @Component({
     standalone: true,
     selector: 'curator-profile',
     templateUrl: './curator-profile.component.html',
-    imports:[CommonModule, OrcidModule],
+    imports: [CommonModule, OrcidModule],
     styleUrls: ['./curator-profile.component.scss']
 })
 export class CuratorProfileComponent implements OnInit {
     profileLinks$: Observable<OrcidProfileLink[]>;
     keywords$: Observable<string[]>;
     biography$: Observable<string>;
+    employment$: Observable<string>; // field for the place of work
+    // avatarLink$: Observable<SafeUrl | string>; // field for uploading the avatar
 
     userInfo$: Observable<Boolean>;
     
@@ -30,12 +33,10 @@ export class CuratorProfileComponent implements OnInit {
         this.biography$ = this.orcidService.get_biography(this.curator.orcid_id)
         this.keywords$ = this.orcidService.get_keywords(this.curator.orcid_id)
         this.profileLinks$ = this.orcidService.get_profile_links(this.curator.orcid_id)
+        this.employment$ = this.orcidService.get_employment(this.curator.orcid_id)
 
-        this.userInfo$ = merge(this.biography$, this.keywords$, this.profileLinks$, 3).pipe(
+        this.userInfo$ = merge(this.biography$, this.keywords$, this.profileLinks$, this.employment$, 4).pipe(
             map((k) => !!k )
         )
     }
-
-
-
 }
