@@ -16,6 +16,8 @@ import { computePrivacyField } from '../../util/privacy.helper';
 import { AggregatedReportIteratorService } from '../../report-iterator/aggregated-report-iterator.service';
 import { BaseReportAggregationService } from '../../report-aggregation/aggregators/base-report-aggregation.service';
 import { SortedPipelineStage } from '../../report-aggregation/interfaces/aggregator.interface';
+import { BaseAggregationResult } from '../../report-aggregation/interfaces/aggregation-results';
+import { BaseReportIteratorResult } from '../../report-iterator/interfaces/base-report-iterator-result';
 @Injectable()
 export class ComputeStatisticsService {
 	logger = new Logger(ComputeStatisticsService.name);
@@ -209,17 +211,7 @@ export class ComputeStatisticsService {
 
 	updateSingleStat(
 		stat: StatisticsDocument,
-		{
-			resource,
-			report,
-			user,
-			term,
-		}: {
-			resource: PartnerResourceDocument;
-			report: ReportDocument & { count: number };
-			user: UserDocument;
-			term: TermDocument;
-		},
+		{ resource, report, user, term }: BaseReportIteratorResult,
 	) {
 		computePrivacyField(resource, user, stat);
 		const activity_category = term.activity_category;
@@ -258,12 +250,12 @@ export class ComputeStatisticsService {
 		);
 		const statSaves$ = [];
 
-		const aggregationPipeline: SortedPipelineStage = [
-			{ $match: statFilter },
-			...this.reportAggregator.buildPipeline(),
-		];
-
-		const reportsByTerms = this.reportIterator.iterate(aggregationPipeline);
+		const aggregation = this.reportAggregator.aggregate(this.reportModel, [
+			{
+				$match: filter,
+			},
+		]);
+		const reportsByTerms = this.reportIterator.iterate(aggregation);
 
 		let currentStat = null;
 		for await (const { resource, report, user, term } of reportsByTerms) {

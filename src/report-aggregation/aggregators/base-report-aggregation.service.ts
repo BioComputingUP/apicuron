@@ -68,8 +68,12 @@ export class BaseReportAggregationService
 	 * @param model - The model to perform the aggregation on.
 	 * @returns The aggregated results.
 	 */
-	aggregate(model: Model<any>): Aggregate<BaseAggregationResult> {
+	aggregate(
+		model: Model<any>,
+		prefixPipeline: PipelineStage[],
+	): Aggregate<BaseAggregationResult> {
 		const pipeline: PipelineStage[] = this.buildPipeline();
+		pipeline.unshift(...prefixPipeline);
 		return model.aggregate(
 			pipeline,
 		) as unknown as Aggregate<BaseAggregationResult>;
