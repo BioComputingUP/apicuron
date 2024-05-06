@@ -8,25 +8,35 @@ import {
 	runMapOperations,
 	runGroupOperations,
 	runPostGroupOperations,
-} from '../base/aggregator-helper';
+} from '../helper/aggregator-helper';
 import { AggregateDateBoundsService } from '../operations/aggregate-date-bounds.service';
 import { AggregateDaysService } from '../operations/aggregate-days.service';
 import { AggregateMonthsService } from '../operations/aggregate-months.service';
+import { DetailedAggregationResult } from '../interfaces/aggregation-results';
+import { Model, Aggregate } from 'mongoose';
 
 @Injectable()
-export class DetailedReportAggregationService implements Aggregator {
+export class DetailedReportAggregationService
+	implements Aggregator<DetailedAggregationResult>
+{
 	constructor(
 		protected aggregateDays: AggregateDaysService,
 		protected aggregateDates: AggregateDateBoundsService,
 		protected aggregateMonths: AggregateMonthsService,
 	) {}
+	aggregate(model: Model<any>): Aggregate<DetailedAggregationResult> {
+		const pipeline = this.buildPipeline();
+		return model.aggregate(
+			pipeline,
+		) as unknown as Aggregate<DetailedAggregationResult>;
+	}
 
-	operations = [this.aggregateDays, this.aggregateDates];
+	private operations = [this.aggregateDays, this.aggregateDates];
 
 	/**
 	 * Returns the aggregation pipeline stages for the base aggregation
 	 */
-	aggregate(): SortedPipelineStage {
+	buildPipeline(): SortedPipelineStage {
 		const pipeline: PipelineStage[] = [];
 
 		const mapOperations = runMapOperations(this.operations);

@@ -3,16 +3,25 @@ import {
 	Aggregator,
 	SortedPipelineStage,
 } from '../interfaces/aggregator.interface';
-import { PipelineStage } from 'mongoose';
+import { Aggregate, Model, PipelineStage } from 'mongoose';
+import { BaseAggregationResult } from '../interfaces/aggregation-results';
+import { Report } from '../../core/schemas/reports.schema';
 
 @Injectable()
-export class BaseReportAggregationService implements Aggregator {
+/**
+ * Represents a base report aggregation service.
+ * @implements Aggregator<BaseAggregationResult>
+ */
+export class BaseReportAggregationService
+	implements Aggregator<BaseAggregationResult>
+{
 	operations = [];
 
 	/**
-	 * Returns the aggregation pipeline stages for the base aggregation
+	 * Builds the aggregation pipeline stages.
+	 * @returns The list of pipeline stages with the last element sorted
 	 */
-	aggregate(): SortedPipelineStage {
+	buildPipeline(): SortedPipelineStage {
 		const pipeline: PipelineStage[] = [];
 
 		// Group the documents by the days of the week
@@ -52,5 +61,17 @@ export class BaseReportAggregationService implements Aggregator {
 		};
 
 		return [...pipeline, sortStage];
+	}
+
+	/**
+	 * Returns the aggregation pipeline stages for the base aggregation.
+	 * @param model - The model to perform the aggregation on.
+	 * @returns The aggregated results.
+	 */
+	aggregate(model: Model<any>): Aggregate<BaseAggregationResult> {
+		const pipeline: PipelineStage[] = this.buildPipeline();
+		return model.aggregate(
+			pipeline,
+		) as unknown as Aggregate<BaseAggregationResult>;
 	}
 }

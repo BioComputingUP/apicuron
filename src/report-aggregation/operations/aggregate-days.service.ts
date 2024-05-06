@@ -1,17 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PipelineStage } from 'mongoose';
+import { days } from '../constants';
 
 @Injectable()
 export class AggregateDaysService {
-	days = [
-		'monday',
-		'tuesday',
-		'wednesday',
-		'thursday',
-		'friday',
-		'saturday',
-		'sunday',
-	];
+	days = days;
 
 	map(): PipelineStage[] {
 		const fields: PipelineStage.AddFields['$addFields'] = {};

@@ -1,23 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Operation } from '../interfaces/operations.interface';
 import { PipelineStage, AccumulatorOperator } from 'mongoose';
+import { months } from '../constants';
 
 @Injectable()
 export class AggregateMonthsService implements Operation {
-	months = [
-		'january',
-		'february',
-		'march',
-		'april',
-		'may',
-		'june',
-		'july',
-		'august',
-		'september',
-		'october',
-		'november',
-		'december',
-	];
+	months = months;
+
 	map(): PipelineStage[] {
 		const fields: PipelineStage.AddFields['$addFields'] = {};
 		this.months.forEach((month, index) => {

@@ -207,6 +207,42 @@ export class ComputeStatisticsService {
 			});
 	}
 
+	updateSingleStat(
+		stat: StatisticsDocument,
+		{
+			resource,
+			report,
+			user,
+			term,
+		}: {
+			resource: PartnerResourceDocument;
+			report: ReportDocument & { count: number };
+			user: UserDocument;
+			term: TermDocument;
+		},
+	) {
+		computePrivacyField(resource, user, stat);
+		const activity_category = term.activity_category;
+		const score = term.score;
+		stat[`${activity_category}_count`] += report.count;
+		stat[`${activity_category}_score`] += report.count * score;
+		if (!stat[`${activity_category}_terms`]) {
+			stat[`${activity_category}_terms`] = [];
+		}
+		stat[`${activity_category}_terms`].push({
+			activity_category: term.activity_category,
+			activity_name: term.activity_name,
+			description: term.description,
+			activity_term: report.activity_term,
+			count: report.count,
+			score: score,
+			sum: report.count * score,
+		});
+
+		stat.total_count += report.count;
+		stat.total_score += report.count * score;
+	}
+
 	/**
 	 * Computes statistics based on the provided filter.
 	 * @param filter - The filter query to apply when fetching reports.
@@ -220,42 +256,17 @@ export class ComputeStatisticsService {
 		this.logger.debug(
 			`Deleted ${delResponse.deletedCount} documents, acknowledged ${delResponse.acknowledged} `,
 		);
-
-		// const reportsByTerms = this.aggregateReportsByActivity(filter).cursor({
-		// 	batchSize: 100,
-		// });
-
-		// let currentStat: StatisticsDocument | null = null;
-		// let currentResource: PartnerResourceDocument | null = null;
-		// let currentUser: UserDocument | null = null;
-		// let current_terms: Map<string, LeanDocument<Term>> = new Map();
-
 		const statSaves$ = [];
 
 		const aggregationPipeline: SortedPipelineStage = [
 			{ $match: statFilter },
-			...this.reportAggregator.aggregate(),
+			...this.reportAggregator.buildPipeline(),
 		];
 
 		const reportsByTerms = this.reportIterator.iterate(aggregationPipeline);
 
 		let currentStat = null;
 		for await (const { resource, report, user, term } of reportsByTerms) {
-			if (
-				currentStat.resource_id !== report.resource_id ||
-				currentStat.curator_orcid !== report.curator_orcid ||
-				currentStat.league !== report.league
-			) {
-				console.log('Saving stat');
-				console.log({
-					resource,
-					report,
-					user,
-					term,
-				});
-				statSaves$.push(currentStat.save());
-				currentStat = null;
-			}
 			if (!currentStat) {
 				// instantiate a new stat object if the current stat is null
 				currentStat = new this.statModel({
@@ -264,28 +275,23 @@ export class ComputeStatisticsService {
 					league: report.league,
 				});
 			}
-			computePrivacyField(resource, user, currentStat);
-
-			const activity_category = term.activity_category;
-			const score = term.score;
-
-			currentStat[`${activity_category}_count`] += report.count;
-			currentStat[`${activity_category}_score`] += report.count * score;
-			if (!currentStat[`${activity_category}_terms`]) {
-				currentStat[`${activity_category}_terms`] = [];
+			if (
+				currentStat.resource_id != report.resource_id ||
+				currentStat.curator_orcid != report.curator_orcid ||
+				currentStat.league != report.league
+			) {
+				statSaves$.push(currentStat.save());
+				currentStat = new this.statModel({
+					resource_id: report.resource_id,
+					curator_orcid: report.curator_orcid,
+					league: report.league,
+				});
 			}
-			currentStat[`${activity_category}_terms`].push({
-				activity_category: term.activity_category,
-				activity_name: term.activity_name,
-				description: term.description,
-				activity_term: report.activity_term,
-				count: report.count,
-				sum: report.count * score,
-			});
 
-			currentStat.total_count += report.count;
-			currentStat.total_score += report.count * score;
+			this.updateSingleStat(currentStat, { resource, report, user, term });
+		}
 
+		if (currentStat) {
 			statSaves$.push(currentStat.save());
 		}
 

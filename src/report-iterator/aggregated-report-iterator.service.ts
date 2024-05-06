@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { SortedPipelineStage } from '../report-aggregation/interfaces/aggregator.interface';
-import { FilterQuery, Model } from 'mongoose';
+import { Aggregate, FilterQuery, Model } from 'mongoose';
 import { Report, ReportDocument } from '../core/schemas/reports.schema';
 import {
 	PartnerResource,
@@ -10,9 +9,14 @@ import { Term, TermDocument } from '../core/schemas/terms.schema';
 import { User, UserDocument } from '../core/schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cache } from '@nestjs/cache-manager';
+import { BaseAggregationResult } from '../report-aggregation/interfaces/aggregation-results';
+import { BaseReportIteratorResult } from './interfaces/base-report-iterator-result';
+import { Iterator } from './interfaces/iterator.interface';
 
 @Injectable()
-export class AggregatedReportIteratorService {
+export class AggregatedReportIteratorService
+	implements Iterator<BaseAggregationResult, BaseReportIteratorResult>
+{
 	constructor(
 		@InjectModel(PartnerResource.name)
 		protected resourceModel: Model<PartnerResourceDocument>,
@@ -68,10 +72,10 @@ export class AggregatedReportIteratorService {
 		return resultTerm;
 	}
 
-	async *iterate(pipeline: SortedPipelineStage) {
-		const cursor = this.reportModel
-			.aggregate(pipeline, { batchSize: 100 })
-			.cursor();
+	async *iterate(
+		aggregation: Aggregate<BaseAggregationResult>,
+	): AsyncGenerator<BaseReportIteratorResult> {
+		const cursor = aggregation.cursor({ batchSize: 100 });
 		let currentResource: PartnerResourceDocument | null = null;
 		let currentUser: UserDocument | null = null;
 

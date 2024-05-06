@@ -46,25 +46,6 @@ export class StatisticsTerms {
 		default: () => 0,
 	})
 	sum: number;
-
-	@Prop({
-		type: Date,
-		required: true,
-	})
-	lastSubmission: Date;
-
-	@Prop({
-		type: Date,
-		required: true,
-	})
-	firstSubmission: Date;
-
-	@Prop({
-		type: [Date],
-		required: true,
-		default: () => [],
-	})
-	dates: Date[];
 }
 
 export const StatisticsTermsSchema =

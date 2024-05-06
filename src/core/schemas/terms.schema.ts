@@ -32,7 +32,7 @@ export class Term extends ResourceEntity {
 	league: string;
 	privacy: PrivacyType;
 
-	@Prop({ required: true, type: String })
+	@Prop({ required: true, type: Number })
 	score: number;
 }
 
