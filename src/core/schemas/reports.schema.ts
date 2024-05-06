@@ -1,9 +1,11 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, LeanDocument } from 'mongoose';
 import { PrivacyType } from '../enums';
 import { ResourceEntity } from './components/resource-entity.schema';
 
 export type ReportDocument = HydratedDocument<Report>;
+
+export type ReportLeanDocument = LeanDocument<Report>;
 @Schema({
 	collection: 'reports',
 })

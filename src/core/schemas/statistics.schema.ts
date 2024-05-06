@@ -2,7 +2,7 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import {
 	StatisticsTerms,
 	StatisticsTermsSchema,
-} from './statistics-terms.schema';
+} from './components/statistics-terms.schema';
 import { HydratedDocument } from 'mongoose';
 import { UserResourceEntity } from './components/user-resource-entity.schema';
 import { PrivacyType } from '../enums';
@@ -77,27 +77,3 @@ export class Statistics extends UserResourceEntity {
 
 export const StatisticsSchema =
 	SchemaFactory.createForClass(Statistics).loadClass(Statistics);
-
-// export function StatisticsSchemaFactory() {
-
-// 	StatisticsSchema.virtual('user', {
-// 		ref: User.name,
-// 		localField: 'curator_orcid',
-// 		foreignField: 'orcid_id',
-// 		justOne: true,
-// 	});
-
-// 	// creating indexes
-// 	StatisticsSchema.index({ resource_id: 1 }, { name: 'resource_id_index ' });
-// 	StatisticsSchema.index(
-// 		{ curator_orcid: 1 },
-// 		{ name: 'curator_orcid_index ' },
-// 	);
-
-// 	// creating unique index, using fields from ActivityClass
-// 	StatisticsSchema.index(
-// 		{ resource_id: 1, curator_orcid: 1, privacy: 1, league: 1 },
-// 		{ name: 'unique_index', unique: true },
-// 	);
-// 	return StatisticsSchema;
-// }

@@ -13,6 +13,9 @@ import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { computePrivacyField } from '../../util/privacy.helper';
+import { AggregatedReportIteratorService } from '../../report-iterator/aggregated-report-iterator.service';
+import { BaseReportAggregationService } from '../../report-aggregation/aggregators/base-report-aggregation.service';
+import { SortedPipelineStage } from '../../report-aggregation/interfaces/aggregator.interface';
 @Injectable()
 export class ComputeStatisticsService {
 	logger = new Logger(ComputeStatisticsService.name);
@@ -24,6 +27,8 @@ export class ComputeStatisticsService {
 		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
 		protected partnerResourceService: PartnerResourcesService,
 		@Inject(CACHE_MANAGER) private cacheManager: Cache,
+		protected reportIterator: AggregatedReportIteratorService,
+		protected reportAggregator: BaseReportAggregationService,
 	) {}
 	defaultCacheTTl = 10;
 	private async getTerm(
@@ -209,7 +214,6 @@ export class ComputeStatisticsService {
 	 */
 	async computeStatistics(filter: FilterQuery<ReportDocument> = {}) {
 		const statFilter = this.getRelatedStatsFilter(new this.reportModel(filter));
-		this.logger.debug(`statFilter:`, JSON.stringify(statFilter));
 
 		const delResponse = await this.statModel.deleteMany(statFilter);
 
@@ -217,72 +221,53 @@ export class ComputeStatisticsService {
 			`Deleted ${delResponse.deletedCount} documents, acknowledged ${delResponse.acknowledged} `,
 		);
 
-		const reportsByTerms = this.aggregateReportsByActivity(filter).cursor({
-			batchSize: 100,
-		});
+		// const reportsByTerms = this.aggregateReportsByActivity(filter).cursor({
+		// 	batchSize: 100,
+		// });
 
-		let currentStat: StatisticsDocument | null = null;
-		let currentResource: PartnerResourceDocument | null = null;
-		let currentUser: UserDocument | null = null;
-		let current_terms: Map<string, LeanDocument<Term>> = new Map();
+		// let currentStat: StatisticsDocument | null = null;
+		// let currentResource: PartnerResourceDocument | null = null;
+		// let currentUser: UserDocument | null = null;
+		// let current_terms: Map<string, LeanDocument<Term>> = new Map();
 
 		const statSaves$ = [];
 
-		for await (const report of reportsByTerms) {
-			const relatedStat = this.getRelatedStatsFilter(report);
+		const aggregationPipeline: SortedPipelineStage = [
+			{ $match: statFilter },
+			...this.reportAggregator.aggregate(),
+		];
 
+		const reportsByTerms = this.reportIterator.iterate(aggregationPipeline);
+
+		let currentStat = null;
+		for await (const { resource, report, user, term } of reportsByTerms) {
+			if (
+				currentStat.resource_id !== report.resource_id ||
+				currentStat.curator_orcid !== report.curator_orcid ||
+				currentStat.league !== report.league
+			) {
+				console.log('Saving stat');
+				console.log({
+					resource,
+					report,
+					user,
+					term,
+				});
+				statSaves$.push(currentStat.save());
+				currentStat = null;
+			}
 			if (!currentStat) {
 				// instantiate a new stat object if the current stat is null
-				currentStat = new this.statModel(relatedStat);
-			}
-			if (!this.reportIsRelatedToStat(report, currentStat)) {
-				if (!currentResource) {
-					throw new Error('An error occured in the processing of the reports');
-				}
-
-				computePrivacyField(currentResource, currentUser, currentStat);
-
-				const statSavePromise$ = currentStat
-					.save()
-					.then((val) => {
-						this.logger.debug(
-							`Saved stat: ${currentStat.resource_id}/${currentStat.curator_orcid}/${currentStat.league}`,
-						);
-					})
-					.catch((err) => {
-						this.logger.error(err);
-						this.logger.error(
-							`Duplicate stat: ${currentStat.resource_id}/${currentStat.curator_orcid}/${currentStat.league}`,
-						);
-					});
-				statSaves$.push(statSavePromise$);
-				currentStat = new this.statModel(relatedStat);
-			}
-
-			if (
-				!currentResource ||
-				currentResource.resource_id !== report.resource_id
-			) {
-				const resource$ = this.partnerResourceService.get_resource(
-					report.resource_id,
-				);
-				const terms$ = this.getResourceTerms(report.resource_id);
-				[currentResource, current_terms] = await Promise.all([
-					resource$,
-					terms$,
-				]);
-			}
-
-			if (!currentUser || currentUser.orcid_id !== report.curator_orcid) {
-				currentUser = await this.userModel.findOne({
-					orcid_id: report.curator_orcid,
+				currentStat = new this.statModel({
+					resource_id: report.resource_id,
+					curator_orcid: report.curator_orcid,
+					league: report.league,
 				});
 			}
+			computePrivacyField(resource, user, currentStat);
 
-			const term = current_terms.get(
-				report.league + ':' + report.activity_term,
-			);
-			const { activity_category, score } = term;
+			const activity_category = term.activity_category;
+			const score = term.score;
 
 			currentStat[`${activity_category}_count`] += report.count;
 			currentStat[`${activity_category}_score`] += report.count * score;
@@ -300,9 +285,6 @@ export class ComputeStatisticsService {
 
 			currentStat.total_count += report.count;
 			currentStat.total_score += report.count * score;
-		}
-		if (!!currentStat && currentStat instanceof this.statModel) {
-			computePrivacyField(currentResource, currentUser, currentStat);
 
 			statSaves$.push(currentStat.save());
 		}
