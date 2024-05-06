@@ -118,6 +118,7 @@ export class DatabaseUpdateComponent implements OnDestroy {
             ),
           ],
         ],
+        leagues: [null, [Validators.required]],
       },
       { validators: Validators.required, updateOn: "change" }
     );
@@ -229,4 +230,5 @@ export class DatabaseUpdateComponent implements OnDestroy {
   get color() {
     return this.form.get("color");
   }
+
 }

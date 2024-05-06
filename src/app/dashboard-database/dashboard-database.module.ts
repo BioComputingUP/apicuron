@@ -1,6 +1,5 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
-
 import { DatabaseUpdateComponent } from "./database-update/database-update.component";
 import { DatabasesModule } from "../databases/databases.module";
 import { SubmitReportComponent } from "./submit-report/submit-report.component";
@@ -33,6 +32,12 @@ import { SpinnerComponent } from "../components/utils/spinner/spinner.component"
 import { BadgeFormComponent } from "../components/badge-form/badge-form.component";
 import { PaginationComponent } from "../pagination/pagination.component";
 import { MedalFormComponent } from "../components/medal-form/medal-form.component";
+import { CuratorGroupsComponent } from './curator-groups/curator-groups.component';
+import { ShowGroupsComponent } from './curator-groups/show-groups/show-groups.component';
+import { ModifyGroupsComponent } from './curator-groups/modify-groups/modify-groups.component';
+import { ParticipantsListComponent } from './curator-groups/participants-list/participants-list.component';
+import { GroupsService } from "./curator-groups/services/groups.service";
+
 @NgModule({
   declarations: [
     DatabaseUpdateComponent,
@@ -43,8 +48,12 @@ import { MedalFormComponent } from "../components/medal-form/medal-form.componen
     ManageBadgesComponent,
     ManageMedalsComponent,
     DatabaseOverviewComponent,
+    CuratorGroupsComponent,
+    ShowGroupsComponent,
+    ModifyGroupsComponent,
+    ParticipantsListComponent,
   ],
-  providers: [DashboardService, TermsService, MessageService],
+  providers: [DashboardService, TermsService, MessageService, GroupsService],
   imports: [
     CommonModule,
     DashboardDatabaseRoutingModule,

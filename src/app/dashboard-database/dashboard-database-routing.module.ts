@@ -9,6 +9,7 @@ import { DatabaseOverviewComponent } from "src/app/dashboard-database/database-o
 import { UserDashboardComponent } from "src/app/dashboard/user-dashboard/user-dashboard.component";
 import { ManageBadgesComponent } from "./manage-badges/manage-badges.component";
 import { ManageMedalsComponent } from "./manage-medals/manage-medals.component";
+import { CuratorGroupsComponent } from "./curator-groups/curator-groups.component";
 
 const databaseDashboardRoutes: Routes = [
   {
@@ -50,6 +51,12 @@ const databaseDashboardRoutes: Routes = [
         component: ManageMedalsComponent,
         canActivate: [AuthGuard],
         title: "Manage Resource Medals",
+      },
+      {
+        path: "groups",
+        component: CuratorGroupsComponent,
+        canActivate: [AuthGuard],
+        title: "Manage Resource groups",
       },
       { path: "**", redirectTo: "/" }, // redirects to the home page
     ],

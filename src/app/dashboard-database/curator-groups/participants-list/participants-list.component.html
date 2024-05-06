@@ -1,0 +1,9 @@
+<div class="tw-border-gray-500 tw-bg-gray-100 tw-shadow-lg tw-border tw-rounded tw-p-1 tw-flex tw-flex-col">
+	<h2 class="tw-text-xl tw-font-bold tw-text-gray-800 tw-text-center">Participants List</h2>
+	<ul class="tw-flex tw-flex-col tw-m-2 tw-rounded">
+		<li class="tw-text-center tw-border-b hover:tw-bg-white hover:tw-shadow-lg hover:tw-font-bold" 
+		*ngFor="let participant of (participants$ | async)">
+			{{ participant }}
+		</li>
+	</ul>
+</div>

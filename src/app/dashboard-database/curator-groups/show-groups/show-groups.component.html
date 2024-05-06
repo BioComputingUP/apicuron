@@ -1,0 +1,13 @@
+<!-- List of the groups -->
+<div class="tw-border-gray-500 tw-bg-gray-100 tw-shadow-lg tw-border tw-rounded tw-p-1 tw-flex tw-flex-col">
+	<h2 class="tw-text-xl tw-font-bold tw-text-gray-800 tw-text-center">Curation Groups</h2>
+	<ul>
+		<li class="tw-text-center" *ngFor="let group of (groups$ | async)">
+			<button type="button" class="tw-font-bold tw-p-2 tw-m-0.5 focus:tw-ring-1 tw-ring-purple-900 tw-rounded-md tw-text-white tw-bg-apicuron-bright-purple"
+			(click)="selectGroup(group.name)">
+				<span>{{ group.name }}</span>
+			</button>
+		</li>
+	</ul>
+	<!-- <modify-groups></modify-groups> -->
+</div>
