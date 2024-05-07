@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Operation } from '../interfaces/operations.interface';
+import { GroupEntries, Operation } from '../interfaces/operations.interface';
 import { PipelineStage, AccumulatorOperator } from 'mongoose';
 import { months } from '../constants';
 
@@ -23,7 +23,7 @@ export class AggregateMonthsService implements Operation {
 
 		return [{ $addFields: fields }];
 	}
-	group(): { [key: string]: AccumulatorOperator } {
+	group(): GroupEntries {
 		const groupParams = {};
 		this.months.forEach((month) => {
 			groupParams[month] = { $sum: `$${month}` };

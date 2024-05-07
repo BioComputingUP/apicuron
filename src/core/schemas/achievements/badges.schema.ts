@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { AchievementState, PrivacyType } from '../../enums';
-import { UserResourceEntity } from '../components/user-resource-entity.schema';
+import { IUserResourceEntity } from '../../interfaces/user-resource-entity';
 
 export type BadgeDocument = HydratedDocument<Badge>;
 
@@ -9,7 +9,7 @@ export type BadgeDocument = HydratedDocument<Badge>;
 	collection: 'achievements',
 	timestamps: true,
 })
-export class Badge extends UserResourceEntity {
+export class Badge implements IUserResourceEntity {
 	// fields from Achievement
 	// id: string;
 

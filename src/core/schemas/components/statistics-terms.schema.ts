@@ -1,11 +1,15 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument, LeanDocument } from 'mongoose';
 
-export type StatisticsTermsDocument = StatisticsTerms & Document;
+export type ActivitiesStatisticsDocument =
+	HydratedDocument<ActivitiesStatistics>;
+export type LeanActivitiesStatisticsDocument =
+	LeanDocument<ActivitiesStatisticsDocument>;
 
 @Schema({
 	autoCreate: false,
 })
-export class StatisticsTerms {
+export class ActivitiesStatistics {
 	@Prop({
 		type: String,
 		required: true,
@@ -46,7 +50,28 @@ export class StatisticsTerms {
 		default: () => 0,
 	})
 	sum: number;
+
+	@Prop({
+		type: Number,
+		required: true,
+		default: () => 0,
+	})
+	total_score: number;
+
+	@Prop({
+		type: Date,
+		required: true,
+	})
+	last_contribution: Date;
+
+	@Prop({
+		type: Date,
+		required: true,
+	})
+	first_contribution: Date;
 }
 
-export const StatisticsTermsSchema =
-	SchemaFactory.createForClass(StatisticsTerms);
+export const ActivitiesStatisticsSchema =
+	SchemaFactory.createForClass(ActivitiesStatistics).loadClass(
+		ActivitiesStatistics,
+	);

@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { ResourceEntity } from './components/resource-entity.schema';
 import { PrivacyType } from '../enums';
+import { IResourceEntity } from '../interfaces/user-resource-entity';
 
 export type TermDocument = HydratedDocument<Term>;
 
 @Schema({ collection: 'terms_def' })
-export class Term extends ResourceEntity {
+export class Term implements IResourceEntity {
 	// fields from Achievement
 
 	// https://mongoosejs.com/docs/schematypes.html#schematype-options
@@ -28,8 +28,13 @@ export class Term extends ResourceEntity {
 	@Prop({ required: false, type: String })
 	resource_uri: string;
 
+	@Prop({ required: true, type: String })
 	resource_id: string;
+
+	@Prop({ required: true, type: String })
 	league: string;
+
+	@Prop({ required: true, type: String })
 	privacy: PrivacyType;
 
 	@Prop({ required: true, type: Number })

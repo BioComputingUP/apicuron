@@ -17,4 +17,4 @@ import { DetailedReportAggregationService } from './aggregators/detailed-report-
 	],
 	exports: [BaseReportAggregationService, DetailedReportAggregationService],
 })
-export class ReportAggregationModule {}
+export class DataAggregationModule {}

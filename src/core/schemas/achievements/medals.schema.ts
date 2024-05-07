@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { AchievementState, PrivacyType } from '../../enums';
-import { UserResourceEntity } from '../components/user-resource-entity.schema';
+import { IUserResourceEntity } from '../../interfaces/user-resource-entity';
 
 export type MedalDocument = HydratedDocument<Medal>;
 @Schema({ collection: 'achievements', timestamps: true })
-export class Medal extends UserResourceEntity {
+export class Medal implements IUserResourceEntity {
 	createdAt: Date;
 	updatedAt: Date;
 

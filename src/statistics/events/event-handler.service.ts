@@ -44,6 +44,7 @@ import {
 import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
 import { onBadgesCompute } from '../../achievements/events/events';
 import { AchievementState, AchievementType } from '../../core/enums';
+import { AllStatisticsPipelinesOrchestratorService } from '../../pipeline-runner/orchestrators/all-statistics-pipelines.service';
 
 @Injectable()
 export class StatisticsEventHandlerService {
@@ -54,6 +55,7 @@ export class StatisticsEventHandlerService {
 		protected statModel: Model<StatisticsDocument>,
 		protected computeStats: ComputeStatisticsService,
 		protected resourceService: PartnerResourcesService,
+		protected pipelineOrchestrator: AllStatisticsPipelinesOrchestratorService,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 	) {}
 
@@ -217,11 +219,14 @@ export class StatisticsEventHandlerService {
 	}: IPostReportInsertManyEventPayload) {
 		const resourceIds = uniq(reports.map((report) => report.resource_id));
 		const orcidIds = uniq(reports.map((report) => report.curator_orcid));
-
-		await this.computeStats.computeStatistics({
+		await this.pipelineOrchestrator.runAllPipelines({
 			resource_id: { $in: resourceIds },
 			curator_orcid: { $in: orcidIds },
 		});
+		// await this.pipelineOrchestrator.runAllPipelines({
+		// 	resource_id: { $in: resourceIds },
+		// 	curator_orcid: { $in: orcidIds },
+		// });
 		return;
 	}
 
@@ -245,7 +250,7 @@ export class StatisticsEventHandlerService {
 
 	@OnEvent(onTermDeletedEvent, { async: true, promisify: true })
 	async onTermDeleted({ term }: ITermDeletedEventPayload) {
-		await this.computeStats.computeStatistics({
+		await this.pipelineOrchestrator.runAllPipelines({
 			resource_id: term.resource_id,
 			league: term.league,
 		});
@@ -253,7 +258,7 @@ export class StatisticsEventHandlerService {
 
 	@OnEvent(onTermUpdatedEvent, { async: true, promisify: true })
 	async onTermUpdated({ term }: ITermUpdatedEventPayload) {
-		await this.computeStats.computeStatistics({
+		await this.pipelineOrchestrator.runAllPipelines({
 			resource_id: term.resource_id,
 			league: term.league,
 		});

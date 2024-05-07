@@ -7,15 +7,17 @@ import {
 	PartnerResourceDocument,
 } from '../core/schemas/resource/partner-resource.schema';
 import { PrivacyType } from '../core/enums';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { Term } from '../core/schemas/terms.schema';
 import { AchievementDef } from '../core/schemas/achievements-def/achievement-def.schema';
 import { Report } from '../core/schemas/reports.schema';
-import { ResourceEntity } from '../core/schemas/components/resource-entity.schema';
 import { Achievement } from '../core/schemas/achievements/achievements.schema';
-import { UserResourceEntity } from '../core/schemas/components/user-resource-entity.schema';
 import { computePrivacyField } from '../util/privacy.helper';
 import { User, UserDocument } from '../core/schemas/user.schema';
+import {
+	IResourceEntity,
+	IUserResourceEntity,
+} from '../core/interfaces/user-resource-entity';
 
 async function addLeagueToResources(app: INestApplicationContext) {
 	const logger = new Logger(addLeagueToResources.name);
@@ -84,7 +86,7 @@ async function addLeagueToUserResourceEntities(app: INestApplicationContext) {
 	for (const model of [
 		reportModel,
 		achievementsModel,
-	] as Model<UserResourceEntity>[]) {
+	] as Model<IUserResourceEntity>[]) {
 		logger.debug(`Loading Model ${model.modelName}`);
 
 		const allEntries = model.find({}, {}, { batchSize: 500 }).cursor();
@@ -147,7 +149,7 @@ async function addLeagueToResourceEntities(app: INestApplicationContext) {
 	for (const model of [
 		termModel,
 		achievementDefModel,
-	] as Model<ResourceEntity>[]) {
+	] as Model<IResourceEntity>[]) {
 		logger.debug(`Loading Model ${model.modelName}`);
 		const allEntries = model.find().cursor();
 

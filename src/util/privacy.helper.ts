@@ -1,15 +1,17 @@
-import { FilterQuery, LeanDocument } from 'mongoose';
+import { FilterQuery, HydratedDocument, LeanDocument } from 'mongoose';
 import { PrivacyType } from '../core/enums';
-import { ResourceEntityDocument } from '../core/schemas/components/resource-entity.schema';
-import {
-	UserResourceEntity,
-	UserResourceEntityDocument,
-} from '../core/schemas/components/user-resource-entity.schema';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../core/schemas/resource/partner-resource.schema';
 import { User, UserDocument } from '../core/schemas/user.schema';
+import {
+	IResourceEntity,
+	IResourceEntityDocument,
+	IUserResourceEntity,
+	IUserResourceEntityDocument,
+	LeanIResourceEntityDocument,
+} from '../core/interfaces/user-resource-entity';
 
 /**
  * Computes the privacy field for a given resource entity based on the resource, related user, and user resource entity.
@@ -24,8 +26,8 @@ export function computePrivacyField(
 	resource: PartnerResourceDocument | LeanDocument<PartnerResource>,
 	relatedUser: UserDocument | LeanDocument<User> | null,
 	userResourceEntity:
-		| LeanDocument<UserResourceEntity>
-		| UserResourceEntityDocument
+		| LeanDocument<IUserResourceEntity>
+		| HydratedDocument<IUserResourceEntity>
 		| { league?: string; privacy?: PrivacyType },
 ): PrivacyType {
 	// if the resourceEntity has a specified league we use it otherwise we use the resource's default league
@@ -54,7 +56,7 @@ export function computePrivacyField(
  */
 export function assignResourceEntityPrivacyField(
 	resource: PartnerResourceDocument | LeanDocument<PartnerResource>,
-	resourceEntity: LeanDocument<ResourceEntityDocument> | ResourceEntityDocument,
+	resourceEntity: LeanIResourceEntityDocument | IResourceEntityDocument,
 ): PrivacyType {
 	const league = resourceEntity.league ?? resource.defaultLeague;
 	resourceEntity.league = league;
@@ -64,7 +66,7 @@ export function assignResourceEntityPrivacyField(
 
 export function resourceEntityPrivacyFilter(
 	requestUser: User | null,
-): FilterQuery<ResourceEntityDocument> {
+): FilterQuery<IResourceEntityDocument> {
 	if (!requestUser || requestUser == null) {
 		return { privacy: PrivacyType.public };
 	}
@@ -81,7 +83,7 @@ export function resourceEntityPrivacyFilter(
 
 export function userResourceEntityPrivacyFilter(
 	requestUser: User | null,
-): FilterQuery<UserResourceEntityDocument> {
+): FilterQuery<IUserResourceEntityDocument> {
 	if (!requestUser || requestUser == null) {
 		return { privacy: PrivacyType.public };
 	}

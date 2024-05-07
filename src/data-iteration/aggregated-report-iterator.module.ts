@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CoreApicuronModule } from '../core/core.module';
-import { AggregatedReportIteratorService } from './aggregated-report-iterator.service';
+import { AggregatedReportIteratorService } from './iterators/aggregated-report-iterator.service';
 import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
@@ -14,4 +14,4 @@ import { CacheModule } from '@nestjs/cache-manager';
 	providers: [AggregatedReportIteratorService],
 	exports: [AggregatedReportIteratorService],
 })
-export class AggregatedReportIteratorModule {}
+export class DataIteratorModule {}

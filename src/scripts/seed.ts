@@ -84,7 +84,9 @@ async function bootstrap() {
 		},
 	);
 
-	logger.verbose(`Assigned testing resource to testing user: ${testingOrcidId}`);
+	logger.verbose(
+		`Assigned testing resource to testing user: ${testingOrcidId}`,
+	);
 
 	//create terms for resource
 	const terms$ = [];
@@ -148,7 +150,7 @@ async function bootstrap() {
 	await app.close();
 }
 
-async function mockReport(
+export async function mockReport(
 	userModel: Model<User>,
 	reportModel: Model<Report>,
 	resource: PartnerResourceDocument,
@@ -183,4 +185,7 @@ async function mockReport(
 	return report;
 }
 
-bootstrap();
+if (require.main === module) {
+	console.log('called directly');
+	bootstrap();
+}

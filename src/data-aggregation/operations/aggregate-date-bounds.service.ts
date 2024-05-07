@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PipelineStage } from 'mongoose';
-import { Operation } from '../interfaces/operations.interface';
+import { GroupEntries, Operation } from '../interfaces/operations.interface';
 
 @Injectable()
 export class AggregateDateBoundsService implements Operation {
@@ -8,7 +8,7 @@ export class AggregateDateBoundsService implements Operation {
 		return [];
 	}
 
-	group(): PipelineStage.Group['$group'] {
+	group(): GroupEntries {
 		return {
 			last_contribution: {
 				$min: '$timestamp',

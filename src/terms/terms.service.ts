@@ -8,13 +8,13 @@ import { Term, TermDocument } from '../core/schemas/terms.schema';
 import { Report, ReportDocument } from '../core/schemas/reports.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CreateTermDto } from './dto/createTerm.dto';
-import { ResourceEntity } from '../core/schemas/components/resource-entity.schema';
 import {
 	ITermDeletedEventPayload,
 	ITermUpdatedEventPayload,
 	onTermDeletedEvent,
 	onTermUpdatedEvent,
 } from './events/events';
+import { IResourceEntity } from '../core/interfaces/user-resource-entity';
 
 @Injectable()
 export class TermsService {
@@ -33,7 +33,7 @@ export class TermsService {
 	 */
 	async getTerms(
 		term_list: string[],
-		filter: FilterQuery<ResourceEntity> & {
+		filter: FilterQuery<IResourceEntity> & {
 			resource_id: string;
 			league: string;
 		},

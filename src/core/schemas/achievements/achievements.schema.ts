@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { AchievementState, AchievementType } from '../../enums';
-import { ResourceEntity } from '../components/resource-entity.schema';
+import { AchievementState, AchievementType, PrivacyType } from '../../enums';
+import { IResourceEntity } from '../../interfaces/user-resource-entity';
 
 export type AchievementDocument = HydratedDocument<Achievement>;
 
@@ -10,7 +10,11 @@ export type AchievementDocument = HydratedDocument<Achievement>;
 	timestamps: true,
 	discriminatorKey: 'type',
 })
-export class Achievement extends ResourceEntity {
+export class Achievement implements IResourceEntity {
+	@Prop({ required: true, type: String })
+	privacy: PrivacyType;
+
+	@Prop({ required: true, type: String })
 	curator_orcid: string;
 
 	createdAt: Date;
@@ -45,6 +49,7 @@ export class Achievement extends ResourceEntity {
 	})
 	state: AchievementState;
 
+	@Prop({ required: true, type: String })
 	league: string;
 }
 

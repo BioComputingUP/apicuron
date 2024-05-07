@@ -3,8 +3,7 @@ export type NotificationDocument = Notification & Document;
 
 @Schema({ collection: 'notifications' })
 export class Notification {
-
-    @Prop({ required: true })
+	@Prop({ required: true })
 	title: string;
 
 	@Prop({ required: true })
@@ -21,12 +20,12 @@ export class Notification {
 	})
 	seen: Boolean;
 
-    @Prop({
-        default(){
-            return Date.now()
-        }
-    })
-    created_at: Date
+	@Prop({
+		default() {
+			return Date.now();
+		},
+	})
+	created_at: Date;
 }
 
 export const NotificationSchema = SchemaFactory.createForClass(Notification);

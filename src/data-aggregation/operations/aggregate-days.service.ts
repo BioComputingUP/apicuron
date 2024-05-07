@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PipelineStage } from 'mongoose';
 import { days } from '../constants';
+import { GroupEntries } from '../interfaces/operations.interface';
 
 @Injectable()
 export class AggregateDaysService {
@@ -22,7 +23,7 @@ export class AggregateDaysService {
 		return [{ $addFields: fields }];
 	}
 
-	group(): PipelineStage.Group['$group'] {
+	group(): GroupEntries {
 		const groupParams = {};
 		this.days.forEach((day) => {
 			groupParams[day] = { $sum: `$${day}` };

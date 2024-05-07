@@ -1,5 +1,4 @@
 import { LeanDocument, Types, Document } from 'mongoose';
-import { UserResourceEntity } from '../../core/schemas/components/user-resource-entity.schema';
 import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 import { Statistics } from '../../core/schemas/statistics.schema';
 import { User } from '../../core/schemas/user.schema';
@@ -16,9 +15,7 @@ export class DefaultWorkBuilder implements OrcidWorkBuilder {
 
 	frontendHost: string;
 	buildWork(
-		statsitics: LeanDocument<
-			Statistics & UserResourceEntity & { _id: Types.ObjectId }
-		>,
+		statsitics: LeanDocument<Statistics>,
 		resource: LeanDocument<PartnerResource>,
 		user: Document<unknown, any, User> & User & { _id: Types.ObjectId },
 	): OrcidWork {

@@ -24,14 +24,21 @@ export class DetailedReportAggregationService
 		protected aggregateDates: AggregateDateBoundsService,
 		protected aggregateMonths: AggregateMonthsService,
 	) {}
-	aggregate(model: Model<any>): Aggregate<DetailedAggregationResult> {
-		const pipeline = this.buildPipeline();
+	aggregate(
+		model: Model<any>,
+		pipelinePrefix: PipelineStage[] = [],
+	): Aggregate<DetailedAggregationResult> {
+		const pipeline = [...this.buildPipeline(), ...pipelinePrefix];
 		return model.aggregate(
 			pipeline,
 		) as unknown as Aggregate<DetailedAggregationResult>;
 	}
 
-	private operations = [this.aggregateDays, this.aggregateDates];
+	private operations = [
+		this.aggregateDays,
+		this.aggregateDates,
+		this.aggregateMonths,
+	];
 
 	/**
 	 * Returns the aggregation pipeline stages for the base aggregation

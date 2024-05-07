@@ -1,7 +1,7 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, LeanDocument } from 'mongoose';
 import { PrivacyType } from '../enums';
-import { ResourceEntity } from './components/resource-entity.schema';
+import { IUserResourceEntity } from '../interfaces/user-resource-entity';
 
 export type ReportDocument = HydratedDocument<Report>;
 
@@ -9,7 +9,16 @@ export type ReportLeanDocument = LeanDocument<Report>;
 @Schema({
 	collection: 'reports',
 })
-export class Report extends ResourceEntity {
+export class Report implements IUserResourceEntity {
+	@Prop({ required: true, type: String })
+	resource_id: string;
+
+	@Prop({ required: true, type: String })
+	privacy: PrivacyType;
+
+	@Prop({ required: true, type: String })
+	league: string;
+
 	@Prop({
 		required: true,
 	})

@@ -133,4 +133,17 @@ export class PartnerResourcesService {
 			return [resource, league];
 		});
 	}
+
+	public getUserLeague(
+		resource: PartnerResourceDocument | LeanDocument<PartnerResourceDocument>,
+		orcid_id: string,
+	) {
+		resource.leagues.forEach((league) => {
+			if (league.defaultMembers.includes(orcid_id)) {
+				return league;
+			}
+		});
+
+		return resource.defaultLeague;
+	}
 }

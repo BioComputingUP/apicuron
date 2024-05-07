@@ -6,6 +6,12 @@ import {
 import { Aggregate, Model, PipelineStage } from 'mongoose';
 import { BaseAggregationResult } from '../interfaces/aggregation-results';
 import { Report } from '../../core/schemas/reports.schema';
+import { AggregateDateBoundsService } from '../operations/aggregate-date-bounds.service';
+import {
+	runGroupOperations,
+	runMapOperations,
+	runPostGroupOperations,
+} from '../helper/aggregator-helper';
 
 @Injectable()
 /**
@@ -15,14 +21,15 @@ import { Report } from '../../core/schemas/reports.schema';
 export class BaseReportAggregationService
 	implements Aggregator<BaseAggregationResult>
 {
-	operations = [];
+	constructor(protected dateBoundsOperation: AggregateDateBoundsService) {}
+	operations = [this.dateBoundsOperation];
 
 	/**
 	 * Builds the aggregation pipeline stages.
 	 * @returns The list of pipeline stages with the last element sorted
 	 */
 	buildPipeline(): SortedPipelineStage {
-		const pipeline: PipelineStage[] = [];
+		const pipeline: PipelineStage[] = runMapOperations(this.operations);
 
 		// Group the documents by the days of the week
 		pipeline.push({
@@ -48,8 +55,11 @@ export class BaseReportAggregationService
 				count: {
 					$sum: 1,
 				},
+				...runGroupOperations(this.operations),
 			},
 		});
+
+		const stages = runPostGroupOperations(this.operations);
 
 		const sortStage: PipelineStage.Sort = {
 			$sort: {
@@ -60,7 +70,7 @@ export class BaseReportAggregationService
 			},
 		};
 
-		return [...pipeline, sortStage];
+		return [...pipeline, ...stages, sortStage];
 	}
 
 	/**

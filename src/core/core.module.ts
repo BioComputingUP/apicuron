@@ -40,6 +40,14 @@ import {
 } from './schemas/achievements-def/medal-def.schema';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AchievementType } from './enums';
+import {
+	DetailedStatistics,
+	DetailedStatisticsSchema,
+} from './schemas/statistics/detailed-statistics.schema';
+import {
+	WeeklyStatistics,
+	WeeklyStatisticsSchema,
+} from './schemas/statistics/weekly-statistics.schema';
 
 @Module({
 	imports: [
@@ -88,12 +96,16 @@ import { AchievementType } from './enums';
 				name: Statistics.name,
 				schema: StatisticsSchema,
 			},
+			{
+				name: DetailedStatistics.name,
+				schema: DetailedStatisticsSchema,
+			},
+			{
+				name: WeeklyStatistics.name,
+				schema: WeeklyStatisticsSchema,
+			},
 		]),
 		MongooseModule.forFeatureAsync([
-			// {
-			// 	name: Statistics.name,
-			// 	useFactory: StatisticsSchemaFactory,
-			// },
 			{
 				name: Achievement.name,
 				useFactory: AchievementsSchemaFactory,
@@ -110,29 +122,6 @@ import { AchievementType } from './enums';
 					},
 				],
 			},
-			// {
-			// 	name: EarnedAchievement.name,
-			// 	useFactory: EarnedAchievementsSchemaFactory,
-			// 	discriminators: [
-			// 		{
-			// 			name: EarnedBadge.name,
-			// 			schema: EarnedBadgeSchema,
-			// 			value: AchievementType.badge,
-			// 		},
-			// 		{
-			// 			name: EarnedMedal.name,
-			// 			schema: EarnedMedalSchema,
-			// 			value: AchievementType.medal,
-			// 		},
-			// 	],
-			// },
-
-			// {
-			// 	name: Report.name,
-			// 	useFactory: ReportSchemaFactory,
-			// 	inject: [EventEmitter2],
-			// 	imports: [EventEmitterModule],
-			// },
 		]),
 	],
 

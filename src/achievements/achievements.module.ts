@@ -17,6 +17,8 @@ import { ComputeBadgesService } from './services/compute-badges.service';
 import { AchievementEventHandlerService } from './services/achievements-event-handler.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { AchievementsDefEventHandlerService } from './services/achievements-def-event-handler.service';
+import { EarnedBadgesService } from './services/earned-badges.service';
+import { EarnedMedalsService } from './services/earned-medals.service';
 
 @Module({
 	providers: [
@@ -29,6 +31,8 @@ import { AchievementsDefEventHandlerService } from './services/achievements-def-
 		ComputeAchievementsService,
 		AchievementEventHandlerService,
 		AchievementsDefEventHandlerService,
+		EarnedBadgesService,
+		EarnedMedalsService,
 	],
 	imports: [
 		CoreApicuronModule,
@@ -45,6 +49,8 @@ import { AchievementsDefEventHandlerService } from './services/achievements-def-
 		ComputeAchievementsService,
 		ComputeMedalsService,
 		ComputeBadgesService,
+		EarnedBadgesService,
+		EarnedMedalsService,
 	],
 	controllers: [
 		AchievementsController,

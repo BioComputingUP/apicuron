@@ -1,21 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { Aggregate, FilterQuery, Model } from 'mongoose';
-import { Report, ReportDocument } from '../core/schemas/reports.schema';
+import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
-} from '../core/schemas/resource/partner-resource.schema';
-import { Term, TermDocument } from '../core/schemas/terms.schema';
-import { User, UserDocument } from '../core/schemas/user.schema';
+} from '../../core/schemas/resource/partner-resource.schema';
+import { Term, TermDocument } from '../../core/schemas/terms.schema';
+import { User, UserDocument } from '../../core/schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cache } from '@nestjs/cache-manager';
-import { BaseAggregationResult } from '../report-aggregation/interfaces/aggregation-results';
-import { BaseReportIteratorResult } from './interfaces/base-report-iterator-result';
-import { Iterator } from './interfaces/iterator.interface';
+import {
+	BaseAggregationResult,
+	DetailedAggregationResult,
+} from '../../data-aggregation/interfaces/aggregation-results';
+import { BaseReportIteratorResult } from '../interfaces/base-report-iterator-result';
+import { Iterator } from '../interfaces/iterator.interface';
 
 @Injectable()
 export class AggregatedReportIteratorService
-	implements Iterator<BaseAggregationResult, BaseReportIteratorResult>
+	implements
+		Iterator<
+			BaseAggregationResult,
+			BaseReportIteratorResult<DetailedAggregationResult>
+		>
 {
 	constructor(
 		@InjectModel(PartnerResource.name)
@@ -40,12 +47,13 @@ export class AggregatedReportIteratorService
 			activity_term: string,
 			league: string,
 		) => `term: ${resource_id}:${activity_term}:${league}`;
+		const termKey = getTermKey(
+			termFilter.resource_id,
+			termFilter.activity_term,
+			termFilter.league,
+		);
 		const cachedTerm = (await this.cacheManager.get(
-			getTermKey(
-				termFilter.resource_id,
-				termFilter.activity_term,
-				termFilter.league,
-			),
+			termKey,
 		)) as TermDocument | null;
 		if (cachedTerm) {
 			return cachedTerm;
@@ -56,7 +64,7 @@ export class AggregatedReportIteratorService
 
 		const cacheEvents$ = [];
 		for (const term of terms) {
-			if (term.activity_term === activity_term && term.league === league) {
+			if (term.activity_term == activity_term && term.league == league) {
 				resultTerm = term;
 			}
 			const cacheEvent$ = this.cacheManager.set(
@@ -66,15 +74,19 @@ export class AggregatedReportIteratorService
 			);
 			cacheEvents$.push(cacheEvent$);
 		}
-
 		await Promise.all(cacheEvents$);
+		if (!resultTerm) {
+			throw new Error(
+				`Term ${activity_term} from resource ${resource_id} not found`,
+			);
+		}
 
 		return resultTerm;
 	}
 
 	async *iterate(
-		aggregation: Aggregate<BaseAggregationResult>,
-	): AsyncGenerator<BaseReportIteratorResult> {
+		aggregation: Aggregate<BaseAggregationResult | DetailedAggregationResult>,
+	): AsyncGenerator<BaseReportIteratorResult<DetailedAggregationResult>> {
 		const cursor = aggregation.cursor({ batchSize: 100 });
 		let currentResource: PartnerResourceDocument | null = null;
 		let currentUser: UserDocument | null = null;

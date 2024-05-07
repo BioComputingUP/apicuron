@@ -15,6 +15,8 @@ export interface BaseAggregationResult {
 	league: string;
 	activity_term: string;
 	count: number;
+	last_contribution: Date;
+	first_contribution: Date;
 }
 
 export interface DetailedAggregationResult
@@ -31,4 +33,6 @@ export interface DetailedAggregationResult
 	league: string;
 	activity_term: string;
 	count: number;
+	last_contribution: Date;
+	first_contribution: Date;
 }
