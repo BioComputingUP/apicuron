@@ -33,6 +33,9 @@ export function setupSwagger(app: INestApplication, docs_prefix = '') {
 	SwaggerModule.setup('/', app, document, {
 		useGlobalPrefix: false,
 		customCss: '.topbar-wrapper img { content: url(/assets/APICURON.svg;}',
+		swaggerOptions: {
+			explorer: false,
+		},
 	});
 
 	// resetting the prefix for the proxy routing

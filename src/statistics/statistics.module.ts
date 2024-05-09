@@ -11,10 +11,10 @@ import { CoreApicuronModule } from '../core/core.module';
 import { ComputeStatisticsService } from './compute-statistics/compute-statistics.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { StatisticsEventHandlerService } from './events/event-handler.service';
-import { OrcidClientModule } from '../orcid-client/orcid-client.module';
-import { DataAggregationModule } from '../data-aggregation/data-aggregation.module';
-import { DataIteratorModule } from '../data-iteration/aggregated-report-iterator.module';
-import { PipelineRunnerModule } from '../pipeline-runner/pipeline-runner.module';
+import { OrcidClientModule } from '../orcid/orcid-client/orcid-client.module';
+import { DataAggregationModule } from '../aggregation/data-aggregation/data-aggregation.module';
+import { DataIteratorModule } from '../aggregation/data-iteration/aggregated-report-iterator.module';
+import { PipelineRunnerModule } from '../aggregation/pipeline-runner/pipeline-runner.module';
 
 @Module({
 	imports: [

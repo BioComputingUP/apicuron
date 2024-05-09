@@ -13,11 +13,11 @@ import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { computePrivacyField } from '../../util/privacy.helper';
-import { AggregatedReportIteratorService } from '../../data-iteration/iterators/aggregated-report-iterator.service';
-import { BaseReportAggregationService } from '../../data-aggregation/aggregators/base-report-aggregation.service';
-import { SortedPipelineStage } from '../../data-aggregation/interfaces/aggregator.interface';
-import { BaseAggregationResult } from '../../data-aggregation/interfaces/aggregation-results';
-import { BaseReportIteratorResult } from '../../data-iteration/interfaces/base-report-iterator-result';
+import { AggregatedReportIteratorService } from '../../aggregation/data-iteration/iterators/aggregated-report-iterator.service';
+import { BaseReportAggregationService } from '../../aggregation/data-aggregation/aggregators/base-report-aggregation.service';
+import { SortedPipelineStage } from '../../aggregation/data-aggregation/interfaces/aggregator.interface';
+import { BaseAggregationResult } from '../../aggregation/data-aggregation/interfaces/aggregation-results';
+import { BaseReportIteratorResult } from '../../aggregation/data-iteration/interfaces/base-report-iterator-result';
 @Injectable()
 export class ComputeStatisticsService {
 	logger = new Logger(ComputeStatisticsService.name);

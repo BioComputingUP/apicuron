@@ -5,7 +5,7 @@ import { IUserResourceEntity } from '../interfaces/user-resource-entity';
 
 export type ReportDocument = HydratedDocument<Report>;
 
-export type ReportLeanDocument = LeanDocument<Report>;
+export type LeanReportDocument = LeanDocument<ReportDocument>;
 @Schema({
 	collection: 'reports',
 })

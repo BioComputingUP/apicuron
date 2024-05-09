@@ -18,7 +18,7 @@ export class Notification {
 			return false;
 		},
 	})
-	seen: Boolean;
+	seen: boolean;
 
 	@Prop({
 		default() {

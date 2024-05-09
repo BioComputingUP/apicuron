@@ -198,8 +198,6 @@ export class ComputeBadgesService {
 		badgeDefFilter: FilterQuery<BadgeDefDocument> = {},
 		reportFilter: FilterQuery<ReportDocument> = {},
 	) {
-		this.logger.debug(`Badge Def Filter: `, badgeDefFilter);
-
 		await this.badgeModel.deleteMany(badgeDefFilter);
 
 		const badgeDefs = this.badgeDefModel

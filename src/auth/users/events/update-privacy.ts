@@ -7,3 +7,7 @@ export interface IUserUpdatePrivacyEventPayload {
 	user: UserDocument | LeanDocument<User>;
 	privacy: PrivacyType;
 }
+
+export interface UserUpdatePrivacyEventHandler {
+	handle(payload: IUserUpdatePrivacyEventPayload): Promise<void>;
+}

@@ -31,10 +31,11 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MongoEventsModule } from './mongo-events/mongo-events.module';
 import { SubmitReportModule } from './submit-reports/submit-reports.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { OrcidClientModule } from './orcid-client/orcid-client.module';
-import { OrcidSubmissionModule } from './orcid-submission/orcid-submission.module';
+import { OrcidClientModule } from './orcid/orcid-client/orcid-client.module';
+import { OrcidSubmissionModule } from './orcid/orcid-submission/orcid-submission.module';
 import { ResourceManagerModule } from './resource-manager/resource-manager.module';
-import { StatisticsDetailsModule } from './statistics-details/statistics-details.module';
+import { DetailedStatisticsModule } from './detailed-statistics/detailed-statistics.module';
+import { WeeklyStatisticsModule } from './weekly-statistics/weekly-statistics.module';
 const logger = new Logger('AppModule');
 
 @Module({
@@ -116,7 +117,8 @@ const logger = new Logger('AppModule');
 		SchedulerModule,
 		SchedulerClientModule,
 		EmailModule,
-		StatisticsDetailsModule,
+		DetailedStatisticsModule,
+		WeeklyStatisticsModule,
 	],
 	controllers: [AppController],
 	providers: [

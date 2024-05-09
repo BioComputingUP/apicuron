@@ -44,7 +44,7 @@ import {
 import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
 import { onBadgesCompute } from '../../achievements/events/events';
 import { AchievementState, AchievementType } from '../../core/enums';
-import { AllStatisticsPipelinesOrchestratorService } from '../../pipeline-runner/orchestrators/all-statistics-pipelines.service';
+import { AllStatisticsPipelinesOrchestratorService } from '../../aggregation/pipeline-runner/orchestrators/all-statistics-pipelines.service';
 
 @Injectable()
 export class StatisticsEventHandlerService {
@@ -223,10 +223,6 @@ export class StatisticsEventHandlerService {
 			resource_id: { $in: resourceIds },
 			curator_orcid: { $in: orcidIds },
 		});
-		// await this.pipelineOrchestrator.runAllPipelines({
-		// 	resource_id: { $in: resourceIds },
-		// 	curator_orcid: { $in: orcidIds },
-		// });
 		return;
 	}
 
@@ -236,6 +232,7 @@ export class StatisticsEventHandlerService {
 	}: IPostReportInsertSingleEventPayload) {
 		const reportDoc = new this.reportModel(report);
 		await this.computeStats.incrementStatByReport(reportDoc);
+		await this.pipelineOrchestrator.runIncrementalPipelines(reportDoc);
 	}
 
 	@OnEvent(postDeleteAllResourceReports, { async: true, promisify: true })

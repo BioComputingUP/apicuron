@@ -43,9 +43,6 @@ export class WeeklyStatistics implements IUserResourceEntity {
 	// @Prop({ required: true, default: () => [], type: [StatisticsTermsSchema] })
 	// invalidation_terms: StatisticsTerms[];
 
-	@Prop({ required: true, default: () => 0 })
-	ranking: number;
-
 	@Prop({ required: false })
 	resource_uri: string;
 
@@ -71,6 +68,10 @@ export class WeeklyStatistics implements IUserResourceEntity {
 
 	@Prop({ required: true, type: Date })
 	first_contribution: Date;
+
+	@Prop({ required: true, default: () => Array(7).fill(0) })
+	daysOfWeek: number[];
+
 	createdAt: Date;
 	updatedAt: Date;
 }

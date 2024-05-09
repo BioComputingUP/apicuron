@@ -1,4 +1,4 @@
-import { OrcidEmailEntry } from '../../../orcid-client/interfaces/orcid.interface';
+import { OrcidEmailEntry } from '../../../orcid/orcid-client/interfaces/orcid.interface';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema()

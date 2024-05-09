@@ -12,6 +12,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:dev:debug": "nodemon --config nodemon-debug.json",
+    "start:repl": "nest start --watch --entryFile repl",
     "start-all:dev": "npm run --prefix apicuron_v1/ start-dev & nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "NODE_ENV=production node dist/main",
