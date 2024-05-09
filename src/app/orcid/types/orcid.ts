@@ -5,5 +5,6 @@ export type OrcidProfileLink = {
 export type OrcidInformation = {
     keywords?: string[]
     profileLinks?: OrcidProfileLink[],
-    biography?: string
+    biography?: string,
+    employment?: string,
 }
