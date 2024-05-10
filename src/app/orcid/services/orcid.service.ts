@@ -72,8 +72,12 @@ export class OrcidService {
         pluck("researcher-url"),
         map((url_list) => {
           // for each url in the url_list, build object containing "name" and "url" attributes
+          // return url_list.map(({ "url-name": name, url }) => {
+          //   return { name, value: new URL(url.value) };
+          // });
           return url_list.map(({ "url-name": name, url }) => {
-            return { name, value: new URL(url.value) };
+            const value = new URL(url.value);
+            return { name, value, host: value.host };
           });
         }),
         filter((urls) => !!urls && urls.length > 0),
