@@ -33,6 +33,7 @@ import { SpinnerComponent } from "../components/utils/spinner/spinner.component"
 import { BadgeFormComponent } from "../components/badge-form/badge-form.component";
 import { PaginationComponent } from "../pagination/pagination.component";
 import { MedalFormComponent } from "../components/medal-form/medal-form.component";
+import { BarchartComponent } from "../components/charts/barchart/barchart.component";
 @NgModule({
   declarations: [
     DatabaseUpdateComponent,
@@ -66,7 +67,8 @@ import { MedalFormComponent } from "../components/medal-form/medal-form.componen
     ToastModule,
     BadgeFormComponent,
     MedalFormComponent,
-    PaginationComponent
+    PaginationComponent,
+    BarchartComponent
   ],
 })
 export class DashboardDatabaseModule {}

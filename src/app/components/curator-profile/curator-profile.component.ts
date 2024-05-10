@@ -7,12 +7,13 @@ import { Observable, merge } from "rxjs";
 import { OrcidProfileLink } from "src/app/orcid/types/orcid";
 import { map } from "rxjs/operators";
 import { SafeUrl } from "@angular/platform-browser";
+import { BarchartComponent } from "../charts/barchart/barchart.component";
 
 @Component({
     standalone: true,
     selector: 'curator-profile',
     templateUrl: './curator-profile.component.html',
-    imports: [CommonModule, OrcidModule],
+    imports: [CommonModule, OrcidModule, BarchartComponent],
     styleUrls: ['./curator-profile.component.scss']
 })
 export class CuratorProfileComponent implements OnInit {

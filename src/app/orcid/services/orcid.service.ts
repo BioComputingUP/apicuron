@@ -71,13 +71,10 @@ export class OrcidService {
         filter(({ "researcher-url": urls }: any) => !!urls && urls),
         pluck("researcher-url"),
         map((url_list) => {
-          // for each url in the url_list, build object containing "name" and "url" attributes
-          // return url_list.map(({ "url-name": name, url }) => {
-          //   return { name, value: new URL(url.value) };
-          // });
           return url_list.map(({ "url-name": name, url }) => {
             const value = new URL(url.value);
-            return { name, value, host: value.host };
+            const host = value.host.replace('www.', '');
+            return { name, value, host };
           });
         }),
         filter((urls) => !!urls && urls.length > 0),

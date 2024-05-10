@@ -7,21 +7,34 @@ import { AngularSvgIconModule } from "angular-svg-icon";
   standalone: true,
   imports: [CommonModule, AngularSvgIconModule],
   template: `
+    <!-- <div
+      class="tw-shadow-md tw-p-1 tw-bg-white tw-rounded tw-flex tw-flex-row 
+      tw-justify-between tw-items-center tw-flex-wrap sm:tw-flex-nowrap tw-h-full"
+    > -->
     <div
-      class="tw-shadow-md tw-p-1 tw-bg-white tw-rounded tw-flex tw-flex-row tw-justify-between tw-items-center tw-flex-wrap sm:tw-flex-nowrap tw-h-full"
+      class="tw-shadow-md tw-p-1 tw-bg-white tw-rounded tw-flex tw-flex-row 
+      tw-justify-between tw-items-center tw-flex-wrap sm:tw-flex-nowrap tw-h-full tw-overflow-hidden"
     >
-      <div class="tw-flex sm:tw-flex-row tw-flex-col tw-items-center tw-justify-center sm:tw-justify-normal tw-w-full sm:tw-w-auto">
+      <!-- <div class="tw-flex sm:tw-flex-row tw-flex-col tw-items-center 
+      tw-justify-center sm:tw-justify-normal tw-w-full sm:tw-w-auto"> -->
+      <div class="tw-flex tw-p-1 tw-m-1 sm:tw-flex-row tw-flex-col tw-items-center 
+      tw-justify-center sm:tw-justify-normal tw-w-full sm:tw-w-auto">
         <svg-icon
           class="sm:tw-order-last"
           [src]="icon_src"
-          svgClass="tw-w-8 tw-h-12 sm:tw-w-10 sm:tw-h-10 sm:tw-ml-2"
+          svgClass="tw-flex tw-w-8 tw-h-12 sm:tw-w-10 sm:tw-h-10 sm:tw-ml-2"
           [svgStyle]="{ color: color }"
         ></svg-icon>
         <span class="tw-text-base sm:tw-text-xl tw-font-bold tw-pl-1" [ngStyle]="{ color: color }">{{
           value_text
         }}</span>
       </div>
-      <span class="tw-w-full tw-font-bold tw-text-gray-500 tw-text-sm tw-text-center sm:tw-text-left tw-order-first tw-block tw-whitespace-break-spaces tw-break-words sm:tw-break-normal ">{{
+      <!-- <span class="tw-w-full tw-font-bold tw-text-gray-500 tw-text-sm tw-text-center sm:tw-text-left 
+      tw-order-first tw-block tw-whitespace-break-spaces tw-break-words sm:tw-break-normal ">{{
+        label_text
+      }}</span> -->
+      <span class="tw-w-full tw-font-bold tw-text-gray-500 tw-text-sm tw-text-center sm:tw-text-left 
+      tw-order-first tw-flex tw-whitespace-break-spaces tw-break-words sm:tw-break-normal ">{{
         label_text
       }}</span>
     </div>
