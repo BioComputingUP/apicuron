@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
 import { map, pluck } from "rxjs/operators";
 import { DatabasesService } from "../../databases/services/databases.service";
@@ -20,6 +20,7 @@ type StatData = {
   selector: "curator-card",
   templateUrl: "./curator-card.component.html",
   styleUrls: ["./curator-card.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CuratorCardComponent implements OnInit {
   resources$: Observable<any>;

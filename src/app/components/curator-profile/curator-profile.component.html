@@ -1,5 +1,5 @@
 <div class="tw-py-2 sm:tw-py-4 tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap" [ngClass]="{'tw-justify-center': !(userInfo$ | async)}">
-    <div class="sm:tw-flex-none tw-flex-1 tw-flex tw-flex-col tw-px-4 tw-w-full sm:tw-w-auto">
+    <div class="sm:tw-flex-none tw-flex-1 tw-flex tw-flex-col tw-px-4 tw-w-full sm:tw-w-auto" *ngIf="curatorObs$ | async as curator">
         <!-- <input #fileInput type="file" class="tw-hidden" (change)="onFileSelected($event)" id=""> -->
         <img [src]="curator.generate_avatar()"
             class="tw-w-24 tw-h-24 tw-mx-auto tw-rounded-full tw-bg-gray-50 tw-border-2 tw-border-gray-150" alt="">
