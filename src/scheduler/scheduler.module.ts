@@ -2,7 +2,6 @@ import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
 import { SchedulerService } from './services/scheduler.service';
-// import { ComputeStatisticsTask } from './tasks/compute_statistics.task';
 import { Provider } from '@nestjs/common/interfaces/modules';
 import { SubmitBulkTask } from './tasks/submit_bulk.task';
 import { ComputeBadgesTask } from './tasks/compute_badges.task';
@@ -15,9 +14,9 @@ import { ResourcesModule } from '../resources/resources.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { OrcidSubmissionTask } from './tasks/orcid-submission.task';
 import { StatisticsModule } from '../statistics/statistics.module';
-import { AchievementsModule } from '../achievements/achievements.module';
-// import { ReportsModule } from '../reports/reports.module';
 import { SubmitReportModule } from '../submit-reports/submit-reports.module';
+import { BadgesModule } from '../badges/badges.module';
+import { MedalsModule } from '../medals/medals.module';
 @Module({
 	imports: [
 		HttpModule,
@@ -25,7 +24,8 @@ import { SubmitReportModule } from '../submit-reports/submit-reports.module';
 		NotificationsModule,
 		ResourcesModule,
 		SubmitReportModule,
-		AchievementsModule,
+		MedalsModule,
+		BadgesModule,
 		StatisticsModule,
 		AuthModule,
 	],

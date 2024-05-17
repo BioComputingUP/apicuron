@@ -1,11 +1,12 @@
 import { Controller, Get, InternalServerErrorException } from '@nestjs/common';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
-import { AchievementsDefService } from './achievements/achievements-def.service';
 import { AppService } from './app.service';
 import { UsersService } from './auth/users/users.service';
 import { ReportsService } from './reports/reports.service';
 import { PartnerResourcesService } from './resources/partner-resources/partner-resources.service';
-import { getMetadataStorage } from 'class-validator';
+import { InjectModel } from '@nestjs/mongoose';
+import { AchievementDef } from './core/schemas/achievements-def/achievement-def.schema';
+import { Model } from 'mongoose';
 
 @Controller()
 export class AppController {
@@ -14,7 +15,8 @@ export class AppController {
 		protected partnerResourceService: PartnerResourcesService,
 		protected userService: UsersService,
 		protected reportService: ReportsService,
-		protected achievementsService: AchievementsDefService,
+		@InjectModel(AchievementDef.name)
+		protected achievementDefModel: Model<AchievementDef>,
 	) {}
 
 	@ApiExcludeEndpoint()
@@ -23,7 +25,7 @@ export class AppController {
 		const resource_count_promise = this.partnerResourceService.count();
 		const user_count_promise = this.userService.count();
 		const report_count_promise = this.reportService.all_reports_count();
-		const achievement_count_promise = this.achievementsService.count();
+		const achievement_count_promise = this.achievementDefModel.countDocuments();
 		const [resource_count, user_count, report_count, achievement_count] =
 			await Promise.all([
 				resource_count_promise,
@@ -41,7 +43,6 @@ export class AppController {
 
 	@Get('jsonschema')
 	async getJsonSchema() {
-
 		console.log(test);
 		return 'hello';
 	}

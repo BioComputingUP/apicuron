@@ -15,7 +15,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { UsersService } from '../auth/users/users.service';
 import {
 	ITermDeletedEventPayload,
-	onTermDeletedEvent,
+	TermDeletedEvent,
 } from '../terms/events/events';
 import { pick, mapKeys } from 'lodash';
 @Injectable()
@@ -349,7 +349,7 @@ export class ReportsService {
 		return converter[groupBy];
 	}
 
-	@OnEvent(onTermDeletedEvent, { async: true, promisify: true })
+	@OnEvent(TermDeletedEvent, { async: true, promisify: true })
 	async deleteTermReports({ term }: ITermDeletedEventPayload) {
 		return await this.reportModel.deleteMany({
 			resource_id: term.resource_id,

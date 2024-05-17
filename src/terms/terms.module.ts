@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { AchievementsModule } from '../achievements/achievements.module';
 import { AuthModule } from '../auth/auth.module';
 import { ResourcesModule } from '../resources/resources.module';
 import { TermsController } from './terms.controller';
 import { TermsService } from './terms.service';
 import { ActivityTermExists } from './validators/activity-term-exists';
 import { CoreApicuronModule } from '../core/core.module';
+import { MedalsModule } from '../medals/medals.module';
+import { BadgesModule } from '../badges/badges.module';
 
 
 
@@ -23,7 +24,8 @@ import { CoreApicuronModule } from '../core/core.module';
         AuthModule,
         JwtModule,
         ResourcesModule,
-        AchievementsModule,
+        MedalsModule,
+        BadgesModule,
     ],
     exports: [
         TermsService,

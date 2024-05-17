@@ -7,9 +7,10 @@ import { AllStatisticsPipelinesOrchestratorService } from './orchestrators/all-s
 import { ResourcesModule } from '../../resources/resources.module';
 import { DataAggregationModule } from '../data-aggregation/data-aggregation.module';
 import { DataIteratorModule } from '../data-iteration/aggregated-report-iterator.module';
-import { AchievementsModule } from '../../achievements/achievements.module';
 import { IncrementDetailedStatisticsRunner } from './runners/increment-detailed-statistics.service';
 import { IncrementWeeklyStatisticsRunner } from './runners/increment-weekly-stats.service';
+import { BadgesModule } from '../../badges/badges.module';
+import { MedalsModule } from '../../medals/medals.module';
 
 @Module({
 	imports: [
@@ -17,7 +18,8 @@ import { IncrementWeeklyStatisticsRunner } from './runners/increment-weekly-stat
 		DataAggregationModule,
 		DataIteratorModule,
 		ResourcesModule,
-		AchievementsModule,
+		BadgesModule,
+		MedalsModule
 	],
 	controllers: [],
 	providers: [

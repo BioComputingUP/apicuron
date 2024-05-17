@@ -1,15 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import {
-	IMedalCountChangeEventPayload,
-	onMedalsCompute,
-} from '../../achievements/events/events';
 import { InjectModel } from '@nestjs/mongoose';
 import {
 	Badge,
 	BadgeDocument,
 } from '../../core/schemas/achievements/badges.schema';
-import { FilterQuery, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import {
 	Statistics,
 	StatisticsDocument,
@@ -25,12 +21,12 @@ import {
 	UserUpdatePrivacyEvent,
 } from '../../auth/users/events/update-privacy';
 import {
-	IPostDeleteAllResourceReports,
-	IPostReportInsertManyEventPayload,
-	IPostReportInsertSingleEventPayload,
-	postDeleteAllResourceReports,
-	postReportInsertManyEvent,
-	postReportInsertSingleEvent,
+	IAllResourceReportsDeletedEventPayload,
+	IManyReportsSubmittedEventPayload,
+	IReportSubmittedEventPayload,
+	AllResourceReportsDeletedEvent,
+	ManyReportsSubmittedEvent,
+	ReportSubmittedEvent,
 } from '../../submit-reports/events/events';
 import { ComputeStatisticsService } from '../compute-statistics/compute-statistics.service';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
@@ -38,13 +34,15 @@ import { uniq } from 'lodash';
 import {
 	ITermDeletedEventPayload,
 	ITermUpdatedEventPayload,
-	onTermDeletedEvent,
-	onTermUpdatedEvent,
+	TermDeletedEvent,
+	TermUpdatedEvent,
 } from '../../terms/events/events';
-import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
-import { onBadgesCompute } from '../../achievements/events/events';
-import { AchievementState, AchievementType } from '../../core/enums';
+import { AchievementState } from '../../core/enums';
 import { AllStatisticsPipelinesOrchestratorService } from '../../aggregation/pipeline-runner/orchestrators/all-statistics-pipelines.service';
+import {
+	ResourceMedalsCountUpdatedEvent,
+	UserMedalsCountUpdatedEvent,
+} from '../../medals/events/medal-count-updated.event';
 
 @Injectable()
 export class StatisticsEventHandlerService {
@@ -61,107 +59,46 @@ export class StatisticsEventHandlerService {
 
 	logger = new Logger(StatisticsEventHandlerService.name);
 
-	@OnEvent(onBadgesCompute, { async: true, promisify: true })
-	async updateStatBadgeCount(badgeDefFilter: FilterQuery<BadgeDefDocument>) {
-		// retrieve stats linked to the affected badges
-
-		const badgeCounts = this.badgeModel
-			.aggregate()
-			.match({
-				...badgeDefFilter,
-				type: AchievementType.badge,
-				state: AchievementState.achieved,
-			})
-			.group({
-				_id: {
-					resource_id: '$resource_id',
-					curator_orcid: '$curator_orcid',
-					league: '$league',
-				},
-				resource_id: { $first: '$resource_id' },
-				curator_orcid: { $first: '$curator_orcid' },
-				league: { $first: '$league' },
-				count: { $sum: 1 },
-			})
+	@OnEvent(ResourceMedalsCountUpdatedEvent.name, {
+		promisify: true,
+		async: true,
+	})
+	async updateResourceMedalCount(payload: ResourceMedalsCountUpdatedEvent) {
+		const stats = this.statModel
+			.find({ resource_id: payload.resource_id })
 			.cursor({ batchSize: 50 });
 
 		const statUpdates$ = [];
-
-		for await (const badgeCount of badgeCounts) {
-			const { resource_id, curator_orcid, league, count } = badgeCount;
-			const update$ = this.statModel.findOneAndUpdate(
-				{
-					resource_id,
-					curator_orcid,
-					league,
-				},
-				{
-					$set: {
-						badges_count: count,
-					},
-				},
-			);
-
-			statUpdates$.push(update$);
-		}
-
-		await Promise.all(statUpdates$);
-		return;
-	}
-
-	@OnEvent(onMedalsCompute, { async: true, promisify: true })
-	async updateMedalCount(medalDefFilter: IMedalCountChangeEventPayload) {
-		this.logger.log('updating counts');
-
-		this.logger.log('filter object', {
-			...medalDefFilter,
-			type: AchievementType.medal,
-			state: AchievementState.achieved,
-		});
-
-		const medalCounts = this.medalModel
-			.aggregate()
-			.match({
-				...medalDefFilter,
-				type: AchievementType.medal,
-				state: AchievementState.achieved,
-			})
-			.group({
-				_id: {
-					resource_id: '$resource_id',
-					curator_orcid: '$curator_orcid',
-					league: '$league',
-				},
-				resource_id: { $first: '$resource_id' },
-				curator_orcid: { $first: '$curator_orcid' },
-				league: { $first: '$league' },
-				count: { $sum: 1 },
-			})
-			.cursor({ batchSize: 50 });
-
-		const statUpdates$ = [];
-		for await (const medalCount of medalCounts) {
-			const { resource_id, curator_orcid, league, count } = medalCount;
-			const update$ = this.statModel
-				.updateOne(
-					{
-						resource_id,
-						curator_orcid,
-						league,
-					},
-					{
-						medals_count: count,
-					},
-				)
-				.then((result) => {
-					this.logger.log(
-						`Updating medal count for stat ${resource_id}/${curator_orcid}/${league} with count ${count} modifiedCount: ${result.modifiedCount}!`,
-					);
+		for await (const stat of stats) {
+			const update$ = this.medalModel
+				.countDocuments({
+					resource_id: payload.resource_id,
+					curator_orcid: stat.curator_orcid,
+					league: stat.league,
+					state: AchievementState.achieved,
+				})
+				.then((count: number) => {
+					stat.medals_count = count;
+					return stat.save();
 				});
 			statUpdates$.push(update$);
 		}
-
 		await Promise.all(statUpdates$);
+	}
+
+	@OnEvent(UserMedalsCountUpdatedEvent.name, { promisify: true, async: true })
+	async updateUserMedalCount(payload: UserMedalsCountUpdatedEvent) {
+		const filter = {
+			resource_id: payload.resource_id,
+			curator_orcid: payload.curator_orcid,
+			league: payload.league,
+		};
+		const medalCount = await this.medalModel.countDocuments(filter);
+
+		await this.statModel.findOneAndUpdate(filter, {
+			$set: { medals_count: medalCount },
+		});
+		return;
 	}
 
 	@OnEvent(UserUpdatePrivacyEvent, { async: true, promisify: true })
@@ -213,10 +150,10 @@ export class StatisticsEventHandlerService {
 		return;
 	}
 
-	@OnEvent(postReportInsertManyEvent, { async: true, promisify: true })
+	@OnEvent(ManyReportsSubmittedEvent, { async: true, promisify: true })
 	async insertManyReportsHandler({
 		reports,
-	}: IPostReportInsertManyEventPayload) {
+	}: IManyReportsSubmittedEventPayload) {
 		const resourceIds = uniq(reports.map((report) => report.resource_id));
 		const orcidIds = uniq(reports.map((report) => report.curator_orcid));
 		await this.pipelineOrchestrator.runAllPipelines({
@@ -226,18 +163,16 @@ export class StatisticsEventHandlerService {
 		return;
 	}
 
-	@OnEvent(postReportInsertSingleEvent, { async: true, promisify: true })
-	async insertSingleReportHandler({
-		report,
-	}: IPostReportInsertSingleEventPayload) {
+	@OnEvent(ReportSubmittedEvent, { async: true, promisify: true })
+	async insertSingleReportHandler({ report }: IReportSubmittedEventPayload) {
 		const reportDoc = new this.reportModel(report);
 		await this.computeStats.incrementStatByReport(reportDoc);
 		await this.pipelineOrchestrator.runIncrementalPipelines(reportDoc);
 	}
 
-	@OnEvent(postDeleteAllResourceReports, { async: true, promisify: true })
+	@OnEvent(AllResourceReportsDeletedEvent, { async: true, promisify: true })
 	async deleteAllResourceReportsHandler(
-		deleteAllResourceReportsPayload: IPostDeleteAllResourceReports,
+		deleteAllResourceReportsPayload: IAllResourceReportsDeletedEventPayload,
 	) {
 		await this.statModel.deleteMany({
 			resource_id: deleteAllResourceReportsPayload.resource_id,
@@ -245,7 +180,7 @@ export class StatisticsEventHandlerService {
 		return;
 	}
 
-	@OnEvent(onTermDeletedEvent, { async: true, promisify: true })
+	@OnEvent(TermDeletedEvent, { async: true, promisify: true })
 	async onTermDeleted({ term }: ITermDeletedEventPayload) {
 		await this.pipelineOrchestrator.runAllPipelines({
 			resource_id: term.resource_id,
@@ -253,7 +188,7 @@ export class StatisticsEventHandlerService {
 		});
 	}
 
-	@OnEvent(onTermUpdatedEvent, { async: true, promisify: true })
+	@OnEvent(TermUpdatedEvent, { async: true, promisify: true })
 	async onTermUpdated({ term }: ITermUpdatedEventPayload) {
 		await this.pipelineOrchestrator.runAllPipelines({
 			resource_id: term.resource_id,

@@ -22,8 +22,8 @@ import { MongoBulkWriteError } from 'mongodb';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SubmitReportService } from '../../submit-reports/services/submit-reports.service';
 import {
-	IPostReportInsertManyEventPayload,
-	postReportInsertManyEvent,
+	IManyReportsSubmittedEventPayload,
+	ManyReportsSubmittedEvent,
 } from '../../submit-reports/events/events';
 
 export type ValidatedReport = {
@@ -144,9 +144,9 @@ export class SubmitBulkTask {
 			// });
 			this.logger.debug(`inserted ${insertResult.insertedCount} reports`);
 
-			await this.eventEmitter.emitAsync(postReportInsertManyEvent, {
+			await this.eventEmitter.emitAsync(ManyReportsSubmittedEvent, {
 				reports: reportDocuments,
-			} as IPostReportInsertManyEventPayload);
+			} as IManyReportsSubmittedEventPayload);
 
 			const successCount = validReports.length;
 			const errors = invalidReports

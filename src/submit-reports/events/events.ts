@@ -2,17 +2,17 @@ import { LeanDocument } from 'mongoose';
 import { ReportDocument, Report } from '../../core/schemas/reports.schema';
 import { ReportDto } from '../../reports/dto/report.dto';
 
-export const postReportInsertManyEvent = 'post.report.insert.many';
-export interface IPostReportInsertManyEventPayload {
+export const ManyReportsSubmittedEvent = 'post.report.insert.many';
+export interface IManyReportsSubmittedEventPayload {
 	reports: ReportDocument[] | LeanDocument<Report>[] | ReportDto[];
 }
 
-export const postReportInsertSingleEvent = 'post.report.insert.single';
-export interface IPostReportInsertSingleEventPayload {
+export const ReportSubmittedEvent = 'post.report.insert.single';
+export interface IReportSubmittedEventPayload {
 	report: ReportDocument | LeanDocument<Report> | ReportDto;
 }
 
-export const postDeleteAllResourceReports = 'post.reports.deleteall.resource';
-export interface IPostDeleteAllResourceReports {
+export const AllResourceReportsDeletedEvent = 'post.reports.deleteall.resource';
+export interface IAllResourceReportsDeletedEventPayload {
 	resource_id: string;
 }

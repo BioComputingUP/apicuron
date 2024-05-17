@@ -5,12 +5,14 @@ import {
 	SubmittedResource,
 	SubmittedResourceDocument,
 } from '../schemas/resource/submitted-resource.schema';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 export class SubmittedResourceRepository extends EntityRepository<SubmittedResourceDocument> {
 	constructor(
 		@InjectModel(SubmittedResource.name)
 		resourceModel: Model<SubmittedResourceDocument>,
+		eventEmitter: EventEmitter2,
 	) {
-		super(resourceModel);
+		super(resourceModel, eventEmitter);
 	}
 }

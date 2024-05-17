@@ -13,12 +13,12 @@ import { DeleteResult } from 'mongodb';
 import { UsersService } from '../../auth/users/users.service';
 import { ReportMetaHandler } from './report-meta.handler';
 import {
-	IPostDeleteAllResourceReports,
-	IPostReportInsertManyEventPayload,
-	IPostReportInsertSingleEventPayload,
-	postDeleteAllResourceReports,
-	postReportInsertManyEvent,
-	postReportInsertSingleEvent,
+	IAllResourceReportsDeletedEventPayload,
+	IManyReportsSubmittedEventPayload,
+	IReportSubmittedEventPayload,
+	AllResourceReportsDeletedEvent,
+	ManyReportsSubmittedEvent,
+	ReportSubmittedEvent,
 } from '../events/events';
 
 @Injectable()
@@ -53,9 +53,9 @@ export class SubmitReportService {
 		const { deletedCount, acknowledged } = await this.reportModel.deleteMany({
 			resource_id,
 		});
-		await this.eventEmitter.emitAsync(postDeleteAllResourceReports, {
+		await this.eventEmitter.emitAsync(AllResourceReportsDeletedEvent, {
 			resource_id,
-		} as IPostDeleteAllResourceReports);
+		} as IAllResourceReportsDeletedEventPayload);
 		return { deletedCount, acknowledged };
 	}
 
@@ -71,9 +71,9 @@ export class SubmitReportService {
 			await instance.save();
 
 			if (!options.preventEvents) {
-				await this.eventEmitter.emitAsync(postReportInsertSingleEvent, {
+				await this.eventEmitter.emitAsync(ReportSubmittedEvent, {
 					report,
-				} as IPostReportInsertSingleEventPayload);
+				} as IReportSubmittedEventPayload);
 			}
 			return instance;
 		} catch (e: any) {
@@ -98,9 +98,9 @@ export class SubmitReportService {
 				{ rawResult: true },
 			);
 			if (!options.preventEvents) {
-				await this.eventEmitter.emitAsync(postReportInsertManyEvent, {
+				await this.eventEmitter.emitAsync(ManyReportsSubmittedEvent, {
 					reports,
-				} as IPostReportInsertManyEventPayload);
+				} as IManyReportsSubmittedEventPayload);
 			}
 			return {
 				insertedCount,

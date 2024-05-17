@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Scope } from '@nestjs/common';
 import {
 	Aggregator,
 	SortedPipelineStage,
@@ -14,7 +14,9 @@ import {
 } from '../helper/aggregator-helper';
 import { Operation } from '../interfaces/operations.interface';
 
-@Injectable()
+@Injectable({
+	scope: Scope.TRANSIENT,
+})
 /**
  * Represents a base report aggregation service.
  * @implements Aggregator<BaseAggregationResult>

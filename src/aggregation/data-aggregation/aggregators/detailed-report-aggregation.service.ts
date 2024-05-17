@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Scope } from '@nestjs/common';
 import {
 	Aggregator,
 	SortedPipelineStage,
@@ -16,7 +16,9 @@ import { DetailedAggregationResult } from '../interfaces/aggregation-results';
 import { Model, Aggregate } from 'mongoose';
 import { Operation } from '../interfaces/operations.interface';
 
-@Injectable()
+@Injectable({
+	scope: Scope.TRANSIENT
+})
 export class DetailedReportAggregationService
 	implements Aggregator<DetailedAggregationResult>
 {

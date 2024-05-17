@@ -12,8 +12,8 @@ import { computePrivacyField } from '../../../util/privacy.helper';
 import { AggregatedReportIteratorService } from '../../data-iteration/iterators/aggregated-report-iterator.service';
 import { BaseReportAggregationService } from '../../data-aggregation/aggregators/base-report-aggregation.service';
 import { BaseReportIteratorResult } from '../../data-iteration/interfaces/base-report-iterator-result';
-import { EarnedMedalsService } from '../../../achievements/services/earned-medals.service';
-import { EarnedBadgesService } from '../../../achievements/services/earned-badges.service';
+import { EarnedMedalsService } from '../../../medals/services/earned-medals.service';
+import { EarnedBadgesService } from '../../../badges/services/earned-badges.service';
 
 @Injectable()
 export class ComputeStatisticsRunnerService implements Runner {

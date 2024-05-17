@@ -11,8 +11,8 @@ import { CreateTermDto } from './dto/createTerm.dto';
 import {
 	ITermDeletedEventPayload,
 	ITermUpdatedEventPayload,
-	onTermDeletedEvent,
-	onTermUpdatedEvent,
+	TermDeletedEvent,
+	TermUpdatedEvent,
 } from './events/events';
 import { IResourceEntity } from '../core/interfaces/user-resource-entity';
 
@@ -76,7 +76,7 @@ export class TermsService {
 			{ new: true },
 		);
 
-		await this.eventEmitter.emitAsync(onTermUpdatedEvent, {
+		await this.eventEmitter.emitAsync(TermUpdatedEvent, {
 			term: updatedTerm,
 		} as ITermUpdatedEventPayload);
 
@@ -103,7 +103,7 @@ export class TermsService {
 		}
 		const response = await this.termModel.deleteOne(term);
 
-		await this.eventEmitter.emitAsync(onTermDeletedEvent, {
+		await this.eventEmitter.emitAsync(TermDeletedEvent, {
 			term,
 		} as ITermDeletedEventPayload);
 

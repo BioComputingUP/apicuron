@@ -3,7 +3,8 @@ import { PartnerResourcesService } from '../../resources/partner-resources/partn
 import { InjectModel } from '@nestjs/mongoose';
 import { AchievementDef } from '../../core/schemas/achievements-def/achievement-def.schema';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
-import { ComputeMedalsService } from '../../achievements/services/compute-medals.service';
+import { ComputeMedalsService } from '../../medals/services/compute-medals.service';
+import { MedalAggregatorService } from '../../medals/services/medal-aggregator.service';
 
 @Injectable()
 export class ComputeMedalsTask {
@@ -11,6 +12,7 @@ export class ComputeMedalsTask {
 		protected partnerResourceService: PartnerResourcesService,
 		@InjectModel(AchievementDef.name)
 		protected computeMedals: ComputeMedalsService,
+		protected medalsAggregator: MedalAggregatorService,
 	) {}
 
 	logger = new Logger(ComputeMedalsTask.name);
@@ -30,6 +32,6 @@ export class ComputeMedalsTask {
 		}
 		this.logger.log(`Computing medals for resource ${resource_id}`);
 		// we first compute the medals for the resource`)
-		await this.computeMedals.computeResourceMedals(resource);
+		await this.medalsAggregator.applyAllReports(resource_id);
 	}
 }

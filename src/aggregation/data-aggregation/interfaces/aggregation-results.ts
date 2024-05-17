@@ -1,3 +1,4 @@
+import { PrivacyType } from '../../../core/enums';
 import {
 	AggregateDaysResult,
 	AggregateMonthsResult,
@@ -35,4 +36,14 @@ export interface DetailedAggregationResult
 	count: number;
 	last_contribution: Date;
 	first_contribution: Date;
+}
+
+export interface AggregatedUserReportsByActivities {
+	_id: string;
+	activity_terms: string[];
+	count: number;
+	resource_id: string;
+	league: string;
+	privacy: PrivacyType;
+	curator_orcid: string;
 }

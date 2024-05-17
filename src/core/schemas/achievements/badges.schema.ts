@@ -1,9 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, LeanDocument } from 'mongoose';
 import { AchievementState, PrivacyType } from '../../enums';
 import { IUserResourceEntity } from '../../interfaces/user-resource-entity';
 
 export type BadgeDocument = HydratedDocument<Badge>;
+export type LeanBadgeDocument = LeanDocument<BadgeDocument>;
 
 @Schema({
 	collection: 'achievements',
@@ -54,6 +55,12 @@ export class Badge implements IUserResourceEntity {
 		required: true,
 	})
 	state: AchievementState;
+
+	@Prop({
+		type: Date,
+		required: false,
+	})
+	achieved_at?: Date;
 
 	league: string;
 	privacy: PrivacyType;

@@ -38,10 +38,10 @@ import _ from 'lodash';
 import { SchedulerClientService } from '../../scheduler-client/services/scheduler-client.service';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import {
-	IPostReportInsertManyEventPayload,
-	IPostReportInsertSingleEventPayload,
-	postReportInsertManyEvent,
-	postReportInsertSingleEvent,
+	IManyReportsSubmittedEventPayload,
+	IReportSubmittedEventPayload,
+	ManyReportsSubmittedEvent,
+	ReportSubmittedEvent,
 } from '../events/events';
 import { isArray } from 'lodash';
 @ApiTags('Reports')
@@ -163,9 +163,9 @@ export class SubmitReportsController {
 
 		res.send(report_confirmation);
 
-		await this.eventEmitter.emitAsync(postReportInsertSingleEvent, {
+		await this.eventEmitter.emitAsync(ReportSubmittedEvent, {
 			report,
-		} as IPostReportInsertSingleEventPayload);
+		} as IReportSubmittedEventPayload);
 	}
 
 	@ApiOperation({
@@ -213,9 +213,9 @@ export class SubmitReportsController {
 		// send the insertion response
 		res.send(response);
 
-		await this.eventEmitter.emitAsync(postReportInsertManyEvent, {
+		await this.eventEmitter.emitAsync(ManyReportsSubmittedEvent, {
 			reports: reportSubmission.reports,
-		} as IPostReportInsertManyEventPayload);
+		} as IManyReportsSubmittedEventPayload);
 
 		return;
 	}

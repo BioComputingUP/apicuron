@@ -13,7 +13,6 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { resolve } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MulterModule } from '@nestjs/platform-express';
-import { AchievementsModule } from './achievements/achievements.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { TermsModule } from './terms/terms.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
@@ -36,6 +35,8 @@ import { OrcidSubmissionModule } from './orcid/orcid-submission/orcid-submission
 import { ResourceManagerModule } from './resource-manager/resource-manager.module';
 import { DetailedStatisticsModule } from './detailed-statistics/detailed-statistics.module';
 import { WeeklyStatisticsModule } from './weekly-statistics/weekly-statistics.module';
+import { BadgesModule } from './badges/badges.module';
+import { MedalsModule } from './medals/medals.module';
 const logger = new Logger('AppModule');
 
 @Module({
@@ -111,7 +112,8 @@ const logger = new Logger('AppModule');
 		ReportsModule,
 		SubmitReportModule,
 		StatisticsModule,
-		AchievementsModule,
+		MedalsModule,
+		BadgesModule,
 		NotificationsModule,
 		ResourceManagerModule,
 		SchedulerModule,
@@ -119,6 +121,9 @@ const logger = new Logger('AppModule');
 		EmailModule,
 		DetailedStatisticsModule,
 		WeeklyStatisticsModule,
+		// testing
+		MedalsModule,
+		BadgesModule,
 	],
 	controllers: [AppController],
 	providers: [

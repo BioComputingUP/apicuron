@@ -10,7 +10,6 @@ import {
 	NotFoundException,
 	BadRequestException,
 } from '@nestjs/common';
-import { AchievementsService } from '../../achievements/achievements.service';
 import { ParseUnsignedIntPipe } from '../../shared/pipes/unsigned-int-validation.pipe';
 import { TransformInterceptor } from '../../shared/transformer/transform.interceptor';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
@@ -26,7 +25,6 @@ import { VersionHeader } from '../../swagger/config';
 import { UsersService } from '../../auth/users/users.service';
 import { Response } from 'express';
 import { plainToInstance } from 'class-transformer';
-// import { paginate } from '../../pagination/paginator';
 import { PaginateDto } from '../../pagination/dto/paginate.dto';
 import { Public } from '../../auth/decorators/public.decorator';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
@@ -49,7 +47,6 @@ export class StatisticsController {
 	constructor(
 		protected statService: StatisticsService,
 		protected partnerResourceService: PartnerResourcesService,
-		protected achievementsService: AchievementsService,
 		protected userService: UsersService,
 	) {}
 

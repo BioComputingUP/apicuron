@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../app.module';
-import { ComputeBadgesService } from '../achievements/services/compute-badges.service';
-import { ComputeMedalsService } from '../achievements/services/compute-medals.service';
+import { ComputeBadgesService } from '../badges/services/compute-badges.service';
+import { ComputeMedalsService } from '../medals/services/compute-medals.service';
 import { ComputeStatisticsService } from '../statistics/compute-statistics/compute-statistics.service';
 import { log } from 'console';
 

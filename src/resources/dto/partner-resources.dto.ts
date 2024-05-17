@@ -1,8 +1,4 @@
 import { Allow, IsNotEmpty, IsString, IsUrl } from 'class-validator';
-import { BadgeDto } from '../../achievements/dto/badge.dto';
-import { MedalDto } from '../../achievements/dto/medal.dto';
-import { TermDto } from '../../terms/dto/term.dto';
-
 export class SelectPartnerResourceDto {
 	@IsString()
 	@IsNotEmpty()
@@ -37,13 +33,4 @@ export class PartnerResourceDto extends SelectPartnerResourceDto {
 	@IsNotEmpty()
 	@IsString()
 	logo: string;
-}
-
-export class PartnerResourceSummaryDto extends PartnerResourceDto {
-	@Allow()
-	badges: BadgeDto[];
-	@Allow()
-	medals: MedalDto[];
-	@Allow()
-	terms: TermDto[];
 }

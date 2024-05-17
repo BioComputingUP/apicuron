@@ -54,7 +54,24 @@ export class Achievement implements IResourceEntity {
 }
 
 export function AchievementsSchemaFactory() {
-	const AchievementSchema = SchemaFactory.createForClass(Achievement);
+	const AchievementSchema =
+		SchemaFactory.createForClass(Achievement).loadClass(Achievement);
+
+	AchievementSchema.index(
+		{
+			resource_id: 1,
+			league: 1,
+			type: 1,
+			name: 1,
+			curator_orcid: 1,
+		},
+		{
+			name: 'unique_index',
+			unique: true,
+			comment:
+				'Uniquely indexes the achievement by resource_id, league, type, name, and curator_orcid',
+		},
+	);
 
 	return AchievementSchema;
 }

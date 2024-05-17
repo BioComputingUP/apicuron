@@ -12,11 +12,16 @@ import {
 	IUserResourceEntityDocument,
 	LeanIResourceEntityDocument,
 } from '../core/interfaces/user-resource-entity';
+import {
+	LeanReportDocument,
+	ReportDocument,
+} from '../core/schemas/reports.schema';
 
 /**
  * Computes the privacy field for a given resource entity based on the resource, related user, and user resource entity.
  * If either the league privacy or the user privacy is set to private, the privacy type of the entity will be private.
  * Otherwise, it will be public.
+ * @deprecated
  * @param resource - The resource document or lean document.
  * @param relatedUser - The related user document or lean document, or null.
  * @param userResourceEntity - The user resource entity document or lean document.
@@ -46,6 +51,28 @@ export function computePrivacyField(
 	}
 
 	return userResourceEntity.privacy;
+}
+
+/**
+ * Computes the privacy field of an aggregated entity based on the privacy of a resource entity and a report.
+ * E.G: if I process a badge using a badgedef and a report, the report contains the privacy value of the user/resource
+ * And the badgedef contains the privacy value of the resource. Therefore combining this method would combine the two
+ * If either the resource entity or the report has a privacy type of "private", the aggregate privacy will be "private".
+ * Otherwise, the aggregate privacy will be "public".
+ *
+ * @param resourceEntity - The resource entity object.
+ * @param report - The report object.
+ * @returns The aggregate privacy type.
+ */
+export function computeAggregatePrivacyField(
+	resourceEntity:
+		| LeanDocument<IResourceEntity>
+		| HydratedDocument<IResourceEntity>,
+	report: LeanReportDocument | ReportDocument | { privacy: PrivacyType },
+) {
+	return [resourceEntity.privacy, report.privacy].includes(PrivacyType.private)
+		? PrivacyType.private
+		: PrivacyType.public;
 }
 
 /**
