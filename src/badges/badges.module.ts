@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
-import { ReportAggregatorModule } from '../report-aggregator/report-aggregator.module';
+import { EventOrchestratorModule } from '../event-orchestrator/event-orchestrator.module';
 import { BadgeAggregatorService } from './services/badge-aggregator.service';
 import { CoreApicuronModule } from '../core/core.module';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { DataAggregationModule } from '../aggregation/data-aggregation/data-aggregation.module';
 import { BadgeDefCommandsService } from './services/badge-def-commands.service';
 import { BadgeDefDeletedEventHandler } from './handlers/badge-def-deleted.handler';
@@ -20,9 +19,8 @@ import { EarnedBadgesService } from './services/earned-badges.service';
 		CoreApicuronModule,
 		AuthModule,
 		ResourcesModule,
-		EventEmitter2,
 		DataAggregationModule,
-		ReportAggregatorModule.registerAsync({
+		EventOrchestratorModule.registerAsync({
 			imports: [BadgesModule],
 			inject: [BadgeAggregatorService],
 			useFactory(badgeAggregator: BadgeAggregatorService) {

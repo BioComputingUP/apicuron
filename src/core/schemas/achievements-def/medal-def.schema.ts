@@ -87,11 +87,19 @@ export class MedalDef {
 	/**
 	 * The league associated with the medal.
 	 */
+	@Prop({
+		required: true,
+	})
 	league: string;
 
 	/**
 	 * The privacy type of the medal.
 	 */
+	@Prop({
+		required: true,
+		type: String,
+		enum: PrivacyType,
+	})
 	privacy: PrivacyType;
 }
 

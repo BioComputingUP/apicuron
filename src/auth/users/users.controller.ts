@@ -35,10 +35,7 @@ import { Model } from 'mongoose';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Public } from '../decorators/public.decorator';
-import {
-	IUserUpdatePrivacyEventPayload,
-	UserUpdatePrivacyEvent,
-} from './events/update-privacy';
+import { UserPrivacyUpdatedEvent } from './events/update-privacy';
 import { UserReq } from '../decorators/applyUser.decorator';
 
 @ApiTags('First Version')
@@ -204,10 +201,10 @@ export class UserControllerV2 {
 				},
 			);
 			if (updateData.privacy) {
-				await this.eventEmitter.emitAsync(UserUpdatePrivacyEvent, {
-					user: updatedUser,
-					privacy: updateData.privacy,
-				} as IUserUpdatePrivacyEventPayload);
+				await this.eventEmitter.emitAsync(
+					UserPrivacyUpdatedEvent.name,
+					new UserPrivacyUpdatedEvent(updatedUser, updateData.privacy),
+				);
 			}
 		} else {
 			throw new UnauthorizedException('Cannot update the data of another User');

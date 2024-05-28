@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Aggregator } from '../../report-aggregator/interfaces/aggregator.interface';
+import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { FilterQuery, Model } from 'mongoose';
 import {
 	Report,
@@ -7,17 +7,9 @@ import {
 	ReportDocument,
 } from '../../core/schemas/reports.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-	BadgeDef,
-	BadgeDefDocument,
-} from '../../core/schemas/achievements-def/badge-def.schema';
-import {
-	Badge,
-	BadgeDocument,
-} from '../../core/schemas/achievements/badges.schema';
+import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
 import { GetRelatedMedalDefFilter } from '../helpers/helpers';
-import { AchievementState } from '../../core/enums';
-import { MongoServerError } from 'mongodb';
+import { AchievementState, PrivacyType } from '../../core/enums';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { GroupReportsByUserAggregationService } from '../../aggregation/data-aggregation/aggregators/group-reports-by-user.service';
 import { ComputeMedalsService } from './compute-medals.service';
@@ -35,6 +27,8 @@ import {
 	ResourceMedalsCountUpdatedEvent,
 	UserMedalsCountUpdatedEvent,
 } from '../events/medal-count-updated.event';
+import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { User, UserDocument } from '../../core/schemas/user.schema';
 @Injectable()
 export class MedalAggregatorService implements Aggregator {
 	constructor(
@@ -42,13 +36,62 @@ export class MedalAggregatorService implements Aggregator {
 		protected medalDefModel: Model<MedalDefDocument>,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		@InjectModel(Medal.name) protected medalModel: Model<MedalDocument>,
-		@InjectModel(Term.name) protected termModel: Model<Term>,
+		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
+		@InjectModel(User.name) protected userModel: Model<UserDocument>,
+		protected resourceService: PartnerResourcesService,
 		protected groupReportsByUser: GroupReportsByUserAggregationService,
 		protected computeMedals: ComputeMedalsService,
 		protected eventEmitter: EventEmitter2,
 	) {}
 
 	logger = new Logger(MedalAggregatorService.name);
+
+	async updateUserPrivacy(curator_orcid: string, privacy: PrivacyType) {
+		// update public medals  to the correct privacy
+		this.medalModel.updateMany(
+			{
+				curator_orcid,
+				privacy: PrivacyType.public,
+			},
+			{
+				$set: {
+					privacy,
+				},
+			},
+		);
+
+		// update private medals to the correct privacy
+		// Get related resourceids
+		const resourceIds = this.medalModel
+			.find({ curator_orcid })
+			.distinct('resource_id');
+		const resources = await this.resourceService.get_resources({
+			resource_id: { $in: resourceIds },
+		});
+		const privacyUpdates$ = [];
+		for (const resource of resources) {
+			for (const league of resource.leagues) {
+				const update$ = this.medalModel.updateMany(
+					{
+						curator_orcid,
+						resource_id: resource.resource_id,
+						privacy: PrivacyType.private,
+					},
+					{
+						$set: {
+							privacy: computeAggregatePrivacyField(
+								{ privacy: league.visibility },
+								{ privacy },
+							),
+						},
+					},
+				);
+				privacyUpdates$.push(update$);
+			}
+		}
+
+		await Promise.all(privacyUpdates$);
+	}
 
 	private async updateMedalsEarnedState(
 		medalDef: MedalDefDocument,

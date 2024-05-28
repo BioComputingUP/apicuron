@@ -5,7 +5,6 @@ import {
 	WeeklyStatisticsDocument,
 } from '../../core/schemas/statistics/weekly-statistics.schema';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
-import { paginate } from '../../pagination/paginator';
 
 @Injectable()
 export class WeeklyStatisticsService {

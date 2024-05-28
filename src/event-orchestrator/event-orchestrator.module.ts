@@ -1,10 +1,13 @@
 import { Module } from '@nestjs/common';
-import { ConfigurableModuleClass } from './report-aggregator.module-definition';
+import { ConfigurableModuleClass } from './event-orchestrator.module-definition';
 import { CoreApicuronModule } from '../core/core.module';
 import { ManyReportsSubmittedHandler } from './handlers/many-reports-submitted.handler';
 import { ReportSubmittedEventHandler } from './handlers/report-submitted.handler';
 import { ResourceReportsDeletedHandler } from './handlers/resource-reports-deleted.handler';
 import { TermDeletedEventHandler } from './handlers/term-deleted.handler';
+import { UserPrivacyUpdatedEventHandler } from './handlers/user-privacy-updated.handler';
+import { TermUpdatedEventHandler } from './handlers/term-updated.handler';
+// import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
 	imports: [CoreApicuronModule],
@@ -12,8 +15,10 @@ import { TermDeletedEventHandler } from './handlers/term-deleted.handler';
 		ManyReportsSubmittedHandler,
 		ReportSubmittedEventHandler,
 		ResourceReportsDeletedHandler,
+		UserPrivacyUpdatedEventHandler,
+		TermUpdatedEventHandler,
 		TermDeletedEventHandler,
 	],
 	exports: [],
 })
-export class ReportAggregatorModule extends ConfigurableModuleClass {}
+export class EventOrchestratorModule extends ConfigurableModuleClass {}

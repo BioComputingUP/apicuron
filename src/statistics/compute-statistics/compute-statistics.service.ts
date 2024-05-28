@@ -41,11 +41,14 @@ export class ComputeStatisticsService {
 		const cachedTerm = (await this.cacheManager.get(
 			termCacheKey,
 		)) as TermDocument | null;
+
 		if (cachedTerm) {
+			this.logger.debug('Found cached term');
 			return cachedTerm;
 		}
+		this.logger.debug('fatching term from db using query', termFilter);
 
-		const term = await this.termModel.findOne({ resource_id, activity_term });
+		const term = await this.termModel.findOne(termFilter);
 		await this.cacheManager.set(termCacheKey, term, this.defaultCacheTTl);
 		return term;
 	}
@@ -82,6 +85,7 @@ export class ComputeStatisticsService {
 			count?: number;
 		},
 	): Promise<void> {
+		this.logger.debug('Upserting stat by report', report);
 		const { resource_id, curator_orcid, activity_term, league } = report;
 		const reportCount = report.count ?? 1;
 

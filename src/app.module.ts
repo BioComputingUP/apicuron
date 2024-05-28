@@ -53,13 +53,9 @@ const logger = new Logger('AppModule');
 			}),
 		}),
 
-		CacheModule.register({
-			store: 'memory',
-			shouldCloneBeforeSet: false,
-		}),
-
 		EventEmitterModule.forRoot({
-			wildcard: true,
+			// wildcard: true,
+			global: true,
 		}),
 
 		ScheduleModule.forRoot(),

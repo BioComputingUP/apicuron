@@ -38,7 +38,6 @@ import {
 	MedalDef,
 	MedalDefSchema,
 } from './schemas/achievements-def/medal-def.schema';
-import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AchievementType } from './enums';
 import {
 	DetailedStatistics,
@@ -46,12 +45,11 @@ import {
 } from './schemas/statistics/detailed-statistics.schema';
 import {
 	WeeklyStatistics,
-	WeeklyStatisticsSchema,
+	WeeklyStatisticsSchemaFactory,
 } from './schemas/statistics/weekly-statistics.schema';
 
 @Module({
 	imports: [
-		EventEmitterModule,
 		MongooseModule.forFeature([
 			{
 				name: Report.name,
@@ -100,10 +98,6 @@ import {
 				name: DetailedStatistics.name,
 				schema: DetailedStatisticsSchema,
 			},
-			{
-				name: WeeklyStatistics.name,
-				schema: WeeklyStatisticsSchema,
-			},
 		]),
 		MongooseModule.forFeatureAsync([
 			{
@@ -121,6 +115,10 @@ import {
 						value: AchievementType.medal,
 					},
 				],
+			},
+			{
+				name: WeeklyStatistics.name,
+				useFactory: WeeklyStatisticsSchemaFactory,
 			},
 		]),
 	],

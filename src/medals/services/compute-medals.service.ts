@@ -50,6 +50,8 @@ export class ComputeMedalsService {
 			...medalDef.toObject(),
 			_id: undefined,
 			curator_orcid: aggregatedReports.curator_orcid,
+			last_day: medalDef?.last_day,
+			first_day: medalDef?.first_day,
 			count_total: aggregatedReports.count,
 			score_total: aggregatedReports.score_total,
 			state: earned ? AchievementState.achieved : AchievementState.progress,

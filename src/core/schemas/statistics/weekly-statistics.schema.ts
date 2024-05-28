@@ -76,5 +76,22 @@ export class WeeklyStatistics implements IUserResourceEntity {
 	updatedAt: Date;
 }
 
-export const WeeklyStatisticsSchema =
-	SchemaFactory.createForClass(WeeklyStatistics).loadClass(WeeklyStatistics);
+// const WeeklyStatisticsSchema =
+// 	SchemaFactory.createForClass(WeeklyStatistics).loadClass(WeeklyStatistics);
+
+export function WeeklyStatisticsSchemaFactory() {
+	const WeeklyStatisticsSchema =
+		SchemaFactory.createForClass(WeeklyStatistics).loadClass(WeeklyStatistics);
+
+	WeeklyStatisticsSchema.index(
+		{ resource_id: 1, league: 1, curator_orcid: 1 },
+		{
+			unique: true,
+			name: 'unique_index',
+			comment:
+				'Uniquely indexes the WeeklyStatistic by resource_id, league, and curator_orcid',
+		},
+	);
+
+	return WeeklyStatisticsSchema;
+}

@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Aggregator } from '../../report-aggregator/interfaces/aggregator.interface';
+import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { FilterQuery, Model } from 'mongoose';
 import {
 	Report,
@@ -16,7 +16,7 @@ import {
 	BadgeDocument,
 } from '../../core/schemas/achievements/badges.schema';
 import { getReportRelatedBadgeDefFilter } from '../helpers/helpers';
-import { AchievementState } from '../../core/enums';
+import { AchievementState, PrivacyType } from '../../core/enums';
 import { MongoServerError } from 'mongodb';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -26,6 +26,7 @@ import {
 	ResourceBadgesUpdatedEvent,
 	UserBadgesUpdatedEvent,
 } from '../events/badge-count-updated.event';
+import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 @Injectable()
 export class BadgeAggregatorService implements Aggregator {
 	constructor(
@@ -33,10 +34,52 @@ export class BadgeAggregatorService implements Aggregator {
 		protected badgeDefModel: Model<BadgeDefDocument>,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		@InjectModel(Badge.name) protected badgeModel: Model<BadgeDocument>,
+		protected resourceService: PartnerResourcesService,
 		protected groupReportsByUser: GroupReportsByUserAggregationService,
 		protected computeBadges: ComputeBadgesService,
 		protected eventEmitter: EventEmitter2,
 	) {}
+	async updateUserPrivacy(curator_orcid: string, privacy: PrivacyType) {
+		await this.badgeModel.updateMany(
+			{
+				curator_orcid,
+				privacy: PrivacyType.public,
+			},
+			{
+				$set: { privacy },
+			},
+		);
+		const resource_ids = await this.badgeModel.distinct('resource_id', {
+			curator_orcid,
+		});
+
+		const resources = await this.resourceService.get_resources({
+			resource_id: { $in: resource_ids },
+		});
+		const updates$ = [];
+		for (const resource of resources) {
+			for (const league of resource.leagues) {
+				const update$ = this.badgeModel.updateMany(
+					{
+						curator_orcid,
+						league: league.name,
+						resource_id: resource.resource_id,
+					},
+					{
+						$set: {
+							privacy: computeAggregatePrivacyField(
+								{ privacy: league.visibility },
+								{ privacy },
+							),
+						},
+					},
+				);
+				updates$.push(update$);
+			}
+		}
+
+		await Promise.all(updates$);
+	}
 
 	logger = new Logger(BadgeAggregatorService.name);
 

@@ -7,7 +7,6 @@ import {
 import { getLastWeekDate } from '../../../weekly-statistics/helpers/last-week-date';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { filter } from 'rxjs';
 import {
 	WeeklyStatistics,
 	WeeklyStatisticsDocument,

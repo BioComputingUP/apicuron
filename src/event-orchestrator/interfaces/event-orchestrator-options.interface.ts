@@ -1,5 +1,5 @@
 import { Aggregator } from './aggregator.interface';
 
-export interface ReportAggregatorModuleOptions {
+export interface EventOrchestratorModuleOptions {
 	aggregator: Aggregator;
 }

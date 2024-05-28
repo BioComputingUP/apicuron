@@ -6,6 +6,9 @@ import { WeeklyStatisticsService } from './services/weekly-statistics.service';
 import { RunDailyPipelineJob } from './jobs/run-daily-job';
 import { PipelineRunnerModule } from '../aggregation/pipeline-runner/pipeline-runner.module';
 import { ResourcesModule } from '../resources/resources.module';
+import { WeeklyStatisticsAggregatorService } from './services/weekly-stat-aggregator.service';
+import { ComputeWeeklyStatisticsService } from './services/compute-weekly-statistics.service';
+import { ReportsWeeklyAggregationPipeline } from './aggregations/reports-weekly.service';
 
 @Module({
 	imports: [
@@ -15,6 +18,12 @@ import { ResourcesModule } from '../resources/resources.module';
 		PipelineRunnerModule,
 	],
 	controllers: [WeeklyStatisticsController],
-	providers: [WeeklyStatisticsService, RunDailyPipelineJob],
+	providers: [
+		WeeklyStatisticsService,
+		ReportsWeeklyAggregationPipeline,
+		ComputeWeeklyStatisticsService,
+		WeeklyStatisticsAggregatorService,
+		RunDailyPipelineJob,
+	],
 })
 export class WeeklyStatisticsModule {}

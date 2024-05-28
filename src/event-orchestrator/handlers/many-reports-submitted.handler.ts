@@ -3,8 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Aggregator } from '../interfaces/aggregator.interface';
-import { ReportAggregatorModuleOptions } from '../interfaces/report-aggregator-options.interface';
-import { MODULE_OPTIONS_TOKEN } from '../report-aggregator.module-definition';
+import { EventOrchestratorModuleOptions } from '../interfaces/event-orchestrator-options.interface';
+import { MODULE_OPTIONS_TOKEN } from '../event-orchestrator.module-definition';
 import {
 	IManyReportsSubmittedEventPayload,
 	ManyReportsSubmittedEvent,
@@ -16,7 +16,7 @@ import { IEventHandler } from '@nestjs/cqrs';
 export class ManyReportsSubmittedHandler implements IEventHandler {
 	constructor(
 		@Inject(MODULE_OPTIONS_TOKEN)
-		protected options: ReportAggregatorModuleOptions,
+		protected options: EventOrchestratorModuleOptions,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 	) {
 		this.aggregator = options.aggregator;

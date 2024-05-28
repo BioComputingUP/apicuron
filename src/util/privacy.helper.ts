@@ -6,16 +6,11 @@ import {
 } from '../core/schemas/resource/partner-resource.schema';
 import { User, UserDocument } from '../core/schemas/user.schema';
 import {
-	IResourceEntity,
 	IResourceEntityDocument,
 	IUserResourceEntity,
 	IUserResourceEntityDocument,
 	LeanIResourceEntityDocument,
 } from '../core/interfaces/user-resource-entity';
-import {
-	LeanReportDocument,
-	ReportDocument,
-} from '../core/schemas/reports.schema';
 
 /**
  * Computes the privacy field for a given resource entity based on the resource, related user, and user resource entity.
@@ -65,10 +60,8 @@ export function computePrivacyField(
  * @returns The aggregate privacy type.
  */
 export function computeAggregatePrivacyField(
-	resourceEntity:
-		| LeanDocument<IResourceEntity>
-		| HydratedDocument<IResourceEntity>,
-	report: LeanReportDocument | ReportDocument | { privacy: PrivacyType },
+	resourceEntity: { privacy: PrivacyType },
+	report: { privacy: PrivacyType },
 ) {
 	return [resourceEntity.privacy, report.privacy].includes(PrivacyType.private)
 		? PrivacyType.private

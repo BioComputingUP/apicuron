@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import {
-	IUserUpdatePrivacyEventPayload,
-	UserUpdatePrivacyEvent,
-} from '../../auth/users/events/update-privacy';
+import { UserPrivacyUpdatedEvent } from '../../auth/users/events/update-privacy';
 import { InjectModel } from '@nestjs/mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
@@ -22,8 +19,8 @@ export class ReportEventsHandlerService {
 	 *
 	 * @param user - The user for whom the reports' privacy settings will be updated.
 	 */
-	@OnEvent(UserUpdatePrivacyEvent, { async: true, promisify: true })
-	async updateReportsPrivacy({ user }: IUserUpdatePrivacyEventPayload) {
+	@OnEvent(UserPrivacyUpdatedEvent.name, { async: true, promisify: true })
+	async updateReportsPrivacy({ user }: UserPrivacyUpdatedEvent) {
 		// first we retrieve all the resource_ids concerned by this change
 		const resourceIdList = (await this.reportModel
 			.aggregate()

@@ -9,7 +9,7 @@ import { ReportDocument } from '../../../core/schemas/reports.schema';
 import { AggregatedUserReportsByActivities } from '../interfaces/aggregation-results';
 
 @Injectable({
-	scope: Scope.TRANSIENT
+	scope: Scope.TRANSIENT,
 })
 export class GroupReportsByUserAggregationService
 	implements Aggregator<AggregatedUserReportsByActivities>

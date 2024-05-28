@@ -16,6 +16,9 @@ import { DataIteratorModule } from '../aggregation/data-iteration/aggregated-rep
 import { PipelineRunnerModule } from '../aggregation/pipeline-runner/pipeline-runner.module';
 import { BadgesModule } from '../badges/badges.module';
 import { MedalsModule } from '../medals/medals.module';
+import { EventOrchestratorModule } from '../event-orchestrator/event-orchestrator.module';
+import { StatisticsAggregator } from './services/statistics-aggregator.service';
+import { EventOrchestratorModuleOptions } from '../event-orchestrator/interfaces/event-orchestrator-options.interface';
 
 @Module({
 	imports: [
@@ -29,6 +32,17 @@ import { MedalsModule } from '../medals/medals.module';
 			max: 100,
 			shouldCloneBeforeSet: false,
 		}),
+		EventOrchestratorModule.registerAsync({
+			imports: [StatisticsModule],
+			inject: [StatisticsAggregator],
+			useFactory(
+				statisticsAggregator: StatisticsAggregator,
+			): EventOrchestratorModuleOptions {
+				return {
+					aggregator: statisticsAggregator,
+				};
+			},
+		}),
 		DataAggregationModule,
 		DataIteratorModule,
 		PipelineRunnerModule,
@@ -37,8 +51,9 @@ import { MedalsModule } from '../medals/medals.module';
 	providers: [
 		StatisticsService,
 		ComputeStatisticsService,
+		StatisticsAggregator,
 		StatisticsEventHandlerService,
 	],
-	exports: [ComputeStatisticsService],
+	exports: [ComputeStatisticsService, StatisticsAggregator],
 })
 export class StatisticsModule {}

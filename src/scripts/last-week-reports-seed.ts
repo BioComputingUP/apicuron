@@ -53,8 +53,8 @@ async function bootstrap() {
 	const termModel: Model<Term> = app.get(getModelToken(Term.name));
 
 	// initialize variables
-	const reportCount = 1;
-	// const termCount = 30;
+	// const reportCount = 1;
+	const reportCount = 30;
 
 	const terms = await termModel.find({ resource_id: 'disprot' });
 	const activities = terms.map((terms) => terms.activity_term);
