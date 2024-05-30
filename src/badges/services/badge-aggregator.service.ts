@@ -20,7 +20,7 @@ import { AchievementState, PrivacyType } from '../../core/enums';
 import { MongoServerError } from 'mongodb';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { GroupReportsByUserAggregationService } from '../../aggregation/data-aggregation/aggregators/group-reports-by-user.service';
+
 import { ComputeBadgesService } from './compute-badges.service';
 import {
 	ResourceBadgesUpdatedEvent,
@@ -35,7 +35,7 @@ export class BadgeAggregatorService implements Aggregator {
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		@InjectModel(Badge.name) protected badgeModel: Model<BadgeDocument>,
 		protected resourceService: PartnerResourcesService,
-		protected groupReportsByUser: GroupReportsByUserAggregationService,
+
 		protected computeBadges: ComputeBadgesService,
 		protected eventEmitter: EventEmitter2,
 	) {}

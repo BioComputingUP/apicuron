@@ -1,37 +1,90 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Aggregate, FilterQuery, Model } from 'mongoose';
-import { Report, ReportDocument } from '../../../core/schemas/reports.schema';
+import { Term, TermDocument } from '../../core/schemas/terms.schema';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { User, UserDocument } from '../../core/schemas/user.schema';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
-} from '../../../core/schemas/resource/partner-resource.schema';
-import { Term, TermDocument } from '../../../core/schemas/terms.schema';
-import { User, UserDocument } from '../../../core/schemas/user.schema';
-import { InjectModel } from '@nestjs/mongoose';
-import { Cache } from '@nestjs/cache-manager';
-import {
-	BaseAggregationResult,
-	DetailedAggregationResult,
-} from '../../data-aggregation/interfaces/aggregation-results';
-import { BaseReportIteratorResult } from '../interfaces/base-report-iterator-result';
-import { Iterator } from '../interfaces/iterator.interface';
+} from '../../core/schemas/resource/partner-resource.schema';
 
+export interface BaseAggregationResult {
+	_id: {
+		resource_id: string;
+		curator_orcid: string;
+		league: string;
+		activity_term: string;
+	};
+	resource_id: string;
+	curator_orcid: string;
+	league: string;
+	activity_term: string;
+	count: number;
+	last_contribution: Date;
+	first_contribution: Date;
+}
+
+export type BaseReportIteratorResult<T> = {
+	term: TermDocument;
+	resource: PartnerResourceDocument;
+	user: UserDocument;
+	report: T;
+};
 @Injectable()
-export class AggregatedReportIteratorService
-	implements
-		Iterator<
-			BaseAggregationResult,
-			BaseReportIteratorResult<DetailedAggregationResult>
-		>
-{
+export class StatisticsReportAggregator {
 	constructor(
+		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
+		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
+		@Inject(CACHE_MANAGER) protected cacheManager: Cache,
+		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 		@InjectModel(PartnerResource.name)
 		protected resourceModel: Model<PartnerResourceDocument>,
-		@InjectModel(User.name) protected userModel: Model<UserDocument>,
-		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
-		protected cacheManager: Cache,
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 	) {}
+
+	aggregate(
+		filter: FilterQuery<ReportDocument>,
+	): Aggregate<BaseAggregationResult[]> {
+		return this.reportModel
+			.aggregate()
+			.match(filter)
+			.group({
+				_id: {
+					resource_id: '$resource_id',
+					curator_orcid: '$curator_orcid',
+					league: '$league',
+					activity_term: '$activity_term',
+				},
+				resource_id: {
+					$first: '$resource_id',
+				},
+				curator_orcid: {
+					$first: '$curator_orcid',
+				},
+				league: {
+					$first: '$league',
+				},
+				activity_term: {
+					$first: '$activity_term',
+				},
+				count: {
+					$sum: 1,
+				},
+				last_contribution: {
+					$max: '$timestamp',
+				},
+				first_contribution: {
+					$min: '$timestamp',
+				},
+			})
+			.sort({
+				resource_id: -1,
+				curator_orcid: -1,
+				league: -1,
+				activity_term: -1,
+			}) as unknown as Aggregate<BaseAggregationResult[]>;
+	}
 
 	defaultCacheTTl = 10;
 	private async getTerm(
@@ -85,9 +138,9 @@ export class AggregatedReportIteratorService
 	}
 
 	async *iterate(
-		aggregation: Aggregate<BaseAggregationResult | DetailedAggregationResult>,
-	): AsyncGenerator<BaseReportIteratorResult<DetailedAggregationResult>> {
-		const cursor = aggregation.cursor({ batchSize: 100 });
+		filter: FilterQuery<ReportDocument> = {},
+	): AsyncGenerator<BaseReportIteratorResult<BaseAggregationResult>> {
+		const cursor = this.aggregate(filter).cursor({ batchSize: 100 });
 		let currentResource: PartnerResourceDocument | null = null;
 		let currentUser: UserDocument | null = null;
 

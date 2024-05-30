@@ -7,7 +7,7 @@ import {
 } from 'mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { getLastWeekDate } from '../helpers/last-week-date';
-import { DaysOfWeek, DayOfWeek } from '../enums/days-of-week';
+import { DaysOfWeek, DayOfWeek } from '../../core/enums';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';

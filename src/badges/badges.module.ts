@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { EventOrchestratorModule } from '../event-orchestrator/event-orchestrator.module';
 import { BadgeAggregatorService } from './services/badge-aggregator.service';
 import { CoreApicuronModule } from '../core/core.module';
-import { DataAggregationModule } from '../aggregation/data-aggregation/data-aggregation.module';
 import { BadgeDefCommandsService } from './services/badge-def-commands.service';
 import { BadgeDefDeletedEventHandler } from './handlers/badge-def-deleted.handler';
 import { BadgeDefUpdatedEventHandler } from './handlers/badge-def-updated.handler';
@@ -13,13 +12,13 @@ import { BadgeDefQueriesService } from './services/badge-def-queries.service';
 import { BadgeDefCreatedEventHandler } from './handlers/badge-def-created.handler';
 import { ComputeBadgesService } from './services/compute-badges.service';
 import { EarnedBadgesService } from './services/earned-badges.service';
+import { GroupReportsByUserAggregator } from './aggregation/group-reports-by-user.service';
 
 @Module({
 	imports: [
 		CoreApicuronModule,
 		AuthModule,
 		ResourcesModule,
-		DataAggregationModule,
 		EventOrchestratorModule.registerAsync({
 			imports: [BadgesModule],
 			inject: [BadgeAggregatorService],
@@ -33,6 +32,7 @@ import { EarnedBadgesService } from './services/earned-badges.service';
 		// ReportAggregatorModule.register(BadgeAggregatorService),
 	],
 	providers: [
+		GroupReportsByUserAggregator,
 		BadgeDefCommandsService,
 		BadgeDefQueriesService,
 		ComputeBadgesService,

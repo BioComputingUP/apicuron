@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { GroupReportsByUserAggregationService } from '../../aggregation/data-aggregation/aggregators/group-reports-by-user.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { FilterQuery, Model } from 'mongoose';
@@ -12,14 +11,17 @@ import {
 	BadgeDefDocument,
 } from '../../core/schemas/achievements-def/badge-def.schema';
 import { AchievementState } from '../../core/enums';
-import { AggregatedUserReportsByActivities } from '../../aggregation/data-aggregation/interfaces/aggregation-results';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import {
+	GroupedReportsByUser,
+	GroupReportsByUserAggregator,
+} from '../aggregation/group-reports-by-user.service';
 
 @Injectable()
 export class ComputeBadgesService {
 	constructor(
-		protected groupReportsByUser: GroupReportsByUserAggregationService,
+		protected groupReportsByUser: GroupReportsByUserAggregator,
 		protected eventEmitter: EventEmitter2,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		@InjectModel(Badge.name) protected badgeModel: Model<BadgeDocument>,
@@ -31,7 +33,7 @@ export class ComputeBadgesService {
 
 	private async buildBadgeFromAggregatedReports(
 		badgeDef: BadgeDefDocument,
-		reportAgg: AggregatedUserReportsByActivities,
+		reportAgg: GroupedReportsByUser,
 	): Promise<BadgeDocument> {
 		const state =
 			reportAgg.count >= badgeDef.count_threshold
@@ -93,15 +95,11 @@ export class ComputeBadgesService {
 			badgeDefCount++;
 
 			const reportAggregationByUser = this.groupReportsByUser
-				.aggregate(this.reportModel, [
-					{
-						$match: {
-							resource_id: badgeDef.resource_id,
-							league: badgeDef.league,
-							activity_term: { $in: badgeDef.list_terms },
-						},
-					},
-				])
+				.aggregate({
+					resource_id: badgeDef.resource_id,
+					league: badgeDef.league,
+					activity_term: { $in: badgeDef.list_terms },
+				})
 				.cursor({ batchSize: 50 });
 
 			const badges$ = [];

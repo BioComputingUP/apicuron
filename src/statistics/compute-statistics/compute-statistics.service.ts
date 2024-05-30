@@ -11,13 +11,12 @@ import { FilterQuery, LeanDocument, Model } from 'mongoose';
 import { MongoServerError } from 'mongodb';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
-import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { computePrivacyField } from '../../util/privacy.helper';
-import { AggregatedReportIteratorService } from '../../aggregation/data-iteration/iterators/aggregated-report-iterator.service';
-import { BaseReportAggregationService } from '../../aggregation/data-aggregation/aggregators/base-report-aggregation.service';
-import { SortedPipelineStage } from '../../aggregation/data-aggregation/interfaces/aggregator.interface';
-import { BaseAggregationResult } from '../../aggregation/data-aggregation/interfaces/aggregation-results';
-import { BaseReportIteratorResult } from '../../aggregation/data-iteration/interfaces/base-report-iterator-result';
+import {
+	BaseAggregationResult,
+	BaseReportIteratorResult,
+	StatisticsReportAggregator,
+} from '../aggregation/aggregate-reports.service';
 @Injectable()
 export class ComputeStatisticsService {
 	logger = new Logger(ComputeStatisticsService.name);
@@ -29,28 +28,57 @@ export class ComputeStatisticsService {
 		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
 		protected partnerResourceService: PartnerResourcesService,
 		@Inject(CACHE_MANAGER) private cacheManager: Cache,
-		protected reportIterator: AggregatedReportIteratorService,
-		protected reportAggregator: BaseReportAggregationService,
+		private reportAggregator: StatisticsReportAggregator,
 	) {}
 	defaultCacheTTl = 10;
 	private async getTerm(
-		termFilter: FilterQuery<TermDocument>,
+		termFilter: FilterQuery<TermDocument> & {
+			resource_id: string;
+			activity_term: string;
+			league: string;
+		},
 	): Promise<TermDocument> {
 		const { resource_id, activity_term, league } = termFilter;
-		const termCacheKey = `term: ${resource_id}:${activity_term}:${league}`;
+		const getTermKey = (
+			resource_id: string,
+			activity_term: string,
+			league: string,
+		) => `term: ${resource_id}:${activity_term}:${league}`;
+		const termKey = getTermKey(
+			termFilter.resource_id,
+			termFilter.activity_term,
+			termFilter.league,
+		);
 		const cachedTerm = (await this.cacheManager.get(
-			termCacheKey,
+			termKey,
 		)) as TermDocument | null;
-
 		if (cachedTerm) {
-			this.logger.debug('Found cached term');
 			return cachedTerm;
 		}
-		this.logger.debug('fatching term from db using query', termFilter);
 
-		const term = await this.termModel.findOne(termFilter);
-		await this.cacheManager.set(termCacheKey, term, this.defaultCacheTTl);
-		return term;
+		const terms = await this.termModel.find({ resource_id });
+		let resultTerm: TermDocument | null = null;
+
+		const cacheEvents$ = [];
+		for (const term of terms) {
+			if (term.activity_term == activity_term && term.league == league) {
+				resultTerm = term;
+			}
+			const cacheEvent$ = this.cacheManager.set(
+				getTermKey(resource_id, term.activity_term, term.league),
+				term,
+				this.defaultCacheTTl,
+			);
+			cacheEvents$.push(cacheEvent$);
+		}
+		await Promise.all(cacheEvents$);
+		if (!resultTerm) {
+			throw new Error(
+				`Term ${activity_term} from resource ${resource_id} not found`,
+			);
+		}
+
+		return resultTerm;
 	}
 
 	private getRelatedStatsFilter(
@@ -71,7 +99,11 @@ export class ComputeStatisticsService {
 
 	private getRelatedTermFilter(
 		report: ReportDocument | Report | LeanDocument<Report>,
-	): FilterQuery<TermDocument> {
+	): FilterQuery<TermDocument> & {
+		resource_id: string;
+		activity_term: string;
+		league: string;
+	} {
 		const { resource_id, activity_term, league } = report;
 		return {
 			resource_id,
@@ -215,7 +247,12 @@ export class ComputeStatisticsService {
 
 	updateSingleStat(
 		stat: StatisticsDocument,
-		{ resource, report, user, term }: BaseReportIteratorResult,
+		{
+			resource,
+			report,
+			user,
+			term,
+		}: BaseReportIteratorResult<BaseAggregationResult>,
 	) {
 		computePrivacyField(resource, user, stat);
 		const activity_category = term.activity_category;
@@ -245,21 +282,16 @@ export class ComputeStatisticsService {
 	 * @returns {Promise<void>} - A promise that resolves when the statistics computation is complete.
 	 */
 	async computeStatistics(filter: FilterQuery<ReportDocument> = {}) {
-		const statFilter = this.getRelatedStatsFilter(new this.reportModel(filter));
+		// const statFilter = this.getRelatedStatsFilter(new this.reportModel(filter));
 
-		const delResponse = await this.statModel.deleteMany(statFilter);
+		// const delResponse = await this.statModel.deleteMany(statFilter);
 
-		this.logger.debug(
-			`Deleted ${delResponse.deletedCount} documents, acknowledged ${delResponse.acknowledged} `,
-		);
+		// this.logger.debug(
+		// 	`Deleted ${delResponse.deletedCount} documents, acknowledged ${delResponse.acknowledged} `,
+		// );
 		const statSaves$ = [];
 
-		const aggregation = this.reportAggregator.aggregate(this.reportModel, [
-			{
-				$match: filter,
-			},
-		]);
-		const reportsByTerms = this.reportIterator.iterate(aggregation);
+		const reportsByTerms = this.reportAggregator.iterate(filter);
 
 		let currentStat = null;
 		for await (const { resource, report, user, term } of reportsByTerms) {

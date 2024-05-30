@@ -14,11 +14,8 @@ import {
 	Medal,
 	MedalDocument,
 } from '../../core/schemas/achievements/medals.schema';
-import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
-import { ComputeStatisticsService } from '../compute-statistics/compute-statistics.service';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { AchievementState } from '../../core/enums';
-import { AllStatisticsPipelinesOrchestratorService } from '../../aggregation/pipeline-runner/orchestrators/all-statistics-pipelines.service';
 import {
 	ResourceMedalsCountUpdatedEvent,
 	UserMedalsCountUpdatedEvent,

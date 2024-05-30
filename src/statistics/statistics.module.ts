@@ -11,14 +11,12 @@ import { ComputeStatisticsService } from './compute-statistics/compute-statistic
 import { CacheModule } from '@nestjs/cache-manager';
 import { StatisticsEventHandlerService } from './events/event-handler.service';
 import { OrcidClientModule } from '../orcid/orcid-client/orcid-client.module';
-import { DataAggregationModule } from '../aggregation/data-aggregation/data-aggregation.module';
-import { DataIteratorModule } from '../aggregation/data-iteration/aggregated-report-iterator.module';
-import { PipelineRunnerModule } from '../aggregation/pipeline-runner/pipeline-runner.module';
 import { BadgesModule } from '../badges/badges.module';
 import { MedalsModule } from '../medals/medals.module';
 import { EventOrchestratorModule } from '../event-orchestrator/event-orchestrator.module';
 import { StatisticsAggregator } from './services/statistics-aggregator.service';
 import { EventOrchestratorModuleOptions } from '../event-orchestrator/interfaces/event-orchestrator-options.interface';
+import { StatisticsReportAggregator } from './aggregation/aggregate-reports.service';
 
 @Module({
 	imports: [
@@ -43,12 +41,10 @@ import { EventOrchestratorModuleOptions } from '../event-orchestrator/interfaces
 				};
 			},
 		}),
-		DataAggregationModule,
-		DataIteratorModule,
-		PipelineRunnerModule,
 	],
 	controllers: [StatisticsController, OldStatisticsController],
 	providers: [
+		StatisticsReportAggregator,
 		StatisticsService,
 		ComputeStatisticsService,
 		StatisticsAggregator,

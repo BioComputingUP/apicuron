@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { EventOrchestratorModule } from '../event-orchestrator/event-orchestrator.module';
 import { MedalAggregatorService } from './services/medal-aggregator.service';
 import { CoreApicuronModule } from '../core/core.module';
-import { DataAggregationModule } from '../aggregation/data-aggregation/data-aggregation.module';
 import { MedalDefCommandsService } from './services/medal-def-commands.service';
 import { MedalDefDeletedEventHandler } from './handlers/medal-def-deleted.handler';
 import { MedalDefUpdatedEventHandler } from './handlers/medal-def-updated.handler';
@@ -19,7 +18,6 @@ import { EarnedMedalsService } from './services/earned-medals.service';
 		CoreApicuronModule,
 		AuthModule,
 		ResourcesModule,
-		DataAggregationModule,
 		EventOrchestratorModule.registerAsync({
 			imports: [MedalsModule],
 			inject: [MedalAggregatorService],

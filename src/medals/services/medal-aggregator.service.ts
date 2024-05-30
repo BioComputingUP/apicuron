@@ -11,7 +11,6 @@ import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.
 import { GetRelatedMedalDefFilter } from '../helpers/helpers';
 import { AchievementState, PrivacyType } from '../../core/enums';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { GroupReportsByUserAggregationService } from '../../aggregation/data-aggregation/aggregators/group-reports-by-user.service';
 import { ComputeMedalsService } from './compute-medals.service';
 import {
 	MedalDef,
@@ -39,7 +38,6 @@ export class MedalAggregatorService implements Aggregator {
 		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
 		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 		protected resourceService: PartnerResourcesService,
-		protected groupReportsByUser: GroupReportsByUserAggregationService,
 		protected computeMedals: ComputeMedalsService,
 		protected eventEmitter: EventEmitter2,
 	) {}

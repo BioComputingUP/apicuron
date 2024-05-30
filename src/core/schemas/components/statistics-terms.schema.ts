@@ -44,12 +44,6 @@ export class ActivitiesStatistics {
 		default: () => 0,
 	})
 	score: number;
-	@Prop({
-		type: Number,
-		required: true,
-		default: () => 0,
-	})
-	sum: number;
 
 	@Prop({
 		type: Number,

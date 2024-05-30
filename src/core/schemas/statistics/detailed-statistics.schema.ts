@@ -53,7 +53,7 @@ export class DetailedStatistics implements IUserResourceEntity {
 	@Prop({
 		required: true,
 		type: [Number],
-		default: () => Array(7).fill(0),
+		default: () => Array(12).fill(0),
 	})
 	months: number[];
 
@@ -61,7 +61,29 @@ export class DetailedStatistics implements IUserResourceEntity {
 	updatedAt: Date;
 }
 
-export const DetailedStatisticsSchema =
-	SchemaFactory.createForClass(DetailedStatistics).loadClass(
-		DetailedStatistics,
+// export const DetailedStatisticsSchema =
+// 	SchemaFactory.createForClass(DetailedStatistics).loadClass(
+// 		DetailedStatistics,
+// 	);
+export function DetailedStatisticsSchemaFactory() {
+	const DetailedStatisticsSchema =
+		SchemaFactory.createForClass(DetailedStatistics).loadClass(
+			DetailedStatistics,
+		);
+
+	DetailedStatisticsSchema.index(
+		{
+			resource_id: 1,
+			league: 1,
+			curator_orcid: 1,
+		},
+		{
+			name: 'unique_index',
+			unique: true,
+			comment:
+				'Uniquely indexes the statistic by resource_id, league and curator_orcid',
+		},
 	);
+
+	return DetailedStatisticsSchema;
+}

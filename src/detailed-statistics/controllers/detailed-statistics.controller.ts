@@ -13,10 +13,7 @@ import {
 	ApiOkResponse,
 	ApiOperation,
 } from '@nestjs/swagger';
-import {
-	DetailedStatistics,
-	DetailedStatisticsSchema,
-} from '../../core/schemas/statistics/detailed-statistics.schema';
+import { DetailedStatistics } from '../../core/schemas/statistics/detailed-statistics.schema';
 
 @ApiTags('Detailed Statistics')
 @ApiHeader(VersionHeader)

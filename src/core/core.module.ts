@@ -19,7 +19,10 @@ import {
 	NotificationSchema,
 } from './schemas/notification.schema';
 import { Term, TermSchema } from './schemas/terms.schema';
-import { Statistics, StatisticsSchema } from './schemas/statistics.schema';
+import {
+	Statistics,
+	StatisticsSchemaFactory,
+} from './schemas/statistics.schema';
 import {
 	AchievementDef,
 	AchievementDefSchema,
@@ -41,7 +44,7 @@ import {
 import { AchievementType } from './enums';
 import {
 	DetailedStatistics,
-	DetailedStatisticsSchema,
+	DetailedStatisticsSchemaFactory,
 } from './schemas/statistics/detailed-statistics.schema';
 import {
 	WeeklyStatistics,
@@ -90,14 +93,6 @@ import {
 					{ name: MedalDef.name, schema: MedalDefSchema, value: 'medal' },
 				],
 			},
-			{
-				name: Statistics.name,
-				schema: StatisticsSchema,
-			},
-			{
-				name: DetailedStatistics.name,
-				schema: DetailedStatisticsSchema,
-			},
 		]),
 		MongooseModule.forFeatureAsync([
 			{
@@ -115,6 +110,14 @@ import {
 						value: AchievementType.medal,
 					},
 				],
+			},
+			{
+				name: DetailedStatistics.name,
+				useFactory: DetailedStatisticsSchemaFactory,
+			},
+			{
+				name: Statistics.name,
+				useFactory: StatisticsSchemaFactory,
 			},
 			{
 				name: WeeklyStatistics.name,

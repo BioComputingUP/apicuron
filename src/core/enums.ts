@@ -1,5 +1,8 @@
+// Generics
 type ObjectValues<T> = T[keyof T];
+type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType[number];
 
+// Types
 export const PrivacyType = {
 	private: 'private',
 	public: 'public',
@@ -23,3 +26,32 @@ export const AchievementType = {
 	medal: 'medal',
 } as const;
 export type AchievementType = ObjectValues<typeof AchievementType>;
+
+// utilities
+
+export const DaysOfWeek = [
+	'monday',
+	'tuesday',
+	'wednesday',
+	'thursday',
+	'friday',
+	'saturday',
+	'sunday',
+] as const;
+export type DayOfWeek = ArrayElement<typeof DaysOfWeek>;
+
+export const months = [
+	'january',
+	'february',
+	'march',
+	'april',
+	'may',
+	'june',
+	'july',
+	'august',
+	'september',
+	'october',
+	'november',
+	'december',
+] as const;
+export type Month = ArrayElement<typeof months>;

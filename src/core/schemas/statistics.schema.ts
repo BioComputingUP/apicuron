@@ -72,5 +72,26 @@ export class Statistics implements IUserResourceEntity {
 	first_contribution: Date;
 }
 
-export const StatisticsSchema =
-	SchemaFactory.createForClass(Statistics).loadClass(Statistics);
+// export const StatisticsSchema =
+// 	SchemaFactory.createForClass(Statistics).loadClass(Statistics);
+
+export function StatisticsSchemaFactory() {
+	const StatisticsSchema =
+		SchemaFactory.createForClass(Statistics).loadClass(Statistics);
+
+	StatisticsSchema.index(
+		{
+			resource_id: 1,
+			league: 1,
+			curator_orcid: 1,
+		},
+		{
+			name: 'unique_index',
+			unique: true,
+			comment:
+				'Uniquely indexes the statistic by resource_id, league and curator_orcid',
+		},
+	);
+
+	return StatisticsSchema;
+}
