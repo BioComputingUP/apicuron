@@ -188,7 +188,6 @@ export class ComputeWeeklyStatisticsService {
 
 			currentStat.privacy = privacy as PrivacyType;
 
-			this.logger.debug(` Aggregated Days ${reportAgg.days}`);
 			// sum the days of the week with the current value
 			currentStat.daysOfWeek = currentStat.daysOfWeek.map(
 				(value, dayIndex) => reportAgg.days[dayIndex] + value,

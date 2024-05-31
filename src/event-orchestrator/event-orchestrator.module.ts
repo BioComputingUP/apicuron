@@ -7,11 +7,12 @@ import { ResourceReportsDeletedHandler } from './handlers/resource-reports-delet
 import { TermDeletedEventHandler } from './handlers/term-deleted.handler';
 import { UserPrivacyUpdatedEventHandler } from './handlers/user-privacy-updated.handler';
 import { TermUpdatedEventHandler } from './handlers/term-updated.handler';
-// import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
+import { InitializationService } from './services/initialization.service';
 
 @Module({
 	imports: [CoreApicuronModule],
 	providers: [
+		InitializationService,
 		ManyReportsSubmittedHandler,
 		ReportSubmittedEventHandler,
 		ResourceReportsDeletedHandler,
