@@ -9,6 +9,7 @@ import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../../core/schemas/resource/partner-resource.schema';
+import { PrivacyType } from '../../core/enums';
 
 export interface BaseAggregationResult {
 	_id: {
@@ -19,6 +20,7 @@ export interface BaseAggregationResult {
 	};
 	resource_id: string;
 	curator_orcid: string;
+	privacy: PrivacyType;
 	league: string;
 	activity_term: string;
 	count: number;
@@ -29,7 +31,6 @@ export interface BaseAggregationResult {
 export type BaseReportIteratorResult<T> = {
 	term: TermDocument;
 	resource: PartnerResourceDocument;
-	user: UserDocument;
 	report: T;
 };
 @Injectable()
@@ -55,6 +56,9 @@ export class StatisticsReportAggregator {
 					curator_orcid: '$curator_orcid',
 					league: '$league',
 					activity_term: '$activity_term',
+				},
+				privacy: {
+					$first: '$privacy',
 				},
 				resource_id: {
 					$first: '$resource_id',
@@ -87,7 +91,7 @@ export class StatisticsReportAggregator {
 	}
 
 	defaultCacheTTl = 10;
-	private async getTerm(
+	async getTerm(
 		termFilter: FilterQuery<TermDocument> & {
 			resource_id: string;
 			activity_term: string;
@@ -142,7 +146,6 @@ export class StatisticsReportAggregator {
 	): AsyncGenerator<BaseReportIteratorResult<BaseAggregationResult>> {
 		const cursor = this.aggregate(filter).cursor({ batchSize: 100 });
 		let currentResource: PartnerResourceDocument | null = null;
-		let currentUser: UserDocument | null = null;
 
 		for await (const report of cursor) {
 			if (
@@ -154,12 +157,6 @@ export class StatisticsReportAggregator {
 				});
 			}
 
-			if (!currentUser || currentUser.orcid_id !== report.curator_orcid) {
-				currentUser = await this.userModel.findOne({
-					curator_orcid: report.curator_orcid,
-				});
-			}
-
 			const term = await this.getTerm({
 				resource_id: report.resource_id,
 				activity_term: report.activity_term,
@@ -168,7 +165,6 @@ export class StatisticsReportAggregator {
 			yield {
 				term,
 				resource: currentResource,
-				user: currentUser,
 				report: report,
 			};
 		}

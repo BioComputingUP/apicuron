@@ -86,8 +86,11 @@ export class StatisticsAggregator implements Aggregator {
 		await this.computeStats.computeStatistics({ resource_id });
 	}
 	async removeAllResourceAggregates(resource_id: string) {
-		await this.statModel.deleteMany({
+		const result = await this.statModel.deleteMany({
 			resource_id,
 		});
+		this.logger.debug(
+			`Deleted ${result.deletedCount} statistics for ${resource_id}`,
+		);
 	}
 }

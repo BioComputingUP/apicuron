@@ -28,6 +28,7 @@ import {
 } from '../events/medal-count-updated.event';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { User, UserDocument } from '../../core/schemas/user.schema';
+import { MedalEarnedEvent } from '../events/medal-earned.event';
 @Injectable()
 export class MedalAggregatorService implements Aggregator {
 	constructor(
@@ -136,21 +137,34 @@ export class MedalAggregatorService implements Aggregator {
 
 		// update all medals that are higher than the lowest medal earned
 
-		const updateEarnedPromises$ = earnedMedalsList.map(async (medal, idx) => {
-			medal.state = AchievementState.achieved;
-			medal.score_relative_index = idx;
+		const updateEarnedPromises$ = earnedMedalsList
+			.filter(
+				(medal: MedalDocument) => medal.state == AchievementState.progress,
+			)
+			.map(async (medal, idx) => {
+				medal.state = AchievementState.achieved;
+				medal.score_relative_index = idx;
 
-			return await medal.save();
-		});
-		const updateEearned$ = Promise.all(updateEarnedPromises$);
+				return await medal.save();
+			});
+		const earnedMedals = await Promise.all(updateEarnedPromises$);
 
-		const [, higherUpdate] = await Promise.all([updateLower, updateEearned$]);
+		await updateLower;
 
 		this.logger.debug(
-			`Medal ${medalDef.name} earned by ${higherUpdate.length} curators`,
+			`Medal ${medalDef.name} earned by ${earnedMedals.length} curators`,
 		);
 
-		return higherUpdate.length;
+		const MedalEearnedEvents$ = earnedMedals.map((medal) =>
+			this.eventEmitter.emitAsync(
+				MedalEarnedEvent.name,
+				new MedalEarnedEvent(medal),
+			),
+		);
+
+		await Promise.all(MedalEearnedEvents$);
+
+		return earnedMedals.length;
 	}
 
 	private async createOrUpdateMedal(

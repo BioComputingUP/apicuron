@@ -27,6 +27,7 @@ import {
 	UserBadgesUpdatedEvent,
 } from '../events/badge-count-updated.event';
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { BadgeEarnedEvent } from '../events/badge-earned.event';
 @Injectable()
 export class BadgeAggregatorService implements Aggregator {
 	constructor(
@@ -128,14 +129,13 @@ export class BadgeAggregatorService implements Aggregator {
 				badge.state == AchievementState.achieved
 			) {
 				// Badge earned by this report
-				await this.badgeModel.findOneAndUpdate(
-					{
-						name: BadgeDef.name,
-						curator_orcid: report.curator_orcid,
-						league: badgeDef.league,
-						resource_id: badgeDef.resource_id,
-					},
-					{ $set: { state: badge.state, achieved_at: report.timestamp } },
+
+				badge.achieved_at = report.timestamp;
+				await badge.save();
+
+				await this.eventEmitter.emitAsync(
+					BadgeEarnedEvent.name,
+					new BadgeEarnedEvent(badge),
 				);
 			}
 			return;

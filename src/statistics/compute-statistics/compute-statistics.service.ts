@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../core/schemas/user.schema';
@@ -9,14 +9,20 @@ import {
 import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
 import { FilterQuery, LeanDocument, Model } from 'mongoose';
 import { MongoServerError } from 'mongodb';
-import { Term, TermDocument } from '../../core/schemas/terms.schema';
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
-import { computePrivacyField } from '../../util/privacy.helper';
+import { TermDocument } from '../../core/schemas/terms.schema';
+import {
+	computeAggregatePrivacyField,
+	computePrivacyField,
+} from '../../util/privacy.helper';
 import {
 	BaseAggregationResult,
 	BaseReportIteratorResult,
 	StatisticsReportAggregator,
 } from '../aggregation/aggregate-reports.service';
+import {
+	updateMaxDate,
+	updateMinDate,
+} from '../../weekly-statistics/helpers/fields-updater';
 @Injectable()
 export class ComputeStatisticsService {
 	logger = new Logger(ComputeStatisticsService.name);
@@ -25,61 +31,9 @@ export class ComputeStatisticsService {
 		@InjectModel(Statistics.name)
 		protected statModel: Model<StatisticsDocument>,
 		@InjectModel(User.name) protected userModel: Model<UserDocument>,
-		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
 		protected partnerResourceService: PartnerResourcesService,
-		@Inject(CACHE_MANAGER) private cacheManager: Cache,
 		private reportAggregator: StatisticsReportAggregator,
 	) {}
-	defaultCacheTTl = 10;
-	private async getTerm(
-		termFilter: FilterQuery<TermDocument> & {
-			resource_id: string;
-			activity_term: string;
-			league: string;
-		},
-	): Promise<TermDocument> {
-		const { resource_id, activity_term, league } = termFilter;
-		const getTermKey = (
-			resource_id: string,
-			activity_term: string,
-			league: string,
-		) => `term: ${resource_id}:${activity_term}:${league}`;
-		const termKey = getTermKey(
-			termFilter.resource_id,
-			termFilter.activity_term,
-			termFilter.league,
-		);
-		const cachedTerm = (await this.cacheManager.get(
-			termKey,
-		)) as TermDocument | null;
-		if (cachedTerm) {
-			return cachedTerm;
-		}
-
-		const terms = await this.termModel.find({ resource_id });
-		let resultTerm: TermDocument | null = null;
-
-		const cacheEvents$ = [];
-		for (const term of terms) {
-			if (term.activity_term == activity_term && term.league == league) {
-				resultTerm = term;
-			}
-			const cacheEvent$ = this.cacheManager.set(
-				getTermKey(resource_id, term.activity_term, term.league),
-				term,
-				this.defaultCacheTTl,
-			);
-			cacheEvents$.push(cacheEvent$);
-		}
-		await Promise.all(cacheEvents$);
-		if (!resultTerm) {
-			throw new Error(
-				`Term ${activity_term} from resource ${resource_id} not found`,
-			);
-		}
-
-		return resultTerm;
-	}
 
 	private getRelatedStatsFilter(
 		report: ReportDocument | Report | LeanDocument<Report>,
@@ -127,7 +81,9 @@ export class ComputeStatisticsService {
 			);
 		}
 
-		const term = await this.getTerm(this.getRelatedTermFilter(report));
+		const term = await this.reportAggregator.getTerm(
+			this.getRelatedTermFilter(report),
+		);
 		if (!term) {
 			this.logger.warn(
 				`Warning, report found with term ${activity_term} but no corresponding term was found, deleting report`,
@@ -199,17 +155,6 @@ export class ComputeStatisticsService {
 		);
 	}
 
-	async getResourceTerms(
-		resource_id: string,
-	): Promise<Map<string, LeanDocument<Term>>> {
-		const terms = await this.termModel.find({ resource_id }).lean();
-		const termsMap = new Map<string, LeanDocument<Term>>();
-		terms.forEach((term) => {
-			termsMap.set(`${term.league}:${term.activity_term}`, term);
-		});
-		return termsMap;
-	}
-
 	private aggregateReportsByActivity(filter: FilterQuery<ReportDocument> = {}) {
 		return this.reportModel
 			.aggregate()
@@ -247,14 +192,12 @@ export class ComputeStatisticsService {
 
 	updateSingleStat(
 		stat: StatisticsDocument,
-		{
-			resource,
-			report,
-			user,
-			term,
-		}: BaseReportIteratorResult<BaseAggregationResult>,
+		{ resource, report, term }: BaseReportIteratorResult<BaseAggregationResult>,
 	) {
-		computePrivacyField(resource, user, stat);
+		stat.privacy = computeAggregatePrivacyField(
+			{ privacy: resource.getLeague(report.league).visibility },
+			report,
+		);
 		const activity_category = term.activity_category;
 		const score = term.score;
 		stat[`${activity_category}_count`] += report.count;
@@ -262,18 +205,27 @@ export class ComputeStatisticsService {
 		if (!stat[`${activity_category}_terms`]) {
 			stat[`${activity_category}_terms`] = [];
 		}
-		stat[`${activity_category}_terms`].push({
-			activity_category: term.activity_category,
-			activity_name: term.activity_name,
-			description: term.description,
-			activity_term: report.activity_term,
-			count: report.count,
-			score: score,
-			sum: report.count * score,
-		});
+		// stat[`${activity_category}_terms`].push({
+		// 	activity_category: term.activity_category,
+		// 	activity_name: term.activity_name,
+		// 	description: term.description,
+		// 	activity_term: report.activity_term,
+		// 	count: report.count,
+		// 	score: score,
+		// 	sum: report.count * score,
+		// });
 
 		stat.total_count += report.count;
 		stat.total_score += report.count * score;
+
+		stat.last_contribution = updateMaxDate(
+			stat.last_contribution,
+			report.last_contribution,
+		);
+		stat.first_contribution = updateMinDate(
+			stat.first_contribution,
+			report.first_contribution,
+		);
 	}
 
 	/**
@@ -294,7 +246,7 @@ export class ComputeStatisticsService {
 		const reportsByTerms = this.reportAggregator.iterate(filter);
 
 		let currentStat = null;
-		for await (const { resource, report, user, term } of reportsByTerms) {
+		for await (const { resource, report, term } of reportsByTerms) {
 			if (!currentStat) {
 				// instantiate a new stat object if the current stat is null
 				currentStat = new this.statModel({
@@ -316,7 +268,7 @@ export class ComputeStatisticsService {
 				});
 			}
 
-			this.updateSingleStat(currentStat, { resource, report, user, term });
+			this.updateSingleStat(currentStat, { resource, report, term });
 		}
 
 		if (currentStat) {
@@ -338,9 +290,9 @@ export class ComputeStatisticsService {
 			return await this.upsertStatByReport(report);
 		}
 
-		const term$ = this.getTerm(this.getRelatedTermFilter(report)).then(
-			(term) => term.toObject() as LeanDocument<TermDocument>,
-		);
+		const term$ = this.reportAggregator
+			.getTerm(this.getRelatedTermFilter(report))
+			.then((term) => term.toObject() as LeanDocument<TermDocument>);
 		const resource$ = this.partnerResourceService.get_resource(
 			report.resource_id,
 		);
