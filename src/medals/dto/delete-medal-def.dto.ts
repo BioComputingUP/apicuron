@@ -1,4 +1,4 @@
-import { IsNotEmpty, Validate, IsString } from 'class-validator';
+import { IsNotEmpty, Validate, IsString, IsOptional } from 'class-validator';
 import { FilterQuery } from 'mongoose';
 import { AchievementType } from '../../core/enums';
 import { AchievementDef } from '../../core/schemas/achievements-def/achievement-def.schema';
@@ -17,8 +17,8 @@ export class DeleteMedalDefDto {
 	@IsNotEmpty()
 	@Validate(EntryExistsRule, [
 		AchievementDef.name,
-		({ name, league, resource_id }) => {
-			return { name, type: AchievementType.badge, league, resource_id };
+		({ name, resource_id }) => {
+			return { name, type: AchievementType.badge, resource_id };
 		},
 	])
 	name: string;
@@ -33,5 +33,6 @@ export class DeleteMedalDefDto {
 		},
 	])
 	@IsString()
+	@IsOptional()
 	league: string;
 }

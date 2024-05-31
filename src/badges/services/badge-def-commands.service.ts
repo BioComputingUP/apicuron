@@ -27,11 +27,13 @@ export class BadgeDefCommandsService {
 	async updateBadgeDef(updateBadge: UpdateBadgeDefDto) {
 		const { resource_id, name, ...updates } = updateBadge;
 
+		const resource = await this.resourceService.get_resource(resource_id);
+
 		const badgeDef = await this.badgeDefModel.findOneAndUpdate(
 			{
 				resource_id,
 				name,
-				league: updateBadge.league,
+				league: updateBadge.league ?? resource.defaultLeague,
 			},
 			{
 				$set: updates,
@@ -51,10 +53,14 @@ export class BadgeDefCommandsService {
 	}
 
 	async deleteBadgeDef(deleteBadge: DeleteBadgeDefDto) {
+		const resource = await this.resourceService.get_resource(
+			deleteBadge.resource_id,
+		);
+
 		const badgeDef = await this.badgeDefModel.findOneAndDelete({
 			resource_id: deleteBadge.resource_id,
 			name: deleteBadge.name,
-			league: deleteBadge.league,
+			league: deleteBadge.league ?? resource.defaultLeague,
 		});
 
 		await this.eventEmitter.emitAsync(
@@ -71,6 +77,9 @@ export class BadgeDefCommandsService {
 		const resource = await this.resourceService.get_resource(
 			badgeDef.resource_id,
 		);
+		if (!badgeDef.league) {
+			badgeDef.league = resource.defaultLeague;
+		}
 		const newBadge = new this.badgeDefModel({
 			...badgeDef,
 			resource_uri: resource.resource_uri,

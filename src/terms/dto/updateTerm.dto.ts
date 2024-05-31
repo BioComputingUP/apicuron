@@ -38,6 +38,12 @@ export class UpdateTermDto {
 	@IsUrl()
 	resource_uri?: string;
 
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ resource_id }) => {
+			return { resource_id };
+		},
+	])
 	@IsNotEmpty()
 	resource_id: string;
 
@@ -54,7 +60,7 @@ export class UpdateTermDto {
 		PartnerResource.name,
 		({ league, resource_id }) => {
 			return {
-				leagues: league,
+				'leagues.name': league,
 				resource_id,
 			};
 		},

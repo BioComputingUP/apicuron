@@ -21,7 +21,7 @@ export class DeleteTermDto {
 		PartnerResource.name,
 		({ league, resource_id }): FilterQuery<PartnerResourceDocument> => {
 			return {
-				leagues: league,
+				'leagues.name': league,
 				resource_id,
 			};
 		},

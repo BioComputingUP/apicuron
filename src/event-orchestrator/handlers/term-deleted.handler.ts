@@ -23,7 +23,7 @@ export class TermDeletedEventHandler implements IEventHandler {
 	}
 	aggregator: Aggregator;
 
-	@OnEvent(TermDeletedEvent, { promisify: true, async: true })
+	@OnEvent(TermDeletedEvent.name, { promisify: true, async: true })
 	async handle(payload: ITermDeletedEventPayload) {
 		await this.aggregator.removeAllResourceAggregates(payload.term.resource_id);
 		await this.aggregator.applyAllReports(payload.term.resource_id);

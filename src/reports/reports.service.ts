@@ -349,7 +349,7 @@ export class ReportsService {
 		return converter[groupBy];
 	}
 
-	@OnEvent(TermDeletedEvent, { async: true, promisify: true })
+	@OnEvent(TermDeletedEvent.name, { async: true, promisify: true })
 	async deleteTermReports({ term }: ITermDeletedEventPayload) {
 		return await this.reportModel.deleteMany({
 			resource_id: term.resource_id,

@@ -29,7 +29,6 @@ import { CoreApicuronModule } from './core/core.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MongoEventsModule } from './mongo-events/mongo-events.module';
 import { SubmitReportModule } from './submit-reports/submit-reports.module';
-import { CacheModule } from '@nestjs/cache-manager';
 import { OrcidClientModule } from './orcid/orcid-client/orcid-client.module';
 import { OrcidSubmissionModule } from './orcid/orcid-submission/orcid-submission.module';
 import { ResourceManagerModule } from './resource-manager/resource-manager.module';
@@ -37,6 +36,7 @@ import { DetailedStatisticsModule } from './detailed-statistics/detailed-statist
 import { WeeklyStatisticsModule } from './weekly-statistics/weekly-statistics.module';
 import { BadgesModule } from './badges/badges.module';
 import { MedalsModule } from './medals/medals.module';
+import { AchievementsModule } from './achievements/achievements.module';
 const logger = new Logger('AppModule');
 
 @Module({
@@ -108,8 +108,6 @@ const logger = new Logger('AppModule');
 		ReportsModule,
 		SubmitReportModule,
 		StatisticsModule,
-		MedalsModule,
-		BadgesModule,
 		NotificationsModule,
 		ResourceManagerModule,
 		SchedulerModule,
@@ -117,9 +115,9 @@ const logger = new Logger('AppModule');
 		EmailModule,
 		DetailedStatisticsModule,
 		WeeklyStatisticsModule,
-		// testing
 		MedalsModule,
 		BadgesModule,
+		AchievementsModule,
 	],
 	controllers: [AppController],
 	providers: [

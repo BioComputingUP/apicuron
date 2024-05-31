@@ -39,6 +39,7 @@ export class UpdateBadgeDefDto {
 		},
 	])
 	@IsString()
+	@IsOptional()
 	league: string;
 
 	// optional update fields

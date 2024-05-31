@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
 import { DeleteTermDto } from './dto/deleteTerm.dto';
@@ -59,17 +63,31 @@ export class TermsService {
 	}
 
 	async updateTerm(term: UpdateTermDto) {
-		const { resource_id, activity_term, league } = term;
+		// const { resource_id, activity_term, league } = term;
 
-		if (!league) {
+		if (!term.league) {
 			const resource = await this.resourceService.get_resource(
 				term.resource_id,
 			);
 			term.league = resource.defaultLeague;
 		}
+		const exists = await this.termModel.exists({
+			resource_id: term.resource_id,
+			activity_term: term.activity_term,
+			league: term.league,
+		});
+		if (!exists) {
+			throw new BadRequestException(
+				`Term ${term.activity_term} from resource ${term.resource_id} from league ${term.league} does not exist`,
+			);
+		}
 
 		const updatedTerm = await this.termModel.findOneAndUpdate(
-			{ resource_id, activity_term, league },
+			{
+				resource_id: term.resource_id,
+				activity_term: term.activity_term,
+				league: term.league,
+			},
 			{
 				$set: term,
 			},
@@ -83,14 +101,29 @@ export class TermsService {
 		return updatedTerm;
 	}
 
-	async createTerm(term: CreateTermDto) {
+	async createTerm(createTerm: CreateTermDto) {
 		const { resource_uri, defaultLeague } =
-			await this.resourceService.get_resource(term.resource_id);
+			await this.resourceService.get_resource(createTerm.resource_id);
 
-		if (!term.league) {
-			term.league = defaultLeague;
+		if (!createTerm.league) {
+			createTerm.league = defaultLeague;
 		}
-		const termDocument = await this.termModel.create({ ...term, resource_uri });
+
+		const exists = await this.termModel.exists({
+			resource_id: createTerm.resource_id,
+			league: createTerm.league,
+			activity_term: createTerm.activity_term,
+		});
+		if (exists) {
+			throw new BadRequestException(
+				`Term ${createTerm.activity_term} from resource ${createTerm.resource_id} from league ${createTerm.league} already exists`,
+			);
+		}
+
+		const termDocument = await this.termModel.create({
+			...createTerm,
+			resource_uri,
+		});
 		return termDocument.save();
 	}
 
@@ -103,14 +136,14 @@ export class TermsService {
 		}
 		const response = await this.termModel.deleteOne(term);
 
-		await this.eventEmitter.emitAsync(TermDeletedEvent, {
-			term,
-		} as ITermDeletedEventPayload);
-
 		if (response.deletedCount == 1) {
+			await this.eventEmitter.emitAsync(
+				TermDeletedEvent.name,
+				new TermDeletedEvent(term),
+			);
 			return true;
 		} else {
-			return false;
+			throw new InternalServerErrorException(`Failed to delete term ${term}`);
 		}
 	}
 }
