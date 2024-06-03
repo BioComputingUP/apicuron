@@ -28,7 +28,7 @@ export class InitializationService implements OnModuleInit {
 			return;
 		}
 
-		await this.initializeAggregateData();
+		// await this.initializeAggregateData();
 	}
 
 	async initializeAggregateData() {

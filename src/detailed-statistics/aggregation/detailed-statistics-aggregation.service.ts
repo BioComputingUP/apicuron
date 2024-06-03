@@ -156,10 +156,10 @@ export class DetailedStatisticsPipeline implements OnModuleInit {
 					$sum: 1,
 				},
 				last_contribution: {
-					$min: '$timestamp',
+					$max: '$timestamp',
 				},
 				first_contribution: {
-					$max: '$timestamp',
+					$min: '$timestamp',
 				},
 				...this.monthsGroup(),
 				...this.daysGroup(),
