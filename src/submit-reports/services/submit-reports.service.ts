@@ -1,4 +1,5 @@
 import {
+	BadRequestException,
 	Injectable,
 	InternalServerErrorException,
 	Logger,
@@ -20,6 +21,9 @@ import {
 	ManyReportsSubmittedEvent,
 	ReportSubmittedEvent,
 } from '../events/events';
+
+import { MongoServerError } from 'mongodb';
+import { computePrivacyField } from '../../util/privacy.helper';
 
 @Injectable()
 export class SubmitReportService {
@@ -67,7 +71,6 @@ export class SubmitReportService {
 			const instance = new this.reportModel(report);
 
 			await this.reportMetaHandler.handle(instance);
-
 			await instance.save();
 
 			if (!options.preventEvents) {
@@ -77,6 +80,19 @@ export class SubmitReportService {
 			}
 			return instance;
 		} catch (e: any) {
+			if (e instanceof MongoServerError && e.code === 11000) {
+				this.logger.error(`Attempt at duplicate report insertion`);
+				// Duplicate key error, return 403
+				const error = new Error(
+					`Report from user ${report.curator_orcid} to resource ${
+						report.resource_id
+					} with the exact timestamp ${report.timestamp.toISOString()} already exists`,
+				);
+				throw new BadRequestException('Duplicate report submission attempt', {
+					cause: error,
+					description: error.message,
+				});
+			}
 			this.logger.error(e.message, e.stack, 'insertReport');
 			throw new Error(`Failed to save Report ${report}`);
 		}

@@ -20,13 +20,10 @@ import {
 	EntryExistsRule,
 } from '../../shared/validators/entry-exists.validator';
 import { Term } from '../../core/schemas/terms.schema';
-import {
-	PartnerResource,
-	PartnerResourceDocument,
-} from '../../core/schemas/resource/partner-resource.schema';
+import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 import { EntityUriValid } from '../validators/entity-uri';
 import { Type } from 'class-transformer';
-import { FilterQuery } from 'mongoose';
+import { LeagueValidator } from '../validators/league-validator';
 export class SubmitReportDto {
 	@Validate(
 		EntryExistsRule,
@@ -97,15 +94,7 @@ export class SubmitReportDto {
 	// @IsNotEmpty()
 	timestamp: Date;
 
-	@Validate(EntryExistsRule, [
-		PartnerResource.name,
-		({ league, resource_id }): FilterQuery<PartnerResourceDocument> => {
-			return {
-				resource_id,
-				leagues: league,
-			};
-		},
-	])
+	@Validate(LeagueValidator)
 	@IsString()
 	@IsOptional()
 	league: string;

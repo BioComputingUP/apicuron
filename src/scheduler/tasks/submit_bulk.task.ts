@@ -1,4 +1,4 @@
-import { Injectable, Logger, Inject } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { SubmitReportDto } from '../../submit-reports/dto/submit-report.dto';
 
 import StreamObject from 'stream-json/streamers/StreamObject';
@@ -12,8 +12,6 @@ import { validate, ValidationError } from 'class-validator';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 import { NotificationsService } from '../../notifications/notifications.service';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
-import { ComputeAchievementsTask } from './compute_achievements.task';
-import { ComputeStatisticsTask } from './compute_statistics.task';
 import { InjectModel } from '@nestjs/mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Model } from 'mongoose';
@@ -21,22 +19,19 @@ import { plainToClass } from 'class-transformer';
 import { MongoBulkWriteError } from 'mongodb';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SubmitReportService } from '../../submit-reports/services/submit-reports.service';
-import {
-	IManyReportsSubmittedEventPayload,
-	ManyReportsSubmittedEvent,
-} from '../../submit-reports/events/events';
+import { BulkSubmissionEvent } from '../../submit-reports/events/events';
+import { partition } from 'lodash';
 
 export type ValidatedReport = {
 	report: SubmitReportDto;
 	errors: ValidationError[];
 };
-export type ReportProcessReport = {
+export type SubmissionProcessingReport = {
 	errors: ValidationError[];
 	success_count: number;
 	total_report_count: number;
 	resource_ids: string[];
 };
-import { partition } from 'lodash';
 
 @Injectable()
 export class SubmitBulkTask {
@@ -45,10 +40,6 @@ export class SubmitBulkTask {
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 		protected notificationsService: NotificationsService,
-		@Inject('task:compute_achievements')
-		protected compute_achievements: ComputeAchievementsTask,
-		@Inject('task:compute_statistics')
-		protected compute_statistics: ComputeStatisticsTask,
 		protected eventEmitter: EventEmitter2,
 		protected submitReports: SubmitReportService,
 	) {}
@@ -56,7 +47,6 @@ export class SubmitBulkTask {
 	logger = new Logger(SubmitBulkTask.name);
 
 	public async run_task(task_arg: TaskArgument) {
-		// file: string, orcid_id: string, delete_all: string | null = null
 		const file = task_arg.file;
 
 		const [orcid_id, delete_all] = task_arg.arguments;
@@ -77,7 +67,7 @@ export class SubmitBulkTask {
 			}
 		}
 		const fileStats = statSync(file);
-		if (fileStats.size > 1024 * 1024 * 200) {
+		if (fileStats.size > 1024 * 50 /* size in bytes */) {
 			return await this.main(file, orcid_id);
 		}
 		return await this.unbuffered_submission(file, orcid_id);
@@ -103,12 +93,12 @@ export class SubmitBulkTask {
 					reportObj,
 				);
 
-				const priviledgeValidation = this.check_submission_priviledge(
+				const priviledgeValidationErrors = this.check_submission_priviledge(
 					user,
 					report,
 				);
-				if (priviledgeValidation) {
-					reportValidation.errors.push(priviledgeValidation);
+				if (priviledgeValidationErrors) {
+					reportValidation.errors.push(priviledgeValidationErrors);
 				}
 				return reportValidation;
 			},
@@ -131,6 +121,10 @@ export class SubmitBulkTask {
 		this.logger.debug(`${validReports.length} Valid to be inserted, reports`);
 		this.logger.debug(`${invalidReports.length} Invalid, reports`);
 
+		const affected_resource_ids = validReports
+			.map((report) => report.report.resource_id)
+			.reduce((acc, resource_id) => acc.add(resource_id), new Set<string>());
+
 		const reportDocuments: ReportDocument[] = validReports.map(
 			(report) => new this.reportModel(report.report),
 		);
@@ -139,14 +133,10 @@ export class SubmitBulkTask {
 			const insertResult = await this.submitReports.insertReports(
 				reportDocuments,
 			);
-			// const insertResult = await this.reportModel.insertMany(reportDocuments, {
+			// const insertResult = 	await this.reportModel.insertMany(reportDocuments, {
 			// 	rawResult: true,
 			// });
 			this.logger.debug(`inserted ${insertResult.insertedCount} reports`);
-
-			await this.eventEmitter.emitAsync(ManyReportsSubmittedEvent, {
-				reports: reportDocuments,
-			} as IManyReportsSubmittedEventPayload);
 
 			const successCount = validReports.length;
 			const errors = invalidReports
@@ -164,6 +154,14 @@ export class SubmitBulkTask {
 				'Submission report',
 				notification_body,
 				submitter_orcid,
+			);
+
+			await this.eventEmitter.emitAsync(
+				BulkSubmissionEvent.name,
+				new BulkSubmissionEvent(
+					submitter_orcid,
+					Array.from(affected_resource_ids),
+				),
 			);
 		} catch (err: any) {
 			if (err instanceof MongoBulkWriteError) {
@@ -292,23 +290,16 @@ export class SubmitBulkTask {
 				submitter_orcid,
 			);
 
-			for (const resource_id of resource_ids) {
-				this.logger.log(`Computing Achievements for ${resource_id}`);
-				await this.compute_achievements.run_task({
-					arguments: [resource_id],
-				});
-
-				this.logger.log(`Computing Statistics for ${resource_id}`);
-				await this.compute_statistics.run_task({
-					arguments: [resource_id],
-				});
-			}
+			await this.eventEmitter.emitAsync(
+				BulkSubmissionEvent.name,
+				new BulkSubmissionEvent(submitter_orcid, resource_ids),
+			);
 		}
 	}
 
 	private async process_report_stream(
 		reportsStream,
-	): Promise<ReportProcessReport> {
+	): Promise<SubmissionProcessingReport> {
 		let error_report = [];
 		let successful_reports_count = 0;
 		let total_report_count = 0;
@@ -441,7 +432,7 @@ export class SubmitBulkTask {
 		});
 	}
 
-	private build_report_stream(file, defaultReport, user: User): Stream {
+	private build_report_stream(file, defaultReport, user: UserDocument): Stream {
 		const pipeline = createReadStream(file).pipe(parser());
 
 		const reportsPipeline = pipeline.pipe(pick({ filter: 'reports' }));
@@ -498,7 +489,7 @@ export class SubmitBulkTask {
 	}
 
 	private user_can_report(
-		user,
+		user: UserDocument,
 	): ({ report, errors }: ValidatedReport) => ValidatedReport {
 		return ({ report, errors }: ValidatedReport) => {
 			const error = this.check_submission_priviledge(user, report);

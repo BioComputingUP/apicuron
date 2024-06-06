@@ -8,6 +8,7 @@ import { TermDeletedEventHandler } from './handlers/term-deleted.handler';
 import { UserPrivacyUpdatedEventHandler } from './handlers/user-privacy-updated.handler';
 import { TermUpdatedEventHandler } from './handlers/term-updated.handler';
 import { InitializationService } from './services/initialization.service';
+import { BulkReportSubmissionHandler } from './handlers/bulk-submission.handler';
 
 @Module({
 	imports: [CoreApicuronModule],
@@ -15,6 +16,7 @@ import { InitializationService } from './services/initialization.service';
 		InitializationService,
 		ManyReportsSubmittedHandler,
 		ReportSubmittedEventHandler,
+		BulkReportSubmissionHandler,
 		ResourceReportsDeletedHandler,
 		UserPrivacyUpdatedEventHandler,
 		TermUpdatedEventHandler,

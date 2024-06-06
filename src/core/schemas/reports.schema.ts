@@ -48,4 +48,16 @@ export class Report implements IUserResourceEntity {
 
 const ReportSchema = SchemaFactory.createForClass(Report).loadClass(Report);
 
+ReportSchema.index(
+	{
+		resource_id: 1,
+		league: 1,
+		entity_uri: 1,
+		activity_term: 1,
+		curator_orcid: 1,
+		timestamp: 1,
+	},
+	{ unique: true, name: 'unique_index' },
+);
+
 export { ReportSchema };

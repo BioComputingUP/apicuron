@@ -16,3 +16,10 @@ export const AllResourceReportsDeletedEvent = 'post.reports.deleteall.resource';
 export interface IAllResourceReportsDeletedEventPayload {
 	resource_id: string;
 }
+
+export class BulkSubmissionEvent {
+	constructor(
+		public readonly submitter_orcid: string,
+		public readonly resource_ids: string[],
+	) {}
+}

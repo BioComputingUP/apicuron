@@ -7,6 +7,7 @@ import { SubmitReportService } from './services/submit-reports.service';
 import { SchedulerClientModule } from '../scheduler-client/scheduler-client.module';
 import { EntityUriValid } from './validators/entity-uri';
 import { ReportMetaHandler } from './services/report-meta.handler';
+import { LeagueValidator } from './validators/league-validator';
 
 @Module({
 	imports: [
@@ -15,7 +16,12 @@ import { ReportMetaHandler } from './services/report-meta.handler';
 		ResourcesModule,
 		SchedulerClientModule,
 	],
-	providers: [SubmitReportService, EntityUriValid, ReportMetaHandler],
+	providers: [
+		SubmitReportService,
+		EntityUriValid,
+		ReportMetaHandler,
+		LeagueValidator,
+	],
 	controllers: [SubmitReportsController],
 	exports: [SubmitReportService],
 })
