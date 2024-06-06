@@ -123,11 +123,18 @@ export class SubmitReportService {
 				acknowledged,
 			};
 		} catch (e: any) {
+			if (e instanceof MongoServerError && e.code === 11000) {
+				this.logger.error(`Attempt at duplicate report insertion`);
+				// Duplicate key error, return 403
+				const error = new Error(`Duplicate report submission attempt`);
+				throw new BadRequestException('Duplicate report submission attempt', {
+					cause: error,
+					description: error.message,
+				});
+			}
 			if (e instanceof Error) {
 				this.logger.error(e.message, e.stack, e.name);
-				this.logger.error(
-					`A MongoBulkWriteException occurred when inserting Reports, but there are successfully processed documents.`,
-				);
+
 				throw new InternalServerErrorException(
 					'An internal error occured when submitting the reports',
 				);
