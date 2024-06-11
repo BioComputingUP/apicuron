@@ -36,7 +36,7 @@ import { VersionHeader } from '../../swagger/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import _ from 'lodash';
 import { SchedulerClientService } from '../../scheduler-client/services/scheduler-client.service';
-import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import {
 	IManyReportsSubmittedEventPayload,
 	IReportSubmittedEventPayload,

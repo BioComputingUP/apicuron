@@ -3,7 +3,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { UserPrivacyUpdatedEvent } from '../../auth/users/events/update-privacy';
 import { InjectModel } from '@nestjs/mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { computePrivacyField } from '../../util/privacy.helper';
 import { Model } from 'mongoose';
 

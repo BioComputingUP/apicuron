@@ -13,7 +13,7 @@ import {
 } from '../../core/schemas/statistics/weekly-statistics.schema';
 import { ComputeWeeklyStatisticsService } from './compute-weekly-statistics.service';
 import { PrivacyType } from '../../core/enums';
-import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
 
 @Injectable()

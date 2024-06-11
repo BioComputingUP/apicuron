@@ -8,7 +8,7 @@ import {
 	DetailedStatisticsDocument,
 } from '../../core/schemas/statistics/detailed-statistics.schema';
 import { ComputeDetailedStatisticsService } from './compute-detailed-stats.service';
-import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
 
 export class DetailedStatisticsAggregatorService implements Aggregator {

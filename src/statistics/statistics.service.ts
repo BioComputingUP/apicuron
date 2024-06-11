@@ -6,7 +6,7 @@ import {
 	Statistics,
 	StatisticsDocument,
 } from '../core/schemas/statistics.schema';
-import { PartnerResourcesService } from '..//resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../resources/partner-resources/services/partner-resources.service';
 import { GetStatisticsDto } from './dto/get-statistics.dto';
 
 @Injectable()

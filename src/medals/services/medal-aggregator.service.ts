@@ -26,7 +26,7 @@ import {
 	ResourceMedalsCountUpdatedEvent,
 	UserMedalsCountUpdatedEvent,
 } from '../events/medal-count-updated.event';
-import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 import { MedalEarnedEvent } from '../events/medal-earned.event';
 @Injectable()

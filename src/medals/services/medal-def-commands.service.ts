@@ -15,7 +15,7 @@ import { UpdateMedalDefDto as UpdateMedalDefDto } from '../dto/update-medal-def.
 import { MedalDefUpdatedEvent } from '../events/medal-def-updated.event';
 import { DeleteMedalDefDto } from '../dto/delete-medal-def.dto';
 import { MedalDefDeletedEvent } from '../events/medal-def-deleted.event';
-import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { CreateMedalDefDto } from '../dto/create-medal-def.dto';
 import { assignResourceEntityPrivacyField } from '../../util/privacy.helper';
 import { MedalDefCreatedEvent } from '../events/medal-def-created.event';

@@ -7,7 +7,7 @@ import { createReadStream, fstatSync } from 'fs';
 import { HttpModule, HttpService } from '@nestjs/axios';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { config } from 'process';
-import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { AxiosResponse } from 'axios';
 // const FormData = require('form-data')
 @Injectable()

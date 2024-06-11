@@ -10,7 +10,7 @@ import { UpdateBadgeDefDto } from '../dto/update-badge-def.dto';
 import { BadgeDefUpdatedEvent } from '../events/badge-def-updated.event';
 import { DeleteBadgeDefDto } from '../dto/delete-badge-def.dto';
 import { BadgeDefDeletedEvent } from '../events/badge-def-deleted.event';
-import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { CreateBadgeDefDto } from '../dto/create-badge-def.dto';
 import { assignResourceEntityPrivacyField } from '../../util/privacy.helper';
 import { BadgeDefCreatedEvent } from '../events/badge-def-created.event';

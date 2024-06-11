@@ -12,7 +12,7 @@ import { AuthProtected } from '../../../auth/decorators/auth.decorator';
 import { Public } from '../../../auth/decorators/public.decorator';
 import { UserReq } from '../../../auth/decorators/applyUser.decorator';
 import { User } from '../../../core/schemas/user.schema';
-import { PartnerResourcesService } from '../partner-resources.service';
+import { PartnerResourcesService } from '../services/partner-resources.service';
 import { PrivacyType } from '../../../core/enums';
 import { VersionHeader } from '../../../swagger/config';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';

@@ -3,7 +3,7 @@ import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { AppService } from './app.service';
 import { UsersService } from './auth/users/users.service';
 import { ReportsService } from './reports/reports.service';
-import { PartnerResourcesService } from './resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from './resources/partner-resources/services/partner-resources.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { AchievementDef } from './core/schemas/achievements-def/achievement-def.schema';
 import { Model } from 'mongoose';

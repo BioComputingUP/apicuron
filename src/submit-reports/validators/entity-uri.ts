@@ -6,7 +6,7 @@ import {
 	isURL,
 	validate,
 } from 'class-validator';
-import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { Injectable } from '@nestjs/common';
 
 @ValidatorConstraint({ name: 'isBefore', async: false })

@@ -26,7 +26,7 @@ import {
 	ResourceBadgesUpdatedEvent,
 	UserBadgesUpdatedEvent,
 } from '../events/badge-count-updated.event';
-import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { BadgeEarnedEvent } from '../events/badge-earned.event';
 @Injectable()
 export class BadgeAggregatorService implements Aggregator {

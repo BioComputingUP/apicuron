@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
-import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../resources/partner-resources/services/partner-resources.service';
 import {
 	BadgeDocument,
 	Badge,

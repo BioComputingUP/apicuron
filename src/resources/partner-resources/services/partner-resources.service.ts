@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, LeanDocument, Model } from 'mongoose';
-import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
-import { UpdatePartnerResourceDto } from '../dto/updateResource.dto';
-import { League } from '../../core/schemas/league/league.schema';
-import { CreateLeagueDto } from './dto/create-league.dto';
-import { AddMemberToLeagueDTO } from './dto/add-member-to-league';
-import { DeleteLeagueDTO } from './dto/delete-league.dto';
+import { PartnerResourceDocument } from '../../../core/schemas/resource/partner-resource.schema';
+import { PartnerResource } from '../../../core/schemas/resource/partner-resource.schema';
+import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
+import { League } from '../../../core/schemas/league/league.schema';
+import { CreateLeagueDto } from '../dto/create-league.dto';
+import { AddMemberToLeagueDTO } from '../dto/add-member-to-league';
+import { DeleteLeagueDTO } from '../dto/delete-league.dto';
 
 @Injectable()
 export class PartnerResourcesService {

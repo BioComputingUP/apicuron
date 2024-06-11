@@ -100,7 +100,7 @@ export class ComputeWeeklyStatisticsService {
 				await newStat.save();
 			} catch (err: any) {
 				if (err instanceof MongoServerError && err.code === 11000) {
-					await this.updateWithReport(report);
+					return await this.updateWithReport(report);
 				}
 				throw new Error(err);
 			}

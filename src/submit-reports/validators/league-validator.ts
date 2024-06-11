@@ -4,7 +4,7 @@ import {
 	ValidatorConstraintInterface,
 } from 'class-validator';
 import { Logger, InternalServerErrorException } from '@nestjs/common';
-import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 /**
  * @description Validated the ORCID-ID checksum according to the standard
  * here https://support.orcid.org/hc/en-us/articles/360006897674-Structure-of-the-ORCID-Identifier

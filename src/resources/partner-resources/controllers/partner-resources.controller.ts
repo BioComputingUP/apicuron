@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { SvgSanitationValidationPipe } from '../../../shared/pipes/svg-sanitation.pipe';
 
-import { PartnerResourcesService } from '../partner-resources.service';
+import { PartnerResourcesService } from '../services/partner-resources.service';
 import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
 import { UsersService } from '../../../auth/users/users.service';
 import { LocalAuthGuard } from '../../../auth/guards/local-auth.guard';

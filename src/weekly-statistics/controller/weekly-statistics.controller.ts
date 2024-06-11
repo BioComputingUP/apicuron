@@ -16,7 +16,7 @@ import { WeeklyStatisticsService } from '../services/weekly-statistics.service';
 import { User } from '../../core/schemas/user.schema';
 import { PaginateDto } from '../../pagination/dto/paginate.dto';
 import { paginate } from '../../pagination/paginator';
-import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 
 @ApiTags('Weekly Statistics')
 @ApiHeader(VersionHeader)

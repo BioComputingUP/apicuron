@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';

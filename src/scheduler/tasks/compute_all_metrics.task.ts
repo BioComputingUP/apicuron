@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { PartnerResourcesService } from '../../resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 import { ComputeAchievementsTask } from './compute_achievements.task';
 import { ComputeStatisticsTask } from './compute_statistics.task';

@@ -7,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
 import { DeleteTermDto } from './dto/deleteTerm.dto';
 import { UpdateTermDto } from './dto/updateTerm.dto';
-import { PartnerResourcesService } from '../resources/partner-resources/partner-resources.service';
+import { PartnerResourcesService } from '../resources/partner-resources/services/partner-resources.service';
 import { Term, TermDocument } from '../core/schemas/terms.schema';
 import { Report, ReportDocument } from '../core/schemas/reports.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
