@@ -51,7 +51,7 @@ export class OrcidService {
       .pipe(
         catchError(OrcidErrorHandler('name')),
         map((response) => {
-          const name = response["affiliation-group"][0].summaries[0]["employment-summary"].organization.name;
+          const name = response["affiliation-group"]?.[0]?.summaries?.[0]?.["employment-summary"]?.organization?.name;
           return name;
         })
       );
