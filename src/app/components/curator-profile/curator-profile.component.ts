@@ -8,12 +8,14 @@ import { OrcidProfileLink } from "src/app/orcid/types/orcid";
 import { map } from "rxjs/operators";
 import { SafeUrl } from "@angular/platform-browser";
 import { BarchartComponent } from "../charts/barchart/barchart.component";
+import { CalendarChartComponent } from "../charts/calendar-chart/calendar-chart.component";
+import { NgxPopperModule } from "ngx-popper";
 
 @Component({
     standalone: true,
     selector: 'curator-profile',
     templateUrl: './curator-profile.component.html',
-    imports: [CommonModule, OrcidModule, BarchartComponent],
+    imports: [CommonModule, OrcidModule, NgxPopperModule, BarchartComponent, CalendarChartComponent],
     styleUrls: ['./curator-profile.component.scss']
 })
 export class CuratorProfileComponent implements OnInit {
