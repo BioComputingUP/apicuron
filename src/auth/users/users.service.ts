@@ -21,7 +21,7 @@ export class UsersService implements OnApplicationBootstrap {
 			},
 			{
 				$set: {
-					privacy: 'private',
+					privacy: PrivacyType.private,
 				},
 			},
 		);
@@ -66,7 +66,7 @@ export class UsersService implements OnApplicationBootstrap {
 		const user_promise = this.userModel.findOne(
 			{
 				orcid_id,
-				privacy: 'public',
+				privacy: PrivacyType.public,
 			},
 			{
 				stats: 0,
