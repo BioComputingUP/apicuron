@@ -21,36 +21,6 @@ export class AchievementsService {
 		@InjectModel(Medal.name) protected medalModel: Model<MedalDocument>,
 	) {}
 
-	async getBadges(
-		filter: FilterQuery<BadgeDocument>,
-		options: QueryOptions<BadgeDocument>,
-	) {
-		filter.state = AchievementState.achieved;
-		const dataPromise = this.badgeModel.find(filter, {}, options);
-		const countPromise = this.badgeModel.count(filter);
-
-		const [data, count] = await Promise.all([dataPromise, countPromise]);
-		return {
-			data,
-			count,
-		};
-	}
-
-	async getMedals(
-		filter: FilterQuery<MedalDocument>,
-		options: QueryOptions<MedalDocument>,
-	): Promise<{ data: MedalDocument[]; count: number }> {
-		filter.state = AchievementState.achieved;
-		const dataPromise = this.medalModel.find(filter, {}, options);
-		const countPromise = this.medalModel.count(filter);
-
-		const [data, count] = await Promise.all([dataPromise, countPromise]);
-		return {
-			data,
-			count,
-		};
-	}
-
 	async user_achievements({
 		curator_orcid,
 		resource_id,

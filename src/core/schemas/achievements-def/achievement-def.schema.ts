@@ -13,7 +13,7 @@ export class AchievementDef implements IResourceEntity {
 	@Prop({ required: true, type: String })
 	resource_id: string;
 
-	@Prop({ required: true, type: String })
+	@Prop({ required: true, type: String, enum: PrivacyType })
 	privacy: PrivacyType;
 
 	@Prop({ required: true, type: String })

@@ -1,10 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, SchemaTypes, Types } from 'mongoose';
 import { Report } from './reports.schema';
-import {
-	UserResourceSpecificSettings,
-	UserResourceSpecificSettingsSchema,
-} from './components/user-settings.schema';
+
 import { PrivacyType } from '../enums';
 import { UserResource } from '../interfaces/user-resource';
 import { UserResourcePutCode } from '../interfaces/user-resource-put-code';
@@ -132,13 +129,6 @@ export class User {
 	avatar: string;
 
 	@Prop({
-		type: Map,
-		of: UserResourceSpecificSettingsSchema,
-		default: () => new Map(),
-	})
-	resource_settings: Map<string, UserResourceSpecificSettings>;
-
-	@Prop({
 		required: true,
 		default: PrivacyType.private,
 		type: String,
@@ -171,12 +161,6 @@ export class User {
 				putCode,
 			});
 		}
-	}
-
-	getResourceSettings(resource_id: string): UserResourceSpecificSettings {
-		return {
-			privacy: this.resource_settings.get(resource_id)?.privacy || this.privacy,
-		};
 	}
 }
 

@@ -11,7 +11,7 @@ export type AchievementDocument = HydratedDocument<Achievement>;
 	discriminatorKey: 'type',
 })
 export class Achievement implements IResourceEntity {
-	@Prop({ required: true, type: String })
+	@Prop({ required: true, type: String, enum: PrivacyType })
 	privacy: PrivacyType;
 
 	@Prop({ required: true, type: String })

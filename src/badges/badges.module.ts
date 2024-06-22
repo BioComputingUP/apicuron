@@ -13,6 +13,8 @@ import { BadgeDefCreatedEventHandler } from './handlers/badge-def-created.handle
 import { ComputeBadgesService } from './services/compute-badges.service';
 import { EarnedBadgesService } from './services/earned-badges.service';
 import { GroupReportsByUserAggregator } from './aggregation/group-reports-by-user.service';
+import { BadgesController } from './controllers/badges.controller';
+import { BadgesQueryService } from './services/badges-query.service';
 
 @Module({
 	imports: [
@@ -41,8 +43,9 @@ import { GroupReportsByUserAggregator } from './aggregation/group-reports-by-use
 		BadgeDefDeletedEventHandler,
 		EarnedBadgesService,
 		BadgeAggregatorService,
+		BadgesQueryService
 	],
 	exports: [BadgeAggregatorService, EarnedBadgesService],
-	controllers: [BadgesDefController],
+	controllers: [BadgesDefController, BadgesController],
 })
 export class BadgesModule {}
