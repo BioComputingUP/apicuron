@@ -121,6 +121,7 @@ export class MedalDefCommandsService {
 
 		const newMedalDef = new this.medalDefModel({
 			...medalDef,
+			privacy: resource.getLeague(medalDef.league).visibility,
 			resource_uri: resource.resource_uri,
 		});
 

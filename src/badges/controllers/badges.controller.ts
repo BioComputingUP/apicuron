@@ -21,10 +21,7 @@ export class BadgesController {
 	@AuthProtected()
 	@Public()
 	@Get('achievements/badges')
-	async get_badges(
-		@Query() filter: BadgeFilter,
-		@UserReq() user: User | null,
-	) {
+	async get_badges(@Query() filter: BadgeFilter, @UserReq() user: User | null) {
 		const privacyFilter = userResourceEntityPrivacyFilter(user);
 		const query = {
 			...filter.getQuery(),

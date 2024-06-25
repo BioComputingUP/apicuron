@@ -102,8 +102,11 @@ export class TermsService {
 	}
 
 	async createTerm(createTerm: CreateTermDto) {
-		const { resource_uri, defaultLeague } =
-			await this.resourceService.get_resource(createTerm.resource_id);
+		const resource = await this.resourceService.get_resource(
+			createTerm.resource_id,
+		);
+
+		const { resource_uri, defaultLeague } = resource;
 
 		if (!createTerm.league) {
 			createTerm.league = defaultLeague;
@@ -122,6 +125,7 @@ export class TermsService {
 
 		const termDocument = await this.termModel.create({
 			...createTerm,
+			privacy: resource.getLeague(createTerm.league).visibility,
 			resource_uri,
 		});
 		return termDocument.save();

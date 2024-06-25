@@ -82,6 +82,7 @@ export class BadgeDefCommandsService {
 		}
 		const newBadge = new this.badgeDefModel({
 			...badgeDef,
+			privacy: resource.getLeague(badgeDef.league).visibility,
 			resource_uri: resource.resource_uri,
 		});
 		assignResourceEntityPrivacyField(resource, newBadge);
