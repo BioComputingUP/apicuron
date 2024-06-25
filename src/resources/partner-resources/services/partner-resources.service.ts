@@ -5,15 +5,18 @@ import { PartnerResourceDocument } from '../../../core/schemas/resource/partner-
 import { PartnerResource } from '../../../core/schemas/resource/partner-resource.schema';
 import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
 import { League } from '../../../core/schemas/league/league.schema';
-import { CreateLeagueDto } from '../dto/create-league.dto';
-import { AddMemberToLeagueDTO } from '../dto/add-member-to-league';
-import { DeleteLeagueDTO } from '../dto/delete-league.dto';
+import { CreateLeagueDto } from '../leagues/dto/create-league.dto';
+import { AddMemberToLeague } from '../leagues/dto/add-member-to-league.dto';
+import { DeleteLeagueDTO } from '../leagues/dto/delete-league.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { LeagueDeletedEvent } from '../leagues/events/league-deleted-event';
 
 @Injectable()
 export class PartnerResourcesService {
 	constructor(
 		@InjectModel(PartnerResource.name)
 		private partnerResourceModel: Model<PartnerResourceDocument>, // protected transformService: TransformerService
+		protected eventEmitter: EventEmitter2,
 	) {}
 	async get_resources(
 		filter: FilterQuery<PartnerResourceDocument> = {},
@@ -33,7 +36,7 @@ export class PartnerResourcesService {
 		return resource.getLeague(createLeague.name);
 	}
 
-	async addMemberToLeague(addMemberToLeague: AddMemberToLeagueDTO) {
+	async addMemberToLeague(addMemberToLeague: AddMemberToLeague) {
 		const resourceUpdated = await this.partnerResourceModel.findOneAndUpdate(
 			{
 				resource_id: addMemberToLeague.resource_id,
@@ -52,7 +55,7 @@ export class PartnerResourcesService {
 	}
 
 	async removeMemberFromLeague(
-		removeMemberFromLeague: AddMemberToLeagueDTO,
+		removeMemberFromLeague: AddMemberToLeague,
 	): Promise<PartnerResourceDocument> {
 		const resourceUpdated = await this.partnerResourceModel.findOneAndUpdate(
 			{
@@ -77,6 +80,7 @@ export class PartnerResourcesService {
 	async deleteLeague(
 		deleteLeague: DeleteLeagueDTO,
 	): Promise<PartnerResourceDocument> {
+		// TODO: Emit event to handle all resource entities and reports that are linked to the league
 		const resourceUpdated = await this.partnerResourceModel.findOneAndUpdate(
 			{
 				resource_id: deleteLeague.resource_id,
@@ -89,6 +93,10 @@ export class PartnerResourcesService {
 			{
 				new: true,
 			},
+		);
+		await this.eventEmitter.emitAsync(
+			LeagueDeletedEvent.name,
+			new LeagueDeletedEvent(deleteLeague.league, deleteLeague.resource_id),
 		);
 		return resourceUpdated;
 	}

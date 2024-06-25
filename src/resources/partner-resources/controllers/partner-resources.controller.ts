@@ -65,7 +65,7 @@ export class PartnerResourcesController {
 		summary: 'Get the list of all resources on APICURON',
 	})
 	@Get()
-	async list_resources(): Promise<Array<PartnerResourceDto>> {
+	async list_resources(): Promise<PartnerResourceDto[]> {
 		return await this.partnerResourceService.get_resources();
 	}
 

@@ -2,9 +2,9 @@ import { IsString, IsNotEmpty, Validate } from 'class-validator';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
-} from '../../../core/schemas/resource/partner-resource.schema';
+} from '../../../../core/schemas/resource/partner-resource.schema';
 import { FilterQuery } from 'mongoose';
-import { EntryExistsRule } from '../../../shared/validators/entry-exists.validator';
+import { EntryExistsRule } from '../../../../shared/validators/entry-exists.validator';
 
 export class DeleteLeagueDTO {
 	@IsString()

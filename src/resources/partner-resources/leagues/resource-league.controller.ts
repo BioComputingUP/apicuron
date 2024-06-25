@@ -16,10 +16,12 @@ import { PartnerResourcesService } from '../services/partner-resources.service';
 import { PrivacyType } from '../../../core/enums';
 import { VersionHeader } from '../../../swagger/config';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateLeagueDto } from '../dto/create-league.dto';
-import { AddMemberToLeagueDTO } from '../dto/add-member-to-league';
-import { DeleteMemberFromLeagueDTO } from '../dto/delete-from-league.dto';
-import { DeleteLeagueDTO } from '../dto/delete-league.dto';
+import { CreateLeagueDto } from './dto/create-league.dto';
+import { AddMemberToLeague } from './dto/add-member-to-league.dto';
+import { DeleteMemberFromLeagueDTO } from './dto/delete-from-league.dto';
+import { DeleteLeagueDTO } from './dto/delete-league.dto';
+import { LeagueDto } from './dto/league.dto';
+import { PartnerResourceDto } from '../../dto/partner-resources.dto';
 
 @ApiTags('Leagues')
 @ApiHeader(VersionHeader)
@@ -45,24 +47,17 @@ export class ResourceLeagueController {
 	})
 	@Get(':resource_id')
 	@AuthProtected()
-	@Public()
 	async getLeagues(
-		@UserReq() user: User | null,
+		@UserReq() user: User,
 		@Param('resource_id') resourceId: string,
-	) {
+	): Promise<LeagueDto[]> {
 		const resource = await this.resourceService.get_resource(resourceId);
 		if (!resource) {
 			throw new NotFoundException(`Resource (${resourceId}) Not Found`);
 		}
-		if (
-			!user ||
-			!user.resources.map((r) => r.resource_id).includes(resourceId)
-		) {
-			return resource.leagues
-				.filter((league) => league.visibility === PrivacyType.public)
-				.map((league) => league.name);
-		}
-		return resource.leagues;
+		this.userCanAccessResource(user, resourceId);
+
+		return resource.leagues as LeagueDto[];
 	}
 
 	@ApiOperation({
@@ -73,16 +68,16 @@ export class ResourceLeagueController {
 	async createLeague(
 		@Body() createLeague: CreateLeagueDto,
 		@UserReq() user: User | null,
-	) {
+	): Promise<LeagueDto> {
 		this.userCanAccessResource(user, createLeague.resource_id);
 		const league = await this.resourceService.createLeague(createLeague);
-		return league;
+		return league as LeagueDto;
 	}
 
 	@Post('add-member')
 	@AuthProtected()
 	async addMemberToLeague(
-		@Body() addMemberToLeague: AddMemberToLeagueDTO,
+		@Body() addMemberToLeague: AddMemberToLeague,
 		@UserReq() user: User | null,
 	) {
 		this.userCanAccessResource(user, addMemberToLeague.resource_id);
@@ -91,7 +86,7 @@ export class ResourceLeagueController {
 			addMemberToLeague,
 		);
 
-		return updatedResource.getLeague(addMemberToLeague.league);
+		return updatedResource.getLeague(addMemberToLeague.league) as LeagueDto;
 	}
 
 	@Delete('remove-member')
@@ -99,14 +94,16 @@ export class ResourceLeagueController {
 	async removeMemberFromLeague(
 		@Body() removeMemberFromLeague: DeleteMemberFromLeagueDTO,
 		@UserReq() user: User | null,
-	) {
+	): Promise<LeagueDto> {
 		this.userCanAccessResource(user, removeMemberFromLeague.resource_id);
 
 		const updatedResource = await this.resourceService.removeMemberFromLeague(
 			removeMemberFromLeague,
 		);
 
-		return updatedResource.getLeague(removeMemberFromLeague.league);
+		return updatedResource.getLeague(
+			removeMemberFromLeague.league,
+		) as LeagueDto;
 	}
 
 	@Delete()
@@ -114,7 +111,7 @@ export class ResourceLeagueController {
 	async deleteLeague(
 		@Body() deleteLeague: DeleteLeagueDTO,
 		@UserReq() user: User | null,
-	) {
+	): Promise<PartnerResourceDto> {
 		this.userCanAccessResource(user, deleteLeague.resource_id);
 
 		const updatedResource = await this.resourceService.deleteLeague(
@@ -123,6 +120,6 @@ export class ResourceLeagueController {
 
 		delete updatedResource._id;
 
-		return updatedResource.toObject();
+		return updatedResource.toObject() as PartnerResourceDto;
 	}
 }

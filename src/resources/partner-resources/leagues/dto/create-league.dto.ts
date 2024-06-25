@@ -6,14 +6,14 @@ import {
 	IsString,
 	Validate,
 } from 'class-validator';
-import { OrcidChecksum } from '../../../submit-reports/validators/orcid-checksum';
-import { UniqueRule } from '../../../shared/validators/unique.validator';
+import { OrcidChecksum } from '../../../../submit-reports/validators/orcid-checksum';
+import { UniqueRule } from '../../../../shared/validators/unique.validator';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
-} from '../../../core/schemas/resource/partner-resource.schema';
+} from '../../../../core/schemas/resource/partner-resource.schema';
 import { FilterQuery } from 'mongoose';
-import { PrivacyType } from '../../../core/enums';
+import { PrivacyType } from '../../../../core/enums';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateLeagueDto {

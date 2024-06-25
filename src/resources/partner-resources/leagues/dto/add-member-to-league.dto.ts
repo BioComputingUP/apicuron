@@ -3,11 +3,11 @@ import { FilterQuery } from 'mongoose';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
-} from '../../../core/schemas/resource/partner-resource.schema';
-import { UniqueRule } from '../../../shared/validators/unique.validator';
-import { OrcidChecksum } from '../../../submit-reports/validators/orcid-checksum';
+} from '../../../../core/schemas/resource/partner-resource.schema';
+import { UniqueRule } from '../../../../shared/validators/unique.validator';
+import { OrcidChecksum } from '../../../../submit-reports/validators/orcid-checksum';
 
-export class DeleteMemberFromLeagueDTO {
+export class AddMemberToLeague {
 	@Validate(UniqueRule, [
 		PartnerResource.name,
 		({ resource_id, member }): FilterQuery<PartnerResourceDocument> => {
