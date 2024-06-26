@@ -12,6 +12,8 @@ import { MedalDefQueriesService } from './services/medal-def-queries.service';
 import { MedalDefCreatedEventHandler } from './handlers/medal-def-created.handler';
 import { ComputeMedalsService } from './services/compute-medals.service';
 import { EarnedMedalsService } from './services/earned-medals.service';
+import { MedalsController } from './controllers/medals.controller';
+import { MedalsQueryService } from './services/medals-query.service';
 
 @Module({
 	imports: [
@@ -39,8 +41,9 @@ import { EarnedMedalsService } from './services/earned-medals.service';
 		MedalDefDeletedEventHandler,
 		EarnedMedalsService,
 		MedalAggregatorService,
+		MedalsQueryService,
 	],
 	exports: [MedalAggregatorService, EarnedMedalsService],
-	controllers: [MedalsDefController],
+	controllers: [MedalsDefController, MedalsController],
 })
 export class MedalsModule {}

@@ -21,10 +21,7 @@ export class MedalsController {
 	@AuthProtected()
 	@Public()
 	@Get('achievements/medals')
-	async get_medals(
-		@Query() filter: MedalFilter,
-		@UserReq() user: User | null,
-	) {
+	async get_medals(@Query() filter: MedalFilter, @UserReq() user: User | null) {
 		const privacyFilter = userResourceEntityPrivacyFilter(user);
 		const query = {
 			...filter.getQuery(),
