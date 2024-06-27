@@ -1,42 +1,78 @@
 import { CommonModule } from "@angular/common";
-import { Component, Input, OnInit } from "@angular/core";
-import { User } from '../../models/User.model' ;
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit,
+} from "@angular/core";
+import { User } from "../../models/User.model";
 import { OrcidService } from "src/app/orcid/services/orcid.service";
 import { OrcidModule } from "src/app/orcid/orcid.module";
-import { Observable, merge } from "rxjs";
+import { BehaviorSubject, Observable, merge } from "rxjs";
 import { OrcidProfileLink } from "src/app/orcid/types/orcid";
-import { map } from "rxjs/operators";
+import { filter, map, shareReplay, switchMap } from "rxjs/operators";
 import { NgxPopperModule } from "ngx-popper";
 
 @Component({
-    standalone: true,
-    selector: 'curator-profile',
-    templateUrl: './curator-profile.component.html',
-    imports: [CommonModule, OrcidModule, NgxPopperModule],
-    styleUrls: ['./curator-profile.component.scss']
+  standalone: true,
+  selector: "curator-profile",
+  templateUrl: "./curator-profile.component.html",
+  imports: [CommonModule, OrcidModule, NgxPopperModule],
+  styleUrls: ["./curator-profile.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CuratorProfileComponent implements OnInit {
-    profileLinks$: Observable<OrcidProfileLink[]>;
-    keywords$: Observable<string[]>;
-    biography$: Observable<string>;
-    employment$: Observable<string>; // field for the place of work
-    // avatarLink$: Observable<SafeUrl | string>; // field for uploading the avatar
+  profileLinks$: Observable<OrcidProfileLink[]>;
+  keywords$: Observable<string[]>;
+  biography$: Observable<string>;
+  employment$: Observable<string>; // field for the place of work
+  // avatarLink$: Observable<SafeUrl | string>; // field for uploading the avatar
 
-    userInfo$: Observable<Boolean>;
-    
-    constructor(protected orcidService: OrcidService) {}
+  userInfo$: Observable<Boolean>;
 
-    @Input() curator: User
+  constructor(protected orcidService: OrcidService) {}
 
-    ngOnInit(): void {
-        // extract orcid_id
-        this.biography$ = this.orcidService.get_biography(this.curator.orcid_id)
-        this.keywords$ = this.orcidService.get_keywords(this.curator.orcid_id)
-        this.profileLinks$ = this.orcidService.get_profile_links(this.curator.orcid_id)
-        this.employment$ = this.orcidService.get_employment(this.curator.orcid_id)
+  curator$ = new BehaviorSubject<User>(null);
 
-        this.userInfo$ = merge(this.biography$, this.keywords$, this.profileLinks$, this.employment$, 4).pipe(
-            map((k) => !!k )
-        )
-    }
+  @Input() set curator(value: User) {
+    this.curator$.next(value);
+  }
+
+  curatorObs$ = this.curator$.asObservable().pipe(
+    filter((curator) => !!curator),
+    shareReplay(1)
+  );
+
+  ngOnInit(): void {
+    // extract orcid_id
+
+    this.biography$ = this.curatorObs$.pipe(
+      switchMap((curator: User) =>
+        this.orcidService.get_biography(curator.orcid_id)
+      )
+    );
+    this.keywords$ = this.curatorObs$.pipe(
+      switchMap((curator: User) =>
+        this.orcidService.get_keywords(curator.orcid_id)
+      )
+    );
+    this.profileLinks$ = this.curatorObs$.pipe(
+      switchMap((curator: User) =>
+        this.orcidService.get_profile_links(curator.orcid_id)
+      )
+    );
+    this.employment$ = this.curatorObs$.pipe(
+      switchMap((curator: User) =>
+        this.orcidService.get_employment(curator.orcid_id)
+      )
+    );
+
+    this.userInfo$ = merge(
+      this.biography$,
+      this.keywords$,
+      this.profileLinks$,
+      this.employment$,
+      4
+    ).pipe(map((k) => !!k));
+  }
 }

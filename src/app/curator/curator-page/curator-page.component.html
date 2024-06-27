@@ -2,7 +2,7 @@
   <ng-container *ngIf="curator$ | async as curator">
     <curator-profile [curator]="curator"></curator-profile>
     <div>
-      <div class="tw-flex tw-flex-col tw-gap-4">
+      <div class="tw-flex tw-flex-col tw-gap-4 tw-pb-4">
         <div *ngFor="let stats of statistics$ | async">
           <curator-stat-card [statistics]="stats" [curator]="curator"></curator-stat-card>
         </div>
