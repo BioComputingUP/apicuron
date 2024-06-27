@@ -25,16 +25,9 @@ export class BannerService {
     startWith(() => new Date()),
     mapTo(new Date()),
     map((currentDate: Date) => {
-      if (!!this.startDate && !!this.endDate) {
-        console.log("alldefined");
-        return currentDate >= this.startDate && currentDate <= this.endDate;
-      } else if (!!this.startDate && !this.endDate) {
-        return currentDate >= this.startDate;
-      } else if (!!this.endDate && !this.startDate) {
-        console.log("end defined");
-        return currentDate <= this.endDate;
-      }
-      return true;
+      // if startDate or endDate are not specified, return true
+      // if any of the dates are specified, check if the current date is in the range
+      return (!this.startDate || currentDate >= this.startDate) && (!this.endDate || currentDate <= this.endDate);
     }),
   );
 

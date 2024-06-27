@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable, combineLatest, of, throwError } from "rxjs";
 import { catchError, filter, map, pluck } from "rxjs/operators";
@@ -40,6 +40,25 @@ export class OrcidService {
       );
   }
 
+  get_employment(orcid_id: string): Observable<string> {
+    const url = new URL(`${orcid_id}/employments`, this.orcid_url);
+    return this.http
+      .get(url.href, {
+        headers: {
+          ...this.base_headers,
+        },
+      })
+      .pipe(
+        catchError(OrcidErrorHandler('affiliation-group')),
+        filter((response) => !!response["affiliation-group"]),
+        pluck("affiliation-group"),
+        map((workplace) => {
+          const name = workplace?.[0].summaries?.[0]?.["employment-summary"]?.organization?.name;
+          return name;
+        })
+      );
+  }
+
   get_profile_links(orcid_id: string): Observable<OrcidProfileLink[]> {
     const url = new URL(`${orcid_id}/researcher-urls`, this.orcid_url);
 
@@ -54,12 +73,13 @@ export class OrcidService {
         filter(({ "researcher-url": urls }: any) => !!urls && urls),
         pluck("researcher-url"),
         map((url_list) => {
-          // for each url in the url_list, build object containing "name" and "url" attributes
           return url_list.map(({ "url-name": name, url }) => {
-            return { name, value: new URL(url.value) };
+            const value = new URL(url.value);
+            const host = value.host.replace('www.', '');
+            return { name, value, host };
           });
         }),
-        filter((urls) => !!urls && urls.length > 0)
+        filter((urls) => !!urls && urls.length > 0),
       );
   }
 
@@ -73,9 +93,7 @@ export class OrcidService {
       })
       .pipe(
         catchError(OrcidErrorHandler('keyword')),
-        filter(
-          (response: any) => !!response.keyword && response.keyword.length > 0
-        ),
+        filter((response: any) => !!response.keyword && response.keyword.length > 0),
         pluck("keyword"),
         map((keyword_list: any[]): string[] => {
           return keyword_list.map((keyword) => keyword.content);
@@ -88,12 +106,14 @@ export class OrcidService {
     const biography$ = this.get_biography(orcid_id);
     const profile_links$ = this.get_profile_links(orcid_id);
     const keywords$ = this.get_keywords(orcid_id);
-    return combineLatest([biography$, profile_links$, keywords$]).pipe(
-      map(([biography, profileLinks, keywords]) => {
+    const employment$ = this.get_employment(orcid_id);
+    return combineLatest([biography$, profile_links$, keywords$, employment$]).pipe(
+      map(([biography, profileLinks, keywords, employment]) => {
         return {
-          biography: biography,
+          biography,
           profileLinks,
           keywords,
+          employment,
         };
       })
     );

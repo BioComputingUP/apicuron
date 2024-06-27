@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, Input, OnDestroy, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { BehaviorSubject, Observable, Subject, combineLatest, of } from "rxjs";
 import {
   filter,
@@ -73,6 +73,7 @@ const leaderboardColumns = {
   ],
   templateUrl: "./leaderboard.component.html",
   styleUrls: ["./leaderboard.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LeaderboardComponent implements OnInit, OnDestroy {
   statsList$: Observable<CuratorWithStats[]>;

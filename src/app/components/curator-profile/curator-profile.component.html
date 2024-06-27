@@ -1,5 +1,6 @@
 <div class="tw-py-2 sm:tw-py-4 tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap" [ngClass]="{'tw-justify-center': !(userInfo$ | async)}">
-    <div class="sm:tw-flex-none tw-flex-1 tw-flex tw-flex-col tw-px-4 tw-w-full sm:tw-w-auto">
+    <div class="sm:tw-flex-none tw-flex-1 tw-flex tw-flex-col tw-px-4 tw-w-full sm:tw-w-auto" *ngIf="curatorObs$ | async as curator">
+        <!-- <input #fileInput type="file" class="tw-hidden" (change)="onFileSelected($event)" id=""> -->
         <img [src]="curator.generate_avatar()"
             class="tw-w-24 tw-h-24 tw-mx-auto tw-rounded-full tw-bg-gray-50 tw-border-2 tw-border-gray-150" alt="">
         <h2 class="tw-text-center tw-font-bold tw-font-dm-sans tw-text-2xl tw-whitespace-nowrap">{{
@@ -10,8 +11,6 @@
                 <img class="tw-w-6 tw-mx-auto" src="https://orcid.org/assets/vectors/orcid.logo.icon.svg" alt="" srcset="">
             </a>
         </div>
-        
-
     </div>
     <!-- <table class="tw-table-auto">
         <tbody>
@@ -61,6 +60,15 @@
                     </p>
                 </div>
             </div>
+            <div *ngIf="employment$ | async as employment"
+                class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
+                <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Place of Work</div>
+                <div class="tw-ml-2">
+                    <p class="tw-leading-relaxed tw-tracking-wider tw-text-justify tw-text-sm sm:tw-text-base">
+                        {{ employment }}
+                    </p>
+                </div>
+            </div>
             <div *ngIf="keywords$ | async as keywords"
                 class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
                 <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Keywords</div>
@@ -74,15 +82,23 @@
             <div *ngIf="profileLinks$ | async as orcid_links"
                 class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
                 <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Social Links</div>
-                <div class="tw-ml-2">
-                    <a *ngFor="let url of orcid_links"
-                        class="tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer tw-underline tw-mr-3"
-                        [href]="url.value.href">
-                        {{ url.name }}
+                <div class="tw-ml-2 tw-flex tw-justify-center tw-flex-wrap">
+                    <a *ngFor="let url of orcid_links" class="tw-text-blue-500 tw-cursor-pointer tw-underline tw-mr-3" [href]="url.value.href">
+                        <ng-container *ngIf="!url.error">
+                            <img [src]="'assets/social-links/' + url.host + '.svg'"
+                                [popper]="url.name" [popperTrigger]="'hover'"
+                                [popperDisableStyle]="false" 
+                                [popperPlacement]="'top'" 
+                                [popperApplyClass]="'tw-bg-white'"
+                                (error)="url.error = true"
+                                onerror="this.style.display='none'" >
+                        </ng-container>
+                        <ng-container *ngIf="url.error">
+                            <span>{{ url.name }}</span>
+                        </ng-container>
                     </a>
                 </div>
             </div>
-
         </div>
     </ng-container>
 </div>
