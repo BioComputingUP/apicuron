@@ -24,6 +24,12 @@ export class League {
 	@Prop({
 		required: true,
 		type: String,
+	})
+	displayedName: string;
+
+	@Prop({
+		required: true,
+		type: String,
 		defualt: () => PrivacyType.public,
 	})
 	visibility: PrivacyType;

@@ -45,8 +45,8 @@ export class ResourceLeagueController {
 	@ApiOperation({
 		summary: 'Get the leagues of a resource',
 	})
-	@Get(':resource_id')
 	@AuthProtected()
+	@Get(':resource_id')
 	async getLeagues(
 		@UserReq() user: User,
 		@Param('resource_id') resourceId: string,

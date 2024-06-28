@@ -42,6 +42,10 @@ export class CreateLeagueDto {
 	@IsNotEmpty()
 	name: string;
 
+	@IsString()
+	@IsNotEmpty()
+	displayedName: string;
+
 	@ApiProperty({
 		enum: PrivacyType,
 		example: PrivacyType.public,
