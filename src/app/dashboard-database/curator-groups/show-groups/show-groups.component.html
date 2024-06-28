@@ -1,13 +1,28 @@
 <!-- List of the groups -->
 <div class="tw-flex tw-flex-col">
-	<!-- <h2 class="tw-text-xl tw-font-bold tw-text-gray-800 tw-text-center tw-pb-2">Groups</h2> -->
-	<ul class="tw-flex tw-flex-row">
-		<li class="tw-text-center tw-flex tw-flex-col" *ngFor="let group of (groups$ | async)">
-			<button type="button" class="tw-p-2 tw-m-0.5 focus:tw-ring-1 focus:tw-font-semibold tw-ring-purple-900 tw-rounded-md tw-text-white tw-bg-apicuron-bright-purple"
-			(click)="selectGroup(group.name)">
-				<span>{{ group.name }}</span>
-			</button>
-		</li>
-	</ul>
-	<!-- <modify-groups></modify-groups> -->
+  <!-- <h2 class="tw-text-xl tw-font-bold tw-text-gray-800 tw-text-center tw-pb-2">Groups</h2> -->
+  <div
+    class="tw-flex tw-flex-row"
+    *ngIf="selectedGroup$ | async as selectedGroup"
+  >
+    <div
+      class="tw-text-center tw-flex tw-flex-col tw-py-2"
+      *ngFor="let grp of groups$ | async"
+    >
+      <resource-group-card
+        [group]="grp"
+        class="tw-rounded"
+		(groupEvent)="groupClickEventHandler($event)"
+        [ngClass]="{
+          'tw-border tw-border-apicuron-purple': selectedGroup.name == grp.name
+        }"
+      ></resource-group-card>
+      <!-- <button type="button"
+				class="tw-p-2 tw-m-0.5 focus:tw-ring-1 focus:tw-font-semibold tw-ring-purple-900 tw-rounded-md tw-text-white tw-bg-apicuron-bright-purple"
+				(click)="selectGroup(group.name)">
+				<span>{{ group.displayedName }}</span>
+			</button> -->
+    </div>
+  </div>
+  <!-- <modify-groups></modify-groups> -->
 </div>

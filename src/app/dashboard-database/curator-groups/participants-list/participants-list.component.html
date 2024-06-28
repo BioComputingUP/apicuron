@@ -1,77 +1,142 @@
-<div class="tw-border-gray-500 tw-bg-white tw-w-1/2 tw-shadow-lg tw-border tw-rounded tw-p-1 tw-flex tw-flex-col">
-	<!-- <h2 class="tw-text-xl tw-font-bold tw-text-gray-800 tw-text-center tw-pb-2">Curators</h2> -->
-	<ul class="tw-flex tw-flex-col tw-m-2 tw-rounded">
-
-		<table class="tw-min-w-full">
-			<thead class="tw-border-b">
-				<tr class="tw-capitalize">
-					<th scope="col" class="head-cell">#</th>
-					<th scope="col" class="head-cell">Curator Name</th>
-					<!-- <th scope="col" class="head-cell">Group</th> -->
-					<th scope="col" class="head-cell">Settings</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr *ngFor="let item of (currentParticipants$ | async); let i = index"
-					class="tw-border-b hover:tw-bg-white hover:tw-shadow-lg">
-					<td class="tw-px-6 tw-py-4 tw-whitespace-nowrap tw-text-sm tw-font-medium tw-text-gray-900">
-						{{ i + 1 }}
-					</td>
-					<td class="cell">
-						<a [routerLink]="['/curators', item[0]]">
-							<span>{{ get_curator_name(item[0]) }}</span>
-						</a>
-					</td>
-					<!-- <td class="cell">
+<div
+  class="tw-border-gray-500 tw-bg-white tw-w-1/2 tw-shadow-lg tw-border tw-rounded tw-p-1 tw-flex tw-flex-col"
+>
+  <!-- <h2 class="tw-text-xl tw-font-bold tw-text-gray-800 tw-text-center tw-pb-2">Curators</h2> -->
+  <ul class="tw-flex tw-flex-col tw-m-2 tw-rounded">
+    <table class="tw-min-w-full">
+      <thead class="tw-border-b">
+        <tr class="tw-capitalize">
+          <th scope="col" class="head-cell">#</th>
+          <th scope="col" class="head-cell">Curator Name</th>
+          <!-- <th scope="col" class="head-cell">Group</th> -->
+          <th scope="col" class="head-cell">Settings</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="currentGroup$ | async as currentGroup">
+        <tr
+          *ngFor="let item of currentGroup.defaultMembers; let i = index"
+          class="tw-border-b hover:tw-bg-white hover:tw-shadow-lg"
+        >
+          <td
+            class="tw-px-6 tw-py-4 tw-whitespace-nowrap tw-text-sm tw-font-medium tw-text-gray-900"
+          >
+            {{ i + 1 }}
+          </td>
+          <td class="cell">
+            <a [routerLink]="['/curators', item[0]]">
+              <span>{{ item }}</span>
+            </a>
+          </td>
+          <!-- <td class="cell">
 						{{ item[1] }}
 					</td> -->
-					<td class="cell">
-						<button (click)="edit_group(item[1])" class="tw-bg-green-500 tw-p-2 tw-rounded tw-text-white">
-							Edit Group
-						</button>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+          <td class="cell">
+            <button
+              (click)="edit_group(item[1])"
+              class="tw-bg-green-500 tw-p-2 tw-rounded tw-text-white"
+            >
+              Edit Group
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="tw-w-full">
+      <span class="tw-font-bold">Add a default member</span>
 
-		<div *ngIf="show_form" class="tw-relative tw-z-30" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-			<div class="tw-fixed tw-inset-0 tw-bg-gray-700 tw-bg-opacity-75 tw-transition-opacity tw-duration-200"
-				[ngClass]="{'tw-block':show_form, 'tw-hidden': !show_form}" (click)="show_form = false">
-			</div>
-	
-			<div class="tw-fixed tw-inset-0 tw-z-10 tw-overflow-y-auto">
-				<div class="tw-flex tw-min-h-full tw-items-center tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0">
-	
-					<div [ngClass]="{'tw-block':show_form, 'tw-hidden': !show_form}"
-						class="tw-relative tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 sm:tw-max-h-screen ">
-						<form action="" [formGroup]="form" (submit)="submit_form()">
-							<div class="tw-bg-white tw-grid tw-grid-flow-row tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4 tw-grid-cols-1">
-	
-								<h2 *ngIf="show_form == 'update'" class="tw-text-xl tw-text-center tw-font-bold">Edit Group</h2>
-		
-								<div class="form-control-element">
-									<label for="curation_group">Curation Group</label>
-									<select class="text-input" formControlName="curation_group">
-										<option class="tw-bg-white tw-shadow-md tw-text-gray-900"
-											*ngFor="let group of curation_groups" [value]="group">
-											<span class="tw-font-bold tw-capitalize">{{ group }}</span>
-										</option>
-									</select>
-									<small class="tw-pt-6">Assign the curator to the appropriate group based on the contribution type: Professional Curators for paid contributors, 
-										and Community Curators for those who voluntarily contribute to the resource.</small>
-								</div>
-	
-								<input type="submit" class="tw-w-full tw-p-2 tw-mx-1 tw-bg-green-500 tw-text-white"
-									(click)="submit_form()"
-									value="Submit">
-							</div>
-						</form>
-						<button class="tw-w-full tw-mx-auto tw-p-2 tw-bg-gray-400 tw-text-white"
-							(click)="show_form = false">Close</button>
-					</div>
-				</div>
-			</div>
-		</div>
+      <div class="tw-relative tw-flex tw-flex-row tw-gap-2">
+        <input type="text" name="" id="" class="tw-flex-grow" />
 
-	</ul>
+        <!-- <ul
+          *ngIf="1 > 0"
+          class="tw-absolute tw-z-10 tw-w-full tw-mt-1 tw-bg-white tw-border tw-border-gray-300 tw-rounded-lg tw-shadow-lg"
+        >
+          <li
+            *ngFor="let result of [{ name: 'test result'}, { name: 'test2'}]"
+            class="tw-px-4 tw-py-2 tw-border-b tw-border-gray-100 hover:tw-bg-gray-200"
+          >
+            {{ result.name }}
+          </li>
+        </ul> -->
+
+        <button
+          class="tw-bg-green-500 tw-text-white tw-font-bold tw-p-1 tw-rounded"
+        >
+          Add to {{ (currentGroup$ | async).displayedName }}
+        </button>
+      </div>
+    </div>
+
+    <div
+      *ngIf="show_form"
+      class="tw-relative tw-z-30"
+      aria-labelledby="modal-title"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        class="tw-fixed tw-inset-0 tw-bg-gray-700 tw-bg-opacity-75 tw-transition-opacity tw-duration-200"
+        [ngClass]="{ 'tw-block': show_form, 'tw-hidden': !show_form }"
+        (click)="show_form = false"
+      ></div>
+
+      <div class="tw-fixed tw-inset-0 tw-z-10 tw-overflow-y-auto">
+        <div
+          class="tw-flex tw-min-h-full tw-items-center tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0"
+        >
+          <div
+            [ngClass]="{ 'tw-block': show_form, 'tw-hidden': !show_form }"
+            class="tw-relative tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 sm:tw-max-h-screen"
+          >
+            <form action="" [formGroup]="form" (submit)="submit_form()">
+              <div
+                class="tw-bg-white tw-grid tw-grid-flow-row tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4 tw-grid-cols-1"
+              >
+                <h2
+                  *ngIf="show_form == 'update'"
+                  class="tw-text-xl tw-text-center tw-font-bold"
+                >
+                  Edit Group
+                </h2>
+
+                <div class="form-control-element">
+                  <label for="curation_group">Curation Group</label>
+                  <select class="text-input" formControlName="curation_group">
+                    <option
+                      class="tw-bg-white tw-shadow-md tw-text-gray-900"
+                      *ngFor="let group of curation_groups"
+                      [value]="group"
+                    >
+                      <span class="tw-font-bold tw-capitalize">{{
+                        group
+                      }}</span>
+                    </option>
+                  </select>
+                  <small class="tw-pt-6"
+                    >Assign the curator to the appropriate group based on the
+                    contribution type: Professional Curators for paid
+                    contributors, and Community Curators for those who
+                    voluntarily contribute to the resource.</small
+                  >
+                </div>
+
+                <input
+                  type="submit"
+                  class="tw-w-full tw-p-2 tw-mx-1 tw-bg-green-500 tw-text-white"
+                  (click)="submit_form()"
+                  value="Submit"
+                />
+              </div>
+            </form>
+            <button
+              class="tw-w-full tw-mx-auto tw-p-2 tw-bg-gray-400 tw-text-white"
+              (click)="show_form = false"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ul>
 </div>

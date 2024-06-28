@@ -37,6 +37,7 @@ import { ShowGroupsComponent } from './curator-groups/show-groups/show-groups.co
 import { ModifyGroupsComponent } from './curator-groups/modify-groups/modify-groups.component';
 import { ParticipantsListComponent } from './curator-groups/participants-list/participants-list.component';
 import { GroupsService } from "./curator-groups/services/groups.service";
+import { ResourceGroupCardComponent } from "../components/group-card/resource-group-card.component";
 
 @NgModule({
   declarations: [
@@ -75,7 +76,8 @@ import { GroupsService } from "./curator-groups/services/groups.service";
     ToastModule,
     BadgeFormComponent,
     MedalFormComponent,
-    PaginationComponent
+    PaginationComponent,
+    ResourceGroupCardComponent,
   ],
 })
 export class DashboardDatabaseModule {}
