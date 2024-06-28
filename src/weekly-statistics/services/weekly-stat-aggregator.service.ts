@@ -24,6 +24,14 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 		protected resourceService: PartnerResourcesService,
 		protected computeWeeklyStat: ComputeWeeklyStatisticsService,
 	) {}
+	async deleteLeague(resource_id: string, league: string): Promise<number> {
+		const deleted = await this.weeklyStatModel.deleteMany({
+			resource_id,
+			league,
+		});
+
+		return deleted.deletedCount;
+	}
 	async updateUserPrivacy(curator_orcid: string, privacy: PrivacyType) {
 		await this.weeklyStatModel.updateMany(
 			{

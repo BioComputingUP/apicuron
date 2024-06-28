@@ -1,3 +1,3 @@
 export class LeagueDeletedEvent {
-	constructor(protected name: string, protected resource_id: string) {}
+	constructor(public name: string, public resource_id: string) {}
 }

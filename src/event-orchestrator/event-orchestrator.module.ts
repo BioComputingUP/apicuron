@@ -9,6 +9,7 @@ import { UserPrivacyUpdatedEventHandler } from './handlers/user-privacy-updated.
 import { TermUpdatedEventHandler } from './handlers/term-updated.handler';
 import { InitializationService } from './services/initialization.service';
 import { BulkReportSubmissionHandler } from './handlers/bulk-submission.handler';
+import { DeleteLeagueHandler } from './handlers/delete-league.handler';
 
 @Module({
 	imports: [CoreApicuronModule],
@@ -21,6 +22,7 @@ import { BulkReportSubmissionHandler } from './handlers/bulk-submission.handler'
 		UserPrivacyUpdatedEventHandler,
 		TermUpdatedEventHandler,
 		TermDeletedEventHandler,
+		DeleteLeagueHandler,
 	],
 	exports: [],
 })

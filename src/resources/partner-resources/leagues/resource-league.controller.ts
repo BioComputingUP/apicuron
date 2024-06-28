@@ -9,11 +9,9 @@ import {
 	Post,
 } from '@nestjs/common';
 import { AuthProtected } from '../../../auth/decorators/auth.decorator';
-import { Public } from '../../../auth/decorators/public.decorator';
 import { UserReq } from '../../../auth/decorators/applyUser.decorator';
 import { User } from '../../../core/schemas/user.schema';
 import { PartnerResourcesService } from '../services/partner-resources.service';
-import { PrivacyType } from '../../../core/enums';
 import { VersionHeader } from '../../../swagger/config';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateLeagueDto } from './dto/create-league.dto';
@@ -74,6 +72,9 @@ export class ResourceLeagueController {
 		return league as LeagueDto;
 	}
 
+	@ApiOperation({
+		summary: `Add an orcid id as a default member of a league in a specific resource`,
+	})
 	@Post('add-member')
 	@AuthProtected()
 	async addMemberToLeague(
@@ -89,6 +90,9 @@ export class ResourceLeagueController {
 		return updatedResource.getLeague(addMemberToLeague.league) as LeagueDto;
 	}
 
+	@ApiOperation({
+		summary: `Remove an orcid id from the list of defaultMembers of a league in a specific resource`,
+	})
 	@Delete('remove-member')
 	@AuthProtected()
 	async removeMemberFromLeague(

@@ -20,6 +20,14 @@ export class StatisticsAggregator implements Aggregator {
 		protected resourceService: PartnerResourcesService,
 		protected computeStats: ComputeStatisticsService,
 	) {}
+	async deleteLeague(resource_id: string, league: string): Promise<number> {
+		const deleted = await this.statModel.deleteMany({
+			resource_id,
+			league,
+		});
+
+		return deleted.deletedCount;
+	}
 	logger = new Logger(StatisticsAggregator.name);
 
 	async updateUserPrivacy(curator_orcid: string, privacy: PrivacyType) {

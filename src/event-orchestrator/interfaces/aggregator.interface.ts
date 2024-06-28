@@ -12,4 +12,5 @@ export interface Aggregator {
 		curator_orcid: string,
 		privacy: PrivacyType,
 	): Promise<any> | any;
+	deleteLeague(resource_id: string, league: string): Promise<number> | number;
 }

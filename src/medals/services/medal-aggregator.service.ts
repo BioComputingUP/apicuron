@@ -42,6 +42,21 @@ export class MedalAggregatorService implements Aggregator {
 		protected computeMedals: ComputeMedalsService,
 		protected eventEmitter: EventEmitter2,
 	) {}
+	async deleteLeague(resource_id: string, league: string): Promise<number> {
+		const filter = {
+			resource_id,
+			league,
+		};
+		const medalDefDelete$ = this.medalDefModel.deleteMany(filter);
+		const medalDelete$ = this.medalModel.deleteMany(filter);
+
+		const [medalDefDelete, medalDelete] = await Promise.all([
+			medalDefDelete$,
+			medalDelete$,
+		]);
+
+		return medalDefDelete.deletedCount + medalDelete.deletedCount;
+	}
 
 	logger = new Logger(MedalAggregatorService.name);
 

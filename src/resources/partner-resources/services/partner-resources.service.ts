@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, LeanDocument, Model } from 'mongoose';
 import { PartnerResourceDocument } from '../../../core/schemas/resource/partner-resource.schema';
@@ -81,7 +81,21 @@ export class PartnerResourcesService {
 	async deleteLeague(
 		deleteLeague: DeleteLeagueDTO,
 	): Promise<PartnerResourceDocument> {
-		// TODO: Emit event to handle all resource entities and reports that are linked to the league
+		// check if this is the last and only league, if it is we return an error
+
+		const resource = await this.partnerResourceModel.findOne({
+			resource_id: deleteLeague.league,
+		});
+		if (resource.leagues.length == 1) {
+			throw new BadRequestException(
+				`The resource ${resource.resource_name} only has one remaining league ${resource.leagues[0].name}. It cannot be deleted`,
+			);
+		}
+		if (resource.defaultLeague == deleteLeague.league) {
+			throw new BadRequestException(
+				`The League ${deleteLeague.league} is set as  the default league for resource ${resource.resource_name}. Change the default league for the resource to proceed to delete it, use the PUT route (/partner-resources)`,
+			);
+		}
 		const resourceUpdated = await this.partnerResourceModel.findOneAndUpdate(
 			{
 				resource_id: deleteLeague.resource_id,

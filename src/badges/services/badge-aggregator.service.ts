@@ -40,6 +40,25 @@ export class BadgeAggregatorService implements Aggregator {
 		protected computeBadges: ComputeBadgesService,
 		protected eventEmitter: EventEmitter2,
 	) {}
+
+	async deleteLeague(resource_id: string, league: string): Promise<number> {
+		const medalDefDeleted$ = this.badgeDefModel.deleteMany({
+			resource_id,
+			league,
+		});
+
+		const medalDeleted$ = this.badgeModel.deleteMany({
+			resource_id,
+			league,
+		});
+
+		const [medalDefDeleted, medalDeleted] = await Promise.all([
+			medalDefDeleted$,
+			medalDeleted$,
+		]);
+
+		return medalDefDeleted.deletedCount + medalDeleted.deletedCount;
+	}
 	async updateUserPrivacy(curator_orcid: string, privacy: PrivacyType) {
 		await this.badgeModel.updateMany(
 			{

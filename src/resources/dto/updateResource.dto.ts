@@ -10,7 +10,11 @@ import {
 	Validate,
 } from 'class-validator';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
-import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
+import {
+	PartnerResource,
+	PartnerResourceDocument,
+} from '../../core/schemas/resource/partner-resource.schema';
+import { FilterQuery } from 'mongoose';
 
 export class UpdatePartnerResourceDto {
 	@Validate(EntryExistsRule, [
@@ -50,4 +54,15 @@ export class UpdatePartnerResourceDto {
 	@IsString()
 	@IsOptional()
 	color: string;
+
+	@Validate(EntryExistsRule, [
+		PartnerResource.name,
+		({ defaultLeague, resource_id }): FilterQuery<PartnerResourceDocument> => ({
+			resource_id,
+			'leagues.name': defaultLeague,
+		}),
+	])
+	@IsString()
+	@IsOptional()
+	defaultLeague: string;
 }
