@@ -8,13 +8,21 @@ import {
 } from '../../core/schemas/resource/partner-resource.schema';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
+import {
+	BadgeDef,
+	BadgeDefDocument,
+} from '../../core/schemas/achievements-def/badge-def.schema';
 
 export class UpdateBadgeDefDto {
 	// mandatory identifier fields
 	@Validate(EntryExistsRule, [
-		AchievementDef.name,
+		BadgeDef.name,
 		({ name, resource_id, league }) => {
-			return { name, resource_id, type: AchievementType.badge, league };
+			const q: FilterQuery<BadgeDefDocument> = { name, resource_id };
+			if (league) {
+				q.league = league;
+			}
+			return q;
 		},
 	])
 	@IsString()

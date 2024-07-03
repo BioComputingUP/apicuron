@@ -129,7 +129,7 @@ export class MedalDefCommandsService {
 
 		await newMedalDef.save();
 
-		this.eventEmitter.emit(
+		await this.eventEmitter.emitAsync(
 			MedalDefCreatedEvent.name,
 			new MedalDefCreatedEvent(newMedalDef),
 		);

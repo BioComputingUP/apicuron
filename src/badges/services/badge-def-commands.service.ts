@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
 	BadgeDef,
@@ -57,11 +61,19 @@ export class BadgeDefCommandsService {
 			deleteBadge.resource_id,
 		);
 
+		deleteBadge.league = deleteBadge.league ?? resource.defaultLeague;
+
 		const badgeDef = await this.badgeDefModel.findOneAndDelete({
 			resource_id: deleteBadge.resource_id,
 			name: deleteBadge.name,
-			league: deleteBadge.league ?? resource.defaultLeague,
+			league: deleteBadge.league,
 		});
+
+		if (!badgeDef) {
+			throw new BadRequestException(
+				`Badge ${deleteBadge.name} from resource ${deleteBadge.resource_id}:${deleteBadge.league} not found, cannot be deleted`,
+			);
+		}
 
 		await this.eventEmitter.emitAsync(
 			BadgeDefDeletedEvent.name,
@@ -80,6 +92,17 @@ export class BadgeDefCommandsService {
 		if (!badgeDef.league) {
 			badgeDef.league = resource.defaultLeague;
 		}
+
+		const badgeDefExists = await this.badgeDefModel.exists({
+			resource_id: badgeDef.resource_id,
+			name: badgeDef.name,
+			league: badgeDef.league,
+		});
+		if (badgeDefExists) {
+			throw new BadRequestException(
+				`Badge ${badgeDef.name} for resource ${badgeDef.resource_id}:${badgeDef.league} already exists`,
+			);
+		}
 		const newBadge = new this.badgeDefModel({
 			...badgeDef,
 			privacy: resource.getLeague(badgeDef.league).visibility,
@@ -95,7 +118,7 @@ export class BadgeDefCommandsService {
 			);
 		}
 
-		this.eventEmitter.emit(
+		await this.eventEmitter.emitAsync(
 			BadgeDefCreatedEvent.name,
 			new BadgeDefCreatedEvent(newBadge),
 		);

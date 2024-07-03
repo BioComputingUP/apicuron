@@ -25,7 +25,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "deploy-prod": "./deployment/deploy.sh prod",
-    "deploy-dev": "./deployment/deploy.sh dev"
+    "deploy-dev": "./deployment/deploy.sh dev",
+    "deploy-dev-quick": "./deployment/deploy.sh dev quick"
   },
   "dependencies": {
     "@dicebear/collection": "^6.0.4",

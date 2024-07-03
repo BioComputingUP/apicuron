@@ -7,7 +7,6 @@ import {
 	IsString,
 } from 'class-validator';
 import { FilterQuery } from 'mongoose';
-import { BadgeUnique } from '../validators/achievement-exists';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
@@ -32,7 +31,6 @@ export class CreateBadgeDefDto {
 	@IsNotEmpty()
 	count_threshold: number;
 
-	@Validate(BadgeUnique)
 	@IsNotEmpty()
 	name: string;
 
