@@ -92,7 +92,7 @@ export class MedalsDefController {
 
 		const queryFilter = {
 			...medalFilter.omitPagination(),
-			privacyQuery,
+			...privacyQuery,
 		};
 		const options = medalFilter.getMongoQueryOptions();
 
