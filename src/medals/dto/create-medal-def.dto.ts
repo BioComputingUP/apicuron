@@ -54,7 +54,7 @@ export class CreateMedalDefDto {
 		},
 	])
 	@IsString()
-	@IsNotEmpty()
+	@IsOptional()
 	league: string;
 
 	@Validate(ActivityTermExists, [{ each: true }])
