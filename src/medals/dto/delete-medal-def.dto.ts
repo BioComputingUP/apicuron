@@ -8,6 +8,7 @@ import {
 } from '../../core/schemas/resource/partner-resource.schema';
 import { ResourceIdExists } from '../../resources/partner-resources/validators/resource-id-exists';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
+import { MedalDef } from '../../core/schemas/achievements-def/medal-def.schema';
 
 export class DeleteMedalDefDto {
 	@IsNotEmpty()
@@ -16,9 +17,9 @@ export class DeleteMedalDefDto {
 
 	@IsNotEmpty()
 	@Validate(EntryExistsRule, [
-		AchievementDef.name,
+		MedalDef.name,
 		({ name, resource_id }) => {
-			return { name, type: AchievementType.badge, resource_id };
+			return { name, resource_id };
 		},
 	])
 	name: string;
