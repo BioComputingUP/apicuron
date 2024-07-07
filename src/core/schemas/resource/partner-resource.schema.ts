@@ -41,7 +41,12 @@ export class PartnerResource {
 		required: true,
 		type: [LeagueSchema],
 		default: (): League[] => [
-			{ name: 'default', defaultMembers: [], visibility: PrivacyType.public },
+			{
+				name: 'default',
+				defaultMembers: [],
+				visibility: PrivacyType.public,
+				displayedName: 'Default Group',
+			},
 		],
 	})
 	leagues: League[];

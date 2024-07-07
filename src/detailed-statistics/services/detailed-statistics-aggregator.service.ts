@@ -18,6 +18,15 @@ export class DetailedStatisticsAggregatorService implements Aggregator {
 		protected computeDetailedStats: ComputeDetailedStatisticsService,
 		protected resourceService: PartnerResourcesService,
 	) {}
+
+	async deleteLeague(resource_id: string, league: string): Promise<number> {
+		const deleted = await this.detailedStatsModel.deleteMany({
+			resource_id,
+			league,
+		});
+
+		return deleted.deletedCount;
+	}
 	async applyReport(
 		report:
 			| (Document<unknown, any, Report> & Report & { _id: Types.ObjectId })

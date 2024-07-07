@@ -6,6 +6,7 @@ import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { computePrivacyField } from '../../util/privacy.helper';
 import { Model } from 'mongoose';
+import { LeagueDeletedEvent } from '../../resources/partner-resources/leagues/events/league-deleted-event';
 
 @Injectable()
 export class ReportEventsHandlerService {
@@ -66,5 +67,17 @@ export class ReportEventsHandlerService {
 		await Promise.all(updatePromises$);
 
 		return;
+	}
+
+	@OnEvent(LeagueDeletedEvent.name, { async: true, promisify: true })
+	async leagueDeletedHandler(
+		leagueDeleted: LeagueDeletedEvent,
+	): Promise<number> {
+		const deleted = await this.reportModel.deleteMany({
+			resource_id: leagueDeleted.resource_id,
+			league: leagueDeleted.name,
+		});
+
+		return deleted.deletedCount;
 	}
 }

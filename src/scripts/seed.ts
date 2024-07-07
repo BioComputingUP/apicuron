@@ -16,6 +16,8 @@ import { ComputeStatisticsService } from '../statistics/compute-statistics/compu
 import { Logger } from '@nestjs/common';
 import { ResourceDocument } from '../core/schemas/resource/resource.schema';
 import { UsersService } from '../auth/users/users.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { BulkSubmissionEvent } from '../submit-reports/events/events';
 
 async function bootstrap() {
 	const app = await NestFactory.createApplicationContext(AppModule);
@@ -145,7 +147,12 @@ async function bootstrap() {
 
 	logger.verbose(`Created ${reportCount} Mock reports`);
 
-	await app.get(ComputeStatisticsService).computeStatistics({});
+	await app
+		.get(EventEmitter2)
+		.emitAsync(
+			BulkSubmissionEvent.name,
+			new BulkSubmissionEvent(testingOrcidId, [exampleResource.resource_id]),
+		);
 
 	await app.close();
 }

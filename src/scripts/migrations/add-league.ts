@@ -46,6 +46,7 @@ async function addLeagueToResources(app: INestApplicationContext) {
 			logger.debug(`Resource ${resource.resource_id} has empty league list`);
 			resource.leagues.push({
 				name: 'default',
+				displayedName: 'Default Group',
 				defaultMembers: [],
 				visibility: PrivacyType.public,
 			});
