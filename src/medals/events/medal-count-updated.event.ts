@@ -1,7 +1,5 @@
 export class ResourceMedalsCountUpdatedEvent {
-	constructor(
-		public readonly resource_id: string,
-	) {}
+	constructor(public readonly resource_id: string) {}
 }
 
 export class UserMedalsCountUpdatedEvent {

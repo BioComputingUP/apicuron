@@ -76,7 +76,7 @@ export class ComputeBadgesService {
 
 	public async computeBadges(
 		badgeDefFilter: FilterQuery<BadgeDefDocument> = {},
-	) {
+	): Promise<{ badgeCount: number; badgeDefsCount: number }> {
 		let badgeDefCount = 0;
 
 		const badgeDefs = this.badgeDefModel
@@ -128,5 +128,12 @@ export class ComputeBadgesService {
 			badgeCount: badgeSaves.length,
 			badgeDefsCount: badgeDefCount,
 		};
+	}
+
+	public async reComputeBadges(
+		filter: FilterQuery<BadgeDefDocument>,
+	): Promise<{ badgeCount: number; badgeDefsCount: number }> {
+		await this.badgeModel.deleteMany(filter);
+		return await this.computeBadges(filter);
 	}
 }

@@ -1,21 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { BadgeAggregatorService } from '../services/badge-aggregator.service';
-import { OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { BadgeDefUpdatedEvent } from '../events/badge-def-updated.event';
-import { InjectModel } from '@nestjs/mongoose';
-import {
-	Badge,
-	BadgeDocument,
-} from '../../core/schemas/achievements/badges.schema';
-import { FilterQuery, Model } from 'mongoose';
+import { BadgeDocument } from '../../core/schemas/achievements/badges.schema';
+import { FilterQuery } from 'mongoose';
 import { ComputeBadgesService } from '../services/compute-badges.service';
+import { ResourceBadgesUpdatedEvent } from '../events/badge-count-updated.event';
 
 @Injectable()
 export class BadgeDefUpdatedEventHandler {
 	constructor(
-		protected badgeAggregator: BadgeAggregatorService,
-		@InjectModel(Badge.name) protected badgeModel: Model<BadgeDocument>,
 		protected computeBadges: ComputeBadgesService,
+		protected eventEmitter: EventEmitter2,
 	) {}
 
 	@OnEvent(BadgeDefUpdatedEvent.name, { promisify: true, async: true })
@@ -25,7 +20,10 @@ export class BadgeDefUpdatedEventHandler {
 			resource_id: badgeDef.resource_id,
 			league: badgeDef.league,
 		};
-		await this.badgeModel.deleteMany(filter);
-		await this.computeBadges.computeBadges(filter);
+		await this.computeBadges.reComputeBadges(filter);
+		await this.eventEmitter.emitAsync(
+			ResourceBadgesUpdatedEvent.name,
+			new ResourceBadgesUpdatedEvent(badgeDef.resource_id),
+		);
 	}
 }

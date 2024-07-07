@@ -1,19 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { MedalAggregatorService } from '../services/medal-aggregator.service';
-import { OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { MedalDefDeletedEvent } from '../events/medal-def-deleted.event';
+import { InjectModel } from '@nestjs/mongoose';
+import {
+	Medal,
+	MedalDocument,
+} from '../../core/schemas/achievements/medals.schema';
+import { Model } from 'mongoose';
+import { ResourceMedalsCountUpdatedEvent } from '../events/medal-count-updated.event';
 
 @Injectable()
 export class MedalDefDeletedEventHandler {
-	constructor(protected medalAggregator: MedalAggregatorService) {}
+	constructor(
+		protected eventEmitter: EventEmitter2,
+		@InjectModel(Medal.name) protected medalModel: Model<MedalDocument>,
+	) {}
 
 	@OnEvent(MedalDefDeletedEvent.name, { promisify: true, async: true })
-	async handle(medalDefDeleted: MedalDefDeletedEvent) {
-		await this.medalAggregator.removeAllResourceAggregates(
-			medalDefDeleted.medalDef.resource_id,
-		);
-		await this.medalAggregator.applyAllReports(
-			medalDefDeleted.medalDef.resource_id,
+	async handle({ medalDef }: MedalDefDeletedEvent) {
+		await this.medalModel.deleteMany({
+			resource_id: medalDef.resource_id,
+			name: medalDef.name,
+			league: medalDef.league,
+		});
+
+		await this.eventEmitter.emitAsync(
+			ResourceMedalsCountUpdatedEvent.name,
+			new ResourceMedalsCountUpdatedEvent(medalDef.resource_id),
 		);
 	}
 }

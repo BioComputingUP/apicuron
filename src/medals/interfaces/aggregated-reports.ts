@@ -1,14 +1,15 @@
-import { PrivacyType } from "../../core/enums";
+import { PrivacyType } from '../../core/enums';
 
-export type AggregatedReportsByActivities = {
+/**
+ * This is the output of an aggregation pipeline
+ * it groups all reports related to a medal definition for a specific user
+ */
+export type MedalDefReportsUserSummary = {
+	score_total: number;
 	activity_terms: string[];
 	count: number;
 	resource_id: string;
 	league: string;
 	privacy: PrivacyType;
 	curator_orcid: string;
-};
-
-export type AggregatedReportsByMedalDef = AggregatedReportsByActivities & {
-	score_total: number;
 };
