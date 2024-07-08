@@ -40,6 +40,10 @@ export class BadgeAggregatorService implements Aggregator {
 		protected computeBadges: ComputeBadgesService,
 		protected eventEmitter: EventEmitter2,
 	) {}
+	async recomputeAllResourceAggregates(resource_id: string) {
+		await this.removeAllResourceAggregates(resource_id);
+		await this.applyAllReports(resource_id);
+	}
 
 	async deleteLeague(resource_id: string, league: string): Promise<number> {
 		const medalDefDeleted$ = this.badgeDefModel.deleteMany({

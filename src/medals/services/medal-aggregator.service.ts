@@ -42,6 +42,13 @@ export class MedalAggregatorService implements Aggregator {
 		protected computeMedals: ComputeMedalsService,
 		protected eventEmitter: EventEmitter2,
 	) {}
+	logger = new Logger(MedalAggregatorService.name);
+
+	async recomputeAllResourceAggregates(resource_id: string) {
+		await this.removeAllResourceAggregates(resource_id);
+		await this.applyAllReports(resource_id);
+	}
+
 	async deleteLeague(resource_id: string, league: string): Promise<number> {
 		const filter = {
 			resource_id,
@@ -57,8 +64,6 @@ export class MedalAggregatorService implements Aggregator {
 
 		return medalDefDelete.deletedCount + medalDelete.deletedCount;
 	}
-
-	logger = new Logger(MedalAggregatorService.name);
 
 	async updateUserPrivacy(curator_orcid: string, privacy: PrivacyType) {
 		// update public medals  to the correct privacy

@@ -28,6 +28,12 @@ export class StatisticsAggregator implements Aggregator {
 
 		return deleted.deletedCount;
 	}
+
+	async recomputeAllResourceAggregates(resource_id: string) {
+		await this.removeAllResourceAggregates(resource_id);
+		await this.applyAllReports(resource_id);
+	}
+
 	logger = new Logger(StatisticsAggregator.name);
 
 	async updateUserPrivacy(curator_orcid: string, privacy: PrivacyType) {

@@ -13,4 +13,5 @@ export interface Aggregator {
 		privacy: PrivacyType,
 	): Promise<any> | any;
 	deleteLeague(resource_id: string, league: string): Promise<number> | number;
+	recomputeAllResourceAggregates(resource_id: string): Promise<any> | any;
 }

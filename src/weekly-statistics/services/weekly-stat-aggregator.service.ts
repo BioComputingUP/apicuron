@@ -24,6 +24,12 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 		protected resourceService: PartnerResourcesService,
 		protected computeWeeklyStat: ComputeWeeklyStatisticsService,
 	) {}
+
+	async recomputeAllResourceAggregates(resource_id: string) {
+		await this.removeAllResourceAggregates(resource_id);
+		await this.applyAllReports(resource_id);
+	}
+
 	async deleteLeague(resource_id: string, league: string): Promise<number> {
 		const deleted = await this.weeklyStatModel.deleteMany({
 			resource_id,

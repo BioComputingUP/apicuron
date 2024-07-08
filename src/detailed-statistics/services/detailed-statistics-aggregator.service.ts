@@ -19,6 +19,11 @@ export class DetailedStatisticsAggregatorService implements Aggregator {
 		protected resourceService: PartnerResourcesService,
 	) {}
 
+	async recomputeAllResourceAggregates(resource_id: string) {
+		await this.removeAllResourceAggregates(resource_id);
+		await this.applyAllReports(resource_id);
+	}
+
 	async deleteLeague(resource_id: string, league: string): Promise<number> {
 		const deleted = await this.detailedStatsModel.deleteMany({
 			resource_id,
