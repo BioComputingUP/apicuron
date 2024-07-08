@@ -75,7 +75,7 @@ export class SubmitReportService {
 
 			if (!options.preventEvents) {
 				await this.eventEmitter.emitAsync(ReportSubmittedEvent, {
-					report,
+					report: instance,
 				} as IReportSubmittedEventPayload);
 			}
 			return instance;

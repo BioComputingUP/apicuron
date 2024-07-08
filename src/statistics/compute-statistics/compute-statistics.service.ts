@@ -71,7 +71,7 @@ export class ComputeStatisticsService {
 			count?: number;
 		},
 	): Promise<void> {
-		this.logger.debug('Upserting stat by report', report);
+		this.logger.debug('Upserting stat by report');
 		const { resource_id, curator_orcid, activity_term, league } = report;
 		const reportCount = report.count ?? 1;
 
@@ -117,7 +117,9 @@ export class ComputeStatisticsService {
 					rawResult: true,
 				},
 			);
-
+			this.logger.debug(
+				`upserted Regular Statistics for user ${report.curator_orcid} at resource ${report.resource_id} and league ${report.league}`,
+			);
 			return;
 		} catch (err: any) {
 			if (!(err instanceof MongoServerError) || err.code != 11000) {
@@ -138,6 +140,10 @@ export class ComputeStatisticsService {
 						total_score: scoreIncrement,
 					},
 				},
+			);
+
+			this.logger.debug(
+				`updated statistics for user ${report.curator_orcid} at resource ${report.resource_id} and league ${report.league}`,
 			);
 
 			return;

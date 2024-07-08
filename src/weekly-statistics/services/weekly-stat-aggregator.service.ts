@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { Document, FilterQuery, Model, Types } from 'mongoose';
 import {
@@ -24,6 +24,8 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 		protected resourceService: PartnerResourcesService,
 		protected computeWeeklyStat: ComputeWeeklyStatisticsService,
 	) {}
+
+	logger = new Logger(WeeklyStatisticsAggregatorService.name);
 
 	async recomputeAllResourceAggregates(resource_id: string) {
 		await this.removeAllResourceAggregates(resource_id);
@@ -88,7 +90,11 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 			| (Document<unknown, any, Report> & Report & { _id: Types.ObjectId })
 			| LeanReportDocument,
 	) {
-		return await this.computeWeeklyStat.updateWithReport(report);
+		const result = await this.computeWeeklyStat.updateWithReport(report);
+		this.logger.debug(
+			`Updated Weekly Statistics for user ${report.curator_orcid} at resource ${report.resource_id} and league ${report.league}`,
+		);
+		return result;
 	}
 	async applyAllReports(resource_id: string) {
 		const reportFilter: FilterQuery<ReportDocument> = { resource_id };

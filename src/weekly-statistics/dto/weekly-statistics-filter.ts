@@ -2,7 +2,6 @@ import { IsString, Validate } from 'class-validator';
 import { OrcidChecksum } from '../../submit-reports/validators/orcid-checksum';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
-import { PaginateDto } from '../../pagination/dto/paginate.dto';
 
 export class WeeklyStatisticsFilter {
 	@Validate(EntryExistsRule, [
@@ -32,5 +31,3 @@ export class WeeklyStatisticsFilter {
 	@IsString()
 	league: string;
 }
-
-export class WeeklyLeaderboardDto extends PaginateDto {}

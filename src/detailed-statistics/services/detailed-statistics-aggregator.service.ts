@@ -10,6 +10,7 @@ import {
 import { ComputeDetailedStatisticsService } from './compute-detailed-stats.service';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
+import { Logger } from '@nestjs/common';
 
 export class DetailedStatisticsAggregatorService implements Aggregator {
 	constructor(
@@ -18,6 +19,8 @@ export class DetailedStatisticsAggregatorService implements Aggregator {
 		protected computeDetailedStats: ComputeDetailedStatisticsService,
 		protected resourceService: PartnerResourcesService,
 	) {}
+
+	logger = new Logger(DetailedStatisticsAggregatorService.name);
 
 	async recomputeAllResourceAggregates(resource_id: string) {
 		await this.removeAllResourceAggregates(resource_id);
@@ -37,7 +40,12 @@ export class DetailedStatisticsAggregatorService implements Aggregator {
 			| (Document<unknown, any, Report> & Report & { _id: Types.ObjectId })
 			| LeanReportDocument,
 	) {
-		return await this.computeDetailedStats.upsertDetailedStats(report);
+		const result = await this.computeDetailedStats.upsertDetailedStats(report);
+		this.logger.debug(
+			`Updated Detailed Statistics for user ${report.curator_orcid} at resource ${report.resource_id} and league ${report.league}`,
+		);
+
+		return result;
 	}
 	async applyAllReports(resource_id: string) {
 		return await this.computeDetailedStats.computeDetailedStats({

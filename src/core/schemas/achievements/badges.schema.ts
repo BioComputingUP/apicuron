@@ -23,9 +23,9 @@ export class Badge implements IUserResourceEntity {
 	})
 	name: string;
 	@Prop({
-		required: true,
+		required: false,
 	})
-	resource_uri: string;
+	resource_uri?: string;
 
 	// fields from Badge
 	@Prop({

@@ -164,7 +164,7 @@ export class SubmitReportsController {
 		res.send(report_confirmation);
 
 		await this.eventEmitter.emitAsync(ReportSubmittedEvent, {
-			report,
+			report: report_confirmation,
 		} as IReportSubmittedEventPayload);
 	}
 
