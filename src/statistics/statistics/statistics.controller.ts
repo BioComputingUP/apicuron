@@ -21,7 +21,7 @@ import {
 	ApiOperation,
 	ApiTags,
 } from '@nestjs/swagger';
-import { VersionHeader } from '../../swagger/config';
+import { VersionHeader } from '../../plugins/swagger/config';
 import { UsersService } from '../../auth/users/users.service';
 import { Response } from 'express';
 import { plainToInstance } from 'class-transformer';

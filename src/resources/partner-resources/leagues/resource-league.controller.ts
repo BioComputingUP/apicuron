@@ -12,7 +12,7 @@ import { AuthProtected } from '../../../auth/decorators/auth.decorator';
 import { UserReq } from '../../../auth/decorators/applyUser.decorator';
 import { User } from '../../../core/schemas/user.schema';
 import { PartnerResourcesService } from '../services/partner-resources.service';
-import { VersionHeader } from '../../../swagger/config';
+import { VersionHeader } from '../../../plugins/swagger/config';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateLeagueDto } from './dto/create-league.dto';
 import { AddMemberToLeague } from './dto/add-member-to-league.dto';

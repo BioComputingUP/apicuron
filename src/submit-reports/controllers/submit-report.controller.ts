@@ -32,9 +32,8 @@ import {
 import { SubmitReportService } from '../services/submit-reports.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Response } from 'express';
-import { VersionHeader } from '../../swagger/config';
+import { VersionHeader } from '../../plugins/swagger/config';
 import { FileInterceptor } from '@nestjs/platform-express';
-import _ from 'lodash';
 import { SchedulerClientService } from '../../scheduler-client/services/scheduler-client.service';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import {

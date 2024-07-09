@@ -25,7 +25,7 @@ import { AuthProtected } from '../../auth/decorators/auth.decorator';
 import { Public } from '../../auth/decorators/public.decorator';
 import { User } from '../../core/schemas/user.schema';
 import { UserReq } from '../../auth/decorators/applyUser.decorator';
-import { VersionHeader } from '../../swagger/config';
+import { VersionHeader } from '../../plugins/swagger/config';
 import { AuthService } from '../../auth/auth.service';
 import { paginate } from '../../pagination/paginator';
 import { UpdateBadgeDefDto } from '../dto/update-badge-def.dto';

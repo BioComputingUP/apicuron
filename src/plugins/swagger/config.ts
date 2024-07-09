@@ -1,6 +1,6 @@
-import { loadConfig } from '../config/load';
+import { loadConfig } from '../../config/load';
 
-const env: Function = loadConfig();
+const env = loadConfig();
 const { JWT_HEADER, JWT_PREFIX } = env();
 
 export const VersionHeader = {

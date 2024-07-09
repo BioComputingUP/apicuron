@@ -29,7 +29,7 @@ import {
 	ApiSecurity,
 	ApiTags,
 } from '@nestjs/swagger';
-import { VersionHeader } from '../../swagger/config';
+import { VersionHeader } from '../../plugins/swagger/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../../core/schemas/user.schema';
@@ -70,7 +70,7 @@ export class UsersController {
 	@Get('/browse')
 	// @Roles('user')
 	@UseGuards(LocalAuthGuard)
-	async get_user_stats(@Param() params, @Res() res: Response, @Req() req) {
+	async get_user_stats(@Param() params, @Res() res: Response) {
 		// params['orcid_filter'] =
 
 		const result = await this.usersService.get_users_with_stats(params);

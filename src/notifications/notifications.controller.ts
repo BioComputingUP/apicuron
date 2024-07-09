@@ -1,16 +1,7 @@
-import {
-	Controller,
-	Get,
-	UseGuards,
-	Req,
-	Delete,
-	Param,
-	Query,
-} from '@nestjs/common';
-import { ApiHeader, ApiOperation, ApiTags, ApiSecurity } from '@nestjs/swagger';
+import { Controller, Get, Req, Delete, Param, Query } from '@nestjs/common';
+import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import mongoose from 'mongoose';
-import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
-import { AuthorizationHeader, VersionHeader } from '../swagger/config';
+import { VersionHeader } from '../plugins/swagger/config';
 import { NotificationsService } from './notifications.service';
 import { UserReq } from '../auth/decorators/applyUser.decorator';
 import { User as UserModel } from '../core/schemas/user.schema';

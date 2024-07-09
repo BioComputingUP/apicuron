@@ -1,6 +1,6 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
-import { VersionHeader } from '../../swagger/config';
+import { VersionHeader } from '../../plugins/swagger/config';
 import { AchievementsService } from '../achievements.service';
 import { AchievementSelectDto } from '../dto/achievements.dto';
 import { Public } from '../../auth/decorators/public.decorator';

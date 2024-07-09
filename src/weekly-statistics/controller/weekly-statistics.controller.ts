@@ -6,7 +6,7 @@ import {
 	Query,
 } from '@nestjs/common';
 import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { VersionHeader } from '../../swagger/config';
+import { VersionHeader } from '../../plugins/swagger/config';
 import { WeeklyStatisticsFilter } from '../dto/weekly-statistics-filter';
 import { UserReq } from '../../auth/decorators/applyUser.decorator';
 import { AuthProtected } from '../../auth/decorators/auth.decorator';
@@ -15,7 +15,7 @@ import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
 import { WeeklyStatisticsService } from '../services/weekly-statistics.service';
 import { User } from '../../core/schemas/user.schema';
 import { PaginateDto } from '../../pagination/dto/paginate.dto';
-import { paginate, Paginated } from '../../pagination/paginator';
+import { paginate } from '../../pagination/paginator';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import {
 	PaginatedWeeklyStatisticsDto,

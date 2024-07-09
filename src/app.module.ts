@@ -1,5 +1,4 @@
-import { HttpException, Module, Logger } from '@nestjs/common';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { Module, Logger } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -23,7 +22,7 @@ import {
 } from './shared/validators/entry-exists.validator';
 import { SchedulerClientModule } from './scheduler-client/scheduler-client.module';
 import { TransformInterceptor } from './shared/transformer/transform.interceptor';
-import { SentryInterceptor, SentryModule } from '@ntegral/nestjs-sentry';
+import { SentryModule } from '@ntegral/nestjs-sentry';
 import { EmailModule } from './email/email.module';
 import { CoreApicuronModule } from './core/core.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -37,21 +36,13 @@ import { WeeklyStatisticsModule } from './weekly-statistics/weekly-statistics.mo
 import { BadgesModule } from './badges/badges.module';
 import { MedalsModule } from './medals/medals.module';
 import { AchievementsModule } from './achievements/achievements.module';
+import { loadSentryModule } from './plugins/sentry';
 const logger = new Logger('AppModule');
 
 @Module({
 	imports: [
 		// Sentry Setup
-		SentryModule.forRootAsync({
-			inject: [ConfigService],
-			useFactory: async (cfg: ConfigService) => ({
-				dsn: 'https://c2d718a504bb4e42971684f3049099c3@o4505266554470400.ingest.sentry.io/4505266764251136',
-				debug: true,
-				environment: cfg.get<string>('environment'),
-				logLevels: ['debug', 'error', 'log', 'error', 'warn'],
-				release: '2.0.0',
-			}),
-		}),
+		...loadSentryModule(),
 
 		EventEmitterModule.forRoot({
 			// wildcard: true,
@@ -126,21 +117,6 @@ const logger = new Logger('AppModule');
 		EntryExistsRule,
 		EntriesExistRule,
 		TransformInterceptor,
-		// App interceptor to capture errors
-		{
-			provide: APP_INTERCEPTOR,
-			useFactory: () =>
-				new SentryInterceptor({
-					filters: [
-						{
-							type: HttpException,
-							filter: (exception: HttpException) => {
-								return exception.getStatus() >= 500;
-							},
-						},
-					],
-				}),
-		},
 	],
 })
 export class AppModule {}

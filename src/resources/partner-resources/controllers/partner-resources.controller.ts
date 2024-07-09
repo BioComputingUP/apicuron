@@ -34,7 +34,7 @@ import {
 	ApiSecurity,
 	ApiTags,
 } from '@nestjs/swagger';
-import { VersionHeader } from '../../../swagger/config';
+import { VersionHeader } from '../../../plugins/swagger/config';
 import {
 	PartnerResourceDto,
 	SelectPartnerResourceDto,

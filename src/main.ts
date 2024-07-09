@@ -5,9 +5,10 @@ import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { useContainer } from 'class-validator';
 import { TransformInterceptor } from './shared/transformer/transform.interceptor';
-import { setupSwagger } from './swagger/setup';
+import { setupSwagger } from './plugins/swagger/setup';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import { setupSentry } from './plugins/sentry';
 
 async function bootstrap() {
 	// App creation
@@ -22,12 +23,17 @@ async function bootstrap() {
 	const host = configService.get('HOST');
 	const envConfig = configService.get<string>('environment');
 
+	// setup sentry
+	setupSentry(app, appLogger, configService);
+
 	// class-validator setup
 	useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
 	// set the global transform pipe
 	const transformer = app.get(TransformInterceptor);
 	app.useGlobalInterceptors(transformer);
+
+	// Load global interceptors
 
 	// setup express middlewares
 	app.use(cookieParser());

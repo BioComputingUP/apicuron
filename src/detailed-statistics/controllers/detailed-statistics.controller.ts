@@ -6,7 +6,7 @@ import { Public } from '../../auth/decorators/public.decorator';
 import { User } from '../../core/schemas/user.schema';
 import { UserReq } from '../../auth/decorators/applyUser.decorator';
 import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
-import { VersionHeader } from '../../swagger/config';
+import { VersionHeader } from '../../plugins/swagger/config';
 import {
 	ApiTags,
 	ApiHeader,

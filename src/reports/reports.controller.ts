@@ -9,7 +9,7 @@ import {
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
 
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
-import { VersionHeader } from '../swagger/config';
+import { VersionHeader } from '../plugins/swagger/config';
 import { ReportsService } from './reports.service';
 import {
 	ReportFilterDto,

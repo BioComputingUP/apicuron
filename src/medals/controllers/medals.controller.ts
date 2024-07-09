@@ -6,7 +6,7 @@ import { paginate } from '../../pagination/paginator';
 import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
 import { User } from '../../core/schemas/user.schema';
 import { MedalsQueryService } from '../services/medals-query.service';
-import { VersionHeader } from '../../swagger/config';
+import { VersionHeader } from '../../plugins/swagger/config';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
 import { MedalFilter } from '../dto/medal-filter.dto';
 

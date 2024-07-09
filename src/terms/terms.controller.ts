@@ -21,7 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { HasAResourceGuard } from '../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
-import { VersionHeader } from '../swagger/config';
+import { VersionHeader } from '../plugins/swagger/config';
 import { CreateTermDto } from './dto/createTerm.dto';
 import { DeleteTermDto } from './dto/deleteTerm.dto';
 import { TermFilterDto } from './dto/term.dto';
