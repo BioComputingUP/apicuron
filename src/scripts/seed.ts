@@ -3,7 +3,7 @@ import { getModelToken } from '@nestjs/mongoose';
 import { AppModule } from '../app.module';
 import { Report } from '../core/schemas/reports.schema';
 import { faker } from '@faker-js/faker';
-import { Term, TermDocument } from '../core/schemas/terms.schema';
+import { Term } from '../core/schemas/terms.schema';
 import { Model } from 'mongoose';
 import { User } from '../core/schemas/user.schema';
 import { random, sum } from 'lodash';
@@ -12,12 +12,9 @@ import {
 	PartnerResourceDocument,
 } from '../core/schemas/resource/partner-resource.schema';
 import { PrivacyType } from '../core/enums';
-import { ComputeStatisticsService } from '../statistics/compute-statistics/compute-statistics.service';
 import { Logger } from '@nestjs/common';
-import { ResourceDocument } from '../core/schemas/resource/resource.schema';
 import { UsersService } from '../auth/users/users.service';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { BulkSubmissionEvent } from '../submit-reports/events/events';
+import { SubmitReportService } from '../submit-reports/services/submit-reports.service';
 
 async function bootstrap() {
 	const app = await NestFactory.createApplicationContext(AppModule);
@@ -129,7 +126,7 @@ async function bootstrap() {
 
 	const userCount: number = await userModel.count();
 
-	const savesPromise = [];
+	const reports = [];
 
 	for (let index = 0; index < reportCount; index++) {
 		const report = await mockReport(
@@ -140,19 +137,21 @@ async function bootstrap() {
 			terms,
 		);
 
-		savesPromise.push(report.save());
+		reports.push(report);
 	}
 
-	await Promise.all(savesPromise);
+	await app.get(SubmitReportService).insertReports(reports);
+
+	// await Promise.all(savesPromise);
 
 	logger.verbose(`Created ${reportCount} Mock reports`);
 
-	await app
-		.get(EventEmitter2)
-		.emitAsync(
-			BulkSubmissionEvent.name,
-			new BulkSubmissionEvent(testingOrcidId, [exampleResource.resource_id]),
-		);
+	// await app
+	// 	.get(EventEmitter2)
+	// 	.emitAsync(
+	// 		BulkSubmissionEvent.name,
+	// 		new BulkSubmissionEvent(testingOrcidId, [exampleResource.resource_id]),
+	// 	);
 
 	await app.close();
 }

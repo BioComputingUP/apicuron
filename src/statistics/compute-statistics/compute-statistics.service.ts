@@ -327,6 +327,8 @@ export class ComputeStatisticsService {
 					sum: termObj.score,
 				},
 			],
+			first_contribution: report.timestamp,
+			last_contribution: report.timestamp,
 		});
 		stat.privacy = computePrivacyField(resource, user, stat);
 
