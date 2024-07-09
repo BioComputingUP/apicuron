@@ -8,9 +8,26 @@ import { ResourcesModule } from '../resources/resources.module';
 import { WeeklyStatisticsAggregatorService } from './services/weekly-stat-aggregator.service';
 import { ComputeWeeklyStatisticsService } from './services/compute-weekly-statistics.service';
 import { ReportsWeeklyAggregationPipeline } from './aggregations/reports-weekly.service';
+import { EventOrchestratorModule } from '../event-orchestrator/event-orchestrator.module';
+import { EventOrchestratorModuleOptions } from '../event-orchestrator/interfaces/event-orchestrator-options.interface';
 
 @Module({
-	imports: [CoreApicuronModule, AuthModule, ResourcesModule],
+	imports: [
+		CoreApicuronModule,
+		AuthModule,
+		ResourcesModule,
+		EventOrchestratorModule.registerAsync({
+			imports: [WeeklyStatisticsModule],
+			inject: [WeeklyStatisticsAggregatorService],
+			useFactory(
+				statisticsAggregator: WeeklyStatisticsAggregatorService,
+			): EventOrchestratorModuleOptions {
+				return {
+					aggregator: statisticsAggregator,
+				};
+			},
+		}),
+	],
 	controllers: [WeeklyStatisticsController],
 	providers: [
 		WeeklyStatisticsService,
@@ -19,5 +36,6 @@ import { ReportsWeeklyAggregationPipeline } from './aggregations/reports-weekly.
 		WeeklyStatisticsAggregatorService,
 		RunDailyPipelineJob,
 	],
+	exports: [WeeklyStatisticsAggregatorService]
 })
 export class WeeklyStatisticsModule {}

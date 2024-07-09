@@ -181,7 +181,7 @@ export async function mockReport(
 
 		resource_id: resource.resource_id,
 
-		timestamp: faker.date.recent({ days: 90 }),
+		timestamp: faker.date.recent({ days: 7 }),
 		privacy: faker.helpers.arrayElement([
 			PrivacyType.private,
 			PrivacyType.public,
