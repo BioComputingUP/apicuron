@@ -5,7 +5,7 @@ import {
 	Param,
 	Query,
 } from '@nestjs/common';
-import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { VersionHeader } from '../../swagger/config';
 import { WeeklyStatisticsFilter } from '../dto/weekly-statistics-filter';
 import { UserReq } from '../../auth/decorators/applyUser.decorator';
@@ -15,8 +15,12 @@ import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
 import { WeeklyStatisticsService } from '../services/weekly-statistics.service';
 import { User } from '../../core/schemas/user.schema';
 import { PaginateDto } from '../../pagination/dto/paginate.dto';
-import { paginate } from '../../pagination/paginator';
+import { paginate, Paginated } from '../../pagination/paginator';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
+import {
+	PaginatedWeeklyStatisticsDto,
+	WeeklyStatisticsDto,
+} from '../dto/weekly-statistics.dto';
 
 @ApiTags('Weekly Statistics')
 @ApiHeader(VersionHeader)
@@ -34,6 +38,12 @@ export class WeeklyStatisticsController {
 		description:
 			'This endpoint is used to get the weekly leaderboard for a given resource.',
 	})
+	@ApiResponse({
+		status: 200,
+		description: 'The weekly leaderboard for the given resource',
+		type: PaginatedWeeklyStatisticsDto,
+		isArray: true,
+	})
 	@AuthProtected()
 	@Public()
 	@Get(':resource_id/leaderboard')
@@ -41,7 +51,7 @@ export class WeeklyStatisticsController {
 		@Param('resource_id') resource_id: string,
 		@Query() pagination: PaginateDto,
 		@UserReq() user: User | null,
-	) {
+	): Promise<PaginatedWeeklyStatisticsDto> {
 		const exists = await this.resourceService.exists(resource_id);
 		if (!exists) {
 			throw new NotFoundException(`Resource ${resource_id} not found`);
@@ -57,7 +67,11 @@ export class WeeklyStatisticsController {
 				pagination.getMongoQueryOptions(),
 			);
 
-		return paginate(data, pagination, count);
+		return paginate<WeeklyStatisticsDto>(
+			data as WeeklyStatisticsDto[],
+			pagination,
+			count,
+		);
 	}
 
 	@ApiOperation({

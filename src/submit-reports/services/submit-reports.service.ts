@@ -101,7 +101,11 @@ export class SubmitReportService {
 	async insertReports(
 		reports: ReportDto[],
 		options = { preventEvents: false },
-	): Promise<Omit<InsertManyResult<Report>, 'insertedIds'>> {
+	): Promise<
+		Omit<InsertManyResult<Report>, 'insertedIds'> & {
+			reports: ReportDocument[];
+		}
+	> {
 		try {
 			const reportDocuments = reports.map(
 				(report: ReportDto) => new this.reportModel(report),
@@ -115,12 +119,13 @@ export class SubmitReportService {
 			);
 			if (!options.preventEvents) {
 				await this.eventEmitter.emitAsync(ManyReportsSubmittedEvent, {
-					reports,
+					reports: reportDocuments,
 				} as IManyReportsSubmittedEventPayload);
 			}
 			return {
 				insertedCount,
 				acknowledged,
+				reports: reportDocuments,
 			};
 		} catch (e: any) {
 			if (e instanceof MongoServerError && e.code === 11000) {

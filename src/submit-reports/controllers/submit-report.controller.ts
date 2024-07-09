@@ -204,7 +204,7 @@ export class SubmitReportsController {
 				);
 		}
 
-		const { insertedCount } = await this.reportService.insertReports(
+		const { insertedCount, reports } = await this.reportService.insertReports(
 			reportSubmission.reports,
 			{ preventEvents: true },
 		);
@@ -214,7 +214,7 @@ export class SubmitReportsController {
 		res.send(response);
 
 		await this.eventEmitter.emitAsync(ManyReportsSubmittedEvent, {
-			reports: reportSubmission.reports,
+			reports,
 		} as IManyReportsSubmittedEventPayload);
 
 		return;
