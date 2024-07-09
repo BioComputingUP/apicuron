@@ -134,7 +134,7 @@ export class StatisticsReportAggregator {
 		await Promise.all(cacheEvents$);
 		if (!resultTerm) {
 			throw new Error(
-				`Term ${activity_term} from resource ${resource_id} not found`,
+				`Term ${activity_term} from resource ${resource_id}:${league} not found`,
 			);
 		}
 
