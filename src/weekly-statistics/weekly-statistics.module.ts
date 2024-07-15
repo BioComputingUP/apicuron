@@ -20,10 +20,10 @@ import { EventOrchestratorModuleOptions } from '../event-orchestrator/interfaces
 			imports: [WeeklyStatisticsModule],
 			inject: [WeeklyStatisticsAggregatorService],
 			useFactory(
-				statisticsAggregator: WeeklyStatisticsAggregatorService,
+				weeklyStatAggregator: WeeklyStatisticsAggregatorService,
 			): EventOrchestratorModuleOptions {
 				return {
-					aggregator: statisticsAggregator,
+					aggregator: weeklyStatAggregator,
 				};
 			},
 		}),

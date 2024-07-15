@@ -23,21 +23,11 @@ export class BulkReportSubmissionHandler implements IEventHandler {
 
 	@OnEvent(BulkSubmissionEvent.name, { async: true, promisify: true })
 	async handle({ resource_ids }: BulkSubmissionEvent) {
-		// delete all aggregates
-		const deleteAllAggregates$ = resource_ids.map(
+		const reComputeAggregates$ = resource_ids.map(
 			async (resource_id: string) =>
-				await this.aggregator.removeAllResourceAggregates(resource_id),
+				await this.aggregator.recomputeAllResourceAggregates(resource_id),
 		);
 
-		await Promise.all(deleteAllAggregates$);
-
-		// delete recompute all aggregates
-
-		const computeAggregates$ = resource_ids.map(
-			async (resource_id: string) =>
-				await this.aggregator.applyAllReports(resource_id),
-		);
-
-		await Promise.all(computeAggregates$);
+		await Promise.all(reComputeAggregates$);
 	}
 }

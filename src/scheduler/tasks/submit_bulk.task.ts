@@ -51,7 +51,7 @@ export class SubmitBulkTask {
 
 		const [orcid_id, delete_all] = task_arg.arguments;
 
-		if (delete_all) {
+		if (delete_all && delete_all instanceof String) {
 			const resources_delete_all: string[] = delete_all.split(',');
 
 			this.logger.log(`User specified resources ${delete_all}`);
@@ -75,9 +75,6 @@ export class SubmitBulkTask {
 
 	public async unbuffered_submission(file: string, submitter_orcid: string) {
 		const user = await this.userModel.findOne({ orcid_id: submitter_orcid });
-		// const allowedResources: string[] = user.resources.map(
-		// 	({ resource_id }) => resource_id,
-		// );
 
 		const rawData = await this.loadRawData(file, submitter_orcid);
 
@@ -133,10 +130,9 @@ export class SubmitBulkTask {
 			const insertResult = await this.submitReports.insertReports(
 				reportDocuments,
 			);
-			// const insertResult = 	await this.reportModel.insertMany(reportDocuments, {
-			// 	rawResult: true,
-			// });
-			this.logger.debug(`inserted ${insertResult.insertedCount} reports`);
+
+			const insertCount = insertResult.insertedCount ?? 0;
+			this.logger.debug(`inserted ${insertCount} reports`);
 
 			const successCount = validReports.length;
 			const errors = invalidReports
@@ -155,14 +151,15 @@ export class SubmitBulkTask {
 				notification_body,
 				submitter_orcid,
 			);
-
-			await this.eventEmitter.emitAsync(
-				BulkSubmissionEvent.name,
-				new BulkSubmissionEvent(
-					submitter_orcid,
-					Array.from(affected_resource_ids),
-				),
-			);
+			if (successCount > 0) {
+				await this.eventEmitter.emitAsync(
+					BulkSubmissionEvent.name,
+					new BulkSubmissionEvent(
+						submitter_orcid,
+						Array.from(affected_resource_ids),
+					),
+				);
+			}
 		} catch (err: any) {
 			if (err instanceof MongoBulkWriteError) {
 				this.logger.error(err.message, err.stack, err.name);
@@ -244,10 +241,7 @@ export class SubmitBulkTask {
 		if (reports instanceof Array) {
 			return reports;
 		}
-		this.logger.error(
-			`Reports key is of type ${typeof reports} when it should be an instance of Array`,
-		);
-		throw new Error('Invalid Report Array');
+		return [];
 	}
 
 	private async main(file: string, submitter_orcid: string) {
@@ -290,10 +284,12 @@ export class SubmitBulkTask {
 				submitter_orcid,
 			);
 
-			await this.eventEmitter.emitAsync(
-				BulkSubmissionEvent.name,
-				new BulkSubmissionEvent(submitter_orcid, resource_ids),
-			);
+			if (success_count > 0) {
+				await this.eventEmitter.emitAsync(
+					BulkSubmissionEvent.name,
+					new BulkSubmissionEvent(submitter_orcid, resource_ids),
+				);
+			}
 		}
 	}
 
@@ -390,6 +386,11 @@ export class SubmitBulkTask {
 			];
 		} else {
 			submission_report = [`Submission failed!`];
+			if (total_count > 0) {
+				submission_report.push(
+					`Could not find any report in the submitted file`,
+				);
+			}
 		}
 
 		if (error_reports.length > 0) {
