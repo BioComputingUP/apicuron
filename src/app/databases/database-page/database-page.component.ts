@@ -1,23 +1,8 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  OnInit,
-  ViewChild,
-} from "@angular/core";
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from "@angular/core";
 import { DatabasesService } from "../services/databases.service";
 import { ActivatedRoute, ParamMap } from "@angular/router";
-import {
-  catchError,
-  delay,
-  map,
-  pluck,
-  share,
-  shareReplay,
-  switchMap,
-  tap,
-} from "rxjs/operators";
-import { combineLatest, interval, Observable } from "rxjs";
+import { delay, map, pluck, shareReplay, switchMap, tap } from "rxjs/operators";
+import { interval, Observable } from "rxjs";
 import { CuratorService } from "src/app/curator/curator.service";
 import { Resource } from "../../models/resource.model";
 import { BadgeDefService } from "../../achievements-def/services/badge-def.service";
@@ -30,7 +15,6 @@ import { Term } from "../../models/term.model";
 import { MedalDefService } from "../../achievements-def/services/medal-def.service";
 import { MedalDefFilter } from "../../achievements-def/interfaces/medal-def.filter";
 import { MedalDef } from "../../models/medal-def.model";
-import { User } from "../../models/User.model";
 @Component({
   selector: "app-database-page",
   templateUrl: "./database-page.component.html",
@@ -54,8 +38,7 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
     private badgeDefService: BadgeDefService,
     private medalDefService: MedalDefService,
     private termService: TermsService,
-    private curatorService: CuratorService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {}
 
   ngAfterViewInit(): void {
