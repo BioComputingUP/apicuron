@@ -43,7 +43,7 @@ import { BadgesQueryService } from './services/badges-query.service';
 		BadgeDefDeletedEventHandler,
 		EarnedBadgesService,
 		BadgeAggregatorService,
-		BadgesQueryService
+		BadgesQueryService,
 	],
 	exports: [BadgeAggregatorService, EarnedBadgesService],
 	controllers: [BadgesDefController, BadgesController],

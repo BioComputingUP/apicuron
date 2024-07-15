@@ -17,7 +17,7 @@ import { DeleteMedalDefDto } from '../dto/delete-medal-def.dto';
 import { MedalDefDeletedEvent } from '../events/medal-def-deleted.event';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { CreateMedalDefDto } from '../dto/create-medal-def.dto';
-import { assignResourceEntityPrivacyField } from '../../util/privacy.helper';
+import { assignResourceEntityPrivacy } from '../../util/privacy.helper';
 import { MedalDefCreatedEvent } from '../events/medal-def-created.event';
 import {
 	MedalDef,
@@ -125,7 +125,7 @@ export class MedalDefCommandsService {
 			resource_uri: resource.resource_uri,
 		});
 
-		assignResourceEntityPrivacyField(resource, newMedalDef);
+		assignResourceEntityPrivacy(resource, newMedalDef);
 
 		await newMedalDef.save();
 

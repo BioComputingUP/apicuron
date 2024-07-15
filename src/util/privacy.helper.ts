@@ -74,7 +74,7 @@ export function computeAggregatePrivacyField(
  * @param resourceEntity - The resource entity object.
  * @returns The privacy type assigned to the resource entity.
  */
-export function assignResourceEntityPrivacyField(
+export function assignResourceEntityPrivacy(
 	resource: PartnerResourceDocument | LeanDocument<PartnerResource>,
 	resourceEntity: LeanIResourceEntityDocument | IResourceEntityDocument,
 ): PrivacyType {
@@ -84,6 +84,12 @@ export function assignResourceEntityPrivacyField(
 	return resourceEntity.privacy;
 }
 
+/**
+ * Assigns the privacy value to a resource entity. Any item that is exclusively defined by the resource
+ * E.G: A badge definition, an activity type (term), etc. will have its privacy value set to the resource's corresponding league
+ * @param requestUser The user making the request.
+ * @returns The filterQuery to apply to any resource entity to only allow public entities and private entities to the ones owned by the user.
+ */
 export function resourceEntityPrivacyFilter(
 	requestUser: User | null,
 ): FilterQuery<IResourceEntityDocument> {

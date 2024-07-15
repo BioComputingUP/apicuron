@@ -22,7 +22,6 @@ import {
 } from './shared/validators/entry-exists.validator';
 import { SchedulerClientModule } from './scheduler-client/scheduler-client.module';
 import { TransformInterceptor } from './shared/transformer/transform.interceptor';
-import { SentryModule } from '@ntegral/nestjs-sentry';
 import { EmailModule } from './email/email.module';
 import { CoreApicuronModule } from './core/core.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -37,6 +36,7 @@ import { BadgesModule } from './badges/badges.module';
 import { MedalsModule } from './medals/medals.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { loadSentryModule } from './plugins/sentry';
+
 const logger = new Logger('AppModule');
 
 @Module({

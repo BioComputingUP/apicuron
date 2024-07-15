@@ -16,7 +16,7 @@ import { DeleteBadgeDefDto } from '../dto/delete-badge-def.dto';
 import { BadgeDefDeletedEvent } from '../events/badge-def-deleted.event';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { CreateBadgeDefDto } from '../dto/create-badge-def.dto';
-import { assignResourceEntityPrivacyField } from '../../util/privacy.helper';
+import { assignResourceEntityPrivacy } from '../../util/privacy.helper';
 import { BadgeDefCreatedEvent } from '../events/badge-def-created.event';
 
 @Injectable()
@@ -108,7 +108,7 @@ export class BadgeDefCommandsService {
 			privacy: resource.getLeague(badgeDef.league).visibility,
 			resource_uri: resource.resource_uri,
 		});
-		assignResourceEntityPrivacyField(resource, newBadge);
+		assignResourceEntityPrivacy(resource, newBadge);
 
 		try {
 			await newBadge.save();
