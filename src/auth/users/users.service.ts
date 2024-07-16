@@ -7,12 +7,15 @@ import { User, UserDocument } from '../../core/schemas/user.schema';
 import { ConfigService } from '@nestjs/config';
 import { generateAvatar } from './generate_avatar';
 import { PrivacyType } from '../../core/enums';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { UserPrivacyUpdatedEvent } from './events/update-privacy';
 @Injectable()
 export class UsersService implements OnApplicationBootstrap {
 	private readonly logger = new Logger(UsersService.name);
 	constructor(
 		@InjectModel(User.name) private userModel: Model<UserDocument>,
 		protected configService: ConfigService,
+		protected eventEmitter: EventEmitter2,
 	) {}
 	async onApplicationBootstrap(): Promise<void> {
 		const result = await this.userModel.updateMany(
@@ -114,7 +117,14 @@ export class UsersService implements OnApplicationBootstrap {
 		);
 		newUser.avatar = avatarLink;
 
-		return await newUser.save();
+		await newUser.save();
+
+		// Emit the update event of this user privacy according to the user's settings
+		await this.eventEmitter.emitAsync(
+			UserPrivacyUpdatedEvent.name,
+			new UserPrivacyUpdatedEvent(newUser, newUser.privacy),
+		);
+		return newUser;
 	}
 
 	async createOrUpdateUser({ orcid_id, ...data }: Partial<User>) {
