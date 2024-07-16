@@ -107,7 +107,7 @@ export class UsersService implements OnApplicationBootstrap {
 		);
 	}
 
-	async createUser(user: any): Promise<User> {
+	async createUser(user: any): Promise<UserDocument> {
 		const newUser = new this.userModel(user);
 
 		const avatarLink = await generateAvatar(
@@ -119,21 +119,26 @@ export class UsersService implements OnApplicationBootstrap {
 
 		await newUser.save();
 
-		// Emit the update event of this user privacy according to the user's settings
+		return newUser;
+	}
+
+	async createOrUpdateUser({
+		orcid_id,
+		...data
+	}: Partial<User>): Promise<UserDocument> {
+		const exists = await this.userModel.exists({ orcid_id });
+
+		// upsert user
+		const newUser = exists
+			? await this.userModel.findOneAndUpdate({ orcid_id }, data, { new: true })
+			: await this.createUser({ orcid_id, ...data });
+
 		await this.eventEmitter.emitAsync(
 			UserPrivacyUpdatedEvent.name,
 			new UserPrivacyUpdatedEvent(newUser, newUser.privacy),
 		);
-		return newUser;
-	}
 
-	async createOrUpdateUser({ orcid_id, ...data }: Partial<User>) {
-		const exists = await this.userModel.exists({ orcid_id });
-		if (exists) {
-			await this.userModel.updateOne({ orcid_id }, data);
-		} else {
-			return await this.createUser({ orcid_id, ...data });
-		}
+		return newUser;
 	}
 
 	async get_users_with_stats(params) {
