@@ -211,15 +211,6 @@ export class ComputeStatisticsService {
 		if (!stat[`${activity_category}_terms`]) {
 			stat[`${activity_category}_terms`] = [];
 		}
-		// stat[`${activity_category}_terms`].push({
-		// 	activity_category: term.activity_category,
-		// 	activity_name: term.activity_name,
-		// 	description: term.description,
-		// 	activity_term: report.activity_term,
-		// 	count: report.count,
-		// 	score: score,
-		// 	sum: report.count * score,
-		// });
 
 		stat.total_count += report.count;
 		stat.total_score += report.count * score;

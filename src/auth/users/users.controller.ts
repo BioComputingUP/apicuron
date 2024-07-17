@@ -148,7 +148,10 @@ export class UserControllerV2 {
 				user = this.userModel.findOne(
 					{
 						orcid_id,
-						$or: [{ privacy: 'public' }, { orcid_id: userReq.orcid_id }],
+						$or: [
+							{ orcid_id, privacy: 'public' },
+							{ $and: [{ orcid_id: userReq.orcid_id }, { orcid_id }] },
+						],
 					},
 					{
 						stats: 0,
