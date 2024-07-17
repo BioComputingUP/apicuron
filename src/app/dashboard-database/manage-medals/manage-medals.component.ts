@@ -45,11 +45,11 @@ export class ManageMedalsComponent implements OnInit {
   updateMedal$ = new Subject<MedalListUpdate>();
 
   // Form
-  manageForm$ = new BehaviorSubject<{
+  manageForm$ = new Subject<{
     medal: MedalDef;
     show: boolean;
     type: "create" | "update";
-  }>({ medal: null, show: false, type: "create" });
+  }>();
 
   // pagination
   page$ = new BehaviorSubject<number>(1);
@@ -238,8 +238,8 @@ export class ManageMedalsComponent implements OnInit {
       },
       (error) => {
         this.toastr.error(
-          `An error occured while updating the medal ${medal.name}`,
-          "medal Update Failed"
+          `An error occured while deleting the medal ${medal.name}`,
+          "medal Delete Failed"
         );
       }
     );
