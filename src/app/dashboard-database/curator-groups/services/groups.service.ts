@@ -60,20 +60,10 @@ export class GroupsService {
 
     const firstGroup$: Observable<ResourceGroup> = this.resourceGroups$.pipe(
       map((groups: ResourceGroup[]) => groups[0]),
-      take(1),
+      take(1)
     );
 
     this.currentGroup$ = concat(firstGroup$, this.selectGroup$);
-
-    // this.currentParticipants$ = this.leagues$.pipe(
-    //   map((groups) => {
-    //     return groups.reduce((allParticipants, group) => {
-    //       return allParticipants.concat(
-    //         group.defaultMembers.map((participant) => [participant, group.name])
-    //       );
-    //     }, []);
-    //   })
-    // );
   }
 
   getCurrentGroup(): Observable<ResourceGroup> {

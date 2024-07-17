@@ -33,7 +33,6 @@ import { BadgeFormComponent } from "../components/badge-form/badge-form.componen
 import { PaginationComponent } from "../pagination/pagination.component";
 import { MedalFormComponent } from "../components/medal-form/medal-form.component";
 import { CuratorGroupsComponent } from './curator-groups/curator-groups.component';
-import { ShowGroupsComponent } from './curator-groups/show-groups/show-groups.component';
 import { ModifyGroupsComponent } from './curator-groups/modify-groups/modify-groups.component';
 import { ParticipantsListComponent } from './curator-groups/participants-list/participants-list.component';
 import { GroupsService } from "./curator-groups/services/groups.service";
@@ -50,7 +49,6 @@ import { ResourceGroupCardComponent } from "../components/group-card/resource-gr
     ManageMedalsComponent,
     DatabaseOverviewComponent,
     CuratorGroupsComponent,
-    ShowGroupsComponent,
     ModifyGroupsComponent,
     ParticipantsListComponent,
   ],
