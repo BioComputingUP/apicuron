@@ -106,7 +106,8 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
   apicuronURL = environment.host;
   stats$: Observable<Paginated<CuratorWithStats>>;
   leaderboard$: Observable<{ user: User; stat: BaseCuratorStatistics; }[]>;
-  weeklyLeaderboard$: Observable<{ user: User; stat: WeeklyCuratorStatistics; }[]>;
+  // weeklyLeaderboard$: Observable<{ user: User; stat: WeeklyCuratorStatistics; }[]>;
+  weeklyLeaderboard$: Observable<{ user: User; stat: WeeklyCuratorStatistics; }[]>
   leaderboardWithUsers$: Observable<{ stat: CuratorStatistics; user: User }[]>;
   weeklyLeaderboardWithUsers$: Observable<{ stat: WeeklyCuratorStatistics; user: User }[]>;
   user$: Observable<any>;

@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable, combineLatest } from "rxjs";
+import { Observable, combineLatest, of } from "rxjs";
 import { map, pluck, switchMap } from "rxjs/operators";
 import { Paginated } from "src/app/interfaces/paginated";
 import { BaseCuratorStatistics, CuratorStatistics, WeeklyCuratorStatistics } from "src/app/models/statistics.model";
@@ -88,7 +88,7 @@ export class CuratorStatisticsService {
         return combineLatest(usersList$).pipe(
           map((users: User[]) => {
             return statList.map((stat, index) => {
-              const user = users[index];
+              const user = users.find(user => user.orcid_id == stat.curator_orcid);
               stat.ranking = index + 1;
               return { user, stat };
             });
@@ -135,7 +135,7 @@ export class CuratorStatisticsService {
   //       const orcidIds = statList.map(({ curator_orcid }) => curator_orcid);
   //       const usersList$ = orcidIds.map((id) => this.getUser(id));
   //       const users$ = combineLatest(usersList$);
-  //       const result = combineLatest([users$, of(stats)]);
+  //       const result = combineLatest([users$, of(statList)]);
   //       return result
   //     }),
   //     map(([user, stat]) => {
@@ -154,7 +154,7 @@ export class CuratorStatisticsService {
         return combineLatest(usersList$).pipe(
           map((users: User[]) => {
             return statList.map((stat, index) => {
-              const user = users[index];
+              const user = users.find(user => user.orcid_id == stat.curator_orcid);
               stat.ranking = index + 1;
               return { user, stat };
             });
@@ -162,7 +162,7 @@ export class CuratorStatisticsService {
         );
       })
     );
-  }  
+  }    
 
   getStatistics(
     statFilter: StatisticsFilter
