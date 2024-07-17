@@ -13,18 +13,17 @@ import { switchMap, pluck } from "rxjs/operators";
 import { environment } from "src/environments/environment";
 import { User } from "src/app/models/User.model";
 import { ResourceGroup } from "../../../models/resource-group.model";
+import { Dialog } from "@angular/cdk/dialog";
+import { CreateGroupComponent } from "../create-group/create-group.component";
 
-// export type CreateLeague = Required<UpdateLeague>
-
-// export type RemoveLeague = Omit<UpdateLeague>
-
-// @Injectable({
-// providedIn: 'root' // This is wrong, there are only some cases where this makes sense
-// })
 @Injectable()
 export class GroupsService {
   resourceGroups$: Observable<ResourceGroup[]>;
-  constructor(protected http: HttpClient, protected route: ActivatedRoute) {}
+  constructor(
+    protected http: HttpClient,
+    protected route: ActivatedRoute,
+    protected dialog: Dialog
+  ) {}
 
   ws = environment.ws;
 
@@ -64,6 +63,13 @@ export class GroupsService {
     );
 
     this.currentGroup$ = concat(firstGroup$, this.selectGroup$);
+  }
+
+  openCreateGroupForm(){
+    this.dialog.open(CreateGroupComponent, {
+      width: "50vw",
+      height: "90vh",
+    });
   }
 
   getCurrentGroup(): Observable<ResourceGroup> {

@@ -24,17 +24,20 @@
               ></resource-group-card>
             </div>
             <!-- Create new Curation group icon -->
-            <div class="tw-block tw-p-2">
+            <div
+              class="tw-block tw-p-2 tw-cursor-pointer"
+              (click)="createGroupClickHandler($event)"
+            >
               <div
-                class="tw-flex tw-flex-col tw-border-2 tw-border-dashed tw-border-apicuron-purple-100 tw-rounded-lg tw-w-56 tw-max-h-full tw-h-full tw-justify-center tw-items-center"
+                class="tw-flex tw-flex-col tw-border-2 tw-border-dashed tw-border-apicuron-purple-100 tw-rounded-lg tw-w-56 tw-max-h-full tw-h-full tw-justify-center tw-items-center tw-cursor-pointer"
               >
                 <svg-icon
-                  class="tw-block tw-h-16 tw-w-16"
+                  class="tw-block tw-h-16 tw-w-16 tw-cursor-pointer"
                   svgClass="tw-text-apicuron-purple"
                   src="assets/svg/create_icon.svg"
                 >
                 </svg-icon>
-                <span class="tw-text-apicuron-purple tw-text-center tw-text-sm"
+                <span class="tw-text-apicuron-purple tw-text-center tw-text-sm tw-cursor-pointer"
                   >Create a new Curation Group</span
                 >
               </div>

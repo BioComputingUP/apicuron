@@ -13,11 +13,6 @@ import { GroupClickEvent } from "../../components/group-card/resource-group-card
   styleUrls: ["./curator-groups.component.scss"],
 })
 export class CuratorGroupsComponent implements OnInit {
-  search_fields = {
-    field: "displayedName",
-    text: "Biocurator name",
-  };
-
   resource_id$: Observable<string>;
   // biocurators_list$: Observable<Array<any>>;
 
@@ -43,5 +38,9 @@ export class CuratorGroupsComponent implements OnInit {
 
   groupClickEventHandler(clickEvent: GroupClickEvent) {
     console.log(`called ${clickEvent.action} button`, clickEvent.group);
+  }
+
+  createGroupClickHandler($event: PointerEvent) {
+    this.groupsService.openCreateGroupForm();
   }
 }

@@ -9,7 +9,6 @@ import { SubmitSingleComponent } from "./submit-report/submit-single/submit-sing
 import { SubmitBulkComponent } from "./submit-report/submit-bulk/submit-bulk.component";
 import { ManageTermsComponent } from "./manage-terms/manage-terms.component";
 import { TermsService } from "./services/terms.service";
-import { SvgModule } from "../svg/svg.module";
 import { ManageBadgesComponent } from "./manage-badges/manage-badges.component";
 import { ManageMedalsComponent } from "./manage-medals/manage-medals.component";
 import { AngularSvgIconModule } from "angular-svg-icon";
@@ -25,18 +24,18 @@ import { ReportsByDateChartComponent } from "../components/charts/reports-by-dat
 import { ResourceModule } from "../resource/resource.module";
 import { FileUploadModule } from "primeng/fileupload";
 import { ProgressSpinnerModule } from "primeng/progressspinner";
-import { BlockUIModule } from "primeng/blockui";
 import { ToastModule } from "primeng/toast";
 import { MessageService } from "primeng/api";
 import { SpinnerComponent } from "../components/utils/spinner/spinner.component";
 import { BadgeFormComponent } from "../components/badge-form/badge-form.component";
 import { PaginationComponent } from "../pagination/pagination.component";
 import { MedalFormComponent } from "../components/medal-form/medal-form.component";
-import { CuratorGroupsComponent } from './curator-groups/curator-groups.component';
-import { ModifyGroupsComponent } from './curator-groups/modify-groups/modify-groups.component';
-import { ParticipantsListComponent } from './curator-groups/participants-list/participants-list.component';
+import { CuratorGroupsComponent } from "./curator-groups/curator-groups.component";
+import { ModifyGroupsComponent } from "./curator-groups/modify-groups/modify-groups.component";
+import { ParticipantsListComponent } from "./curator-groups/participants-list/participants-list.component";
 import { GroupsService } from "./curator-groups/services/groups.service";
 import { ResourceGroupCardComponent } from "../components/group-card/resource-group-card.component";
+import { DialogModule } from "@angular/cdk/dialog";
 
 @NgModule({
   declarations: [
@@ -55,6 +54,7 @@ import { ResourceGroupCardComponent } from "../components/group-card/resource-gr
   providers: [DashboardService, TermsService, MessageService, GroupsService],
   imports: [
     CommonModule,
+    DialogModule,
     DashboardDatabaseRoutingModule,
     SlideOverPanelComponent,
     AuthDropdownComponent,
