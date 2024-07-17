@@ -1,12 +1,13 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
-import { catchError, map, pluck, tap } from "rxjs/operators";
+import { Observable, combineLatest } from "rxjs";
+import { map, pluck, switchMap } from "rxjs/operators";
 import { Paginated } from "src/app/interfaces/paginated";
-import { CuratorStatistics, WeeklyCuratorStatistics } from "src/app/models/statistics.model";
+import { BaseCuratorStatistics, CuratorStatistics, WeeklyCuratorStatistics } from "src/app/models/statistics.model";
 import { environment } from "src/environments/environment";
 import { StatisticsFilter } from "../models/statistics-filter";
 import { CuratorWithStats } from "../models/curator-stats";
+import { User } from "src/app/models/User.model";
 
 @Injectable()
 export class CuratorStatisticsService {
@@ -42,17 +43,23 @@ export class CuratorStatisticsService {
       );
   }
 
-  get_resource_statistics(resource_id: string) {
-    throw new Error("Not Implemented Error !");
+  getUser(orcid_id: string): Observable<User> {
+    return this.getUserData(orcid_id).pipe(
+      map((response) => {
+        const user = new User().deserialize(response);
+        return user;
+      })
+    )
   }
 
   getResourceLeaderboard(
     resource_id: string,
     limit: number = 10,
     skip: number = 0
-  ): Observable<Paginated<CuratorStatistics>> {
-    const response$ = this.http
-      .get(`${environment.ws}/statistics/leaderboard/${resource_id}`, {
+  ): Observable<Paginated<BaseCuratorStatistics>> {
+    const url = `${environment.ws}/statistics/leaderboard/${resource_id}`;
+    return this.http
+      .get<Paginated<BaseCuratorStatistics>>(url, {
         responseType: "json",
         headers: {
           version: "2",
@@ -63,44 +70,33 @@ export class CuratorStatisticsService {
         },
       })
       .pipe(
-        map(({ data, meta }: Paginated<CuratorStatistics>) => {
-          return {
-            data: data.map((stat: CuratorStatistics) =>
-              new CuratorStatistics().deserialize(stat)
-            ),
-            meta,
-          };
+        map((response: Paginated<BaseCuratorStatistics>) => {
+          response.data = response.data.map((stat: BaseCuratorStatistics) =>
+            new BaseCuratorStatistics().deserialize(stat)
+          );
+          return response;
         })
       );
-    return response$;
-  }
+  }  
 
-  // getResourceLeaderboard(
-  //   resource_id: string,
-  //   limit: number = 10,
-  //   skip: number = 0
-  // ): Observable<Paginated<CuratorWithStats>> {
-  //   const url = `${environment.ws}/statistics/leaderboard/${resource_id}`;
-  //   return this.http
-  //     .get<Paginated<CuratorWithStats>>(url, {
-  //       responseType: "json",
-  //       headers: {
-  //         version: "2",
-  //       },
-  //       params: {
-  //         limit,
-  //         skip,
-  //       },
-  //     })
-  //     .pipe(
-  //       map((response: Paginated<CuratorWithStats>) => {
-  //         response.data = response.data.map((stat: CuratorWithStats) =>
-  //           new CuratorWithStats().deserialize(stat)
-  //         );
-  //         return response;
-  //       })
-  //     );
-  // }  
+  getResourceLeaderboardWithUsers(resource_id: string): Observable<{ user: User, stat: BaseCuratorStatistics }[]> {
+    return this.getResourceLeaderboard(resource_id).pipe(
+      switchMap((stats: Paginated<BaseCuratorStatistics>) => {
+        const statList = stats.data;
+        const orcidIds = statList.map(({ curator_orcid }) => curator_orcid);
+        const usersList$ = orcidIds.map((id) => this.getUser(id));
+        return combineLatest(usersList$).pipe(
+          map((users: User[]) => {
+            return statList.map((stat, index) => {
+              const user = users[index];
+              stat.ranking = index + 1;
+              return { user, stat };
+            });
+          })
+        );
+      })
+    );
+  }
 
   getWeeklyResourceLeaderboard(
     resource_id: string,
@@ -130,6 +126,43 @@ export class CuratorStatisticsService {
       );
     return response$;
   }
+
+  // getWeeklyResourceLeaderboardWithUsers(resource_id: string) { 
+  //   const stats$ = this.getWeeklyResourceLeaderboard(resource_id)
+  //   const result$ = stats$.pipe(
+  //     switchMap((stats: Paginated<WeeklyCuratorStatistics>) => {
+  //       const statList = stats.data;
+  //       const orcidIds = statList.map(({ curator_orcid }) => curator_orcid);
+  //       const usersList$ = orcidIds.map((id) => this.getUser(id));
+  //       const users$ = combineLatest(usersList$);
+  //       const result = combineLatest([users$, of(stats)]);
+  //       return result
+  //     }),
+  //     map(([user, stat]) => {
+  //       return { user, stat };
+  //     })
+  //   )
+  //   return result$;
+  // }
+
+  getWeeklyResourceLeaderboardWithUsers(resource_id: string): Observable<{ user: User, stat: WeeklyCuratorStatistics }[]> {
+    return this.getWeeklyResourceLeaderboard(resource_id).pipe(
+      switchMap((stats: Paginated<WeeklyCuratorStatistics>) => {
+        const statList = stats.data;
+        const orcidIds = statList.map(({ curator_orcid }) => curator_orcid);
+        const usersList$ = orcidIds.map((id) => this.getUser(id));
+        return combineLatest(usersList$).pipe(
+          map((users: User[]) => {
+            return statList.map((stat, index) => {
+              const user = users[index];
+              stat.ranking = index + 1;
+              return { user, stat };
+            });
+          })
+        );
+      })
+    );
+  }  
 
   getStatistics(
     statFilter: StatisticsFilter

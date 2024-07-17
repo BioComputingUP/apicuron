@@ -7,7 +7,7 @@
     <!-- Total -->
     <div *ngIf="showTotal" class="tw-bg-white tw-rounded-t-md tw-shadow-lg tw-p-1 md:tw-p-2 tw-text-gray-700" style="font-family: system-ui;">
         <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold tw-my-2">{{ resource.resource_name }}'s Total Leaderboard</h4>
-        <ng-container *ngIf="leaderboardWithUsers$ | async as leaderboardWithUsers">
+        <ng-container *ngIf="leaderboard$ | async as leaderboard">
             <div class="tw-flex tw-flex-col tw-overflow-x-auto">
                 <table class="tw-table-auto">
                     <thead>
@@ -28,7 +28,7 @@
                         </tr>
                     </thead>
                     <tbody class="tw-divide-y tw-divide-gray-200">
-                        <tr *ngFor="let entry of leaderboardWithUsers; let indexOfelement=index" class="odd:tw-bg-gray-50">
+                        <tr *ngFor="let entry of leaderboard; let indexOfelement=index" class="odd:tw-bg-gray-50">
                             <td class="tw-text-center tw-font-bold">{{ entry.stat.ranking }}</td>
                             <td>
                                 <div class="tw-overflow-hidden tw-w-12 tw-h-12 tw-rounded-full tw-border-2 tw-border-apicuron-bright-purple"
@@ -67,7 +67,7 @@
     <!-- Weekly -->
     <div *ngIf="!showTotal" class="tw-bg-white tw-rounded-t-md tw-shadow-lg tw-p-1 md:tw-p-2 tw-text-gray-700" style="font-family: system-ui;">
         <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold tw-my-2">{{ resource.resource_name }}'s Weekly Leaderboard</h4>
-        <ng-container *ngIf="weeklyLeaderboardWithUsers$ | async as weeklyLeaderboardWithUsers">
+        <ng-container *ngIf="weeklyLeaderboard$ | async as weeklyLeaderboard">
             <div class="tw-flex tw-flex-col tw-overflow-x-auto">
                 <table class="tw-table-auto">
                     <thead>
@@ -82,7 +82,7 @@
                         </tr>
                     </thead>
                     <tbody class="tw-divide-y tw-divide-gray-200">
-                        <tr *ngFor="let entry of weeklyLeaderboardWithUsers; let indexOfelement=index" class="odd:tw-bg-gray-50">
+                        <tr *ngFor="let entry of weeklyLeaderboard; let indexOfelement=index" class="odd:tw-bg-gray-50">
                             <td class="tw-text-center tw-font-bold">{{ entry.stat.ranking }}</td>
                             <td>
                                 <div class="tw-overflow-hidden tw-w-12 tw-h-12 tw-rounded-full tw-border-2 tw-border-apicuron-bright-purple"
@@ -106,6 +106,9 @@
                             <td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.revision_count }}</td>
                             <td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.total_score }}</td>
                             <!-- <td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.daysOfWeek }}</td> -->
+                            <!-- <td class="tw-text-center tw-font-bold tw-text-gray-700">
+                                <weekly-bar-chart [daysOfWeek]="entry.stat.daysOfWeek"></weekly-bar-chart>
+                            </td> -->
                             <td class="tw-text-center tw-font-bold tw-text-gray-700">
                                 <div>{{ entry.stat.last_contribution | date:'dd-MM-yyyy' }}</div>
                                 <!-- <div>{{ entry.stat.last_contribution | date:'HH:mm' }}</div> -->

@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { BehaviorSubject, Observable, Subject, combineLatest } from "rxjs";
 import { filter, map, pluck, shareReplay, startWith, switchMap } from "rxjs/operators";
 import { CuratorStatisticsModule } from "../../curator-statistics/curator-statistics.module";
@@ -8,7 +8,7 @@ import { CuratorModule } from "../../curator/curator.module";
 import { CuratorService } from "../../curator/curator.service";
 import { User } from "../../models/User.model";
 import { Resource } from "../../models/resource.model";
-import { CuratorStatistics, WeeklyCuratorStatistics } from "../../models/statistics.model";
+import { BaseCuratorStatistics, CuratorStatistics, WeeklyCuratorStatistics } from "../../models/statistics.model";
 import { ResourcesService } from "../../resource/service/resources.service";
 import { environment } from "src/environments/environment";
 import { AngularSvgIconModule, SvgIconRegistryService } from "angular-svg-icon";
@@ -18,6 +18,7 @@ import { ResourceModule } from "src/app/resource/resource.module";
 import { RouterModule } from "@angular/router";
 import { StatisticsFilter } from "../../curator-statistics/models/statistics-filter";
 import { CuratorWithStats } from "../../curator-statistics/models/curator-stats";
+// import { WeeklyBarChartComponent } from "../weekly-bar-chart/weekly-bar-chart.component";
 
 const leaderboardColumns = {
   medals_count: {
@@ -69,6 +70,7 @@ const leaderboardColumns = {
     CuratorModule,
     AngularSvgIconModule,
     ReactiveFormsModule,
+    // WeeklyBarChartComponent,
   ],
   templateUrl: "./leaderboard.component.html",
   styleUrls: ["./leaderboard.component.scss"],
@@ -103,8 +105,8 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
 
   apicuronURL = environment.host;
   stats$: Observable<Paginated<CuratorWithStats>>;
-  leaderboard$: Observable<Paginated<CuratorStatistics>>;
-  weeklyLeaderboard$: Observable<Paginated<WeeklyCuratorStatistics>>;
+  leaderboard$: Observable<{ user: User; stat: BaseCuratorStatistics; }[]>;
+  weeklyLeaderboard$: Observable<{ user: User; stat: WeeklyCuratorStatistics; }[]>;
   leaderboardWithUsers$: Observable<{ stat: CuratorStatistics; user: User }[]>;
   weeklyLeaderboardWithUsers$: Observable<{ stat: WeeklyCuratorStatistics; user: User }[]>;
   user$: Observable<any>;
@@ -193,10 +195,16 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
     );
 
     // Overall leaderboard
-    this.leaderboard$ = this.statService.getResourceLeaderboard(this.resource_id);
+    this.leaderboard$ = this.statService.getResourceLeaderboardWithUsers(this.resource_id);
 
     // Weekly leaderboard
-    this.weeklyLeaderboard$ = this.statService.getWeeklyResourceLeaderboard(this.resource_id);
+    this.weeklyLeaderboard$ = this.statService.getWeeklyResourceLeaderboardWithUsers(this.resource_id);
+
+    // this.weeklyLeaderboard$.subscribe({
+    //   next: weeklyLeaderboard => {
+    //     console.log('weeklyLeaderboard observable:', weeklyLeaderboard);
+    //   },
+    // });
 
     this.statsList$ = this.stats$.pipe(pluck("data"));
     this.statsMeta$ = this.stats$.pipe(pluck("meta"));
@@ -216,64 +224,6 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
           return { user, stat };
         });
       })
-    );
-
-    this.statsWithUsers$.subscribe({
-      next: statsWithUsers => {
-        console.log('Stats with users data:', statsWithUsers);
-      },
-    });
-
-    this.orcid_id$ = this.statsWithUsers$.pipe(
-      map((statsWithUsers: { user: User, stat: any }[]) => {
-        if (statsWithUsers.length > 0) {
-          return statsWithUsers[0].user.orcid_id;
-        }
-      }),
-    );
-    
-    this.user$ = this.orcid_id$.pipe(
-      switchMap((orcid_id: string) => {
-        return this.statService.getUserData(orcid_id);
-      }),
-    );
-
-    this.leaderboardWithUsers$ = combineLatest([
-      this.user$,
-      this.leaderboard$,
-      this.statFilter$
-    ]).pipe(
-      map(([user, leaderboard, filter]: [User, Paginated<CuratorStatistics>, StatisticsFilter]) => {
-        return leaderboard.data.map((entry, index) => {
-          const skip = filter ? filter.skip : 0;
-          entry.ranking = skip + index + 1;
-    
-          const deserializedUser = new User().deserialize(user);
-          return { user: deserializedUser, stat: entry };
-        });
-      }),
-    );
-
-    this.leaderboardWithUsers$.subscribe({
-      next: leaderboardWithUsers => {
-        console.log('Leaderboard with users data:', leaderboardWithUsers);
-      },
-    });
-
-    this.weeklyLeaderboardWithUsers$ = combineLatest([
-      this.user$,
-      this.weeklyLeaderboard$,
-      this.statFilter$
-    ]).pipe(
-      map(([user, weeklyLeaderboard, filter]: [User, Paginated<WeeklyCuratorStatistics>, StatisticsFilter]) => {
-        return weeklyLeaderboard.data.map((entry, index) => {
-          const skip = filter ? filter.skip : 0;
-          entry.ranking = skip + index + 1;
-
-          const deserializedUser = new User().deserialize(user);
-          return { user: deserializedUser, stat: entry };
-        });
-      }),
     );
 
     this.maxPage$ = this.statsMeta$.pipe(
