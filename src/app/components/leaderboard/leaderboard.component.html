@@ -1,6 +1,6 @@
-<div class="tw-flex tw-flex-row tw-mb-1">
-    <button (click)="showTotalLeaderboard()" class="tw-w-full sm:tw-w-auto tw-py-2 tw-m-1 tw-bg-apicuron-bright-purple focus:tw-bg-apicuron-purple focus:tw-font-semibold tw-text-gray-100 tw-shadow-sm sm:tw-rounded-md tw-px-4">Total Leaderboard</button>
-    <button (click)="showWeeklyLeaderboard()" class="tw-w-full sm:tw-w-auto tw-py-2 tw-m-1 tw-bg-apicuron-bright-purple focus:tw-bg-apicuron-purple focus:tw-font-semibold tw-text-gray-100 tw-shadow-sm sm:tw-rounded-md tw-px-4">Weekly Leaderboard</button>
+<div class="tw-flex tw-flex-row tw-mb-1 tw-max-w-fit tw-bg-white tw-rounded-md">
+    <button (click)="showTotalLeaderboard()" class="tw-w-full sm:tw-w-auto tw-py-2 tw-m-1 tw-bg-white tw-text-gray-700 focus:tw-bg-apicuron-bright-purple tw-font-semibold focus:tw-text-gray-100  sm:tw-rounded-l-md tw-px-4">Total Leaderboard</button>
+    <button (click)="showWeeklyLeaderboard()" class="tw-w-full sm:tw-w-auto tw-py-2 tw-m-1 tw-bg-white tw-text-gray-700 focus:tw-bg-apicuron-bright-purple tw-font-semibold focus:tw-text-gray-100 sm:tw-rounded-r-md tw-px-4">Weekly Leaderboard</button>
 </div>
 
 <div *ngIf="resource$ | async as resource">
