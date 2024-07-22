@@ -10,7 +10,6 @@ import { CoreApicuronModule } from '../core/core.module';
 import { ComputeStatisticsService } from './compute-statistics/compute-statistics.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { StatisticsEventHandlerService } from './events/event-handler.service';
-import { OrcidClientModule } from '../orcid/orcid-client/orcid-client.module';
 import { BadgesModule } from '../badges/badges.module';
 import { MedalsModule } from '../medals/medals.module';
 import { EventOrchestratorModule } from '../event-orchestrator/event-orchestrator.module';
@@ -25,7 +24,6 @@ import { StatisticsReportAggregator } from './aggregation/aggregate-reports.serv
 		ResourcesModule,
 		BadgesModule,
 		MedalsModule,
-		OrcidClientModule,
 		CacheModule.register({
 			max: 100,
 			shouldCloneBeforeSet: false,

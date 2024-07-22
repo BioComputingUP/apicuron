@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { OrcidApiUrl } from './constants';
 import {
 	OrcidEmailEntry,
@@ -9,13 +9,16 @@ import {
 } from './interfaces/orcid.interface';
 import { buildExternalId } from './helpers/build-external-id';
 import { inspect } from 'util';
+import { OrcidTokenAuthService } from './token-auth.service';
 
 @Injectable()
 export class OrcidClientService {
 	constructor(
 		protected httpService: HttpService,
 		@Inject(OrcidApiUrl) protected orcidUrl: string,
+		protected tokenAuth: OrcidTokenAuthService,
 	) {}
+
 	logger = new Logger(OrcidClientService.name);
 
 	async loadUserEmail(user: OrcidUser): Promise<OrcidEmailEntry[] | null> {
@@ -152,5 +155,25 @@ export class OrcidClientService {
 		}
 
 		return { status: response.status };
+	}
+
+	async expandedSearch(solrQuery: string) {
+		const token = await this.tokenAuth.getToken();
+		this.logger.debug(`Orcid API URL: ${this.orcidUrl}`);
+		const response = await this.httpService.axiosRef.get(
+			`${this.orcidUrl}expanded-search`,
+			{
+				params: {
+					q: solrQuery,
+				},
+				headers: {
+					Authorization: `Bearer ${token.access_token}`,
+					Accept: 'application/orcid+json',
+				},
+				validateStatus: () => true,
+			},
+		);
+
+		return response;
 	}
 }

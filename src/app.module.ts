@@ -27,7 +27,6 @@ import { CoreApicuronModule } from './core/core.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MongoEventsModule } from './mongo-events/mongo-events.module';
 import { SubmitReportModule } from './submit-reports/submit-reports.module';
-import { OrcidClientModule } from './orcid/orcid-client/orcid-client.module';
 import { OrcidSubmissionModule } from './orcid/orcid-submission/orcid-submission.module';
 import { ResourceManagerModule } from './resource-manager/resource-manager.module';
 import { DetailedStatisticsModule } from './detailed-statistics/detailed-statistics.module';
@@ -91,7 +90,6 @@ const logger = new Logger('AppModule');
 				},
 			],
 		}),
-		OrcidClientModule,
 		OrcidSubmissionModule,
 		CoreApicuronModule,
 		ResourcesModule,
