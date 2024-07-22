@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { BehaviorSubject, Observable, Subject, combineLatest } from "rxjs";
 import { filter, map, pluck, shareReplay, startWith, switchMap } from "rxjs/operators";
 import { CuratorStatisticsModule } from "../../curator-statistics/curator-statistics.module";
@@ -10,7 +10,6 @@ import { User } from "../../models/User.model";
 import { Resource } from "../../models/resource.model";
 import { BaseCuratorStatistics, CuratorStatistics, WeeklyCuratorStatistics } from "../../models/statistics.model";
 import { ResourcesService } from "../../resource/service/resources.service";
-import { environment } from "src/environments/environment";
 import { AngularSvgIconModule, SvgIconRegistryService } from "angular-svg-icon";
 import { Paginated } from "../../interfaces/paginated";
 import { ReactiveFormsModule } from "@angular/forms";
@@ -18,46 +17,10 @@ import { ResourceModule } from "src/app/resource/resource.module";
 import { RouterModule } from "@angular/router";
 import { StatisticsFilter } from "../../curator-statistics/models/statistics-filter";
 import { CuratorWithStats } from "../../curator-statistics/models/curator-stats";
-// import { WeeklyBarChartComponent } from "../weekly-bar-chart/weekly-bar-chart.component";
-
-const leaderboardColumns = {
-  medals_count: {
-    name: "Medals",
-  },
-  badges_count: {
-    name: "Badges",
-  },
-  generation_count: {
-    name: "Generation Contributions",
-  },
-  invalidation_count: {
-    name: "Invalidation Contributions",
-  },
-  revision_count: {
-    name: "Revision Contributions",
-  },
-  generation_score: {
-    name: "Generation Score",
-  },
-  invalidation_score: {
-    name: "Invalidation Score",
-  },
-  revision_score: {
-    name: "Revision Score",
-  },
-  total_score: {
-    name: "Total Score",
-  },
-  total_count: {
-    name: "Total Contributions",
-  },
-  last_contribution: {
-    name: "Last Contribution Date"
-  },
-  daysOfWeek: {
-    name: "Days Of Week"
-  }
-};
+import { LeaderboardService } from "src/app/databases/services/leaderboard.service";
+import { TotalLeaderboardComponent } from "../total-leaderboard/total-leaderboard.component";
+import { WeeklyLeaderboardComponent } from "../weekly-leaderboard/weekly-leaderboard.component";
+import { CdkPortalOutlet } from '@angular/cdk/portal';
 
 @Component({
   standalone: true,
@@ -70,99 +33,45 @@ const leaderboardColumns = {
     CuratorModule,
     AngularSvgIconModule,
     ReactiveFormsModule,
-    // WeeklyBarChartComponent,
-  ],
+    TotalLeaderboardComponent,
+    WeeklyLeaderboardComponent
+],
   templateUrl: "./leaderboard.component.html",
   styleUrls: ["./leaderboard.component.scss"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LeaderboardComponent implements OnInit, OnDestroy {
-  statsList$: Observable<CuratorWithStats[]>;
-  statsWithUsers$: Observable<{ stat: CuratorStatistics; user: User }[]>;
-  resource$: Observable<Resource>;
-  league$: Observable<string>;
+  @Input("resource-id") resource_id: string;
+
+  @ViewChild(CdkPortalOutlet, { static: true })
+  portalOutlet: CdkPortalOutlet | undefined;
 
   showTotal: boolean = true;
-
-  tableColumns: string[] = [
-    "medals_count",
-    "badges_count",
-    "generation_count",
-    "invalidation_count",
-    "revision_count",
-    "total_score",
-    "last_contribution",
-  ];
-
-  tableColumnsWeekly: string[] = [
-    "generation_count",
-    "invalidation_count",
-    "revision_count",
-    "total_score",
-    // "daysOfWeek",
-    "last_contribution",
-  ];
-
-  apicuronURL = environment.host;
+  
+  resource$: Observable<Resource>;
+  statFilter$: Observable<StatisticsFilter>;
   stats$: Observable<Paginated<CuratorWithStats>>;
-  leaderboard$: Observable<{ user: User; stat: BaseCuratorStatistics; }[]>;
-  // weeklyLeaderboard$: Observable<{ user: User; stat: WeeklyCuratorStatistics; }[]>;
-  weeklyLeaderboard$: Observable<{ user: User; stat: WeeklyCuratorStatistics; }[]>
-  leaderboardWithUsers$: Observable<{ stat: CuratorStatistics; user: User }[]>;
-  weeklyLeaderboardWithUsers$: Observable<{ stat: WeeklyCuratorStatistics; user: User }[]>;
-  user$: Observable<any>;
-
-  statsMeta$: Observable<{
-    pagination: { total: number; start: number; limit: number };
-  }>;
+  statsList$: Observable<CuratorWithStats[]>;
+  statsMeta$: Observable<{ pagination: { total: number; start: number; limit: number }; }>;
+  statsWithUsers$: Observable<{ stat: CuratorStatistics; user: User }[]>;
+  maxPage$: Observable<number>;
 
   destroy$ = new Subject();
-
   page$ = new BehaviorSubject<number>(1);
   limit = 10;
-  statFilter$: Observable<StatisticsFilter>;
-  maxPage$: Observable<number>;
-  combinedData$: Observable<unknown>;
-  orcid_id$: Observable<string>;
 
-  private activeLeaderboardSource = new Subject<string>();
-  activeLeaderboard$ = this.activeLeaderboardSource.asObservable();
+  leaderboard$: Observable<{ user: User; stat: BaseCuratorStatistics; }[]>;
+  weeklyLeaderboard$: Observable<{ user: User; stat: WeeklyCuratorStatistics; }[]>;
 
   constructor(
     protected statService: CuratorStatisticsService,
     protected curatorService: CuratorService,
     protected resourceService: ResourcesService,
-    protected svgRegistry: SvgIconRegistryService
+    protected svgRegistry: SvgIconRegistryService,
+    protected leaderboardService: LeaderboardService
   ) {
     // preloading the loading svg icon
     this.svgRegistry.loadSvg("assets/svg/loading-spinner.svg").subscribe();
-  }
-  ngOnDestroy(): void {
-    this.destroy$.next(true);
-  }
-
-  @Input("resource-id") resource_id: string;
-  @Input("columns")
-  set columns(value: string) {
-    this.tableColumns = value
-      .split(",")
-      .filter((val) => Object.keys(leaderboardColumns).includes(val));
-  }
-
-  setActiveLeaderboard(leaderboardId: string) {
-    this.activeLeaderboardSource.next(leaderboardId);
-  }
-
-  getColumnProps(col: string) {
-    return leaderboardColumns[col];
-  }
-
-  showTotalLeaderboard(): void {
-    this.showTotal = true;
-  }
-
-  showWeeklyLeaderboard(): void {
-    this.showTotal = false;
   }
 
   ngOnInit(): void {
@@ -195,11 +104,8 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
       shareReplay()
     );
 
-    // Overall leaderboard
-    this.leaderboard$ = this.statService.getResourceLeaderboardWithUsers(this.resource_id);
-
-    // Weekly leaderboard
-    this.weeklyLeaderboard$ = this.statService.getWeeklyResourceLeaderboardWithUsers(this.resource_id);
+    this.leaderboard$ = this.leaderboardService.getResourceLeaderboardWithUsers(this.resource_id);
+    this.weeklyLeaderboard$ = this.leaderboardService.getWeeklyResourceLeaderboardWithUsers(this.resource_id);
 
     // this.weeklyLeaderboard$.subscribe({
     //   next: weeklyLeaderboard => {
@@ -233,6 +139,18 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
       }),
       startWith(1)
     );
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+  }
+
+  showTotalLeaderboard(): void {
+    this.showTotal = true;
+  }
+
+  showWeeklyLeaderboard(): void {
+    this.showTotal = false;
   }
 
   nextPage() {

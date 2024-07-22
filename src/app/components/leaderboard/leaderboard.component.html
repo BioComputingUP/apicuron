@@ -7,117 +7,13 @@
     <!-- Total -->
     <div *ngIf="showTotal" class="tw-bg-white tw-rounded-t-md tw-shadow-lg tw-p-1 md:tw-p-2 tw-text-gray-700" style="font-family: system-ui;">
         <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold tw-my-2">{{ resource.resource_name }}'s Total Leaderboard</h4>
-        <ng-container *ngIf="leaderboard$ | async as leaderboard">
-            <div class="tw-flex tw-flex-col tw-overflow-x-auto">
-                <table class="tw-table-auto">
-                    <thead>
-                        <tr class="tw-divide-x tw-divide-gray-200">
-                            <th>Ranking</th>
-                            <th colspan="2">Curator</th>
-                            <th *ngFor="let column of tableColumns">
-                                <span>
-                                    {{ getColumnProps(column).name }}
-                                    <ng-container *ngIf="column == 'medals_count'">
-                                        <svg-icon src="assets/medal_icon.svg" svgClass="tw-inline tw-w-4 tw-h-4 tw-text-gray-700"></svg-icon>
-                                    </ng-container>
-                                    <ng-container *ngIf="column == 'badges_count'">
-                                        <svg-icon src="assets/badge_icon.svg" svgClass="tw-inline tw-w-4 tw-h-4 tw-text-gray-700"></svg-icon>
-                                    </ng-container>
-                                </span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="tw-divide-y tw-divide-gray-200">
-                        <tr *ngFor="let entry of leaderboard; let indexOfelement=index" class="odd:tw-bg-gray-50">
-                            <td class="tw-text-center tw-font-bold">{{ entry.stat.ranking }}</td>
-                            <td>
-                                <div class="tw-overflow-hidden tw-w-12 tw-h-12 tw-rounded-full tw-border-2 tw-border-apicuron-bright-purple"
-                                    [ngStyle]="{ borderColor: resource.color}">
-                                    <img [src]="entry.user.generate_avatar()"class="tw-w-full" alt="">
-                                </div>
-                            </td>
-                            <td>
-                                <div class="tw-flex tw-flex-row tw-ml-1 md:tw-ml-2 tw-items-center">
-                                    <a class="tw-text-lg tw-block hover:tw-underline tw-whitespace-pre"
-                                        [routerLink]="['/curators', entry.user.orcid_id]">
-                                        <span>{{ entry.user.displayedName }}</span>
-                                    </a>
-                                    <a [href]="entry.user.orcid_url()" class="tw-block tw-w-6 tw-h-6 tw-ml-1 md:tw-ml-2">
-                                        <img src="https://orcid.org/assets/vectors/orcid.logo.icon.svg" class="tw-w-6 tw-h-6" alt="">
-                                    </a>
-                                </div>
-                            </td>
-                            <td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.medals_count }}</td>
-                            <td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.badges_count }}</td>
-                            <td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.generation_count }}</td>
-                            <td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.invalidation_count }}</td>
-                            <td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.revision_count }}</td>
-                            <td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.total_score }}</td>
-                            <td class="tw-text-center tw-font-bold tw-text-gray-700">
-                                <div>{{ entry.stat.last_contribution | date:'dd-MM-yyyy' }}</div>
-                                <!-- <div>{{ entry.stat.last_contribution | date:'HH:mm' }}</div> -->
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </ng-container>
+        <total-leaderboard></total-leaderboard>
     </div>
 
     <!-- Weekly -->
     <div *ngIf="!showTotal" class="tw-bg-white tw-rounded-t-md tw-shadow-lg tw-p-1 md:tw-p-2 tw-text-gray-700" style="font-family: system-ui;">
         <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold tw-my-2">{{ resource.resource_name }}'s Weekly Leaderboard</h4>
-        <ng-container *ngIf="weeklyLeaderboard$ | async as weeklyLeaderboard">
-            <div class="tw-flex tw-flex-col tw-overflow-x-auto">
-                <table class="tw-table-auto">
-                    <thead>
-                        <tr class="tw-divide-x tw-divide-gray-200">
-                            <th>Ranking</th>
-                            <th colspan="2">Curator</th>
-                            <th *ngFor="let column of tableColumnsWeekly">
-                                <span>
-                                    {{ getColumnProps(column).name }}
-                                </span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="tw-divide-y tw-divide-gray-200">
-                        <tr *ngFor="let entry of weeklyLeaderboard; let indexOfelement=index" class="odd:tw-bg-gray-50">
-                            <td class="tw-text-center tw-font-bold">{{ entry.stat.ranking }}</td>
-                            <td>
-                                <div class="tw-overflow-hidden tw-w-12 tw-h-12 tw-rounded-full tw-border-2 tw-border-apicuron-bright-purple"
-                                    [ngStyle]="{ borderColor: resource.color}">
-                                    <img [src]="entry.user.generate_avatar()"class="tw-w-full" alt="">
-                                </div>
-                            </td>
-                            <td>
-                                <div class="tw-flex tw-flex-row tw-ml-1 md:tw-ml-2 tw-items-center">
-                                    <a class="tw-text-lg tw-block hover:tw-underline tw-whitespace-pre"
-                                        [routerLink]="['/curators', entry.user.orcid_id]">
-                                        <span>{{ entry.user.displayedName }}</span>
-                                    </a>
-                                    <a [href]="entry.user.orcid_url()" class="tw-block tw-w-6 tw-h-6 tw-ml-1 md:tw-ml-2">
-                                        <img src="https://orcid.org/assets/vectors/orcid.logo.icon.svg" class="tw-w-6 tw-h-6" alt="">
-                                    </a>
-                                </div>
-                            </td>
-                            <td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.generation_count }}</td>
-                            <td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.invalidation_count }}</td>
-                            <td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.revision_count }}</td>
-                            <td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.total_score }}</td>
-                            <!-- <td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.daysOfWeek }}</td> -->
-                            <!-- <td class="tw-text-center tw-font-bold tw-text-gray-700">
-                                <weekly-bar-chart [daysOfWeek]="entry.stat.daysOfWeek"></weekly-bar-chart>
-                            </td> -->
-                            <td class="tw-text-center tw-font-bold tw-text-gray-700">
-                                <div>{{ entry.stat.last_contribution | date:'dd-MM-yyyy' }}</div>
-                                <!-- <div>{{ entry.stat.last_contribution | date:'HH:mm' }}</div> -->
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </ng-container>
+        <weekly-leaderboard></weekly-leaderboard>
     </div>
 </div>
 
