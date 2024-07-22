@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SubmitReportDto } from '../../submit-reports/dto/submit-report.dto';
 
-import StreamObject from 'stream-json/streamers/StreamObject';
+import * as StreamObject from 'stream-json/streamers/StreamObject';
 import { createReadStream, readFileSync, statSync } from 'fs';
 import { filter } from 'stream-json/filters/Filter';
 import { parser } from 'stream-json';
 import { Stream, chain } from 'stream-chain';
 import { pick } from 'stream-json/filters/Pick';
-import StreamArray from 'stream-json/streamers/StreamArray';
+import * as StreamArray from 'stream-json/streamers/StreamArray';
 import { validate, ValidationError } from 'class-validator';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 import { NotificationsService } from '../../notifications/notifications.service';
@@ -66,11 +66,11 @@ export class SubmitBulkTask {
 				);
 			}
 		}
-		const fileStats = statSync(file);
-		if (fileStats.size > 1024 * 50 /* size in bytes */) {
-			return await this.main(file, orcid_id);
-		}
-		return await this.unbuffered_submission(file, orcid_id);
+		// const fileStats = statSync(file);
+		// if (fileStats.size > 1024 * 50 /* size in bytes */) {
+		return await this.main(file, orcid_id);
+		// }
+		// return await this.unbuffered_submission(file, orcid_id);
 	}
 
 	public async unbuffered_submission(file: string, submitter_orcid: string) {
@@ -285,6 +285,7 @@ export class SubmitBulkTask {
 			);
 
 			if (success_count > 0) {
+				this.logger.log(`Success count ${success_count}`);
 				await this.eventEmitter.emitAsync(
 					BulkSubmissionEvent.name,
 					new BulkSubmissionEvent(submitter_orcid, resource_ids),
