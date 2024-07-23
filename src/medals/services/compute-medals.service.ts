@@ -15,7 +15,7 @@ import {
 import { AchievementState } from '../../core/enums';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import _ from 'lodash';
+import * as _ from 'lodash';
 
 @Injectable()
 export class ComputeMedalsService {
