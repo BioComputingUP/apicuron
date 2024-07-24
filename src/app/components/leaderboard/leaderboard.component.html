@@ -1,98 +1,36 @@
-<div class="tw-flex tw-flex-row tw-mb-1 tw-max-w-fit tw-bg-white tw-rounded-md">
-    <button (click)="showTotalLeaderboard()" class="tw-w-full sm:tw-w-auto tw-py-2 tw-m-1 tw-bg-white tw-text-gray-700 focus:tw-bg-apicuron-bright-purple tw-font-semibold focus:tw-text-gray-100  sm:tw-rounded-l-md tw-px-4">Total Leaderboard</button>
-    <button (click)="showWeeklyLeaderboard()" class="tw-w-full sm:tw-w-auto tw-py-2 tw-m-1 tw-bg-white tw-text-gray-700 focus:tw-bg-apicuron-bright-purple tw-font-semibold focus:tw-text-gray-100 sm:tw-rounded-r-md tw-px-4">Weekly Leaderboard</button>
-</div>
-
 <div *ngIf="resource$ | async as resource">
-    <!-- Total -->
-    <div *ngIf="showTotal" class="tw-bg-white tw-rounded-t-md tw-shadow-lg tw-p-1 md:tw-p-2 tw-text-gray-700" style="font-family: system-ui;">
+    <div class="tw-flex tw-flex-row tw-max-w-fit tw-bg-white tw-rounded-t-md">
+        <button (click)="showTotalLeaderboard()" 
+        class="tw-w-full sm:tw-w-auto tw-py-1 tw-m-1 tw-bg-white tw-text-gray-700 focus:tw-bg-apicuron-bright-purple tw-font-semibold tw-text-sm focus:tw-text-gray-100 sm:tw-rounded-tl-md tw-px-2">
+            Total Leaderboard
+        </button>
+        <button (click)="showWeeklyLeaderboard()" 
+        class="tw-w-full sm:tw-w-auto tw-py-1 tw-m-1 tw-bg-white tw-text-gray-700 focus:tw-bg-apicuron-bright-purple tw-font-semibold tw-text-sm focus:tw-text-gray-100 sm:tw-rounded-tr-md tw-px-2">
+            Weekly Leaderboard
+        </button>
+    </div>
+
+    <!-- Total Leaderboard -->
+    <div *ngIf="showTotal" class="tw-bg-white tw-rounded-r-md tw-shadow-lg tw-p-1 md:tw-p-2 tw-text-gray-700" style="font-family: system-ui;">
         <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold tw-my-2">{{ resource.resource_name }}'s Total Leaderboard</h4>
         <total-leaderboard></total-leaderboard>
     </div>
 
-    <!-- Weekly -->
-    <div *ngIf="!showTotal" class="tw-bg-white tw-rounded-t-md tw-shadow-lg tw-p-1 md:tw-p-2 tw-text-gray-700" style="font-family: system-ui;">
+    <!-- Weekly Leaderboard -->
+    <div *ngIf="!showTotal" class="tw-bg-white tw-rounded-r-md tw-shadow-lg tw-p-1 md:tw-p-2 tw-text-gray-700" style="font-family: system-ui;">
         <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold tw-my-2">{{ resource.resource_name }}'s Weekly Leaderboard</h4>
         <weekly-leaderboard></weekly-leaderboard>
     </div>
 </div>
 
-<!-- Previous version -->
-<div class="tw-bg-white tw-rounded-b-md tw-shadow-lg tw-p-1 md:tw-p-2 tw-text-gray-700" style="font-family: system-ui;"
-    *ngIf="resource$ | async as resource">
+<!-- Terms and awards section -->
+<div class="tw-bg-white tw-rounded-b-md tw-shadow-md tw-p-1 md:tw-p-2 tw-text-gray-700" style="font-family: system-ui;">
     <ng-container *ngIf="statsWithUsers$ | async as statsWithUsers; else loading">
         <ng-container *ngIf="statsWithUsers.length > 0; else emptyList">
-            <!-- <div class="tw-flex tw-flex-col tw-overflow-x-auto">
-
-                <table class="tw-table-auto">
-                    <thead>
-                        <tr class="tw-divide-x tw-divide-gray-200">
-                            <th>Ranking</th>
-                            <th colspan="2">Curator</th>
-                            <th *ngFor="let column of tableColumns">
-                                <span>
-
-                                    {{ getColumnProps(column).name }}
-                                    <ng-container *ngIf="column == 'medals_count'">
-                                        <svg-icon src="assets/medal_icon.svg"
-                                            svgClass="tw-inline tw-w-4 tw-h-4 tw-text-gray-700"></svg-icon>
-                                    </ng-container>
-
-                                    <ng-container *ngIf="column == 'badges_count'">
-                                        <svg-icon src="assets/badge_icon.svg"
-                                            svgClass="tw-inline tw-w-4 tw-h-4 tw-text-gray-700"></svg-icon>
-                                    </ng-container>
-
-                                </span>
-                            </th>
-
-                        </tr>
-                    </thead>
-                    <tbody class="tw-divide-y tw-divide-gray-200">
-                        <tr *ngFor="let entry of statsWithUsers;let indexOfelement=index;" class="odd:tw-bg-gray-50">
-                            <td class="tw-text-center tw-font-bold">{{ entry.stat.ranking }}</td>
-                            <td>
-                                <div class="tw-overflow-hidden tw-w-12 tw-h-12 tw-rounded-full tw-border-2 tw-border-apicuron-bright-purple"
-                                    [ngStyle]="{ borderColor: resource.color}">
-                                    <img [src]="entry.user.generate_avatar()"class="tw-w-full" alt="">
-                                </div>
-                            </td>
-
-                            <td>
-
-                                <div class="tw-flex tw-flex-row tw-ml-1 md:tw-ml-2 tw-items-center">
-                                    <a class="tw-text-lg tw-block hover:tw-underline tw-whitespace-pre"
-                                        [routerLink]="['/curators',entry.user.orcid_id]">
-                                        <span>{{ entry.user.displayedName }}</span>
-
-                                    </a>
-
-                                    <a [href]="entry.user.orcid_url()"
-                                        class="tw-block tw-w-6 tw-h-6 tw-ml-1 md:tw-ml-2">
-                                        <img src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
-                                            class="tw-w-6 tw-h-6" alt="">
-                                    </a>
-                                </div>
-
-
-                            </td>
-                            <td class="tw-text-center tw-font-bold tw-text-gray-700"
-                                *ngFor="let column of tableColumns">
-                                {{ entry.stat[column] }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-
-
-            </div> -->
             <div class="tw-flex tw-flex-row tw-justify-between tw-pt-2 md:tw-pt-4">
                 <div *ngIf="statsMeta$ | async as statsMeta">
-                    <span>
-                        Total Contributors: <span
-                            class="tw-bg-apicuron-bright-purple tw-text-white tw-font-bold tw-rounded-md tw-px-1">{{
-                            statsMeta.pagination.total }}</span>
+                    <span>Total Contributors:
+                        <span class="tw-bg-apicuron-bright-purple tw-text-white tw-font-bold tw-rounded-md tw-px-1">{{ statsMeta.pagination.total }}</span>
                     </span>
                 </div>
                 <div *ngIf="maxPage$ | async as maxPage">

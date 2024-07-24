@@ -4,18 +4,18 @@
 			<table class="tw-table-auto">
 				<thead>
 					<tr class="tw-divide-x tw-divide-gray-200">
-						<th>Ranking</th>
-						<th colspan="2">Curator</th>
-						<th *ngFor="let column of tableColumns">
-						<span>
-							{{ leaderboardService.getColumnProps(column).name }}
-							<ng-container *ngIf="column == 'medals_count'">
-								<svg-icon src="assets/medal_icon.svg" svgClass="tw-inline tw-w-4 tw-h-4 tw-text-gray-700"></svg-icon>
-							</ng-container>
-							<ng-container *ngIf="column == 'badges_count'">
-								<svg-icon src="assets/badge_icon.svg" svgClass="tw-inline tw-w-4 tw-h-4 tw-text-gray-700"></svg-icon>
-							</ng-container>
-						</span>
+						<th class="tw-px-2 tw-py-1">Ranking</th>
+						<th class="tw-px-2 tw-py-1" colspan="2">Curator</th>
+						<th *ngFor="let column of tableColumns" class="tw-px-2 tw-py-1 tw-justify-center">
+							<span>
+								{{ leaderboardService.getColumnProps(column).name }}
+								<ng-container *ngIf="column == 'medals_count'">
+									<svg-icon src="assets/medal_icon.svg" svgClass="tw-inline tw-w-4 tw-h-4 tw-text-gray-700"></svg-icon>
+								</ng-container>
+								<ng-container *ngIf="column == 'badges_count'">
+									<svg-icon src="assets/badge_icon.svg" svgClass="tw-inline tw-w-4 tw-h-4 tw-text-gray-700"></svg-icon>
+								</ng-container>
+							</span>
 						</th>
 					</tr>
 				</thead>
@@ -44,8 +44,10 @@
 						<td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.invalidation_count }}</td>
 						<td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.revision_count }}</td>
 						<td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.total_score }}</td>
-						<!-- <td *ngIf="isWeekly" class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.daysOfWeek }}</td> -->
-						<td class="tw-text-center tw-font-bold tw-text-gray-700">
+						<td *ngIf="isWeekly" class="tw-text-center tw-font-bold tw-text-gray-700">
+							<weekly-bar-chart [days-of-week]="entry.stat.daysOfWeek"></weekly-bar-chart>
+						</td>
+						<td *ngIf="!isWeekly" class="tw-text-center tw-font-bold tw-text-gray-700">
 							<div>{{ entry.stat.last_contribution | date: 'dd-MM-yyyy' }}</div>
 						</td>
 					</tr>

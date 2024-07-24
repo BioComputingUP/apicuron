@@ -126,9 +126,16 @@ export class WeeklyCuratorStatistics implements Deserializable {
     this.ranking = input.ranking;
     this.total_count = input.total_count;
     this.total_score = input.total_score;
-    this.daysOfWeek = input.daysOfWeek;
+    this.daysOfWeek = this.processDaysOfWeek(input.daysOfWeek);
     this.first_contribution = input.first_contribution;
     this.last_contribution = input.last_contribution;
     return this;
+  }
+
+  private processDaysOfWeek(daysOfWeek: number[]): Array<{ day: number; count: number }> {
+    return daysOfWeek.map((count, index) => ({
+      day: index,
+      count: count
+    }));
   }
 }

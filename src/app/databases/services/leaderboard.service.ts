@@ -27,7 +27,7 @@ export class LeaderboardService {
 	total_score: { name: "Total Score" },
 	total_count: { name: "Total Contributions" },
 	last_contribution: { name: "Last Contribution Date" },
-	daysOfWeek: { name: "Days Of Week" }
+	daysOfWeek: { name: "Weekly Contribution" }
   };
 
 	getColumnProps(col: string) {

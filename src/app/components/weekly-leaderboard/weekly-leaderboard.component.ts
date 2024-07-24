@@ -10,7 +10,6 @@ import { map, shareReplay, switchMap } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { Resource } from 'src/app/models/resource.model';
 import { LeaderboardTableComponent } from '../leaderboard-table/leaderboard-table.component';
-// import { WeeklyBarChartComponent } from "../weekly-bar-chart/weekly-bar-chart.component";
 
 @Component({
   standalone: true,
@@ -29,8 +28,7 @@ export class WeeklyLeaderboardComponent implements OnInit {
     'invalidation_count',
     'revision_count',
     'total_score',
-    // "daysOfWeek",
-    'last_contribution'
+    "daysOfWeek",
   ];
 
   constructor(

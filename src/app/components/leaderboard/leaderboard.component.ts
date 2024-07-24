@@ -20,7 +20,6 @@ import { CuratorWithStats } from "../../curator-statistics/models/curator-stats"
 import { LeaderboardService } from "src/app/databases/services/leaderboard.service";
 import { TotalLeaderboardComponent } from "../total-leaderboard/total-leaderboard.component";
 import { WeeklyLeaderboardComponent } from "../weekly-leaderboard/weekly-leaderboard.component";
-import { CdkPortalOutlet } from '@angular/cdk/portal';
 
 @Component({
   standalone: true,
@@ -42,9 +41,6 @@ import { CdkPortalOutlet } from '@angular/cdk/portal';
 })
 export class LeaderboardComponent implements OnInit, OnDestroy {
   @Input("resource-id") resource_id: string;
-
-  @ViewChild(CdkPortalOutlet, { static: true })
-  portalOutlet: CdkPortalOutlet | undefined;
 
   showTotal: boolean = true;
   
@@ -106,12 +102,6 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
 
     this.leaderboard$ = this.leaderboardService.getResourceLeaderboardWithUsers(this.resource_id);
     this.weeklyLeaderboard$ = this.leaderboardService.getWeeklyResourceLeaderboardWithUsers(this.resource_id);
-
-    // this.weeklyLeaderboard$.subscribe({
-    //   next: weeklyLeaderboard => {
-    //     console.log('weeklyLeaderboard observable:', weeklyLeaderboard);
-    //   },
-    // });
 
     this.statsList$ = this.stats$.pipe(pluck("data"));
     this.statsMeta$ = this.stats$.pipe(pluck("meta"));
