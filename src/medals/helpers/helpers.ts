@@ -5,7 +5,7 @@ import {
 } from '../../core/schemas/reports.schema';
 import { MedalDefDocument } from '../../core/schemas/achievements-def/medal-def.schema';
 import { MedalDocument } from '../../core/schemas/achievements/medals.schema';
-import _ from 'lodash';
+import * as _ from 'lodash';
 
 export function GetRelatedMedalDefFilter(
 	report: ReportDocument | LeanReportDocument,
