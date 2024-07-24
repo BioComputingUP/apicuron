@@ -165,6 +165,7 @@ export class OrcidClientService {
 			{
 				params: {
 					q: solrQuery,
+					rows: 20,
 				},
 				headers: {
 					Authorization: `Bearer ${token.access_token}`,
