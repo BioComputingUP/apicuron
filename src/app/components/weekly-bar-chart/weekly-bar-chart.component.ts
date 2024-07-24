@@ -37,6 +37,7 @@ export class WeeklyBarChartComponent implements AfterViewInit {
         datasets: [{
           data: counts,
           fill: false,
+          borderColor: 'rgb(116 37 116)',
           tension: 0
         }]
       },
