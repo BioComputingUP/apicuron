@@ -6,6 +6,7 @@ export type LeagueDocument = HydratedDocument<League>;
 
 @Schema({
 	_id: false,
+	timestamps: true,
 })
 export class League {
 	@Prop({

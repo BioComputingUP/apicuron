@@ -1,25 +1,43 @@
 import { HttpModule } from '@nestjs/axios';
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import {
+	ConfigurableModuleAsyncOptions,
+	FactoryProvider,
+	Module,
+} from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { OrcidClientService } from './orcid-client.service';
-import { OrcidApiUrl } from './constants';
+import {
+	ConfigurableModuleClass,
+	generateApiUrlProvider
+} from './orcid-client-module-options';
+import { OrcidClientModuleOptions } from './interfaces/orcid.interface';
+import { OrcidTokenAuthService } from './token-auth.service';
+import { OrcidAPIController } from './controllers/orcid.controller';
+import { AuthModule } from '../../auth/auth.module';
 
 @Module({
-	imports: [HttpModule, ConfigModule],
-	providers: [
-		{
-			provide: OrcidApiUrl,
-			inject: [ConfigService],
-			useFactory(config: ConfigService) {
-				const orcidApiUrl = config.get<string>('ORCID_API_URL');
-				if (!orcidApiUrl) {
-					throw new Error('ORCID_API_URL is not defined in the environment');
-				}
-				return orcidApiUrl;
-			},
-		},
-		OrcidClientService,
-	],
+	imports: [HttpModule, ConfigModule, AuthModule],
+	controllers: [OrcidAPIController],
+	providers: [OrcidTokenAuthService, OrcidClientService],
 	exports: [OrcidClientService],
 })
-export class OrcidClientModule {}
+export class OrcidClientModule extends ConfigurableModuleClass {
+	static register(options: OrcidClientModuleOptions) {
+		const orcidAPIUrlProvider: FactoryProvider = generateApiUrlProvider();
+		const dynamicModule = super.register(options);
+
+		dynamicModule.providers.push(orcidAPIUrlProvider);
+
+		return dynamicModule;
+	}
+
+	static registerAsync(
+		asyncOptions: ConfigurableModuleAsyncOptions<OrcidClientModuleOptions>,
+	) {
+		const orcidAPIUrlProvider: FactoryProvider = generateApiUrlProvider();
+		const dynamicModule = super.registerAsync(asyncOptions);
+
+		dynamicModule.providers.push(orcidAPIUrlProvider);
+		return dynamicModule;
+	}
+}
