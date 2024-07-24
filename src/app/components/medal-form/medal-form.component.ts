@@ -16,7 +16,7 @@ import { Term } from "src/app/models/term.model";
 @Component({
   selector: "medal-form",
   templateUrl: "./medal-form.component.html",
-  styleUrls: ["./medal-form.component.scss"],
+  styleUrls: ["./medal-form.component.scss", '../../../styles/form-styles.scss'],
   standalone: true,
   imports: [
     CommonModule,

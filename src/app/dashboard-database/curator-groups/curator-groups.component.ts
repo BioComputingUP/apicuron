@@ -37,7 +37,10 @@ export class CuratorGroupsComponent implements OnInit {
   }
 
   groupClickEventHandler(clickEvent: GroupClickEvent) {
-    console.log(`called ${clickEvent.action} button`, clickEvent.group);
+    switch (clickEvent.action) {
+      case "edit":
+        this.groupsService.openUpdateGroupForm(clickEvent.group);
+    }
   }
 
   createGroupClickHandler($event: PointerEvent) {

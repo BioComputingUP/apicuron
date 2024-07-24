@@ -1,0 +1,86 @@
+<div
+  class="tw-relative tw-w-full tw-flex tw-flex-col tw-border-gray-300 tw-text-gray-900 tw-border tw-shadow-md tw-rounded focus:tw-outline-none focus:tw-ring-1 tw-ring-apicuron-purple"
+>
+  <!-- Selected users container -->
+  <ng-container *ngIf="selectedCuratorsList$ | async as selectedCurators">
+    <div
+      *ngIf="selectedCurators && selectedCurators.length > 0"
+      class="tw-flex tw-flex-row tw-flex-wrap tw-justify-start tw-py-1 tw-px-1"
+    >
+      <curator-badge
+        *ngFor="let selected of selectedCurators"
+        [curator]="selected"
+        [isRemovable]="true"
+        (remove)="removeSelectedCurator($event)"
+      ></curator-badge>
+    </div>
+  </ng-container>
+  <!-- Text input -->
+  <input
+    type="text"
+    class="tw-block tw-w-full tw-grow tw-px-1 tw-py-2 disabled:tw-bg-gray-400 tw-rounded"
+    placeholder="search..."
+    value=""
+    (input)="change($event)"
+    cdkOverlayOrigin
+    (focus)="onInputFocus()"
+    #searchBar
+    [disabled]="disabled"
+  />
+</div>
+<!-- suggestions overlay panel -->
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="searchBar"
+  [cdkConnectedOverlayOpen]="overlayState$ | async"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
+  [cdkConnectedOverlayPositions]="{
+			'originX': 'start',
+			'originY': 'bottom',
+		  }"
+  [cdkConnectedOverlayDisableClose]="false"
+  (backdropClick)="closeOverlay()"
+>
+  <ul
+    *ngIf="(suggestions$ | async)?.data"
+    class="tw-bg-white tw-border tw-border-gray-100 tw-w-full tw-my-2"
+  >
+    <li
+      *ngFor="let suggestion of (suggestions$ | async)?.data"
+      (click)="selectSuggestion(suggestion)"
+      [attr.aria-selected]="profileSelected(suggestion) | async"
+      class="tw-px-2 tw-py-1 tw-border-b-2 tw-flex tw-flex-row tw-items-center tw-border-gray-100 tw-relative tw-cursor-pointer hover:tw-bg-gray-200 aria-selected:tw-bg-apicuron-purple aria-selected:tw-text-gray-100"
+    >
+      <a [href]="suggestion.profileUrl" class="tw-block tw-w-6 tw-h-6 tw-mr-1">
+        <img
+          src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
+          class="tw-w-6 tw-h-6"
+          alt="Orcid Logo"
+        />
+      </a>
+      <span class="tw-block">
+        <b>{{ suggestion.displayedName }}</b> - {{ suggestion.orcid_id }}
+      </span>
+      <img />
+
+      <svg-icon
+        *ngIf="(profileSelected(suggestion) | async) == 'true'"
+        src="assets/svg/check.svg"
+        class="tw-w-4 tw-h-4 tw-text-inherit tw-ml-auto"
+        alt="Selected Curator"
+      >
+      </svg-icon>
+    </li>
+  </ul>
+
+  <div
+    *ngIf="(suggestions$ | async)?.loading as loading"
+    class="tw-bg-white tw-p-1 lg:tw-p-2"
+  >
+    <svg-icon
+      src="assets/svg/loading-spinner.svg"
+      svgClass="tw-animate-spin tw-w-6 tw-h-6 lg:tw-w-12 lg:tw-h-12 tw-text-apicuron-purple"
+    ></svg-icon>
+  </div>
+</ng-template>

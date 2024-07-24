@@ -2,9 +2,9 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
-import { combineLatest, Observable, of } from "rxjs";
-import { catchError, map, pluck, shareReplay, tap } from "rxjs/operators";
-import { toFormData } from "../../directives/toFormData";
+import { Observable, of } from "rxjs";
+import { pluck, shareReplay, tap } from "rxjs/operators";
+import { toFormData } from "../../util/toFormData";
 import { DatabasesService } from "../services/databases.service";
 import { ResourceIdValidator } from "../validators/resource-id.validator";
 

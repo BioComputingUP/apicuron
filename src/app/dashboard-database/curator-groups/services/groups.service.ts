@@ -15,6 +15,8 @@ import { User } from "src/app/models/User.model";
 import { ResourceGroup } from "../../../models/resource-group.model";
 import { Dialog } from "@angular/cdk/dialog";
 import { CreateGroupComponent } from "../create-group/create-group.component";
+import { UpdateGroupComponent } from "../update-group/update-group.component";
+import { GroupCreateForm } from "../../../components/group-create-form/group-create-form.component";
 
 @Injectable()
 export class GroupsService {
@@ -65,13 +67,29 @@ export class GroupsService {
     this.currentGroup$ = concat(firstGroup$, this.selectGroup$);
   }
 
-  openCreateGroupForm(){
-    this.dialog.open(CreateGroupComponent, {
-      width: "50vw",
-      height: "90vh",
+  openCreateGroupForm() {
+    this.dialog.open(GroupCreateForm);
+  }
+
+  openUpdateGroupForm(resourceGroup: ResourceGroup) {
+    this.dialog.open(UpdateGroupComponent, {
+      data: {
+        group: resourceGroup,
+      },
     });
   }
 
+  createNewGroup(group: ResourceGroup) {
+    return this.http
+      .post(`${this.ws}/leagues`, group.serialize(), {
+        headers: { version: "2" },
+      })
+      .pipe(
+        map((response: any) => {
+          return new ResourceGroup().deserialize(response);
+        })
+      );
+  }
   getCurrentGroup(): Observable<ResourceGroup> {
     return this.currentGroup$;
   }

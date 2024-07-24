@@ -22,6 +22,10 @@ html {
   scroll-behavior: smooth;
 }
 
+:focus-visible {
+  outline: none;
+}
+
 // Navbar Styles Section
 // ------------------------------------
 .nav-item {

@@ -1,0 +1,102 @@
+<div
+  class="tw-bg-white tw-grid tw-grid-flow-row tw-grid-cols-1 tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4 tw-max-w-2xl tw-max-h-screen tw-overflow-y-auto"
+>
+  <form [formGroup]="form" (submit)="submit()">
+    <!-- for the update term form -->
+    <h2 class="tw-text-xl tw-text-center tw-font-bold">
+      Create Curation Group
+    </h2>
+
+    <div class="form-control-element">
+      <label for="displayedName">Group Name</label>
+      <input
+        type="text"
+        name="displayedName"
+        id=""
+        formControlName="displayedName"
+      />
+      <span class="tw-text-xs tw-font-light tw-text-gray-400"
+        >Publicly visible name, for the user interface</span
+      >
+
+      <span
+        *ngIf="form.get('displayedName').errors?.['required'] && form.get('displayedName').touched"
+        class="tw-text-sm tw-text-red-500 tw-font-light"
+      >
+        The displayedName field is required
+      </span>
+
+      <span
+        *ngIf="form.get('displayedName').errors?.['minlength']"
+        class="tw-text-sm tw-text-red-500 tw-font-light"
+      >
+        The displayedName field has to be at least 3 characters long
+      </span>
+    </div>
+
+    <div class="form-control-element">
+      <label for="name">identifier name</label>
+      <input type="text" name="name" formControlName="name" />
+      <span class="tw-text-xs tw-font-light tw-text-gray-400"
+        >Name used for API identification</span
+      >
+      <span
+        *ngIf="form.get('name').errors?.['required'] && form.get('name').touched"
+        class="tw-text-sm tw-text-red-500 tw-font-light"
+      >
+        The name field is required
+      </span>
+
+      <span
+        *ngIf="form.get('name').errors?.['minlength']"
+        class="tw-text-sm tw-text-red-500 tw-font-light"
+      >
+        The name field has to be at least 3 characters long
+      </span>
+    </div>
+
+    <div class="form-control-element">
+      <label for="visibility">Visibility</label>
+      <div class="tw-flex tw-flex-row tw-gap-2 tw-items-center">
+        <select name="visibility" formControlName="visibility">
+          <option value="public" class="tw-text-green-500">Public</option>
+          <option value="private" class="tw-text-orange-500">Private</option>
+        </select>
+      </div>
+
+      <small class="tw-text-xs tw-font-light tw-text-gray-400">
+        This setting will influence whether the contribtions/Badges or
+        Medals...etc associated to this are publicly visible to outside visitors
+      </small>
+    </div>
+
+    <div class="form-control-element">
+      <label for="defaultMembers">Default Members</label>
+      <orcid-search-select
+        formControlName="defaultMembers"
+        class="tw-py-1 lg:tw-py-2"
+      ></orcid-search-select>
+      <small class="tw-text-xs tw-font-light tw-text-gray-400">
+        This list of members are automatically added to the group. Meaning all
+        future contributions of these members will be associated with this
+        group. unless precised otherwise in the reports.<br />
+        This does NOT mean that this option has retroactive effect on the
+        previously submitted contributions. A curator can belong to various
+        groups depending on the contribution associated with that group
+      </small>
+    </div>
+
+    <input
+      type="submit"
+      class="tw-w-full tw-p-2 tw-bg-green-500 tw-text-white tw-capitalize tw-cursor-pointer"
+      value="submit"
+    />
+  </form>
+
+  <button
+    class="tw-bg-gray-400 tw-text-gray-100 tw-w-full tw-block tw-py-1 lg:tw-py-2"
+    (click)="closeForm()"
+  >
+    Close
+  </button>
+</div>
