@@ -84,6 +84,7 @@ async function bootstrap() {
 
 	const orcidIds = users.map((user) => user.orcid_id);
 
+
 	for (const user of users) {
 		await app.get(UsersService).createOrUpdateUser(user);
 	}
@@ -94,11 +95,11 @@ async function bootstrap() {
 	const reportCount = parseInt(process.argv?.[2] ?? '150');
 
 	logger.verbose(`Generating ${reportCount} reports`);
+	const resource = await resourceModel.findOne();
 
-	const terms = await termModel.find({ resource_id: 'disprot' });
+	const terms = await termModel.find({ resource_id: resource.resource_id });
 	const activities = terms.map((terms) => terms.activity_term);
 
-	const resource = await resourceModel.findOne({ resource_id: 'disprot' });
 
 	const reportSaves$ = [];
 	for (let index = 0; index < reportCount; index++) {
