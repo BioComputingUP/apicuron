@@ -8,7 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { OrcidClientService } from './orcid-client.service';
 import {
 	ConfigurableModuleClass,
-	generateApiUrlProvider
+	generateApiUrlProvider,
 } from './orcid-client-module-options';
 import { OrcidClientModuleOptions } from './interfaces/orcid.interface';
 import { OrcidTokenAuthService } from './token-auth.service';

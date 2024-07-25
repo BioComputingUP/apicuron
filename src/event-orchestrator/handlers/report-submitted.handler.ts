@@ -39,18 +39,24 @@ export class ReportSubmittedEventHandler
 	}
 	logger: Logger;
 	destroy$ = new Subject<void>();
-	eventSubject = new Subject<IReportSubmittedEventPayload>();
+	eventSubject = new Subject<{
+		payload: IReportSubmittedEventPayload;
+		callback: (...args: any[]) => any;
+	}>();
 
 	onModuleInit() {
 		this.eventSubject
 			.pipe(
-				concatMap((payload: IReportSubmittedEventPayload) => {
+				concatMap(({ payload, callback }): Observable<any> => {
 					const reportInstance = new this.reportModel(payload.report);
 					return new Observable((subscriber) => {
-						this.aggregator.applyReport(reportInstance).then((v) => {
-							subscriber.next(v);
-							subscriber.complete();
-						});
+						this.aggregator
+							.applyReport(reportInstance)
+							.then(callback)
+							.then((v) => {
+								subscriber.next(v);
+								subscriber.complete();
+							});
 					});
 				}),
 				takeUntil(this.destroy$),
@@ -60,8 +66,19 @@ export class ReportSubmittedEventHandler
 
 	aggregator: Aggregator;
 
+	/**
+	 * A method that submits the event payload to the aggregator
+	 * @param payload The payload of the event
+	 * @returns A promise that resolves when the event has been processed
+	 */
+	async submitEventPayload(payload: IReportSubmittedEventPayload) {
+		return await new Promise((resolve) => {
+			this.eventSubject.next({ payload, callback: resolve });
+		});
+	}
+
 	@OnEvent(ReportSubmittedEvent, { async: true, promisify: true })
 	async handle(payload: IReportSubmittedEventPayload) {
-		this.eventSubject.next(payload);
+		return await this.submitEventPayload(payload);
 	}
 }

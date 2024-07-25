@@ -7,23 +7,26 @@ import {
 	PartnerResourceDocument,
 } from '../core/schemas/resource/partner-resource.schema';
 import { Term } from '../core/schemas/terms.schema';
-import { faker } from '@faker-js/faker';
+import { en, faker } from '@faker-js/faker';
 import { PrivacyType } from '../core/enums';
 import { Report } from '../core/schemas/reports.schema';
-import { ReportsService } from '../reports/reports.service';
 import { SubmitReportService } from '../submit-reports/services/submit-reports.service';
+import { OrcidClientService } from '../orcid/orcid-client/orcid-client.service';
+import { UsersService } from '../auth/users/users.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { BulkSubmissionEvent } from '../submit-reports/events/events';
+import { Logger } from '@nestjs/common';
 
 async function mockReport(
 	reportModel: Model<Report>,
 	resource: PartnerResourceDocument,
 	terms: string[],
+	orcidIds: string[],
 ) {
-	const testingOrcidId = '0000-0002-2472-5685';
-
 	return {
 		activity_term: faker.helpers.arrayElement(terms),
 
-		curator_orcid: testingOrcidId,
+		curator_orcid: faker.helpers.arrayElement(orcidIds),
 
 		entity_uri: faker.internet.url(),
 
@@ -40,9 +43,27 @@ async function mockReport(
 	};
 }
 
+function createUser(input: any) {
+	const result = {} as any;
+	result.orcid_id = input['orcid-id'];
+	result.given_names = input['given-names'] ?? '';
+	result.family_names = input['family-names'] ?? '';
+	result.credit_name = input['credit-name'] ?? null;
+
+	result.displayedName =
+		result.credit_name ?? `${result.given_names} ${result.family_names}`;
+
+	result.profileUrl = `https://sandbox.orcid.org/${result.orcid_id}`;
+
+	result.privacy = PrivacyType.public as PrivacyType;
+
+	return result;
+}
+
 async function bootstrap() {
 	const app = await NestFactory.createApplicationContext(AppModule);
 
+	const testingOrcidId = '0000-0002-2472-5685';
 	// initialize models
 	const reportModel: Model<Report> = app.get(getModelToken(Report.name));
 	const reportService = app.get(SubmitReportService);
@@ -50,11 +71,29 @@ async function bootstrap() {
 		getModelToken(PartnerResource.name),
 	);
 
+	// Load users
+
+	const query = 'test';
+	const searchResults = await app
+		.get(OrcidClientService)
+		.expandedSearch(`given-and-family-names:${query} OR credit-name:${query}`);
+
+	const entries = searchResults.data?.['expanded-result'] as any[];
+
+	const users = entries.map((entry) => createUser(entry));
+
+	const orcidIds = users.map((user) => user.orcid_id);
+
+	for (const user of users) {
+		await app.get(UsersService).createOrUpdateUser(user);
+	}
+	const logger = new Logger('Seed Script Logger');
+
 	const termModel: Model<Term> = app.get(getModelToken(Term.name));
 
-	// initialize variables
-	// const reportCount = 1;
-	const reportCount = 30;
+	const reportCount = parseInt(process.argv?.[2] ?? '150');
+
+	logger.verbose(`Generating ${reportCount} reports`);
 
 	const terms = await termModel.find({ resource_id: 'disprot' });
 	const activities = terms.map((terms) => terms.activity_term);
@@ -63,11 +102,25 @@ async function bootstrap() {
 
 	const reportSaves$ = [];
 	for (let index = 0; index < reportCount; index++) {
-		const report = await mockReport(reportModel, resource, activities);
-		reportSaves$.push(reportService.insertReport(report));
+		const report = await mockReport(
+			reportModel,
+			resource,
+			activities,
+			orcidIds,
+		);
+		reportSaves$.push(
+			reportService.insertReport(report, { preventEvents: true }),
+		);
 	}
 
 	await Promise.all(reportSaves$);
+
+	await app
+		.get(EventEmitter2)
+		.emitAsync(
+			BulkSubmissionEvent.name,
+			new BulkSubmissionEvent(testingOrcidId, [resource.resource_id]),
+		);
 
 	await app.close();
 }
