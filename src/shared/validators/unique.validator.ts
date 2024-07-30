@@ -25,7 +25,7 @@ import { Connection } from 'mongoose';
  * 	filter object when the value is supplied as a parameter
  */
 @Injectable()
-@ValidatorConstraint({ name: 'UniqueResourceId', async: true })
+@ValidatorConstraint({ name: 'UniqueValidator', async: true })
 export class UniqueRule implements ValidatorConstraintInterface {
 	// the class does not populate the SubmittedResourcesService for some reason
 	// The mongodb connection is used to overcome that issue

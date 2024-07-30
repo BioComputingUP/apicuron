@@ -6,13 +6,14 @@ import {
 } from '../../../../core/schemas/resource/partner-resource.schema';
 import { UniqueRule } from '../../../../shared/validators/unique.validator';
 import { OrcidChecksum } from '../../../../submit-reports/validators/orcid-checksum';
+import { EntryExistsRule } from '../../../../shared/validators/entry-exists.validator';
 
 export class DeleteMemberFromLeagueDTO {
-	@Validate(UniqueRule, [
+	@Validate(EntryExistsRule, [
 		PartnerResource.name,
-		({ resource_id, member }): FilterQuery<PartnerResourceDocument> => {
+		({ resource_id, member, league }): FilterQuery<PartnerResourceDocument> => {
 			return {
-				leagues: { $elemMatch: { defaultMembers: member } },
+				leagues: { $elemMatch: { defaultMembers: member, name: league } },
 				resource_id,
 			};
 		},
