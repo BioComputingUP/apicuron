@@ -4,8 +4,6 @@ import { PartnerResourcesController } from './partner-resources/controllers/part
 import { PartnerResourcesService } from './partner-resources/services/partner-resources.service';
 import { SubmittedResourcesController } from './submitted-resources/resources.controller';
 import { SubmittedResourcesService } from './submitted-resources/resources.service';
-import { UniqueResourceIdRule } from './validators/unique-resource-id';
-import { UniqueResourceURIRule } from './validators/unique-resource-uri';
 import { JwtModule } from '@nestjs/jwt';
 import { ResourceIdExists } from './partner-resources/validators/resource-id-exists';
 import { CoreApicuronModule } from '../core/core.module';
@@ -18,8 +16,6 @@ import { ResourceLeagueController } from './partner-resources/leagues/resource-l
 		ResourceLeagueController,
 	],
 	providers: [
-		UniqueResourceIdRule,
-		UniqueResourceURIRule,
 		ResourceIdExists,
 		PartnerResourcesService,
 		SubmittedResourcesService,

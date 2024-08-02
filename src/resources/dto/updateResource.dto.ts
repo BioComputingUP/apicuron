@@ -22,6 +22,7 @@ export class UpdatePartnerResourceDto {
 		({ resource_id }) => ({ resource_id }),
 	])
 	@IsString()
+	@Matches(/^([a-z0-9-]|\-|\_)+$/)
 	@IsNotEmpty()
 	resource_id: string;
 

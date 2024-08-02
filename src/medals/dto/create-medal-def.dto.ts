@@ -16,10 +16,7 @@ import {
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
 import { Type } from 'class-transformer';
-import {
-	MaxDateField,
-	MinDateField,
-} from '../validators/date-comparison';
+import { MaxDateField, MinDateField } from '../validators/date-comparison';
 import { MedalDef } from '../../core/schemas/achievements-def/medal-def.schema';
 import { UniqueRule } from '../../shared/validators/unique.validator';
 

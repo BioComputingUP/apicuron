@@ -1,5 +1,6 @@
 import {
 	IsEmpty,
+	IsHexColor,
 	IsNotEmpty,
 	IsString,
 	IsUrl,
@@ -9,15 +10,21 @@ import {
 } from 'class-validator';
 import { UniqueRule } from '../../shared/validators/unique.validator';
 import { Resource } from '../../core/schemas/resource/resource.schema';
-import { UniqueResourceIdRule } from '../validators/unique-resource-id';
-import { UniqueResourceURIRule } from '../validators/unique-resource-uri';
 
 export class CreateResourceDto {
 	@IsString()
 	@IsNotEmpty()
 	resource_description: string;
 
-	@Validate(UniqueResourceIdRule)
+	@Validate(UniqueRule, [
+		Resource.name,
+		({ resource_id }) => {
+			return {
+				resource_id,
+			};
+		},
+	])
+	@Matches(/^([a-z0-9-]|\-|\_)+$/)
 	@IsString()
 	@IsNotEmpty()
 	resource_id: string;
@@ -48,7 +55,14 @@ export class CreateResourceDto {
 	@IsNotEmpty()
 	resource_name: string;
 
-	@Validate(UniqueResourceURIRule)
+	@Validate(UniqueRule, [
+		Resource.name,
+		({ resource_uri }) => {
+			return {
+				resource_uri,
+			};
+		},
+	])
 	@IsUrl()
 	@IsString()
 	@IsNotEmpty()
@@ -67,9 +81,7 @@ export class CreateResourceDto {
 	@IsNotEmpty()
 	resource_url: string;
 
-	@Matches(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, {
-		message: 'The resource color has to be a color hexcode',
-	})
+	@IsHexColor()
 	@IsString()
 	@IsNotEmpty()
 	color: string;
