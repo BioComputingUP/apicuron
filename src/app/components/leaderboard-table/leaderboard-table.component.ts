@@ -17,9 +17,10 @@ import { RouterModule } from '@angular/router';
     CommonModule, 
     AngularSvgIconModule,
     RouterModule,
-    WeeklyBarChartComponent]
+    WeeklyBarChartComponent
+  ]
 })
-export class LeaderboardTableComponent implements OnInit {
+export class LeaderboardTableComponent {
   @Input() leaderboard$: Observable<{ user: User; stat: BaseCuratorStatistics | WeeklyCuratorStatistics }[]>;
   @Input() tableColumns: string[] = [];
   @Input() isWeekly: boolean = false;
@@ -29,7 +30,5 @@ export class LeaderboardTableComponent implements OnInit {
     protected leaderboardService: LeaderboardService,
     protected resourceService: ResourcesService,
   ) {}
-
-  ngOnInit(): void {}
   
 }
