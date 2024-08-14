@@ -113,44 +113,4 @@ export class GroupsService {
   onSelectedGroupChange(groupName) {
     this.selectedGroup$.next(groupName);
   }
-
-  get_resource_leagues(resource_id: string) {
-    return this.http.get(`${this.ws}/leagues/${resource_id}`, {
-      headers: {
-        version: "2",
-      },
-    });
-  }
-
-  create_league() {
-    return this.http.post(this.ws + "/leagues", {
-      headers: {
-        version: "2",
-      },
-    });
-  }
-
-  delete_league() {
-    return this.http.delete(this.ws + "/leagues", {
-      headers: {
-        version: "2",
-      },
-    });
-  }
-
-  add_league_member(curator) {
-    return this.http.post(this.ws + "/leagues/add-member", curator, {
-      headers: {
-        Version: "2",
-      },
-    });
-  }
-
-  remove_league_member(curator) {
-    // return this.http.delete(this.ws + "/leagues/remove-member", curator, {
-    //   headers: {
-    //     Version: '2'
-    //   }
-    // })
-  }
 }
