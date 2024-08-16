@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable, combineLatest } from "rxjs";
-import { map, pluck, switchMap } from "rxjs/operators";
+import { map, pluck, switchMap, tap } from "rxjs/operators";
 import { Paginated } from "src/app/interfaces/paginated";
 import { User } from "src/app/models/User.model";
 import { BaseCuratorStatistics, WeeklyCuratorStatistics } from "src/app/models/statistics.model";
@@ -34,14 +34,6 @@ export class LeaderboardService {
 	  return this.leaderboardColumns[col];
 	}
 
-	// showTotalLeaderboard(): void {
-	//   this.showTotal = true;
-	// }
-	
-	// showWeeklyLeaderboard(): void {
-	//   this.showTotal = false;
-	// }
-
 	getUserData(orcid_id: string) {
       return this.http.get(this.ws + "/users/" + orcid_id, {
 		headers: {
@@ -59,20 +51,12 @@ export class LeaderboardService {
 	  )
 	}
 
-	getResourceLeaderboard(
-		resource_id: string,
-		limit: number = 10,
-		skip: number = 0
-		): Observable<Paginated<BaseCuratorStatistics>> {
+	getResourceLeaderboard(resource_id: string): Observable<Paginated<BaseCuratorStatistics>> {
 		const url = `${environment.ws}/statistics/leaderboard/${resource_id}`;
 			return this.http
 			.get<Paginated<BaseCuratorStatistics>>(url, {
 				responseType: "json",
 				headers: {version: "2"},
-				params: {
-					limit,
-					skip,
-				},
 			})
 			.pipe(
 				map((response: Paginated<BaseCuratorStatistics>) => {
@@ -82,41 +66,33 @@ export class LeaderboardService {
 					return response;
 				})
 			);
-	  }
+	}
 
-	  getResourceLeaderboardWithUsers(resource_id: string): Observable<{ user: User, stat: BaseCuratorStatistics }[]> {
+	getResourceLeaderboardWithUsers(resource_id: string): Observable<{ user: User, stat: BaseCuratorStatistics }[]> {
 		return this.getResourceLeaderboard(resource_id).pipe(
-		  switchMap((stats: Paginated<BaseCuratorStatistics>) => {
+			switchMap((stats: Paginated<BaseCuratorStatistics>) => {
 			const statList = stats.data;
 			const orcidIds = statList.map(({ curator_orcid }) => curator_orcid);
 			const usersList$ = orcidIds.map((id) => this.getUser(id));
 			return combineLatest(usersList$).pipe(
-			  map((users: User[]) => {
+				map((users: User[]) => {
 				return statList.map((stat, index) => {
-				  const user = users.find(user => user.orcid_id == stat.curator_orcid);
-				  stat.ranking = index + 1;
-				  return { user, stat };
+					const user = users.find(user => user.orcid_id == stat.curator_orcid);
+					stat.ranking = index + 1;
+					return { user, stat };
 				});
-			  })
+				})
 			);
-		  })
+			})
 		);
-	  }
+	}
 	  
-	getWeeklyResourceLeaderboard(
-		resource_id: string,
-		limit: number = 10,
-		skip: number = 0
-		): Observable<Paginated<WeeklyCuratorStatistics>> {
+	getWeeklyResourceLeaderboard(resource_id: string): Observable<Paginated<WeeklyCuratorStatistics>> {
 		const response$ = this.http
 		  .get(`${environment.ws}/weekly-statistics/${resource_id}/leaderboard`, {
 			responseType: "json",
 			headers: {
 			  version: "2",
-			},
-			params: {
-			  limit,
-			  skip,
 			},
 		  })
 		  .pipe(

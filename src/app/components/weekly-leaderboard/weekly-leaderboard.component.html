@@ -1,4 +1,6 @@
-<base-leaderboard 
-	[tableColumns]="tableColumnsWeekly" 
-	[isWeekly]="true">
-</base-leaderboard>
+<leaderboard-table
+    [leaderboard$]="leaderboard$"
+    [tableColumns]="tableColumnsWeekly"
+    [resource$]="resource$"
+    [isWeekly]="true">
+</leaderboard-table>

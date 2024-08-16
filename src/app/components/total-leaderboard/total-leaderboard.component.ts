@@ -1,20 +1,28 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { LeaderboardComponent } from '../leaderboard/leaderboard.component';
 import { LeaderboardService } from 'src/app/databases/services/leaderboard.service';
 import { ResourcesService } from 'src/app/resource/service/resources.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LeaderboardTableComponent } from '../leaderboard-table/leaderboard-table.component';
-import { BaseLeaderboardComponent } from '../base-leaderboard/base-leaderboard.component';
+import { Observable } from 'rxjs';
+import { Resource } from 'src/app/models/resource.model';
+import { User } from 'src/app/models/User.model';
+import { BaseCuratorStatistics } from 'src/app/models/statistics.model';
+import { map, shareReplay, switchMap } from 'rxjs/operators';
 
 @Component({
   standalone: true,
   selector: 'total-leaderboard',
   templateUrl: './total-leaderboard.component.html',
-  imports: [CommonModule, LeaderboardComponent, LeaderboardTableComponent, BaseLeaderboardComponent],
+  imports: [CommonModule, LeaderboardComponent, LeaderboardTableComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TotalLeaderboardComponent extends BaseLeaderboardComponent {
+export class TotalLeaderboardComponent implements OnInit {
+  resource_id$: Observable<string>;
+  resource$: Observable<Resource>;
+  leaderboard$: Observable<{ user: User; stat: BaseCuratorStatistics }[]>;
+
   tableColumnsTotal: string[] = [
     'medals_count',
     'badges_count',
@@ -29,7 +37,22 @@ export class TotalLeaderboardComponent extends BaseLeaderboardComponent {
     protected resourceService: ResourcesService,
     protected leaderboardService: LeaderboardService,
     protected route: ActivatedRoute,
-  ) {
-    super(resourceService, leaderboardService, route);
+  ) { }
+
+  ngOnInit(): void {
+    this.resource_id$ = this.route.paramMap.pipe(
+      map((params: ParamMap) => params.get('resource_id'))
+    );
+
+    this.resource$ = this.resource_id$.pipe(
+      switchMap(resource_id => this.resourceService.get_resource(resource_id).pipe(shareReplay()))
+    );
+
+    this.leaderboard$ = this.resource_id$.pipe(
+      switchMap((resource_id: string) => 
+        this.leaderboardService.getResourceLeaderboardWithUsers(resource_id)
+      ),
+      shareReplay()
+    );
   }
 }
