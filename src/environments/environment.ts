@@ -11,7 +11,8 @@ export const environment = {
   public_file_url: 'http://localhost:3000/api/files',
   resource_logo_path: 'resources',
   orcid_url: 'https://pub.sandbox.orcid.org/v3.0/',
-  orcid_main_url: 'https://sandbox.orcid.org/'
+  orcid_main_url: 'https://sandbox.orcid.org/',
+  fairsharing_url: 'https://api.fairsharing.org/'
 
   // ws: 'https://apicuron.bio.unipd.it/api/'
   // ws: 'http://localhost:8098/'

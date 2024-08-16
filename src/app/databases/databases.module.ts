@@ -18,6 +18,7 @@ import { MedalDefCardComponent } from "../components/medal-def-card/medal-def-ca
 import { AchievementsDefModule } from "../achievements-def/achievements-def.module";
 import { TermsModule } from "../terms/terms.module";
 import { LeaderboardComponent } from "../components/leaderboard/leaderboard.component";
+import { FairSharingComponent } from "./fairsharing/fairsharing.component";
 @NgModule({
   declarations: [
     DatabasesPageComponent,
@@ -40,8 +41,9 @@ import { LeaderboardComponent } from "../components/leaderboard/leaderboard.comp
     MedalDefCardComponent,
     TermsModule,
     AchievementsDefModule,
-    LeaderboardComponent
-  ],
+    LeaderboardComponent,
+    FairSharingComponent
+],
   providers:[DatabasesService],
   exports: [DatabasesPageComponent],
 })
