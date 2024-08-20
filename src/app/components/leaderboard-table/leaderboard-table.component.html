@@ -6,6 +6,30 @@
 					<tr class="tw-divide-x tw-divide-gray-200">
 						<th class="tw-px-2 tw-py-1">Ranking</th>
 						<th class="tw-px-2 tw-py-1" colspan="2">Curator</th>
+						<!-- <th>
+							<table-medals [header]="'Medals'"></table-medals>
+						</th>
+						<th>
+							<table-badges [header]="'Badges'"></table-badges>
+						</th>
+						<th>
+							<table-generation [header]="'Generation Contributions'"></table-generation>
+						</th>
+						<th>
+							<table-invalidation [header]="'Invalidation Contributions'"></table-invalidation>
+						</th>
+						<th>
+							<table-revision [header]="'Revision Contributions'"></table-revision>
+						</th>
+						<th>
+							<table-total [header]="'Total Score'"></table-total>
+						</th>
+						<th>
+							<table-last-date [header]="'Last Contribution Date'"></table-last-date>
+						</th>
+						<th>
+							<table-chart [header]="'Last Contribution Date'"></table-chart>
+						</th> -->
 						<th *ngFor="let column of tableColumns" class="tw-px-2 tw-py-1 tw-justify-center">
 							<span>
 								{{ leaderboardService.getColumnProps(column).name }}
@@ -38,6 +62,32 @@
 								</a>
 							</div>
 						</td>
+						<!-- <td>
+							<table-medals [userStat]="entry"></table-medals>
+						</td>
+						<td>
+							<table-badges [userStat]="entry"></table-badges>
+						</td>
+						<td>
+							<table-generation [userStat]="entry"></table-generation>
+						</td>
+						<td>
+							<table-invalidation [userStat]="entry"></table-invalidation>
+						</td>
+						<td>
+							<table-revision [userStat]="entry"></table-revision>
+						</td>
+						<td>
+							<table-total [userStat]="entry"></table-total>
+						</td>
+						<td>
+							<table-last-date [userStat]="entry"></table-last-date>
+						</td> -->
+						<!-- <td>
+							<table-chart [userStat]="entry">
+								<weekly-bar-chart [days-of-week]="entry"></weekly-bar-chart>
+							</table-chart>
+						</td> -->
 						<td *ngIf="!isWeekly" class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.medals_count }}</td>
 						<td *ngIf="!isWeekly" class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.badges_count }}</td>
 						<td class="tw-text-center tw-font-bold tw-text-gray-700">{{ entry.stat.generation_count }}</td>

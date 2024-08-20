@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, combineLatest } from 'rxjs';
 import { LeaderboardService } from 'src/app/databases/services/leaderboard.service';
 import { User } from 'src/app/models/User.model';
@@ -14,15 +14,31 @@ import { StatisticsFilter } from 'src/app/curator-statistics/models/statistics-f
 import { Paginated } from 'src/app/interfaces/paginated';
 import { filter, map, pluck, shareReplay, startWith, switchMap } from 'rxjs/operators';
 import { CuratorStatisticsService } from 'src/app/curator-statistics/services/curator-statistics.service';
+import { TableMedalsComponent } from '../table-medals/table-medals.component';
+import { TableGenerationComponent } from '../table-generation/table-generation.component';
+import { TableBadgesComponent } from '../table-badges/table-badges.component';
+import { TableInvalidationComponent } from '../table-invalidation/table-invalidation.component';
+import { TableRevisionComponent } from '../table-revision/table-revision.component';
+import { TableTotalComponent } from '../table-total/table-total.component';
+import { TableLastDateComponent } from '../table-last-date/table-last-date.component';
+import { TableChartComponent } from '../table-chart/table-chart.component';
 @Component({
   standalone: true,
   selector: 'leaderboard-table',
   templateUrl: './leaderboard-table.component.html',
   imports: [
-    CommonModule, 
+    CommonModule,
     AngularSvgIconModule,
     RouterModule,
-    WeeklyBarChartComponent
+    WeeklyBarChartComponent,
+    TableMedalsComponent,
+    TableBadgesComponent,
+    TableGenerationComponent,
+    TableInvalidationComponent,
+    TableRevisionComponent,
+    TableTotalComponent,
+    TableLastDateComponent,
+    TableChartComponent
   ]
 })
 export class LeaderboardTableComponent implements OnInit, OnDestroy {
