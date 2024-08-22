@@ -8,7 +8,7 @@ import { BehaviorSubject, Observable, Subject, combineLatest } from 'rxjs';
 import { Resource } from 'src/app/models/resource.model';
 import { User } from 'src/app/models/User.model';
 import { BaseCuratorStatistics } from 'src/app/models/statistics.model';
-import { filter, map, pluck, shareReplay, startWith, switchMap } from 'rxjs/operators';
+import { map, shareReplay, startWith, switchMap } from 'rxjs/operators';
 import { StatisticsFilter } from 'src/app/curator-statistics/models/statistics-filter';
 import { CuratorWithStats } from 'src/app/curator-statistics/models/curator-stats';
 import { Paginated } from 'src/app/interfaces/paginated';
@@ -26,6 +26,7 @@ export class TotalLeaderboardComponent implements OnInit, OnDestroy {
 
   totalLeaderboard$: Observable<{ user: User; stat: BaseCuratorStatistics }[]>;
   paginatedTotalLeaderboard$: Observable<{ user: User; stat: BaseCuratorStatistics }[]>;
+  totalContributors$: Observable<number>;
 
   statFilter$: Observable<StatisticsFilter>;
   stats$: Observable<Paginated<CuratorWithStats>>;
@@ -80,55 +81,13 @@ export class TotalLeaderboardComponent implements OnInit, OnDestroy {
       shareReplay()
     );
 
-    this.statFilter$ = combineLatest([this.page$, this.resource$]).pipe(
-      map(([page, resource]: [number, Resource]) => {
-        const filter = new StatisticsFilter();
-        filter.limit = this.limit;
-        filter.skip = (page - 1) * this.limit;
-        filter.resources = [resource.resource_id];
-        filter.sortOrder = -1;
-        filter.sortBy = "total_score";
-        return filter;
-      }),
-      shareReplay()
+    this.totalContributors$ = this.totalLeaderboard$.pipe(
+      map(totalLeaderboard => totalLeaderboard.length),
+      startWith(0)
     );
     
-    this.stats$ = this.statFilter$.pipe(
-      filter((filter: StatisticsFilter) => {
-        return !!filter.resources && filter.resources.length > 0;
-      }),
-      shareReplay(),
-      switchMap((filter: StatisticsFilter) => {
-        return this.statService.getStatistics(filter);
-      }),
-
-      shareReplay(),
-    );
-
-    this.statsList$ = this.stats$.pipe(pluck("data"));
-    this.statsMeta$ = this.stats$.pipe(pluck("meta"));
-    
-    this.statsWithUsers$ = combineLatest([
-      this.statsList$,
-      this.statFilter$,
-    ]).pipe(
-      map(([stats, filter]: [CuratorWithStats[], StatisticsFilter]) => {
-        return stats.map((entry: CuratorWithStats, index: number) => {
-          const stat = entry.stats.find(
-            (stat) => stat.resource_id == filter.resources[0]
-          );
-          stat.ranking = filter.skip + index + 1;
-
-          const user = new User().deserialize(entry);
-          return { user, stat };
-        });
-      })
-    );
-
-    this.maxPage$ = this.statsMeta$.pipe(
-      map((meta) => {
-        return meta.pagination.total / meta.pagination.limit;
-      }),
+    this.maxPage$ = this.totalLeaderboard$.pipe(
+      map(totalLeaderboard => Math.ceil(totalLeaderboard.length / this.limit)),
       startWith(1)
     );
   }
