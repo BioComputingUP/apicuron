@@ -6,9 +6,7 @@ import { CuratorStatisticsModule } from "../../curator-statistics/curator-statis
 import { CuratorStatisticsService } from "../../curator-statistics/services/curator-statistics.service";
 import { CuratorModule } from "../../curator/curator.module";
 import { CuratorService } from "../../curator/curator.service";
-import { User } from "../../models/User.model";
 import { Resource } from "../../models/resource.model";
-import { BaseCuratorStatistics } from "../../models/statistics.model";
 import { ResourcesService } from "../../resource/service/resources.service";
 import { AngularSvgIconModule, SvgIconRegistryService } from "angular-svg-icon";
 import { ReactiveFormsModule } from "@angular/forms";
@@ -17,7 +15,6 @@ import { RouterModule } from "@angular/router";
 import { LeaderboardService } from "src/app/databases/services/leaderboard.service";
 import { TotalLeaderboardComponent } from "../total-leaderboard/total-leaderboard.component";
 import { WeeklyLeaderboardComponent } from "../weekly-leaderboard/weekly-leaderboard.component";
-
 @Component({
   standalone: true,
   selector: "leaderboard",
@@ -41,7 +38,6 @@ export class LeaderboardComponent implements OnInit {
 
   showTotal: boolean = true;
   resource$: Observable<Resource>;
-  leaderboard$: Observable<{ user: User; stat: BaseCuratorStatistics; }[]>;
 
   constructor(
     protected statService: CuratorStatisticsService,
@@ -58,8 +54,6 @@ export class LeaderboardComponent implements OnInit {
     this.resource$ = this.resourceService
       .get_resource(this.resource_id)
       .pipe(shareReplay());
-
-    this.leaderboard$ = this.leaderboardService.getResourceLeaderboardWithUsers(this.resource_id);
   }
 
   showTotalLeaderboard(): void {

@@ -20,7 +20,6 @@ import { TermsModule } from "../terms/terms.module";
 import { LeaderboardComponent } from "../components/leaderboard/leaderboard.component";
 import { TotalLeaderboardComponent } from "../components/total-leaderboard/total-leaderboard.component";
 import { WeeklyLeaderboardComponent } from "../components/weekly-leaderboard/weekly-leaderboard.component";
-import { LeaderboardTableComponent } from "../components/leaderboard-table/leaderboard-table.component";
 @NgModule({
   declarations: [
     DatabasesPageComponent,
@@ -44,7 +43,6 @@ import { LeaderboardTableComponent } from "../components/leaderboard-table/leade
     TermsModule,
     AchievementsDefModule,
     LeaderboardComponent,
-    LeaderboardTableComponent,
     TotalLeaderboardComponent,
     WeeklyLeaderboardComponent,
   ],

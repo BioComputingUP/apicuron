@@ -1,13 +1,12 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable, combineLatest, of } from "rxjs";
-import { map, pluck, switchMap, tap } from "rxjs/operators";
+import { Observable } from "rxjs";
+import { map, pluck } from "rxjs/operators";
 import { Paginated } from "src/app/interfaces/paginated";
-import { BaseCuratorStatistics, CuratorStatistics, WeeklyCuratorStatistics } from "src/app/models/statistics.model";
+import { CuratorStatistics } from "src/app/models/statistics.model";
 import { environment } from "src/environments/environment";
 import { StatisticsFilter } from "../models/statistics-filter";
-import { CuratorWithStats } from "../models/curator-stats";
-import { User } from "src/app/models/User.model";
+import { CuratorWithStats, CuratorWithWeeklyStats } from "../models/curator-stats";
 
 @Injectable()
 export class CuratorStatisticsService {
@@ -57,7 +56,7 @@ export class CuratorStatisticsService {
     curator_orcid: string,
     league: string,
     statFilter: StatisticsFilter
-  ): Observable<Paginated<CuratorWithStats>> {
+    ): Observable<Paginated<CuratorWithWeeklyStats>> {
     const url = `${this.ws}/weekly-statistics/${resource_id}/${curator_orcid}/${league}`;
     return this.http
       .get(url, {
@@ -67,9 +66,9 @@ export class CuratorStatisticsService {
         params: statFilter.serialize(),
       })
       .pipe(
-        map((response: Paginated<CuratorWithStats>) => {
-          response.data = response.data.map((curatorWithStats) =>
-            new CuratorWithStats().deserialize(curatorWithStats)
+        map((response: Paginated<CuratorWithWeeklyStats>) => {
+          response.data = response.data.map((curatorWithWeeklyStats) =>
+            new CuratorWithWeeklyStats().deserialize(curatorWithWeeklyStats)
           );
           return response;
         })

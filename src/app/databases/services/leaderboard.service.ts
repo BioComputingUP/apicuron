@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable, combineLatest } from "rxjs";
-import { map, pluck, switchMap, tap } from "rxjs/operators";
+import { map, pluck, switchMap } from "rxjs/operators";
 import { Paginated } from "src/app/interfaces/paginated";
 import { User } from "src/app/models/User.model";
 import { BaseCuratorStatistics, WeeklyCuratorStatistics } from "src/app/models/statistics.model";
