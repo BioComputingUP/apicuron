@@ -259,7 +259,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
   }
 
   delete_badge(badge) {
-    this.badgeDefService.deleteBadge(badge).subscribe(
+    this.badgeDefService.deleteBadge(badge).pipe(take(1)).subscribe(
       (response) => {
         if (response["data"]) {
           this.toastr.success(
