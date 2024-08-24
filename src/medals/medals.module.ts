@@ -15,12 +15,7 @@ import { MedalsController } from './controllers/medals.controller';
 import { MedalsQueryService } from './services/medals-query.service';
 
 @Module({
-	imports: [
-		CoreApicuronModule,
-		AuthModule,
-		ResourcesModule,
-		// ReportAggregatorModule.register(BadgeAggregatorService),
-	],
+	imports: [CoreApicuronModule, AuthModule, ResourcesModule],
 	providers: [
 		MedalDefCommandsService,
 		MedalDefQueriesService,

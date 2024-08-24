@@ -208,16 +208,7 @@ export class BadgeAggregatorService implements Aggregator {
 		const badgeDefFilter: FilterQuery<BadgeDefDocument> = {
 			resource_id,
 		};
-		performance.mark('before_compute_badges');
 		await this.computeBadges.computeBadges(badgeDefFilter);
-		performance.mark('after_compute_badges');
-		const m = performance.measure(
-			'compute_badges',
-			'before_compute_badges',
-			'after_compute_badges',
-		);
-
-		this.logger.warn(`Compute Badges took ${m.duration} ms`);
 
 		await this.eventEmitter.emitAsync(
 			ResourceBadgesUpdatedEvent.name,

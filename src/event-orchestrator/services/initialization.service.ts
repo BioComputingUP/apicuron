@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+	Injectable,
+	Logger,
+	OnApplicationBootstrap,
+	OnModuleInit,
+} from '@nestjs/common';
 import { Aggregator } from '../interfaces/aggregator.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -10,41 +15,36 @@ import { ConfigService } from '@nestjs/config';
 import { AggregatorManager } from './aggregator-manager.service';
 
 @Injectable()
-export class InitializationService implements OnModuleInit {
+export class InitializationService implements OnApplicationBootstrap {
 	constructor(
 		@InjectModel(PartnerResource.name)
 		protected resourceModel: Model<PartnerResourceDocument>,
 		protected configService: ConfigService,
 		protected aggregatorManager: AggregatorManager,
 	) {}
-	logger = new Logger(InitializationService.name);
-	async onModuleInit() {
+	async onApplicationBootstrap() {
 		if (this.configService.get<string>('environment') == 'local') {
 			return;
 		}
-
 		await this.initializeAggregateData();
 	}
+	logger = new Logger(InitializationService.name);
 
 	async initializeAggregateData() {
 		this.logger.debug(`InitializationService initialized with aggregator `);
 
 		const resources = await this.resourceModel.find();
 
-		await this.aggregatorManager.runOnAggregators(
-			async (aggregator: Aggregator) => {
-				const updates$ = resources.map(
-					async ({ resource_id }: PartnerResourceDocument) => {
-						await aggregator.recomputeAllResourceAggregates(resource_id);
+		const tasks$ = resources.map(
+			async ({ resource_id }: PartnerResourceDocument) => {
+				return await this.aggregatorManager.runOnAggregators(
+					async (aggregator: Aggregator) => {
+						return aggregator.recomputeAllResourceAggregates(resource_id);
 					},
 				);
-
-				await Promise.all(updates$);
-				this.logger.debug(
-					`InitializationService completed for Aggregator ${aggregator.constructor.name}`,
-				);
-				return;
 			},
 		);
+
+		await Promise.all(tasks$);
 	}
 }
