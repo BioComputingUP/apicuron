@@ -28,7 +28,9 @@ import {
 } from '../events/badge-count-updated.event';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { BadgeEarnedEvent } from '../events/badge-earned.event';
+import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 @Injectable()
+@AggregatorClass()
 export class BadgeAggregatorService implements Aggregator {
 	constructor(
 		@InjectModel(BadgeDef.name)
@@ -110,13 +112,7 @@ export class BadgeAggregatorService implements Aggregator {
 	private async createOrUpdateBadge(
 		badgeDef: BadgeDefDocument,
 		report: ReportDocument | LeanReportDocument,
-	) {
-		this.logger.log(
-			'Applied update to badge ' +
-				badgeDef.name +
-				' for user ' +
-				report.curator_orcid,
-		);
+	): Promise<AchievementState> {
 		try {
 			const badge = await this.badgeModel.findOneAndUpdate(
 				{
@@ -160,14 +156,18 @@ export class BadgeAggregatorService implements Aggregator {
 					BadgeEarnedEvent.name,
 					new BadgeEarnedEvent(badge),
 				);
+
+				return AchievementState.achieved;
 			}
-			return;
+
+			return AchievementState.progress;
 		} catch (error: any) {
 			if (error instanceof MongoServerError && error.code == 11000) {
 				// Duplicate key error
 				// retry operation
 				this.logger.log('Duplicate key error..., retrying');
-				// this.logger.error(error.message, error.stack, error.name);
+				this.logger.error(error.message, error.stack, error.name);
+				return await this.createOrUpdateBadge(badgeDef, report);
 			} else {
 				throw error;
 			}
@@ -180,9 +180,17 @@ export class BadgeAggregatorService implements Aggregator {
 		const affectedBadgeDefs = this.badgeDefModel
 			.find(badgeDefsFilter)
 			.cursor({ batchSize: 20 });
-
+		const badgesUpdated$ = [];
 		for await (const badgeDef of affectedBadgeDefs) {
-			await this.createOrUpdateBadge(badgeDef, report);
+			const badgeUpdate$ = this.createOrUpdateBadge(badgeDef, report);
+
+			badgesUpdated$.push(badgeUpdate$);
+		}
+
+		const badgesUpdated = await Promise.all(badgesUpdated$);
+
+		if (!badgesUpdated.includes(AchievementState.achieved)) {
+			return;
 		}
 
 		await this.eventEmitter.emitAsync(
@@ -200,8 +208,16 @@ export class BadgeAggregatorService implements Aggregator {
 		const badgeDefFilter: FilterQuery<BadgeDefDocument> = {
 			resource_id,
 		};
-
+		performance.mark('before_compute_badges');
 		await this.computeBadges.computeBadges(badgeDefFilter);
+		performance.mark('after_compute_badges');
+		const m = performance.measure(
+			'compute_badges',
+			'before_compute_badges',
+			'after_compute_badges',
+		);
+
+		this.logger.warn(`Compute Badges took ${m.duration} ms`);
 
 		await this.eventEmitter.emitAsync(
 			ResourceBadgesUpdatedEvent.name,

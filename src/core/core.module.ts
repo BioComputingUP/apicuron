@@ -25,7 +25,7 @@ import {
 } from './schemas/statistics.schema';
 import {
 	AchievementDef,
-	AchievementDefSchema,
+	AchievementDefSchemaFactory,
 } from './schemas/achievements-def/achievement-def.schema';
 import {
 	Achievement,
@@ -50,6 +50,10 @@ import {
 	WeeklyStatistics,
 	WeeklyStatisticsSchemaFactory,
 } from './schemas/statistics/weekly-statistics.schema';
+import {
+	ResourceStats,
+	ResourceStatsSchema,
+} from './schemas/resource/resource-stats.schema';
 
 @Module({
 	imports: [
@@ -84,17 +88,16 @@ import {
 				name: Term.name,
 				schema: TermSchema,
 			},
-
+		]),
+		MongooseModule.forFeatureAsync([
 			{
 				name: AchievementDef.name,
-				schema: AchievementDefSchema,
+				useFactory: AchievementDefSchemaFactory,
 				discriminators: [
 					{ name: BadgeDef.name, schema: BadgeDefSchema, value: 'badge' },
 					{ name: MedalDef.name, schema: MedalDefSchema, value: 'medal' },
 				],
 			},
-		]),
-		MongooseModule.forFeatureAsync([
 			{
 				name: Achievement.name,
 				useFactory: AchievementsSchemaFactory,

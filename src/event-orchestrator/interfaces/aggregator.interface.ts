@@ -15,3 +15,12 @@ export interface Aggregator {
 	deleteLeague(resource_id: string, league: string): Promise<number> | number;
 	recomputeAllResourceAggregates(resource_id: string): Promise<any> | any;
 }
+
+export interface AggregatorOptions {
+	runBefore?: string[];
+}
+export interface AggregatorEntry {
+	aggregator: Aggregator;
+	options: AggregatorOptions;
+	name: string;
+}

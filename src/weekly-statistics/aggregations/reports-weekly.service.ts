@@ -6,11 +6,11 @@ import {
 	PipelineStage,
 } from 'mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { getLastWeekDate } from '../helpers/last-week-date';
 import { DaysOfWeek, DayOfWeek } from '../../core/enums';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { getLastWeekDate } from '../../util/date.helper';
 
 export interface AggregatedReportsWeekly {
 	resource_id: string;

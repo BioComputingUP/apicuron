@@ -4,6 +4,7 @@ import { HydratedDocument } from 'mongoose';
 import { AchievementDef } from '../achievements-def/achievement-def.schema';
 import { Term } from '../terms.schema';
 import { League, LeagueSchema } from '../league/league.schema';
+import { ResourceStats, ResourceStatsSchema } from './resource-stats.schema';
 
 export type PartnerResourceDocument = HydratedDocument<PartnerResource>;
 
@@ -57,6 +58,12 @@ export class PartnerResource {
 		default: () => 'default',
 	})
 	defaultLeague: string;
+
+	@Prop({
+		type: ResourceStatsSchema,
+		required: true,
+	})
+	stats: ResourceStats;
 
 	getLeague(leagueName: string) {
 		return this.leagues.find((league: League) => league.name == leagueName);

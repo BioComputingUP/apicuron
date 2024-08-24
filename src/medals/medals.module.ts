@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { EventOrchestratorModule } from '../event-orchestrator/event-orchestrator.module';
 import { MedalAggregatorService } from './services/medal-aggregator.service';
 import { CoreApicuronModule } from '../core/core.module';
 import { MedalDefCommandsService } from './services/medal-def-commands.service';
@@ -20,16 +19,6 @@ import { MedalsQueryService } from './services/medals-query.service';
 		CoreApicuronModule,
 		AuthModule,
 		ResourcesModule,
-		EventOrchestratorModule.registerAsync({
-			imports: [MedalsModule],
-			inject: [MedalAggregatorService],
-			useFactory(medalAggregator: MedalAggregatorService) {
-				return {
-					aggregator: medalAggregator,
-				};
-			},
-		}),
-
 		// ReportAggregatorModule.register(BadgeAggregatorService),
 	],
 	providers: [

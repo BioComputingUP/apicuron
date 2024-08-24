@@ -10,9 +10,11 @@ import {
 } from 'mongoose';
 import { DeleteResult, UpdateResult } from 'mongodb';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EntityUpdatedEvent } from '../events/entity-updated.event';
-import { MassEntityUpdated } from '../events/mass-entity-updated.event';
-import { EntityDeletedEvent } from '../events/entity-deleted.event';
+import {
+	EntityDeletedEvent,
+	MassEntityUpdated,
+	EntityUpdatedEvent,
+} from '../events';
 
 export abstract class EntityRepository<T extends Document> {
 	constructor(
@@ -29,12 +31,7 @@ export abstract class EntityRepository<T extends Document> {
 	async deleteById(id: string): Promise<T> {
 		const doc = await this.model.findByIdAndDelete(id);
 
-		const event = new EntityDeletedEvent(
-			this.model.modelName,
-			id,
-			doc,
-			new Date(),
-		);
+		const event = new EntityDeletedEvent(this.model, id, doc, new Date());
 		this.eventEmitter.emit(event.name, event);
 		return doc;
 	}
@@ -52,7 +49,7 @@ export abstract class EntityRepository<T extends Document> {
 	): Promise<T> {
 		const doc = await this.model.findOneAndDelete(filter, options);
 		const event = new EntityDeletedEvent(
-			this.model.modelName,
+			this.model,
 			doc._id.toString(),
 			doc,
 			new Date(),
@@ -89,12 +86,7 @@ export abstract class EntityRepository<T extends Document> {
 		options?: QueryOptions<T>,
 	): Promise<UpdateResult> {
 		const result = await this.model.updateMany(filter, update, options);
-		const event = new MassEntityUpdated(
-			this.model.modelName,
-			filter,
-			update,
-			new Date(),
-		);
+		const event = new MassEntityUpdated(this.model, filter, update, new Date());
 		this.eventEmitter.emit(event.name, event);
 		return result;
 	}
@@ -118,7 +110,7 @@ export abstract class EntityRepository<T extends Document> {
 			new: true,
 		});
 		const event = new EntityUpdatedEvent(
-			this.model.modelName,
+			this.model,
 			before._id.toString(),
 			before,
 			result,
@@ -148,7 +140,7 @@ export abstract class EntityRepository<T extends Document> {
 			new: true,
 		});
 		const event = new EntityUpdatedEvent(
-			this.model.modelName,
+			this.model,
 			id.toString(),
 			before,
 			doc,

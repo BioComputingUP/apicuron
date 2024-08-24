@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
 import { Report, ReportDocument } from '../schemas/reports.schema';
-import { EntityRepository } from './abstract-repository';
+import { EntityRepository } from './entity-repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 

@@ -28,8 +28,9 @@ import {
 } from '../events/medal-count-updated.event';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { User, UserDocument } from '../../core/schemas/user.schema';
-import { MedalEarnedEvent } from '../events/medal-earned.event';
+import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 @Injectable()
+@AggregatorClass()
 export class MedalAggregatorService implements Aggregator {
 	constructor(
 		@InjectModel(MedalDef.name)
@@ -112,127 +113,6 @@ export class MedalAggregatorService implements Aggregator {
 		await Promise.all(privacyUpdates$);
 	}
 
-	private async updateMedalsEarnedState(
-		medalDef: MedalDefDocument,
-	): Promise<number> {
-		this.logger.verbose(
-			`Compute Medals Earned for ${medalDef.name} score_relative: ${medalDef.score_relative}`,
-		);
-		const earnedMedalsList = await this.medalModel
-			.find(
-				{
-					resource_id: medalDef.resource_id,
-					league: medalDef.league,
-					name: medalDef.name,
-				},
-				null,
-				{ sort: { score_total: -1 } },
-			)
-			.limit(medalDef.score_relative);
-
-		if (earnedMedalsList.length === 0) {
-			this.logger.debug(
-				`No medals earned for ${medalDef.name} for resource ${medalDef.resource_id}`,
-			);
-			return 0;
-		}
-
-		const lowestMedalEarned: MedalDocument =
-			earnedMedalsList[earnedMedalsList.length - 1];
-
-		this.logger.debug(
-			`Lowest Medal (${lowestMedalEarned.name}) Earned is by ${lowestMedalEarned.curator_orcid} has score ${lowestMedalEarned.score_total}`,
-		);
-
-		// update all medals that are lower than the lowest medal earned
-		const updateLower = this.medalModel.updateMany(
-			{
-				name: medalDef.name,
-				resource_id: medalDef.resource_id,
-				league: medalDef.league,
-				score_total: { $lt: lowestMedalEarned.score_total },
-			},
-			{ $set: { state: AchievementState.progress } },
-		);
-
-		// update all medals that are higher than the lowest medal earned
-
-		const updateEarnedPromises$ = earnedMedalsList
-			.filter(
-				(medal: MedalDocument) => medal.state == AchievementState.progress,
-			)
-			.map(async (medal, idx) => {
-				medal.state = AchievementState.achieved;
-				medal.score_relative_index = idx;
-
-				return await medal.save();
-			});
-		const earnedMedals = await Promise.all(updateEarnedPromises$);
-
-		await updateLower;
-
-		this.logger.debug(
-			`Medal ${medalDef.name} earned by ${earnedMedals.length} curators`,
-		);
-
-		const MedalEearnedEvents$ = earnedMedals.map((medal) =>
-			this.eventEmitter.emitAsync(
-				MedalEarnedEvent.name,
-				new MedalEarnedEvent(medal),
-			),
-		);
-
-		await Promise.all(MedalEearnedEvents$);
-
-		return earnedMedals.length;
-	}
-
-	private async createOrUpdateMedal(
-		medalDef: MedalDefDocument,
-		report: ReportDocument | LeanReportDocument,
-		term: TermDocument,
-	) {
-		const medal = await this.medalModel.findOneAndUpdate(
-			{
-				resource_id: report.resource_id,
-				league: report.league,
-				list_terms: report.activity_term,
-				curator_orcid: report.curator_orcid,
-				name: medalDef.name,
-			},
-			{
-				$inc: {
-					count_total: 1,
-					score_total: term.score,
-				},
-				$setOnInsert: {
-					color: medalDef.color,
-					list_terms: medalDef.list_terms,
-					score_relative: medalDef.score_relative,
-					count_relative_valid: false,
-					score_threshold_valid: false,
-					privacy: computeAggregatePrivacyField(medalDef, report),
-					state: AchievementState.progress,
-				},
-			},
-			{
-				upsert: true,
-			},
-		);
-
-		if (!!medal) {
-			this.logger.verbose(
-				`Medal ${medal.name} updated for ${medal.curator_orcid}`,
-			);
-		}
-
-		const earnedMedalsCount = await this.updateMedalsEarnedState(medalDef);
-		this.logger.verbose(
-			` ${earnedMedalsCount} Medals earned for ${medalDef.name}`,
-		);
-		return earnedMedalsCount;
-	}
-
 	async applyReport(report: ReportDocument | LeanReportDocument) {
 		const term = await this.termModel.findOne({
 			resource_id: report.resource_id,
@@ -246,10 +126,18 @@ export class MedalAggregatorService implements Aggregator {
 			.cursor({ batchSize: 20 });
 		const medalDefsUpdated = [];
 		for await (const medalDef of affectedMedalDefs) {
-			const update$ = this.createOrUpdateMedal(medalDef, report, term);
+			const update$ = this.computeMedals.createOrUpdateMedal(
+				medalDef,
+				report,
+				term,
+			);
 			medalDefsUpdated.push(update$);
 		}
 		await Promise.all(medalDefsUpdated);
+
+		if (medalDefsUpdated.length == 0) {
+			return;
+		}
 
 		await this.eventEmitter.emitAsync(
 			UserMedalsCountUpdatedEvent.name,

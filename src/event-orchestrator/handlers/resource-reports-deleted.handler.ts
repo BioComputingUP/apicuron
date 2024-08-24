@@ -1,30 +1,19 @@
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Aggregator } from '../interfaces/aggregator.interface';
-import { EventOrchestratorModuleOptions } from '../interfaces/event-orchestrator-options.interface';
-import { MODULE_OPTIONS_TOKEN } from '../event-orchestrator.module-definition';
 import { IEventHandler } from '@nestjs/cqrs';
 import { OnEvent } from '@nestjs/event-emitter';
 import {
 	AllResourceReportsDeletedEvent,
 	IAllResourceReportsDeletedEventPayload,
 } from '../../submit-reports/events/events';
-import { Inject } from '@nestjs/common';
+import { BaseAggregatorRunner } from '../aggregator-runners/base.runner';
 
 export class ResourceReportsDeletedHandler implements IEventHandler {
-	constructor(
-		@Inject(MODULE_OPTIONS_TOKEN)
-		protected options: EventOrchestratorModuleOptions,
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-	) {
-		this.aggregator = options.aggregator;
-	}
-
-	aggregator: Aggregator;
+	constructor(protected aggregatorRunner: BaseAggregatorRunner) {}
 
 	@OnEvent(AllResourceReportsDeletedEvent, { async: true, promisify: true })
 	async handle({ resource_id }: IAllResourceReportsDeletedEventPayload) {
-		await this.aggregator.removeAllResourceAggregates(resource_id);
+		await this.aggregatorRunner.run(async (aggregator: Aggregator) => {
+			await aggregator.removeAllResourceAggregates(resource_id);
+		});
 	}
 }

@@ -87,9 +87,9 @@ export class ComputeBadgesService {
 					sort: { resource_id: -1, league: -1 },
 				},
 			)
-			.cursor({ batchSize: 50 });
+			.cursor({ batchSize: 100 });
 
-		const badgeSaves = [];
+		const userBadgesPromises$ = [];
 
 		for await (const badgeDef of badgeDefs) {
 			badgeDefCount++;
@@ -105,27 +105,26 @@ export class ComputeBadgesService {
 			const badges$ = [];
 
 			for await (const report of reportAggregationByUser) {
-				const badge = await this.buildBadgeFromAggregatedReports(
+				const computeBadge$ = this.buildBadgeFromAggregatedReports(
 					badgeDef,
 					report,
-				);
+				).then((badge) => badge.save());
 
-				badges$.push(badge.save());
+				badges$.push(computeBadge$);
 			}
-
-			badgeSaves.push(Promise.all(badges$));
+			userBadgesPromises$.push(Promise.all(badges$));
 
 			this.logger.log(
-				`Badge ${badgeDef.name} computed for ${badgeSaves.length} users`,
+				`Badge ${badgeDef.name} computed for ${badges$.length} users`,
 			);
 		}
 
-		await Promise.all(badgeSaves);
+		await Promise.all(userBadgesPromises$);
 
-		this.logger.log(`Computed ${badgeSaves.length} badges`);
+		this.logger.log(`Computed ${userBadgesPromises$.length} badges`);
 
 		return {
-			badgeCount: badgeSaves.length,
+			badgeCount: userBadgesPromises$.length,
 			badgeDefsCount: badgeDefCount,
 		};
 	}

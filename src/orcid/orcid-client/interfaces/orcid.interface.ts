@@ -40,6 +40,7 @@ export interface OrcidClientModuleOptions {
 	client_id: string;
 	client_secret: string;
 	scopes: string[];
+	loadOnStartup?: boolean;
 }
 
 export interface OrcidAuthToken {

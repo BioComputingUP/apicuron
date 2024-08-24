@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
 import { Statistics, StatisticsDocument } from '../schemas/statistics.schema';
-import { EntityRepository } from './abstract-repository';
+import { EntityRepository } from './entity-repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 export class StatisticsRepository extends EntityRepository<StatisticsDocument> {

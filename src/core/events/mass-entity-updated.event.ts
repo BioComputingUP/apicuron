@@ -1,13 +1,14 @@
-import { Document, FilterQuery, UpdateQuery } from 'mongoose';
+import { Document, FilterQuery, Model, UpdateQuery } from 'mongoose';
+import { EntityEvent } from './abstract-entity.event';
 
-export class MassEntityUpdated<T extends Document> {
+export class MassEntityUpdated<T extends Document> extends EntityEvent<T> {
 	name: string;
 	constructor(
-		public readonly model: string,
+		public readonly model: Model<T>,
 		public readonly query: FilterQuery<T>,
 		public readonly update: UpdateQuery<T>,
 		public readonly timestamp: Date,
 	) {
-		this.name = `${model}MassUpdatedEvent`;
+		super(model, timestamp);
 	}
 }

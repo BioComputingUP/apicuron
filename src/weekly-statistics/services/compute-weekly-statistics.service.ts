@@ -17,7 +17,7 @@ import {
 	ReportsWeeklyAggregationPipeline,
 } from '../aggregations/reports-weekly.service';
 import { PrivacyType } from '../../core/enums';
-import { getLastWeekDate } from '../helpers/last-week-date';
+import { getLastWeekDate } from 'src/util/date.helper';
 import { MongoServerError } from 'mongodb';
 @Injectable()
 export class ComputeWeeklyStatisticsService {

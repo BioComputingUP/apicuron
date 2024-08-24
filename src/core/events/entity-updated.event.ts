@@ -1,18 +1,15 @@
-import { Document } from 'mongoose';
+import { Document, Model } from 'mongoose';
+import { EntityEvent } from './abstract-entity.event';
 
-export class EntityUpdatedEvent<T extends Document> {
+export class EntityUpdatedEvent<T extends Document> extends EntityEvent<T> {
 	public name: string;
 	constructor(
-		public readonly model: string,
+		public readonly model: Model<T>,
 		public readonly identifier: string,
 		public readonly before: T,
 		public readonly after: T,
 		public readonly timestamp: Date,
 	) {
-		this.name = EntityUpdatedEvent.getModelEventName(model);
-	}
-
-	static getModelEventName(modelName: string): string {
-		return `${modelName}UpdatedEvent`;
+		super(model, timestamp);
 	}
 }

@@ -35,6 +35,7 @@ import { BadgesModule } from './badges/badges.module';
 import { MedalsModule } from './medals/medals.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { loadSentryModule } from './plugins/sentry';
+import { EventOrchestratorModule } from './event-orchestrator/event-orchestrator.module';
 
 const logger = new Logger('AppModule');
 
@@ -107,6 +108,7 @@ const logger = new Logger('AppModule');
 		MedalsModule,
 		BadgesModule,
 		AchievementsModule,
+		EventOrchestratorModule,
 	],
 	controllers: [AppController],
 	providers: [

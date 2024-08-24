@@ -28,17 +28,6 @@ import { StatisticsReportAggregator } from './aggregation/aggregate-reports.serv
 			max: 100,
 			shouldCloneBeforeSet: false,
 		}),
-		EventOrchestratorModule.registerAsync({
-			imports: [StatisticsModule],
-			inject: [StatisticsAggregator],
-			useFactory(
-				statisticsAggregator: StatisticsAggregator,
-			): EventOrchestratorModuleOptions {
-				return {
-					aggregator: statisticsAggregator,
-				};
-			},
-		}),
 	],
 	controllers: [StatisticsController, OldStatisticsController],
 	providers: [

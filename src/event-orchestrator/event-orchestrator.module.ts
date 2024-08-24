@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ConfigurableModuleClass } from './event-orchestrator.module-definition';
 import { CoreApicuronModule } from '../core/core.module';
 import { ManyReportsSubmittedHandler } from './handlers/many-reports-submitted.handler';
 import { ReportSubmittedEventHandler } from './handlers/report-submitted.handler';
@@ -10,9 +9,14 @@ import { TermUpdatedEventHandler } from './handlers/term-updated.handler';
 import { InitializationService } from './services/initialization.service';
 import { BulkReportSubmissionHandler } from './handlers/bulk-submission.handler';
 import { DeleteLeagueHandler } from './handlers/delete-league.handler';
+import { AggregatorManager } from './services/aggregator-manager.service';
+import { DiscoveryModule } from '@nestjs/core';
+import { AggregatorLoader } from './services/aggregator-loader.service';
+import { BaseAggregatorRunner } from './aggregator-runners/base.runner';
+import { BulkSubmissionRunner } from './aggregator-runners/bulk-submission.runner';
 
 @Module({
-	imports: [CoreApicuronModule],
+	imports: [DiscoveryModule, CoreApicuronModule],
 	providers: [
 		InitializationService,
 		ManyReportsSubmittedHandler,
@@ -23,7 +27,11 @@ import { DeleteLeagueHandler } from './handlers/delete-league.handler';
 		TermUpdatedEventHandler,
 		TermDeletedEventHandler,
 		DeleteLeagueHandler,
+		AggregatorLoader,
+		AggregatorManager,
+		BaseAggregatorRunner,
+		BulkSubmissionRunner,
 	],
 	exports: [],
 })
-export class EventOrchestratorModule extends ConfigurableModuleClass {}
+export class EventOrchestratorModule {}

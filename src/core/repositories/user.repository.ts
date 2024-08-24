@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../schemas/user.schema';
-import { EntityRepository } from './abstract-repository';
+import { EntityRepository } from './entity-repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 export class UserRepository extends EntityRepository<UserDocument> {

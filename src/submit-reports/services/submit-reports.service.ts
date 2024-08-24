@@ -23,7 +23,6 @@ import {
 } from '../events/events';
 
 import { MongoServerError } from 'mongodb';
-import { computePrivacyField } from '../../util/privacy.helper';
 
 @Injectable()
 export class SubmitReportService {
@@ -74,6 +73,7 @@ export class SubmitReportService {
 			await instance.save();
 
 			if (!options.preventEvents) {
+				console.log('emitting ReportSubmittedEvent');
 				await this.eventEmitter.emitAsync(ReportSubmittedEvent, {
 					report: instance,
 				} as IReportSubmittedEventPayload);

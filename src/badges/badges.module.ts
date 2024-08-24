@@ -17,22 +17,7 @@ import { BadgesController } from './controllers/badges.controller';
 import { BadgesQueryService } from './services/badges-query.service';
 
 @Module({
-	imports: [
-		CoreApicuronModule,
-		AuthModule,
-		ResourcesModule,
-		EventOrchestratorModule.registerAsync({
-			imports: [BadgesModule],
-			inject: [BadgeAggregatorService],
-			useFactory(badgeAggregator: BadgeAggregatorService) {
-				return {
-					aggregator: badgeAggregator,
-				};
-			},
-		}),
-
-		// ReportAggregatorModule.register(BadgeAggregatorService),
-	],
+	imports: [CoreApicuronModule, AuthModule, ResourcesModule],
 	providers: [
 		GroupReportsByUserAggregator,
 		BadgeDefCommandsService,

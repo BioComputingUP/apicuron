@@ -10,8 +10,11 @@ import {
 import { ComputeDetailedStatisticsService } from './compute-detailed-stats.service';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 
+@Injectable()
+@AggregatorClass()
 export class DetailedStatisticsAggregatorService implements Aggregator {
 	constructor(
 		@InjectModel(DetailedStatistics.name)

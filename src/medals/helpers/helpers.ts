@@ -53,13 +53,14 @@ export function GetrelatedReportFilter(
 	if (medalDef.first_day) {
 		timestampFilter = { $gte: medalDef.first_day, ...timestampFilter };
 	}
+
 	const filter: FilterQuery<ReportDocument> = {
 		resource_id: medalDef.resource_id,
 		league: medalDef.league,
 		activity_term: { $in: medalDef.list_terms },
 	};
 
-	if (!_.isEmpty(timestampFilter)) {
+	if (timestampFilter != null) {
 		filter.timestamp = timestampFilter;
 	}
 

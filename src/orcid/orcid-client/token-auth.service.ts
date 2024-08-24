@@ -14,10 +14,12 @@ export class OrcidTokenAuthService implements OnModuleInit {
 	) {}
 	private logger = new Logger(OrcidTokenAuthService.name);
 
-	private token: OrcidAuthToken;
+	private token: OrcidAuthToken = null;
 
 	async onModuleInit() {
-		await this.fetchToken();
+		if (this.options.loadOnStartup) {
+			await this.fetchToken();
+		}
 	}
 
 	private async fetchToken() {
@@ -45,13 +47,13 @@ export class OrcidTokenAuthService implements OnModuleInit {
 
 		this.token = token;
 
-		this.logger.debug(`Loaded ORCID API Key ${util.inspect(token)}`)
+		this.logger.debug(`Loaded ORCID API Key ${util.inspect(token)}`);
 
 		return token;
 	}
 
 	async getToken(): Promise<OrcidAuthToken> {
-		if (Date.now() + 10 * 1000 >= this.token.expires_at) {
+		if (Date.now() + 10 * 1000 >= this.token?.expires_at) {
 			return await this.fetchToken();
 		}
 		return this.token;

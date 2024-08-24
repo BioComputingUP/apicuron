@@ -1,6 +1,4 @@
-import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { MODULE_OPTIONS_TOKEN } from '../event-orchestrator.module-definition';
-import { EventOrchestratorModuleOptions } from '../interfaces/event-orchestrator-options.interface';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Aggregator } from '../interfaces/aggregator.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -9,26 +7,23 @@ import {
 } from '../../core/schemas/resource/partner-resource.schema';
 import { Model } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
+import { AggregatorManager } from './aggregator-manager.service';
 
 @Injectable()
 export class InitializationService implements OnModuleInit {
-	aggregator: Aggregator;
 	constructor(
-		@Inject(MODULE_OPTIONS_TOKEN)
-		protected options: EventOrchestratorModuleOptions,
 		@InjectModel(PartnerResource.name)
 		protected resourceModel: Model<PartnerResourceDocument>,
 		protected configService: ConfigService,
-	) {
-		this.aggregator = options.aggregator;
-	}
+		protected aggregatorManager: AggregatorManager,
+	) {}
 	logger = new Logger(InitializationService.name);
 	async onModuleInit() {
 		if (this.configService.get<string>('environment') == 'local') {
 			return;
 		}
 
-		// await this.initializeAggregateData();
+		await this.initializeAggregateData();
 	}
 
 	async initializeAggregateData() {
@@ -36,17 +31,20 @@ export class InitializationService implements OnModuleInit {
 
 		const resources = await this.resourceModel.find();
 
-		const updates$ = resources.map(
-			async ({ resource_id }: PartnerResourceDocument) => {
-				await this.aggregator.removeAllResourceAggregates(resource_id);
-				return await this.aggregator.applyAllReports(resource_id);
+		await this.aggregatorManager.runOnAggregators(
+			async (aggregator: Aggregator) => {
+				const updates$ = resources.map(
+					async ({ resource_id }: PartnerResourceDocument) => {
+						await aggregator.recomputeAllResourceAggregates(resource_id);
+					},
+				);
+
+				await Promise.all(updates$);
+				this.logger.debug(
+					`InitializationService completed for Aggregator ${aggregator.constructor.name}`,
+				);
+				return;
 			},
-		);
-
-		await Promise.all(updates$);
-
-		this.logger.debug(
-			`InitializationService completed for Aggregator ${this.aggregator.constructor.name}`,
 		);
 	}
 }

@@ -18,6 +18,7 @@ import { OrcidClientModuleOptions } from '../orcid-client/interfaces/orcid.inter
 					client_id: config.get<string>('ORCID_CLIENT_ID'),
 					client_secret: config.get<string>('ORCID_CLIENT_SECRET'),
 					scopes: ['/read-limited', '/activities/update'],
+					loadOnStartup: config.get<string>('environment') != 'local',
 				};
 			},
 		}),

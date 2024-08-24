@@ -15,8 +15,10 @@ import { ComputeWeeklyStatisticsService } from './compute-weekly-statistics.serv
 import { PrivacyType } from '../../core/enums';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
+import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 
 @Injectable()
+@AggregatorClass()
 export class WeeklyStatisticsAggregatorService implements Aggregator {
 	constructor(
 		@InjectModel(WeeklyStatistics.name)

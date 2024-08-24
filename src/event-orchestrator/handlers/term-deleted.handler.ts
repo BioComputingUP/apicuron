@@ -1,32 +1,23 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { IEventHandler } from '@nestjs/cqrs';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Aggregator } from '../interfaces/aggregator.interface';
-import { EventOrchestratorModuleOptions } from '../interfaces/event-orchestrator-options.interface';
-import { MODULE_OPTIONS_TOKEN } from '../event-orchestrator.module-definition';
 import { OnEvent } from '@nestjs/event-emitter';
 import {
 	ITermDeletedEventPayload,
 	TermDeletedEvent,
 } from '../../terms/events/events';
+import { AggregatorManager } from '../services/aggregator-manager.service';
+import { BaseAggregatorRunner } from '../aggregator-runners/base.runner';
 
 @Injectable()
 export class TermDeletedEventHandler implements IEventHandler {
-	constructor(
-		@Inject(MODULE_OPTIONS_TOKEN)
-		protected options: EventOrchestratorModuleOptions,
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-	) {
-		this.aggregator = options.aggregator;
-	}
-	aggregator: Aggregator;
+	constructor(protected aggregatorRunner: BaseAggregatorRunner) {}
 
 	@OnEvent(TermDeletedEvent.name, { promisify: true, async: true })
 	async handle(payload: ITermDeletedEventPayload) {
-		await this.aggregator.removeAllResourceAggregates(payload.term.resource_id);
-		await this.aggregator.applyAllReports(payload.term.resource_id);
-		return;
+		return await this.aggregatorRunner.run(async (aggregator: Aggregator) => {
+			await aggregator.removeAllResourceAggregates(payload.term.resource_id);
+			await aggregator.applyAllReports(payload.term.resource_id);
+		});
 	}
 }

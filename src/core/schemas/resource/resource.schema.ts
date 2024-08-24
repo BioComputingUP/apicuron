@@ -54,7 +54,7 @@ export class Resource {
 	// terms: Term[]
 }
 
-export const ResourceSchema = SchemaFactory.createForClass(Resource);
+const ResourceSchema = SchemaFactory.createForClass(Resource);
 
 ResourceSchema.virtual('terms', {
 	ref: Term.name,
@@ -75,7 +75,8 @@ ResourceSchema.virtual('medals', {
 	foreignField: 'resource_id',
 	match: { type: 'medal' },
 });
-// export { ResourceSchema }
+
+export { ResourceSchema };
 // function get_valid_resources_only(next) {
 // 	this.where('valid').equals(true);
 // }

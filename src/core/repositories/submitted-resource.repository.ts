@@ -1,5 +1,5 @@
 import { Model } from 'mongoose';
-import { EntityRepository } from './abstract-repository';
+import { EntityRepository } from './entity-repository';
 import { InjectModel } from '@nestjs/mongoose';
 import {
 	SubmittedResource,

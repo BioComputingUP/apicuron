@@ -11,30 +11,34 @@ import {
 } from '../../submit-reports/events/events';
 import { OnEvent } from '@nestjs/event-emitter';
 import { IEventHandler } from '@nestjs/cqrs';
+import { AggregatorManager } from '../services/aggregator-manager.service';
+import { BaseAggregatorRunner } from '../aggregator-runners/base.runner';
 
 @Injectable()
 export class ManyReportsSubmittedHandler implements IEventHandler {
 	constructor(
-		@Inject(MODULE_OPTIONS_TOKEN)
-		protected options: EventOrchestratorModuleOptions,
+		protected runner: BaseAggregatorRunner,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-	) {
-		this.aggregator = options.aggregator;
-	}
+	) {}
 
-	aggregator: Aggregator;
+	payloadProcessorFactory(payload: IManyReportsSubmittedEventPayload) {
+		return async (aggregator: Aggregator) => {
+			const reportDocuments = payload.reports.map(
+				(report) => new this.reportModel(report),
+			);
+			reportDocuments.sort(
+				(a, b) => a.timestamp.getTime() - b.timestamp.getTime(),
+			);
+
+			for (const report of reportDocuments) {
+				await aggregator.applyReport(report);
+			}
+		};
+	}
 
 	@OnEvent(ManyReportsSubmittedEvent, { async: true, promisify: true })
 	async handle(payload: IManyReportsSubmittedEventPayload) {
-		const reportDocuments = payload.reports.map(
-			(report) => new this.reportModel(report),
-		);
-		reportDocuments.sort(
-			(a, b) => a.timestamp.getTime() - b.timestamp.getTime(),
-		);
-
-		for (const report of reportDocuments) {
-			await this.aggregator.applyReport(report);
-		}
+		const processor = this.payloadProcessorFactory(payload);
+		await this.runner.run(processor);
 	}
 }

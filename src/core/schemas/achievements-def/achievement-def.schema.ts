@@ -80,5 +80,18 @@ export class AchievementDef implements IResourceEntity {
 	last_day?: Date;
 }
 
-export const AchievementDefSchema =
-	SchemaFactory.createForClass(AchievementDef);
+export const AchievementDefSchemaFactory = () => {
+	const AchievementDefSchema = SchemaFactory.createForClass(AchievementDef);
+
+	AchievementDefSchema.index(
+		{
+			resource_id: 1,
+			league: 1,
+			type: 1,
+			name: 1,
+		},
+		{ unique: true, name: 'unique_index' },
+	);
+
+	return AchievementDefSchema;
+};

@@ -1,23 +1,22 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { IEventHandler } from '@nestjs/cqrs';
-import { MODULE_OPTIONS_TOKEN } from '../event-orchestrator.module-definition';
-import { EventOrchestratorModuleOptions } from '../interfaces/event-orchestrator-options.interface';
 import { OnEvent } from '@nestjs/event-emitter';
 import { LeagueDeletedEvent } from '../../resources/partner-resources/leagues/events/league-deleted-event';
 import { Aggregator } from '../interfaces/aggregator.interface';
+import { BaseAggregatorRunner } from '../aggregator-runners/base.runner';
 
 @Injectable()
 export class DeleteLeagueHandler implements IEventHandler {
-	aggregator: Aggregator;
-	constructor(
-		@Inject(MODULE_OPTIONS_TOKEN)
-		protected options: EventOrchestratorModuleOptions,
-	) {
-		this.aggregator = options.aggregator;
-	}
+	constructor(protected aggregatorRunner: BaseAggregatorRunner) {}
 
 	@OnEvent(LeagueDeletedEvent.name, { async: true, promisify: true })
+	/**
+	 * Handles the LeagueDeletedEvent by deleting the league from the aggregators.
+	 * @param event The LeagueDeletedEvent object containing the details of the league to be deleted.
+	 */
 	async handle(event: LeagueDeletedEvent) {
-		return await this.aggregator.deleteLeague(event.resource_id, event.name);
+		this.aggregatorRunner.run(async (aggregator: Aggregator) => {
+			return await aggregator.deleteLeague(event.resource_id, event.name);
+		});
 	}
 }

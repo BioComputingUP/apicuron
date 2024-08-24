@@ -1,6 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
+import {
+	LeanReportDocument,
+	Report,
+	ReportDocument,
+} from '../../core/schemas/reports.schema';
 import { Cursor, FilterQuery, Model } from 'mongoose';
 import {
 	MedalDef,
@@ -16,6 +20,8 @@ import { AchievementState } from '../../core/enums';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import * as _ from 'lodash';
+import { GetrelatedReportFilter } from '../helpers/helpers';
+import { MedalEarnedEvent } from '../events/medal-earned.event';
 
 @Injectable()
 export class ComputeMedalsService {
@@ -133,44 +139,6 @@ export class ComputeMedalsService {
 	}
 
 	/**
-	 * Builds a report filter based on the given medal criteria.
-	 * @param medal - The medal definition to match against reports.
-	 * @returns The filter query object for matching related reports.
-	 */
-	public matchRelatedReports(
-		medal: MedalDefDocument,
-	): FilterQuery<ReportDocument> {
-		// first we first filter all the reports by the resource
-		// and the terms that are concerned by the medals
-		const reportFilter: FilterQuery<ReportDocument> = {
-			resource_id: medal.resource_id,
-			activity_term: {
-				$in: medal.list_terms,
-			},
-			league: medal.league,
-		};
-
-		// if the medal has a time constraint we make sure it's added to the filter
-		if (medal.first_day) {
-			reportFilter['timestamp'] = { $gte: medal.first_day };
-		}
-
-		if (medal.last_day) {
-			// if the timestamp object doesn't exist, it is created otherwise it is updated
-			if (!reportFilter['timestamp']) {
-				reportFilter['timestamp'] = { $lte: medal.last_day };
-			} else {
-				reportFilter['timestamp'] = {
-					...reportFilter['timestamp'],
-					$lte: medal.last_day,
-				};
-			}
-		}
-
-		return reportFilter;
-	}
-
-	/**
 	 * Retrieves a cursor for aggregating medal reports.
 	 * This function groups reports by user while counting all sorts of stats regarding the tasks
 	 * Specifically the total score
@@ -183,7 +151,7 @@ export class ComputeMedalsService {
 		medal: MedalDefDocument,
 		cursorOptions: { batchSize: number } = { batchSize: 50 },
 	): Cursor<MedalDefReportsUserSummary> {
-		const reportFilter = this.matchRelatedReports(medal);
+		const reportFilter = GetrelatedReportFilter(medal);
 
 		return (
 			this.reportModel
@@ -260,5 +228,124 @@ export class ComputeMedalsService {
 		this.logger.debug(`Computed ${medalComputedCounts.length} medals`);
 
 		return totalAchieved;
+	}
+
+	async updateMedalsEarnedState(medalDef: MedalDefDocument): Promise<number> {
+		this.logger.verbose(
+			`Compute Medals Earned for ${medalDef.name} score_relative: ${medalDef.score_relative}`,
+		);
+		const earnedMedalsList = await this.medalModel
+			.find(
+				{
+					resource_id: medalDef.resource_id,
+					league: medalDef.league,
+					name: medalDef.name,
+				},
+				null,
+				{ sort: { score_total: -1 } },
+			)
+			.limit(medalDef.score_relative);
+
+		if (earnedMedalsList.length === 0) {
+			this.logger.debug(
+				`No medals earned for ${medalDef.name} for resource ${medalDef.resource_id}`,
+			);
+			return 0;
+		}
+
+		const lowestMedalEarned: MedalDocument =
+			earnedMedalsList[earnedMedalsList.length - 1];
+
+		this.logger.debug(
+			`Lowest Medal (${lowestMedalEarned.name}) Earned is by ${lowestMedalEarned.curator_orcid} has score ${lowestMedalEarned.score_total}`,
+		);
+
+		// update all medals that are lower than the lowest medal earned
+		const updateLower = this.medalModel.updateMany(
+			{
+				name: medalDef.name,
+				resource_id: medalDef.resource_id,
+				league: medalDef.league,
+				score_total: { $lt: lowestMedalEarned.score_total },
+			},
+			{ $set: { state: AchievementState.progress } },
+		);
+
+		// update all medals that are higher than the lowest medal earned
+
+		const updateEarnedPromises$ = earnedMedalsList
+			.filter(
+				(medal: MedalDocument) => medal.state == AchievementState.progress,
+			)
+			.map(async (medal, idx) => {
+				medal.state = AchievementState.achieved;
+				medal.score_relative_index = idx;
+
+				return await medal.save();
+			});
+		const earnedMedals = await Promise.all(updateEarnedPromises$);
+
+		await updateLower;
+
+		this.logger.debug(
+			`Medal ${medalDef.name} earned by ${earnedMedals.length} curators`,
+		);
+
+		const MedalEearnedEvents$ = earnedMedals.map((medal) =>
+			this.eventEmitter.emitAsync(
+				MedalEarnedEvent.name,
+				new MedalEarnedEvent(medal),
+			),
+		);
+
+		await Promise.all(MedalEearnedEvents$);
+
+		return earnedMedals.length;
+	}
+
+	async createOrUpdateMedal(
+		medalDef: MedalDefDocument,
+		report: ReportDocument | LeanReportDocument,
+		term: TermDocument,
+	) {
+		const medal = await this.medalModel.findOneAndUpdate(
+			{
+				resource_id: report.resource_id,
+				league: report.league,
+				list_terms: report.activity_term,
+				curator_orcid: report.curator_orcid,
+				name: medalDef.name,
+			},
+			{
+				$inc: {
+					count_total: 1,
+					score_total: term.score,
+				},
+				$setOnInsert: {
+					color: medalDef.color,
+					list_terms: medalDef.list_terms,
+					score_relative: medalDef.score_relative,
+					count_relative_valid: false,
+					score_threshold_valid: false,
+					privacy: computeAggregatePrivacyField(medalDef, report),
+					state: AchievementState.progress,
+				},
+			},
+			{
+				upsert: true,
+			},
+		);
+
+		if (!!medal) {
+			this.logger.verbose(
+				`Medal ${medal.name} updated for ${medal.curator_orcid}`,
+			);
+		}
+
+		const earnedMedalsCount = await this.updateMedalsEarnedState(medalDef);
+		this.logger.verbose(
+			` ${earnedMedalsCount} Medals earned for ${medalDef.name}`,
+		);
+		return earnedMedalsCount;
 	}
 }
