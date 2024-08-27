@@ -43,7 +43,7 @@ export class BadgeFormComponent implements OnInit {
       ],
     ],
     count_threshold: [1, [Validators.required, Validators.min(1)]],
-    list_terms: [[] as string[], [Validators.required]],
+    list_terms: [[] as string[], [Validators.minLength(1)]],
   });
 
   constructor(

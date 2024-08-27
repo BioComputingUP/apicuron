@@ -1,64 +1,92 @@
 <form [formGroup]="form" (submit)="submit()">
-    <div
-        class="tw-bg-white tw-grid tw-grid-flow-row tw-grid-cols-1 tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4">
+  <div
+    class="tw-bg-white tw-grid tw-grid-flow-row tw-grid-cols-1 tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4"
+  >
+    <h2 *ngIf="type == 'create'" class="tw-text-xl tw-text-center tw-font-bold">
+      Create a new Badge "{{ this.form.get("name").value }}"
+    </h2>
 
+    <h2 *ngIf="type == 'update'" class="tw-text-xl tw-text-center tw-font-bold">
+      Updating Badge "{{ this.form.get("name").value }}"
+    </h2>
+    <ng-container *ngIf="type == 'create'">
+      <div class="form-control-element">
+        <label for="name">Badge Name</label>
+        <input type="text" name="" id="" formControlName="name" />
+      </div>
+    </ng-container>
 
-        <h2 *ngIf="type == 'create'" class="tw-text-xl tw-text-center tw-font-bold">Create a new
-            Badge "{{
-            this.form.get('name').value
-            }}"</h2>
+    <div *ngIf="terms" class="form-control-element">
+      <label for="list_terms">List of Terms</label>
 
-        <h2 *ngIf="type == 'update'" class="tw-text-xl tw-text-center tw-font-bold">Updating
-            Badge "{{
-            this.form.get('name').value
-            }}"</h2>
-        <ng-container *ngIf="type == 'create'">
-            <div class="form-control-element">
-                <label for="name">Badge Name</label>
-                <input type="text" name="" id="" formControlName="name">
-            </div>
-        </ng-container>
-
-
-        <div *ngIf="terms" class="tw-w-full">
-            <label for="list_terms">List of Terms</label>
-
-            <p-multiSelect [options]="terms" [group]="true" formControlName="list_terms"
-                defaultLabel="Select an activity Term" scrollHeight="250px" display="chip">
-                <ng-template let-group pTemplate="group">
-                    <div class="tw-flex tw-items-center">
-                        <span class="tw-capitalize">{{group.label}} Terms</span>
-                    </div>
-                </ng-template>
-            </p-multiSelect>
-        </div>
-
-        <div class="form-control-element">
-            <label for="color_code">Color Code</label>
-            <input type="text" name="" id="" formControlName="color_code">
-            <small class="tw-text-red-500 tw-text-sm tw-font-light"
-                *ngIf="form.get('color_code').hasError('pattern') && form.get('color_code').touched">
-                Color Code should be either a hex code (eg #333), "bronze", "silver" or "gold"
-            </small>
-        </div>
-
-
-
-        <div class="form-control-element">
-            <label for="score">Number of Contributions</label>
-            <input type="number" min="1" name="score" formControlName="count_threshold" id="">
-            <small class="tw-text-red-500 tw-text-sm tw-font-light"
-                *ngIf="form.get('count_threshold').hasError('min') && form.get('count_threshold').touched">
-                Minimum value of a count threshold is 1
-            </small>
-            <small>This value is the number of times a user has to complete an activity among the ones specified
-                above to earn the Badge</small>
-
-        </div>
-
-        <input type="submit" class="tw-w-full tw-cursor-pointer tw-p-2 tw-mx-1 tw-bg-green-500 tw-text-white tw-capitalize"
-            value="submit">
-
-
+      <p-multiSelect
+        [options]="terms"
+        [group]="true"
+        formControlName="list_terms"
+        defaultLabel="Select an activity Term"
+        scrollHeight="250px"
+        display="chip"
+      >
+        <ng-template let-group pTemplate="group">
+          <div class="tw-flex tw-items-center">
+            <span class="tw-capitalize">{{ group.label }} Terms</span>
+          </div>
+        </ng-template>
+      </p-multiSelect>
+      <small
+        class="tw-text-red-500 tw-text-sm tw-font-light"
+        *ngIf="form.get('list_terms').hasError('minLength') && form.touched"
+      >
+        At least one associated term is required to create a badge
+      </small>
     </div>
+
+    <div class="form-control-element">
+      <label for="color_code">Color Code</label>
+      <input type="text" name="" id="" formControlName="color_code" />
+      <small
+        class="tw-text-red-500 tw-text-sm tw-font-light"
+        *ngIf="form.get('color_code').hasError('pattern') && form.touched"
+      >
+        Color Code should be either a hex code (eg #333), "bronze", "silver" or
+        "gold"
+      </small>
+      <small
+        class="tw-text-red-500 tw-text-sm tw-font-light"
+        *ngIf="form.get('color_code').hasError('required') && form.touched"
+      >
+        Color code is required
+      </small>
+    </div>
+
+    <div class="form-control-element">
+      <label for="score">Number of Contributions</label>
+      <input
+        type="number"
+        min="1"
+        name="score"
+        formControlName="count_threshold"
+        id=""
+      />
+      <small
+        class="tw-text-red-500 tw-text-sm tw-font-light"
+        *ngIf="
+          form.get('count_threshold').hasError('min') &&
+          form.get('count_threshold').touched
+        "
+      >
+        Minimum value of a count threshold is 1
+      </small>
+      <small
+        >This value is the number of times a user has to complete an activity
+        among the ones specified above to earn the Badge</small
+      >
+    </div>
+
+    <input
+      type="submit"
+      class="tw-w-full tw-cursor-pointer tw-p-2 tw-mx-1 tw-bg-green-500 tw-text-white tw-capitalize"
+      value="submit"
+    />
+  </div>
 </form>

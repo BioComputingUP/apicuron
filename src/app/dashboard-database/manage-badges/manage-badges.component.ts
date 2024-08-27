@@ -84,7 +84,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
     this.termList$ = this.resource$.pipe(
       switchMap(({ resource_id }: Resource) => {
         return this.termsService.getTerms({ resource_id });
-      }),
+      })
     );
 
     this.terms$ = this.termList$.pipe(
@@ -105,8 +105,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
         });
         return groupValues;
       })
-
-    )
+    );
 
     this.badgeFilter$ = combineLatest([this.resource$, this.page$]).pipe(
       tap(console.log),
@@ -259,22 +258,25 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
   }
 
   delete_badge(badge) {
-    this.badgeDefService.deleteBadge(badge).pipe(take(1)).subscribe(
-      (response) => {
-        if (response["data"]) {
-          this.toastr.success(
-            `Badge ${badge.name} sucessfully Deleted`,
-            "Badge Deletion Sucessfull"
+    this.badgeDefService
+      .deleteBadge(badge)
+      .pipe(take(1))
+      .subscribe(
+        (response) => {
+          if (response["data"]) {
+            this.toastr.success(
+              `Badge ${badge.name} sucessfully Deleted`,
+              "Badge Deletion Sucessfull"
+            );
+            this.updateBadge$.next({ operation: "delete", badge });
+          }
+        },
+        (error) => {
+          this.toastr.error(
+            `An error occured while deleting the badge ${badge.name}`,
+            "Badge Deletion Failed"
           );
-          this.updateBadge$.next({ operation: "delete", badge });
         }
-      },
-      (error) => {
-        this.toastr.error(
-          `An error occured while deleting the badge ${badge.name}`,
-          "Badge Deletion Failed"
-        );
-      }
-    );
+      );
   }
 }
