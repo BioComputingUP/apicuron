@@ -12,13 +12,8 @@ import { PartnerResourcesService } from '../../resources/partner-resources/servi
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
 import { PrivacyType } from '../../core/enums';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
-import { BadgeAggregatorService } from '../../badges/services/badge-aggregator.service';
-import { MedalAggregatorService } from '../../medals/services/medal-aggregator.service';
-
 @Injectable()
-@AggregatorClass({
-	runBefore: [BadgeAggregatorService.name, MedalAggregatorService.name],
-})
+@AggregatorClass()
 export class StatisticsAggregator implements Aggregator {
 	constructor(
 		@InjectModel(Statistics.name)
