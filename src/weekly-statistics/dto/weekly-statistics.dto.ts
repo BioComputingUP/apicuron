@@ -75,8 +75,3 @@ export class WeeklyStatisticsDto {
 	@IsNotEmpty()
 	updatedAt: Date;
 }
-
-export class PaginatedWeeklyStatisticsDto extends Paginated<WeeklyStatisticsDto> {
-	@ApiProperty({ isArray: true, type: WeeklyStatisticsDto })
-	data: WeeklyStatisticsDto[];
-}

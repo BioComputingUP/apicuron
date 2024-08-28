@@ -1,6 +1,9 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { DetailedStatisticsService } from '../services/detailed-statistics.service';
-import { DetailedStatisticsFilter } from '../dto/detailedStatistics.dto';
+import {
+	DetailedStatisticsDto,
+	DetailedStatisticsFilter,
+} from '../dto/detailedStatistics.dto';
 import { AuthProtected } from '../../auth/decorators/auth.decorator';
 import { Public } from '../../auth/decorators/public.decorator';
 import { User } from '../../core/schemas/user.schema';
@@ -14,6 +17,8 @@ import {
 	ApiOperation,
 } from '@nestjs/swagger';
 import { DetailedStatistics } from '../../core/schemas/statistics/detailed-statistics.schema';
+import { ApiResponseWrapped } from '../../shared/decorators/wrapped-data-response.decorator';
+import { plainToClass } from 'class-transformer';
 
 @ApiTags('Detailed Statistics')
 @ApiHeader(VersionHeader)
@@ -28,11 +33,11 @@ export class DetailedStatisticsController {
 		description:
 			'Get a single JSON entry that contains the  for a given curator contributed to a resource in a specific league.',
 	})
-	@ApiOkResponse({
-		description:
-			'A JSON document containing detailed statistics for a given curator contributed to a resource in a specific league.',
-		type: DetailedStatistics,
-	})
+	@ApiResponseWrapped(
+		DetailedStatisticsDto,
+		200,
+		'Detailed statistics for a given curator contributed to a resource in a specific league.',
+	)
 	@Get(':resource_id/:curator_orcid/:league')
 	@AuthProtected()
 	@Public()
@@ -41,9 +46,11 @@ export class DetailedStatisticsController {
 		@UserReq() user: User | null,
 	) {
 		const privacyFilter = userResourceEntityPrivacyFilter(user);
-		return await this.detailedStatisticsService.getDetailedStatistics(
+		const data = await this.detailedStatisticsService.getDetailedStatistics(
 			filter,
 			privacyFilter,
 		);
+
+		return { data: plainToClass(DetailedStatisticsDto, data) };
 	}
 }

@@ -7,6 +7,8 @@ import {
 	BadgeDocument,
 } from '../../core/schemas/achievements/badges.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
+import { plainToClass, plainToInstance } from 'class-transformer';
+import { BadgeDto } from '../dto/badge.dto';
 
 @Injectable()
 export class BadgesQueryService {
@@ -18,14 +20,14 @@ export class BadgesQueryService {
 	async getBadges(
 		filter: FilterQuery<BadgeDocument>,
 		options: QueryOptions<BadgeDocument>,
-	) {
+	): Promise<{ data: BadgeDto[]; count: number }> {
 		filter.state = AchievementState.achieved;
 		const dataPromise = this.badgeModel.find(filter, {}, options);
 		const countPromise = this.badgeModel.count(filter);
 
 		const [data, count] = await Promise.all([dataPromise, countPromise]);
 		return {
-			data,
+			data: plainToInstance(BadgeDto, data),
 			count,
 		};
 	}

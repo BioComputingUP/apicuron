@@ -7,9 +7,8 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { InsertManyResult, Model } from 'mongoose';
-import { SubmitReportDto } from '../dto/submit-report.dto';
+import { SubmitReportDto, SubmitReportsDto } from '../dto/submit-report.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ReportDto } from '../../reports/dto/report.dto';
 import { DeleteResult } from 'mongodb';
 import { UsersService } from '../../auth/users/users.service';
 import { ReportMetaHandler } from './report-meta.handler';
@@ -99,7 +98,7 @@ export class SubmitReportService {
 	}
 
 	async insertReports(
-		reports: ReportDto[],
+		reportSubmission: SubmitReportsDto,
 		options = { preventEvents: false },
 	): Promise<
 		Omit<InsertManyResult<Report>, 'insertedIds'> & {
@@ -107,8 +106,9 @@ export class SubmitReportService {
 		}
 	> {
 		try {
+			const { reports } = reportSubmission;
 			const reportDocuments = reports.map(
-				(report: ReportDto) => new this.reportModel(report),
+				(report: SubmitReportDto) => new this.reportModel(report),
 			);
 
 			await this.reportMetaHandler.handleMultiple(reportDocuments);

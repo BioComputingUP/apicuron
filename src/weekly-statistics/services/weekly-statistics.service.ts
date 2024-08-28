@@ -5,6 +5,8 @@ import {
 	WeeklyStatisticsDocument,
 } from '../../core/schemas/statistics/weekly-statistics.schema';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
+import { plainToInstance } from 'class-transformer';
+import { WeeklyStatisticsDto } from '../dto/weekly-statistics.dto';
 
 @Injectable()
 export class WeeklyStatisticsService {
@@ -16,7 +18,9 @@ export class WeeklyStatisticsService {
 	async getUserWeeklyStatistics(
 		filter: FilterQuery<WeeklyStatisticsDocument> = {},
 	) {
-		return await this.WeeklyStatistics.findOne(filter);
+		const stat = await this.WeeklyStatistics.findOne(filter);
+
+		return plainToInstance(WeeklyStatisticsDto, stat);
 	}
 
 	async getWeeklyLeaderboard(

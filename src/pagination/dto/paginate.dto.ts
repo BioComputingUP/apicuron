@@ -1,25 +1,38 @@
 import { Transform, TransformFnParams } from 'class-transformer';
-import { IsInt, IsOptional, Max, Min } from 'class-validator';
+import { IsInt, IsOptional, Max, Min, ValidateIf } from 'class-validator';
 import { QueryOptions } from 'mongoose';
 import { PaginationAggregation } from '../interfaces/pagination-aggregation';
 import { omit } from 'lodash';
-export class PaginateDto {
+import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
+export class BasePaginationDto {
+	@ApiProperty({
+		description: 'The number of records to skip',
+		required: false,
+		default: 0,
+	})
 	@Min(0)
 	@IsInt()
+	@ValidateIf((o) => o.skip !== undefined)
 	@IsOptional()
-	@Transform(({ value }) => {
-		return Number.isNaN(parseInt(value)) ? null : parseInt(value);
+	@Transform(({ value }): number => {
+		return Number.isNaN(parseInt(value)) ? 0 : parseInt(value);
 	})
-	skip = 0;
+	skip: number;
 
+	@ApiProperty({
+		description: 'The limit of records to return',
+		required: false,
+		default: 10,
+	})
 	@Max(100)
 	@Min(-1)
 	@IsInt()
 	@IsOptional()
-	@Transform(({ value, obj }: TransformFnParams) => {
-		return Number.isNaN(parseInt(value)) ? obj.defaultLimit : parseInt(value);
+	@ValidateIf((o) => o.limit !== undefined)
+	@Transform(({ value, obj }: TransformFnParams): number => {
+		return Number.isNaN(parseInt(value)) ? -1 : parseInt(value);
 	})
-	limit;
+	limit: number;
 
 	getMongoQueryOptions<T>(): QueryOptions<T> {
 		if (this.limit < 0) {
@@ -50,6 +63,15 @@ export class PaginateDto {
 	omitPagination(): Omit<this, 'skip' | 'limit'> {
 		return omit(this, ['skip', 'limit']);
 	}
+}
 
-	defaultLimit = -1;
+@ApiExtraModels(PaginationDto)
+export class PaginationDto extends BasePaginationDto {
+	@ApiProperty()
+	@IsOptional()
+	skip: number;
+
+	@ApiProperty()
+	@IsOptional()
+	limit: number;
 }

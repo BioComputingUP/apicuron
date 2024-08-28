@@ -9,7 +9,10 @@ import {
 	IsString,
 } from 'class-validator';
 import { User } from '../../core/schemas/user.schema';
-import { PartnerResource, PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import {
+	PartnerResource,
+	PartnerResourceDocument,
+} from '../../core/schemas/resource/partner-resource.schema';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 import {
 	DateAfter,
@@ -17,11 +20,11 @@ import {
 } from '../../submit-reports/validators/date-comparison';
 import * as _ from 'lodash';
 import { Term } from '../../core/schemas/terms.schema';
-import { PaginateDto } from '../../pagination/dto/paginate.dto';
+import { BasePaginationDto } from '../../pagination/dto/paginate.dto';
 import { FilterQuery } from 'mongoose';
 import { ReportGroupBy } from '../types/group-by';
 
-export class ReportFilterDto extends PaginateDto {
+export class ReportFilterDto extends BasePaginationDto {
 	@Validate(EntryExistsRule, [
 		User.name,
 		({ curator_orcid }) => {
@@ -64,7 +67,7 @@ export class ReportFilterDto extends PaginateDto {
 	])
 	@IsString()
 	@IsOptional()
-	league: string;
+	league?: string;
 
 	@IsOptional()
 	entity_uri?: string;

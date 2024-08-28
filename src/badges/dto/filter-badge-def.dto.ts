@@ -6,11 +6,11 @@ import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../../core/schemas/resource/partner-resource.schema';
-import { PaginateDto } from '../../pagination/dto/paginate.dto';
+import { BasePaginationDto } from '../../pagination/dto/paginate.dto';
 import { ResourceIdExists } from '../../resources/partner-resources/validators/resource-id-exists';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 
-export class BadgeDefFilter extends PaginateDto {
+export class BadgeDefFilter extends BasePaginationDto {
 	static create(obj: any) {
 		const filter = new BadgeDefFilter();
 		Object.assign(filter, obj);

@@ -9,6 +9,8 @@ import { MedalsQueryService } from '../services/medals-query.service';
 import { VersionHeader } from '../../plugins/swagger/config';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
 import { MedalFilter } from '../dto/medal-filter.dto';
+import { MedalDto } from '../dto/medal.dto';
+import { ApiResponsePaginated } from '../../pagination/decorators/paginated-reponse.decorator';
 
 @ApiHeader(VersionHeader)
 @ApiTags('Achievements')
@@ -18,6 +20,11 @@ import { MedalFilter } from '../dto/medal-filter.dto';
 export class MedalsController {
 	constructor(protected medalsQueryService: MedalsQueryService) {}
 
+	@ApiResponsePaginated(
+		MedalDto,
+		200,
+		'A list of medals matching the filter achieved by users',
+	)
 	@AuthProtected()
 	@Public()
 	@Get('achievements/medals')
@@ -32,6 +39,6 @@ export class MedalsController {
 			filter.getMongoQueryOptions(),
 		);
 
-		return paginate(data, filter, count);
+		return paginate<MedalDto>(data, filter, count);
 	}
 }

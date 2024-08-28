@@ -1,21 +1,29 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PaginateDto } from './dto/paginate.dto';
-// import { Paginated } from './interfaces/paginated';
+import { BasePaginationDto } from './dto/paginate.dto';
 
+class Pagination {
+	@ApiProperty()
+	start: number;
+
+	@ApiProperty()
+	limit: number;
+
+	@ApiProperty()
+	total: number;
+}
+
+class Meta {
+	@ApiProperty()
+	pagination: Pagination;
+}
 export class Paginated<T> {
 	@ApiProperty({ isArray: true })
 	data: T[];
 
 	@ApiProperty()
-	meta: {
-		pagination: {
-			start: number;
-			limit: number;
-			total: number;
-		};
-	};
+	meta: Meta;
 
-	constructor(data: T[], page: PaginateDto, totalCount: number) {
+	constructor(data: T[], page: BasePaginationDto, totalCount: number) {
 		this.data = data;
 		this.meta = {
 			pagination: {
@@ -28,7 +36,7 @@ export class Paginated<T> {
 }
 export function paginate<T>(
 	data: T[],
-	page: PaginateDto,
+	page: BasePaginationDto,
 	totalCount: number,
 ): Paginated<T> {
 	return new Paginated<T>(data, page, totalCount);

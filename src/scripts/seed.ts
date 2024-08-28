@@ -15,6 +15,8 @@ import { PrivacyType } from '../core/enums';
 import { Logger } from '@nestjs/common';
 import { UsersService } from '../auth/users/users.service';
 import { SubmitReportService } from '../submit-reports/services/submit-reports.service';
+import { plainToInstance } from 'class-transformer';
+import { SubmitReportsDto } from '../submit-reports/dto/submit-report.dto';
 
 async function bootstrap() {
 	const app = await NestFactory.createApplicationContext(AppModule);
@@ -140,7 +142,9 @@ async function bootstrap() {
 		reports.push(report);
 	}
 
-	await app.get(SubmitReportService).insertReports(reports);
+	await app
+		.get(SubmitReportService)
+		.insertReports(plainToInstance(SubmitReportsDto, { reports }));
 
 	// await Promise.all(savesPromise);
 
@@ -169,7 +173,7 @@ export async function mockReport(
 		{ skip: random(0, userCount - 1, false) },
 	);
 
-	const report = new reportModel({
+	const report = {
 		activity_term: faker.helpers.arrayElement(terms),
 
 		curator_orcid: randomUser.orcid_id,
@@ -186,7 +190,7 @@ export async function mockReport(
 			PrivacyType.public,
 		]),
 		league: faker.helpers.arrayElement(resource.leagues.map((l) => l.name)),
-	});
+	};
 
 	return report;
 }

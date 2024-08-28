@@ -8,16 +8,14 @@ import {
 	ReportFilterGroupedDto,
 } from './dto/report-filter.dto';
 import { Report, ReportDocument } from '../core/schemas/reports.schema';
-import * as _ from 'lodash';
 import { paginate } from '../pagination/paginator';
 import { PaginationAggregation } from '../pagination/interfaces/pagination-aggregation';
 import { OnEvent } from '@nestjs/event-emitter';
 import { UsersService } from '../auth/users/users.service';
-import {
-	ITermDeletedEventPayload,
-	TermDeletedEvent,
-} from '../terms/events/events';
+import { TermDeletedEvent } from '../terms/events/events';
 import { pick, mapKeys } from 'lodash';
+import { plainToInstance } from 'class-transformer';
+import { ReportWithTermDto } from './dto/report.dto';
 @Injectable()
 export class ReportsService {
 	constructor(
@@ -143,9 +141,17 @@ export class ReportsService {
 			data = reports_with_terms;
 		}
 
+		const reportsData = plainToInstance(ReportWithTermDto, data, {
+			excludeExtraneousValues: true,
+		});
+
 		const reports_count: number = await this.reportModel.count(query);
 
-		return paginate(data, reportFilter, reports_count);
+		return paginate<ReportWithTermDto>(
+			reportsData,
+			reportFilter,
+			reports_count,
+		);
 	}
 
 	async getGroupedReports(
@@ -350,7 +356,7 @@ export class ReportsService {
 	}
 
 	@OnEvent(TermDeletedEvent.name, { async: true, promisify: true })
-	async deleteTermReports({ term }: ITermDeletedEventPayload) {
+	async deleteTermReports({ term }: TermDeletedEvent) {
 		return await this.reportModel.deleteMany({
 			resource_id: term.resource_id,
 			activity_term: term.activity_term,

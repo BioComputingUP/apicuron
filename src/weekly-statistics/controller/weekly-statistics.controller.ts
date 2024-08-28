@@ -5,7 +5,7 @@ import {
 	Param,
 	Query,
 } from '@nestjs/common';
-import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { VersionHeader } from '../../plugins/swagger/config';
 import { WeeklyStatisticsFilter } from '../dto/weekly-statistics-filter';
 import { UserReq } from '../../auth/decorators/applyUser.decorator';
@@ -14,13 +14,12 @@ import { Public } from '../../auth/decorators/public.decorator';
 import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
 import { WeeklyStatisticsService } from '../services/weekly-statistics.service';
 import { User } from '../../core/schemas/user.schema';
-import { PaginateDto } from '../../pagination/dto/paginate.dto';
-import { paginate } from '../../pagination/paginator';
+import { BasePaginationDto } from '../../pagination/dto/paginate.dto';
+import { paginate, Paginated } from '../../pagination/paginator';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import {
-	PaginatedWeeklyStatisticsDto,
-	WeeklyStatisticsDto,
-} from '../dto/weekly-statistics.dto';
+import { WeeklyStatisticsDto } from '../dto/weekly-statistics.dto';
+import { ApiResponsePaginated } from '../../pagination/decorators/paginated-reponse.decorator';
+import { ApiResponseWrapped } from '../../shared/decorators/wrapped-data-response.decorator';
 
 @ApiTags('Weekly Statistics')
 @ApiHeader(VersionHeader)
@@ -38,20 +37,19 @@ export class WeeklyStatisticsController {
 		description:
 			'This endpoint is used to get the weekly leaderboard for a given resource.',
 	})
-	@ApiResponse({
-		status: 200,
-		description: 'The weekly leaderboard for the given resource',
-		type: PaginatedWeeklyStatisticsDto,
-		isArray: true,
-	})
+	@ApiResponsePaginated(
+		WeeklyStatisticsDto,
+		200,
+		'The weekly leaderboard for the given resource',
+	)
 	@AuthProtected()
 	@Public()
 	@Get(':resource_id/leaderboard')
 	async getWeeklyLeaderboard(
 		@Param('resource_id') resource_id: string,
-		@Query() pagination: PaginateDto,
+		@Query() pagination: BasePaginationDto,
 		@UserReq() user: User | null,
-	): Promise<PaginatedWeeklyStatisticsDto> {
+	): Promise<Paginated<WeeklyStatisticsDto>> {
 		const exists = await this.resourceService.exists(resource_id);
 		if (!exists) {
 			throw new NotFoundException(`Resource ${resource_id} not found`);
@@ -79,6 +77,11 @@ export class WeeklyStatisticsController {
 		description:
 			'This endpoint is used to get the weekly statistics for a given curator at a given resource while belonging in a specific league.',
 	})
+	@ApiResponseWrapped(
+		WeeklyStatisticsDto,
+		200,
+		'The weekly statistics for the given user for a specific resource and league',
+	)
 	@AuthProtected()
 	@Public()
 	@Get(':resource_id/:curator_orcid/:league')
@@ -87,8 +90,10 @@ export class WeeklyStatisticsController {
 		@UserReq() user: User | null,
 	) {
 		const privacyFilter = userResourceEntityPrivacyFilter(user);
-		return await this.weeklyStatisticsService.getUserWeeklyStatistics({
+		const data = await this.weeklyStatisticsService.getUserWeeklyStatistics({
 			$and: [statFilter, privacyFilter],
 		});
+
+		return { data };
 	}
 }

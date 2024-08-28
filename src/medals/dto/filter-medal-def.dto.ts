@@ -1,11 +1,11 @@
 import { Validate, IsOptional, IsString, IsDate } from 'class-validator';
-import { PaginateDto } from '../../pagination/dto/paginate.dto';
+import { BasePaginationDto } from '../../pagination/dto/paginate.dto';
 import { ResourceIdExists } from '../../resources/partner-resources/validators/resource-id-exists';
 import { Type } from 'class-transformer';
 import { MaxDateField, MinDateField } from '../validators/date-comparison';
 import { MedalUnique } from '../validators/achievement-exists';
 
-export class MedalDefFilter extends PaginateDto {
+export class MedalDefFilter extends BasePaginationDto {
 	static create(obj: any) {
 		const filter = new MedalDefFilter();
 		Object.assign(filter, obj);

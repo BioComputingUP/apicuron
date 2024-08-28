@@ -6,6 +6,8 @@ import {
 	MedalDocument,
 } from '../../core/schemas/achievements/medals.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
+import { plainToInstance } from 'class-transformer';
+import { MedalDto } from '../dto/medal.dto';
 
 export class MedalsQueryService {
 	constructor(
@@ -16,12 +18,15 @@ export class MedalsQueryService {
 	async getMedals(
 		filter: FilterQuery<MedalDocument>,
 		options: QueryOptions<MedalDocument>,
-	): Promise<{ data: MedalDocument[]; count: number }> {
+	): Promise<{ data: MedalDto[]; count: number }> {
 		filter.state = AchievementState.achieved;
 		const dataPromise = this.medalModel.find(filter, {}, options);
 		const countPromise = this.medalModel.count(filter);
 
-		const [data, count] = await Promise.all([dataPromise, countPromise]);
+		const [medals, count] = await Promise.all([dataPromise, countPromise]);
+
+		const data = plainToInstance(MedalDto, medals);
+
 		return {
 			data,
 			count,

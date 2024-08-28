@@ -3,22 +3,13 @@ import {
 	NestInterceptor,
 	ExecutionContext,
 	CallHandler,
-	Inject,
 } from '@nestjs/common';
-import { Observable, filter } from 'rxjs';
-import {
-	concatMap,
-	map,
-	mergeMap,
-	shareReplay,
-	switchMap,
-	tap,
-} from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 // import { TransformerService } from './transformer.service';
 
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
-	// constructor(protected transformerService: TransformerService) {}
 	intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
 		const req = context.switchToHttp().getRequest();
 		if (req.get('version') != '2') {

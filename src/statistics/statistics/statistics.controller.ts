@@ -19,13 +19,17 @@ import {
 	ApiHeader,
 	ApiOkResponse,
 	ApiOperation,
+	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger';
 import { VersionHeader } from '../../plugins/swagger/config';
 import { UsersService } from '../../auth/users/users.service';
 import { Response } from 'express';
 import { plainToInstance } from 'class-transformer';
-import { PaginateDto } from '../../pagination/dto/paginate.dto';
+import {
+	BasePaginationDto,
+	PaginationDto,
+} from '../../pagination/dto/paginate.dto';
 import { Public } from '../../auth/decorators/public.decorator';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
 import { UserReq } from '../../auth/decorators/applyUser.decorator';
@@ -36,6 +40,8 @@ import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
 import { ValidationError, validate } from 'class-validator';
 import { paginate } from '../../pagination/paginator';
 import { mapValues, uniq, map, keyBy } from 'lodash';
+import { StatLeaderboardDto } from '../dto/statistics.dto';
+import { ApiResponsePaginated } from '../../pagination/decorators/paginated-reponse.decorator';
 @ApiTags('Statistics')
 @ApiHeader(VersionHeader)
 @Controller({
@@ -52,26 +58,29 @@ export class StatisticsController {
 
 	private readonly logger = new Logger(StatisticsController.name);
 
-	@ApiOperation({
-		summary:
-			'Get a paginated list of user statistics sorted by their score representing the resource leaderboard',
-	})
-	@ApiOkResponse({
-		description:
-			'A paginated list of user statistics sorted by the highest score to the lowest',
-	})
+	// @ApiOperation({
+	// 	summary:
+	// 		'Get a paginated list of user statistics sorted by their score representing the resource leaderboard',
+	// })
+	@ApiResponsePaginated(
+		StatLeaderboardDto,
+		200,
+		'Paginated list of user statistics',
+	)
+	// @ApiQuery({ name: 'skip', type: Number, required: false })
+	// @ApiQuery({ name: 'limit', type: Number, required: false })
 	@AuthProtected()
 	@Public()
-	@Get('leaderboard/:resource_id')
+	@Get(':resource_id/leaderboard')
 	async getResourceLeaderboard(
+		@Query() pagination: BasePaginationDto,
 		@Param('resource_id') resource_id: string,
-		@Query() pagination: PaginateDto,
 		@UserReq() user: User | null,
 	) {
-		const resourceExists = await this.partnerResourceService.exists(
+		const resource = await this.partnerResourceService.get_resource(
 			resource_id,
 		);
-		if (!resourceExists) {
+		if (!resource) {
 			throw new NotFoundException(`Resource ${resource_id} Not found !`);
 		}
 
@@ -86,8 +95,9 @@ export class StatisticsController {
 			filter,
 			pagination.getMongoQueryOptions(),
 		);
+		const paginated = paginate<StatLeaderboardDto>(data, pagination, count);
 
-		return paginate(data, pagination, count);
+		return paginated;
 	}
 
 	@ApiOkResponse({
@@ -179,7 +189,7 @@ export class OldStatisticsController {
 		@UserReq() user: User | null,
 		@Res() res: Response,
 	) {
-		const pagination = new PaginateDto();
+		const pagination = new BasePaginationDto();
 		pagination.limit = page_size;
 		pagination.skip = (page - 1) * pagination.limit;
 

@@ -1,5 +1,6 @@
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { INestApplication } from '@nestjs/common';
+import { NextFunction, Request, Response } from 'express';
 
 export function setupSwagger(app: INestApplication, docs_prefix = '') {
 	// setup for swagger docs generation
@@ -37,6 +38,14 @@ export function setupSwagger(app: INestApplication, docs_prefix = '') {
 			explorer: false,
 		},
 	});
+
+	app
+		.getHttpAdapter()
+		.getInstance()
+		.get('/test-route', (req: Request, res: Response, next: NextFunction) => {
+			res.send(document.components.schemas);
+			return;
+		});
 
 	// resetting the prefix for the proxy routing
 	app.setGlobalPrefix('');

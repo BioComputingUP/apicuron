@@ -11,6 +11,7 @@ import {
 	InternalServerErrorException,
 	Query,
 	UploadedFile,
+	Header,
 } from '@nestjs/common';
 import {
 	ApiOperation,
@@ -43,6 +44,7 @@ import {
 	ReportSubmittedEvent,
 } from '../events/events';
 import { isArray } from 'lodash';
+import { AuthProtected } from '../../auth/decorators/auth.decorator';
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
 @Controller({ path: 'reports', version: '2' })
@@ -84,10 +86,9 @@ export class SubmitReportsController {
 		example: ['disprot'],
 		required: false,
 	})
-	@ApiSecurity('basic')
 	@ApiConsumes('multipart/form-data')
+	@AuthProtected()
 	@Post('bulk')
-	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	@UseInterceptors(
 		FileInterceptor('reports', {
 			dest: '/tmp/apicuron/reports/',
@@ -204,7 +205,7 @@ export class SubmitReportsController {
 		}
 
 		const { insertedCount, reports } = await this.reportService.insertReports(
-			reportSubmission.reports,
+			reportSubmission,
 			{ preventEvents: true },
 		);
 		response.insertedCount = insertedCount;

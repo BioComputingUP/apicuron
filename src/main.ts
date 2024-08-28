@@ -1,6 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
+import {
+	ClassSerializerInterceptor,
+	Logger,
+	ValidationPipe,
+	VersioningType,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { useContainer } from 'class-validator';

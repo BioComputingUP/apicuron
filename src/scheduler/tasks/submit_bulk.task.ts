@@ -1,5 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { SubmitReportDto } from '../../submit-reports/dto/submit-report.dto';
+import {
+	SubmitReportDto,
+	SubmitReportsDto,
+} from '../../submit-reports/dto/submit-report.dto';
 
 import * as StreamObject from 'stream-json/streamers/StreamObject';
 import { createReadStream, readFileSync, statSync } from 'fs';
@@ -15,7 +18,7 @@ import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { InjectModel } from '@nestjs/mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Model } from 'mongoose';
-import { plainToClass } from 'class-transformer';
+import { plainToClass, plainToInstance } from 'class-transformer';
 import { MongoBulkWriteError } from 'mongodb';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SubmitReportService } from '../../submit-reports/services/submit-reports.service';
@@ -122,13 +125,17 @@ export class SubmitBulkTask {
 			.map((report) => report.report.resource_id)
 			.reduce((acc, resource_id) => acc.add(resource_id), new Set<string>());
 
-		const reportDocuments: ReportDocument[] = validReports.map(
-			(report) => new this.reportModel(report.report),
+		const reportsToSave: SubmitReportDto[] = validReports.map(
+			(validatedReport) => validatedReport.report,
 		);
+
+		const reportSubmission = plainToInstance(SubmitReportsDto, {
+			reports: reportsToSave,
+		});
 
 		try {
 			const insertResult = await this.submitReports.insertReports(
-				reportDocuments,
+				reportSubmission,
 			);
 
 			const insertCount = insertResult.insertedCount ?? 0;
