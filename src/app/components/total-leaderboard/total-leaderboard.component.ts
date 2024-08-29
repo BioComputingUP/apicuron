@@ -1,38 +1,47 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
-import { LeaderboardComponent } from '../leaderboard/leaderboard.component';
-import { LeaderboardService } from 'src/app/databases/services/leaderboard.service';
-import { ResourcesService } from 'src/app/resource/service/resources.service';
-import { ActivatedRoute, ParamMap } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { BehaviorSubject, Observable, Subject, combineLatest } from 'rxjs';
-import { Resource } from 'src/app/models/resource.model';
-import { User } from 'src/app/models/User.model';
-import { BaseCuratorStatistics } from 'src/app/models/statistics.model';
-import { map, shareReplay, startWith, switchMap } from 'rxjs/operators';
-import { StatisticsFilter } from 'src/app/curator-statistics/models/statistics-filter';
-import { CuratorWithStats } from 'src/app/curator-statistics/models/curator-stats';
-import { Paginated } from 'src/app/interfaces/paginated';
-import { CuratorStatisticsService } from 'src/app/curator-statistics/services/curator-statistics.service';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+} from "@angular/core";
+import { LeaderboardComponent } from "../leaderboard/leaderboard.component";
+import { LeaderboardService } from "src/app/databases/services/leaderboard.service";
+import { ResourcesService } from "src/app/resource/service/resources.service";
+import { ActivatedRoute } from "@angular/router";
+import { CommonModule } from "@angular/common";
+import {
+  BehaviorSubject,
+  Observable,
+  ReplaySubject,
+  Subject,
+  combineLatest,
+} from "rxjs";
+import { Resource } from "src/app/models/resource.model";
+import { map, switchMap, tap } from "rxjs/operators";
+import { Paginated } from "src/app/interfaces/paginated";
+import { CuratorStatisticsService } from "src/app/curator-statistics/services/curator-statistics.service";
+import { LeaderboardFilter } from "../../databases/interfaces/leaderboard-filter";
+import { AngularSvgIconModule } from "angular-svg-icon";
+import { LeaderboardEntry } from "../../databases/interfaces/leaderboard-entry";
 @Component({
   standalone: true,
-  selector: 'total-leaderboard',
-  templateUrl: './total-leaderboard.component.html',
-  imports: [CommonModule, LeaderboardComponent],
+  selector: "total-leaderboard",
+  templateUrl: "./total-leaderboard.component.html",
+  imports: [CommonModule, LeaderboardComponent, AngularSvgIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TotalLeaderboardComponent implements OnInit, OnDestroy {
-  resource_id$: Observable<string>;
-  resource$: Observable<Resource>;
+  resource$ = new ReplaySubject<Resource>(1);
 
-  totalLeaderboard$: Observable<{ user: User; stat: BaseCuratorStatistics }[]>;
-  paginatedTotalLeaderboard$: Observable<{ user: User; stat: BaseCuratorStatistics }[]>;
+  @Input("resource") set resource(value: Resource) {
+    console.log("Resource Set", value);
+    this.resource$.next(value);
+  }
+
+  totalLeaderboard$: Observable<Paginated<LeaderboardEntry>>;
   totalContributors$: Observable<number>;
-
-  statFilter$: Observable<StatisticsFilter>;
-  stats$: Observable<Paginated<CuratorWithStats>>;
-  statsWithUsers$: Observable<{ stat: BaseCuratorStatistics; user: User }[]>;
-  statsList$: Observable<CuratorWithStats[]>;
-  statsMeta$: Observable<{ pagination: { total: number; start: number; limit: number }; }>;
+  leaderboardFilter$: Observable<LeaderboardFilter>;
   maxPage$: Observable<number>;
 
   destroy$ = new Subject();
@@ -40,62 +49,54 @@ export class TotalLeaderboardComponent implements OnInit, OnDestroy {
   limit = 10;
 
   tableColumnsTotal: string[] = [
-    'medals_count',
-    'badges_count',
-    'generation_count',
-    'invalidation_count',
-    'revision_count',
-    'total_score',
-    'last_contribution'
+    "medals_count",
+    "badges_count",
+    "generation_count",
+    "invalidation_count",
+    "revision_count",
+    "total_score",
+    "last_contribution",
   ];
 
   constructor(
     protected resourceService: ResourcesService,
     protected leaderboardService: LeaderboardService,
     protected route: ActivatedRoute,
-    protected statService: CuratorStatisticsService,
-  ) { }
+    protected statService: CuratorStatisticsService
+  ) {}
 
   ngOnInit(): void {
-    this.resource_id$ = this.route.paramMap.pipe(
-      map((params: ParamMap) => params.get('resource_id'))
+    this.leaderboardFilter$ = combineLatest([this.resource$, this.page$]).pipe(
+      map(([resource, page]: [Resource, number]) => {
+        return new LeaderboardFilter(
+          resource.resource_id,
+          (page - 1) * this.limit,
+          this.limit
+        );
+      })
     );
 
-    this.resource$ = this.resource_id$.pipe(
-      switchMap(resource_id => this.resourceService.get_resource(resource_id).pipe(shareReplay()))
-    );
-
-    this.totalLeaderboard$ = this.resource_id$.pipe(
-      switchMap((resource_id: string) => 
-        this.leaderboardService.getResourceLeaderboardWithUsers(resource_id)
-      ),
-      shareReplay()
-    );
-
-    this.paginatedTotalLeaderboard$ = combineLatest([this.totalLeaderboard$, this.page$]).pipe(
-      map(([totalLeaderboard, page]) => {
-        const start = (page - 1) * this.limit;
-        const end = start + this.limit;
-        return totalLeaderboard.slice(start, end);
-      }),
-      shareReplay()
+    this.totalLeaderboard$ = this.leaderboardFilter$.pipe(
+      switchMap((filter: LeaderboardFilter) =>
+        this.leaderboardService.getResourceLeaderboard(filter)
+      )
     );
 
     this.totalContributors$ = this.totalLeaderboard$.pipe(
-      map(totalLeaderboard => totalLeaderboard.length),
-      startWith(0)
+      map((totalLeaderboard) => totalLeaderboard.meta.pagination.total)
     );
-    
+
     this.maxPage$ = this.totalLeaderboard$.pipe(
-      map(totalLeaderboard => Math.ceil(totalLeaderboard.length / this.limit)),
-      startWith(1)
+      map((totalLeaderboard) =>
+        Math.ceil(totalLeaderboard.meta.pagination.total / this.limit)
+      ),
     );
   }
 
   ngOnDestroy(): void {
     this.destroy$.next(true);
   }
-  
+
   nextPage() {
     this.page$.next(this.page$.value + 1);
   }

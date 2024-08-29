@@ -1,5 +1,5 @@
 <!-- Weekly Leaderboard -->
-<ng-container *ngIf="paginatedWeeklyLeaderboard$ | async as weeklyLeaderboard">
+<ng-container *ngIf="weeklyLeaderboard$ | async as weeklyLeaderboard">
 	<ng-container *ngIf="resource$ | async as resource">
 		<div class="tw-flex tw-flex-col tw-overflow-x-auto">
 			<table class="tw-table-auto">
@@ -21,8 +21,8 @@
 					</tr>
 				</thead>
 				<tbody class="tw-divide-y tw-divide-gray-200">
-					<tr *ngFor="let entry of weeklyLeaderboard; let indexOfelement=index" class="odd:tw-bg-gray-50">
-						<td class="tw-text-center tw-font-bold">{{ entry.stat.ranking }}</td>
+					<tr *ngFor="let entry of weeklyLeaderboard.data; let indexOfelement=index" class="odd:tw-bg-gray-50">
+						<td class="tw-text-center tw-font-bold">{{ weeklyLeaderboard.meta.pagination.start + indexOfelement }}</td>
 						<td>
 							<div class="tw-overflow-hidden tw-w-12 tw-h-12 tw-rounded-full tw-border-2 tw-border-apicuron-bright-purple"
 								[ngStyle]="{ borderColor: resource.color}">
@@ -55,8 +55,8 @@
 
 <!-- Pagination -->
 <div class="tw-bg-white tw-p-1 md:tw-p-2 tw-text-gray-700" style="font-family: system-ui;">
-    <ng-container *ngIf="paginatedWeeklyLeaderboard$ | async as paginatedWeeklyLeaderboard; else loading">
-        <ng-container *ngIf="paginatedWeeklyLeaderboard.length > 0; else emptyList">
+    <ng-container *ngIf="weeklyLeaderboard$ | async as paginatedWeeklyLeaderboard; else loading">
+        <ng-container *ngIf="paginatedWeeklyLeaderboard.data.length > 0; else emptyList">
             <div class="tw-flex tw-flex-row tw-justify-between tw-pt-2 md:tw-pt-4">
                 <div *ngIf="weeklyContributors$ | async as weeklyContributors">
                     <span>Total Contributors:

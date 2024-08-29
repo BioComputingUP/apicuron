@@ -1,7 +1,12 @@
 import { CommonModule } from "@angular/common";
-import { ChangeDetectionStrategy, Component, Input, OnInit } from "@angular/core";
-import { Observable } from "rxjs";
-import { shareReplay } from "rxjs/operators";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit,
+} from "@angular/core";
+import { BehaviorSubject, Observable, ReplaySubject, Subject } from "rxjs";
+import { map, shareReplay, tap } from "rxjs/operators";
 import { CuratorStatisticsModule } from "../../curator-statistics/curator-statistics.module";
 import { CuratorStatisticsService } from "../../curator-statistics/services/curator-statistics.service";
 import { CuratorModule } from "../../curator/curator.module";
@@ -27,17 +32,22 @@ import { WeeklyLeaderboardComponent } from "../weekly-leaderboard/weekly-leaderb
     AngularSvgIconModule,
     ReactiveFormsModule,
     TotalLeaderboardComponent,
-    WeeklyLeaderboardComponent
-],
+    WeeklyLeaderboardComponent,
+  ],
   templateUrl: "./leaderboard.component.html",
   styleUrls: ["./leaderboard.component.scss"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LeaderboardComponent implements OnInit {
-  @Input("resource-id") resource_id: string;
+  resource$: ReplaySubject<Resource> = new ReplaySubject<Resource>(1);
+  @Input("resource") set resource (value: Resource) {
+    console.log(value);
+    this.resource$.next(value);
+  }
 
-  showTotal: boolean = true;
-  resource$: Observable<Resource>;
+  leaderboardType$ = new BehaviorSubject<"total" | "weekly">("total");
+  isWeekly$: Observable<boolean>;
+  isTotal$: Observable<boolean>;
 
   constructor(
     protected statService: CuratorStatisticsService,
@@ -51,16 +61,20 @@ export class LeaderboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.resource$ = this.resourceService
-      .get_resource(this.resource_id)
-      .pipe(shareReplay());
+    this.resource$.pipe(tap(console.log)).subscribe();
+    this.isWeekly$ = this.leaderboardType$.pipe(
+      map((type: "total" | "weekly") => type === "weekly")
+    );
+    this.isTotal$ = this.leaderboardType$.pipe(
+      map((type: "total" | "weekly") => type === "total")
+    );
   }
 
   showTotalLeaderboard(): void {
-    this.showTotal = true;
+    this.leaderboardType$.next("total");
   }
 
   showWeeklyLeaderboard(): void {
-    this.showTotal = false;
+    this.leaderboardType$.next("weekly");
   }
 }

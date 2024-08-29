@@ -82,7 +82,7 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
         return this.databaseService.get_resource(resource_id);
       }),
       pluck<{ data: Resource }, "data">("data"),
-      shareReplay()
+      shareReplay(1)
     );
 
     this.firstBadges$ = this.resource$.pipe(
