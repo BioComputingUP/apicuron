@@ -195,7 +195,9 @@ export class StatisticsService {
 				user: user ? user.toObject() : null,
 			};
 
-			return plainToClass(StatLeaderboardDto, leaderboardEntry);
+			return plainToClass(StatLeaderboardDto, leaderboardEntry, {
+				excludeExtraneousValues: true,
+			});
 		});
 
 		const count = await this.statisticsModel.count(filter);

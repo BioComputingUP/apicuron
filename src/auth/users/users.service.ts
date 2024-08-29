@@ -9,6 +9,9 @@ import { generateAvatar } from './generate_avatar';
 import { PrivacyType } from '../../core/enums';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserPrivacyUpdatedEvent } from './events/update-privacy';
+import { ICreateOrUpdateUser } from './dto/create-or-update-user.dto';
+import { UserEntity } from './dto/user';
+import { plainToInstance } from 'class-transformer';
 @Injectable()
 export class UsersService implements OnApplicationBootstrap {
 	private readonly logger = new Logger(UsersService.name);
@@ -35,7 +38,7 @@ export class UsersService implements OnApplicationBootstrap {
 		return;
 	}
 
-	public async user_exists(orcid_id: string): Promise<boolean> {
+	public async userExists(orcid_id: string): Promise<boolean> {
 		return !!(await this.userModel.exists({
 			orcid_id,
 		}));
@@ -49,7 +52,7 @@ export class UsersService implements OnApplicationBootstrap {
 		return await user_promise;
 	}
 
-	async get_by_orcid(orcid_id: string): Promise<UserDocument> {
+	async getByOrcid(orcid_id: string): Promise<UserDocument> {
 		const user_promise = await this.userModel.findOne(
 			{
 				orcid_id,
@@ -63,6 +66,23 @@ export class UsersService implements OnApplicationBootstrap {
 		);
 
 		return await user_promise;
+	}
+
+	/**
+	 * Get users by orcid_ids, maintains order and returns a list of UserEntity matching the orcid_ids order
+	 * @param orcid_ids List of orcid_ids
+	 * @returns list of users from the database
+	 */
+	async getUsersByOrcid(orcid_ids: string[]): Promise<UserDocument[]> {
+		const users = await this.userModel.find({ orcid_id: { $in: orcid_ids } });
+
+		const sortedUsers = orcid_ids.map(
+			(orcid_id): UserDocument =>
+				users.find((user) => user.orcid_id === orcid_id),
+		);
+		// .map((user) => user.toObject());
+
+		return sortedUsers;
 	}
 
 	async getPublicUser(orcid_id: string) {
@@ -107,7 +127,7 @@ export class UsersService implements OnApplicationBootstrap {
 		);
 	}
 
-	async createUser(user: any): Promise<UserDocument> {
+	async createUser(user: ICreateOrUpdateUser): Promise<UserDocument> {
 		const newUser = new this.userModel(user);
 
 		const avatarLink = await generateAvatar(
@@ -125,8 +145,8 @@ export class UsersService implements OnApplicationBootstrap {
 	async createOrUpdateUser({
 		orcid_id,
 		...data
-	}: Partial<User>): Promise<UserDocument> {
-		const exists = await this.userModel.exists({ orcid_id });
+	}: ICreateOrUpdateUser): Promise<UserDocument> {
+		const exists = await this.userExists(orcid_id);
 
 		// upsert user
 		const newUser = exists

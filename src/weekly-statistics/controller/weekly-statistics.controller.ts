@@ -17,7 +17,10 @@ import { User } from '../../core/schemas/user.schema';
 import { BasePaginationDto } from '../../pagination/dto/paginate.dto';
 import { paginate, Paginated } from '../../pagination/paginator';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { WeeklyStatisticsDto } from '../dto/weekly-statistics.dto';
+import {
+	WeeklyLeaderboardDto,
+	WeeklyStatisticsDto,
+} from '../dto/weekly-statistics.dto';
 import { ApiResponsePaginated } from '../../pagination/decorators/paginated-reponse.decorator';
 import { ApiResponseWrapped } from '../../shared/decorators/wrapped-data-response.decorator';
 
@@ -38,7 +41,7 @@ export class WeeklyStatisticsController {
 			'This endpoint is used to get the weekly leaderboard for a given resource.',
 	})
 	@ApiResponsePaginated(
-		WeeklyStatisticsDto,
+		WeeklyLeaderboardDto,
 		200,
 		'The weekly leaderboard for the given resource',
 	)
@@ -49,7 +52,7 @@ export class WeeklyStatisticsController {
 		@Param('resource_id') resource_id: string,
 		@Query() pagination: BasePaginationDto,
 		@UserReq() user: User | null,
-	): Promise<Paginated<WeeklyStatisticsDto>> {
+	): Promise<Paginated<WeeklyLeaderboardDto>> {
 		const exists = await this.resourceService.exists(resource_id);
 		if (!exists) {
 			throw new NotFoundException(`Resource ${resource_id} not found`);
@@ -65,11 +68,7 @@ export class WeeklyStatisticsController {
 				pagination.getMongoQueryOptions(),
 			);
 
-		return paginate<WeeklyStatisticsDto>(
-			data as WeeklyStatisticsDto[],
-			pagination,
-			count,
-		);
+		return paginate<WeeklyLeaderboardDto>(data, pagination, count);
 	}
 
 	@ApiOperation({

@@ -27,13 +27,13 @@ export class AuthMiddleware implements NestMiddleware {
 	async use(req, res: Response, next: NextFunction) {
 		try {
 			const header = this.check_auth_header(req);
-			if(!header){
+			if (!header) {
 				next();
-				return
+				return;
 			}
 			const token = this.get_token(header);
 			const payload = this.check_token(token);
-			req.user = await this.usersService.get_by_orcid(payload.orcid_id);
+			req.user = await this.usersService.getByOrcid(payload.orcid_id);
 		} catch (e) {
 			this.authMiddlewareLogger.error(e.message);
 			// req.user = null;
@@ -76,7 +76,7 @@ export class AuthMiddleware implements NestMiddleware {
 		} else if (req.cookies[tokenKey]) {
 			return req.cookies[tokenKey];
 		} else {
-			return null
+			return null;
 			// this.unauthorized_exception('authorization header non-existent');
 		}
 	}

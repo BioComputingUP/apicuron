@@ -18,8 +18,7 @@ export class JWTStrategy extends PassportStrategy(Strategy, 'jwt') {
 	}
 
 	async validate(payload: { orcid_id: string }) {
-
-		const user = await this.userService.get_by_orcid(payload.orcid_id);
+		const user = await this.userService.getByOrcid(payload.orcid_id);
 		if (!!user) {
 			return user;
 		} else {

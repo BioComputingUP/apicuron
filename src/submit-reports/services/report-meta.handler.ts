@@ -18,7 +18,7 @@ export class ReportMetaHandler implements ReportHandler {
 		const resource = await this.resourceService.get_resource(
 			report.resource_id,
 		);
-		const user = await this.usersService.get_by_orcid(report.curator_orcid);
+		const user = await this.usersService.getByOrcid(report.curator_orcid);
 		this.handleIndividualReport(report, resource, user);
 		return report;
 	}

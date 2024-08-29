@@ -6,13 +6,18 @@ import {
 } from '../../core/schemas/statistics/weekly-statistics.schema';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
 import { plainToInstance } from 'class-transformer';
-import { WeeklyStatisticsDto } from '../dto/weekly-statistics.dto';
+import {
+	WeeklyLeaderboardDto,
+	WeeklyStatisticsDto,
+} from '../dto/weekly-statistics.dto';
+import { UsersService } from '../../auth/users/users.service';
 
 @Injectable()
 export class WeeklyStatisticsService {
 	constructor(
 		@InjectModel(WeeklyStatistics.name)
 		protected WeeklyStatistics: Model<WeeklyStatisticsDocument>,
+		protected userService: UsersService,
 	) {}
 
 	async getUserWeeklyStatistics(
@@ -26,12 +31,26 @@ export class WeeklyStatisticsService {
 	async getWeeklyLeaderboard(
 		filter: FilterQuery<WeeklyStatisticsDocument> = {},
 		queryOptions: QueryOptions,
-	) {
-		const [data, count] = await Promise.all([
+	): Promise<{ data: WeeklyLeaderboardDto[]; count: number }> {
+		const [statistics, count] = await Promise.all([
 			this.WeeklyStatistics.find(filter, null, queryOptions),
 			this.WeeklyStatistics.count(filter),
 		]);
 
-		return { data, count };
+		const orcid_ids = statistics.map((stat) => stat.curator_orcid);
+		const users = await this.userService.getUsersByOrcid(orcid_ids);
+
+		const statLeaderboard = statistics.map((stat, index) => {
+			const user = users[index];
+			const leaderboardEntry = plainToInstance(
+				WeeklyLeaderboardDto,
+				{ stat, user },
+				{ excludeExtraneousValues: true },
+			);
+
+			return leaderboardEntry;
+		});
+
+		return { data: statLeaderboard, count };
 	}
 }

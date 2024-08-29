@@ -1,8 +1,9 @@
+import { IUserEmailEntry } from '../../../auth/users/interfaces/user.interface';
 import { OrcidEmailEntry } from '../../../orcid/orcid-client/interfaces/orcid.interface';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema()
-export class UserEmailEntry implements OrcidEmailEntry {
+export class UserEmailEntry implements OrcidEmailEntry, IUserEmailEntry {
 	@Prop({
 		required: true,
 		default: 'limited',

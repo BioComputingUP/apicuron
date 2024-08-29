@@ -4,6 +4,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import { AuthService } from '../auth.service';
 import { Strategy } from 'passport-oauth2';
 import { UsersService } from '../users/users.service';
+import { plainToInstance } from 'class-transformer';
+import { CreateOrUpdateUserDto } from '../users/dto/create-or-update-user.dto';
 
 const orcid_scopes = '/read-limited /activities/update';
 
@@ -30,7 +32,7 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 				// const user = { orcid_id, username: params.name };
 				// console.log({ params });
 				try {
-					await usersService.createOrUpdateUser({
+					const user = await usersService.createOrUpdateUser({
 						// displayed Name obtained from orcid
 						displayedName: params.name,
 						username: params.name,
@@ -42,7 +44,6 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 						refresh_token: refreshToken,
 					});
 
-					const user = await usersService.getPrivateUser({ orcid_id });
 					done(null, user);
 				} catch (error) {
 					logger.error(`Error Orcid Oauth for user ${orcid_id} ! `);

@@ -10,7 +10,7 @@ export class HasAResourceGuard implements CanActivate {
 		const req = context.switchToHttp().getRequest();
 
 		if (req.user.orcid_id) {
-			const user = await this.userService.get_by_orcid(req.user.orcid_id);
+			const user = await this.userService.getByOrcid(req.user.orcid_id);
 			if (
 				!!user.resources &&
 				Array.isArray(user.resources) &&

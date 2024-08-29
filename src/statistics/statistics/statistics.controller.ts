@@ -115,7 +115,7 @@ export class StatisticsController {
 		@Param('orcid_id') orcid_id: string,
 		@UserReq() user: User,
 	) {
-		const exists = await this.userService.user_exists(orcid_id);
+		const exists = await this.userService.userExists(orcid_id);
 		// if the user doesn't exist we reply with 404
 		if (!exists) {
 			throw new NotFoundException(`User with orcid id:${orcid_id} not found `);
@@ -204,7 +204,7 @@ export class OldStatisticsController {
 
 		const orcid_list = uniq(map(data, 'curator_orcid'));
 		const user_list_promises = orcid_list.map((orcid) =>
-			this.userService.get_by_orcid(orcid),
+			this.userService.getByOrcid(orcid),
 		);
 		const user_list = await Promise.all(user_list_promises);
 		const orcid_to_user = keyBy(user_list, 'orcid_id');
