@@ -5,3 +5,11 @@ th {
 td {
     @apply tw-py-2
 }
+
+
+.selected-item {
+    @apply tw-bg-apicuron-bright-purple tw-text-gray-100
+}
+.unselected-item {
+    @apply tw-bg-white tw-text-gray-700
+}
