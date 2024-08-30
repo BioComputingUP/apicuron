@@ -43,6 +43,7 @@ export class MedalAggregatorService implements Aggregator {
 		protected computeMedals: ComputeMedalsService,
 		protected eventEmitter: EventEmitter2,
 	) {}
+
 	logger = new Logger(MedalAggregatorService.name);
 
 	async recomputeAllResourceAggregates(resource_id: string) {
@@ -166,5 +167,60 @@ export class MedalAggregatorService implements Aggregator {
 
 	async removeAllResourceAggregates(resource_id: string) {
 		return await this.medalModel.deleteMany({ resource_id });
+	}
+
+	async termUpdated(oldTerm: TermDocument, newTerm: TermDocument) {
+		if (oldTerm.score == newTerm.score) {
+			return;
+		}
+		await this.computeMedals.reComputeMedals({
+			resource_id: newTerm.resource_id,
+			league: newTerm.league,
+			activity_term: newTerm.activity_term,
+		});
+		await this.medalDefModel.updateMany(
+			{
+				resource_id: newTerm.resource_id,
+				league: newTerm.league,
+				activity_term: newTerm.activity_term,
+			},
+			{
+				$pull: { list_terms: newTerm.activity_term },
+			},
+		);
+	}
+
+	async termDeleted(term: TermDocument) {
+		// retrieve the list of medal definitions that are affected by the term deletion
+		const affectedMedalDefs = await this.medalDefModel.find(
+			{
+				resource_id: term.resource_id,
+				league: term.league,
+				list_terms: term.activity_term,
+			},
+			{ _id: 1 },
+		);
+
+		if (affectedMedalDefs.length === 0) {
+			return;
+		}
+
+		// extract the ids of the affected medals
+		const affectedIds = affectedMedalDefs.map((medalDef) => medalDef._id);
+
+		// remove the term from the list of terms in the medal definitions
+		await this.medalDefModel.updateMany(
+			{
+				resource_id: term.resource_id,
+				league: term.league,
+				list_terms: term.activity_term,
+			},
+			{
+				$pull: { list_terms: term.activity_term },
+			},
+		);
+
+		// recompute the medals that are affected by the term deletion
+		await this.computeMedals.reComputeMedals({ _id: { $in: affectedIds } });
 	}
 }

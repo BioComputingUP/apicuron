@@ -12,6 +12,7 @@ import { PartnerResourcesService } from '../../resources/partner-resources/servi
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
 import { Injectable, Logger } from '@nestjs/common';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
+import { TermDocument } from '../../core/schemas/terms.schema';
 
 @Injectable()
 @AggregatorClass()
@@ -22,6 +23,12 @@ export class DetailedStatisticsAggregatorService implements Aggregator {
 		protected computeDetailedStats: ComputeDetailedStatisticsService,
 		protected resourceService: PartnerResourcesService,
 	) {}
+	async termDeleted(term: TermDocument) {
+		return await this.computeDetailedStats.reComputeStatsRelatedToTerm(term);
+	}
+	async termUpdated(oldTerm: TermDocument, term: TermDocument) {
+		return await this.computeDetailedStats.reComputeStatsRelatedToTerm(term);
+	}
 
 	logger = new Logger(DetailedStatisticsAggregatorService.name);
 

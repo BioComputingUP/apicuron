@@ -68,13 +68,15 @@ export class SubmitReportService {
 		try {
 			const instance = new this.reportModel(report);
 
-			await this.reportMetaHandler.handle(instance);
+			const { resource, user } = await this.reportMetaHandler.handle(instance);
 			await instance.save();
 
 			if (!options.preventEvents) {
 				console.log('emitting ReportSubmittedEvent');
 				await this.eventEmitter.emitAsync(ReportSubmittedEvent, {
 					report: instance,
+					user,
+					resource,
 				} as IReportSubmittedEventPayload);
 			}
 			return instance;
@@ -111,7 +113,9 @@ export class SubmitReportService {
 				(report: SubmitReportDto) => new this.reportModel(report),
 			);
 
-			await this.reportMetaHandler.handleMultiple(reportDocuments);
+			const { users, resources } = await this.reportMetaHandler.handleMultiple(
+				reportDocuments,
+			);
 
 			const { insertedCount, acknowledged } = await this.reportModel.insertMany(
 				reportDocuments,
@@ -120,6 +124,8 @@ export class SubmitReportService {
 			if (!options.preventEvents) {
 				await this.eventEmitter.emitAsync(ManyReportsSubmittedEvent, {
 					reports: reportDocuments,
+					users,
+					resources,
 				} as IManyReportsSubmittedEventPayload);
 			}
 			return {

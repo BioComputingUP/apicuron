@@ -230,6 +230,11 @@ export class ComputeMedalsService {
 		return totalAchieved;
 	}
 
+	public async reComputeMedals(filter: FilterQuery<MedalDefDocument>) {
+		await this.medalModel.deleteMany(filter);
+		return await this.computeMedals(filter);
+	}
+
 	async updateMedalsEarnedState(medalDef: MedalDefDocument): Promise<number> {
 		this.logger.verbose(
 			`Compute Medals Earned for ${medalDef.name} score_relative: ${medalDef.score_relative}`,

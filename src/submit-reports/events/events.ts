@@ -1,15 +1,21 @@
 import { LeanDocument } from 'mongoose';
 import { ReportDocument, Report } from '../../core/schemas/reports.schema';
 import { ReportDto } from '../../reports/dto/report.dto';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
 
 export const ManyReportsSubmittedEvent = 'post.report.insert.many';
 export interface IManyReportsSubmittedEventPayload {
 	reports: ReportDocument[] | LeanDocument<Report>[] | ReportDto[];
+	resources: PartnerResourceDocument[];
+	users: UserDocument[];
 }
 
 export const ReportSubmittedEvent = 'post.report.insert.single';
 export interface IReportSubmittedEventPayload {
 	report: ReportDocument | LeanDocument<Report> | ReportDto;
+	resource: PartnerResourceDocument;
+	user: UserDocument;
 }
 
 export const AllResourceReportsDeletedEvent = 'post.reports.deleteall.resource';

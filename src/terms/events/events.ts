@@ -7,9 +7,11 @@ export interface ITermDeletedEventPayload {
 }
 
 export class TermDeletedEvent implements ITermDeletedEventPayload {
-	constructor(public readonly term: DeleteTermDto) {}
+	constructor(public readonly term: TermDocument) {}
 }
-export const TermUpdatedEvent = 'on.term.updated';
-export interface ITermUpdatedEventPayload {
-	term: TermDocument;
+export class TermUpdatedEvent {
+	constructor(
+		public readonly oldTerm: TermDocument,
+		public readonly newTerm: TermDocument,
+	) {}
 }

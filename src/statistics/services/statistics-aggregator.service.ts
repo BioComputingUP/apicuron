@@ -12,6 +12,9 @@ import { PartnerResourcesService } from '../../resources/partner-resources/servi
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
 import { PrivacyType } from '../../core/enums';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
+import { TermDocument } from '../../core/schemas/terms.schema';
 @Injectable()
 @AggregatorClass()
 export class StatisticsAggregator implements Aggregator {
@@ -21,6 +24,15 @@ export class StatisticsAggregator implements Aggregator {
 		protected resourceService: PartnerResourcesService,
 		protected computeStats: ComputeStatisticsService,
 	) {}
+	async termDeleted(term: TermDocument) {
+		return await this.recomputeAllResourceAggregates(term.resource_id);
+	}
+	async termUpdated(oldTerm: TermDocument, term: TermDocument) {
+		if (oldTerm.score == term.score) {
+			return;
+		}
+		return await this.recomputeAllResourceAggregates(term.resource_id);
+	}
 	async deleteLeague(resource_id: string, league: string): Promise<number> {
 		const deleted = await this.statModel.deleteMany({
 			resource_id,
@@ -94,8 +106,14 @@ export class StatisticsAggregator implements Aggregator {
 		report:
 			| (Document<unknown, any, Report> & Report & { _id: Types.ObjectId })
 			| LeanReportDocument,
+		user?: UserDocument,
+		resource?: PartnerResourceDocument,
 	) {
-		return await this.computeStats.incrementStatByReport(report);
+		return await this.computeStats.incrementStatByReport(
+			report,
+			user,
+			resource,
+		);
 	}
 	async applyAllReports(resource_id: string) {
 		await this.computeStats.computeStatistics({ resource_id });

@@ -16,7 +16,6 @@ import {
  * Computes the privacy field for a given resource entity based on the resource, related user, and user resource entity.
  * If either the league privacy or the user privacy is set to private, the privacy type of the entity will be private.
  * Otherwise, it will be public.
- * @deprecated
  * @param resource - The resource document or lean document.
  * @param relatedUser - The related user document or lean document, or null.
  * @param userResourceEntity - The user resource entity document or lean document.

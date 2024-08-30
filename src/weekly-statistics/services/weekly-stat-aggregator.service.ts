@@ -16,6 +16,7 @@ import { PrivacyType } from '../../core/enums';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
+import { TermDocument } from '../../core/schemas/terms.schema';
 
 @Injectable()
 @AggregatorClass()
@@ -26,6 +27,15 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 		protected resourceService: PartnerResourcesService,
 		protected computeWeeklyStat: ComputeWeeklyStatisticsService,
 	) {}
+	async termDeleted(term: TermDocument) {
+		return await this.recomputeAllResourceAggregates(term.resource_id);
+	}
+	async termUpdated(oldTerm: TermDocument, term: TermDocument) {
+		if (oldTerm.score == term.score) {
+			return;
+		}
+		return await this.recomputeAllResourceAggregates(term.resource_id);
+	}
 
 	logger = new Logger(WeeklyStatisticsAggregatorService.name);
 
@@ -42,6 +52,7 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 
 		return deleted.deletedCount;
 	}
+
 	async updateUserPrivacy(curator_orcid: string, privacy: PrivacyType) {
 		await this.weeklyStatModel.updateMany(
 			{
@@ -98,11 +109,13 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 		);
 		return result;
 	}
+
 	async applyAllReports(resource_id: string) {
 		const reportFilter: FilterQuery<ReportDocument> = { resource_id };
 
 		await this.computeWeeklyStat.computeWeeklyStatistics(reportFilter);
 	}
+
 	async removeAllResourceAggregates(resource_id: string) {
 		await this.weeklyStatModel.deleteMany({ resource_id });
 	}

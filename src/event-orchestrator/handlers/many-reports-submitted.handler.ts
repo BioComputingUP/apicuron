@@ -30,8 +30,13 @@ export class ManyReportsSubmittedHandler implements IEventHandler {
 				(a, b) => a.timestamp.getTime() - b.timestamp.getTime(),
 			);
 
+			const resources = payload.resources;
+			const users = payload.users;
+
 			for (const report of reportDocuments) {
-				await aggregator.applyReport(report);
+				const resource = resources.find((r) => r.id === report.resource_id);
+				const user = users.find((u) => u.id === report.curator_orcid);
+				await aggregator.applyReport(report, user, resource);
 			}
 		};
 	}

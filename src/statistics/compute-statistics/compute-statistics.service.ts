@@ -23,6 +23,7 @@ import {
 	updateMaxDate,
 	updateMinDate,
 } from '../../weekly-statistics/helpers/fields-updater';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 @Injectable()
 export class ComputeStatisticsService {
 	logger = new Logger(ComputeStatisticsService.name);
@@ -279,6 +280,8 @@ export class ComputeStatisticsService {
 
 	async incrementStatByReport(
 		report: ReportDocument | Report | LeanDocument<Report>,
+		contributor?: UserDocument,
+		resource?: PartnerResourceDocument,
 	) {
 		const statFilter = await this.getRelatedStatsFilter(report);
 
@@ -290,17 +293,19 @@ export class ComputeStatisticsService {
 		const term$ = this.reportAggregator
 			.getTerm(this.getRelatedTermFilter(report))
 			.then((term) => term.toObject() as LeanDocument<TermDocument>);
-		const resource$ = this.partnerResourceService.get_resource(
-			report.resource_id,
-		);
-		const user$ = this.userModel.findOne({
-			orcid_id: report.curator_orcid,
-		});
+		// if passed resource is null, we fetch the resource from the database
+		const resource$ = resource
+			? Promise.resolve(resource)
+			: this.partnerResourceService.get_resource(report.resource_id);
+		// if passed contributor is null, we fetch the contributor from the database
+		const contributor$ = contributor
+			? Promise.resolve(contributor)
+			: this.userModel.findOne({ orcid_id: report.curator_orcid });
 
-		const [termObj, resource, user] = await Promise.all([
+		const [termObj, resourceDoc, user] = await Promise.all([
 			term$,
 			resource$,
-			user$,
+			contributor$,
 		]);
 
 		delete termObj._id;
@@ -321,7 +326,7 @@ export class ComputeStatisticsService {
 			first_contribution: report.timestamp,
 			last_contribution: report.timestamp,
 		});
-		stat.privacy = computePrivacyField(resource, user, stat);
+		stat.privacy = computePrivacyField(resourceDoc, user, stat);
 
 		await stat.save();
 	}

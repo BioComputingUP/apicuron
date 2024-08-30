@@ -14,7 +14,6 @@ import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Model } from 'mongoose';
 import { IEventHandler } from '@nestjs/cqrs';
 import { Observable, Subject, concatMap, takeUntil } from 'rxjs';
-import { AggregatorManager } from '../services/aggregator-manager.service';
 import { BaseAggregatorRunner } from '../aggregator-runners/base.runner';
 
 @Injectable()
