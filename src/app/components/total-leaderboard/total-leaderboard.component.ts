@@ -8,7 +8,7 @@ import {
 import { LeaderboardComponent } from "../leaderboard/leaderboard.component";
 import { LeaderboardService } from "src/app/databases/services/leaderboard.service";
 import { ResourcesService } from "src/app/resource/service/resources.service";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import {
   BehaviorSubject,
@@ -28,7 +28,7 @@ import { LeaderboardEntry } from "../../databases/interfaces/leaderboard-entry";
   standalone: true,
   selector: "total-leaderboard",
   templateUrl: "./total-leaderboard.component.html",
-  imports: [CommonModule, LeaderboardComponent, AngularSvgIconModule],
+  imports: [CommonModule, LeaderboardComponent, AngularSvgIconModule, RouterModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TotalLeaderboardComponent implements OnInit, OnDestroy {

@@ -8,7 +8,7 @@ import {
 import { LeaderboardComponent } from "../leaderboard/leaderboard.component";
 import { LeaderboardService } from "src/app/databases/services/leaderboard.service";
 import { ResourcesService } from "src/app/resource/service/resources.service";
-import { ActivatedRoute, ParamMap } from "@angular/router";
+import { ActivatedRoute, RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import {
   BehaviorSubject,
@@ -16,13 +16,8 @@ import {
   ReplaySubject,
   Subject,
   combineLatest,
-  of,
 } from "rxjs";
 import { Resource } from "src/app/models/resource.model";
-import {
-  BaseCuratorStatistics,
-  WeeklyCuratorStatistics,
-} from "src/app/models/statistics.model";
 import { User } from "src/app/models/User.model";
 import { map, shareReplay, startWith, switchMap } from "rxjs/operators";
 import { CuratorWithStats } from "src/app/curator-statistics/models/curator-stats";
@@ -37,7 +32,7 @@ import { WeeklyLeaderboardEntry } from "../../databases/interfaces/leaderboard-e
   standalone: true,
   selector: "weekly-leaderboard",
   templateUrl: "./weekly-leaderboard.component.html",
-  imports: [CommonModule, LeaderboardComponent, WeeklyBarChartComponent],
+  imports: [CommonModule, LeaderboardComponent, WeeklyBarChartComponent, RouterModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WeeklyLeaderboardComponent implements OnInit, OnDestroy {
