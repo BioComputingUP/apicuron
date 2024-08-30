@@ -18,7 +18,7 @@ export class GroupCreateForm implements OnDestroy {
   form: FormGroup<ResourceGroupCreateForm>;
   destroy$ = new Subject<void>();
   
-  @Output() formResult = new EventEmitter<{ group: ResourceGroup }>();
+  @Output() formResult = new EventEmitter<ResourceGroup>();
 
   constructor(protected fb: FormBuilder, public dialogRef: DialogRef<string>) {
     this.form = ResourceGroup.generateCreateForm(this.fb);
@@ -37,9 +37,7 @@ export class GroupCreateForm implements OnDestroy {
   submit() {
     if (this.form.valid) {
       const resourceGroup = new ResourceGroup().fromForm(this.form);
-      console.log(resourceGroup);
-  
-      // this.formResult.emit({ group: resourceGroup })
+      this.formResult.emit(resourceGroup);
     }
   }
 

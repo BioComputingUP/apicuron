@@ -18,6 +18,7 @@ export class UpdateGroupComponent {
   group: ResourceGroup;
   form: FormGroup<ResourceGroupCreateForm>;
   destroy$ = new Subject<void>();
+  resourceGroup= new ResourceGroup();
 
   constructor(
     @Inject(DIALOG_DATA) 
@@ -26,7 +27,7 @@ export class UpdateGroupComponent {
     public dialogRef: DialogRef<string>
   ) {
       this.group = data.group;
-      this.form = ResourceGroup.generateCreateForm(this.fb);
+      this.form = this.resourceGroup.generateUpdateForm(this.fb, this.group);
       const slugifier$ = slugifyFieldFromAnother(
         this.form,
         "displayedName",
@@ -45,6 +46,6 @@ export class UpdateGroupComponent {
 
   submit() {
     const resourceGroup = new ResourceGroup().fromForm(this.form);
-    console.log(resourceGroup);
+    console.log("Modified Resource Group", resourceGroup);
   }
 }

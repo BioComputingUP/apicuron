@@ -1,14 +1,8 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, OnDestroy } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { map, startWith, take, tap } from "rxjs/operators";
-import {
-  BehaviorSubject,
-  Observable,
-  Subject,
-  combineLatest,
-  concat,
-} from "rxjs";
+import { map, shareReplay, startWith, take, takeUntil, tap } from "rxjs/operators";
+import { BehaviorSubject, Observable, Subject, combineLatest, concat } from "rxjs";
 import { switchMap, pluck } from "rxjs/operators";
 import { environment } from "src/environments/environment";
 import { User } from "src/app/models/User.model";
@@ -17,26 +11,32 @@ import { Dialog } from "@angular/cdk/dialog";
 import { CreateGroupComponent } from "../create-group/create-group.component";
 import { UpdateGroupComponent } from "../update-group/update-group.component";
 import { GroupCreateForm } from "../../../components/group-create-form/group-create-form.component";
+import { response } from "express";
+import { ToastrService } from "ngx-toastr";
+
+type GroupOperation = {
+  group: ResourceGroup;
+  operation: "update" | "delete" | "create";
+} | null;
 
 @Injectable()
-export class GroupsService {
-  resourceGroups$: Observable<ResourceGroup[]>;
+export class GroupsService implements OnDestroy {
   constructor(
     protected http: HttpClient,
     protected route: ActivatedRoute,
-    protected dialog: Dialog
+    protected dialog: Dialog,
+    protected toastr: ToastrService,
   ) {}
 
+  resourceGroups$: Observable<{ data: ResourceGroup[] }>;
+  destroy$ = new Subject<void>();
   ws = environment.ws;
-
   resource_id$: Observable<string>;
-  leagues$: Observable<any[]>;
-  currentParticipants$: Observable<any[]>;
-  selectedGroup$ = new Subject<string>();
-  currentGroup$: Observable<ResourceGroup>;
-  curator$: Observable<User>;
+  groupUpdates$ = new Subject<GroupOperation>();
 
-  selectGroup$ = new Subject<ResourceGroup>();
+  ngOnDestroy(): void {
+    this.destroy$.next();
+  }
 
   fetchResourceGroups(resource_id: string): Observable<ResourceGroup[]> {
     return this.http
@@ -52,26 +52,79 @@ export class GroupsService {
         )
       );
   }
-
+  
   init(resource_id$: Observable<string>) {
     this.resource_id$ = resource_id$;
-    this.resourceGroups$ = this.resource_id$.pipe(
-      switchMap((resource_id: string) => this.fetchResourceGroups(resource_id))
+    const resourceGroupList$ = this.resource_id$.pipe(
+      switchMap((resource_id: string) => this.fetchResourceGroups(resource_id)),
+      map((groups: ResourceGroup[]) => ({ data: groups }))
     );
 
-    const firstGroup$: Observable<ResourceGroup> = this.resourceGroups$.pipe(
-      map((groups: ResourceGroup[]) => groups[0]),
-      take(1)
+    this.resourceGroups$ = combineLatest([
+      resourceGroupList$,
+      this.groupUpdates$.pipe(startWith(<string>null)),
+    ]).pipe(
+      map(
+        ([resourceGroupList, groupUpdates]: [
+          { data: ResourceGroup[] },
+          GroupOperation
+        ]) => {
+          return this.loadGroupsList(resourceGroupList, groupUpdates);
+        }
+      )
     );
+  }
 
-    this.currentGroup$ = concat(firstGroup$, this.selectGroup$);
+  loadGroupsList(
+    resourceGroupList: { data: ResourceGroup[] },
+    groupUpdates: GroupOperation
+  ): { data: ResourceGroup[] } {
+    if (!!groupUpdates) {
+      switch (groupUpdates.operation) {
+        case "create":
+          resourceGroupList.data = [
+            ...resourceGroupList.data,
+            groupUpdates.group,
+          ];
+          break;
+        case "delete":
+          resourceGroupList.data = resourceGroupList.data.filter(
+            (group) => group.name != groupUpdates.group.name
+          );
+          break;
+      }
+    }
+    return resourceGroupList;
+  }
+
+  getResourceGroups(): Observable<{ data: ResourceGroup[]}> {
+    return this.resourceGroups$;
   }
 
   openCreateGroupForm() {
-    this.dialog.open(GroupCreateForm);
+    const dialogRef = this.dialog.open(GroupCreateForm);
+    const component: GroupCreateForm = dialogRef.componentInstance;
+
+    combineLatest([component.formResult, this.resource_id$])
+      .pipe(
+        switchMap(([resourceGroup, resource_id]: [ResourceGroup, string]) => {
+          resourceGroup.resource_id = resource_id;
+          return this.createNewGroup(resourceGroup);
+        }),
+        map((group: ResourceGroup) => {
+          console.log("Successfully created resource group");
+          dialogRef.close();
+          this.groupUpdates$.next({ group, operation: "create" });
+          return group;
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {});
   }
 
   openUpdateGroupForm(resourceGroup: ResourceGroup) {
+
+    // Pass the resourceGroup as an input (use the CreateGroupForm as an example)
     this.dialog.open(UpdateGroupComponent, {
       data: {
         group: resourceGroup,
@@ -85,32 +138,37 @@ export class GroupsService {
         headers: { version: "2" },
       })
       .pipe(
+        pluck("data"),
         map((response: any) => {
           return new ResourceGroup().deserialize(response);
         })
       );
   }
-  getCurrentGroup(): Observable<ResourceGroup> {
-    return this.currentGroup$;
-  }
 
-  getResourceGroups(): Observable<ResourceGroup[]> {
-    return this.resourceGroups$;
-  }
-
-  getGroups(): Observable<any[]> {
-    return this.leagues$;
-  }
-
-  selectGroup(group: ResourceGroup) {
-    this.selectGroup$.next(group);
-  }
-
-  getParticipants() {
-    return this.currentParticipants$;
-  }
-
-  onSelectedGroupChange(groupName) {
-    this.selectedGroup$.next(groupName);
-  }
+  deleteGroup(group: ResourceGroup) {
+    return this.http.delete(`${this.ws}/leagues`, {
+        headers: { version: "2" },
+      })
+      .pipe(take(1),
+      tap(response => {
+        console.log("HTTP DELETE Response:", response); 
+      })
+      )
+      .subscribe(
+        (response) => {
+          if (response["data"]) {
+            this.toastr.success(
+              `Group ${group.name} is successfully deleted`,
+            );
+            this.groupUpdates$.next({ group, operation: "delete" });
+          }
+        },
+        (error) => {
+          console.error("HTTP Error:", error);
+          this.toastr.error(
+            `An error occured while deleting the group ${group.name}`, error,
+          );
+        }
+      )
+    }
 }

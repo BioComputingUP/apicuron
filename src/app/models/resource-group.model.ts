@@ -55,13 +55,24 @@ export class ResourceGroup implements Deserializable, Serializable {
     fb: FormBuilder
   ): FormGroup<ResourceGroupCreateForm> {
     const form = fb.group({
-      name: [
-        "",
-        [Validators.required, Validators.minLength(3), IdentifierValdiator()],
-      ], // matches kebab case
+      name: ["", [Validators.required, Validators.minLength(3), IdentifierValdiator()]], // matches kebab case
       displayedName: ["", [Validators.required, Validators.minLength(3)]],
       defaultMembers: new FormControl<string[]>([]),
       visibility: new FormControl<PrivacyType>(PrivacyType.public),
+    });
+
+    return form;
+  }
+
+  generateUpdateForm(
+    fb: FormBuilder,
+    group: ResourceGroup
+  ): FormGroup<ResourceGroupCreateForm> {
+    const form = fb.group({
+      name: [group.name, [Validators.required, Validators.minLength(3), IdentifierValdiator()]], // matches kebab case
+      displayedName: [group.displayedName, [Validators.required, Validators.minLength(3)]],
+      defaultMembers: [group.defaultMembers],
+      visibility: group.visibility,
     });
 
     return form;

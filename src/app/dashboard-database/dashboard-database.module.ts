@@ -32,10 +32,10 @@ import { PaginationComponent } from "../pagination/pagination.component";
 import { MedalFormComponent } from "../components/medal-form/medal-form.component";
 import { CuratorGroupsComponent } from "./curator-groups/curator-groups.component";
 import { ModifyGroupsComponent } from "./curator-groups/modify-groups/modify-groups.component";
-import { ParticipantsListComponent } from "./curator-groups/participants-list/participants-list.component";
 import { GroupsService } from "./curator-groups/services/groups.service";
 import { ResourceGroupCardComponent } from "../components/group-card/resource-group-card.component";
 import { DialogModule } from "@angular/cdk/dialog";
+import { GroupCreateForm } from "../components/group-create-form/group-create-form.component";
 
 @NgModule({
   declarations: [
@@ -49,7 +49,6 @@ import { DialogModule } from "@angular/cdk/dialog";
     DatabaseOverviewComponent,
     CuratorGroupsComponent,
     ModifyGroupsComponent,
-    ParticipantsListComponent,
   ],
   providers: [DashboardService, TermsService, MessageService, GroupsService],
   imports: [
@@ -76,6 +75,7 @@ import { DialogModule } from "@angular/cdk/dialog";
     MedalFormComponent,
     PaginationComponent,
     ResourceGroupCardComponent,
-  ],
+    GroupCreateForm
+],
 })
 export class DashboardDatabaseModule {}
