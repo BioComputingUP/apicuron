@@ -18,7 +18,7 @@ import {
   combineLatest,
 } from "rxjs";
 import { Resource } from "src/app/models/resource.model";
-import { map, switchMap, tap } from "rxjs/operators";
+import { map, shareReplay, switchMap, tap } from "rxjs/operators";
 import { Paginated } from "src/app/interfaces/paginated";
 import { CuratorStatisticsService } from "src/app/curator-statistics/services/curator-statistics.service";
 import { LeaderboardFilter } from "../../databases/interfaces/leaderboard-filter";
@@ -79,7 +79,8 @@ export class TotalLeaderboardComponent implements OnInit, OnDestroy {
     this.totalLeaderboard$ = this.leaderboardFilter$.pipe(
       switchMap((filter: LeaderboardFilter) =>
         this.leaderboardService.getResourceLeaderboard(filter)
-      )
+      ),
+      shareReplay(1)
     );
 
     this.totalContributors$ = this.totalLeaderboard$.pipe(

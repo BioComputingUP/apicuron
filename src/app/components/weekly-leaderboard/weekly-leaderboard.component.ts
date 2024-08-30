@@ -85,7 +85,7 @@ export class WeeklyLeaderboardComponent implements OnInit, OnDestroy {
       switchMap((filter: LeaderboardFilter) =>
         this.leaderboardService.getWeeklyResourceLeaderboard(filter)
       ),
-      shareReplay()
+      shareReplay(1)
     );
 
     this.weeklyContributors$ = this.weeklyLeaderboard$.pipe(
