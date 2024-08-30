@@ -21,7 +21,7 @@ export class InitializationService implements OnApplicationBootstrap {
 		if (this.configService.get<string>('environment') == 'local') {
 			return;
 		}
-		await this.initializeAggregateData();
+		// const initPromise$ = this.initializeAggregateData();
 	}
 	logger = new Logger(InitializationService.name);
 
