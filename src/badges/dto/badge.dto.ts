@@ -1,45 +1,42 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose, Type } from 'class-transformer';
 import { AchievementState, PrivacyType } from 'src/core/enums';
 
 export class BadgeDto {
-	@ApiProperty()
+	@Expose()
 	curator_orcid: string;
 
-	@ApiProperty()
+	@Expose()
 	name: string;
 
-	@ApiProperty()
+	@Expose()
 	resource_uri?: string;
 
 	// fields from Badge
-	@ApiProperty()
+	@Expose()
 	resource_id: string;
 
-	@ApiProperty()
+	@Expose()
 	count: number;
 
-	@ApiProperty()
+	@Expose()
 	color_code: string;
 
-	@ApiProperty()
+	@Expose()
 	count_threshold: number;
 
-	@ApiProperty()
+	@Expose()
 	list_terms: string[];
 
-	@ApiProperty({
-		enum: AchievementState,
-	})
+	@Expose()
 	state: AchievementState;
 
-	@ApiProperty()
+	@Expose()
 	achieved_at?: Date;
 
-	@ApiProperty()
+	@Expose()
 	league: string;
 
-	@ApiProperty({
-		enum: PrivacyType,
-	})
+	@Expose()
 	privacy: PrivacyType;
 }

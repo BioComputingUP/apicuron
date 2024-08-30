@@ -25,7 +25,9 @@ export class MedalsQueryService {
 
 		const [medals, count] = await Promise.all([dataPromise, countPromise]);
 
-		const data = plainToInstance(MedalDto, medals);
+		const data = plainToInstance(MedalDto, medals, {
+			excludeExtraneousValues: true,
+		});
 
 		return {
 			data,

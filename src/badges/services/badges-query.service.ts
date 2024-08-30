@@ -27,7 +27,7 @@ export class BadgesQueryService {
 
 		const [data, count] = await Promise.all([dataPromise, countPromise]);
 		return {
-			data: plainToInstance(BadgeDto, data),
+			data: plainToInstance(BadgeDto, data, { excludeExtraneousValues: true }),
 			count,
 		};
 	}

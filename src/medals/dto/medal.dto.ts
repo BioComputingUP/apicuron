@@ -1,54 +1,52 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { AchievementState, PrivacyType } from '../../core/enums';
+import { Expose } from 'class-transformer';
 
 export class MedalDto {
-	@ApiProperty()
+	@Expose()
 	curator_orcid: string;
 
-	@ApiProperty({
-		enum: PrivacyType,
-	})
+	@Expose()
 	privacy: PrivacyType;
 
-	@ApiProperty()
+	@Expose()
 	name: string;
 
-	@ApiProperty()
+	@Expose()
 	resource_id: string;
 
-	@ApiProperty()
+	@Expose()
 	list_terms: string[];
 
-	@ApiProperty()
+	@Expose()
 	color: string;
 
-	@ApiProperty()
+	@Expose()
 	score_relative: number;
 
-	@ApiProperty()
+	@Expose()
 	first_day?: Date;
 
-	@ApiProperty()
+	@Expose()
 	last_day?: Date;
 
-	@ApiProperty()
+	@Expose()
 	league: string;
 
-	@ApiProperty()
+	@Expose()
 	score_total: number;
 
-	@ApiProperty()
+	@Expose()
 	score_threshold_valid: boolean;
 
-	@ApiProperty()
+	@Expose()
 	score_relative_index: number;
 
-	@ApiProperty()
+	@Expose()
 	score_relative_valid: boolean;
 
-	@ApiProperty()
+	@Expose()
 	count_total: number;
 
-	@ApiProperty()
+	@Expose()
 	state: AchievementState;
 }

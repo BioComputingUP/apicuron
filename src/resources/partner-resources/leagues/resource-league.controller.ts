@@ -20,6 +20,8 @@ import { DeleteMemberFromLeagueDTO } from './dto/delete-from-league.dto';
 import { DeleteLeagueDTO } from './dto/delete-league.dto';
 import { LeagueDto } from './dto/league.dto';
 import { PartnerResourceDto } from '../../dto/partner-resources.dto';
+import { plainToInstance } from 'class-transformer';
+import { ApiResponseWrapped } from '../../../shared/decorators/wrapped-data-response.decorator';
 
 @ApiTags('Leagues')
 @ApiHeader(VersionHeader)
@@ -43,19 +45,22 @@ export class ResourceLeagueController {
 	@ApiOperation({
 		summary: 'Get the leagues of a resource',
 	})
+	@ApiResponseWrapped([LeagueDto])
 	@AuthProtected()
 	@Get(':resource_id')
 	async getLeagues(
 		@UserReq() user: User,
 		@Param('resource_id') resourceId: string,
-	): Promise<LeagueDto[]> {
+	): Promise<{ data: LeagueDto[] }> {
 		const resource = await this.resourceService.get_resource(resourceId);
 		if (!resource) {
 			throw new NotFoundException(`Resource (${resourceId}) Not Found`);
 		}
 		this.userCanAccessResource(user, resourceId);
 
-		return resource.leagues as LeagueDto[];
+		const leagues = plainToInstance(LeagueDto, resource.leagues);
+
+		return { data: leagues };
 	}
 
 	@ApiOperation({

@@ -13,8 +13,6 @@ import {
 import { AchievementDocument } from '../core/schemas/achievements/achievements.schema';
 import { AchievementState } from '../core/enums';
 import { plainToInstance } from 'class-transformer';
-import { BadgeDto } from '../badges/dto/badge.dto';
-import { MedalDto } from '../medals/dto/medal.dto';
 import { UserAchievements } from './dto/achievements.dto';
 
 @Injectable()
