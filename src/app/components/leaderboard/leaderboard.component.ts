@@ -1,12 +1,7 @@
 import { CommonModule } from "@angular/common";
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnInit,
-} from "@angular/core";
-import { BehaviorSubject, Observable, ReplaySubject, Subject } from "rxjs";
-import { map, shareReplay, tap } from "rxjs/operators";
+import { ChangeDetectionStrategy, Component, Input, OnInit } from "@angular/core";
+import { BehaviorSubject, Observable, ReplaySubject } from "rxjs";
+import { map, tap } from "rxjs/operators";
 import { CuratorStatisticsModule } from "../../curator-statistics/curator-statistics.module";
 import { CuratorStatisticsService } from "../../curator-statistics/services/curator-statistics.service";
 import { CuratorModule } from "../../curator/curator.module";

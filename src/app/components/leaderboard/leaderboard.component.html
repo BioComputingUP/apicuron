@@ -1,9 +1,13 @@
 <div *ngIf="resource$ | async as resource">
     <div class="tw-flex tw-flex-row tw-max-w-fit tw-bg-white tw-rounded-t-md">
-        <button (click)="showTotalLeaderboard()" autofocus
-            class="tw-w-full sm:tw-w-auto tw-py-1 tw-m-1 tw-bg-white tw-text-gray-700 focus:tw-bg-apicuron-bright-purple tw-font-semibold tw-text-sm focus:tw-text-gray-100 sm:tw-rounded-tl-md tw-px-2">Total Leaderboard</button>
-        <button (click)="showWeeklyLeaderboard()"
-            class="tw-w-full sm:tw-w-auto tw-py-1 tw-m-1 tw-bg-white tw-text-gray-700 focus:tw-bg-apicuron-bright-purple tw-font-semibold tw-text-sm focus:tw-text-gray-100 sm:tw-rounded-tr-md tw-px-2">Weekly Leaderboard</button>
+        <button 
+        (click)="showTotalLeaderboard()" autofocus
+        [ngClass]="{'tw-bg-apicuron-bright-purple tw-text-gray-100': (leaderboardType$ | async) == 'total', 'tw-bg-white tw-text-gray-700': (leaderboardType$ | async) != 'total'}"
+        class="tw-w-full sm:tw-w-auto tw-py-1 tw-m-1 tw-bg-white tw-text-gray-700  focus:tw-bg-apicuron-bright-purple tw-font-semibold tw-text-sm focus:tw-text-gray-100 sm:tw-rounded-tl-md tw-px-2">Total Leaderboard</button>
+        <button 
+        (click)="showWeeklyLeaderboard()"
+        [ngClass]="{'tw-bg-apicuron-bright-purple tw-text-gray-100': (leaderboardType$ | async) == 'weekly', 'tw-bg-white tw-text-gray-700': (leaderboardType$ | async) != 'weekly'}"
+        class="tw-w-full sm:tw-w-auto tw-py-1 tw-m-1 tw-bg-white tw-text-gray-700  focus:tw-bg-apicuron-bright-purple tw-font-semibold tw-text-sm focus:tw-text-gray-100 sm:tw-rounded-tr-md tw-px-2">Weekly Leaderboard</button>
     </div>
 
     <!-- Total Leaderboard -->
