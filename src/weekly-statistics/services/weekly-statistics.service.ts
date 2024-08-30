@@ -33,7 +33,10 @@ export class WeeklyStatisticsService {
 		queryOptions: QueryOptions,
 	): Promise<{ data: WeeklyLeaderboardDto[]; count: number }> {
 		const [statistics, count] = await Promise.all([
-			this.WeeklyStatistics.find(filter, null, queryOptions),
+			this.WeeklyStatistics.find(filter, null, {
+				...queryOptions,
+				sort: { total_score: -1 },
+			}),
 			this.WeeklyStatistics.count(filter),
 		]);
 
