@@ -2,7 +2,7 @@
 <ng-container *ngIf="totalLeaderboard$ | async as totalLeaderboard">
 	<ng-container *ngIf="resource$ | async as resource">
 		<div class="tw-flex tw-flex-col tw-overflow-x-auto">
-			<table class="tw-table-auto">
+			<table *ngIf="totalLeaderboard.data.length > 0" class="tw-table-auto">
 				<thead>
 					<tr class="tw-divide-x tw-divide-gray-200">
 						<th class="tw-px-2 tw-py-1">Ranking</th>
@@ -67,8 +67,7 @@
 								<button (click)="prevPage()" [disabled]="page == 1"
 									class="tw-inline-flex tw-h-8 disabled:tw-text-gray-400 tw-w-8 tw-items-center tw-justify-center tw-rounded tw-border tw-border-gray-100 tw-bg-white tw-text-gray-900 rtl:tw-rotate-180">
 									<span class="tw-sr-only">Prev Page</span>
-									<svg xmlns="http://www.w3.org/2000/svg" class="tw-h-3 tw-w-3 tw-text-inherit"
-										viewBox="0 0 20 20" fill="currentColor">
+									<svg xmlns="http://www.w3.org/2000/svg" class="tw-h-3 tw-w-3 tw-text-inherit" viewBox="0 0 20 20" fill="currentColor">
 										<path fill-rule="evenodd"
 											d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
 											clip-rule="evenodd"></path>
