@@ -84,7 +84,7 @@ export class PartnerResourcesService {
 		// check if this is the last and only league, if it is we return an error
 
 		const resource = await this.partnerResourceModel.findOne({
-			resource_id: deleteLeague.league,
+			resource_id: deleteLeague.resource_id,
 		});
 		if (resource.leagues.length == 1) {
 			throw new BadRequestException(

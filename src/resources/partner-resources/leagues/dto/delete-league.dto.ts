@@ -13,11 +13,11 @@ export class DeleteLeagueDTO {
 
 	@Validate(EntryExistsRule, [
 		PartnerResource.name,
-		({ name, resource_id }): FilterQuery<PartnerResourceDocument> => {
+		({ league, resource_id }): FilterQuery<PartnerResourceDocument> => {
 			return {
 				resource_id,
 				leagues: {
-					$elemMatch: { name },
+					$elemMatch: { name: league },
 				},
 			};
 		},
