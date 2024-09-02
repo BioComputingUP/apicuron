@@ -53,7 +53,7 @@ export class OrcidTokenAuthService implements OnModuleInit {
 	}
 
 	async getToken(): Promise<OrcidAuthToken> {
-		if (Date.now() + 10 * 1000 >= this.token?.expires_at) {
+		if (!this.token || Date.now() + 10 * 1000 >= this.token?.expires_at) {
 			return await this.fetchToken();
 		}
 		return this.token;
