@@ -15,15 +15,18 @@ import {
 } from '../../../../core/schemas/resource/partner-resource.schema';
 import { UniqueRule } from '../../../../shared/validators/unique.validator';
 import { OrcidChecksum } from '../../../../submit-reports/validators/orcid-checksum';
+import { Expose } from 'class-transformer';
 
 export class LeagueDto {
 	@Validate(OrcidChecksum, { each: true })
 	@IsString({ each: true })
 	@IsArray()
 	@IsOptional()
+	@Expose()
 	defaultMembers: string[];
 
 	@IsString()
+	@Expose()
 	resource_id?: string;
 
 	@Validate(UniqueRule, [
@@ -39,10 +42,12 @@ export class LeagueDto {
 	])
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	name: string;
 
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	displayedName: string;
 
 	@ApiProperty({
@@ -53,5 +58,6 @@ export class LeagueDto {
 	@IsEnum(PrivacyType)
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	visibility: PrivacyType;
 }
