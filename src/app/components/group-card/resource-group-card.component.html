@@ -17,8 +17,12 @@
           <span class="tw-text-gray-600">{{ group.defaultMembers.length }} members</span>
         </li>
         <li class="tw-text-sm tw-text-gray-600 tw-m-1">
-          Privacy:
-          <span class="tw-inline-flex tw-items-center tw-rounded-md tw-bg-apicuron-purple-100 tw-px-1 tw-py-1 tw-text-xs tw-text-apicuron-purple tw-font-bold">
+          <span *ngIf="group.visibility == 'public'"
+            class="tw-inline-flex tw-items-center tw-rounded-md tw-px-1 tw-py-1 tw-text-sm tw-font-bold tw-text-apicuron-purple">
+            {{ group.visibility }}
+          </span>
+          <span *ngIf="group.visibility == 'private'"
+            class="tw-inline-flex tw-items-center tw-rounded-md tw-px-1 tw-py-1 tw-text-sm tw-font-bold tw-text-apicuron-red">
             {{ group.visibility }}
           </span>
         </li>

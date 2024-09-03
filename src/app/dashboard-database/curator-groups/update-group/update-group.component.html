@@ -1,5 +1,4 @@
 <div class="tw-bg-white tw-grid tw-grid-flow-row tw-grid-cols-1 tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4 tw-max-w-2xl tw-max-h-screen tw-overflow-y-auto">
-	<!-- <form [formGroup]="form" (submit)="submit()"> -->
 	<form>
 	  <h2 class="tw-text-xl tw-text-center tw-font-bold">
 		Update {{ group.displayedName }}
@@ -9,7 +8,7 @@
 		<label for="displayedName">Group Name</label>
 		<input type="text"
 		  [placeholder]="group.displayedName"
-		  class="tw-mb-2"
+		  class="tw-mb-2 tw-placeholder-black"
 		  name="displayedName"
 		  formControlName="displayedName"/>
 		<span class="tw-text-xs tw-font-light tw-text-gray-400">
@@ -29,7 +28,7 @@
   
 	  <div class="form-control-element">
 		<label for="name">Identifier Name</label>
-		<input [placeholder]="group.name" type="text" class="tw-mb-2" name="name" formControlName="name" />
+		<input [placeholder]="group.name" type="text" class="tw-mb-2 tw-placeholder-black" name="name" formControlName="name" />
 		<span class="tw-text-xs tw-font-light tw-text-gray-400">
 		  Name used for API identification. This field is filled automatically after the Group Name is provided.
 		</span>
