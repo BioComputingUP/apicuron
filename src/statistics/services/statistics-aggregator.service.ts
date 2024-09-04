@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
-import { Document, Model, Types } from 'mongoose';
-import { Report, LeanReportDocument } from '../../core/schemas/reports.schema';
+import { Model } from 'mongoose';
+import { ReportDocument } from '../../core/schemas/reports.schema';
 import { ComputeStatisticsService } from '../compute-statistics/compute-statistics.service';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -103,16 +103,16 @@ export class StatisticsAggregator implements Aggregator {
 	}
 
 	async applyReport(
-		report:
-			| (Document<unknown, any, Report> & Report & { _id: Types.ObjectId })
-			| LeanReportDocument,
+		report: ReportDocument,
+		term: TermDocument,
+		resource: PartnerResourceDocument,
 		user?: UserDocument,
-		resource?: PartnerResourceDocument,
 	) {
 		return await this.computeStats.incrementStatByReport(
 			report,
-			user,
 			resource,
+			term,
+			user,
 		);
 	}
 	async applyAllReports(resource_id: string) {

@@ -102,8 +102,9 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 		report:
 			| (Document<unknown, any, Report> & Report & { _id: Types.ObjectId })
 			| LeanReportDocument,
+		term: TermDocument,
 	) {
-		const result = await this.computeWeeklyStat.updateWithReport(report);
+		const result = await this.computeWeeklyStat.updateWithReport(report, term);
 		this.logger.debug(
 			`Updated Weekly Statistics for user ${report.curator_orcid} at resource ${report.resource_id} and league ${report.league}`,
 		);

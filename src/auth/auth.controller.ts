@@ -19,6 +19,8 @@ import { Roles } from './decorators/roles.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { RoleGuard } from './guards/role.guard';
 import { UsersService } from './users/users.service';
+import { UserReq } from './decorators/applyUser.decorator';
+import { User } from '../core/schemas/user.schema';
 
 @Controller({
 	path: 'auth',
@@ -50,9 +52,9 @@ export class AuthController {
 	// @Redirect('/orcid/', 301)
 	@Render('auth')
 	@UseGuards(OrcidGuard)
-	orcid_redirect(@Req() req) {
-		const user = req.user;
+	orcid_redirect(@UserReq() user: User) {
 		return {
+			displayedName: user.displayedName,
 			access_token: user.orcid_permission,
 			refresh_token: user.refresh_token,
 		};

@@ -11,7 +11,6 @@ import {
 	InternalServerErrorException,
 	Query,
 	UploadedFile,
-	Header,
 } from '@nestjs/common';
 import {
 	ApiOperation,
@@ -31,18 +30,11 @@ import {
 	SubmitReportsDto,
 } from '../dto/submit-report.dto';
 import { SubmitReportService } from '../services/submit-reports.service';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Response } from 'express';
 import { VersionHeader } from '../../plugins/swagger/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SchedulerClientService } from '../../scheduler-client/services/scheduler-client.service';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import {
-	IManyReportsSubmittedEventPayload,
-	IReportSubmittedEventPayload,
-	ManyReportsSubmittedEvent,
-	ReportSubmittedEvent,
-} from '../events/events';
 import { isArray } from 'lodash';
 import { AuthProtected } from '../../auth/decorators/auth.decorator';
 @ApiTags('Reports')
@@ -51,7 +43,6 @@ import { AuthProtected } from '../../auth/decorators/auth.decorator';
 export class SubmitReportsController {
 	constructor(
 		protected reportService: SubmitReportService,
-		protected eventEmitter: EventEmitter2,
 		private schedulerClientService: SchedulerClientService,
 		private resourceService: PartnerResourcesService,
 	) {}
@@ -157,15 +148,14 @@ export class SubmitReportsController {
 	) {
 		this.can_edit_resource(req.user, report.resource_id);
 
-		const report_confirmation = await this.reportService.insertReport(report, {
-			preventEvents: true,
-		});
+		const { report: report_confirmation, callback } =
+			await this.reportService.insertReport(report, {
+				preventEvents: true,
+			});
 
 		res.send(report_confirmation);
 
-		await this.eventEmitter.emitAsync(ReportSubmittedEvent, {
-			report: report_confirmation,
-		} as IReportSubmittedEventPayload);
+		await callback();
 	}
 
 	@ApiOperation({
@@ -182,40 +172,19 @@ export class SubmitReportsController {
 		@Request() req,
 		@Res() res: Response,
 	) {
-		const resourcesConcerned = await reportSubmission.reports.reduce(
-			(prev, curr) => {
-				if (!prev.includes(curr.resource_id)) {
-					prev.push(curr.resource_id);
-				}
-				return prev;
-			},
-			[],
-		);
-		resourcesConcerned.map((res_id: string) =>
-			this.can_edit_resource(req.user, res_id),
-		);
-
 		const response = { deletedReports: null, insertedCount: 0 };
 
-		if (reportSubmission.delete_all) {
-			response.deletedReports =
-				await this.reportService.deleteAllResourcesReports(
-					reportSubmission.delete_all,
-				);
-		}
-
-		const { insertedCount, reports } = await this.reportService.insertReports(
-			reportSubmission,
-			{ preventEvents: true },
-		);
+		const { insertedCount, reports, deletedReports, callback } =
+			await this.reportService.insertReports(reportSubmission, {
+				preventEvents: true,
+			});
 		response.insertedCount = insertedCount;
+		response.deletedReports = deletedReports;
 
 		// send the insertion response
 		res.send(response);
 
-		await this.eventEmitter.emitAsync(ManyReportsSubmittedEvent, {
-			reports,
-		} as IManyReportsSubmittedEventPayload);
+		await callback();
 
 		return;
 	}

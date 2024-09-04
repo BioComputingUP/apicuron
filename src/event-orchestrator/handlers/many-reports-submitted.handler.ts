@@ -1,21 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Aggregator } from '../interfaces/aggregator.interface';
-import { EventOrchestratorModuleOptions } from '../interfaces/event-orchestrator-options.interface';
-import { MODULE_OPTIONS_TOKEN } from '../event-orchestrator.module-definition';
 import {
 	IManyReportsSubmittedEventPayload,
 	ManyReportsSubmittedEvent,
 } from '../../submit-reports/events/events';
 import { OnEvent } from '@nestjs/event-emitter';
 import { IEventHandler } from '@nestjs/cqrs';
-import { AggregatorManager } from '../services/aggregator-manager.service';
 import { BaseAggregatorRunner } from '../aggregator-runners/base.runner';
 
 @Injectable()
 export class ManyReportsSubmittedHandler implements IEventHandler {
+	logger = new Logger(ManyReportsSubmittedHandler.name);
 	constructor(
 		protected runner: BaseAggregatorRunner,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
@@ -23,6 +21,9 @@ export class ManyReportsSubmittedHandler implements IEventHandler {
 
 	payloadProcessorFactory(payload: IManyReportsSubmittedEventPayload) {
 		return async (aggregator: Aggregator) => {
+			this.logger.debug(
+				`Processing ${payload.reports.length} reports using aggregator: ${aggregator.constructor.name}`,
+			);
 			const reportDocuments = payload.reports.map(
 				(report) => new this.reportModel(report),
 			);
@@ -32,11 +33,20 @@ export class ManyReportsSubmittedHandler implements IEventHandler {
 
 			const resources = payload.resources;
 			const users = payload.users;
+			const terms = payload.terms;
 
 			for (const report of reportDocuments) {
-				const resource = resources.find((r) => r.id === report.resource_id);
-				const user = users.find((u) => u.id === report.curator_orcid);
-				await aggregator.applyReport(report, user, resource);
+				const resource = resources.find(
+					(r) => r.resource_id === report.resource_id,
+				);
+				const user = users.find((u) => u.orcid_id === report.curator_orcid);
+				const term = terms.find(
+					(t) =>
+						t.activity_term === report.activity_term &&
+						t.resource_id === report.resource_id &&
+						t.league === report.league,
+				);
+				await aggregator.applyReport(report, term, resource, user);
 			}
 		};
 	}

@@ -1,6 +1,10 @@
 import { Document, Model, Types } from 'mongoose';
 import { PrivacyType } from '../../core/enums';
-import { Report, LeanReportDocument } from '../../core/schemas/reports.schema';
+import {
+	Report,
+	LeanReportDocument,
+	ReportDocument,
+} from '../../core/schemas/reports.schema';
 import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -13,6 +17,8 @@ import { computeAggregatePrivacyField } from '../../util/privacy.helper';
 import { Injectable, Logger } from '@nestjs/common';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { TermDocument } from '../../core/schemas/terms.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 
 @Injectable()
 @AggregatorClass()
@@ -46,13 +52,17 @@ export class DetailedStatisticsAggregatorService implements Aggregator {
 		return deleted.deletedCount;
 	}
 	async applyReport(
-		report:
-			| (Document<unknown, any, Report> & Report & { _id: Types.ObjectId })
-			| LeanReportDocument,
+		report: ReportDocument | LeanReportDocument,
+		term: TermDocument,
+		resource: PartnerResourceDocument,
+		curator?: UserDocument,
 	) {
-		const result = await this.computeDetailedStats.upsertDetailedStats(report);
+		const result = await this.computeDetailedStats.upsertDetailedStats(
+			report,
+			term,
+		);
 		this.logger.debug(
-			`Updated Detailed Statistics for user ${report.curator_orcid} at resource ${report.resource_id} and league ${report.league}`,
+			`Updated Detailed Statistics for user ${report.curator_orcid} ${curator?.displayedName} at resource ${resource.resource_name} and league ${report.league}`,
 		);
 
 		return result;

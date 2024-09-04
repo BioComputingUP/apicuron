@@ -58,6 +58,7 @@ export class ComputeWeeklyStatisticsService {
 			| ReportDocument
 			| (Document<unknown, any, Report> & Report & { _id: Types.ObjectId })
 			| LeanReportDocument,
+		termDoc?: TermDocument,
 	) {
 		if (report.timestamp < getLastWeekDate()) {
 			return;
@@ -75,10 +76,12 @@ export class ComputeWeeklyStatisticsService {
 			(lastSavedReport &&
 				lastSavedReport.timestamp.getTime() < report.timestamp.getTime());
 
-		const term = await this.termModel.findOne({
-			resource_id: report.resource_id,
-			league: report.league,
-		});
+		const term = !termDoc
+			? await this.termModel.findOne({
+					resource_id: report.resource_id,
+					league: report.league,
+			  })
+			: termDoc;
 
 		const stat = await this.weeklyStatModel.findOne({
 			resource_id: report.resource_id,

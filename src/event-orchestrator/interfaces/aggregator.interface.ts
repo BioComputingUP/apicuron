@@ -10,8 +10,9 @@ import { UserDocument } from '../../core/schemas/user.schema';
 export interface Aggregator {
 	applyReport(
 		report: LeanReportDocument | ReportDocument,
+		term: TermDocument,
+		resource: PartnerResourceDocument,
 		curator?: UserDocument,
-		resource?: PartnerResourceDocument,
 	): Promise<any> | any;
 	applyAllReports(resource_id: string): Promise<any> | any;
 	removeAllResourceAggregates(resource_id: string): Promise<any> | any;

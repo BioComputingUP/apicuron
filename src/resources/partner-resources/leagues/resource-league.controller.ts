@@ -59,7 +59,7 @@ export class ResourceLeagueController {
 		this.userCanAccessResource(user, resourceId);
 
 		const leagues = plainToInstance(LeagueDto, resource.leagues, {
-			excludeExtraneousValues: true
+			excludeExtraneousValues: true,
 		});
 
 		return { data: leagues };

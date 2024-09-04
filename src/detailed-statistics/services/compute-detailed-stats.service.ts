@@ -65,17 +65,22 @@ export class ComputeDetailedStatisticsService {
 		});
 	}
 
-	async upsertDetailedStats(report: ReportDocument | LeanReportDocument) {
+	async upsertDetailedStats(
+		report: ReportDocument | LeanReportDocument,
+		termDoc: TermDocument = null,
+	) {
 		const statFilter = {
 			curator_orcid: report.curator_orcid,
 			resource_id: report.resource_id,
 			league: report.league,
 		};
-		const term$ = this.termModel.findOne({
-			activity_term: report.activity_term,
-			resource_id: report.resource_id,
-			league: report.league,
-		});
+		const term$ = !!termDoc
+			? Promise.resolve(termDoc)
+			: this.termModel.findOne({
+					activity_term: report.activity_term,
+					resource_id: report.resource_id,
+					league: report.league,
+			  });
 
 		const stat$ = this.detailedStatsModel.findOne(statFilter);
 
