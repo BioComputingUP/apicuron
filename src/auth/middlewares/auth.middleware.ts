@@ -7,7 +7,7 @@ import {
 import { Request, Response, NextFunction } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
+import { UsersService } from '../users/services/users.service';
 
 export interface JwtPayload {
 	orcid_id: string;

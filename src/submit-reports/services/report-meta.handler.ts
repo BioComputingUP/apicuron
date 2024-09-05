@@ -5,7 +5,7 @@ import { PrivacyType } from '../../core/enums';
 import { ReportHandler } from '../interfaces/report.handler';
 import { ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { UsersService } from '../../auth/users/users.service';
+import { UsersService } from '../../auth/users/services/users.service';
 import { computePrivacyField } from '../../util/privacy.helper';
 import { uniq } from 'lodash';
 @Injectable()

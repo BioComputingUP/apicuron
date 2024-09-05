@@ -36,5 +36,5 @@ export class ReportDto {
 export class ReportWithTermDto extends ReportDto {
 	@Expose()
 	@Type(() => TermDto)
-	term: TermDto;
+	term?: TermDto;
 }

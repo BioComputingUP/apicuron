@@ -14,11 +14,11 @@ import {
 	UseGuards,
 } from '@nestjs/common';
 import { UpdateProfileDto, UpdateUserDto } from './dto/update-user.dto';
-import { UsersService } from './users.service';
+import { UsersService } from './services/users.service';
 import { Logger } from '@nestjs/common';
 import { Response } from 'express';
 import { Roles } from '../decorators/roles.decorator';
-import { json_to_tsv } from './json-tsv';
+import { json_to_tsv } from './helpers/json-tsv';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { RoleGuard } from '../guards/role.guard';
 import {

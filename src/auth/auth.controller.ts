@@ -18,7 +18,7 @@ import { AuthService } from './auth.service';
 import { Roles } from './decorators/roles.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { RoleGuard } from './guards/role.guard';
-import { UsersService } from './users/users.service';
+import { UsersService } from './users/services/users.service';
 import { UserReq } from './decorators/applyUser.decorator';
 import { User } from '../core/schemas/user.schema';
 

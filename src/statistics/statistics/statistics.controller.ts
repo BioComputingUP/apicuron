@@ -23,7 +23,7 @@ import {
 	ApiTags,
 } from '@nestjs/swagger';
 import { VersionHeader } from '../../plugins/swagger/config';
-import { UsersService } from '../../auth/users/users.service';
+import { UsersService } from '../../auth/users/services/users.service';
 import { Response } from 'express';
 import { plainToInstance } from 'class-transformer';
 import {

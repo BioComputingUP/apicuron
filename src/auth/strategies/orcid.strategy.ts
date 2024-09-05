@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { AuthService } from '../auth.service';
 import { Strategy } from 'passport-oauth2';
-import { UsersService } from '../users/users.service';
+import { UsersService } from '../users/services/users.service';
 import { plainToInstance } from 'class-transformer';
 import { CreateOrUpdateUserDto } from '../users/dto/create-or-update-user.dto';
 

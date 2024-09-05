@@ -2,6 +2,7 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, LeanDocument } from 'mongoose';
 import { PrivacyType } from '../enums';
 import { IUserResourceEntity } from '../interfaces/user-resource-entity';
+import { Term, TermSchema } from './terms.schema';
 
 export type ReportDocument = HydratedDocument<Report>;
 
@@ -38,6 +39,12 @@ export class Report implements IUserResourceEntity {
 		type: Date,
 	})
 	timestamp: Date;
+
+	@Prop({
+		required: false,
+		type: TermSchema,
+	})
+	term: Term;
 
 	getMetaFields() {
 		return {

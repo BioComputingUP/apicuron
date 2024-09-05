@@ -12,7 +12,7 @@ import { PrivacyType } from '../core/enums';
 import { Report } from '../core/schemas/reports.schema';
 import { SubmitReportService } from '../submit-reports/services/submit-reports.service';
 import { OrcidClientService } from '../orcid/orcid-client/orcid-client.service';
-import { UsersService } from '../auth/users/users.service';
+import { UsersService } from '../auth/users/services/users.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BulkSubmissionEvent } from '../submit-reports/events/events';
 import { Logger } from '@nestjs/common';

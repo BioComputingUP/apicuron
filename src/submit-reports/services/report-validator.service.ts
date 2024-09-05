@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { UsersService } from '../../auth/users/users.service';
+import { UsersService } from '../../auth/users/services/users.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { Model } from 'mongoose';
@@ -100,9 +100,9 @@ export class ReportValidatorService {
 	 * Validates a report.
 	 *
 	 * @param report - The report to validate.
-	 * @param userDoc - The user document.
-	 * @param resourceDoc - The partner resource document.
-	 * @param termDoc - The term document.
+	 * @param userDoc - The user document, (optional). otherwise it will be fetched from the database.
+	 * @param resourceDoc - The partner resource document, (optional).otherwise it will be fetched from the database.
+	 * @param termDoc - The term document, to be used for validation, (optional) otherwise it will be fetched from the database.
 	 * @returns An object containing the validated report, resource, user, and term documents.
 	 * @throws BadRequestException if the resource or league does not exist.
 	 */
@@ -136,6 +136,7 @@ export class ReportValidatorService {
 		const { term } = await this.validateReportActivityTerm(report, termDoc);
 
 		const reportDoc = new this.reportModel(report);
+		reportDoc.term = term;
 
 		reportDoc.privacy = computePrivacyField(resource, userDoc, reportDoc);
 

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import {
 	SubmitReportDto,
 	SubmitReportsDto,
@@ -181,6 +181,13 @@ export class SubmitBulkTask {
 				this.notificationsService.create_user_notification(
 					'Submission Failed',
 					'Error inserting reports, Unknown Error Please contact us at info@apicuron.org for assistance',
+					submitter_orcid,
+				);
+			}
+			if (err instanceof BadRequestException) {
+				this.notificationsService.create_user_notification(
+					'Submission Failed',
+					`Error inserting reports, Bad Reports ${err.message}`,
 					submitter_orcid,
 				);
 			}

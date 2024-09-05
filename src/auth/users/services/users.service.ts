@@ -1,16 +1,16 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
-import { achievements_v1_pipeline } from './aggregation-pipeline/achievements.pipeline';
-import { browse_v1_pipeline } from './aggregation-pipeline/browse.pipeline';
-import { User, UserDocument } from '../../core/schemas/user.schema';
+import { achievements_v1_pipeline } from '../aggregation-pipeline/achievements.pipeline';
+import { browse_v1_pipeline } from '../aggregation-pipeline/browse.pipeline';
+import { User, UserDocument } from '../../../core/schemas/user.schema';
 import { ConfigService } from '@nestjs/config';
-import { generateAvatar } from './generate_avatar';
-import { PrivacyType } from '../../core/enums';
+import { generateAvatar } from '../generate_avatar';
+import { PrivacyType } from '../../../core/enums';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { UserPrivacyUpdatedEvent } from './events/update-privacy';
-import { ICreateOrUpdateUser } from './dto/create-or-update-user.dto';
-import { UserEntity } from './dto/user';
+import { UserPrivacyUpdatedEvent } from '../events/update-privacy';
+import { ICreateOrUpdateUser } from '../dto/create-or-update-user.dto';
+import { UserEntity } from '../dto/user';
 import { plainToInstance } from 'class-transformer';
 @Injectable()
 export class UsersService implements OnApplicationBootstrap {

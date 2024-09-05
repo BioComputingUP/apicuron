@@ -13,7 +13,7 @@ import {
 } from '../core/schemas/resource/partner-resource.schema';
 import { PrivacyType } from '../core/enums';
 import { Logger } from '@nestjs/common';
-import { UsersService } from '../auth/users/users.service';
+import { UsersService } from '../auth/users/services/users.service';
 import { SubmitReportService } from '../submit-reports/services/submit-reports.service';
 import { plainToInstance } from 'class-transformer';
 import { SubmitReportsDto } from '../submit-reports/dto/submit-report.dto';

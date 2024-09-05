@@ -11,7 +11,7 @@ import { Report, ReportDocument } from '../core/schemas/reports.schema';
 import { paginate } from '../pagination/paginator';
 import { PaginationAggregation } from '../pagination/interfaces/pagination-aggregation';
 import { OnEvent } from '@nestjs/event-emitter';
-import { UsersService } from '../auth/users/users.service';
+import { UsersService } from '../auth/users/services/users.service';
 import { TermDeletedEvent } from '../terms/events/events';
 import { pick, mapKeys } from 'lodash';
 import { plainToInstance } from 'class-transformer';
@@ -117,29 +117,35 @@ export class ReportsService {
 			query.league = reportFilter.league;
 		}
 
-		const reports = await this.reportModel.find(query, {}, options).lean();
-		let data = reports;
+		const projection = reportFilter.extend.includes('term')
+			? null
+			: { term: 0 };
 
-		if (reportFilter.extend.includes('term')) {
-			const { resource_id } = reportFilter;
+		const reports = await this.reportModel
+			.find(query, projection, options)
+			.lean();
+		const data = reports;
 
-			const activity_term_list = [
-				...new Set(reports.map((report) => report.activity_term)),
-			];
+		// if (reportFilter.extend.includes('term')) {
+		// 	const { resource_id } = reportFilter;
 
-			const terms_list = await this.termsService.getTerms(activity_term_list, {
-				resource_id,
-				league: reportFilter.league,
-			});
+		// 	const activity_term_list = [
+		// 		...new Set(reports.map((report) => report.activity_term)),
+		// 	];
 
-			const reports_with_terms = reports.map((report) => {
-				report['term'] = terms_list.find(
-					(term) => term.activity_term == report.activity_term,
-				);
-				return report;
-			});
-			data = reports_with_terms;
-		}
+		// 	const terms_list = await this.termsService.getTerms(activity_term_list, {
+		// 		resource_id,
+		// 		league: reportFilter.league,
+		// 	});
+
+		// 	const reports_with_terms = reports.map((report) => {
+		// 		report['term'] = terms_list.find(
+		// 			(term) => term.activity_term == report.activity_term,
+		// 		);
+		// 		return report;
+		// 	});
+		// 	data = reports_with_terms;
+		// }
 
 		const reportsData = plainToInstance(ReportWithTermDto, data, {
 			excludeExtraneousValues: true,

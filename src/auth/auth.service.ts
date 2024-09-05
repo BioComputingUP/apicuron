@@ -2,7 +2,7 @@ import { Injectable, ForbiddenException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { uuid } from 'uuidv4';
-import { UsersService } from './users/users.service';
+import { UsersService } from './users/services/users.service';
 
 export interface userJWT {
 	orcid_id: string;

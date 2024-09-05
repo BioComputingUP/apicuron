@@ -10,7 +10,7 @@ import {
 	WeeklyLeaderboardDto,
 	WeeklyStatisticsDto,
 } from '../dto/weekly-statistics.dto';
-import { UsersService } from '../../auth/users/users.service';
+import { UsersService } from '../../auth/users/services/users.service';
 
 @Injectable()
 export class WeeklyStatisticsService {

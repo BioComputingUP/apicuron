@@ -1,7 +1,7 @@
 import { Controller, Get, InternalServerErrorException } from '@nestjs/common';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { AppService } from './app.service';
-import { UsersService } from './auth/users/users.service';
+import { UsersService } from './auth/users/services/users.service';
 import { ReportsService } from './reports/reports.service';
 import { PartnerResourcesService } from './resources/partner-resources/services/partner-resources.service';
 import { InjectModel } from '@nestjs/mongoose';
