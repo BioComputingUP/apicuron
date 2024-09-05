@@ -6,11 +6,10 @@ import { Observable, Subject, combineLatest, of } from "rxjs";
 import { switchMap, pluck } from "rxjs/operators";
 import { environment } from "src/environments/environment";
 import { ResourceGroup } from "../../../models/resource-group.model";
-import { Dialog } from "@angular/cdk/dialog";
-import { ViewParticipantsComponent } from "../view-participants/view-participants.component";
 import { UpdateGroupComponent } from "../update-group/update-group.component";
 import { GroupCreateForm } from "../../../components/group-create-form/group-create-form.component";
 import { ToastrService } from "ngx-toastr";
+import { Dialog } from "@angular/cdk/dialog";
 
 export type UpdateGroup = Partial<ResourceGroup> & DeleteGroup;
 export type DeleteGroup = Pick<ResourceGroup, 'name' | 'resource_id'>;
@@ -127,14 +126,6 @@ export class GroupsService implements OnDestroy {
 
     // Pass the resourceGroup as an input (use the CreateGroupForm as an example)
     this.dialog.open(UpdateGroupComponent, {
-      data: {
-        group: resourceGroup,
-      },
-    });
-  }
-
-  openParticipantsList(resourceGroup: ResourceGroup) {
-    this.dialog.open(ViewParticipantsComponent, {
       data: {
         group: resourceGroup,
       },
