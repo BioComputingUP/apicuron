@@ -1,9 +1,8 @@
 import { Deserializable } from "../../interfaces/deserializable.model";
 import { User } from "../../models/User.model";
-import { CuratorStatistics } from "../../models/statistics.model";
-
+import { BaseCuratorStatistics, WeeklyCuratorStatistics } from "../../models/statistics.model";
 export class CuratorWithStats extends User implements Deserializable {
-    stats: CuratorStatistics[];
+    stats: BaseCuratorStatistics[];
   
     deserialize(input: any): this {
       super.deserialize(input);
@@ -12,3 +11,14 @@ export class CuratorWithStats extends User implements Deserializable {
       return this;
     }
   }
+
+export class CuratorWithWeeklyStats extends User implements Deserializable {
+  stats: WeeklyCuratorStatistics[];
+
+  deserialize(input: any): this {
+    super.deserialize(input);
+    this.stats = input?.stats ?? [];
+
+    return this;
+  }
+}

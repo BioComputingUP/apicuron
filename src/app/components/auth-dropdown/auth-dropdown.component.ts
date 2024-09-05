@@ -23,6 +23,7 @@ import { Notification } from "../../notifications-data/models/Notification";
 import { RouterModule } from "@angular/router";
 import { NgxPopperModule } from "ngx-popper";
 import _ from "lodash";
+import { NgxPopperjsModule } from "ngx-popperjs";
 // import { NotificationsDataModule } from '../../notifications-data/notifications-data.module';
 @Component({
   selector: "auth-dropdown",
@@ -32,7 +33,7 @@ import _ from "lodash";
     CommonModule,
     RouterModule,
     AngularSvgIconModule,
-    NgxPopperModule,
+    NgxPopperjsModule,
   ],
   standalone: true,
 })

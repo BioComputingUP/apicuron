@@ -18,6 +18,8 @@ import { MedalDefCardComponent } from "../components/medal-def-card/medal-def-ca
 import { AchievementsDefModule } from "../achievements-def/achievements-def.module";
 import { TermsModule } from "../terms/terms.module";
 import { LeaderboardComponent } from "../components/leaderboard/leaderboard.component";
+import { TotalLeaderboardComponent } from "../components/total-leaderboard/total-leaderboard.component";
+import { WeeklyLeaderboardComponent } from "../components/weekly-leaderboard/weekly-leaderboard.component";
 @NgModule({
   declarations: [
     DatabasesPageComponent,
@@ -40,7 +42,9 @@ import { LeaderboardComponent } from "../components/leaderboard/leaderboard.comp
     MedalDefCardComponent,
     TermsModule,
     AchievementsDefModule,
-    LeaderboardComponent
+    LeaderboardComponent,
+    TotalLeaderboardComponent,
+    WeeklyLeaderboardComponent,
   ],
   providers:[DatabasesService],
   exports: [DatabasesPageComponent],

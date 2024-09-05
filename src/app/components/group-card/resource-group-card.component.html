@@ -1,0 +1,22 @@
+<div
+  class="tw-bg-white tw-shadow-md tw-p-2 tw-rounded tw-flex tw-flex-col tw-w-44 tw-cursor-poi"
+  (click)="handleEvent('select', $event)"
+>
+  <span class="tw-block">{{ group.displayedName }}</span>
+
+  <div class="tw-flex tw-flex-row tw-justify-end">
+    <button
+      class="tw-mr-2 tw-bg-apicuron-purple tw-text-white tw-p-1 tw-rounded"
+      (click)="handleEvent('edit', $event)"
+    >
+      Edit
+    </button>
+
+    <button
+      class="tw-bg-apicuron-purple tw-text-white tw-p-1 tw-rounded"
+      (click)="handleEvent('delete', $event)"
+    >
+      Delete
+    </button>
+  </div>
+</div>

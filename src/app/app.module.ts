@@ -19,6 +19,7 @@ import { NgxPopperModule } from "ngx-popper";
 import { SentryModuleConfig } from "../config/sentry.config";
 import { BannerService } from "./main-layout/banner.service";
 import { MatomoModule } from "ngx-matomo";
+import { NgxPopperjsModule } from "ngx-popperjs";
 @NgModule({
   declarations: [AppComponent, PageNotFoundComponent, MainLayoutComponent],
   imports: [
@@ -39,7 +40,7 @@ import { MatomoModule } from "ngx-matomo";
     FootComponent,
     AngularSvgIconModule.forRoot(),
     // popper Integration
-    NgxPopperModule.forRoot({
+    NgxPopperjsModule.forRoot({
       disableDefaultStyling: true,
       disableAnimation: false,
     }),

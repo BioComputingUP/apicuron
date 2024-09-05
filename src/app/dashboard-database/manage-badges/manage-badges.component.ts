@@ -13,6 +13,7 @@ import {
 import {
   catchError,
   map,
+  scan,
   shareReplay,
   startWith,
   switchMap,
@@ -84,7 +85,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
     this.termList$ = this.resource$.pipe(
       switchMap(({ resource_id }: Resource) => {
         return this.termsService.getTerms({ resource_id });
-      }),
+      })
     );
 
     this.terms$ = this.termList$.pipe(
@@ -105,8 +106,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
         });
         return groupValues;
       })
-
-    )
+    );
 
     this.badgeFilter$ = combineLatest([this.resource$, this.page$]).pipe(
       tap(console.log),
@@ -118,6 +118,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
         });
       })
     );
+
     this.badgesList$ = this.badgeFilter$.pipe(
       switchMap((badgeFilter: BadgeDefFilter) => {
         return this.badgeDefService.getBadgeDefs(badgeFilter);
@@ -131,33 +132,21 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.badges$ = combineLatest([
-      this.updateBadge$.pipe(startWith(<string>null)),
-      this.badgesList$,
-    ]).pipe(
-      map(([update, badges]: [BadgeListUpdate, Paginated<BadgeDef>]) => {
-        if (update != null) {
-          if (update.operation == "create") {
-            badges.data = [...badges.data, update.badge];
-          }
-          if (update.operation == "update") {
-            const index = badges.data.findIndex(
-              ({ name, resource_id }) =>
-                name == update.badge.name &&
-                update.badge.resource_id == resource_id
-            );
-            if (index != -1) {
-              badges.data[index] = update.badge;
-            }
-          }
-          if (update.operation == "delete") {
-            badges.data = badges.data.filter(
-              (badge) => badge.name != update.badge.name
-            );
-          }
-        }
-
-        return badges;
+    this.badges$ = this.badgesList$.pipe(
+      switchMap((badgeList: Paginated<BadgeDef>) => {
+        // We switch to the updateBadge$ observable to listen for updates
+        // This makes sure this observable is rebuilt whenever badgeList changes
+        return this.updateBadge$.pipe(
+          // We start with the initial badgeList
+          // Making sure the first value is the badgeList
+          startWith(badgeList),
+          // We scan over the updates and apply them to the badgeList
+          // This way we can keep track of the badgeList state
+          // and apply updates to it
+          scan((badges: Paginated<BadgeDef>, update: BadgeListUpdate) => {
+            return this.applyBadgeUpdates(badges, update);
+          })
+        ) as Observable<Paginated<BadgeDef>>;
       })
     );
   }
@@ -172,6 +161,46 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
       operation: "update",
       badge,
     });
+  }
+
+  applyBadgeUpdates(
+    badges: Paginated<BadgeDef>,
+    update: BadgeListUpdate
+  ): Paginated<BadgeDef> {
+    switch (update.operation) {
+      case "create":
+        return {
+          data: [...badges.data, update.badge],
+          meta: {
+            pagination: {
+              total: badges.meta.pagination.total + 1,
+              start: badges.meta.pagination.start,
+              limit: badges.meta.pagination.limit + 1,
+            },
+          },
+        };
+      case "update":
+        return {
+          data: badges.data.map((badge) => {
+            if (badge.name == update.badge.name) {
+              return update.badge;
+            }
+            return badge;
+          }),
+          meta: badges.meta,
+        };
+      case "delete":
+        return {
+          data: badges.data.filter((badge) => badge.name != update.badge.name),
+          meta: {
+            pagination: {
+              total: badges.meta.pagination.total - 1,
+              start: badges.meta.pagination.start,
+              limit: badges.meta.pagination.limit - 1,
+            },
+          },
+        };
+    }
   }
 
   update_page(page) {
@@ -259,22 +288,25 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
   }
 
   delete_badge(badge) {
-    this.badgeDefService.deleteBadge(badge).subscribe(
-      (response) => {
-        if (response["data"]) {
-          this.toastr.success(
-            `Badge ${badge.name} sucessfully Deleted`,
-            "Badge Deletion Sucessfull"
+    this.badgeDefService
+      .deleteBadge(badge)
+      .pipe(take(1))
+      .subscribe(
+        (response) => {
+          if (response["data"]) {
+            this.toastr.success(
+              `Badge ${badge.name} sucessfully Deleted`,
+              "Badge Deletion Sucessfull"
+            );
+            this.updateBadge$.next({ operation: "delete", badge });
+          }
+        },
+        (error) => {
+          this.toastr.error(
+            `An error occured while deleting the badge ${badge.name}`,
+            "Badge Deletion Failed"
           );
-          this.updateBadge$.next({ operation: "delete", badge });
         }
-      },
-      (error) => {
-        this.toastr.error(
-          `An error occured while deleting the badge ${badge.name}`,
-          "Badge Deletion Failed"
-        );
-      }
-    );
+      );
   }
 }

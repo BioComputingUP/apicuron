@@ -1,0 +1,29 @@
+<!-- Main page with the information about curation groups -->
+<div class="tw-p-2 tw-flex-auto">
+    <div class="tw-flex tw-flex-col tw-mx-2">
+        <div>
+            <h3 class="tw-text-2xl tw-px-2 tw-font-bold">Manage Curation Groups</h3>
+        </div>
+
+        <div class="tw-flex-auto tw-w-1/2 tw-flex tw-flex-col tw-justify-between tw-px-1 tw-pt-2">
+            <div class="tw-flex tw-flex-row tw-pb-1">
+                <show-groups></show-groups>
+            </div>
+            <div class="">
+                <input class="tw-rounded-b-md sm:tw-rounded-b-none sm:tw-rounded-l-md tw-outline-none tw-p-1 tw-flex-auto tw-bg-white" type="search" name="search" id=""
+                [(ngModel)]="search_text" [ngModelOptions]="{standalone: true}"
+                placeholder="Biocurator's Name..." (keyup.enter)="onSubmit()">
+                <button class="tw-w-full sm:tw-w-auto tw-py-1 tw-bg-apicuron-bright-purple focus:tw-outline-none focus:tw-shadow-inner
+                    tw-text-gray-50 tw-rounded-b-md sm:tw-rounded-b-none sm:tw-rounded-r-md tw-px-2"
+                    type="submit" (click)="onSubmit()">Search
+                </button>
+            </div>
+        </div>
+
+    </div>
+	<div class="tw-my-2 tw-flex tw-flex-row tw-border-gray-500">
+        <div class="tw-w-full tw-p-2">
+            <participants-list></participants-list>
+        </div>
+    </div>
+</div>

@@ -35,12 +35,12 @@ export class MedalFormComponent implements OnInit {
     }
     if (this.type == "update") {
       this.form.setValue({
-        name: this.medal.name,
-        list_terms: this.medal.list_terms,
-        color: this.medal.color,
-        score_relative: this.medal.score_relative,
-        first_day: this.medal.first_day,
-        last_day: this.medal.last_day,
+        name: this.medal.name ?? null,
+        list_terms: this.medal.list_terms ?? null,
+        color: this.medal.color ?? null,
+        score_relative: this.medal.score_relative ?? null,
+        first_day: this.medal.first_day ?? null,
+        last_day: this.medal.last_day ?? null,
       });
     }
   }

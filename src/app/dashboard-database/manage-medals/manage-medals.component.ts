@@ -9,7 +9,7 @@ import {
   Subscription,
   combineLatest,
 } from "rxjs";
-import { map, shareReplay, startWith, switchMap } from "rxjs/operators";
+import { map, scan, shareReplay, startWith, switchMap } from "rxjs/operators";
 import { ResourcesService } from "../../resource/service/resources.service";
 import { Resource } from "../../models/resource.model";
 import { TermsService } from "../../terms/services/terms.service";
@@ -45,11 +45,11 @@ export class ManageMedalsComponent implements OnInit {
   updateMedal$ = new Subject<MedalListUpdate>();
 
   // Form
-  manageForm$ = new BehaviorSubject<{
+  manageForm$ = new Subject<{
     medal: MedalDef;
     show: boolean;
     type: "create" | "update";
-  }>({ medal: null, show: false, type: "create" });
+  }>();
 
   // pagination
   page$ = new BehaviorSubject<number>(1);
@@ -118,51 +118,66 @@ export class ManageMedalsComponent implements OnInit {
       })
     );
 
-    this.medals$ = combineLatest([
-      this.medalsList$,
-      this.updateMedal$.pipe(startWith(<string>null)),
-    ]).pipe(
-      map(([medals, update]: [Paginated<MedalDef>, MedalListUpdate]) => {
-        if (update != null) {
-          if (update.operation == "create") {
-            medals.data = [...medals.data, update.medal];
-          }
-          if (update.operation == "update") {
-            const index = medals.data.findIndex(
-              ({ name, resource_id }) =>
-                name == update.medal.name &&
-                update.medal.resource_id == resource_id
-            );
-            if (index != -1) {
-              medals.data[index] = update.medal;
-            }
-          }
-          if (update.operation == "delete") {
-            medals.data = medals.data.filter(
-              (medal) => medal.name != update.medal.name
-            );
-          }
+    this.medals$ = this.medalsList$.pipe(
+      switchMap(
+        (medals: Paginated<MedalDef>): Observable<Paginated<MedalDef>> => {
+          const medalList$: Observable<Paginated<MedalDef>> =
+            this.updateMedal$.pipe(
+              startWith(medals as Paginated<MedalDef>),
+              scan(
+                (
+                  medals: Paginated<MedalDef>,
+                  update: MedalListUpdate
+                ): Paginated<MedalDef> => this.applyMedalUpdates(medals, update)
+              )
+            ) as Observable<Paginated<MedalDef>>;
+          return medalList$;
         }
-        return medals;
-      })
+      )
     );
   }
 
   ngOnInit(): void {}
 
-  // private update_medal(medal_update) {
-  //   const medals = this.medals$.value;
-  //   const update_index = medals.findIndex(
-  //     (medal) => medal.name == medal_update.name
-  //   );
-  //   medals[update_index] = medal_update;
-  //   this.medals$.next(medals);
-  // }
-
-  // private create_medal(medal) {
-  //   const medals = this.medals$.value;
-  //   this.medals$.next([medal, ...medals]);
-  // }
+  applyMedalUpdates(
+    medals: Paginated<MedalDef>,
+    update: MedalListUpdate
+  ): Paginated<MedalDef> {
+    switch (update.operation) {
+      case "create":
+        return {
+          data: [...medals.data, update.medal],
+          meta: {
+            pagination: {
+              total: medals.meta.pagination.total + 1,
+              start: medals.meta.pagination.start,
+              limit: medals.meta.pagination.limit + 1,
+            },
+          },
+        };
+      case "update":
+        return {
+          data: medals.data.map((medal) => {
+            if (medal.name == update.medal.name) {
+              return update.medal;
+            }
+            return medal;
+          }),
+          meta: medals.meta,
+        };
+      case "delete":
+        return {
+          data: medals.data.filter((medal) => medal.name != update.medal.name),
+          meta: {
+            pagination: {
+              total: medals.meta.pagination.total - 1,
+              start: medals.meta.pagination.start,
+              limit: medals.meta.pagination.limit - 1,
+            },
+          },
+        };
+    }
+  }
 
   formSubmit({
     medal,
@@ -238,8 +253,8 @@ export class ManageMedalsComponent implements OnInit {
       },
       (error) => {
         this.toastr.error(
-          `An error occured while updating the medal ${medal.name}`,
-          "medal Update Failed"
+          `An error occured while deleting the medal ${medal.name}`,
+          "medal Delete Failed"
         );
       }
     );

@@ -49,9 +49,11 @@ export class OrcidService {
         },
       })
       .pipe(
-        catchError(OrcidErrorHandler('name')),
-        map((response) => {
-          const name = response["affiliation-group"][0].summaries[0]["employment-summary"].organization.name;
+        catchError(OrcidErrorHandler('affiliation-group')),
+        filter((response) => !!response["affiliation-group"]),
+        pluck("affiliation-group"),
+        map((workplace) => {
+          const name = workplace?.[0].summaries?.[0]?.["employment-summary"]?.organization?.name;
           return name;
         })
       );
@@ -91,9 +93,7 @@ export class OrcidService {
       })
       .pipe(
         catchError(OrcidErrorHandler('keyword')),
-        filter(
-          (response: any) => !!response.keyword && response.keyword.length > 0
-        ),
+        filter((response: any) => !!response.keyword && response.keyword.length > 0),
         pluck("keyword"),
         map((keyword_list: any[]): string[] => {
           return keyword_list.map((keyword) => keyword.content);
@@ -110,7 +110,6 @@ export class OrcidService {
     return combineLatest([biography$, profile_links$, keywords$, employment$]).pipe(
       map(([biography, profileLinks, keywords, employment]) => {
         return {
-          // biography: biography,
           biography,
           profileLinks,
           keywords,

@@ -10,8 +10,16 @@ input[type=text], .text-input{
     @apply tw-flex tw-flex-col tw-my-2 tw-px-2 tw-py-1
 }
 
-
-
 ::ng-deep .p-button,.p-fileupload-choose {
     @apply focus:tw-ring-0 hover:tw-bg-apicuron-purple
+}
+
+.left-element {
+    display: inline-block;
+    float: left;
+}
+
+.right-element {
+    display: inline-block;
+    float: left;
 }

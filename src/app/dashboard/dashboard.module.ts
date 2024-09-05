@@ -20,6 +20,7 @@ import { ProfileUpdateComponent } from "./profile-update/profile-update.componen
 import { RouterModule } from "@angular/router";
 import { SpinnerComponent } from "../components/utils/spinner/spinner.component";
 import { UsersService } from "./services/users.service";
+import { CuratorReportsDetailsComponent } from "../components/curator-reports-details/curator-reports-details.component";
 @NgModule({
   declarations: [
     DashboardSidebarComponent,
@@ -43,6 +44,7 @@ import { UsersService } from "./services/users.service";
     SpinnerComponent,
     ReportsByDateChartComponent,
     CategoriesPieChartComponent,
+    CuratorReportsDetailsComponent,
   ],
 })
 export class DashboardModule {}

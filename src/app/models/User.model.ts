@@ -49,6 +49,10 @@ export class User implements Deserializable {
   }
 }
 
+  // upload_avatar(scale = 80, radius = 50): URL {
+
+  // }
+
 export class UpdateUser implements Deserializable, Serializable {
   serialize() {
     const payload: any = { orcid_id: this.orcid_id };

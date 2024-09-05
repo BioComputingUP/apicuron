@@ -1,6 +1,6 @@
 <div class="tw-p-2 tw-flex-auto" *ngIf="resource$ | async as resource">
 
-    <div class=" tw-p-2">
+    <div class="tw-p-2">
         <span class="tw-text-xl tw-font-bold">Update {{ resource.resource_name }}</span>
 
         <form class="tw-flex tw-flex-row tw-flex-wrap" (ngSubmit)="submit()" [formGroup]="form">
@@ -14,8 +14,8 @@
                         *ngIf="resource_name.hasError('required') && resource_name.touched">
                         The Resource Name is required
                     </small>
-
                 </div>
+
                 <div class="form-control-element">
                     <label for="resource_long_name">Resource Long Name</label>
                     <input type="text" formControlName="resource_long_name">
@@ -33,6 +33,7 @@
                         The Resource URI Name is required
                     </small>
                 </div>
+
                 <div class="form-control-element">
                     <label for="resource_description">Resource Description</label>
                     <textarea class="text-input" name="resource_description" formControlName="resource_description"
@@ -66,9 +67,7 @@
                     </small>
                 </div>
 
-
                 <div class="form-control-element">
-
                     <label>Upload Resource Logo</label>
 
                     <!-- <p-fileUpload #fubauto mode="advanced" name="logo" accept="image/*" maxFileSize="1000000"
@@ -97,9 +96,28 @@
 
                 </div>
 
+                <div class="form-control-element">
+                    <label for="curation_group">Curation Group</label>
+                    <div class="tw-flex tw-flex-row tw-gap-2">
+                        <small class="tw-text-red-500 tw-text-sm tw-font-light">The Curation Group is required
+                        </small>
+                        <div class="">
+                            <!-- <legend>Select a Curation Group</legend> -->
+                        <div><label for="group1"><input type="radio" name="groups" id="group1">Group 1</label></div>
+                        <div><label for="group2"><input type="radio" name="groups" id="group2">Group 2</label></div>
+                            <button type="button"
+                                class="tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded-md tw-text-gray-200 tw-bg-apicuron-bright-purple">
+                                <span>Add New Group</span>
+                            </button>
+                        </div>
+
+                        <div class="tw-w-1/2">
+                            <label for="">Group Settings</label>
+                            <div><input type="text" placeholder="Type ORCID ID here"></div>
+                        </div>
+                    </div>    
+                </div>
             </div>
-
-
 
             <div class="tw-w-full tw-flex tw-justify-center tw-py-1 sm:tw-py-2">
                 <div class="tw-flex tw-justify-center">
@@ -111,7 +129,7 @@
         </form>
 
     </div>
-
+    <!-- put Curation Groups here -->
 </div>
 
 <!-- <p-blockUI [blocked]="(blocked$ | async)"></p-blockUI>
