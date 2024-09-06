@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { catchError, map, startWith, take, takeUntil } from "rxjs/operators";
-import { Observable, Subject, combineLatest, of } from "rxjs";
+import { Observable, Subject, combineLatest, of, throwError } from "rxjs";
 import { switchMap, pluck } from "rxjs/operators";
 import { environment } from "src/environments/environment";
 import { ResourceGroup } from "../../../models/resource-group.model";
@@ -124,17 +124,8 @@ export class GroupsService implements OnDestroy {
   }
 
   openUpdateGroupForm(resourceGroup: ResourceGroup) {
-
     // Pass the resourceGroup as an input (use the CreateGroupForm as an example)
     this.dialog.open(UpdateGroupComponent, {
-      data: {
-        group: resourceGroup,
-      },
-    });
-  }
-
-  openParticipantsList(resourceGroup: ResourceGroup) {
-    this.dialog.open(ViewParticipantsComponent, {
       data: {
         group: resourceGroup,
       },
@@ -154,6 +145,40 @@ export class GroupsService implements OnDestroy {
       );
   }
 
+  addMemberToLeague(group: ResourceGroup) {
+    this.resource_id$.pipe(
+      take(1),
+      switchMap(resource_id => {
+        return this.http
+          .post(`${this.ws}/leagues/add-member`, {
+            headers: { version: "2" },
+            body: {
+              // member: 
+              resource_id: resource_id,
+              league: group.name,
+            }
+        })
+      })
+    )
+  }
+
+  deleteMemberFromLeague(group: ResourceGroup) {
+    this.resource_id$.pipe(
+      take(1),
+      switchMap(resource_id => {
+        return this.http
+          .delete(`${this.ws}/leagues/remove-member`, {
+            headers: { version: "2" },
+            body: {
+              // member: 
+              resource_id: resource_id,
+              league: group.name,
+            }
+        })
+      })
+    )
+  }
+
   deleteGroup(group: ResourceGroup) {
     this.resource_id$.pipe(
       take(1),
@@ -167,22 +192,22 @@ export class GroupsService implements OnDestroy {
         });
       }),
       catchError(error => {
-        console.error("HTTP DELETE Error:", error);
-        return of(error);
+        console.error("HTTP DELETE Error:", error.status, error.message);
+        const errorMessage = `Error ${error.status}: ${error.error?.message || error.message || 'Unknown error'}`;
+        return throwError(() => new Error(errorMessage));
       })
     ).subscribe(
       (response) => {
         if (response["data"]) {
           this.toastr.success(
-            `Group ${group.name} is successfully deleted`,
+            `Group ${group.displayedName} is successfully deleted`,
           );
           this.groupUpdates$.next({ group, operation: "delete" });
         }
       },
       (error) => {
-        const errorMessage = error.message || JSON.stringify(error);
         this.toastr.error(
-          `An error occurred while deleting the group ${group.name}: ${errorMessage}`,
+          `An error occurred while deleting the group ${group.displayedName}: ${error.status}`,
         );
       }
     );

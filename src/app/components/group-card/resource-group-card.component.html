@@ -14,7 +14,12 @@
 
       <ul>
         <li class="tw-text-sm tw-text-gray-600 tw-m-1">
-          <span class="tw-text-gray-600">{{ group.defaultMembers.length }} members</span>
+          <span *ngIf="group.defaultMembers.length == 1" class="tw-text-gray-600">
+            {{ group.defaultMembers.length }} member
+          </span>
+          <span *ngIf="group.defaultMembers.length != 1" class="tw-text-gray-600">
+            {{ group.defaultMembers.length }} members
+          </span>
         </li>
         <li class="tw-text-sm tw-text-gray-600 tw-m-1">
           <span *ngIf="group.visibility == 'public'"

@@ -28,7 +28,12 @@
   
 	  <div class="form-control-element">
 		<label for="name">Identifier Name</label>
-		<input [placeholder]="group.name" type="text" class="tw-mb-2 tw-placeholder-black" name="name" formControlName="name" />
+		<input 
+		  [placeholder]="group.name" 
+		  type="text"
+		  class="tw-mb-2 tw-placeholder-black"
+		  name="name"
+		  formControlName="name"/>
 		<span class="tw-text-xs tw-font-light tw-text-gray-400">
 		  Name used for API identification. This field is filled automatically after the Group Name is provided.
 		</span>
@@ -48,8 +53,8 @@
 		<label for="visibility">Visibility</label>
 		<div class="tw-flex tw-flex-row tw-gap-2 tw-items-center">
 		  <select class="tw-mb-2" name="visibility" formControlName="visibility">
-			<option value="public" class="tw-text-green-500">Public</option>
-			<option value="private" class="tw-text-orange-500">Private</option>
+			<option value="public">Public</option>
+			<option value="private">Private</option>
 		  </select>
 		</div>
   
@@ -59,15 +64,25 @@
 	  </div>
   
 	  <div class="form-control-element">
-		<label for="defaultMembers">Default Members</label>
-		<orcid-search-select class="tw-mb-2"
-		  formControlName="defaultMembers">
-		</orcid-search-select>
+		<label for="defaultMembers">Group Members</label>
+		<ul class="tw-bg-white tw-border tw-border-gray-100 tw-w-full tw-my-2"> 
+			<li *ngFor="let member of group.defaultMembers" class="tw-px-2 tw-py-1 tw-border-b-2 tw-flex tw-flex-row tw-items-center tw-border-gray-100 tw-relative tw-cursor-pointer hover:tw-bg-gray-200 aria-selected:tw-bg-apicuron-purple aria-selected:tw-text-gray-100">
+				<span>
+					<a [href]="'http://orcid.org/' + member" class="tw-block tw-w-6 tw-h-6 tw-mr-1">
+						<img src="https://orcid.org/assets/vectors/orcid.logo.icon.svg" class="tw-w-6 tw-h-6" alt="Orcid Logo"/>
+					</a>
+					<span class="tw-block">
+						<b>{{ member.displayedName }}</b> - {{ member }}
+					</span>
+				</span>
+			</li>
+		</ul>
+
+
 		<small class="tw-text-xs tw-font-light tw-text-gray-400">
 		  Assigning the members to the group means that all <span class="tw-font-bold">future contributions</span> of these members will be associated with this group 
 		  (unless stated otherwise in the reports). <span class="tw-font-bold">The previous contributions of the curator will NOT be 
-		  assigned to this group.</span><br/> A curator can belong to various groups simultaneously depending on the contribution 
-		  associated with that group.
+		  assigned to this group.</span><br/> A curator cannot belong to various groups simultaneously.
 		</small>
 	  </div>
   

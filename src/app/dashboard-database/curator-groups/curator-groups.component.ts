@@ -52,7 +52,12 @@ export class CuratorGroupsComponent implements OnInit {
         this.groupsService.openUpdateGroupForm(clickEvent.group);
         break;
       case "delete":
-        this.groupsService.deleteGroup(clickEvent.group);
+        try {
+          this.groupsService.deleteGroup(clickEvent.group);
+        } catch (error) {
+          console.error(this.groupsService.deleteGroup(clickEvent.group));
+        }
+        break;
     }
   }
 
