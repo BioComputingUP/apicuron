@@ -60,7 +60,7 @@ export class Badge implements IUserResourceEntity {
 	achieved_at?: Date;
 
 	@Prop({
-		reqiored: true,
+		required: true,
 	})
 	league: string;
 
