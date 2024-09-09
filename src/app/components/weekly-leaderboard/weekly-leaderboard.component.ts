@@ -51,7 +51,6 @@ export class WeeklyLeaderboardComponent implements OnInit, OnDestroy {
     "invalidation_count",
     "revision_count",
     "total_score",
-    "daysOfWeek",
   ];
 
   constructor(

@@ -1,16 +1,6 @@
 <div *ngIf="resource$ | async as resource">
   <div class="tw-flex tw-flex-row tw-max-w-fit tw-bg-white tw-rounded-t-md">
     <button
-      (click)="selectLeaderboard('total')"
-      [ngClass]="{
-        'selected-item': (isLeaderboard('total') | async),
-        'unselected-item': !(isLeaderboard('total') | async)
-      }"
-      class="tw-w-full sm:tw-w-auto tw-py-1 tw-m-1 tw-bg-white tw-text-gray-700 tw-font-semibold tw-text-sm sm:tw-rounded-tl-md tw-px-2"
-    >
-      Total Leaderboard
-    </button>
-    <button
       (click)="selectLeaderboard('weekly')"
       [ngClass]="{
         'selected-item': (isLeaderboard('weekly') | async),
@@ -19,6 +9,16 @@
       class="tw-w-full sm:tw-w-auto tw-py-1 tw-m-1 tw-bg-white tw-text-gray-700 tw-font-semibold tw-text-sm sm:tw-rounded-tr-md tw-px-2"
     >
       Weekly Leaderboard
+    </button>
+    <button
+      (click)="selectLeaderboard('total')"
+      [ngClass]="{
+        'selected-item': (isLeaderboard('total') | async),
+        'unselected-item': !(isLeaderboard('total') | async)
+      }"
+      class="tw-w-full sm:tw-w-auto tw-py-1 tw-m-1 tw-bg-white tw-text-gray-700 tw-font-semibold tw-text-sm sm:tw-rounded-tl-md tw-px-2"
+    >
+      Total Leaderboard
     </button>
   </div>
 

@@ -31,8 +31,10 @@ export class LeaderboardService {
     revision_score: { name: "Revision Score" },
     total_score: { name: "Total Score" },
     total_count: { name: "Total Contributions" },
+    first_contribution: { name: "First Contribution Date" },
     last_contribution: { name: "Last Contribution Date" },
-    daysOfWeek: { name: "Weekly Contribution" },
+    weekStart: { name: "Week Start" },
+    weekEnd: { name: "Week End" },
   };
 
   getColumnProps(col: string) {

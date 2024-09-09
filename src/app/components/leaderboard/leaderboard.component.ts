@@ -30,7 +30,7 @@ export class LeaderboardComponent implements OnInit {
     this.resource$.next(value);
   }
 
-  leaderboardType$ = new BehaviorSubject<"total" | "weekly">("total");
+  leaderboardType$ = new BehaviorSubject<"total" | "weekly">("weekly");
 
   constructor() {
     // preloading the loading svg icon
