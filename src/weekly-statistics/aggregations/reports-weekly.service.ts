@@ -11,12 +11,15 @@ import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { getLastWeekDate } from '../../util/date.helper';
+import { TIMEZONE } from '../constants/start-of-week';
 
 export interface AggregatedReportsWeekly {
 	resource_id: string;
 	curator_orcid: string;
 	league: string;
 	activity_term: string;
+	year: number;
+	week: number;
 	activity_category: string;
 	count: number;
 	score: number;
@@ -24,7 +27,6 @@ export interface AggregatedReportsWeekly {
 	privacy: string;
 	first_contribution: Date;
 	last_contribution: Date;
-	days: Array<number>;
 }
 
 @Injectable()
@@ -85,70 +87,86 @@ export class ReportsWeeklyAggregationPipeline implements OnModuleInit {
 	aggregate(
 		filter: FilterQuery<ReportDocument>,
 	): Aggregate<AggregatedReportsWeekly> {
-		return this.reportModel
-			.aggregate()
-			.match(filter)
-			.match({
-				timestamp: { $gte: getLastWeekDate() },
-			})
-			.lookup({
-				from: this.termModel.collection.name,
-				localField: 'activity_term',
-				foreignField: 'activity_term',
-				as: 'term',
-			})
-			.unwind({ path: '$term' })
-			.addFields({
-				...this.addDayPropertiesStage,
-				score: '$term.score',
-				activity_category: '$term.activity_category',
-			})
-			.project({ term: 0 })
-			.group({
-				_id: {
-					curator_orcid: '$curator_orcid',
-					resource_id: '$resource_id',
-					league: '$league',
-					activity_term: '$activity_term',
-				},
-				resource_id: {
-					$first: '$resource_id',
-				},
-				curator_orcid: {
-					$first: '$curator_orcid',
-				},
-				league: {
-					$first: '$league',
-				},
-				activity_term: {
-					$first: '$activity_term',
-				},
-				activity_category: {
-					$first: '$activity_category',
-				},
-				count: {
-					$sum: 1,
-				},
-				score: {
-					$first: '$score',
-				},
-				total_score: {
-					$sum: '$score',
-				},
-				privacy: {
-					$first: '$privacy',
-				},
-				first_contribution: { $min: '$timestamp' },
-				last_contribution: { $max: '$timestamp' },
-				...this.dayGroupFields,
-			})
-			.addFields(this.addDaysArrayStage)
-			.project(this.removeDayPropertiesStage)
-			.sort({
-				resource_id: -1,
-				curator_orcid: -1,
-				league: -1,
-				activity_term: -1,
-			}) as unknown as Aggregate<AggregatedReportsWeekly>;
+		return (
+			this.reportModel
+				.aggregate()
+				.match(filter)
+				// .match({
+				// 	timestamp: { $gte: getLastWeekDate() },
+				// })
+				.lookup({
+					from: this.termModel.collection.name,
+					localField: 'activity_term',
+					foreignField: 'activity_term',
+					as: 'term',
+				})
+				.unwind({ path: '$term' })
+				.addFields({
+					score: '$term.score',
+					activity_category: '$term.activity_category',
+					week: {
+						$isoWeek: {
+							date: '$timestamp',
+							timezone: TIMEZONE,
+						},
+					},
+					year: {
+						$year: {
+							date: '$timestamp',
+							timezone: TIMEZONE,
+						},
+					},
+				})
+				.project({ term: 0 })
+				.group({
+					_id: {
+						curator_orcid: '$curator_orcid',
+						resource_id: '$resource_id',
+						league: '$league',
+						activity_term: '$activity_term',
+						year: '$year',
+						week: '$week',
+					},
+					resource_id: {
+						$first: '$resource_id',
+					},
+					curator_orcid: {
+						$first: '$curator_orcid',
+					},
+					league: {
+						$first: '$league',
+					},
+					activity_term: {
+						$first: '$activity_term',
+					},
+					activity_category: {
+						$first: '$activity_category',
+					},
+					year: { $first: '$year' },
+					week: { $first: '$week' },
+					count: {
+						$sum: 1,
+					},
+					score: {
+						$first: '$score',
+					},
+					total_score: {
+						$sum: '$score',
+					},
+					privacy: {
+						$first: '$privacy',
+					},
+					first_contribution: { $min: '$timestamp' },
+					last_contribution: { $max: '$timestamp' },
+				})
+				.sort({
+					year: -1,
+					week: -1,
+					resource_id: -1,
+					curator_orcid: -1,
+					league: -1,
+					activity_term: -1,
+				}) as unknown as Aggregate<AggregatedReportsWeekly>
+		);
 	}
 }

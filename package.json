@@ -68,6 +68,8 @@
     "http-proxy-middleware": "^2.0.6",
     "isomorphic-dompurify": "^0.22.0",
     "lodash": "^4.17.21",
+    "moment": "^2.30.1",
+    "moment-timezone": "^0.5.45",
     "mongoose": "^6.3.2",
     "mongoose-paginate": "^5.0.3",
     "mv": "^2.1.1",

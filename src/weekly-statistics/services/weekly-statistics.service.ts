@@ -11,6 +11,7 @@ import {
 	WeeklyStatisticsDto,
 } from '../dto/weekly-statistics.dto';
 import { UsersService } from '../../auth/users/services/users.service';
+import { getWeekEndUTC, getWeekStartUTC } from '../helpers/fields-updater';
 
 @Injectable()
 export class WeeklyStatisticsService {
@@ -32,12 +33,21 @@ export class WeeklyStatisticsService {
 		filter: FilterQuery<WeeklyStatisticsDocument> = {},
 		queryOptions: QueryOptions,
 	): Promise<{ data: WeeklyLeaderboardDto[]; count: number }> {
+		const statFilter = {
+			$and: [
+				filter,
+				{
+					weekStart: getWeekStartUTC(),
+					weekEnd: getWeekEndUTC(),
+				},
+			],
+		};
 		const [statistics, count] = await Promise.all([
-			this.WeeklyStatistics.find(filter, null, {
+			this.WeeklyStatistics.find(statFilter, null, {
 				...queryOptions,
 				sort: { total_score: -1 },
 			}),
-			this.WeeklyStatistics.count(filter),
+			this.WeeklyStatistics.count(statFilter),
 		]);
 
 		const orcid_ids = statistics.map((stat) => stat.curator_orcid);

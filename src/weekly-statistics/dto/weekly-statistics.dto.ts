@@ -79,19 +79,25 @@ export class WeeklyStatisticsDto {
 	@Expose()
 	first_contribution: Date;
 
-	@IsString()
-	@IsNotEmpty()
-	@Expose()
-	daysOfWeek: number[];
-
 	@IsDate()
 	@IsNotEmpty()
 	@Expose()
 	createdAt: Date;
+
 	@IsDate()
 	@IsNotEmpty()
 	@Expose()
 	updatedAt: Date;
+
+	@IsDate()
+	@IsNotEmpty()
+	@Expose()
+	weekStart: Date;
+
+	@IsDate()
+	@IsNotEmpty()
+	@Expose()
+	weekEnd: Date;
 }
 
 export class WeeklyLeaderboardDto {
