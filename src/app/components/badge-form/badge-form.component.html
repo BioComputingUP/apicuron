@@ -59,6 +59,42 @@
       </small>
     </div>
 
+    <div class="tw-px-2">
+      <label> Start Date</label>
+      <p-calendar
+        formControlName="startDate"
+        [showIcon]="true"
+        [maxDate]="form.get('endDate').value"
+        [showClear]="true"
+        [readonlyInput]="true"
+      ></p-calendar>
+      <small class="tw-text-xs tw-leading-none"
+        >This field allows you to decide when
+        <span class="tw-font-bold"
+          >the period the badge considers for counting</span
+        >
+        begins.</small
+      >
+    </div>
+
+    <div class="tw-px-2">
+      <label> End Date</label>
+      <p-calendar
+        formControlName="endDate"
+        [showIcon]="true"
+        [minDate]="form.get('startDate').value"
+        [showClear]="true"
+        [readonlyInput]="true"
+      ></p-calendar>
+      <small class="tw-text-xs tw-leading-none"
+        >This field allows you to decide when
+        <span class="tw-font-bold"
+          >the period the badge considers for counting</span
+        >
+        ends.</small
+      >
+    </div>
+
     <div class="form-control-element">
       <label for="score">Number of Contributions</label>
       <input

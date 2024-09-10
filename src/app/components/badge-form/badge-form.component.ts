@@ -8,6 +8,7 @@ import {
   Validators,
 } from "@angular/forms";
 import { ToastrModule, ToastrService } from "ngx-toastr";
+import { CalendarModule } from "primeng/calendar";
 import { MultiSelectModule } from "primeng/multiselect";
 import { Badge as BadgeDef } from "src/app/models/badge.model";
 import { Term } from "src/app/models/term.model";
@@ -15,7 +16,13 @@ import { Term } from "src/app/models/term.model";
 @Component({
   standalone: true,
   selector: "badge-form",
-  imports: [CommonModule, ReactiveFormsModule, MultiSelectModule, ToastrModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MultiSelectModule,
+    CalendarModule,
+    ToastrModule,
+  ],
   templateUrl: "./badge-form.component.html",
   styleUrls: ["./badge-form.component.scss"],
 })
@@ -29,7 +36,10 @@ export class BadgeFormComponent implements OnInit {
   @Input()
   terms: Term[] = [];
 
-  @Output() formResult = new EventEmitter<{badge: BadgeDef, operation: 'create' | 'update'}>();
+  @Output() formResult = new EventEmitter<{
+    badge: BadgeDef;
+    operation: "create" | "update";
+  }>();
 
   form: FormGroup = this.formBuilder.group({
     name: ["", [Validators.required]],
@@ -44,6 +54,8 @@ export class BadgeFormComponent implements OnInit {
     ],
     count_threshold: [1, [Validators.required, Validators.min(1)]],
     list_terms: [[] as string[], [Validators.minLength(1)]],
+    startDate: [null, []],
+    endDate: [null, []],
   });
 
   constructor(

@@ -16,11 +16,15 @@ export class BadgeDef extends AcheivementDef implements Deserializable, Serializ
         this.list_terms = input.list_terms
         this.resource_id = input.resource_id
         this.resource_uri = input.resource_uri
+        this.startDate = !!input.startDate ? new Date(input.startDate) : null;
+        this.endDate = !!input.endDate ? new Date(input.endDate) : null;
         // this.image = input.image
         return this
     }
-
+    
     // image?: string
+    endDate: Date | null;
+    startDate: Date | null;
     color_code?: string = ''
     count_threshold: number = 1;
 
