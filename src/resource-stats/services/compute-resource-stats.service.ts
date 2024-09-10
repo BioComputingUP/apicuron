@@ -23,16 +23,17 @@ export class ComputeResourceStatsService {
 
 	async getFirstOrLastSubmissionDate(
 		resource_id: string,
-		order: SortOrder,
+		firstOrLast: 'first' | 'last',
 	): Promise<Date | null> {
+		const order = firstOrLast === 'first' ? 1 : -1;
 		const report = await this.reportModel
-			.find({ resource_id })
+			.find({ resource_id }, { timestamp: 1 })
 			.sort({ timestamp: order }) // sort by timestamp according to th
 			.limit(1);
 		return report[0]?.timestamp ?? null;
 	}
 
-	private async getContributionCount(resource_id: string): Promise<number> {
+	async getContributionCount(resource_id: string): Promise<number> {
 		return await this.reportModel.countDocuments({
 			resource_id,
 		});
@@ -70,41 +71,43 @@ export class ComputeResourceStatsService {
 		const [
 			firstSubmissionDate,
 			lastSubmissionDate,
-			contribution_count,
+			contributionCount,
 			uniqueContributors,
-			lastDayContributionCount,
-			lastWeekContributionCount,
 		] = await Promise.all([
-			this.getFirstOrLastSubmissionDate(resource_id, 1),
-			this.getFirstOrLastSubmissionDate(resource_id, -1),
+			this.getFirstOrLastSubmissionDate(resource_id, 'first'),
+			this.getFirstOrLastSubmissionDate(resource_id, 'last'),
 			this.getContributionCount(resource_id),
 			this.getUniqueContributorsCount(resource_id),
-			this.getContributionCountFromDate(resource_id, getLastDayDate()),
-			this.getContributionCountFromDate(resource_id, getLastWeekDate()),
 		]);
 
 		const stats: LeanDocument<ResourceStatsDocument> = {
 			_id: undefined,
 			resource_id,
-			firstSubmissionDate: firstSubmissionDate,
-			lastSubmissionDate: lastSubmissionDate,
-			contribution_count: contribution_count,
+			firstContributionDate: firstSubmissionDate,
+			lastContributionDate: lastSubmissionDate,
+			contributionCount: contributionCount,
 			uniqueContributors: uniqueContributors,
-			lastDayContributionCount: lastDayContributionCount,
-			lastWeekContributionCount: lastWeekContributionCount,
 		};
 
-		return await this.updateResourceStats(stats);
+		return await this.setResourceStats(stats);
 	}
 
-	async updateResourceStats(
+	async setResourceStats(
 		resourceStat: ResourceStatsDocument | LeanDocument<ResourceStatsDocument>,
 	): Promise<UpdateResult> {
 		const t = await this.resourceModel.updateOne(
 			{ resource_id: resourceStat.resource_id },
-			{ stats: resourceStat },
+			{ $set: { stats: resourceStat } },
 		);
 		return t;
+	}
+
+	async reportIsLast(report: ReportDocument): Promise<boolean> {
+		const count = await this.reportModel.exists({
+			timestamp: { $gt: report.timestamp },
+			resource_id: report.resource_id,
+		});
+		return !count;
 	}
 
 	async computeAllResourceStats() {

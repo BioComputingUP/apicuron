@@ -37,6 +37,7 @@ import { AchievementsModule } from './achievements/achievements.module';
 import { loadSentryModule } from './plugins/sentry';
 import { EventOrchestratorModule } from './event-orchestrator/event-orchestrator.module';
 import { Reflector } from '@nestjs/core';
+import { ResourceStatsModule } from './resource-stats/resource-stats.module';
 
 const logger = new Logger('AppModule');
 
@@ -110,6 +111,7 @@ const logger = new Logger('AppModule');
 		BadgesModule,
 		AchievementsModule,
 		EventOrchestratorModule,
+		ResourceStatsModule,
 	],
 	controllers: [AppController],
 	providers: [

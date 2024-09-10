@@ -9,22 +9,19 @@ export class ResourceStats {
 	resource_id: string;
 
 	@Prop({ default: 0, required: true })
-	contribution_count: number;
+	contributionCount: number;
 
 	@Prop({ default: 0, required: true })
 	uniqueContributors: number;
 
 	@Prop({ required: false })
-	lastSubmissionDate?: Date;
+	lastContributionDate?: Date;
 
 	@Prop({ required: false })
-	firstSubmissionDate?: Date;
+	firstContributionDate?: Date;
 
-	@Prop({ defualt: 0, required: true })
-	lastDayContributionCount: number;
-
-	@Prop({ default: 0, required: true })
-	lastWeekContributionCount: number;
+	@Prop({ required: false })
+	lastResourceUpdateDate?: Date;
 }
 
 export const ResourceStatsSchema = SchemaFactory.createForClass(ResourceStats);

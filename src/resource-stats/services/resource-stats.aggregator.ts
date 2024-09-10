@@ -1,50 +1,50 @@
 import { Injectable } from '@nestjs/common';
 import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
-import {
-	LeanReportDocument,
-	ReportDocument,
-} from '../../core/schemas/reports.schema';
+import { ReportDocument } from '../../core/schemas/reports.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../../core/schemas/resource/partner-resource.schema';
-import { getLastDayDate, getLastWeekDate } from '../../util/date.helper';
 import { ComputeResourceStatsService } from './compute-resource-stats.service';
+import { TermDocument } from '../../core/schemas/terms.schema';
+import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 
 @Injectable()
-export class ResourceStatsAggregator implements Aggregator {
+@AggregatorClass()
+export class ResourceStatsAggregatorService implements Aggregator {
 	constructor(
 		@InjectModel(PartnerResource.name)
 		protected resourceModel: Model<PartnerResourceDocument>,
 		protected computeStats: ComputeResourceStatsService,
 	) {}
-	async applyReport(report: LeanReportDocument | ReportDocument) {
-		const resource = await this.resourceModel.findOne({
-			resource_id: report.resource_id,
-		});
-		if (report.timestamp > getLastDayDate()) {
-			resource.stats.lastDayContributionCount += 1;
-			resource.stats.lastWeekContributionCount += 1;
-		} else if (report.timestamp > getLastWeekDate()) {
-			resource.stats.lastWeekContributionCount += 1;
-		}
-
-		resource.stats.contribution_count += 1;
+	termUpdated() {
+		return;
+	}
+	termDeleted() {
+		return;
+	}
+	async applyReport(
+		report: ReportDocument,
+		term: TermDocument,
+		resource: PartnerResourceDocument,
+	) {
+		resource.stats.lastResourceUpdateDate = new Date();
+		resource.stats.contributionCount += 1;
 
 		resource.stats.uniqueContributors =
 			await this.computeStats.getUniqueContributorsCount(report.resource_id);
-		resource.stats.lastSubmissionDate =
+		resource.stats.lastContributionDate =
 			await this.computeStats.getFirstOrLastSubmissionDate(
 				report.resource_id,
-				-1,
+				'last',
 			);
-		if (!resource.stats.firstSubmissionDate) {
-			resource.stats.firstSubmissionDate =
+		if (!resource.stats.firstContributionDate) {
+			resource.stats.firstContributionDate =
 				await this.computeStats.getFirstOrLastSubmissionDate(
 					report.resource_id,
-					1,
+					'first',
 				);
 		}
 
@@ -65,7 +65,12 @@ export class ResourceStatsAggregator implements Aggregator {
 		return 1;
 	}
 
+	// ignores this event because the stats are initialized at startup
+	// and maintained using a dedicated event handler service
+	// using this function would not match the name of the function in the aggregator
+	// we do not recomputeAggregates when a bulk submission occurs in this case
+	// we update the lastSubmissionDate and the contributionCount and set the lastSubmissionDate as the currentDate
 	async recomputeAllResourceAggregates(resource_id: string) {
-		await this.computeStats.computeResourceStats(resource_id);
+		return;
 	}
 }

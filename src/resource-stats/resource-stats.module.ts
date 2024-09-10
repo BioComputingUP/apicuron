@@ -1,16 +1,19 @@
 import { Module } from '@nestjs/common';
 import { InitResourceStatsService } from './services/init-resource-stats.service';
 import { ComputeResourceStatsService } from './services/compute-resource-stats.service';
-import { ResourceStatsAggregator } from './services/resource-stats.aggregator';
+import { ResourceStatsAggregatorService } from './services/resource-stats.aggregator';
 import { CoreApicuronModule } from '../core/core.module';
+import { BulkSubmissionHandler } from './handlers/bulk-submission.handler';
+import { ResourcesModule } from '../resources/resources.module';
 
 @Module({
-	imports: [CoreApicuronModule],
+	imports: [CoreApicuronModule, ResourcesModule],
 	controllers: [],
 	providers: [
 		InitResourceStatsService,
 		ComputeResourceStatsService,
-		ResourceStatsAggregator,
+		BulkSubmissionHandler,
+		ResourceStatsAggregatorService,
 	],
 	exports: [],
 })
