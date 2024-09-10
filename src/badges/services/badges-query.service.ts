@@ -21,7 +21,7 @@ export class BadgesQueryService {
 		filter: FilterQuery<BadgeDocument>,
 		options: QueryOptions<BadgeDocument>,
 	): Promise<{ data: BadgeDto[]; count: number }> {
-		// filter.state = AchievementState.achieved;
+		filter.state = AchievementState.achieved;
 		const dataPromise = this.badgeModel.find(filter, {}, options);
 		const countPromise = this.badgeModel.count(filter);
 
