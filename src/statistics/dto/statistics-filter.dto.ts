@@ -2,7 +2,7 @@ import { IsIn, IsOptional, IsString, Validate } from 'class-validator';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 import { OrcidChecksum } from '../../submit-reports/validators/orcid-checksum';
-import { PaginateDto } from '../../pagination/dto/paginate.dto';
+import { BasePaginationDto } from '../../pagination/dto/paginate.dto';
 
 const sortByFields = [
 	'ranking',
@@ -14,7 +14,7 @@ const sortByFields = [
 	'revision_count',
 ];
 
-export class StatisticsFilter extends PaginateDto {
+export class StatisticsFilter extends BasePaginationDto {
 	@Validate(EntryExistsRule, [
 		PartnerResource.name,
 		({ resource_id }) => {

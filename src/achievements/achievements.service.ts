@@ -12,6 +12,8 @@ import {
 } from '../core/schemas/achievements/medals.schema';
 import { AchievementDocument } from '../core/schemas/achievements/achievements.schema';
 import { AchievementState } from '../core/enums';
+import { plainToInstance } from 'class-transformer';
+import { UserAchievements } from './dto/achievements.dto';
 
 @Injectable()
 export class AchievementsService {
@@ -43,10 +45,11 @@ export class AchievementsService {
 			$or: [{ resource_id }, { resource_uri }],
 		});
 		const [badges, medals] = await Promise.all([badgesPromise, medalsPromise]);
-		return {
+		const result = {
 			badges,
 			medals,
 		};
+		return plainToInstance(UserAchievements, result);
 	}
 
 	public async user_badge_count(resource_id: string, curator_orcid: string) {

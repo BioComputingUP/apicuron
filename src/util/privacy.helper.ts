@@ -16,7 +16,6 @@ import {
  * Computes the privacy field for a given resource entity based on the resource, related user, and user resource entity.
  * If either the league privacy or the user privacy is set to private, the privacy type of the entity will be private.
  * Otherwise, it will be public.
- * @deprecated
  * @param resource - The resource document or lean document.
  * @param relatedUser - The related user document or lean document, or null.
  * @param userResourceEntity - The user resource entity document or lean document.
@@ -37,6 +36,9 @@ export function computePrivacyField(
 	// we retrieve both the league's privacy and the user's privacy setting
 	const leaguePrivacy = resource.getLeague(league).visibility;
 	const userPrivacy = relatedUser?.privacy ?? PrivacyType.private;
+
+	console.log('leaguePrivacy', leaguePrivacy);
+	console.log('userPrivacy', userPrivacy);
 
 	// if one of them happens to be private, the privacyType of the entity will be private
 	if ([leaguePrivacy, userPrivacy].includes(PrivacyType.private)) {

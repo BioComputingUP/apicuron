@@ -29,6 +29,7 @@ import {
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { BadgeEarnedEvent } from '../events/badge-earned.event';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
+import { TermDocument } from '../../core/schemas/terms.schema';
 @Injectable()
 @AggregatorClass()
 export class BadgeAggregatorService implements Aggregator {
@@ -218,5 +219,44 @@ export class BadgeAggregatorService implements Aggregator {
 
 	async removeAllResourceAggregates(resource_id: string) {
 		return await this.badgeModel.deleteMany({ resource_id });
+	}
+
+	/**
+	 * Does nothing, badges do not change when terms are updated
+	 * @returns
+	 */
+	async termUpdated() {
+		return;
+	}
+	async termDeleted(term: TermDocument) {
+		// Retrieve the list of badge definitions that are effected by the term deletion
+		const affectedBadges = await this.badgeDefModel.find(
+			{
+				resource_id: term.resource_id,
+				league: term.league,
+				list_terms: term.activity_term,
+			},
+			{ _id: 1 },
+		);
+		if (affectedBadges.length === 0) {
+			return;
+		}
+		// Extract the ids of the affected badges
+		const affectedIds = affectedBadges.map((badge) => badge._id);
+		// Remove the term from the list of terms in the badge definitions
+		await this.badgeDefModel.updateMany(
+			{
+				resource_id: term.resource_id,
+				league: term.league,
+				list_terms: term.activity_term,
+			},
+			{
+				$pull: { list_terms: term.activity_term },
+			},
+		);
+		// Recompute the badges that are affected by the term deletion
+		await this.computeBadges.reComputeBadges({
+			_id: { $in: affectedIds },
+		});
 	}
 }

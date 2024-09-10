@@ -1,9 +1,9 @@
 import { IsOptional, IsString, IsInt, Min, IsIn } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { pick } from 'lodash';
-import { PaginateDto } from '../../pagination/dto/paginate.dto';
+import { BasePaginationDto } from '../../pagination/dto/paginate.dto';
 
-export class BadgeFilter extends PaginateDto {
+export class BadgeFilter extends BasePaginationDto {
 	@IsOptional()
 	@IsString()
 	curator_orcid?: string;

@@ -11,13 +11,19 @@ import {
 	WeeklyStatisticsDocument,
 } from '../../core/schemas/statistics/weekly-statistics.schema';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
-import { updateMaxDate, updateMinDate } from '../helpers/fields-updater';
+import {
+	fromDate,
+	fromYearWeek,
+	getWeekEndUTC,
+	getWeekStartUTC,
+	updateMaxDate,
+	updateMinDate,
+} from '../helpers/fields-updater';
 import {
 	AggregatedReportsWeekly,
 	ReportsWeeklyAggregationPipeline,
 } from '../aggregations/reports-weekly.service';
 import { PrivacyType } from '../../core/enums';
-import { getLastWeekDate } from 'src/util/date.helper';
 import { MongoServerError } from 'mongodb';
 @Injectable()
 export class ComputeWeeklyStatisticsService {
@@ -32,9 +38,33 @@ export class ComputeWeeklyStatisticsService {
 		protected weeklyStatAggPipeline: ReportsWeeklyAggregationPipeline,
 	) {}
 
+	isReportDocument(report: any): report is ReportDocument {
+		return report instanceof this.reportModel;
+	}
+
+	isLeanReportDocument(report: any): report is LeanReportDocument {
+		return report instanceof Object && 'resource_id' in report;
+	}
+	isAggregatedReportsWeekly(report: any): report is AggregatedReportsWeekly {
+		return typeof report.year == 'number' && typeof report.week == 'number';
+	}
+
 	initStat(
 		report: AggregatedReportsWeekly | ReportDocument | LeanReportDocument,
 	) {
+		let week;
+		let first_contribution, last_contribution;
+		if (this.isReportDocument(report) || this.isLeanReportDocument(report)) {
+			week = fromDate(report.timestamp);
+			first_contribution = report.timestamp;
+			last_contribution = report.timestamp;
+		}
+		if (this.isAggregatedReportsWeekly(report)) {
+			week = fromYearWeek(report.year, report.week);
+			first_contribution = report.first_contribution;
+			last_contribution = report.last_contribution;
+		}
+		const [start, end] = [getWeekStartUTC(week), getWeekEndUTC(week)];
 		const stat = new this.weeklyStatModel({
 			curator_orcid: report.curator_orcid,
 			resource_id: report.resource_id,
@@ -48,7 +78,10 @@ export class ComputeWeeklyStatisticsService {
 			generation_score: 0,
 			total_count: 0,
 			total_score: 0,
-			daysOfWeek: Array(7).fill(0),
+			first_contribution,
+			last_contribution,
+			weekStart: start,
+			weekEnd: end,
 		});
 		return stat;
 	}
@@ -58,9 +91,9 @@ export class ComputeWeeklyStatisticsService {
 			| ReportDocument
 			| (Document<unknown, any, Report> & Report & { _id: Types.ObjectId })
 			| LeanReportDocument,
+		termDoc?: TermDocument,
 	) {
-		if (report.timestamp < getLastWeekDate()) {
-			return;
+		if (report.timestamp < getWeekStartUTC()) {
 		}
 		const lastSavedReport = await this.reportModel
 			.findOne({
@@ -75,27 +108,30 @@ export class ComputeWeeklyStatisticsService {
 			(lastSavedReport &&
 				lastSavedReport.timestamp.getTime() < report.timestamp.getTime());
 
-		const term = await this.termModel.findOne({
-			resource_id: report.resource_id,
-			league: report.league,
-		});
+		const term = !termDoc
+			? await this.termModel.findOne({
+					resource_id: report.resource_id,
+					league: report.league,
+			  })
+			: termDoc;
 
 		const stat = await this.weeklyStatModel.findOne({
 			resource_id: report.resource_id,
 			league: report.league,
 			curator_orcid: report.curator_orcid,
+			weekStart: { $lte: report.timestamp },
+			weekEnd: { $gte: report.timestamp },
 		});
 
-		const dayOfWeek = report.timestamp.getDay();
 		if (!stat) {
 			const newStat = this.initStat(report);
 			newStat[`${term.activity_category}_count`] = 1;
 			newStat[`${term.activity_category}_score`] = term.score;
 			newStat.total_count = 1;
 			newStat.total_score = term.score;
-			newStat.daysOfWeek[dayOfWeek] = 1;
 			newStat.first_contribution = report.timestamp;
 			newStat.last_contribution = report.timestamp;
+
 			try {
 				await newStat.save();
 			} catch (err: any) {
@@ -113,17 +149,18 @@ export class ComputeWeeklyStatisticsService {
 						last_contribution: report.timestamp,
 					},
 			  }
-			: null;
+			: {};
 
 		await this.weeklyStatModel.updateOne(
 			{
 				resource_id: report.resource_id,
 				league: report.league,
 				curator_orcid: report.curator_orcid,
+				weekStart: { $lte: report.timestamp },
+				weekEnd: { $gte: report.timestamp },
 			},
 			{
 				$inc: {
-					[`daysOfWeek.${dayOfWeek}`]: 1,
 					[`${term.activity_category}_count`]: 1,
 					[`${term.activity_category}_score`]: term.score,
 					total_count: 1,
@@ -135,6 +172,11 @@ export class ComputeWeeklyStatisticsService {
 				upsert: true,
 			},
 		);
+	}
+
+	async recomputeWeeklyStatistics() {
+		await this.weeklyStatModel.deleteMany({});
+		await this.computeWeeklyStatistics({});
 	}
 
 	async computeWeeklyStatistics(
@@ -157,7 +199,11 @@ export class ComputeWeeklyStatisticsService {
 				privacy,
 				activity_category,
 				score,
+				year,
+				week,
 			} = reportAgg;
+
+			const weekDate = fromYearWeek(year, week);
 			if (!currentStat) {
 				currentStat = this.initStat(reportAgg);
 			}
@@ -165,7 +211,10 @@ export class ComputeWeeklyStatisticsService {
 			if (
 				currentStat.resource_id !== resource_id ||
 				currentStat.curator_orcid !== curator_orcid ||
-				currentStat.league !== league
+				currentStat.league !== league ||
+				currentStat.weekStart.getTime() !=
+					getWeekStartUTC(weekDate).getTime() ||
+				currentStat.weekEnd.getTime() != getWeekEndUTC(weekDate).getTime()
 			) {
 				saves$.push(currentStat.save());
 				currentStat = this.initStat(reportAgg);
@@ -173,6 +222,7 @@ export class ComputeWeeklyStatisticsService {
 
 			currentStat.total_count += reportAgg.count;
 			currentStat.total_score += reportAgg.count * score;
+
 			currentStat.first_contribution = updateMinDate(
 				currentStat.first_contribution ?? null,
 				reportAgg.first_contribution,
@@ -187,11 +237,6 @@ export class ComputeWeeklyStatisticsService {
 			currentStat.total_score += reportAgg.count * score;
 
 			currentStat.privacy = privacy as PrivacyType;
-
-			// sum the days of the week with the current value
-			currentStat.daysOfWeek = currentStat.daysOfWeek.map(
-				(value, dayIndex) => reportAgg.days[dayIndex] + value,
-			);
 		}
 
 		if (!!currentStat) {

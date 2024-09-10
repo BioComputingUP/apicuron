@@ -9,6 +9,8 @@ import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
 import { User } from '../../core/schemas/user.schema';
 import { BadgesQueryService } from '../services/badges-query.service';
 import { BadgeFilter } from '../dto/badge-filter.dto';
+import { BadgeDto } from '../dto/badge.dto';
+import { ApiResponsePaginated } from '../../pagination/decorators/paginated-reponse.decorator';
 
 @ApiTags('Achievements')
 @ApiHeader(VersionHeader)
@@ -18,6 +20,11 @@ import { BadgeFilter } from '../dto/badge-filter.dto';
 export class BadgesController {
 	constructor(protected badgesQueryService: BadgesQueryService) {}
 
+	@ApiResponsePaginated(
+		BadgeDto,
+		200,
+		'A list of badges matching the filter achieved by users',
+	)
 	@AuthProtected()
 	@Public()
 	@Get('achievements/badges')
@@ -33,6 +40,6 @@ export class BadgesController {
 			filter.getMongoQueryOptions(),
 		);
 
-		return paginate(data, filter, count);
+		return paginate<BadgeDto>(data, filter, count);
 	}
 }

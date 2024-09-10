@@ -25,21 +25,7 @@ import { EntityUriValid } from '../validators/entity-uri';
 import { Type } from 'class-transformer';
 import { LeagueValidator } from '../validators/league-validator';
 export class SubmitReportDto {
-	@Validate(
-		EntryExistsRule,
-		[
-			Term.name,
-			({ activity_term, resource_id }) => {
-				return {
-					activity_term,
-					resource_id,
-				};
-			},
-		],
-		{
-			message: `the activity_term $value does not exist for this resource`,
-		},
-	)
+	@IsString()
 	@IsNotEmpty()
 	activity_term: string;
 
@@ -66,14 +52,6 @@ export class SubmitReportDto {
 		description:
 			'The resource_id of the resource where the activity was performed',
 	})
-	@Validate(EntryExistsRule, [
-		PartnerResource.name,
-		({ resource_id }) => {
-			return {
-				resource_id,
-			};
-		},
-	])
 	@IsNotEmpty()
 	resource_id: string;
 
@@ -94,7 +72,6 @@ export class SubmitReportDto {
 	// @IsNotEmpty()
 	timestamp: Date;
 
-	@Validate(LeagueValidator)
 	@IsString()
 	@IsOptional()
 	league: string;
@@ -137,14 +114,6 @@ export class SubmitReportsDto {
 	reports: SubmitReportDto[];
 
 	@IsArray()
-	@Validate(EntriesExistRule, [
-		PartnerResource.name,
-		({ delete_all }) => {
-			return {
-				resource_id: delete_all,
-			};
-		},
-	])
 	@IsString({ each: true })
 	@IsOptional()
 	delete_all: Array<string>;

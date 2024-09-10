@@ -7,7 +7,7 @@ import {
 	IsString,
 	ValidateIf,
 } from 'class-validator';
-import { PaginateDto } from '../../pagination/dto/paginate.dto';
+import { BasePaginationDto } from '../../pagination/dto/paginate.dto';
 import { Type } from 'class-transformer';
 export enum FilterField {
 	displayedName = 'displayedName',
@@ -25,7 +25,7 @@ export const statisticsSortByFields = [
 	'displayedName',
 ];
 
-export class GetStatisticsDto extends PaginateDto {
+export class GetStatisticsDto extends BasePaginationDto {
 	@IsEnum(FilterField, {
 		message: `filter field can only be one of these values ${Object.values(
 			FilterField,

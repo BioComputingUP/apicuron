@@ -5,7 +5,7 @@ import { PrivacyType } from '../../core/enums';
 import { ReportHandler } from '../interfaces/report.handler';
 import { ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { UsersService } from '../../auth/users/users.service';
+import { UsersService } from '../../auth/users/services/users.service';
 import { computePrivacyField } from '../../util/privacy.helper';
 import { uniq } from 'lodash';
 @Injectable()
@@ -14,16 +14,24 @@ export class ReportMetaHandler implements ReportHandler {
 		protected resourceService: PartnerResourcesService,
 		protected usersService: UsersService,
 	) {}
-	async handle(report: ReportDocument): Promise<ReportDocument> {
+	async handle(report: ReportDocument): Promise<{
+		resource: PartnerResourceDocument;
+		report: ReportDocument;
+		user: UserDocument;
+	}> {
 		const resource = await this.resourceService.get_resource(
 			report.resource_id,
 		);
-		const user = await this.usersService.get_by_orcid(report.curator_orcid);
+		const user = await this.usersService.getByOrcid(report.curator_orcid);
 		this.handleIndividualReport(report, resource, user);
-		return report;
+		return { report, resource, user };
 	}
 
-	async handleMultiple(reports: ReportDocument[]): Promise<ReportDocument[]> {
+	async handleMultiple(reports: ReportDocument[]): Promise<{
+		reports: ReportDocument[];
+		users: UserDocument[];
+		resources: PartnerResourceDocument[];
+	}> {
 		const [resMap, userMap] = await Promise.all([
 			this.loadResourcesMap(reports),
 			this.loadUsersMap(reports),
@@ -37,7 +45,11 @@ export class ReportMetaHandler implements ReportHandler {
 			);
 		}
 
-		return reports;
+		return {
+			reports,
+			resources: Array.from(resMap.values()),
+			users: Array.from(userMap.values()),
+		};
 	}
 
 	private async loadResourcesMap(

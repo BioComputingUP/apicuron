@@ -5,29 +5,65 @@ import {
 	WeeklyStatisticsDocument,
 } from '../../core/schemas/statistics/weekly-statistics.schema';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
+import { plainToInstance } from 'class-transformer';
+import {
+	WeeklyLeaderboardDto,
+	WeeklyStatisticsDto,
+} from '../dto/weekly-statistics.dto';
+import { UsersService } from '../../auth/users/services/users.service';
+import { getWeekEndUTC, getWeekStartUTC } from '../helpers/fields-updater';
 
 @Injectable()
 export class WeeklyStatisticsService {
 	constructor(
 		@InjectModel(WeeklyStatistics.name)
 		protected WeeklyStatistics: Model<WeeklyStatisticsDocument>,
+		protected userService: UsersService,
 	) {}
 
 	async getUserWeeklyStatistics(
 		filter: FilterQuery<WeeklyStatisticsDocument> = {},
 	) {
-		return await this.WeeklyStatistics.findOne(filter);
+		const stat = await this.WeeklyStatistics.findOne(filter);
+
+		return plainToInstance(WeeklyStatisticsDto, stat);
 	}
 
 	async getWeeklyLeaderboard(
 		filter: FilterQuery<WeeklyStatisticsDocument> = {},
 		queryOptions: QueryOptions,
-	) {
-		const [data, count] = await Promise.all([
-			this.WeeklyStatistics.find(filter, null, queryOptions),
-			this.WeeklyStatistics.count(filter),
+	): Promise<{ data: WeeklyLeaderboardDto[]; count: number }> {
+		const statFilter = {
+			$and: [
+				filter,
+				{
+					weekStart: getWeekStartUTC(),
+					weekEnd: getWeekEndUTC(),
+				},
+			],
+		};
+		const [statistics, count] = await Promise.all([
+			this.WeeklyStatistics.find(statFilter, null, {
+				...queryOptions,
+				sort: { total_score: -1 },
+			}),
+			this.WeeklyStatistics.count(statFilter),
 		]);
 
-		return { data, count };
+		const orcid_ids = statistics.map((stat) => stat.curator_orcid);
+		const users = await this.userService.getUsersByOrcid(orcid_ids);
+
+		const statLeaderboard = statistics.map((stat, index) => {
+			const user = users[index];
+			const leaderboardEntry = plainToInstance(
+				WeeklyLeaderboardDto,
+				{ stat, user },
+				{ excludeExtraneousValues: true },
+			);
+
+			return leaderboardEntry;
+		});
+
+		return { data: statLeaderboard, count };
 	}
 }

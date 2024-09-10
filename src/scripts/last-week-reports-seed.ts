@@ -7,15 +7,20 @@ import {
 	PartnerResourceDocument,
 } from '../core/schemas/resource/partner-resource.schema';
 import { Term } from '../core/schemas/terms.schema';
-import { en, faker } from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 import { PrivacyType } from '../core/enums';
-import { Report } from '../core/schemas/reports.schema';
+import {
+	LeanReportDocument,
+	Report,
+	ReportDocument,
+} from '../core/schemas/reports.schema';
 import { SubmitReportService } from '../submit-reports/services/submit-reports.service';
 import { OrcidClientService } from '../orcid/orcid-client/orcid-client.service';
-import { UsersService } from '../auth/users/users.service';
+import { UsersService } from '../auth/users/services/users.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BulkSubmissionEvent } from '../submit-reports/events/events';
 import { Logger } from '@nestjs/common';
+import * as moment from 'moment-timezone';
 
 async function mockReport(
 	reportModel: Model<Report>,
@@ -24,6 +29,7 @@ async function mockReport(
 	orcidIds: string[],
 ) {
 	return {
+		league: 'default',
 		activity_term: faker.helpers.arrayElement(terms),
 
 		curator_orcid: faker.helpers.arrayElement(orcidIds),
@@ -34,12 +40,14 @@ async function mockReport(
 
 		resource_id: resource.resource_id,
 
-		timestamp: faker.date.recent({ days: 7 }),
+		timestamp: faker.date.between({
+			from: moment().utc().startOf('day').toDate(),
+			to: new Date(),
+		}),
 		privacy: faker.helpers.arrayElement([
 			PrivacyType.private,
 			PrivacyType.public,
 		]),
-		league: faker.helpers.arrayElement(resource.leagues.map((l) => l.name)),
 	};
 }
 
@@ -84,7 +92,6 @@ async function bootstrap() {
 
 	const orcidIds = users.map((user) => user.orcid_id);
 
-
 	for (const user of users) {
 		await app.get(UsersService).createOrUpdateUser(user);
 	}
@@ -95,11 +102,21 @@ async function bootstrap() {
 	const reportCount = parseInt(process.argv?.[2] ?? '150');
 
 	logger.verbose(`Generating ${reportCount} reports`);
-	const resource = await resourceModel.findOne();
+	const resource = await resourceModel.findOne({ resource_id: 'disprot' });
 
-	const terms = await termModel.find({ resource_id: resource.resource_id });
+	const terms = await termModel.find({
+		resource_id: resource.resource_id,
+		league: 'default',
+	});
 	const activities = terms.map((terms) => terms.activity_term);
 
+	const insertReport = async (report: LeanReportDocument) => {
+		try {
+			await reportService.insertReport(report, { preventEvents: true });
+		} catch (err) {
+			logger.error(`Error inserting report: ${err.message}`);
+		}
+	};
 
 	const reportSaves$ = [];
 	for (let index = 0; index < reportCount; index++) {
@@ -109,9 +126,7 @@ async function bootstrap() {
 			activities,
 			orcidIds,
 		);
-		reportSaves$.push(
-			reportService.insertReport(report, { preventEvents: true }),
-		);
+		reportSaves$.push(insertReport(report as LeanReportDocument));
 	}
 
 	await Promise.all(reportSaves$);

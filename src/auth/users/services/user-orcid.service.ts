@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User, UserDocument } from '../../core/schemas/user.schema';
+import { User, UserDocument } from '../../../core/schemas/user.schema';
 import { HttpService } from '@nestjs/axios';
 @Injectable()
 export class UserOrcidService {

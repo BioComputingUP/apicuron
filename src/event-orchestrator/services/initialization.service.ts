@@ -1,9 +1,4 @@
-import {
-	Injectable,
-	Logger,
-	OnApplicationBootstrap,
-	OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Aggregator } from '../interfaces/aggregator.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -12,7 +7,7 @@ import {
 } from '../../core/schemas/resource/partner-resource.schema';
 import { Model } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
-import { AggregatorManager } from './aggregator-manager.service';
+import { BulkSubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
 
 @Injectable()
 export class InitializationService implements OnApplicationBootstrap {
@@ -20,13 +15,13 @@ export class InitializationService implements OnApplicationBootstrap {
 		@InjectModel(PartnerResource.name)
 		protected resourceModel: Model<PartnerResourceDocument>,
 		protected configService: ConfigService,
-		protected aggregatorManager: AggregatorManager,
+		protected aggregatorManager: BulkSubmissionRunner,
 	) {}
 	async onApplicationBootstrap() {
 		if (this.configService.get<string>('environment') == 'local') {
 			return;
 		}
-		await this.initializeAggregateData();
+		// const initPromise$ = this.initializeAggregateData();
 	}
 	logger = new Logger(InitializationService.name);
 
@@ -37,9 +32,9 @@ export class InitializationService implements OnApplicationBootstrap {
 
 		const tasks$ = resources.map(
 			async ({ resource_id }: PartnerResourceDocument) => {
-				return await this.aggregatorManager.runOnAggregators(
+				return await this.aggregatorManager.run(
 					async (aggregator: Aggregator) => {
-						return aggregator.recomputeAllResourceAggregates(resource_id);
+						return await aggregator.recomputeAllResourceAggregates(resource_id);
 					},
 				);
 			},

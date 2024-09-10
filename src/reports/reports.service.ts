@@ -8,16 +8,14 @@ import {
 	ReportFilterGroupedDto,
 } from './dto/report-filter.dto';
 import { Report, ReportDocument } from '../core/schemas/reports.schema';
-import * as _ from 'lodash';
 import { paginate } from '../pagination/paginator';
 import { PaginationAggregation } from '../pagination/interfaces/pagination-aggregation';
 import { OnEvent } from '@nestjs/event-emitter';
-import { UsersService } from '../auth/users/users.service';
-import {
-	ITermDeletedEventPayload,
-	TermDeletedEvent,
-} from '../terms/events/events';
+import { UsersService } from '../auth/users/services/users.service';
+import { TermDeletedEvent } from '../terms/events/events';
 import { pick, mapKeys } from 'lodash';
+import { plainToInstance } from 'class-transformer';
+import { ReportWithTermDto } from './dto/report.dto';
 @Injectable()
 export class ReportsService {
 	constructor(
@@ -119,33 +117,47 @@ export class ReportsService {
 			query.league = reportFilter.league;
 		}
 
-		const reports = await this.reportModel.find(query, {}, options).lean();
-		let data = reports;
+		const projection = reportFilter.extend.includes('term')
+			? null
+			: { term: 0 };
 
-		if (reportFilter.extend.includes('term')) {
-			const { resource_id } = reportFilter;
+		const reports = await this.reportModel
+			.find(query, projection, options)
+			.lean();
+		const data = reports;
 
-			const activity_term_list = [
-				...new Set(reports.map((report) => report.activity_term)),
-			];
+		// if (reportFilter.extend.includes('term')) {
+		// 	const { resource_id } = reportFilter;
 
-			const terms_list = await this.termsService.getTerms(activity_term_list, {
-				resource_id,
-				league: reportFilter.league,
-			});
+		// 	const activity_term_list = [
+		// 		...new Set(reports.map((report) => report.activity_term)),
+		// 	];
 
-			const reports_with_terms = reports.map((report) => {
-				report['term'] = terms_list.find(
-					(term) => term.activity_term == report.activity_term,
-				);
-				return report;
-			});
-			data = reports_with_terms;
-		}
+		// 	const terms_list = await this.termsService.getTerms(activity_term_list, {
+		// 		resource_id,
+		// 		league: reportFilter.league,
+		// 	});
+
+		// 	const reports_with_terms = reports.map((report) => {
+		// 		report['term'] = terms_list.find(
+		// 			(term) => term.activity_term == report.activity_term,
+		// 		);
+		// 		return report;
+		// 	});
+		// 	data = reports_with_terms;
+		// }
+
+		const reportsData = plainToInstance(ReportWithTermDto, data, {
+			excludeExtraneousValues: true,
+		});
 
 		const reports_count: number = await this.reportModel.count(query);
 
-		return paginate(data, reportFilter, reports_count);
+		return paginate<ReportWithTermDto>(
+			reportsData,
+			reportFilter,
+			reports_count,
+		);
 	}
 
 	async getGroupedReports(
@@ -347,13 +359,5 @@ export class ReportsService {
 			],
 		};
 		return converter[groupBy];
-	}
-
-	@OnEvent(TermDeletedEvent.name, { async: true, promisify: true })
-	async deleteTermReports({ term }: ITermDeletedEventPayload) {
-		return await this.reportModel.deleteMany({
-			resource_id: term.resource_id,
-			activity_term: term.activity_term,
-		});
 	}
 }

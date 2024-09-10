@@ -11,9 +11,6 @@ export type LeanBadgeDocument = LeanDocument<BadgeDocument>;
 	timestamps: true,
 })
 export class Badge implements IUserResourceEntity {
-	// fields from Achievement
-	// id: string;
-
 	createdAt: Date;
 	updatedAt: Date;
 
@@ -62,7 +59,15 @@ export class Badge implements IUserResourceEntity {
 	})
 	achieved_at?: Date;
 
+	@Prop({
+		required: true,
+	})
 	league: string;
+
+	@Prop({
+		required: true,
+		enum: PrivacyType,
+	})
 	privacy: PrivacyType;
 }
 

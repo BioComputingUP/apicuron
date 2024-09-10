@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { PrivacyType } from '../../enums';
 import { IUserResourceEntity } from '../../interfaces/user-resource-entity';
-import { HydratedDocument, LeanDocument } from 'mongoose';
+import { HydratedDocument, IndexDefinition, LeanDocument } from 'mongoose';
 
 export type WeeklyStatisticsDocument = HydratedDocument<WeeklyStatistics>;
 export type LeanWeeklyStatisticsDocument =
@@ -69,8 +69,11 @@ export class WeeklyStatistics implements IUserResourceEntity {
 	@Prop({ required: true, type: Date })
 	first_contribution: Date;
 
-	@Prop({ required: true, default: () => Array(7).fill(0) })
-	daysOfWeek: number[];
+	@Prop({ required: true, type: Date })
+	weekStart: Date;
+
+	@Prop({ required: true, type: Date })
+	weekEnd: Date;
 
 	createdAt: Date;
 	updatedAt: Date;
@@ -84,7 +87,13 @@ export function WeeklyStatisticsSchemaFactory() {
 		SchemaFactory.createForClass(WeeklyStatistics).loadClass(WeeklyStatistics);
 
 	WeeklyStatisticsSchema.index(
-		{ resource_id: 1, league: 1, curator_orcid: 1 },
+		{
+			resource_id: -1,
+			league: -1,
+			curator_orcid: -1,
+			weekStart: -1,
+			weekEnd: -1,
+		},
 		{
 			unique: true,
 			name: 'unique_index',

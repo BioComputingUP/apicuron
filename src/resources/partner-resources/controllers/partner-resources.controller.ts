@@ -17,7 +17,7 @@ import { SvgSanitationValidationPipe } from '../../../shared/pipes/svg-sanitatio
 
 import { PartnerResourcesService } from '../services/partner-resources.service';
 import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
-import { UsersService } from '../../../auth/users/users.service';
+import { UsersService } from '../../../auth/users/services/users.service';
 import { LocalAuthGuard } from '../../../auth/guards/local-auth.guard';
 import { HasAResourceGuard } from '../../../auth/guards/belongs-to-resource.guard';
 import { FileInterceptor } from '@nestjs/platform-express';

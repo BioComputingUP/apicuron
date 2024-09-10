@@ -12,14 +12,6 @@ export class AggregatorManager {
 	}
 	private aggregatorEntries: AggregatorEntry[] = [];
 
-	async runOnAggregators(task: (aggregator: Aggregator) => any | Promise<any>) {
-		for (const aggregatorEntry of this.aggregatorEntries) {
-			await task(aggregatorEntry.aggregator);
-		}
-
-		return;
-	}
-
 	public getAggregator(name: string): Aggregator {
 		return this.aggregatorEntries.find((entry) => entry.name === name)
 			.aggregator;

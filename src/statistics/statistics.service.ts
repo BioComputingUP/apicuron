@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+	Injectable,
+	InternalServerErrorException,
+	Logger,
+	NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
 import { User, UserDocument } from '../core/schemas/user.schema';
@@ -8,6 +13,9 @@ import {
 } from '../core/schemas/statistics.schema';
 import { PartnerResourcesService } from '../resources/partner-resources/services/partner-resources.service';
 import { GetStatisticsDto } from './dto/get-statistics.dto';
+import { plainToClass } from 'class-transformer';
+import { StatLeaderboardDto } from './dto/statistics.dto';
+import { Paginated } from '../pagination/paginator';
 
 @Injectable()
 export class StatisticsService {
@@ -155,7 +163,7 @@ export class StatisticsService {
 	async getResourceLeaderboard(
 		filter: FilterQuery<StatisticsDocument> & { resource_id: string },
 		options: QueryOptions<StatisticsDocument>,
-	) {
+	): Promise<{ data: StatLeaderboardDto[]; count: number }> {
 		const resource = await this.partnerResourceService.get_resource(
 			filter.resource_id,
 		);
@@ -165,14 +173,34 @@ export class StatisticsService {
 			);
 		}
 
-		const leaderboardPromise = this.statisticsModel.find(
+		const leaderboard = await this.statisticsModel.find(
 			filter,
 			{ generation_terms: 0, invalidation_terms: 0, revision_terms: 0 },
 			{ ...options, sort: { total_score: -1 } },
 		);
 
-		const countPromise = this.statisticsModel.count(filter);
-		const [data, count] = await Promise.all([leaderboardPromise, countPromise]);
+		const orcid_ids = leaderboard.map((stat) => stat.curator_orcid);
+
+		const users = await this.userModel.find({ orcid_id: { $in: orcid_ids } });
+		if (users.length != leaderboard.length) {
+			throw new InternalServerErrorException(
+				`Some users are missing from the database, Could not load users for leaderboard`,
+			);
+		}
+
+		const data = leaderboard.map((stat) => {
+			const user = users.find((u) => u.orcid_id === stat.curator_orcid);
+			const leaderboardEntry = {
+				stat: stat.toObject(),
+				user: user ? user.toObject() : null,
+			};
+
+			return plainToClass(StatLeaderboardDto, leaderboardEntry, {
+				excludeExtraneousValues: true,
+			});
+		});
+
+		const count = await this.statisticsModel.count(filter);
 		return {
 			data,
 			count,

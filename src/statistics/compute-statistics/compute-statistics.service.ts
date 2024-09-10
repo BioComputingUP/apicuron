@@ -23,6 +23,7 @@ import {
 	updateMaxDate,
 	updateMinDate,
 } from '../../weekly-statistics/helpers/fields-updater';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 @Injectable()
 export class ComputeStatisticsService {
 	logger = new Logger(ComputeStatisticsService.name);
@@ -106,7 +107,11 @@ export class ComputeStatisticsService {
 						[term.activity_category + '_score']: scoreIncrement,
 						total_score: scoreIncrement,
 					},
+					$set: {
+						last_contribution: report.timestamp,
+					},
 					$setOnInsert: {
+						first_contribution: report.timestamp,
 						curator_orcid,
 						resource_id,
 						league,
@@ -279,6 +284,9 @@ export class ComputeStatisticsService {
 
 	async incrementStatByReport(
 		report: ReportDocument | Report | LeanDocument<Report>,
+		resource: PartnerResourceDocument,
+		term: TermDocument,
+		user?: UserDocument,
 	) {
 		const statFilter = await this.getRelatedStatsFilter(report);
 
@@ -287,35 +295,19 @@ export class ComputeStatisticsService {
 			return await this.upsertStatByReport(report);
 		}
 
-		const term$ = this.reportAggregator
-			.getTerm(this.getRelatedTermFilter(report))
-			.then((term) => term.toObject() as LeanDocument<TermDocument>);
-		const resource$ = this.partnerResourceService.get_resource(
-			report.resource_id,
-		);
-		const user$ = this.userModel.findOne({
-			orcid_id: report.curator_orcid,
-		});
-
-		const [termObj, resource, user] = await Promise.all([
-			term$,
-			resource$,
-			user$,
-		]);
-
-		delete termObj._id;
+		delete term._id;
 
 		const stat = new this.statModel({
 			...statFilter,
 			total_count: 1,
-			total_score: 1 * termObj.score,
-			[termObj.activity_category + '_count']: 1,
-			[termObj.activity_category + '_score']: 1 * termObj.score,
-			[termObj.activity_category + '_terms']: [
+			total_score: 1 * term.score,
+			[term.activity_category + '_count']: 1,
+			[term.activity_category + '_score']: 1 * term.score,
+			[term.activity_category + '_terms']: [
 				{
-					...termObj,
+					...term,
 					count: 1,
-					sum: termObj.score,
+					sum: term.score,
 				},
 			],
 			first_contribution: report.timestamp,

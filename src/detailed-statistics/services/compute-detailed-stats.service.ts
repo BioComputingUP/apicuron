@@ -65,17 +65,22 @@ export class ComputeDetailedStatisticsService {
 		});
 	}
 
-	async upsertDetailedStats(report: ReportDocument | LeanReportDocument) {
+	async upsertDetailedStats(
+		report: ReportDocument | LeanReportDocument,
+		termDoc: TermDocument = null,
+	) {
 		const statFilter = {
 			curator_orcid: report.curator_orcid,
 			resource_id: report.resource_id,
 			league: report.league,
 		};
-		const term$ = this.termModel.findOne({
-			activity_term: report.activity_term,
-			resource_id: report.resource_id,
-			league: report.league,
-		});
+		const term$ = !!termDoc
+			? Promise.resolve(termDoc)
+			: this.termModel.findOne({
+					activity_term: report.activity_term,
+					resource_id: report.resource_id,
+					league: report.league,
+			  });
 
 		const stat$ = this.detailedStatsModel.findOne(statFilter);
 
@@ -127,11 +132,15 @@ export class ComputeDetailedStatisticsService {
 		let currentStat: DetailedStatisticsDocument | null = null;
 		const statSaves$ = [];
 		for await (const entry of agg) {
+			// load the relevant term
 			const term = await this.termModel.findOne({
 				resource_id: entry.resource_id,
 				activity_term: entry.activity_term,
 				league: entry.league,
 			});
+
+			// Check if the currentStat that is being computed is different from the current entry
+			// If it is different, save the currentStat and set the current Stat to null
 			if (
 				currentStat &&
 				(currentStat.resource_id !== entry.resource_id ||
@@ -143,6 +152,7 @@ export class ComputeDetailedStatisticsService {
 				currentStat = null;
 			}
 
+			// if there is no currentStat, instantiate a new one
 			if (!currentStat) {
 				currentStat = new this.detailedStatsModel({
 					resource_id: entry.resource_id,
@@ -171,6 +181,7 @@ export class ComputeDetailedStatisticsService {
 				continue;
 			}
 
+			// set the values for the currentStat
 			currentStat.total_count += entry.count;
 			currentStat.total_score += entry.count * term.score;
 			currentStat.last_contribution = updateMaxDate(
@@ -182,6 +193,7 @@ export class ComputeDetailedStatisticsService {
 				entry.first_contribution,
 			);
 
+			// push the current entry to the activities array
 			currentStat.activities.push({
 				activity_term: entry.activity_term,
 				activity_category: term.activity_category,
@@ -208,5 +220,19 @@ export class ComputeDetailedStatisticsService {
 		await Promise.all(statSaves$);
 
 		this.logger.log(`Computed ${statSaves$.length} detailed statistics`);
+	}
+
+	async reComputeStatsRelatedToTerm(term: TermDocument) {
+		await this.detailedStatsModel.deleteMany({
+			resource_id: term.resource_id,
+			league: term.league,
+			'activities.activity_term': term.activity_term,
+		});
+
+		await this.computeDetailedStats({
+			resource_id: term.resource_id,
+			league: term.league,
+			activity_term: term.activity_term,
+		});
 	}
 }

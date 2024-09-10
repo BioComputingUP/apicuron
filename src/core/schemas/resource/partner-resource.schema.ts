@@ -61,9 +61,9 @@ export class PartnerResource {
 
 	@Prop({
 		type: ResourceStatsSchema,
-		required: true,
+		required: false,
 	})
-	stats: ResourceStats;
+	stats?: ResourceStats;
 
 	getLeague(leagueName: string) {
 		return this.leagues.find((league: League) => league.name == leagueName);

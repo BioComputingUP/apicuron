@@ -1,82 +1,111 @@
 import { IsDate, IsNotEmpty, IsString } from 'class-validator';
 import { PrivacyType } from '../../core/enums';
-import { Paginated } from '../../pagination/paginator';
-import { ApiProperty } from '@nestjs/swagger';
+import { UserEntity } from '../../auth/users/dto/user';
+import { Expose, Type } from 'class-transformer';
 
 export class WeeklyStatisticsDto {
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	resource_id: string;
 
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	privacy: PrivacyType;
 
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	league: string;
 
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	curator_orcid: string;
 
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	generation_count: number;
 
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	generation_score: number;
 
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	invalidation_count: number;
 
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	invalidation_score: number;
 
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	resource_uri?: string;
 
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	revision_count: number;
 
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	revision_score: number;
 
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	total_count: number;
 
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	total_score: number;
 
 	@IsDate()
 	@IsNotEmpty()
+	@Expose()
 	last_contribution: Date;
 
 	@IsDate()
 	@IsNotEmpty()
+	@Expose()
 	first_contribution: Date;
 
-	@IsString()
+	@IsDate()
 	@IsNotEmpty()
-	daysOfWeek: number[];
+	@Expose()
+	createdAt: Date;
 
 	@IsDate()
 	@IsNotEmpty()
-	createdAt: Date;
+	@Expose()
+	updatedAt: Date;
+
 	@IsDate()
 	@IsNotEmpty()
-	updatedAt: Date;
+	@Expose()
+	weekStart: Date;
+
+	@IsDate()
+	@IsNotEmpty()
+	@Expose()
+	weekEnd: Date;
 }
 
-export class PaginatedWeeklyStatisticsDto extends Paginated<WeeklyStatisticsDto> {
-	@ApiProperty({ isArray: true, type: WeeklyStatisticsDto })
-	data: WeeklyStatisticsDto[];
+export class WeeklyLeaderboardDto {
+	@Type(() => WeeklyStatisticsDto)
+	@Expose()
+	stat: WeeklyStatisticsDto;
+
+	@Type(() => UserEntity)
+	@Expose()
+	user: UserEntity;
 }

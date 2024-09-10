@@ -14,11 +14,11 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CreateTermDto } from './dto/createTerm.dto';
 import {
 	ITermDeletedEventPayload,
-	ITermUpdatedEventPayload,
 	TermDeletedEvent,
 	TermUpdatedEvent,
 } from './events/events';
 import { IResourceEntity } from '../core/interfaces/user-resource-entity';
+import { getRelatedReportFilter } from './helpers/related-report';
 
 @Injectable()
 export class TermsService {
@@ -62,41 +62,42 @@ export class TermsService {
 		return !(await this.termModel.exists({ resource_id, activity_term }));
 	}
 
-	async updateTerm(term: UpdateTermDto) {
+	async updateTerm(termUpdate: UpdateTermDto) {
 		// const { resource_id, activity_term, league } = term;
 
-		if (!term.league) {
+		if (!termUpdate.league) {
 			const resource = await this.resourceService.get_resource(
-				term.resource_id,
+				termUpdate.resource_id,
 			);
-			term.league = resource.defaultLeague;
+			termUpdate.league = resource.defaultLeague;
 		}
-		const exists = await this.termModel.exists({
-			resource_id: term.resource_id,
-			activity_term: term.activity_term,
-			league: term.league,
+		const oldTerm = await this.termModel.findOne({
+			resource_id: termUpdate.resource_id,
+			activity_term: termUpdate.activity_term,
+			league: termUpdate.league,
 		});
-		if (!exists) {
+		if (!oldTerm) {
 			throw new BadRequestException(
-				`Term ${term.activity_term} from resource ${term.resource_id} from league ${term.league} does not exist`,
+				`Term ${termUpdate.activity_term} from resource ${termUpdate.resource_id} from league ${termUpdate.league} does not exist`,
 			);
 		}
 
 		const updatedTerm = await this.termModel.findOneAndUpdate(
 			{
-				resource_id: term.resource_id,
-				activity_term: term.activity_term,
-				league: term.league,
+				resource_id: termUpdate.resource_id,
+				activity_term: termUpdate.activity_term,
+				league: termUpdate.league,
 			},
 			{
-				$set: term,
+				$set: termUpdate,
 			},
 			{ new: true },
 		);
 
-		await this.eventEmitter.emitAsync(TermUpdatedEvent, {
-			term: updatedTerm,
-		} as ITermUpdatedEventPayload);
+		await this.eventEmitter.emitAsync(
+			TermUpdatedEvent.name,
+			new TermUpdatedEvent(oldTerm, updatedTerm),
+		);
 
 		return updatedTerm;
 	}
@@ -131,23 +132,27 @@ export class TermsService {
 		return termDocument.save();
 	}
 
-	async deleteTerm(term: DeleteTermDto) {
-		if (!term.league) {
+	async deleteTerm(deleteTerm: DeleteTermDto) {
+		if (!deleteTerm.league) {
 			const resource = await this.resourceService.get_resource(
-				term.resource_id,
+				deleteTerm.resource_id,
 			);
-			term.league = resource.defaultLeague;
+			deleteTerm.league = resource.defaultLeague;
 		}
-		const response = await this.termModel.deleteOne(term);
+		const term = await this.termModel.findOneAndDelete(deleteTerm);
 
-		if (response.deletedCount == 1) {
+		if (!!term) {
+			await this.reportModel.deleteMany(getRelatedReportFilter(term));
+
 			await this.eventEmitter.emitAsync(
 				TermDeletedEvent.name,
 				new TermDeletedEvent(term),
 			);
 			return true;
 		} else {
-			throw new InternalServerErrorException(`Failed to delete term ${term}`);
+			throw new InternalServerErrorException(
+				`Failed to delete term ${term.activity_term}:${term.activity_name} from resource ${term.resource_id}`,
+			);
 		}
 	}
 }

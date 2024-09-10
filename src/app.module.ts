@@ -1,4 +1,4 @@
-import { Module, Logger } from '@nestjs/common';
+import { Module, Logger, ClassSerializerInterceptor } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -36,6 +36,7 @@ import { MedalsModule } from './medals/medals.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { loadSentryModule } from './plugins/sentry';
 import { EventOrchestratorModule } from './event-orchestrator/event-orchestrator.module';
+import { Reflector } from '@nestjs/core';
 
 const logger = new Logger('AppModule');
 
@@ -117,6 +118,15 @@ const logger = new Logger('AppModule');
 		EntryExistsRule,
 		EntriesExistRule,
 		TransformInterceptor,
+		{
+			provide: ClassSerializerInterceptor,
+			inject: [Reflector],
+			useFactory: (reflect: Reflector) => {
+				return new ClassSerializerInterceptor(reflect, {
+					enableCircularCheck: true,
+				});
+			},
+		},
 	],
 })
 export class AppModule {}

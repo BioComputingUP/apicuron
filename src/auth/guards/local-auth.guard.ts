@@ -3,20 +3,11 @@ import {
 	ExecutionContext,
 	Injectable,
 	Logger,
-	UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
-import {
-	Observable,
-	combineLatest,
-	isObservable,
-	lastValueFrom,
-	map,
-	of,
-} from 'rxjs';
-import { UsersService } from '../users/users.service';
+import { isObservable, lastValueFrom } from 'rxjs';
+import { UsersService } from '../users/services/users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
@@ -42,14 +33,15 @@ export class LocalAuthGuard extends AuthGuard('jwt') implements CanActivate {
 	private readonly localAuthGuardLogger = new Logger(LocalAuthGuard.name);
 	async canActivate(context: ExecutionContext) {
 		const req = context.switchToHttp().getRequest();
-		const orcidAuth = await this.checkOrcidAuth(req);
 
 		const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
 			context.getHandler(),
 			context.getClass(),
 		]);
+		const orcidAuth$ = this.checkOrcidAuth(req);
+		const jwtAuth$ = this.checkJwtAuth(context);
 
-		const jwtAuth = await this.checkJwtAuth(context);
+		const [orcidAuth, jwtAuth] = await Promise.all([orcidAuth$, jwtAuth$]);
 
 		if (isPublic) {
 			// if the request is public, we return true

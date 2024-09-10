@@ -4,7 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { OrcidStrategy } from './strategies/orcid.strategy';
 import { AuthController } from './auth.controller';
-import { UsersService } from './users/users.service';
+import { UsersService } from './users/services/users.service';
 import { UsersController, UserControllerV2 } from './users/users.controller';
 import { HttpModule } from '@nestjs/axios';
 import { OrcidExists } from './validators/orcidExists.dto';
@@ -13,7 +13,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JWTStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CoreApicuronModule } from '../core/core.module';
-import { UsersEventHandlers } from './users/users-event-handlers.service';
+import { UsersEventHandlers } from './users/services/users-event-handlers.service';
 
 @Module({
 	providers: [

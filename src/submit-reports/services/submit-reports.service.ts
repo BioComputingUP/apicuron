@@ -7,12 +7,9 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { InsertManyResult, Model } from 'mongoose';
-import { SubmitReportDto } from '../dto/submit-report.dto';
+import { SubmitReportDto, SubmitReportsDto } from '../dto/submit-report.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ReportDto } from '../../reports/dto/report.dto';
 import { DeleteResult } from 'mongodb';
-import { UsersService } from '../../auth/users/users.service';
-import { ReportMetaHandler } from './report-meta.handler';
 import {
 	IAllResourceReportsDeletedEventPayload,
 	IManyReportsSubmittedEventPayload,
@@ -23,28 +20,41 @@ import {
 } from '../events/events';
 
 import { MongoServerError } from 'mongodb';
+import { ReportValidatorService } from './report-validator.service';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 
 @Injectable()
 export class SubmitReportService {
 	constructor(
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		protected eventEmitter: EventEmitter2,
-		protected userService: UsersService,
-		protected reportMetaHandler: ReportMetaHandler,
+		protected resourceService: PartnerResourcesService,
+		protected reportValidator: ReportValidatorService,
 	) {}
 
 	logger = new Logger(SubmitReportService.name);
 
-	async deleteAllResourcesReports(
+	async deleteAllManyResourcesReports(
 		resource_ids: string[],
 	): Promise<{ [key: string]: DeleteResult }> {
+		// validate that all resource_ids are valid
+
 		// delete all the reports of all resources in order
-		const deleteResponses$ = resource_ids.map(async (resource_id: string) => {
-			return await this.deleteAllResourceReports(resource_id);
-		});
+		const deleteResponses = [];
+		for (const [index, resource_id] of resource_ids.entries()) {
+			try {
+				const deleteResponse = await this.deleteAllResourceReports(resource_id);
+				deleteResponses.push(deleteResponse);
+			} catch (err) {
+				if (err instanceof BadRequestException) {
+					throw new BadRequestException(
+						`Error deleteing resource_id at index:${index}: ${err.message}`,
+					);
+				}
+			}
+		}
 
 		// await for all promises in order
-		const deleteResponses = await Promise.all(deleteResponses$);
 		// Create an object where each key is a resource id and the value is the response object;
 		return resource_ids.reduce((prev, curr, index) => {
 			prev[curr] = deleteResponses[index];
@@ -52,7 +62,21 @@ export class SubmitReportService {
 		}, {});
 	}
 
+	/**
+	 * Deletes all resource reports for a given resource ID.
+	 *
+	 * @param resource_id - The ID of the resource.
+	 * @returns A promise that resolves to a DeleteResult object containing the number of deleted documents and an acknowledgement flag.
+	 * @throws BadRequestException if the resource with the given ID does not exist.
+	 */
 	async deleteAllResourceReports(resource_id: string): Promise<DeleteResult> {
+		const resource = await this.resourceService.get_resource(resource_id);
+		if (!resource) {
+			throw new BadRequestException(
+				`cannot delete reports for resource_id "${resource_id}", the resource does not exist`,
+			);
+		}
+
 		const { deletedCount, acknowledged } = await this.reportModel.deleteMany({
 			resource_id,
 		});
@@ -63,72 +87,100 @@ export class SubmitReportService {
 	}
 
 	async insertReport(
-		report: SubmitReportDto,
+		submittedReport: SubmitReportDto,
 		options = { preventEvents: false },
-	) {
+	): Promise<{ report: ReportDocument; callback?: () => any | Promise<any> }> {
 		try {
-			const instance = new this.reportModel(report);
+			const { resource, user, term, report } =
+				await this.reportValidator.validateReport(submittedReport);
+			await report.save();
 
-			await this.reportMetaHandler.handle(instance);
-			await instance.save();
-
-			if (!options.preventEvents) {
-				console.log('emitting ReportSubmittedEvent');
+			const emitEvent = async () => {
 				await this.eventEmitter.emitAsync(ReportSubmittedEvent, {
-					report: instance,
+					report: report,
+					user,
+					resource,
+					term,
 				} as IReportSubmittedEventPayload);
+			};
+			if (!options.preventEvents) {
+				await emitEvent();
 			}
-			return instance;
-		} catch (e: any) {
-			if (e instanceof MongoServerError && e.code === 11000) {
+			return { report, callback: emitEvent };
+		} catch (error: any) {
+			if (error instanceof MongoServerError && error.code === 11000) {
 				this.logger.error(`Attempt at duplicate report insertion`);
 				// Duplicate key error, return 403
 				const error = new Error(
-					`Report from user ${report.curator_orcid} to resource ${
-						report.resource_id
-					} with the exact timestamp ${report.timestamp.toISOString()} already exists`,
+					`Report from user ${submittedReport.curator_orcid} to resource ${
+						submittedReport.resource_id
+					} with the exact timestamp ${submittedReport.timestamp.toISOString()} already exists`,
 				);
 				throw new BadRequestException('Duplicate report submission attempt', {
 					cause: error,
 					description: error.message,
 				});
 			}
-			this.logger.error(e.message, e.stack, 'insertReport');
-			throw new Error(`Failed to save Report ${report}`);
+			if (error instanceof BadRequestException) {
+				throw error;
+			}
+			this.logger.error(error.message, error.stack, 'insertReport');
+			throw new Error(`Failed to save Report ${submittedReport}`);
 		}
 	}
 
 	async insertReports(
-		reports: ReportDto[],
+		reportSubmission: SubmitReportsDto,
 		options = { preventEvents: false },
 	): Promise<
 		Omit<InsertManyResult<Report>, 'insertedIds'> & {
 			reports: ReportDocument[];
+			deletedReports: { [keyof: string]: DeleteResult };
+			callback?: () => any | Promise<any>;
 		}
 	> {
 		try {
-			const reportDocuments = reports.map(
-				(report: ReportDto) => new this.reportModel(report),
+			const validatedReports = await this.reportValidator.validateReports(
+				reportSubmission.reports,
 			);
 
-			await this.reportMetaHandler.handleMultiple(reportDocuments);
+			let deleteResponses = {};
+			if (reportSubmission.delete_all) {
+				deleteResponses = await this.deleteAllManyResourcesReports(
+					reportSubmission.delete_all,
+				);
+			}
+
+			const reportDocuments = validatedReports.map(
+				(reportEntry) => reportEntry.report,
+			);
 
 			const { insertedCount, acknowledged } = await this.reportModel.insertMany(
 				reportDocuments,
 				{ rawResult: true },
 			);
-			if (!options.preventEvents) {
+			const emitEvent = async () => {
 				await this.eventEmitter.emitAsync(ManyReportsSubmittedEvent, {
 					reports: reportDocuments,
+					users: validatedReports.map((r) => r.user),
+					resources: validatedReports.map((r) => r.resource),
+					terms: validatedReports.map((r) => r.term),
 				} as IManyReportsSubmittedEventPayload);
+			};
+
+			if (!options.preventEvents) {
+				await emitEvent();
 			}
+
 			return {
 				insertedCount,
 				acknowledged,
 				reports: reportDocuments,
+				deletedReports: deleteResponses,
+				callback: options.preventEvents ? emitEvent : undefined,
 			};
-		} catch (e: any) {
-			if (e instanceof MongoServerError && e.code === 11000) {
+		} catch (err: any) {
+			if (err instanceof MongoServerError && err.code === 11000) {
 				this.logger.error(`Attempt at duplicate report insertion`);
 				// Duplicate key error, return 403
 				const error = new Error(`Duplicate report submission attempt`);
@@ -137,8 +189,11 @@ export class SubmitReportService {
 					description: error.message,
 				});
 			}
-			if (e instanceof Error) {
-				this.logger.error(e.message, e.stack, e.name);
+			if (err instanceof BadRequestException) {
+				throw err;
+			}
+			if (err instanceof Error) {
+				this.logger.error(err.message, err.stack, err.name);
 
 				throw new InternalServerErrorException(
 					'An internal error occured when submitting the reports',

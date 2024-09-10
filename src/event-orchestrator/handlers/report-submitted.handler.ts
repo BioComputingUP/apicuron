@@ -14,8 +14,8 @@ import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Model } from 'mongoose';
 import { IEventHandler } from '@nestjs/cqrs';
 import { Observable, Subject, concatMap, takeUntil } from 'rxjs';
-import { AggregatorManager } from '../services/aggregator-manager.service';
 import { BaseAggregatorRunner } from '../aggregator-runners/base.runner';
+import { Aggregator } from '../interfaces/aggregator.interface';
 
 @Injectable()
 export class ReportSubmittedEventHandler
@@ -41,9 +41,8 @@ export class ReportSubmittedEventHandler
 		this.eventSubject
 			.pipe(
 				concatMap(({ payload, callback }): Observable<any> => {
-					const reportInstance = new this.reportModel(payload.report);
 					return new Observable((subscriber) => {
-						this.processReport(reportInstance)
+						this.processReport(payload)
 							.then(callback)
 							.then((v) => {
 								subscriber.next(v);
@@ -59,15 +58,16 @@ export class ReportSubmittedEventHandler
 	/**
 	 * Processes a submitted report.
 	 *
-	 * @param report - The report document to be processed.
+	 * @param payload - The report document to be processed.
 	 * @returns A Promise that resolves to the result of applying the report to the aggregators.
 	 */
-	private async processReport(report: ReportDocument) {
-		return await this.aggregatorRunner.run(async (aggregator) => {
+	private async processReport(payload: IReportSubmittedEventPayload) {
+		return await this.aggregatorRunner.run(async (aggregator: Aggregator) => {
 			this.logger.debug(
-				`Applying report for resource "${report.resource_id}" to aggregator "${aggregator.constructor.name}"`,
+				`Applying report for resource "${payload.report.resource_id}" to aggregator "${aggregator.constructor.name}"`,
 			);
-			return await aggregator.applyReport(report);
+			const { report, term, resource, user } = payload;
+			return await aggregator.applyReport(report, term, resource, user);
 		});
 	}
 

@@ -50,10 +50,7 @@ import {
 	WeeklyStatistics,
 	WeeklyStatisticsSchemaFactory,
 } from './schemas/statistics/weekly-statistics.schema';
-import {
-	ResourceStats,
-	ResourceStatsSchema,
-} from './schemas/resource/resource-stats.schema';
+import { SyncIndexesService } from './services/sync-indexes.service';
 
 @Module({
 	imports: [
@@ -128,6 +125,8 @@ import {
 			},
 		]),
 	],
+
+	providers: [SyncIndexesService],
 
 	exports: [MongooseModule],
 })

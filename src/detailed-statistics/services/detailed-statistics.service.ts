@@ -6,6 +6,8 @@ import {
 import { DetailedStatisticsFilter } from '../interfaces/detailed-statistics';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
+import { plainToInstance } from 'class-transformer';
+import { DetailedStatisticsDto } from '../dto/detailedStatistics.dto';
 
 @Injectable()
 export class DetailedStatisticsService {
@@ -17,9 +19,11 @@ export class DetailedStatisticsService {
 	async getDetailedStatistics(
 		filter: DetailedStatisticsFilter,
 		privacyFilter: FilterQuery<DetailedStatisticsDocument> = {},
-	): Promise<DetailedStatisticsDocument | null> {
-		return await this.detailedStatsModel.findOne({
+	): Promise<DetailedStatisticsDto | null> {
+		const stat = await this.detailedStatsModel.findOne({
 			$and: [filter, privacyFilter],
 		});
+
+		return stat;
 	}
 }

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
-import { Document, Model, Types } from 'mongoose';
-import { Report, LeanReportDocument } from '../../core/schemas/reports.schema';
+import { Model } from 'mongoose';
+import { ReportDocument } from '../../core/schemas/reports.schema';
 import { ComputeStatisticsService } from '../compute-statistics/compute-statistics.service';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -12,13 +12,11 @@ import { PartnerResourcesService } from '../../resources/partner-resources/servi
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
 import { PrivacyType } from '../../core/enums';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
-import { BadgeAggregatorService } from '../../badges/services/badge-aggregator.service';
-import { MedalAggregatorService } from '../../medals/services/medal-aggregator.service';
-
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
+import { TermDocument } from '../../core/schemas/terms.schema';
 @Injectable()
-@AggregatorClass({
-	runBefore: [BadgeAggregatorService.name, MedalAggregatorService.name],
-})
+@AggregatorClass()
 export class StatisticsAggregator implements Aggregator {
 	constructor(
 		@InjectModel(Statistics.name)
@@ -26,6 +24,15 @@ export class StatisticsAggregator implements Aggregator {
 		protected resourceService: PartnerResourcesService,
 		protected computeStats: ComputeStatisticsService,
 	) {}
+	async termDeleted(term: TermDocument) {
+		return await this.recomputeAllResourceAggregates(term.resource_id);
+	}
+	async termUpdated(oldTerm: TermDocument, term: TermDocument) {
+		if (oldTerm.score == term.score) {
+			return;
+		}
+		return await this.recomputeAllResourceAggregates(term.resource_id);
+	}
 	async deleteLeague(resource_id: string, league: string): Promise<number> {
 		const deleted = await this.statModel.deleteMany({
 			resource_id,
@@ -96,11 +103,17 @@ export class StatisticsAggregator implements Aggregator {
 	}
 
 	async applyReport(
-		report:
-			| (Document<unknown, any, Report> & Report & { _id: Types.ObjectId })
-			| LeanReportDocument,
+		report: ReportDocument,
+		term: TermDocument,
+		resource: PartnerResourceDocument,
+		user?: UserDocument,
 	) {
-		return await this.computeStats.incrementStatByReport(report);
+		return await this.computeStats.incrementStatByReport(
+			report,
+			resource,
+			term,
+			user,
+		);
 	}
 	async applyAllReports(resource_id: string) {
 		await this.computeStats.computeStatistics({ resource_id });
