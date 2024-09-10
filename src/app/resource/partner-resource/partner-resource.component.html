@@ -43,8 +43,8 @@
       Last Submission Date:
       {{
         resource?.stats?.lastResourceUpdateDate ??
-          resource?.stats?.lastContributionDate | date : "dd-mm-yyyy"
-      }}</span
+          resource?.stats?.lastContributionDate | date : "dd-MM-yyyy":'UTC'
+      }} UTC</span
     >
   </div>
 </div>
