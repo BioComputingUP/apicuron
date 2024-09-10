@@ -17,6 +17,7 @@ import {
 	GroupedReportsByUser,
 	GroupReportsByUserAggregator,
 } from '../aggregation/group-reports-by-user.service';
+import { getMatchingReportFilter } from '../helpers/helpers';
 
 @Injectable()
 export class ComputeBadgesService {
@@ -65,6 +66,8 @@ export class ComputeBadgesService {
 			color_code: badgeDef.color_code,
 			count_threshold: badgeDef.count_threshold,
 			list_terms: badgeDef.list_terms,
+			startDate: badgeDef.startDate,
+			endDate: badgeDef.endDate,
 			curator_orcid: reportAgg.curator_orcid,
 			count: reportAgg.count,
 			state,
@@ -95,11 +98,7 @@ export class ComputeBadgesService {
 			badgeDefCount++;
 
 			const reportAggregationByUser = this.groupReportsByUser
-				.aggregate({
-					resource_id: badgeDef.resource_id,
-					league: badgeDef.league,
-					activity_term: { $in: badgeDef.list_terms },
-				})
+				.aggregate(getMatchingReportFilter(badgeDef))
 				.cursor({ batchSize: 50 });
 
 			const badges$ = [];

@@ -15,15 +15,8 @@ import {
 // import { ResourceIdExists } from '../../resources/partner-resources/validators/resource-id-exists';
 import { OrcidChecksum } from '../validators/orcid-checksum';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-	EntriesExistRule,
-	EntryExistsRule,
-} from '../../shared/validators/entry-exists.validator';
-import { Term } from '../../core/schemas/terms.schema';
-import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 import { EntityUriValid } from '../validators/entity-uri';
 import { Type } from 'class-transformer';
-import { LeagueValidator } from '../validators/league-validator';
 export class SubmitReportDto {
 	@IsString()
 	@IsNotEmpty()

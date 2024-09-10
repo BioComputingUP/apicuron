@@ -41,6 +41,13 @@ export class BadgeDef {
 	})
 	color_code: string;
 
+	// date bounds
+	@Prop({ required: false })
+	startDate?: Date;
+
+	@Prop({ required: false })
+	endDate?: Date;
+
 	league: string;
 	privacy: PrivacyType;
 }

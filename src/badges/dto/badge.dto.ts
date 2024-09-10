@@ -39,4 +39,10 @@ export class BadgeDto {
 
 	@Expose()
 	privacy: PrivacyType;
+
+	@Expose()
+	startDate?: Date;
+
+	@Expose()
+	endDate?: Date;
 }

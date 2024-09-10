@@ -69,6 +69,16 @@ export class Badge implements IUserResourceEntity {
 		enum: PrivacyType,
 	})
 	privacy: PrivacyType;
+
+	@Prop({
+		required: false,
+	})
+	startDate?: Date;
+
+	@Prop({
+		required: false,
+	})
+	endDate?: Date;
 }
 
 export const BadgeSchema = SchemaFactory.createForClass(Badge).loadClass(Badge);
