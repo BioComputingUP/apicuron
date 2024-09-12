@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { UsersService } from '../../auth/users/services/users.service';
 import { InjectModel } from '@nestjs/mongoose';
@@ -8,11 +8,15 @@ import { SubmitReportDto } from '../dto/submit-report.dto';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
-import { computePrivacyField } from '../../util/privacy.helper';
+import {
+	computeAggregatePrivacyField,
+	computePrivacyField,
+} from '../../util/privacy.helper';
 import {
 	hashTermIdentifier,
 	unHashTermIdentifier,
 } from '../../terms/helpers/term-hash';
+import { PrivacyType } from '../../core/enums';
 
 @Injectable()
 export class ReportValidatorService {
@@ -22,6 +26,8 @@ export class ReportValidatorService {
 		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 	) {}
+
+	logger = new Logger(ReportValidatorService.name);
 
 	/**
 	 * Assigns a default league to the given report based on the user's membership in a league or using the default league of the resource.
@@ -135,16 +141,19 @@ export class ReportValidatorService {
 		// validate the activity term
 		const { term } = await this.validateReportActivityTerm(report, termDoc);
 
+		const user =
+			userDoc ?? (await this.usersService.getByOrcid(report.curator_orcid));
+
 		const reportDoc = new this.reportModel(report);
 		reportDoc.term = term;
 
-		reportDoc.privacy = computePrivacyField(resource, userDoc, reportDoc);
+		reportDoc.privacy = computePrivacyField(resource, user, report);
 
 		return {
 			report: reportDoc,
 			resource,
 			term,
-			user: userDoc,
+			user,
 		};
 	}
 

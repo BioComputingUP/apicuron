@@ -54,7 +54,10 @@ export class SubmitBulkTask {
 
 		const [orcid_id, delete_all] = task_arg.arguments;
 
-		if (delete_all && delete_all instanceof String) {
+		if (delete_all && typeof delete_all == 'string') {
+			this.logger.log(
+				`User specified resources ${delete_all} to be deleted before proceeding`,
+			);
 			const resources_delete_all: string[] = delete_all.split(',');
 
 			this.logger.log(`User specified resources ${delete_all}`);
@@ -285,6 +288,10 @@ export class SubmitBulkTask {
 			}
 			const { errors, success_count, total_report_count, resource_ids } =
 				await this.process_report_stream(reportStream);
+			await this.eventEmitter.emitAsync(
+				BulkSubmissionEvent.name,
+				new BulkSubmissionEvent(submitter_orcid, resource_ids),
+			);
 
 			const notification_body = this.build_notification_body(
 				errors,
@@ -324,7 +331,9 @@ export class SubmitBulkTask {
 					try {
 						const reportDocument = new this.reportModel(report);
 
-						await this.submitReports.insertReport(reportDocument);
+						await this.submitReports.insertReport(reportDocument, {
+							preventEvents: true,
+						});
 
 						this.logger.log(
 							`Sucessfully inserted Report for ${report.resource_id} by ${report.curator_orcid}`,

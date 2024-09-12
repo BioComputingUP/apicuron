@@ -10,10 +10,7 @@ import {
 import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
 import { DeleteMedalDefDto } from './delete-medal-def.dto';
 import { Type } from 'class-transformer';
-import {
-	MaxDateField,
-	MinDateField,
-} from '../validators/date-comparison';
+import { MaxDateField, MinDateField } from '../validators/date-comparison';
 
 export class UpdateMedalDefDto extends DeleteMedalDefDto {
 	@Validate(ActivityTermExists, [{ each: true }])
