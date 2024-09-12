@@ -1,8 +1,14 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+} from "@angular/core";
 import { DatabasesService } from "../services/databases.service";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { delay, map, pluck, shareReplay, switchMap, tap } from "rxjs/operators";
-import { interval, Observable } from "rxjs";
+import { combineLatest, interval, Observable } from "rxjs";
 import { Resource } from "../../models/resource.model";
 import { BadgeDefService } from "../../achievements-def/services/badge-def.service";
 import { BadgeDefFilter } from "../../achievements-def/interfaces/badge-def.filter";
@@ -36,7 +42,7 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
     private badgeDefService: BadgeDefService,
     private medalDefService: MedalDefService,
     private termService: TermsService,
-    private route: ActivatedRoute,
+    private route: ActivatedRoute
   ) {}
 
   ngAfterViewInit(): void {
@@ -56,7 +62,6 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
 
   more_badges = false;
   more_medals = false;
-  expand_terms = false;
 
   @ViewChild("mainPanel") mainPanel: ElementRef;
   @ViewChild("leaderboardPanel") leaderboardPanel: ElementRef;
@@ -76,7 +81,7 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
       }),
       shareReplay()
     );
-
+    
     this.resource$ = this.resourceId$.pipe(
       switchMap((resource_id: string) => {
         return this.databaseService.get_resource(resource_id);
@@ -84,7 +89,13 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
       pluck<{ data: Resource }, "data">("data"),
       shareReplay(1)
     );
-
+    
+    this.terms$ = this.resource$.pipe(
+      switchMap(({ resource_id }: Resource) => {
+        return this.termService.getTerms({ resource_id });
+      })
+    );
+    
     this.firstBadges$ = this.resource$.pipe(
       switchMap(({ resource_id }: Resource) => {
         return this.badgeDefService.getBadgeDefs(
@@ -93,8 +104,10 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
       })
     );
 
-    this.lastBadges$ = this.resource$.pipe(
-      switchMap(({ resource_id }: Resource) => {
+    this.lastBadges$ = combineLatest([this.resource$, this.firstBadges$]).pipe(
+      delay(500),
+      switchMap(([resource, badges]: [Resource, Paginated<BadgeDef>]) => {
+        const { resource_id } = resource;
         return this.badgeDefService.getBadgeDefs(
           BadgeDefFilter.create({ resource_id, skip: 8 })
         );
@@ -111,8 +124,9 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
       shareReplay()
     );
 
-    this.lastMedals$ = this.resource$.pipe(
-      switchMap(({ resource_id }: Resource) => {
+    this.lastMedals$ = combineLatest([this.resource$, this.firstMedals$]).pipe(
+      delay(500),
+      switchMap(([{ resource_id }, _]: [Resource, Paginated<MedalDef>]) => {
         return this.medalDefService.getMedalDefs(
           MedalDefFilter.create({ resource_id, skip: 8 })
         );
@@ -120,10 +134,5 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
       shareReplay()
     );
 
-    this.terms$ = this.resource$.pipe(
-      switchMap(({ resource_id }: Resource) => {
-        return this.termService.getTerms({ resource_id });
-      })
-    );
   }
 }
