@@ -6,6 +6,7 @@ import { Term } from 'src/app/models/term.model'
 import { BehaviorSubject, Observable, Subscription, timer } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 import { OverlayModule } from '@angular/cdk/overlay'
+import * as moment from 'moment'
 @Component({
     standalone: true,
     selector: 'badge-card',
@@ -49,6 +50,8 @@ export class BadgeCardComponent implements OnInit {
 
     overlayOpen$: Observable<boolean> = this.overlayState$.asObservable();
     closeTimeoutSubscription: Subscription | undefined;
+
+    formattedTime: string = '';
   
     setOverlayState(state: boolean, timeout = 100) {
       if (!state) {
@@ -63,6 +66,7 @@ export class BadgeCardComponent implements OnInit {
       this.overlayState$.next(state);
     }
     
-
-
+    formatBadgeDate(date: Date): string {
+      return moment(date).startOf('day').fromNow();
+    }
 }

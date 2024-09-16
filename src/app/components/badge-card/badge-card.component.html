@@ -1,7 +1,5 @@
-<div
-  class="tw-flex tw-flex-col tw-bg-white tw-rounded-md tw-px-1 sm:tw-p-2 tw-text-gray-800 tw-h-full"
-  [ngClass]="{ 'tw-shadow-md tw-shadow-gray-400': enableShadow }"
->
+<div class="tw-flex tw-flex-col tw-bg-white tw-rounded-md tw-px-1 sm:tw-p-2 tw-text-gray-800 tw-h-full"
+  [ngClass]="{ 'tw-shadow-md tw-shadow-gray-400': enableShadow }">
   <div class="tw-flex tw-flex-row tw-justify-between">
     <!-- <img src="assets/svg/badge_check.svg" class="tw-w-16" alt=""> -->
 
@@ -14,7 +12,7 @@
         <span class="tw-inline"></span>
       </div>
 
-      <span class="tw-block tw-text-xs tw-text-gray-500 tw-font-light">
+      <span class="tw-block tw-text-xs tw-text-gray-500 tw-font-light tw-pb-1">
         &emsp;Earned by completing more than
         <span class="tw-italic tw-font-bold">{{ badge.count_threshold }} </span>
         <span
@@ -23,8 +21,7 @@
           #activities_list
           (mouseenter)="setOverlayState(true)"
           (mouseleave)="setOverlayState(false, 300)"
-          >{{ badge.count_threshold > 1 ? "Activities" : "Activity" }}</span
-        >
+          >{{ badge.count_threshold > 1 ? "Activities" : "Activity" }}</span>
         <!-- if only start date is defined -->
         <span *ngIf="!!badge.startDate && !badge.endDate">
           after {{ badge.startDate | date : "dd-MM-yyyy" }} UTC
@@ -41,13 +38,17 @@
       </span>
 
       <span class="tw-block tw-text-xs tw-text-gray-500 tw-font-light">
-        &emsp; Achievement Completed The {{ badge.achieved_at | date : "dd-MM-yyyy" : "UTC" }} UTC
+        <!-- &emsp; Achievement Completed The {{ badge.achieved_at | date : "dd-MM-yyyy" : "UTC" }} UTC -->
+        &emsp; Achieved
+        <span class="tw-font-bold">
+          {{ formatBadgeDate(badge.achieved_at) }}
+        </span>
       </span>
     </div>
     <svg-icon
       src="assets/svg/badge_check.svg"
-      svgClass="tw-w-8 lg:tw-w-12 tw-mx-auto"
-    ></svg-icon>
+      svgClass="tw-w-8 lg:tw-w-12 tw-mx-auto">
+    </svg-icon>
   </div>
 </div>
 
@@ -56,17 +57,12 @@
   [cdkConnectedOverlayOrigin]="activities_list"
   [cdkConnectedOverlayHasBackdrop]="true"
   [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
-  [cdkConnectedOverlayOpen]="!!(overlayOpen$ | async)"
->
-  <ul
-    class="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-py-2 tw-rounded tw-shadow-md tw-shadow-gray-400 tw-relative tw-max-h-28 tw-overflow-y-auto tw-overflow-x-hidden tw-list-disc"
+  [cdkConnectedOverlayOpen]="!!(overlayOpen$ | async)">
+  <ul class="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-py-2 tw-rounded tw-shadow-md tw-shadow-gray-400 tw-relative tw-max-h-28 tw-overflow-y-auto tw-overflow-x-hidden tw-list-disc"
     (mouseleave)="setOverlayState(false, 300)"
-    (mouseenter)="setOverlayState(true)"
-  >
-    <li
-      class="tw-block tw-text-sm tw-leading-4 tw-font-dm-sans tw-text-gray-600 tw-pb-1 tw-px-2 tw-cursor-default tw"
-      *ngFor="let term of termNames$ | async"
-    >
+    (mouseenter)="setOverlayState(true)">
+    <li class="tw-block tw-text-sm tw-leading-4 tw-font-dm-sans tw-text-gray-600 tw-pb-1 tw-px-2 tw-cursor-default tw"
+      *ngFor="let term of termNames$ | async">
       {{ term }}
     </li>
   </ul>
