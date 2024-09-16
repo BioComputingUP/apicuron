@@ -6,6 +6,7 @@ export type DeleteBadgeDef =  Pick<BadgeDef, 'name' | 'resource_id'>;
 export type UpdateBadgeDef = Partial<BadgeDef> & DeleteBadgeDef;
 
 export class BadgeDef extends AcheivementDef implements Deserializable, Serializable {
+    displayedName: string;
     serialize(): any {
         return Object.assign({}, this);
     }
@@ -13,6 +14,7 @@ export class BadgeDef extends AcheivementDef implements Deserializable, Serializ
         this.color_code = this.color = input.color_code
         this.count_threshold = input.count_threshold
         this.name = input.name
+        this.displayedName = input.displayedName;
         this.list_terms = input.list_terms
         this.resource_id = input.resource_id
         this.resource_uri = input.resource_uri

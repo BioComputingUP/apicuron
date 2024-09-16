@@ -1,5 +1,12 @@
 import { CommonModule } from "@angular/common";
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from "@angular/core";
 import {
   FormBuilder,
   FormControl,
@@ -7,11 +14,15 @@ import {
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
+import _ from "lodash";
 import { ToastrModule, ToastrService } from "ngx-toastr";
 import { CalendarModule } from "primeng/calendar";
 import { MultiSelectModule } from "primeng/multiselect";
+import { Subject } from "rxjs";
+import { startWith, takeUntil, tap } from "rxjs/operators";
 import { Badge as BadgeDef } from "src/app/models/badge.model";
 import { Term } from "src/app/models/term.model";
+import { slugifyFieldFromAnother } from "../../util/form-reactivity";
 
 @Component({
   standalone: true,
@@ -26,7 +37,7 @@ import { Term } from "src/app/models/term.model";
   templateUrl: "./badge-form.component.html",
   styleUrls: ["./badge-form.component.scss"],
 })
-export class BadgeFormComponent implements OnInit {
+export class BadgeFormComponent implements OnInit, OnDestroy {
   @Input()
   type: "create" | "update" = "create";
 
@@ -43,6 +54,7 @@ export class BadgeFormComponent implements OnInit {
 
   form: FormGroup = this.formBuilder.group({
     name: ["", [Validators.required]],
+    displayedName: ["", [Validators.required]],
     color_code: [
       "",
       [
@@ -57,11 +69,19 @@ export class BadgeFormComponent implements OnInit {
     startDate: [null, []],
     endDate: [null, []],
   });
+  destroy$ = new Subject<void>();
 
   constructor(
     protected formBuilder: FormBuilder,
     protected toastr: ToastrService
-  ) {}
+  ) {
+    slugifyFieldFromAnother(this.form, "displayedName", "name")
+      .pipe(takeUntil(this.destroy$))
+      .subscribe();
+  }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+  }
 
   ngOnInit(): void {
     if (!this.badge.resource_id) {
@@ -70,9 +90,12 @@ export class BadgeFormComponent implements OnInit {
 
     this.form.setValue({
       name: this.badge.name ?? "",
+      displayedName: this.badge.displayedName ?? "",
       list_terms: this.badge.list_terms ?? "",
       color_code: this.badge.color_code ?? "",
       count_threshold: this.badge.count_threshold ?? "",
+      startDate: this.badge.startDate ?? null,
+      endDate: this.badge.endDate ?? null,
     });
   }
 

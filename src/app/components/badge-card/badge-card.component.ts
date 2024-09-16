@@ -2,14 +2,14 @@ import { Component, ElementRef, Input, OnInit, TemplateRef, ViewChild } from '@a
 import { CommonModule } from '@angular/common'
 import { Badge } from 'src/app/models/badge.model'
 import { AngularSvgIconModule } from 'angular-svg-icon'
-import { NgxPopperModule } from 'ngx-popper'
 import { Term } from 'src/app/models/term.model'
-import { BehaviorSubject, Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { BehaviorSubject, Observable, Subscription, timer } from 'rxjs'
+import { map, tap } from 'rxjs/operators'
+import { OverlayModule } from '@angular/cdk/overlay'
 @Component({
     standalone: true,
     selector: 'badge-card',
-    imports: [CommonModule, AngularSvgIconModule, NgxPopperModule],
+    imports: [CommonModule, AngularSvgIconModule, OverlayModule],
     templateUrl: './badge-card.component.html',
     styleUrls: []
 })
@@ -45,7 +45,23 @@ export class BadgeCardComponent implements OnInit {
             this.terms$.next(value);
         }
     }
+    private overlayState$ = new BehaviorSubject<boolean>(false);
 
+    overlayOpen$: Observable<boolean> = this.overlayState$.asObservable();
+    closeTimeoutSubscription: Subscription | undefined;
+  
+    setOverlayState(state: boolean, timeout = 100) {
+      if (!state) {
+        this.closeTimeoutSubscription = timer(timeout)
+          .pipe(tap(() => this.overlayState$.next(state)))
+          .subscribe();
+        return;
+      }
+      if (this.closeTimeoutSubscription) {
+        this.closeTimeoutSubscription.unsubscribe();
+      }
+      this.overlayState$.next(state);
+    }
     
 
 

@@ -10,6 +10,7 @@ export type AchievementState = ObjectValues<typeof AchievementState>;
 
 export class Badge extends BadgeDef implements Deserializable {
     progressRate: number;
+    displayedName: string;
     
     deserialize(input: any): this {
     super.deserialize(input);
