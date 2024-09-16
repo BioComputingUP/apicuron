@@ -14,7 +14,7 @@ export class BadgeFilter extends BasePaginationDto {
 
 	@IsOptional()
 	@IsString()
-	name?: string;
+	displayedName?: string;
 
 	@Transform(({ value }) => parseInt(value))
 	@IsOptional()

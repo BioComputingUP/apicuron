@@ -20,6 +20,7 @@ import {
 	MaxDateField,
 	MinDateField,
 } from '../../medals/validators/date-comparison';
+import { isSlug } from '../../shared/validators/is-slug.validator';
 
 export class CreateBadgeDefDto {
 	@IsOptional()
@@ -37,8 +38,13 @@ export class CreateBadgeDefDto {
 	@IsNotEmpty()
 	count_threshold: number;
 
+	@isSlug()
+	@IsString()
 	@IsNotEmpty()
 	name: string;
+
+	@IsNotEmpty()
+	displayedName: string;
 
 	@Validate(ResourceIdExists)
 	@IsNotEmpty()

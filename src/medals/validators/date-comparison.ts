@@ -1,4 +1,6 @@
 import {
+	getMetadataStorage,
+	isDateString,
 	registerDecorator,
 	ValidationArguments,
 	ValidationOptions,
@@ -16,6 +18,7 @@ import {
  */
 export function MinDateField(
 	properties: string[],
+	skipIfNull = false,
 	validationOptions?: ValidationOptions,
 ) {
 	return (object: any, propertyName: string) => {
@@ -23,7 +26,10 @@ export function MinDateField(
 			target: object.constructor,
 			propertyName,
 			options: validationOptions,
-			constraints: [{ properties }, { operator: 'min' }],
+			constraints: [
+				{ properties },
+				{ operator: 'min', skipIfNullOption: skipIfNull },
+			],
 			validator: DateFieldComparison,
 		});
 	};
@@ -31,6 +37,7 @@ export function MinDateField(
 
 export function MaxDateField(
 	properties: string[],
+	skipIfNull = false,
 	validationOptions?: ValidationOptions,
 ) {
 	return (object: any, propertyName: string) => {
@@ -38,7 +45,10 @@ export function MaxDateField(
 			target: object.constructor,
 			propertyName,
 			options: validationOptions,
-			constraints: [{ properties }, { operator: 'max' }],
+			constraints: [
+				{ properties },
+				{ operator: 'max', skipIfNullOption: skipIfNull },
+			],
 			validator: DateFieldComparison,
 		});
 	};
@@ -59,12 +69,26 @@ export class DateFieldComparison implements ValidatorConstraintInterface {
 		);
 
 		// get the operator specified in the constraints array by the decorator registration
-		const { operator }: { operator: 'min' | 'max' } = args.constraints.find(
-			(x) => x.operator && (x.operator == 'min' || x.operator == 'max'),
-		);
+		const {
+			operator,
+			skipIfNullOption,
+		}: { operator: 'min' | 'max'; skipIfNullOption: boolean } =
+			args.constraints.find(
+				(x) => !!x.operator && (x.operator == 'min' || x.operator == 'max'),
+			);
+
+		const skipIfNull = !!skipIfNullOption || false;
 
 		// for each property passed
 		this.dates_validation = properties.map((property_name) => {
+			if (
+				skipIfNull &&
+				(!args.object[property_name] ||
+					typeof args.object[property_name] == 'string' ||
+					!isDateString(args.object[property_name]))
+			) {
+				return true;
+			}
 			// intantiate the date from the validation object
 			const compared_date = new Date(args.object[property_name]);
 			// if the operator is 'min' (meaning we're setting the min values for the current field)

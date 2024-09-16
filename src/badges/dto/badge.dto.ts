@@ -10,6 +10,9 @@ export class BadgeDto {
 	name: string;
 
 	@Expose()
+	displayedName: string;
+
+	@Expose()
 	resource_uri?: string;
 
 	// fields from Badge

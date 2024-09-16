@@ -5,6 +5,7 @@ import {
 	Validate,
 	IsString,
 	IsDate,
+	MaxDate,
 } from 'class-validator';
 import { FilterQuery } from 'mongoose';
 import {
@@ -61,6 +62,9 @@ export class UpdateBadgeDefDto {
 	league: string;
 
 	// optional update fields
+	@IsString()
+	@IsOptional()
+	displayedName: string;
 
 	@IsOptional()
 	category: string;
@@ -81,13 +85,13 @@ export class UpdateBadgeDefDto {
 	@IsOptional()
 	list_terms: string[];
 
-	@MaxDateField(['endDate'])
+	@MaxDateField(['endDate'], true)
 	@IsDate()
 	@IsOptional()
 	@Type(() => Date)
 	startDate: Date;
 
-	@MinDateField(['startDate'])
+	@MinDateField(['startDate'], true)
 	@IsDate()
 	@IsOptional()
 	@Type(() => Date)

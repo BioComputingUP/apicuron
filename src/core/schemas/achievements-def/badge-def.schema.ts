@@ -23,6 +23,9 @@ export class BadgeDef {
 	@Prop({ required: true })
 	name: string;
 
+	@Prop({ required: true })
+	displayedName: string;
+
 	@Prop()
 	resource_uri: string;
 

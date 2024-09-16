@@ -19,6 +19,12 @@ export class Badge implements IUserResourceEntity {
 		required: true,
 	})
 	name: string;
+
+	@Prop({
+		required: true,
+	})
+	displayedName: string;
+
 	@Prop({
 		required: false,
 	})

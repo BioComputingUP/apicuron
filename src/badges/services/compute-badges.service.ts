@@ -60,6 +60,7 @@ export class ComputeBadgesService {
 		}
 		const badge = new this.badgeModel({
 			name: badgeDef.name,
+			displayedName: badgeDef.displayedName,
 			resource_uri: badgeDef.resource_uri,
 			resource_id: badgeDef.resource_id,
 			league: badgeDef.league,
