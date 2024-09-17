@@ -1,73 +1,82 @@
-import { Component, Input, OnInit } from '@angular/core'
-import { CommonModule } from '@angular/common'
-import { Badge } from 'src/app/models/badge.model'
-import { AngularSvgIconModule } from 'angular-svg-icon'
-import { Term } from 'src/app/models/term.model'
-import { BehaviorSubject, Observable, Subscription, timer } from 'rxjs'
-import { map, tap } from 'rxjs/operators'
-import { OverlayModule } from '@angular/cdk/overlay'
-import * as moment from 'moment'
+import { Component, Input, OnInit } from "@angular/core";
+import { CommonModule, DatePipe } from "@angular/common";
+import { Badge } from "src/app/models/badge.model";
+import { AngularSvgIconModule } from "angular-svg-icon";
+import { Term } from "src/app/models/term.model";
+import { BehaviorSubject, Observable, Subscription, timer } from "rxjs";
+import { map, tap } from "rxjs/operators";
+import { OverlayModule } from "@angular/cdk/overlay";
+import * as moment from "moment";
 @Component({
-    standalone: true,
-    selector: 'badge-card',
-    imports: [CommonModule, AngularSvgIconModule, OverlayModule],
-    templateUrl: './badge-card.component.html',
-    styleUrls: []
+  standalone: true,
+  selector: "badge-card",
+  imports: [CommonModule, AngularSvgIconModule, OverlayModule],
+  templateUrl: "./badge-card.component.html",
+  styleUrls: [],
 })
 export class BadgeCardComponent implements OnInit {
+  formattedAchievedAt: string;
+  ngOnInit(): void {
+    this.termNames$ = this.terms$.asObservable().pipe(
+      map((terms: Term[]) => {
+        return this.terms.filter((term: Term) =>
+          this.badge.list_terms.includes(term.activity_term)
+        );
+      }),
+      map((terms: Term[]) => {
+        return this.terms.map((term: Term) => term.activity_name);
+      })
+    );
+    this.formattedAchievedAt = this.formatAchievedAt();
+  }
 
-    ngOnInit(): void {
-        this.termNames$ = this.terms$.asObservable().pipe(
-            map((terms: Term[]) => {
-                return this.terms.filter((term: Term) => this.badge.list_terms.includes(term.activity_term))
-            }),
-            map((terms: Term[]) => {
-                return this.terms.map((term: Term) => term.activity_name)
-            })
-        )
+  terms$: BehaviorSubject<Term[]> = new BehaviorSubject([]);
+  termNames$: Observable<string[]>;
+
+  thresholdDate = moment().subtract(30, "days").toDate()
+
+  @Input()
+  enableShadow = true;
+
+  @Input()
+  badge: Badge;
+
+  @Input()
+  public get terms() {
+    return this.terms$.getValue();
+  }
+  public set terms(value) {
+    if (!!value && value instanceof Array && value.length > 0) {
+      this.terms$.next(value);
     }
+  }
+  private overlayState$ = new BehaviorSubject<boolean>(false);
 
-    terms$: BehaviorSubject<Term[]> = new BehaviorSubject([]);
-    termNames$: Observable<string[]>;
+  overlayOpen$: Observable<boolean> = this.overlayState$.asObservable();
+  closeTimeoutSubscription: Subscription | undefined;
 
-    thresholdDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
+  formattedTime: string = "";
 
-    @Input()
-    enableShadow = true;
-
-    @Input()
-    badge: Badge
-
-    @Input()
-    public get terms() {
-        return this.terms$.getValue();
+  setOverlayState(state: boolean, timeout = 100) {
+    if (!state) {
+      this.closeTimeoutSubscription = timer(timeout)
+        .pipe(tap(() => this.overlayState$.next(state)))
+        .subscribe();
+      return;
     }
-    public set terms(value) {
-        if(!!value && value instanceof Array && value.length > 0){
-            this.terms$.next(value);
-        }
+    if (this.closeTimeoutSubscription) {
+      this.closeTimeoutSubscription.unsubscribe();
     }
-    private overlayState$ = new BehaviorSubject<boolean>(false);
+    this.overlayState$.next(state);
+  }
 
-    overlayOpen$: Observable<boolean> = this.overlayState$.asObservable();
-    closeTimeoutSubscription: Subscription | undefined;
+  formatBadgeDate(date: Date): string {
+    return moment(date).startOf("day").fromNow();
+  }
 
-    formattedTime: string = '';
-  
-    setOverlayState(state: boolean, timeout = 100) {
-      if (!state) {
-        this.closeTimeoutSubscription = timer(timeout)
-          .pipe(tap(() => this.overlayState$.next(state)))
-          .subscribe();
-        return;
-      }
-      if (this.closeTimeoutSubscription) {
-        this.closeTimeoutSubscription.unsubscribe();
-      }
-      this.overlayState$.next(state);
-    }
-    
-    formatBadgeDate(date: Date): string {
-      return moment(date).startOf('day').fromNow();
-    }
+  formatAchievedAt() {
+    return this.badge.achieved_at > this.thresholdDate
+      ? 'The ' + new DatePipe("UTC").transform(this.badge.achieved_at, "dd-MM-yyyy") + ' UTC'
+      : this.formatBadgeDate(this.badge.achieved_at);
+  }
 }

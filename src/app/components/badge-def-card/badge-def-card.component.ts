@@ -1,18 +1,9 @@
-import {
-  Component,
-  ElementRef,
-  Input,
-  OnInit,
-  TemplateRef,
-  ViewChild,
-} from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
-// import { Badge } from 'src/app/models/badge.model'
 import { AngularSvgIconModule } from "angular-svg-icon";
-// import { NgxPopperModule } from 'ngx-popper'
 import { Term } from "src/app/models/term.model";
-import { BehaviorSubject, Observable, of, Subscription, timer } from "rxjs";
-import { delay, map, switchMap, tap } from "rxjs/operators";
+import { BehaviorSubject, Observable, Subscription, timer } from "rxjs";
+import { map, tap } from "rxjs/operators";
 import { BadgeDef } from "../../models/badge-def.model";
 import { OverlayModule } from "@angular/cdk/overlay";
 @Component({
