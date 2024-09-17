@@ -12,6 +12,8 @@ import {
 } from '../dto/weekly-statistics.dto';
 import { UsersService } from '../../auth/users/services/users.service';
 import { getWeekEndUTC, getWeekStartUTC } from '../helpers/fields-updater';
+import * as moment from 'moment-timezone';
+import { TIMEZONE } from '../constants/start-of-week';
 
 @Injectable()
 export class WeeklyStatisticsService {
@@ -37,11 +39,13 @@ export class WeeklyStatisticsService {
 			$and: [
 				filter,
 				{
-					weekStart: getWeekStartUTC(),
-					weekEnd: getWeekEndUTC(),
+					weekStart: getWeekStartUTC(moment().tz(TIMEZONE)),
+					weekEnd: getWeekEndUTC(moment().tz(TIMEZONE)),
 				},
 			],
 		};
+		console.debug('----statFilter----');
+		console.debug(JSON.stringify(statFilter, null, 2));
 		const [statistics, count] = await Promise.all([
 			this.WeeklyStatistics.find(statFilter, null, {
 				...queryOptions,
