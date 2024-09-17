@@ -1,27 +1,25 @@
-<div class="tw-flex tw-flex-col tw-bg-white tw-rounded-md tw-px-1 sm:tw-p-2 tw-text-gray-800 tw-h-full"
-  [ngClass]="{ 'tw-shadow-md tw-shadow-gray-400': enableShadow }">
+<div class="tw-flex tw-flex-col tw-bg-white tw-rounded-md tw-px-1 sm:tw-p-2 tw-text-gray-800 tw-h-full" [ngClass]="{ 'tw-shadow-md tw-shadow-gray-400': enableShadow }">
   <div class="tw-flex tw-flex-row tw-justify-between">
-    <!-- <img src="assets/svg/badge_check.svg" class="tw-w-16" alt=""> -->
 
     <div class="tw-flex tw-grow tw-flex-col tw-pl-2">
       <div class="tw-block">
-        <span
-          class="tw-block tw-text-sm sm:tw-text-base tw-font-dm-sans tw-font-bold"
-          >{{ badge.displayedName }}</span
-        >
+        <span class="tw-block tw-text-sm sm:tw-text-base tw-font-dm-sans tw-font-bold">
+          {{ badge.displayedName }}
+        </span>
         <span class="tw-inline"></span>
       </div>
 
       <span class="tw-block tw-text-xs tw-text-gray-500 tw-font-light tw-pb-1">
         &emsp;Earned by completing more than
-        <span class="tw-italic tw-font-bold">{{ badge.count_threshold }} </span>
+        <span class="tw-italic tw-font-bold">{{ badge.count_threshold }}</span>
         <span
           class="tw-font-bold tw-underline tw-cursor-pointer"
           cdkOverlayOrigin
           #activities_list
           (mouseenter)="setOverlayState(true)"
-          (mouseleave)="setOverlayState(false, 300)"
-          >{{ badge.count_threshold > 1 ? "Activities" : "Activity" }}</span>
+          (mouseleave)="setOverlayState(false, 300)">
+          {{ badge.count_threshold > 1 ? "Activities" : "Activity" }}
+        </span>
         <!-- if only start date is defined -->
         <span *ngIf="!!badge.startDate && !badge.endDate">
           after {{ badge.startDate | date : "dd-MM-yyyy" }} UTC
@@ -37,13 +35,26 @@
         </span>
       </span>
 
-      <span class="tw-block tw-text-xs tw-text-gray-500 tw-font-light">
-        <!-- &emsp; Achievement Completed The {{ badge.achieved_at | date : "dd-MM-yyyy" : "UTC" }} UTC -->
-        &emsp; Achieved
-        <span class="tw-font-bold">
-          {{ formatBadgeDate(badge.achieved_at) }}
+      <div *ngIf="badge.state == 'achieved'" class="tw-block tw-text-xs tw-text-gray-500 tw-font-light tw-pb-2">
+        <span *ngIf="(badge.achieved_at | date: 'YYYY-MM-DD') > thresholdDate">
+          &emsp; Achievement Completed The <span class="tw-font-bold">{{ badge.achieved_at | date : "dd-MM-yyyy" : "UTC" }} UTC</span>
         </span>
-      </span>
+        
+        <span *ngIf="(badge.achieved_at | date: 'YYYY-MM-DD') <= thresholdDate">
+          &emsp; Achieved <span class="tw-font-bold">{{ formatBadgeDate(badge.achieved_at) }}</span>
+        </span>
+      </div>
+
+      <div *ngIf="badge.state == 'progress'">
+        <span class="tw-block tw-text-xs tw-font-bold tw-pb-1">Completed activities for the badge</span>
+        <span role="progressbar" class="tw-block tw-rounded-full tw-bg-gray-200">
+          <span class="tw-block tw-h-3 tw-rounded-full 
+            tw-bg-[repeating-linear-gradient(45deg,_var(--tw-gradient-from)_0,_var(--tw-gradient-from)_10px,_var(--tw-gradient-to)_10px,_var(--tw-gradient-to)_20px)] 
+            tw-from-apicuron-purple-100 tw-to-apicuron-red"
+            style="width: 75%">
+          </span>
+        </span>
+      </div>
     </div>
     <svg-icon
       src="assets/svg/badge_check.svg"

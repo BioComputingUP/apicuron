@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, TemplateRef, ViewChild } from '@angular/core'
+import { Component, Input, OnInit } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { Badge } from 'src/app/models/badge.model'
 import { AngularSvgIconModule } from 'angular-svg-icon'
@@ -16,7 +16,6 @@ import * as moment from 'moment'
 })
 export class BadgeCardComponent implements OnInit {
 
-
     ngOnInit(): void {
         this.termNames$ = this.terms$.asObservable().pipe(
             map((terms: Term[]) => {
@@ -30,6 +29,8 @@ export class BadgeCardComponent implements OnInit {
 
     terms$: BehaviorSubject<Term[]> = new BehaviorSubject([]);
     termNames$: Observable<string[]>;
+
+    thresholdDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
 
     @Input()
     enableShadow = true;
