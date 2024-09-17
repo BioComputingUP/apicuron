@@ -67,13 +67,13 @@ export class CreateBadgeDefDto {
 	@IsOptional()
 	league: string;
 
-	@MaxDateField(['endDate'])
+	@MaxDateField(['endDate'], true)
 	@IsDate()
 	@IsOptional()
 	@Type(() => Date)
 	startDate: Date;
 
-	@MinDateField(['startDate'])
+	@MinDateField(['startDate'], true)
 	@IsDate()
 	@IsOptional()
 	@Type(() => Date)
