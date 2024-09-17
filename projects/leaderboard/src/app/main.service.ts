@@ -6,6 +6,9 @@ import { CuratorStatistics } from "../../../../src/app/models/statistics.model";
 import { Resource } from "../../../../src/app/models/resource.model";
 import { User } from "../../../../src/app/models/User.model";
 import { environment } from "../../../../src/environments/environment";
+import { LeaderboardEntry } from "./models/leaderboard.model";
+import { Observable } from "rxjs";
+import { LeaderboardFilter } from "../../../../src/app/databases/interfaces/leaderboard-filter";
 
 
 
@@ -16,31 +19,32 @@ export class MainService {
     constructor(protected http: HttpClient) { }
 
     webserverUrl= environment.ws;
+    
 
-    getResourceLeaderboard(resource_id: string, limit: number = 10, skip: number = 0) {
-        const response$ = this.http.get(
-            `${this.webserverUrl}/statistics/leaderboard/${resource_id}`,
-            {
-                responseType: "json",
-                headers: {
-                    version: "2",
-                },
-                params: {
-                    limit,
-                    skip
-                },
-            }
-        ).pipe(
-            map(({ data, meta }: Paginated<CuratorStatistics>) => {
+    
 
-                return {
-                    data: data.map((stat: CuratorStatistics) => new CuratorStatistics().deserialize(stat)),
-                    meta
-                }
+    getResourceLeaderboard(
+        filter: LeaderboardFilter
+      ): Observable<Paginated<LeaderboardEntry>> {
+        const url = `${environment.ws}/statistics/${filter.resource_id}/leaderboard`;
+        return this.http
+          .get<Paginated<LeaderboardEntry>>(url, {
+            responseType: "json",
+            headers: { version: "2" },
+            params: {
+              skip: filter.skip.toString(),
+              limit: filter.limit.toString(),
+            },
+          })
+          .pipe(
+            map((response: Paginated<LeaderboardEntry>) => {
+              response.data = response.data.map((stat: LeaderboardEntry) =>
+                new LeaderboardEntry().deserialize(stat)
+              );
+              return response as Paginated<LeaderboardEntry>;
             })
-        )
-        return response$;
-    }
+          );
+      }
 
     getResource(resource_id: string) {
         const response = this.http.get(

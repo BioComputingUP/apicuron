@@ -3,7 +3,7 @@
     <h2 class="tw-font-bold tw-text-xl md:tw-text-2xl">
         {{ resource.resource_name }} Leaderboard
     </h2>
-    <div class="tw-flex tw-flex-col tw-overflow-x-auto" *ngIf="statsWithUsers$ | async as statsWithUsers; else loading">
+    <div class="tw-flex tw-flex-col tw-overflow-x-auto" *ngIf="statsList$ | async as statsWithUsers; else loading">
 
 
 
