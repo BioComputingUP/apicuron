@@ -10,6 +10,9 @@ export class BadgeDto {
 	name: string;
 
 	@Expose()
+	displayedName: string;
+
+	@Expose()
 	resource_uri?: string;
 
 	// fields from Badge
@@ -39,4 +42,10 @@ export class BadgeDto {
 
 	@Expose()
 	privacy: PrivacyType;
+
+	@Expose()
+	startDate?: Date;
+
+	@Expose()
+	endDate?: Date;
 }

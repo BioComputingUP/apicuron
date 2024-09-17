@@ -17,14 +17,22 @@ export function getReportRelatedBadgeDefFilter(
 	};
 }
 
-export function getBadgeDefRelatedReportFilter(
+export function getMatchingReportFilter(
 	badgeDef: BadgeDefDocument,
 ): FilterQuery<ReportDocument> {
-	return {
+	const filter: FilterQuery<ReportDocument> = {
 		resource_id: badgeDef.resource_id,
 		league: badgeDef.league,
 		activity_term: { $in: badgeDef.list_terms },
 	};
+
+	if (badgeDef.startDate) {
+		filter.timestamp = { $gte: badgeDef.startDate, ...filter.timestamp };
+	}
+	if (badgeDef.endDate) {
+		filter.timestamp = { $lte: badgeDef.endDate, ...filter.timestamp };
+	}
+	return filter;
 }
 
 export function getReportRelatedBadgeFilter(

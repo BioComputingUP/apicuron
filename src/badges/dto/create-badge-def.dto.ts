@@ -5,6 +5,7 @@ import {
 	Min,
 	Validate,
 	IsString,
+	IsDate,
 } from 'class-validator';
 import { FilterQuery } from 'mongoose';
 import {
@@ -14,6 +15,12 @@ import {
 import { ResourceIdExists } from '../../resources/partner-resources/validators/resource-id-exists';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
+import { Type } from 'class-transformer';
+import {
+	MaxDateField,
+	MinDateField,
+} from '../../medals/validators/date-comparison';
+import { isSlug } from '../../shared/validators/is-slug.validator';
 
 export class CreateBadgeDefDto {
 	@IsOptional()
@@ -31,8 +38,13 @@ export class CreateBadgeDefDto {
 	@IsNotEmpty()
 	count_threshold: number;
 
+	@isSlug()
+	@IsString()
 	@IsNotEmpty()
 	name: string;
+
+	@IsNotEmpty()
+	displayedName: string;
 
 	@Validate(ResourceIdExists)
 	@IsNotEmpty()
@@ -54,4 +66,16 @@ export class CreateBadgeDefDto {
 	@IsString()
 	@IsOptional()
 	league: string;
+
+	@MaxDateField(['endDate'])
+	@IsDate()
+	@IsOptional()
+	@Type(() => Date)
+	startDate: Date;
+
+	@MinDateField(['startDate'])
+	@IsDate()
+	@IsOptional()
+	@Type(() => Date)
+	endDate: Date;
 }

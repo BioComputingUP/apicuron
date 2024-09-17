@@ -23,6 +23,9 @@ export class BadgeDef {
 	@Prop({ required: true })
 	name: string;
 
+	@Prop({ required: true })
+	displayedName: string;
+
 	@Prop()
 	resource_uri: string;
 
@@ -40,6 +43,13 @@ export class BadgeDef {
 		required: true,
 	})
 	color_code: string;
+
+	// date bounds
+	@Prop({ required: false })
+	startDate?: Date;
+
+	@Prop({ required: false })
+	endDate?: Date;
 
 	league: string;
 	privacy: PrivacyType;

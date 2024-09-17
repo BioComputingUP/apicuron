@@ -1,7 +1,13 @@
-import { IsOptional, Matches, Min, Validate, IsString } from 'class-validator';
+import {
+	IsOptional,
+	Matches,
+	Min,
+	Validate,
+	IsString,
+	IsDate,
+	MaxDate,
+} from 'class-validator';
 import { FilterQuery } from 'mongoose';
-import { AchievementType } from '../../core/enums';
-import { AchievementDef } from '../../core/schemas/achievements-def/achievement-def.schema';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
@@ -12,6 +18,11 @@ import {
 	BadgeDef,
 	BadgeDefDocument,
 } from '../../core/schemas/achievements-def/badge-def.schema';
+import { Type } from 'class-transformer';
+import {
+	MaxDateField,
+	MinDateField,
+} from '../../medals/validators/date-comparison';
 
 export class UpdateBadgeDefDto {
 	// mandatory identifier fields
@@ -51,6 +62,9 @@ export class UpdateBadgeDefDto {
 	league: string;
 
 	// optional update fields
+	@IsString()
+	@IsOptional()
+	displayedName: string;
 
 	@IsOptional()
 	category: string;
@@ -70,4 +84,16 @@ export class UpdateBadgeDefDto {
 	@Validate(ActivityTermExists, [{ each: true }])
 	@IsOptional()
 	list_terms: string[];
+
+	@MaxDateField(['endDate'], true)
+	@IsDate()
+	@IsOptional()
+	@Type(() => Date)
+	startDate: Date;
+
+	@MinDateField(['startDate'], true)
+	@IsDate()
+	@IsOptional()
+	@Type(() => Date)
+	endDate: Date;
 }

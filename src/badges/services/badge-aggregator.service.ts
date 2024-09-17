@@ -125,6 +125,7 @@ export class BadgeAggregatorService implements Aggregator {
 				{
 					$inc: { count: 1 },
 					$setOnInsert: {
+						displayedName: badgeDef.displayedName,
 						color_code: badgeDef.color_code,
 						count_threshold: badgeDef.count_threshold,
 						list_terms: badgeDef.list_terms,
