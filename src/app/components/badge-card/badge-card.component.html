@@ -3,25 +3,31 @@
     [ngClass]="{ 'tw-shadow-md tw-shadow-gray-400': enableShadow }">
     <div class="tw-flex tw-flex-row tw-justify-between">
       <div class="tw-flex tw-grow tw-flex-col tw-pl-2">
-        <div class="tw-block">
-          <span class="tw-block tw-text-sm sm:tw-text-base tw-font-dm-sans tw-font-bold">
-            {{ badge.displayedName }}
-          </span>
-          <span class="tw-inline"></span>
-        </div>
+        <div class="tw-flex tw-flex-row tw-justify-between">
+          <div>
+            <span class="tw-block tw-text-sm sm:tw-text-base tw-font-dm-sans tw-font-bold tw-pb-1">
+              {{ badge.displayedName }}
+            </span>
 
-        <span class="tw-block tw-text-xs tw-text-gray-500 tw-font-light tw-pb-1">
-          &emsp;Requires completing
-          <span class="tw-font-bold">{{ badge.count_threshold }} </span>
-          <span
-            cdkOverlayOrigin
-            #activities_list
-            (mouseenter)="setOverlayState(true)"
-            (mouseleave)="setOverlayState(false, 300)"
-            class="tw-font-bold tw-underline tw-cursor-pointer">
-            {{ badge.count_threshold > 1 ? "activities" : "activity" }}
-          </span>
-        </span>
+            <span class="tw-block tw-text-xs tw-text-gray-500 tw-font-light tw-pb-1">
+              &emsp;Requires completing
+              <span class="tw-font-bold">{{ badge.count_threshold }} </span>
+              <span
+                cdkOverlayOrigin
+                #activities_list
+                (mouseenter)="setOverlayState(true)"
+                (mouseleave)="setOverlayState(false, 300)"
+                class="tw-font-bold tw-underline tw-cursor-pointer">
+                {{ badge.count_threshold > 1 ? "activities" : "activity" }}
+              </span>
+            </span>
+          </div>
+
+          <svg-icon
+            src="assets/svg/badge_check.svg"
+            svgClass="tw-w-8 lg:tw-w-12 tw-mx-auto">
+          </svg-icon>
+        </div>
 
         <span *ngIf="badge.state == AchievementState.achieved">
           <!-- if only start date is defined -->
@@ -59,31 +65,23 @@
 
         <span *ngIf="badge.state == AchievementState.progress">
           <span class="tw-text-xs tw-font-bold tw-text-gray-700">in progress</span>
-          <span role="progressbar" class="tw-relative tw-block tw-rounded-full tw-bg-gray-200 tw-overflow-hidden">
+          <span role="progressbar" class="tw-relative tw-block tw-rounded-full tw-bg-gray-200">
             
-            <span class="tw-absolute tw-inset-0 tw-flex tw-items-center tw-justify-center tw-text-[10px]/4 tw-font-bold"
-            [ngClass]="{
-              'tw-text-gray-100': badge.progressRate > 50,
-              'tw-text-gray-700': badge.progressRate <= 50
-            }">
-              {{ badge.progressRate }}%
-            </span>
+            <span class="tw-absolute tw-inset-0 tw-flex tw-items-center tw-justify-center tw-text-[10px]/4 tw-font-bold" 
+            [ngClass]="{ 'tw-text-gray-100': badge.progressRate > 50, 'tw-text-gray-700': badge.progressRate <= 50 }">
+            <!-- <span class="tw-absolute tw-inset-0 tw-flex tw-items-center tw-justify-center tw-text-[10px]/4 tw-font-bold tw-mix-blend-difference
+            tw-text-white"> -->
+            {{ badge.progressRate }}%</span>
             
             <!-- Progress Bar -->
             <span class="tw-block tw-h-4 tw-rounded-full tw-bg-gradient-to-r tw-from-apicuron-purple tw-to-apicuron-red tw-text-center" [style]="{ width: badge.progressRate + '%'}">
-            <!-- <span class="tw-block tw-h-4 tw-rounded-full tw-bg-gradient-to-r tw-from-apicuron-purple tw-to-apicuron-red tw-text-center" style="width: 80%"> -->
+            <!-- <span class="tw-block tw-h-4 tw-rounded-full tw-bg-gradient-to-r tw-from-apicuron-purple tw-to-apicuron-red tw-text-center" style="width: 50%"> -->
             </span>
           </span>
 
 
         </span>
       </div>
-
-      <svg-icon
-        src="assets/svg/badge_check.svg"
-        svgClass="tw-w-8 lg:tw-w-12 tw-mx-auto">
-      </svg-icon>
-
     </div>
   </div>
 

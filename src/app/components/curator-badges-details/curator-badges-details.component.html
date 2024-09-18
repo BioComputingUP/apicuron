@@ -10,7 +10,7 @@
     <div class="tw-mt-6 tw-relative">
         <div class="tw-flex tw-flex-row tw-flex-wrap">
             <ng-container *ngIf="badges$ | async as badges">
-                <div class="tw-w-1/4 tw-p-1" *ngFor="let badge of badges.data">
+                <div class="tw-w-1/3 tw-p-1" *ngFor="let badge of badges.data">
                     <badge-card [badge]="badge" [terms]="(terms$ | async)" ></badge-card>
                 </div>
             </ng-container>
