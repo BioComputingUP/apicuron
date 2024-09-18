@@ -1,35 +1,44 @@
-import {
-  Component,
-  ElementRef,
-  Input,
-  OnInit,
-  TemplateRef,
-  ViewChild,
-} from "@angular/core";
-import { CommonModule } from "@angular/common";
+import { Component, Input, OnInit } from "@angular/core";
+import { CommonModule, DatePipe } from "@angular/common";
 import { AchievementState, Badge } from "src/app/models/badge.model";
 import { AngularSvgIconModule } from "angular-svg-icon";
-import { NgxPopperModule } from "ngx-popper";
 import { Term } from "src/app/models/term.model";
-import { BehaviorSubject, Observable, ReplaySubject } from "rxjs";
-import { map } from "rxjs/operators";
+import {
+  BehaviorSubject,
+  combineLatest,
+  Observable,
+  ReplaySubject,
+  Subscription,
+  timer,
+} from "rxjs";
+import { map, tap } from "rxjs/operators";
+import moment from "moment";
+import { OverlayModule } from "@angular/cdk/overlay";
 @Component({
   standalone: true,
+  imports: [CommonModule, OverlayModule, AngularSvgIconModule],
   selector: "badge-card",
-  imports: [CommonModule, AngularSvgIconModule, NgxPopperModule],
   templateUrl: "./badge-card.component.html",
-  styleUrls: [],
+  styleUrls: ['./badge-card.component.scss'],
 })
 export class BadgeCardComponent implements OnInit {
   badge$ = new ReplaySubject<Badge>();
   badgeInProgress$: Observable<boolean>;
   AchievementState = AchievementState;
+  formattedAchievedAt$: Observable<string>;
+
+  constructor() {
+    this.formattedAchievedAt$ = this.formatAchievedAt();
+  }
 
   ngOnInit(): void {
-    this.termNames$ = this.terms$.asObservable().pipe(
-      map((terms: Term[]) => {
-        return this.terms.filter((term: Term) =>
-          this.badge.list_terms.includes(term.activity_term)
+    this.termNames$ = combineLatest([
+      this.terms$.asObservable(),
+      this.badge$.asObservable(),
+    ]).pipe(
+      map(([terms, badge]: [Term[], Badge]) => {
+        return terms.filter((term: Term) =>
+          badge.list_terms.includes(term.activity_term)
         );
       }),
       map((terms: Term[]) => {
@@ -44,6 +53,8 @@ export class BadgeCardComponent implements OnInit {
 
   terms$: BehaviorSubject<Term[]> = new BehaviorSubject([]);
   termNames$: Observable<string[]>;
+
+  thresholdDate = moment().subtract(30, "days").toDate();
 
   @Input()
   enableShadow = true;
@@ -60,5 +71,38 @@ export class BadgeCardComponent implements OnInit {
     if (!!value && value instanceof Array && value.length > 0) {
       this.terms$.next(value);
     }
+  }
+  private overlayState$ = new BehaviorSubject<boolean>(false);
+
+  overlayOpen$: Observable<boolean> = this.overlayState$.asObservable();
+  closeTimeoutSubscription: Subscription | undefined;
+
+  setOverlayState(state: boolean, timeout = 100) {
+    if (!state) {
+      this.closeTimeoutSubscription = timer(timeout)
+        .pipe(tap(() => this.overlayState$.next(state)))
+        .subscribe();
+      return;
+    }
+    if (this.closeTimeoutSubscription) {
+      this.closeTimeoutSubscription.unsubscribe();
+    }
+    this.overlayState$.next(state);
+  }
+
+  formatBadgeDate(date: Date): string {
+    return moment(date).startOf("day").fromNow();
+  }
+
+  formatAchievedAt(): Observable<string> {
+    return this.badge$.pipe(
+      map((badge: Badge) =>
+        badge.achieved_at > this.thresholdDate
+          ? "The " +
+            new DatePipe("UTC").transform(badge.achieved_at, "dd-MM-yyyy") +
+            " UTC"
+          : this.formatBadgeDate(badge.achieved_at)
+      )
+    );
   }
 }

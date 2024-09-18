@@ -10,12 +10,16 @@ import { User } from "src/app/models/User.model";
 import { Badge } from "src/app/models/badge.model";
 import { Resource } from "src/app/models/resource.model";
 import { PaginationComponent } from "src/app/pagination/pagination.component";
+import { TermsModule } from "../../terms/terms.module";
+import { TermsService } from "../../terms/services/terms.service";
+import { TermsFilter } from "../../terms/models/terms-filter";
+import { Term } from "../../models/term.model";
 
 
 @Component({
     standalone: true,
     selector: 'curator-badges-details',
-    imports: [CommonModule, BadgeCardComponent, PaginationComponent],
+    imports: [CommonModule, TermsModule, BadgeCardComponent, PaginationComponent],
     templateUrl: './curator-badges-details.component.html',
     styleUrls: [],
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -26,6 +30,7 @@ export class CuratorBadgesDetailsComponent {
     @Input() curator: User;
     @Input() resource: Resource;
     badges$: Observable<Paginated<Badge>>;
+    terms$: Observable<Term[]>;
 
     get currentPage (){
         const val = this.badgeFilter$.value
@@ -44,11 +49,17 @@ export class CuratorBadgesDetailsComponent {
 
     badgeFilter$: BehaviorSubject<AchievementFilter> = new BehaviorSubject(null);
 
-    constructor(protected badgeService: BadgesService) {}
+    constructor(protected badgeService: BadgesService, protected termService: TermsService) {}
 
     
 
-    
+    loadTerms(){
+        const termFilter = new TermsFilter()
+        termFilter.resource_id = this.resource.resource_id
+        return this.termService.getTerms(termFilter).pipe(
+            shareReplay(1)
+        )
+    }
 
     ngOnInit(): void {
         const badgeFilter = AchievementFilter.create({
@@ -66,6 +77,8 @@ export class CuratorBadgesDetailsComponent {
             }),
             shareReplay(1)
         )
+
+        this.terms$ = this.loadTerms()
     }
 
 }

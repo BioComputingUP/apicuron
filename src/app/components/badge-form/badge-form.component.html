@@ -3,16 +3,25 @@
     class="tw-bg-white tw-grid tw-grid-flow-row tw-grid-cols-1 tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4"
   >
     <h2 *ngIf="type == 'create'" class="tw-text-xl tw-text-center tw-font-bold">
-      Create a new Badge "{{ this.form.get("name").value }}"
+      Create a new Badge "{{ this.form.get("displayedName").value }}"
     </h2>
 
     <h2 *ngIf="type == 'update'" class="tw-text-xl tw-text-center tw-font-bold">
-      Updating Badge "{{ this.form.get("name").value }}"
+      Updating Badge "{{ this.form.get("displayedName").value }}"
     </h2>
     <ng-container *ngIf="type == 'create'">
       <div class="form-control-element">
         <label for="name">Badge Name</label>
-        <input type="text" name="" id="" formControlName="name" />
+        <input type="text" name="" id="" formControlName="displayedName" />
+      </div>
+
+      <div class="form-control-element">
+        <label for="name">Badge Identifier</label>
+        <input type="text" formControlName="name" />
+        <small class="tw-block tw-text-xs tw-text-gray-500 tw-font-light"
+          >This value is used as an identifier in the API, not displayed
+          publicly</small
+        >
       </div>
     </ng-container>
 
@@ -57,6 +66,42 @@
       >
         Color code is required
       </small>
+    </div>
+
+    <div class="tw-px-2">
+      <label> Start Date</label>
+      <p-calendar
+        formControlName="startDate"
+        [showIcon]="true"
+        [maxDate]="form.get('endDate').value"
+        [showClear]="true"
+        [readonlyInput]="true"
+      ></p-calendar>
+      <small class="tw-block tw-text-xs tw-text-gray-500 tw-font-light"
+        >This field allows you to decide when
+        <span class="tw-font-bold"
+          >the period the badge considers for counting</span
+        >
+        begins.</small
+      >
+    </div>
+
+    <div class="tw-px-2">
+      <label> End Date</label>
+      <p-calendar
+        formControlName="endDate"
+        [showIcon]="true"
+        [minDate]="form.get('startDate').value"
+        [showClear]="true"
+        [readonlyInput]="true"
+      ></p-calendar>
+      <small class="tw-block tw-text-xs tw-text-gray-500 tw-font-light"
+        >This field allows you to decide when
+        <span class="tw-font-bold"
+          >the period the badge considers for counting</span
+        >
+        ends.</small
+      >
     </div>
 
     <div class="form-control-element">
