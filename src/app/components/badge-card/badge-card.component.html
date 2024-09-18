@@ -65,23 +65,17 @@
 
         <span *ngIf="badge.state == AchievementState.progress">
           <span class="tw-text-xs tw-font-bold tw-text-gray-700">in progress</span>
-          <span role="progressbar" class="tw-relative tw-block tw-rounded-full tw-bg-gray-200">
-            
-            <span class="tw-absolute tw-inset-0 tw-flex tw-items-center tw-justify-center tw-text-[10px]/4 tw-font-bold" 
-            [ngClass]="{ 'tw-text-gray-100': badge.progressRate > 50, 'tw-text-gray-700': badge.progressRate <= 50 }">
-            <!-- <span class="tw-absolute tw-inset-0 tw-flex tw-items-center tw-justify-center tw-text-[10px]/4 tw-font-bold tw-mix-blend-difference
-            tw-text-white"> -->
-            {{ badge.progressRate }}%</span>
-            
-            <!-- Progress Bar -->
+
+          <span role="progressbar" class="tw-relative tw-block tw-rounded-full tw-bg-gray-200 tw-w-4/5">
+            <span class="tw-absolute tw-inset-y-0 tw-right-[-3rem] tw-flex tw-items-center tw-pr-2 tw-text-[10px]/4 tw-font-bold tw-text-black">
+              {{ badge.progressRate }}%
+            </span>
             <span class="tw-block tw-h-4 tw-rounded-full tw-bg-gradient-to-r tw-from-apicuron-purple tw-to-apicuron-red tw-text-center" [style]="{ width: badge.progressRate + '%'}">
             <!-- <span class="tw-block tw-h-4 tw-rounded-full tw-bg-gradient-to-r tw-from-apicuron-purple tw-to-apicuron-red tw-text-center" style="width: 50%"> -->
             </span>
           </span>
-
-
         </span>
-      </div>
+        </div>
     </div>
   </div>
 
