@@ -44,8 +44,6 @@ export class WeeklyStatisticsService {
 				},
 			],
 		};
-		console.debug('----statFilter----');
-		console.debug(JSON.stringify(statFilter, null, 2));
 		const [statistics, count] = await Promise.all([
 			this.WeeklyStatistics.find(statFilter, null, {
 				...queryOptions,
