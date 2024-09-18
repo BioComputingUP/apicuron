@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input, OnInit } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { filter, shareReplay, switchMap } from "rxjs/operators";
 import { AchievementFilter } from "src/app/achievements/interfaces/achievement-filter";
@@ -25,7 +25,7 @@ import { Term } from "../../models/term.model";
     changeDetection: ChangeDetectionStrategy.OnPush
 
 })
-export class CuratorBadgesDetailsComponent {
+export class CuratorBadgesDetailsComponent implements OnInit {
 
     @Input() curator: User;
     @Input() resource: Resource;
@@ -80,5 +80,4 @@ export class CuratorBadgesDetailsComponent {
 
         this.terms$ = this.loadTerms()
     }
-
 }
