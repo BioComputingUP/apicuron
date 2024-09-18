@@ -110,7 +110,6 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
     );
 
     this.badgeFilter$ = combineLatest([this.resource$, this.page$]).pipe(
-      tap(console.log),
       map(([{ resource_id }, page]: [Resource, number]) => {
         return BadgeDefFilter.create({
           resource_id,
@@ -222,7 +221,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
 
   createBadge(badgeDef: BadgeDef) {
     this.badgeDefService
-      .createBadgeDef(badgeDef)
+      .createBadgeDef(badgeDef).pipe(take(1))
       .subscribe((data: BadgeDef) => {
         if (data) {
           this.addBadgeToUI(data);

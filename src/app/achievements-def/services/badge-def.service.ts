@@ -46,7 +46,6 @@ export class BadgeDefService {
           }
           return throwError(error);
         }),
-        pluck("data"),
         map(({ data }: { data: BadgeDef }) => new BadgeDef().deserialize(data)),
         tap((badgeDef: BadgeDef) => {
           this.toastr.success(
