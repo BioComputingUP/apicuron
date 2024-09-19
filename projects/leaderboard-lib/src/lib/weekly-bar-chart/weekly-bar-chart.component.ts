@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { LeaderboardComponent } from '../leaderboard/leaderboard.component';
-import { WeeklyLeaderboardComponent } from '../weekly-leaderboard/weekly-leaderboard.component';
+import { WeeklyLeaderboardComponent } from 'projects/leaderboard-lib/src/lib/weekly-leaderboard/weekly-leaderboard.component';
 import Chart from 'chart.js/auto';
 
 @Component({

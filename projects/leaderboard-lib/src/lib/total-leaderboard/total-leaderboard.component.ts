@@ -18,39 +18,44 @@ import {
   combineLatest,
 } from "rxjs";
 import { Resource } from "src/app/models/resource.model";
-import { User } from "src/app/models/User.model";
-import { map, shareReplay, startWith, switchMap } from "rxjs/operators";
-import { CuratorWithStats } from "src/app/curator-statistics/models/curator-stats";
-import { StatisticsFilter } from "src/app/curator-statistics/models/statistics-filter";
+import { map, shareReplay, switchMap, tap } from "rxjs/operators";
 import { Paginated } from "src/app/interfaces/paginated";
-import { WeeklyBarChartComponent } from "../weekly-bar-chart/weekly-bar-chart.component";
 import { CuratorStatisticsService } from "src/app/curator-statistics/services/curator-statistics.service";
-import { LeaderboardFilter } from "../../databases/interfaces/leaderboard-filter";
-import { WeeklyLeaderboardEntry } from "../../databases/interfaces/leaderboard-entry";
-
+import { LeaderboardFilter } from "../../../../../src/app/databases/interfaces/leaderboard-filter";
+import { AngularSvgIconModule } from "angular-svg-icon";
+import { LeaderboardEntry } from "../../../../../src/app/databases/interfaces/leaderboard-entry";
 @Component({
   standalone: true,
-  selector: "weekly-leaderboard",
-  templateUrl: "./weekly-leaderboard.component.html",
-  imports: [CommonModule, LeaderboardComponent, WeeklyBarChartComponent, RouterModule],
+  selector: "total-leaderboard",
+  templateUrl: "./total-leaderboard.component.html",
+  imports: [CommonModule, LeaderboardComponent, AngularSvgIconModule, RouterModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WeeklyLeaderboardComponent implements OnInit, OnDestroy {
+export class TotalLeaderboardComponent implements OnInit, OnDestroy {
   resource$ = new ReplaySubject<Resource>(1);
-  weeklyContributors$: Observable<number>;
+
+  @Input("resource") set resource(value: Resource) {
+    console.log("Resource Set", value);
+    this.resource$.next(value);
+  }
+
+  totalLeaderboard$: Observable<Paginated<LeaderboardEntry>>;
+  totalContributors$: Observable<number>;
+  leaderboardFilter$: Observable<LeaderboardFilter>;
   maxPage$: Observable<number>;
 
   destroy$ = new Subject();
   page$ = new BehaviorSubject<number>(1);
   limit = 10;
-  leaderboardFilter$: Observable<LeaderboardFilter>;
-  weeklyLeaderboard$: Observable<Paginated<WeeklyLeaderboardEntry>>;
 
-  tableColumnsWeekly: string[] = [
+  tableColumnsTotal: string[] = [
+    "medals_count",
+    "badges_count",
     "generation_count",
     "invalidation_count",
     "revision_count",
     "total_score",
+    "last_contribution",
   ];
 
   constructor(
@@ -59,10 +64,6 @@ export class WeeklyLeaderboardComponent implements OnInit, OnDestroy {
     protected route: ActivatedRoute,
     protected statService: CuratorStatisticsService
   ) {}
-
-  @Input("resource") set resource(value: Resource) {
-    this.resource$.next(value);
-  }
 
   ngOnInit(): void {
     this.leaderboardFilter$ = combineLatest([this.resource$, this.page$]).pipe(
@@ -75,21 +76,21 @@ export class WeeklyLeaderboardComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.weeklyLeaderboard$ = this.leaderboardFilter$.pipe(
+    this.totalLeaderboard$ = this.leaderboardFilter$.pipe(
       switchMap((filter: LeaderboardFilter) =>
-        this.leaderboardService.getWeeklyResourceLeaderboard(filter)
+        this.leaderboardService.getResourceLeaderboard(filter)
       ),
       shareReplay(1)
     );
 
-    this.weeklyContributors$ = this.weeklyLeaderboard$.pipe(
-      map((weeklyLeaderboard) => weeklyLeaderboard.meta.pagination.total)
+    this.totalContributors$ = this.totalLeaderboard$.pipe(
+      map((totalLeaderboard) => totalLeaderboard.meta.pagination.total)
     );
 
-    this.maxPage$ = this.weeklyLeaderboard$.pipe(
-      map((weeklyLeaderboard) =>
-        Math.ceil(weeklyLeaderboard.meta.pagination.total / this.limit)
-      )
+    this.maxPage$ = this.totalLeaderboard$.pipe(
+      map((totalLeaderboard) =>
+        Math.ceil(totalLeaderboard.meta.pagination.total / this.limit)
+      ),
     );
   }
 

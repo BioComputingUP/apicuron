@@ -1,7 +1,7 @@
 // import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { bootstrapApplication, createApplication } from "@angular/platform-browser"
-import { LeaderboardComponent } from "../../../src/app/components/leaderboard/leaderboard.component"
+import { LeaderboardComponent } from "../../leaderboard-lib/src/lib/leaderboard/leaderboard.component"
 import { NgZone, importProvidersFrom } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { CuratorStatisticsModule } from "../../../src/app/curator-statistics/curator-statistics.module"

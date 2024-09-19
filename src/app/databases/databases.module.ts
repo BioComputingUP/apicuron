@@ -15,10 +15,11 @@ import { BadgeDefCardComponent } from "../components/badge-def-card/badge-def-ca
 import { MedalDefCardComponent } from "../components/medal-def-card/medal-def-card.component";
 import { AchievementsDefModule } from "../achievements-def/achievements-def.module";
 import { TermsModule } from "../terms/terms.module";
-import { LeaderboardComponent } from "../components/leaderboard/leaderboard.component";
-import { TotalLeaderboardComponent } from "../components/total-leaderboard/total-leaderboard.component";
-import { WeeklyLeaderboardComponent } from "../components/weekly-leaderboard/weekly-leaderboard.component";
+import { LeaderboardComponent } from "../../../projects/leaderboard-lib/src/lib/leaderboard/leaderboard.component";
+import { TotalLeaderboardComponent } from "../../../projects/leaderboard-lib/src/lib/total-leaderboard/total-leaderboard.component";
+import { WeeklyLeaderboardComponent } from "../../../projects/leaderboard-lib/src/lib/weekly-leaderboard/weekly-leaderboard.component";
 import { CdkAccordionModule } from "@angular/cdk/accordion";
+import { LeaderboardLibComponent } from "projects/leaderboard-lib/src/public-api";
 @NgModule({
   declarations: [
     DatabasesPageComponent,
@@ -43,7 +44,8 @@ import { CdkAccordionModule } from "@angular/cdk/accordion";
     LeaderboardComponent,
     TotalLeaderboardComponent,
     WeeklyLeaderboardComponent,
-  ],
+    LeaderboardLibComponent
+],
   providers: [DatabasesService],
   exports: [DatabasesPageComponent],
 })

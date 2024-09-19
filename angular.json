@@ -389,6 +389,39 @@
           }
         }
       }
+    },
+    "leaderboard-lib": {
+      "projectType": "library",
+      "root": "projects/leaderboard-lib",
+      "sourceRoot": "projects/leaderboard-lib/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/leaderboard-lib/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/leaderboard-lib/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/leaderboard-lib/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/leaderboard-lib/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
     }
   },
   "cli": {
