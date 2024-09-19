@@ -15,12 +15,9 @@ import {
 	DetailedStatAggregationResult,
 	DetailedStatisticsPipeline,
 } from '../aggregation/detailed-statistics-aggregation.service';
-import {
-	updateMaxDate,
-	updateMinDate,
-} from '../../weekly-statistics/helpers/fields-updater';
 import { months } from '../../core/enums';
 import { Logger } from '@nestjs/common';
+import { updateMaxDate, updateMinDate } from '../../util/date.helper';
 
 export class ComputeDetailedStatisticsService {
 	constructor(

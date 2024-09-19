@@ -5,7 +5,6 @@ import { UpdateResult } from 'mongodb';
 import { ResourceStatsDocument } from '../../core/schemas/resource/resource-stats.schema';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { User, UserDocument } from '../../core/schemas/user.schema';
-import { getLastDayDate, getLastWeekDate } from '../../util/date.helper';
 import {
 	PartnerResource,
 	PartnerResourceDocument,

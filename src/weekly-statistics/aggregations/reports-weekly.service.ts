@@ -10,8 +10,7 @@ import { DaysOfWeek, DayOfWeek } from '../../core/enums';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { getLastWeekDate } from '../../util/date.helper';
-import { TIMEZONE } from '../constants/start-of-week';
+import { TIMEZONE } from 'src/util/date.helper';
 
 export interface AggregatedReportsWeekly {
 	resource_id: string;

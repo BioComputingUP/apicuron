@@ -12,19 +12,19 @@ import {
 } from '../../core/schemas/statistics/weekly-statistics.schema';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import {
-	fromDate,
-	fromYearWeek,
-	getWeekEndUTC,
-	getWeekStartUTC,
-	updateMaxDate,
-	updateMinDate,
-} from '../helpers/fields-updater';
-import {
 	AggregatedReportsWeekly,
 	ReportsWeeklyAggregationPipeline,
 } from '../aggregations/reports-weekly.service';
 import { PrivacyType } from '../../core/enums';
 import { MongoServerError } from 'mongodb';
+import {
+	fromDate,
+	fromYearWeek,
+	getWeekStart,
+	getWeekEnd,
+	updateMinDate,
+	updateMaxDate,
+} from '../../util/date.helper';
 @Injectable()
 export class ComputeWeeklyStatisticsService {
 	logger = new Logger(ComputeWeeklyStatisticsService.name);
@@ -64,7 +64,7 @@ export class ComputeWeeklyStatisticsService {
 			first_contribution = report.first_contribution;
 			last_contribution = report.last_contribution;
 		}
-		const [start, end] = [getWeekStartUTC(week), getWeekEndUTC(week)];
+		const [start, end] = [getWeekStart(week), getWeekEnd(week)];
 		const stat = new this.weeklyStatModel({
 			curator_orcid: report.curator_orcid,
 			resource_id: report.resource_id,
@@ -93,7 +93,8 @@ export class ComputeWeeklyStatisticsService {
 			| LeanReportDocument,
 		termDoc?: TermDocument,
 	) {
-		if (report.timestamp < getWeekStartUTC()) {
+		if (report.timestamp < getWeekStart()) {
+			return;
 		}
 		const lastSavedReport = await this.reportModel
 			.findOne({
@@ -212,9 +213,8 @@ export class ComputeWeeklyStatisticsService {
 				currentStat.resource_id !== resource_id ||
 				currentStat.curator_orcid !== curator_orcid ||
 				currentStat.league !== league ||
-				currentStat.weekStart.getTime() !=
-					getWeekStartUTC(weekDate).getTime() ||
-				currentStat.weekEnd.getTime() != getWeekEndUTC(weekDate).getTime()
+				currentStat.weekStart.getTime() != getWeekStart(weekDate).getTime() ||
+				currentStat.weekEnd.getTime() != getWeekEnd(weekDate).getTime()
 			) {
 				saves$.push(currentStat.save());
 				currentStat = this.initStat(reportAgg);

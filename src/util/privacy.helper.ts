@@ -37,7 +37,6 @@ export function computePrivacyField(
 	const leaguePrivacy = resource.getLeague(league).visibility;
 	const userPrivacy = relatedUser?.privacy ?? PrivacyType.private;
 
-
 	// if one of them happens to be private, the privacyType of the entity will be private
 	if ([leaguePrivacy, userPrivacy].includes(PrivacyType.private)) {
 		userResourceEntity.privacy = PrivacyType.private;

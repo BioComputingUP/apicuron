@@ -19,11 +19,8 @@ import {
 	BaseReportIteratorResult,
 	StatisticsReportAggregator,
 } from '../aggregation/aggregate-reports.service';
-import {
-	updateMaxDate,
-	updateMinDate,
-} from '../../weekly-statistics/helpers/fields-updater';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { updateMaxDate, updateMinDate } from '../../util/date.helper';
 @Injectable()
 export class ComputeStatisticsService {
 	logger = new Logger(ComputeStatisticsService.name);
