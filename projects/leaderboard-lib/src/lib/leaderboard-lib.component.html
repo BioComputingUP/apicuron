@@ -1,0 +1,18 @@
+<div class="tw-bg-white tw-rounded-md tw-shadow-lg tw-p-1 md:tw-p-2 tw-text-gray-700" style="font-family: system-ui;"
+    *ngIf="resource$ | async as resource">
+	<h2 class="tw-font-bold tw-text-xl md:tw-text-2xl">
+        {{ resource.resource_name }} Leaderboard
+    </h2>
+	<div *ngIf="statsList$ | async as statsList">
+		<table>
+			<ng-container cdkColumnDef="medals_count">
+				<th cdk-header-cell *cdkHeaderDef>Medals</th>
+				<td cdk-cell *cdkCellDef="let row">{{ row.stat.medals_count }}</td>
+			</ng-container>
+
+			<tr cdk-header-row *cdkHeaderRowDef="displayedColumns"></tr>
+			<tr cdk-row *cdkRowDef="let row; columns: displayedColumns;"></tr>
+		</table>
+	</div>
+</div>
+

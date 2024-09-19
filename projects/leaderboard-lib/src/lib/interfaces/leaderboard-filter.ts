@@ -1,4 +1,4 @@
-import { Serializable } from "../../interfaces/deserializable.model";
+import { Serializable } from "../../../../../src/app/interfaces/deserializable.model";
 
 export class LeaderboardFilter implements Serializable {
   constructor(resource_id: string, skip: number, limit: number) {

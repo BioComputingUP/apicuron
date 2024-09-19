@@ -8,7 +8,7 @@ import { User } from "../../../../src/app/models/User.model";
 import { environment } from "../../../../src/environments/environment";
 import { LeaderboardEntry } from "./models/leaderboard.model";
 import { Observable } from "rxjs";
-import { LeaderboardFilter } from "../../../../src/app/databases/interfaces/leaderboard-filter";
+import { LeaderboardFilter } from "../../../leaderboard-lib/src/lib/interfaces/leaderboard-filter";
 
 
 

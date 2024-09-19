@@ -5,7 +5,7 @@ import {
   OnDestroy,
   OnInit,
 } from "@angular/core";
-import { LeaderboardComponent } from "../leaderboard/leaderboard.component";
+import { LeaderboardLibComponent } from "../leaderboard-lib.component";
 import { LeaderboardService } from "src/app/databases/services/leaderboard.service";
 import { ResourcesService } from "src/app/resource/service/resources.service";
 import { ActivatedRoute, RouterModule } from "@angular/router";
@@ -25,14 +25,14 @@ import { StatisticsFilter } from "src/app/curator-statistics/models/statistics-f
 import { Paginated } from "src/app/interfaces/paginated";
 import { WeeklyBarChartComponent } from "../weekly-bar-chart/weekly-bar-chart.component";
 import { CuratorStatisticsService } from "src/app/curator-statistics/services/curator-statistics.service";
-import { LeaderboardFilter } from "../../../../../src/app/databases/interfaces/leaderboard-filter";
-import { WeeklyLeaderboardEntry } from "../../../../../src/app/databases/interfaces/leaderboard-entry";
+import { LeaderboardFilter } from "../interfaces/leaderboard-filter";
+import { WeeklyLeaderboardEntry } from "../interfaces/leaderboard-entry";
 
 @Component({
   standalone: true,
   selector: "weekly-leaderboard",
   templateUrl: "./weekly-leaderboard.component.html",
-  imports: [CommonModule, LeaderboardComponent, WeeklyBarChartComponent, RouterModule],
+  imports: [CommonModule, LeaderboardLibComponent, WeeklyBarChartComponent, RouterModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WeeklyLeaderboardComponent implements OnInit, OnDestroy {

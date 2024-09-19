@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { LeaderboardComponent } from '../leaderboard/leaderboard.component';
+import { LeaderboardLibComponent } from '../leaderboard-lib.component';
 import { WeeklyLeaderboardComponent } from 'projects/leaderboard-lib/src/lib/weekly-leaderboard/weekly-leaderboard.component';
 import Chart from 'chart.js/auto';
 
@@ -8,7 +8,7 @@ import Chart from 'chart.js/auto';
   selector: 'weekly-bar-chart',
   templateUrl: './weekly-bar-chart.component.html',
   imports: [
-    LeaderboardComponent,
+    LeaderboardLibComponent,
     WeeklyLeaderboardComponent
   ],
 })

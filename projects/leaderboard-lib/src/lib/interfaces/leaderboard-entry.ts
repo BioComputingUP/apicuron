@@ -1,9 +1,6 @@
-import { Deserializable } from "../../interfaces/deserializable.model";
-import {
-  BaseCuratorStatistics,
-  WeeklyCuratorStatistics,
-} from "../../models/statistics.model";
-import { User } from "../../models/User.model";
+import { Deserializable } from "../../../../../src/app/interfaces/deserializable.model";
+import { BaseCuratorStatistics, WeeklyCuratorStatistics } from "../../../../../src/app/models/statistics.model";
+import { User } from "../../../../../src/app/models/User.model";
 
 export class LeaderboardEntry implements Deserializable {
   user: User;

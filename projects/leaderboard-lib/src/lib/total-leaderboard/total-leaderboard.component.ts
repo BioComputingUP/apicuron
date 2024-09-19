@@ -5,7 +5,7 @@ import {
   OnDestroy,
   OnInit,
 } from "@angular/core";
-import { LeaderboardComponent } from "../leaderboard/leaderboard.component";
+import { LeaderboardLibComponent } from "../leaderboard-lib.component";
 import { LeaderboardService } from "src/app/databases/services/leaderboard.service";
 import { ResourcesService } from "src/app/resource/service/resources.service";
 import { ActivatedRoute, RouterModule } from "@angular/router";
@@ -21,14 +21,14 @@ import { Resource } from "src/app/models/resource.model";
 import { map, shareReplay, switchMap, tap } from "rxjs/operators";
 import { Paginated } from "src/app/interfaces/paginated";
 import { CuratorStatisticsService } from "src/app/curator-statistics/services/curator-statistics.service";
-import { LeaderboardFilter } from "../../../../../src/app/databases/interfaces/leaderboard-filter";
+import { LeaderboardFilter } from "../interfaces/leaderboard-filter";
 import { AngularSvgIconModule } from "angular-svg-icon";
-import { LeaderboardEntry } from "../../../../../src/app/databases/interfaces/leaderboard-entry";
+import { LeaderboardEntry } from "../interfaces/leaderboard-entry";
 @Component({
   standalone: true,
   selector: "total-leaderboard",
   templateUrl: "./total-leaderboard.component.html",
-  imports: [CommonModule, LeaderboardComponent, AngularSvgIconModule, RouterModule],
+  imports: [CommonModule, LeaderboardLibComponent, AngularSvgIconModule, RouterModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TotalLeaderboardComponent implements OnInit, OnDestroy {
