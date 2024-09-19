@@ -13,7 +13,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Model } from 'mongoose';
 import { IEventHandler } from '@nestjs/cqrs';
-import { Observable, Subject, concatMap, takeUntil } from 'rxjs';
+import {
+	EMPTY,
+	Observable,
+	Subject,
+	catchError,
+	concatMap,
+	takeUntil,
+} from 'rxjs';
 import { BaseAggregatorRunner } from '../aggregator-runners/base.runner';
 import { Aggregator } from '../interfaces/aggregator.interface';
 
@@ -43,12 +50,23 @@ export class ReportSubmittedEventHandler
 				concatMap(({ payload, callback }): Observable<any> => {
 					return new Observable((subscriber) => {
 						this.processReport(payload)
+							.catch((err) => {
+								this.logger.error(
+									`Error Processing report for resource "${payload.report.resource_id}" from user ${payload.report.curator_orcid}:${payload?.user?.displayedName}`,
+									err,
+								);
+								subscriber.error(err);
+							})
 							.then(callback)
 							.then((v) => {
 								subscriber.next(v);
 								subscriber.complete();
 							});
 					});
+				}),
+				catchError((err) => {
+					this.logger.error('Error processing report', err);
+					return EMPTY;
 				}),
 				takeUntil(this.destroy$),
 			)
