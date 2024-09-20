@@ -1,12 +1,13 @@
-import { ElementRef, Input } from '@angular/core';
-import { Directive } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
 
-@Directive({
+@Component({
   standalone: true,
-  selector: '[tableScore]'
+  imports: [CommonModule],
+  selector: '.score-cell',
+  template: `{{ cell | number }} {{ row | json}}`,
 })
-export class TableScoreDirective {
-  constructor(private elementRef: ElementRef) {}
-  
-  @Input() score: number;
+export class TableScoreComponent {
+  @Input() cell: number;
+  @Input() row: any;
 }

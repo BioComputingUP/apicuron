@@ -1,58 +1,53 @@
-import { Component, Injector, Input } from '@angular/core';
-import { Observable, ReplaySubject } from 'rxjs';
+import { Component, Inject, Input, OnInit } from '@angular/core';
+import { ReplaySubject } from 'rxjs';
 import { Resource } from 'src/app/models/resource.model';
-import { TableDateComponent } from './table-date/table-date.component';
-
 import { CommonModule } from '@angular/common';
 import { CdkTableModule } from '@angular/cdk/table';
-import { LeaderboardEntry } from 'projects/leaderboard-lib/src/lib/interfaces/leaderboard-entry';
+import { TABLE_CONFIG, ColumnDef, TableConfig } from './leaderboard-config';
+import { LeaderboardLibModule } from './leaderboard-lib.module';
 
 @Component({
   standalone: true,
   selector: 'lib-leaderboard-lib',
   templateUrl: "../lib/leaderboard-lib.component.html",
-  imports: [CommonModule, CdkTableModule, TableDateComponent],
+  imports: [CommonModule, CdkTableModule, LeaderboardLibModule],
   styles: []
 })
-export class LeaderboardLibComponent {
-  displayedColumns: string[] = ['medals_count', 'badges_count', 'generation_count', 'invalidation_count', 'revision_count', 'total_count']
+export class LeaderboardLibComponent implements OnInit {
+  columns: string[] = [
+    'medals_count', 
+    'badges_count', 
+    'generation_count', 
+    'invalidation_count', 
+    'revision_count', 
+    'total_count', 
+    'last_contribution',
+  ];
 
-  statsList$: Observable<LeaderboardEntry[]>;
+  table: ColumnDef[] = [];
+
+  constructor(@Inject(TABLE_CONFIG) private config: TableConfig) { }
+
+  data = [
+    { 
+      medals_count: 15,
+      badges_count: 10,
+      generation_count: 5,
+      invalidation_count: 2,
+      revision_count: 7,
+      total_count: 24,
+      last_contribution: new Date(),
+    },
+  ];
+
   resource$: ReplaySubject<Resource> = new ReplaySubject<Resource>(1);
   @Input("resource") set resource(value: Resource) {
     this.resource$.next(value);
   }
 
-
-  data = [
-    {
-      today: new Date()
-    }
-  ]
-
-  injectorFactory = (data: any, field: string) => {
-    return Injector.create([
-      {
-        provide: 'CELL_TOKEN',
-        useValue: data[field]
-      },
-      {
-        provide: 'ROW_TOKEN',
-        useValue: data
-      }
-    ])
+  ngOnInit(): void {
+    this.columns = this.config.columnDefs.map(col => col.field);
+    this.table = this.config.columnDefs;
   }
-
-
-  table = [
-    {
-      cellComponent: TableDateComponent,
-      field: 'today',
-      columnName: 'Today\'s date',
-    }
-  ]
-
-  columns =['today']
-
 
 }

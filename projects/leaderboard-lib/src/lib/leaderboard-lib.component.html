@@ -3,16 +3,16 @@
 	<h2 class="tw-font-bold tw-text-xl md:tw-text-2xl">
         {{ resource.resource_name }} Leaderboard
     </h2>
-	<div >
+	<div>
 		<table cdk-table [dataSource]="data">
 			<ng-container *ngFor="let column of table">
 				<ng-container [cdkColumnDef]="column.field">
 					<th cdk-header-cell *cdkHeaderCellDef>{{ column.columnName }}</th>
-					<td cdk-cell *cdkCellDef="let element" [ngClass]="{'date-cell': true}" [row]="element" [cell]="element[column.field]"></td>
+					<td cdk-cell *cdkCellDef="let element">{{ element[column.field] }}</td>
 				</ng-container>
 			</ng-container>
 			<tr cdk-header-row *cdkHeaderRowDef="columns"></tr>
-			 <tr cdk-row *cdkRowDef="let row; columns: columns;"></tr>
+			<tr cdk-row *cdkRowDef="let row; columns: columns;"></tr>
 		</table>
 	</div>
 </div>

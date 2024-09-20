@@ -1,12 +1,14 @@
-import { ElementRef, Input } from '@angular/core';
-import { Directive } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
 
-@Directive({
+@Component({
   standalone: true,
-  selector: '[tableString]',
+  imports: [CommonModule],
+  selector: '.string-cell',
+  template: `{{ cell }} {{ row | json }}`,
 })
-export class TableStringDirective {
-  constructor(private elementRef: ElementRef) {}
-  
-  @Input() string: string;
+
+export class TableStringComponent {
+  @Input() cell: string;
+  @Input() row: any;
 }
