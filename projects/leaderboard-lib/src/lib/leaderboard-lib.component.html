@@ -5,12 +5,13 @@
     </h2>
 	<div>
 		<table cdk-table [dataSource]="data">
-			<ng-container *ngFor="let column of table">
-				<ng-container [cdkColumnDef]="column.field">
-					<th cdk-header-cell *cdkHeaderCellDef>{{ column.columnName }}</th>
-					<td cdk-cell *cdkCellDef="let element">{{ element[column.field] }}</td>
-				</ng-container>
+			<ng-container *ngFor="let column of columns" [cdkColumnDef]="column">
+				<th cdk-header-cell *cdkHeaderCellDef>{{ column }}</th>
+				<td cdk-cell *cdkCellDef="let element">
+					<ng-container *ngComponentOutlet="dateComponent; injector: createInjector(element)"></ng-container>
+				</td>
 			</ng-container>
+			
 			<tr cdk-header-row *cdkHeaderRowDef="columns"></tr>
 			<tr cdk-row *cdkRowDef="let row; columns: columns;"></tr>
 		</table>

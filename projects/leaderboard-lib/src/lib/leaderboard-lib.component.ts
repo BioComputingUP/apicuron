@@ -1,32 +1,31 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Injector, Input, OnInit } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 import { Resource } from 'src/app/models/resource.model';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgComponentOutlet } from '@angular/common';
 import { CdkTableModule } from '@angular/cdk/table';
-import { TABLE_CONFIG, ColumnDef, TableConfig } from './leaderboard-config';
 import { LeaderboardLibModule } from './leaderboard-lib.module';
-
+import { TableDateComponent } from './table-date/table-date.component';
+import { ELEMENT_TOKEN } from './element-token';
 @Component({
   standalone: true,
   selector: 'lib-leaderboard-lib',
   templateUrl: "../lib/leaderboard-lib.component.html",
-  imports: [CommonModule, CdkTableModule, LeaderboardLibModule],
+  imports: [CommonModule, CdkTableModule, LeaderboardLibModule, NgComponentOutlet],
   styles: []
 })
 export class LeaderboardLibComponent implements OnInit {
+  dateComponent = TableDateComponent;
+  myInjector: Injector;
+
   columns: string[] = [
-    'medals_count', 
-    'badges_count', 
-    'generation_count', 
-    'invalidation_count', 
-    'revision_count', 
-    'total_count', 
-    'last_contribution',
+    'Medals', 
+    'Badges', 
+    'Generation Contributions', 
+    'Invalidation Contributions', 
+    'Revision Contributions', 
+    'Total Count', 
+    'Last Contribution Date',
   ];
-
-  table: ColumnDef[] = [];
-
-  constructor(@Inject(TABLE_CONFIG) private config: TableConfig) { }
 
   data = [
     { 
@@ -40,14 +39,20 @@ export class LeaderboardLibComponent implements OnInit {
     },
   ];
 
+  constructor(private injector: Injector) { }
+
   resource$: ReplaySubject<Resource> = new ReplaySubject<Resource>(1);
   @Input("resource") set resource(value: Resource) {
     this.resource$.next(value);
   }
 
-  ngOnInit(): void {
-    this.columns = this.config.columnDefs.map(col => col.field);
-    this.table = this.config.columnDefs;
+  ngOnInit(): void {}
+
+  createInjector(element: any): Injector {
+    return Injector.create({
+      providers: [{ provide: ELEMENT_TOKEN, useValue: element }],
+      parent: this.injector
+    });
   }
 
 }

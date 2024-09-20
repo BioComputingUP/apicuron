@@ -1,14 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
-
+import { Component, Inject } from '@angular/core';
+import { ELEMENT_TOKEN } from '../element-token';
 @Component({
   standalone: true,
   imports: [CommonModule],
-  selector: '.date-cell',
-  template: `{{ cell | date: 'yyyy' }} {{ row | json}}`,
+  selector: '[medals-cell]',
+  template: `<div>{{ element?.medals_count }}</div>`
 })
 export class TableDateComponent {
-  @Input() cell: Date;
-  @Input() row: any;
+  constructor(@Inject(ELEMENT_TOKEN) public element: any) {}
 }
-
