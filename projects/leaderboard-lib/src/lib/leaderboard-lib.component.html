@@ -1,14 +1,13 @@
 <div class="tw-bg-white tw-rounded-md tw-shadow-lg tw-p-1 md:tw-p-2 tw-text-gray-700" style="font-family: system-ui;"
     *ngIf="resource$ | async as resource">
-	<h2 class="tw-font-bold tw-text-xl md:tw-text-2xl">
-        {{ resource.resource_name }} Leaderboard
-    </h2>
-	<div>
-		<table cdk-table [dataSource]="data">
+	<h2 class="tw-font-bold tw-text-xl md:tw-text-2xl">{{ resource.resource_name }} Leaderboard</h2>
+
+	<div *ngIf="leaderboard$ | async as leaderboard">
+		<table cdk-table [dataSource]="leaderboard.data">
 			<ng-container *ngFor="let column of columns" [cdkColumnDef]="column">
-				<th cdk-header-cell *cdkHeaderCellDef>{{ column }}</th>
-				<td cdk-cell *cdkCellDef="let element">
-					<ng-container *ngComponentOutlet="dateComponent; injector: createInjector(element)"></ng-container>
+				<th cdk-header-cell *cdkHeaderCellDef class="tw-text-center">{{ column }}</th>
+				<td cdk-cell *cdkCellDef="let element" class="tw-text-center">
+					<ng-container *ngComponentOutlet="cellComponent; injector: createInjector(element)"></ng-container>
 				</td>
 			</ng-container>
 			
@@ -16,4 +15,5 @@
 			<tr cdk-row *cdkRowDef="let row; columns: columns;"></tr>
 		</table>
 	</div>
+	
 </div>

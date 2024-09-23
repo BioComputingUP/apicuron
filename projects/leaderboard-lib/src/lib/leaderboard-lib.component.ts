@@ -1,11 +1,16 @@
-import { Component, Injector, Input, OnInit } from '@angular/core';
-import { ReplaySubject } from 'rxjs';
+import { Component, Injector, Input, OnDestroy, OnInit } from '@angular/core';
+import { BehaviorSubject, Observable, ReplaySubject, Subject, combineLatest } from 'rxjs';
 import { Resource } from 'src/app/models/resource.model';
 import { CommonModule, NgComponentOutlet } from '@angular/common';
 import { CdkTableModule } from '@angular/cdk/table';
 import { LeaderboardLibModule } from './leaderboard-lib.module';
-import { TableDateComponent } from './table-date/table-date.component';
-import { ELEMENT_TOKEN } from './element-token';
+import { LeaderboardLibService } from './leaderboard-lib.service';
+import { TableCellComponent } from './table-cell/table-cell.component';
+import { ELEMENT_TOKEN, TableConfig } from './element-token';
+import { LeaderboardEntry } from './interfaces/leaderboard-entry';
+import { Paginated } from 'src/app/interfaces/paginated';
+import { LeaderboardFilter } from './interfaces/leaderboard-filter';
+import { map, switchMap } from 'rxjs/operators';
 @Component({
   standalone: true,
   selector: 'lib-leaderboard-lib',
@@ -13,9 +18,15 @@ import { ELEMENT_TOKEN } from './element-token';
   imports: [CommonModule, CdkTableModule, LeaderboardLibModule, NgComponentOutlet],
   styles: []
 })
-export class LeaderboardLibComponent implements OnInit {
-  dateComponent = TableDateComponent;
+export class LeaderboardLibComponent implements OnInit, OnDestroy {
+  cellComponent = TableCellComponent;
   myInjector: Injector;
+
+  destroy$ = new Subject();
+
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+  }
 
   columns: string[] = [
     'Medals', 
@@ -27,30 +38,52 @@ export class LeaderboardLibComponent implements OnInit {
     'Last Contribution Date',
   ];
 
-  data = [
-    { 
-      medals_count: 15,
-      badges_count: 10,
-      generation_count: 5,
-      invalidation_count: 2,
-      revision_count: 7,
-      total_count: 24,
-      last_contribution: new Date(),
-    },
-  ];
+  leaderboard$: Observable<Paginated<LeaderboardEntry>>;
+  leaderboardFilter$: Observable<LeaderboardFilter>;
 
-  constructor(private injector: Injector) { }
+  page$ = new BehaviorSubject<number>(1);
+  limit = 10;
+
+  constructor(
+    private injector: Injector,
+    private leaderboardLibService: LeaderboardLibService,
+  ) {}
 
   resource$: ReplaySubject<Resource> = new ReplaySubject<Resource>(1);
   @Input("resource") set resource(value: Resource) {
     this.resource$.next(value);
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.leaderboardFilter$ = combineLatest([this.resource$, this.page$]).pipe(
+      map(([resource, page]: [Resource, number]) => {
+        return new LeaderboardFilter(
+          resource.resource_id,
+          (page - 1) * this.limit,
+          this.limit
+        );
+      })
+    );
 
-  createInjector(element: any): Injector {
+    this.leaderboard$ = this.leaderboardFilter$.pipe(
+      switchMap((filter: LeaderboardFilter) =>
+        this.leaderboardLibService.getResourceLeaderboard(filter)
+      )
+    );
+
+    // this.leaderboard$.subscribe({
+    //   next: (leaderboardData) => {
+    //     console.log('Leaderboard Data:', leaderboardData);
+    //   }
+    // });
+  }
+
+  createInjector(element: TableConfig): Injector {
     return Injector.create({
-      providers: [{ provide: ELEMENT_TOKEN, useValue: element }],
+      providers: [{ 
+          provide: ELEMENT_TOKEN, 
+          useValue: element }
+        ],
       parent: this.injector
     });
   }
