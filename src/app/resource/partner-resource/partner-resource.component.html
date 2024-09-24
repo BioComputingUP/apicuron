@@ -1,50 +1,45 @@
-<div
-  class="tw-border-2 tw-border-gray-400 tw-bg-white tw-rounded-md tw-p-2 md:tw-p-4 focus:tw-shadow-2xl tw-h-full tw-flex tw-flex-col"
->
+<div class="tw-border-2 tw-border-gray-400 tw-bg-white tw-rounded-md tw-p-2 md:tw-p-4 focus:tw-shadow-2xl tw-h-full tw-flex tw-flex-col">
   <div class="tw-flex tw-flex-row tw-justify-between">
-    <a
-      target="_blank"
+    <a target="_blank"
       class="tw-text-xl tw-font-bold hover:tw-underline tw-text-gray-800 tw-cursor-pointer"
-      [href]="resource.resource_url"
-      >{{ resource.resource_name }}
+      [href]="resource.resource_url">{{ resource.resource_name }}
       <svg-icon
         src="assets/svg/external-link.svg"
-        svgClass="tw-h-4 tw-w-4 tw-inline"
-      ></svg-icon
-    ></a>
-    <a
-      class="tw-text-lg tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer hover:tw-underline"
-      [routerLink]="['/databases', resource.resource_id]"
-      >View Details</a
-    >
+        svgClass="tw-h-4 tw-w-4 tw-inline">
+        </svg-icon>
+      </a>
+    <a class="tw-text-lg tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer hover:tw-underline"
+      [routerLink]="['/databases', resource.resource_id]">View Details</a>
   </div>
-  <span
-    class="tw-text-gray-400 tw-font-semibold tw-text-left tw-font-dm-sans"
-    >{{ resource.resource_long_name }}</span
-  >
-  <p
-    class="tw-font-medium tw-text-gray-800 tw-pt-2 md:tw-pt-4 tw-overflow-ellipsis"
-  >
+  <span class="tw-text-gray-400 tw-font-semibold tw-text-left tw-font-dm-sans">{{ resource.resource_long_name }}</span>
+  <span class="tw-text-gray-800 tw-font-dm-sans tw-text-sm tw-flex tw-flex-col tw-pt-2" *ngIf="resource?.stats?.hasLastActivity()">
+    <span>
+      Contributors:
+      {{ resource?.stats?.uniqueContributors }}
+    </span>
+    <span>
+      Submissions:
+      {{ resource?.stats?.contributionCount }}
+    </span>
+  </span>
+
+  <p class="tw-font-medium tw-text-gray-800 tw-pt-2 md:tw-pt-4 tw-overflow-ellipsis">
     {{ description_formatted }}
   </p>
   <div class="tw-mt-auto tw-pt-2 lg:tw-pt-4 tw-flex tw-flex-row tw-justify-end">
-    <!-- <svg-icon [src]="logo_src" svgClass="tw-w-1/3" viewBox="auto" [applyClass]="true" [svgAriaLabel]="'Logo of ' + name"></svg-icon> -->
-    <img
+    <img 
       [src]="resource.logo"
       [alt]="'Logo of ' + resource.resource_name"
-      class="tw-h-24"
-    />
+      class="tw-h-24"/>
   </div>
   <div class="">
     <span
       class="tw-text-gray-800 tw-font-dm-sans"
-      *ngIf="resource?.stats?.hasLastActivity()"
-    >
-      Last Submission Date:
-      {{
-        resource?.stats?.lastResourceUpdateDate ??
-          resource?.stats?.lastContributionDate | date : "dd-MM-yyyy":'UTC'
-      }} UTC</span
-    >
+      *ngIf="resource?.stats?.hasLastActivity()">
+      <span>
+        Last Submission Date:
+        {{ resource?.stats?.lastResourceUpdateDate ?? resource?.stats?.lastContributionDate | date : "dd-MM-yyyy":'UTC'}} UTC
+      </span>
+    </span>
   </div>
 </div>
