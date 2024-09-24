@@ -24,6 +24,7 @@ import { CuratorStatisticsService } from "src/app/curator-statistics/services/cu
 import { LeaderboardFilter } from "../../databases/interfaces/leaderboard-filter";
 import { AngularSvgIconModule } from "angular-svg-icon";
 import { LeaderboardEntry } from "../../databases/interfaces/leaderboard-entry";
+import { environment } from "../../../environments/environment";
 @Component({
   standalone: true,
   selector: "total-leaderboard",
@@ -39,6 +40,7 @@ export class TotalLeaderboardComponent implements OnInit, OnDestroy {
     this.resource$.next(value);
   }
 
+  apicuronURL= environment.host;
   totalLeaderboard$: Observable<Paginated<LeaderboardEntry>>;
   totalContributors$: Observable<number>;
   leaderboardFilter$: Observable<LeaderboardFilter>;

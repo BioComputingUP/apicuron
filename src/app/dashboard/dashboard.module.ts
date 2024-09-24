@@ -21,14 +21,19 @@ import { RouterModule } from "@angular/router";
 import { SpinnerComponent } from "../components/utils/spinner/spinner.component";
 import { UsersService } from "./services/users.service";
 import { CuratorReportsDetailsComponent } from "../components/curator-reports-details/curator-reports-details.component";
+import { CdkMenuModule } from "@angular/cdk/menu";
+import { NumberCardComponent } from "../components/number-card/number-card.component";
+import { DashboardService } from "./services/dashboard.service";
+import { UserResourceDashboard } from "./user-resource-dashboard/user-resource-dashboard.component";
 @NgModule({
   declarations: [
     DashboardSidebarComponent,
     UserDashboardComponent,
     UserOverviewComponent,
     ProfileUpdateComponent,
+    UserResourceDashboard
   ],
-  providers: [UserOverviewPageService, UsersService],
+  providers: [UserOverviewPageService, UsersService, DashboardService],
   imports: [
     CommonModule,
     RouterModule,
@@ -37,14 +42,16 @@ import { CuratorReportsDetailsComponent } from "../components/curator-reports-de
     AuthDropdownComponent,
     ReactiveFormsModule,
     DatabasesModule,
+    CdkMenuModule,
     AngularSvgIconModule,
     NavbarComponent,
     CalendarModule,
-    SvgModule,
+    // SvgModule,
     SpinnerComponent,
     ReportsByDateChartComponent,
     CategoriesPieChartComponent,
     CuratorReportsDetailsComponent,
+    NumberCardComponent,
   ],
 })
 export class DashboardModule {}

@@ -77,6 +77,10 @@ export class Resource implements Deserializable, Serializable {
     return new URL("/favicon.ico", this.resource_url).href;
   }
 
+  compare(other: Resource): boolean {
+    return this.resource_id === other.resource_id;
+  }
+
   stats: ResourceStats;
   resource_description: string;
   name: string;

@@ -13,16 +13,17 @@
     "importHelpers": true,
     "allowJs": true,
     "target": "ES2022",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "lib": [
-      "es2018",
-      "dom"
-    ],
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2018", "dom"],
     "useDefineForClassFields": false
   },
   "paths": {
     "@app/svg/*": ["src/app/svg/*"]
+  },
+  "angularCompilerOptions": {
+    "compilationMode": "full",
+    "enableIvy": true,
+    "fullTemplateTypeCheck": true,
+    "strictInjectionParameters": true
   }
 }

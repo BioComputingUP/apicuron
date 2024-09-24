@@ -27,12 +27,14 @@ import { WeeklyBarChartComponent } from "../weekly-bar-chart/weekly-bar-chart.co
 import { CuratorStatisticsService } from "src/app/curator-statistics/services/curator-statistics.service";
 import { LeaderboardFilter } from "../../databases/interfaces/leaderboard-filter";
 import { WeeklyLeaderboardEntry } from "../../databases/interfaces/leaderboard-entry";
+import { environment } from "../../../environments/environment";
+import { AngularSvgIconModule } from "angular-svg-icon";
 
 @Component({
   standalone: true,
   selector: "weekly-leaderboard",
   templateUrl: "./weekly-leaderboard.component.html",
-  imports: [CommonModule, LeaderboardComponent, WeeklyBarChartComponent, RouterModule],
+  imports: [CommonModule, LeaderboardComponent, WeeklyBarChartComponent, RouterModule, AngularSvgIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WeeklyLeaderboardComponent implements OnInit, OnDestroy {
@@ -45,6 +47,8 @@ export class WeeklyLeaderboardComponent implements OnInit, OnDestroy {
   limit = 10;
   leaderboardFilter$: Observable<LeaderboardFilter>;
   weeklyLeaderboard$: Observable<Paginated<WeeklyLeaderboardEntry>>;
+
+  apicuronURL= environment.host;
 
   tableColumnsWeekly: string[] = [
     "generation_count",
