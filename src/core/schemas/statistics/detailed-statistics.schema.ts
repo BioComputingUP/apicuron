@@ -43,19 +43,14 @@ export class DetailedStatistics implements IUserResourceEntity {
 	@Prop({ required: true, type: [ActivitiesStatisticsSchema] })
 	activities: ActivitiesStatistics[];
 
-	@Prop({
-		required: true,
-		type: [Number],
-		default: () => Array(7).fill(0),
-	})
-	daysOfWeek: number[];
+	@Prop({ required: true, default: () => 0 })
+	last_week_count: number;
 
-	@Prop({
-		required: true,
-		type: [Number],
-		default: () => Array(12).fill(0),
-	})
-	months: number[];
+	@Prop({ required: true, default: () => 0 })
+	last_month_count: number;
+
+	@Prop({ required: true, default: () => 0 })
+	last_quarter_count: number;
 
 	createdAt: Date;
 	updatedAt: Date;

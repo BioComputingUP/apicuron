@@ -13,9 +13,9 @@ import {
 } from '../core/schemas/statistics.schema';
 import { PartnerResourcesService } from '../resources/partner-resources/services/partner-resources.service';
 import { GetStatisticsDto } from './dto/get-statistics.dto';
-import { plainToClass } from 'class-transformer';
-import { StatLeaderboardDto } from './dto/statistics.dto';
-import { Paginated } from '../pagination/paginator';
+import { plainToClass, plainToInstance } from 'class-transformer';
+import { StatisticsDto, StatLeaderboardDto } from './dto/statistics.dto';
+import { userResourceEntityPrivacyFilter } from '../util/privacy.helper';
 
 @Injectable()
 export class StatisticsService {
@@ -227,5 +227,34 @@ export class StatisticsService {
 			},
 			options,
 		);
+	}
+
+	/**
+	 * Retrieves the statistics for a specific resource and user.
+	 *
+	 * @param resource_id - The ID of the resource.
+	 * @param curator_orcid - The ORCID of the curator.
+	 * @param user - Optional. The user object.
+	 * @returns A promise that resolves to an array of StatisticsDto objects.
+	 */
+	async getResourceUserStatistics(
+		resource_id: string,
+		curator_orcid: string,
+		user?: User,
+	): Promise<StatisticsDto[]> {
+		const privacyFilter = userResourceEntityPrivacyFilter(user);
+
+		const filter = {
+			$and: [{ resource_id, curator_orcid }, privacyFilter],
+		};
+
+		const stats = await this.statisticsModel.find(filter);
+
+		const serializedStats = plainToInstance(StatisticsDto, stats, {
+			excludeExtraneousValues: true,
+			enableCircularCheck: true,
+		});
+
+		return serializedStats;
 	}
 }

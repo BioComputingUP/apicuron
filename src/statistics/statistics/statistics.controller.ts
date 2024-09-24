@@ -38,10 +38,12 @@ import { StatisticsFilter } from '../dto/statistics-filter.dto';
 import { AuthProtected } from '../../auth/decorators/auth.decorator';
 import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
 import { ValidationError, validate } from 'class-validator';
-import { paginate } from '../../pagination/paginator';
+import { paginate, Paginated } from '../../pagination/paginator';
 import { mapValues, uniq, map, keyBy } from 'lodash';
-import { StatLeaderboardDto } from '../dto/statistics.dto';
+import { StatisticsDto, StatLeaderboardDto } from '../dto/statistics.dto';
 import { ApiResponsePaginated } from '../../pagination/decorators/paginated-reponse.decorator';
+import { StatSearchResponseDto } from '../dto/stat-search-response.dto';
+import { ApiResponseWrapped } from '../../shared/decorators/wrapped-data-response.decorator';
 @ApiTags('Statistics')
 @ApiHeader(VersionHeader)
 @Controller({
@@ -150,14 +152,18 @@ export class StatisticsController {
 	@ApiOperation({
 		summary: 'Get Multiple statistics regarding multiple users',
 	})
-	@ApiOkResponse({
-		description:
-			'List of aggregated user statistics regarding each Partner Resource they contributed in',
-	})
-	@UseGuards(LocalAuthGuard)
+	@ApiResponsePaginated(
+		StatSearchResponseDto,
+		200,
+		'List of aggregated user statistics regarding each Partner Resource they contributed in',
+	)
+	@AuthProtected()
 	@Public()
 	@Get()
-	async findAll(@Query() query: GetStatisticsDto, @UserReq() user?: User) {
+	async findAll(
+		@Query() query: GetStatisticsDto,
+		@UserReq() user?: User,
+	): Promise<Paginated<StatSearchResponseDto>> {
 		const getStatDtoInstance = plainToInstance(GetStatisticsDto, query);
 
 		const privacyFilter = userResourceEntityPrivacyFilter(user);
@@ -167,7 +173,39 @@ export class StatisticsController {
 			privacyFilter,
 		);
 
-		return paginate(data, getStatDtoInstance, count);
+		const serializedData = plainToInstance(StatSearchResponseDto, data, {
+			excludeExtraneousValues: true,
+			enableCircularCheck: true,
+		});
+
+		return paginate<StatSearchResponseDto>(
+			serializedData,
+			getStatDtoInstance,
+			count,
+		);
+	}
+
+	@ApiOperation({
+		summary: 'Get a list of the user statistics for a specific resource',
+	})
+	@ApiResponseWrapped(
+		StatisticsDto,
+		200,
+		'A list of the user statistics for a specific resource',
+	)
+	@AuthProtected()
+	@Public()
+	@Get('/resources/:resource_id/user/:orcid_id')
+	async getResourceUserStatistics(
+		@Param('resource_id') resource_id: string,
+		@Param('orcid_id') curator_orcid: string,
+		@UserReq() user: User,
+	): Promise<StatisticsDto[]> {
+		return await this.statService.getResourceUserStatistics(
+			resource_id,
+			curator_orcid,
+			user,
+		);
 	}
 }
 

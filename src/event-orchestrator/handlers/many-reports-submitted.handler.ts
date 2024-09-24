@@ -9,13 +9,13 @@ import {
 } from '../../submit-reports/events/events';
 import { OnEvent } from '@nestjs/event-emitter';
 import { IEventHandler } from '@nestjs/cqrs';
-import { BaseAggregatorRunner } from '../aggregator-runners/base.runner';
+import { SubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
 
 @Injectable()
 export class ManyReportsSubmittedHandler implements IEventHandler {
 	logger = new Logger(ManyReportsSubmittedHandler.name);
 	constructor(
-		protected runner: BaseAggregatorRunner,
+		protected runner: SubmissionRunner,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 	) {}
 

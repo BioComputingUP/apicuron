@@ -8,8 +8,8 @@ import { VersionHeader } from '../../plugins/swagger/config';
 import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
 import { User } from '../../core/schemas/user.schema';
 import { BadgesQueryService } from '../services/badges-query.service';
-import { BadgeFilter } from '../dto/badge-filter.dto';
-import { BadgeDto } from '../dto/badge.dto';
+import { BadgeFilter, UserBadgesFilter } from '../dto/badge-filter.dto';
+import { BadgeDto, PrivateBadgeDto } from '../dto/badge.dto';
 import { ApiResponsePaginated } from '../../pagination/decorators/paginated-reponse.decorator';
 
 @ApiTags('Achievements')
@@ -41,5 +41,24 @@ export class BadgesController {
 		);
 
 		return paginate<BadgeDto>(data, filter, count);
+	}
+
+	@ApiResponsePaginated(
+		PrivateBadgeDto,
+		200,
+		'A list of the current user badges matching the filter, includes achieved and unachieved badges',
+	)
+	@AuthProtected()
+	@Get('achievements/my-badges')
+	async getUserBadges(
+		@Query() filter: UserBadgesFilter,
+		@UserReq() user: User,
+	) {
+		const { count, data } = await this.badgesQueryService.getUserBadges(
+			filter,
+			user,
+		);
+
+		return paginate<PrivateBadgeDto>(data, filter, count);
 	}
 }

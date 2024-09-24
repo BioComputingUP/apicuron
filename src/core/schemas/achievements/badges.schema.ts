@@ -67,6 +67,12 @@ export class Badge implements IUserResourceEntity {
 
 	@Prop({
 		required: true,
+		default: 0,
+	})
+	progress_rate: number;
+
+	@Prop({
+		required: true,
 	})
 	league: string;
 

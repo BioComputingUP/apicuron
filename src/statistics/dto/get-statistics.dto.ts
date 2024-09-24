@@ -40,7 +40,7 @@ export class GetStatisticsDto extends BasePaginationDto {
 
 	@IsArray()
 	@IsOptional()
-	resources: Array<string>;
+	resources: string[];
 
 	@IsIn(statisticsSortByFields)
 	@IsString()

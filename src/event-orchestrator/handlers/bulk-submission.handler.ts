@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { IEventHandler } from '@nestjs/cqrs';
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { OnEvent } from '@nestjs/event-emitter';
 import { Aggregator } from '../interfaces/aggregator.interface';
 import { BulkSubmissionEvent } from '../../submit-reports/events/events';
-import { BulkSubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
+import { SubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
 
 @Injectable()
 export class BulkReportSubmissionHandler implements IEventHandler {
-	constructor(protected bulkSubmissionRunner: BulkSubmissionRunner) {}
+	constructor(protected bulkSubmissionRunner: SubmissionRunner) {}
 
 	@OnEvent(BulkSubmissionEvent.name, { async: true, promisify: true })
 	async handle({ resource_ids }: BulkSubmissionEvent) {

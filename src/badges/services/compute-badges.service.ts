@@ -71,6 +71,7 @@ export class ComputeBadgesService {
 			endDate: badgeDef.endDate,
 			curator_orcid: reportAgg.curator_orcid,
 			count: reportAgg.count,
+			progress_rate: reportAgg.count / badgeDef.count_threshold,
 			state,
 			achieved_at,
 			privacy: computeAggregatePrivacyField(badgeDef, reportAgg),

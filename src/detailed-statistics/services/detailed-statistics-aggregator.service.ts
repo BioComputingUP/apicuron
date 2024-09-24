@@ -1,7 +1,6 @@
-import { Document, Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { PrivacyType } from '../../core/enums';
 import {
-	Report,
 	LeanReportDocument,
 	ReportDocument,
 } from '../../core/schemas/reports.schema';

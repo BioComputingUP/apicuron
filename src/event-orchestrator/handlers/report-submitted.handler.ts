@@ -23,13 +23,14 @@ import {
 } from 'rxjs';
 import { BaseAggregatorRunner } from '../aggregator-runners/base.runner';
 import { Aggregator } from '../interfaces/aggregator.interface';
+import { SubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
 
 @Injectable()
 export class ReportSubmittedEventHandler
 	implements IEventHandler, OnModuleInit, OnModuleDestroy
 {
 	constructor(
-		protected aggregatorRunner: BaseAggregatorRunner,
+		protected aggregatorRunner: SubmissionRunner,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 	) {}
 	logger = new Logger(ReportSubmittedEventHandler.name);

@@ -7,7 +7,7 @@ import {
 } from '../../core/schemas/resource/partner-resource.schema';
 import { Model } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
-import { BulkSubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
+import { SubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
 
 @Injectable()
 export class InitializationService implements OnApplicationBootstrap {
@@ -15,7 +15,7 @@ export class InitializationService implements OnApplicationBootstrap {
 		@InjectModel(PartnerResource.name)
 		protected resourceModel: Model<PartnerResourceDocument>,
 		protected configService: ConfigService,
-		protected aggregatorManager: BulkSubmissionRunner,
+		protected aggregatorManager: SubmissionRunner,
 	) {}
 	async onApplicationBootstrap() {
 		if (this.configService.get<string>('environment') == 'local') {

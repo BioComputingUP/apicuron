@@ -1,14 +1,13 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { Aggregate, FilterQuery, Model, PipelineStage } from 'mongoose';
+import { Aggregate, FilterQuery, Model } from 'mongoose';
+import { PrivacyType } from '../../core/enums';
 import {
-	DayOfWeek,
-	DaysOfWeek,
-	Month,
-	months,
-	PrivacyType,
-} from '../../core/enums';
+	getMonthStart,
+	getQuarterStart,
+	getWeekStart,
+} from '../../util/date.helper';
 
 export interface DetailedStatAggregationResult {
 	_id: {
@@ -25,99 +24,16 @@ export interface DetailedStatAggregationResult {
 	count: number;
 	last_contribution: Date;
 	first_contribution: Date;
-	days: [number, number, number, number, number, number, number];
-	months: { [key in Month]: number };
+	last_week_count: number;
+	last_month_count: number;
+	last_quarter_count: number;
 }
 
 @Injectable()
-export class DetailedStatisticsPipeline implements OnModuleInit {
-	addFieldsDaysArrayStage: { days: any };
-	removeDayPropertiesStage: { [k: string]: number };
-	addDayPropertiesStage: any;
-	countMonthFieldsStage: PipelineStage.AddFields['$addFields'];
-	addmonthsObjectStage: { months: Record<string, any> };
-	removeMonthProperties: PipelineStage.Project['$project'];
+export class DetailedStatisticsPipeline {
 	constructor(
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 	) {}
-	onModuleInit() {
-		this.initDaysPipelineStages();
-		this.initMonthsPipelineStages();
-	}
-
-	initDaysPipelineStages() {
-		this.addFieldsDaysArrayStage = {
-			days: DaysOfWeek.map((day) => `$${day}`),
-		};
-
-		this.removeDayPropertiesStage = Object.fromEntries(
-			DaysOfWeek.map((day) => [day, 0]),
-		);
-
-		this.addDayPropertiesStage = Object.fromEntries(
-			DaysOfWeek.map(
-				(day, index): [DayOfWeek, PipelineStage.AddFields['$addFields']] => {
-					return [
-						day,
-						{
-							$cond: {
-								if: {
-									$eq: [{ $dayOfWeek: '$timestamp' }, index + 1],
-								},
-								then: 1,
-								else: 0,
-							},
-						},
-					];
-				},
-			),
-		);
-	}
-
-	initMonthsPipelineStages() {
-		const fields: PipelineStage.AddFields['$addFields'] = {};
-		months.forEach((month, index) => {
-			fields[month] = {
-				$cond: {
-					if: {
-						$eq: [{ $month: '$timestamp' }, index + 1],
-					},
-					then: 1,
-					else: 0,
-				},
-			};
-		});
-		this.countMonthFieldsStage = fields;
-
-		const monthsObj: PipelineStage.AddFields['$addFields'] = {};
-		const projectObj: PipelineStage.Project['$project'] = {};
-
-		months.forEach((month) => {
-			monthsObj[month] = `$${month}`;
-			projectObj[month] = 0;
-		});
-
-		this.addmonthsObjectStage = {
-			months: monthsObj,
-		};
-
-		this.removeMonthProperties = projectObj;
-	}
-
-	daysGroup() {
-		return Object.fromEntries(
-			DaysOfWeek.map((day: DayOfWeek) => [day, { $sum: `$${day}` }]),
-		);
-	}
-
-	monthsGroup() {
-		const groupParams = {};
-		months.forEach((month) => {
-			groupParams[month] = { $sum: `$${month}` };
-		});
-
-		return groupParams;
-	}
 
 	/**
 	 * Returns the the aggregate
@@ -128,8 +44,6 @@ export class DetailedStatisticsPipeline implements OnModuleInit {
 		return this.reportModel
 			.aggregate()
 			.match(filter)
-			.addFields(this.countMonthFieldsStage)
-			.addFields(this.addDayPropertiesStage)
 			.group({
 				_id: {
 					resource_id: '$resource_id',
@@ -161,13 +75,23 @@ export class DetailedStatisticsPipeline implements OnModuleInit {
 				first_contribution: {
 					$min: '$timestamp',
 				},
-				...this.monthsGroup(),
-				...this.daysGroup(),
+				last_week_count: {
+					$sum: {
+						$cond: [{ $gt: ['$timestamp', getWeekStart()] }, 1, 0],
+					},
+				},
+
+				last_month_count: {
+					$sum: {
+						$cond: [{ $gt: ['$timestamp', getMonthStart()] }, 1, 0],
+					},
+				},
+				last_quarter_count: {
+					$sum: {
+						$cond: [{ $gt: ['$timestamp', getQuarterStart()] }, 1, 0],
+					},
+				},
 			})
-			.addFields(this.addFieldsDaysArrayStage)
-			.project(this.removeDayPropertiesStage)
-			.addFields(this.addmonthsObjectStage)
-			.project(this.removeMonthProperties)
 			.sort({
 				resource_id: -1,
 				curator_orcid: -1,

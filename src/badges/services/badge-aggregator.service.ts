@@ -123,7 +123,7 @@ export class BadgeAggregatorService implements Aggregator {
 					resource_id: badgeDef.resource_id,
 				},
 				{
-					$inc: { count: 1 },
+					$inc: { count: 1, progress_rate: 1 / badgeDef.count_threshold },
 					$setOnInsert: {
 						displayedName: badgeDef.displayedName,
 						color_code: badgeDef.color_code,
@@ -135,6 +135,7 @@ export class BadgeAggregatorService implements Aggregator {
 								: AchievementState.progress,
 						league: badgeDef.league,
 						privacy: computeAggregatePrivacyField(badgeDef, report),
+						progress_rate: 1 / badgeDef.count_threshold,
 					},
 				},
 				{ upsert: true, new: true },

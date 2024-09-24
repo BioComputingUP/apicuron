@@ -13,7 +13,7 @@ import { AggregatorManager } from './services/aggregator-manager.service';
 import { DiscoveryModule } from '@nestjs/core';
 import { AggregatorLoader } from './services/aggregator-loader.service';
 import { BaseAggregatorRunner } from './aggregator-runners/base.runner';
-import { BulkSubmissionRunner } from './aggregator-runners/bulk-submission.runner';
+import { SubmissionRunner } from './aggregator-runners/bulk-submission.runner';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Module({
@@ -31,7 +31,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 		AggregatorLoader,
 		AggregatorManager,
 		BaseAggregatorRunner,
-		BulkSubmissionRunner,
+		SubmissionRunner,
 	],
 	exports: [],
 })

@@ -15,9 +15,14 @@ import {
 	DetailedStatAggregationResult,
 	DetailedStatisticsPipeline,
 } from '../aggregation/detailed-statistics-aggregation.service';
-import { months } from '../../core/enums';
 import { Logger } from '@nestjs/common';
-import { updateMaxDate, updateMinDate } from '../../util/date.helper';
+import {
+	getMonthStart,
+	getQuarterStart,
+	getWeekStart,
+	updateMaxDate,
+	updateMinDate,
+} from '../../util/date.helper';
 
 export class ComputeDetailedStatisticsService {
 	constructor(
@@ -36,7 +41,7 @@ export class ComputeDetailedStatisticsService {
 		report: ReportDocument | LeanReportDocument,
 		term: TermDocument,
 	): DetailedStatisticsDocument {
-		return new this.detailedStatsModel({
+		const stat = new this.detailedStatsModel({
 			curator_orcid: report.curator_orcid,
 			resource_id: report.resource_id,
 			league: report.league,
@@ -45,6 +50,9 @@ export class ComputeDetailedStatisticsService {
 			total_score: term.score,
 			last_contribution: report.timestamp,
 			first_contribution: report.timestamp,
+			last_week_count: 0,
+			last_month_count: 0,
+			last_quarter_count: 0,
 			activities: [
 				{
 					activity_term: report.activity_term,
@@ -60,6 +68,19 @@ export class ComputeDetailedStatisticsService {
 			daysOfWeek: Array(7).fill(0),
 			months: Array(12).fill(0),
 		});
+
+		if (report.timestamp > getWeekStart()) {
+			stat.last_week_count += 1;
+			stat.last_month_count += 1;
+			stat.last_quarter_count += 1;
+		} else if (report.timestamp > getMonthStart()) {
+			stat.last_month_count += 1;
+			stat.last_quarter_count += 1;
+		} else if (report.timestamp > getQuarterStart()) {
+			stat.last_quarter_count += 1;
+		}
+
+		return stat;
 	}
 
 	async upsertDetailedStats(
@@ -71,6 +92,8 @@ export class ComputeDetailedStatisticsService {
 			resource_id: report.resource_id,
 			league: report.league,
 		};
+
+		// if termDoc is not provided, fetch the term from the database
 		const term$ = !!termDoc
 			? Promise.resolve(termDoc)
 			: this.termModel.findOne({
@@ -97,14 +120,19 @@ export class ComputeDetailedStatisticsService {
 
 		stat.total_count += 1;
 		stat.total_score += term.score;
+
+		const isLastWeek = report.timestamp > getWeekStart() ? 1 : 0;
+		const isLastMonth = report.timestamp > getMonthStart() ? 1 : 0;
+		const isLastQuarter = report.timestamp > getQuarterStart() ? 1 : 0;
+
+		stat.last_week_count += isLastWeek;
+		stat.last_month_count += isLastMonth;
+		stat.last_quarter_count += isLastQuarter;
+
 		const actIndex = stat.activities.findIndex(
 			(activity) => activity.activity_term == report.activity_term,
 		);
-		if (actIndex != -1) {
-			stat.activities[actIndex].count += 1;
-			stat.activities[actIndex].score += term.score;
-			stat.activities[actIndex].last_contribution = report.timestamp;
-		} else {
+		if (actIndex == -1) {
 			stat.activities.push({
 				activity_term: report.activity_term,
 				activity_category: term.activity_category,
@@ -115,7 +143,17 @@ export class ComputeDetailedStatisticsService {
 				count: 1,
 				score: term.score,
 				total_score: term.score,
+				last_week_count: isLastWeek,
+				last_month_count: isLastMonth,
+				last_quarter_count: isLastQuarter,
 			});
+		} else {
+			stat.activities[actIndex].count += 1;
+			stat.activities[actIndex].score += term.score;
+			stat.activities[actIndex].last_contribution = report.timestamp;
+			stat.activities[actIndex].last_week_count += isLastWeek;
+			stat.activities[actIndex].last_month_count += isLastMonth;
+			stat.activities[actIndex].last_quarter_count += isLastQuarter;
 		}
 
 		await stat.save();
@@ -170,10 +208,14 @@ export class ComputeDetailedStatisticsService {
 							last_contribution: entry.last_contribution,
 							count: entry.count,
 							score: term.score,
+							last_week_count: entry.last_week_count,
+							last_month_count: entry.last_month_count,
+							last_quarter_count: entry.last_quarter_count,
 						},
 					],
-					daysOfWeek: entry.days,
-					months: months.map((m) => entry.months[m] ?? 0),
+					last_week_count: entry.last_week_count,
+					last_month_count: entry.last_month_count,
+					last_quarter_count: entry.last_quarter_count,
 				});
 				continue;
 			}
@@ -189,6 +231,9 @@ export class ComputeDetailedStatisticsService {
 				currentStat.first_contribution,
 				entry.first_contribution,
 			);
+			currentStat.last_week_count += entry.last_week_count;
+			currentStat.last_month_count += entry.last_month_count;
+			currentStat.last_quarter_count += entry.last_quarter_count;
 
 			// push the current entry to the activities array
 			currentStat.activities.push({
@@ -201,17 +246,10 @@ export class ComputeDetailedStatisticsService {
 				count: entry.count,
 				score: term.score,
 				total_score: entry.count * term.score,
+				last_week_count: entry.last_week_count,
+				last_month_count: entry.last_month_count,
+				last_quarter_count: entry.last_quarter_count,
 			});
-
-			currentStat.daysOfWeek = currentStat.daysOfWeek.map(
-				(day, i) => day + entry.days[i],
-			);
-
-			const entryMonthsCounts = months.map((m) => entry.months[m] ?? 0);
-
-			currentStat.months = currentStat.months.map(
-				(monthCount, i) => monthCount + entryMonthsCounts[i],
-			);
 		}
 
 		await Promise.all(statSaves$);

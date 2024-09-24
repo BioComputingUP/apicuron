@@ -70,10 +70,16 @@ export class Statistics implements IUserResourceEntity {
 
 	@Prop({ required: true, type: Date })
 	first_contribution: Date;
-}
 
-// export const StatisticsSchema =
-// 	SchemaFactory.createForClass(Statistics).loadClass(Statistics);
+	@Prop({ required: true, default: 0 })
+	week_count: number;
+
+	@Prop({ required: true, default: 0 })
+	month_count: number;
+
+	@Prop({ required: true, default: 0 })
+	quarter_count: number;
+}
 
 export function StatisticsSchemaFactory() {
 	const StatisticsSchema =

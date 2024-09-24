@@ -63,6 +63,13 @@ export class ActivitiesStatistics {
 		required: true,
 	})
 	first_contribution: Date;
+
+	@Prop({ required: true, default: () => 0 })
+	last_week_count: number;
+	@Prop({ required: true, default: () => 0 })
+	last_month_count: number;
+	@Prop({ required: true, default: () => 0 })
+	last_quarter_count: number;
 }
 
 export const ActivitiesStatisticsSchema =

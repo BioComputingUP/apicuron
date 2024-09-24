@@ -1,5 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Expose, Type } from 'class-transformer';
+import { Expose } from 'class-transformer';
 import { AchievementState, PrivacyType } from 'src/core/enums';
 
 export class BadgeDto {
@@ -48,4 +47,9 @@ export class BadgeDto {
 
 	@Expose()
 	endDate?: Date;
+}
+
+export class PrivateBadgeDto extends BadgeDto {
+	@Expose()
+	progress_rate: number;
 }

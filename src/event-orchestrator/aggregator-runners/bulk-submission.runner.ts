@@ -4,9 +4,10 @@ import { MedalAggregatorService } from '../../medals/services/medal-aggregator.s
 import { StatisticsAggregator } from '../../statistics/services/statistics-aggregator.service';
 import { Aggregator } from '../interfaces/aggregator.interface';
 import { AggregatorManager } from '../services/aggregator-manager.service';
+import { IRunner } from '../interfaces/runner.interface';
 
 @Injectable()
-export class BulkSubmissionRunner implements OnModuleInit {
+export class SubmissionRunner implements IRunner, OnModuleInit {
 	statAggregator: StatisticsAggregator;
 	badgeAggregator: BadgeAggregatorService;
 	medalAggregator: MedalAggregatorService;

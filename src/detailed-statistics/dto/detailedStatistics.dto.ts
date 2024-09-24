@@ -1,38 +1,5 @@
-import { IsString, Validate } from 'class-validator';
-import { OrcidChecksum } from '../../submit-reports/validators/orcid-checksum';
-import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
-import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 import { PrivacyType } from '../../core/enums';
 import { Expose, Type } from 'class-transformer';
-
-export class DetailedStatisticsFilter {
-	@Validate(EntryExistsRule, [
-		PartnerResource.name,
-		({ resource_id }) => {
-			return { resource_id };
-		},
-	])
-	@IsString()
-	resource_id: string;
-
-	@Validate(OrcidChecksum)
-	@IsString()
-	curator_orcid: string;
-
-	@Validate(EntryExistsRule, [
-		PartnerResource.name,
-		({ league, resource_id }) => {
-			return {
-				resource_id,
-				leagues: {
-					$elemMatch: { name: league },
-				},
-			};
-		},
-	])
-	@IsString()
-	league: string;
-}
 
 export class ActivitiesStatistics {
 	@Expose()
@@ -61,6 +28,15 @@ export class ActivitiesStatistics {
 
 	@Expose()
 	first_contribution: Date;
+
+	@Expose()
+	last_week_count: number;
+
+	@Expose()
+	last_month_count: number;
+
+	@Expose()
+	last_quarter_count: number;
 }
 
 export class DetailedStatisticsDto {
@@ -103,4 +79,13 @@ export class DetailedStatisticsDto {
 
 	@Expose()
 	updatedAt: Date;
+
+	@Expose()
+	last_week_count: number;
+
+	@Expose()
+	last_month_count: number;
+
+	@Expose()
+	last_quarter_count: number;
 }
