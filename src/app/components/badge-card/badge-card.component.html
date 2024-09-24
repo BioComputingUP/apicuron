@@ -1,66 +1,122 @@
-<div class="tw-flex tw-flex-col tw-bg-white tw-rounded-md tw-px-1 sm:tw-p-2 tw-text-gray-800 tw-h-full" [ngClass]="{ 'tw-shadow-md tw-shadow-gray-400': enableShadow }">
-  <div class="tw-flex tw-flex-row tw-justify-between">
+<ng-container *ngIf="badge$ | async as badge">
+  <div
+    class="tw-flex tw-flex-col tw-bg-white tw-rounded-md tw-px-1 sm:tw-p-2 tw-text-gray-800 tw-h-full"
+    [ngClass]="{ 'tw-shadow-md tw-shadow-gray-400': enableShadow }"
+  >
+    <div class="tw-flex tw-flex-row tw-justify-between">
+      <div class="tw-flex tw-grow tw-flex-col tw-pl-2">
+        <div>
+          <div class="tw-float-right">
+            <svg-icon
+              src="assets/svg/badge_check.svg"
+              svgClass="tw-w-8 lg:tw-w-12 tw-mx-auto"
+            >
+            </svg-icon>
+          </div>
+          <span
+            class="tw-block tw-text-sm sm:tw-text-base tw-font-dm-sans tw-font-bold tw-pb-1"
+          >
+            {{ badge.displayedName }}
+          </span>
 
-    <div class="tw-flex tw-grow tw-flex-col tw-pl-2">
-      <div class="tw-block">
-        <span class="tw-block tw-text-sm sm:tw-text-base tw-font-dm-sans tw-font-bold">
-          {{ badge.displayedName }}
-        </span>
-        <span class="tw-inline"></span>
-      </div>
+          <span
+            class="tw-block tw-text-xs tw-text-gray-500 tw-font-light tw-pb-1"
+          >
+            &emsp;Requires completing
+            <span class="tw-font-bold">{{ badge.count_threshold }} </span>
+            <span
+              cdkOverlayOrigin
+              #activities_list
+              (mouseenter)="setOverlayState(true)"
+              (mouseleave)="setOverlayState(false, 300)"
+              class="tw-font-bold tw-underline tw-cursor-pointer"
+            >
+              {{ badge.count_threshold > 1 ? "activities" : "activity" }}
+            </span>
+          </span>
+          <span *ngIf="badge.state == AchievementState.achieved">
+            <!-- if only start date is defined -->
+            <span *ngIf="!!badge.startDate && !badge.endDate">
+              starting from
+              <span class="tw-font-bold">
+                {{ badge.startDate | date : "dd-MM-yyyy" }} UTC
+              </span>
+            </span>
+            <!-- if only end date is defined -->
+            <span *ngIf="!!badge.endDate && !badge.startDate">
+              before
+              <span class="tw-font-bold">
+                {{ badge.endDate | date : "dd-MM-yyyy" }} UTC
+              </span>
+            </span>
+            <!-- if both start and end dates are defined -->
+            <span *ngIf="!!badge.startDate && !!badge.endDate">
+              between
+              <span class="tw-font-bold">
+                {{ badge.startDate | date : "dd-MM-yyyy" }}
+              </span>
+              and
+              <span class="tw-font-bold">
+                {{ badge.endDate | date : "dd-MM-yyyy" }} UTC
+              </span>
+            </span>
+            <div
+              class="tw-block tw-text-xs tw-text-gray-500 tw-font-light tw-pb-2"
+            >
+              <span>
+                &emsp; Achievement completed
+                <span class="tw-font-bold">{{
+                  formattedAchievedAt$ | async
+                }}</span>
+              </span>
+            </div>
+          </span>
 
-      <span class="tw-block tw-text-xs tw-text-gray-500 tw-font-light tw-pb-1">
-        &emsp;Requires completing
-        <span class="tw-font-bold tw-underline">{{ badge.count_threshold }}</span>
-        <span
-          cdkOverlayOrigin
-          #activities_list
-          (mouseenter)="setOverlayState(true)"
-          (mouseleave)="setOverlayState(false, 300)"
-          class="tw-font-bold tw-underline tw-cursor-pointer">
-          {{ badge.count_threshold > 1 ? "activities" : "activity" }}
-        </span>
-        <!-- if only start date is defined -->
-        <span *ngIf="!!badge.startDate && !badge.endDate">
-          starting from 
-          <span class="tw-font-bold">{{ badge.startDate | date : "dd-MM-yyyy" }} UTC</span>
-        </span>
-        <!-- if only end date is defined -->
-        <span *ngIf="!!badge.endDate && !badge.startDate">
-          before <span class="tw-font-bold">{{ badge.endDate | date : "dd-MM-yyyy" }} UTC</span>
-        </span>
-        <!-- if both start and end dates are defined -->
-        <span *ngIf="!!badge.startDate && !!badge.endDate">
-          between <span class="tw-font-bold">{{ badge.startDate | date : "dd-MM-yyyy" }}</span> and
-          <span class="tw-font-bold">{{ badge.endDate | date : "dd-MM-yyyy" }} UTC</span>
-        </span>
-      </span>
+          <span *ngIf="badge.state == AchievementState.progress">
+            <span class="tw-text-xs tw-font-bold tw-text-gray-700"
+              >in progress</span
+            >
 
-      <div class="tw-block tw-text-xs tw-text-gray-500 tw-font-light tw-pb-2">
-        <span> &emsp; Achievement completed 
-          <span class="tw-font-bold">{{ formattedAchievedAt }}</span>
-        </span>
+            <span
+              role="progressbar"
+              class="tw-relative tw-block tw-rounded-full tw-bg-gray-200 tw-w-4/5"
+            >
+              <span
+                class="tw-absolute tw-inset-y-0 tw-right-[-3rem] tw-flex tw-items-center tw-pr-2 tw-text-[10px]/4 tw-font-bold tw-text-black"
+              >
+                {{ badge.progressRate }}%
+              </span>
+              <span
+                class="tw-block tw-h-4 tw-rounded-full tw-bg-gradient-to-r tw-from-apicuron-purple tw-to-apicuron-red tw-text-center"
+                [style]="{ width: badge.progressRate + '%' }"
+              >
+                <!-- <span class="tw-block tw-h-4 tw-rounded-full tw-bg-gradient-to-r tw-from-apicuron-purple tw-to-apicuron-red tw-text-center" style="width: 50%"> -->
+              </span>
+            </span>
+          </span>
+        </div>
       </div>
     </div>
-    <svg-icon
-      src="assets/svg/badge_check.svg"
-      svgClass="tw-w-8 lg:tw-w-12 tw-mx-auto">
-    </svg-icon>
   </div>
-</div>
 
-<ng-template
-  cdkConnectedOverlay
-  [cdkConnectedOverlayOrigin]="activities_list"
-  [cdkConnectedOverlayHasBackdrop]="true"
-  [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
-  [cdkConnectedOverlayOpen]="!!(overlayOpen$ | async)">
-  <ul class="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-py-2 tw-rounded tw-shadow-md tw-shadow-gray-400 tw-relative tw-max-h-28 tw-overflow-y-auto tw-overflow-x-hidden tw-list-disc"
-    (mouseleave)="setOverlayState(false, 300)"
-    (mouseenter)="setOverlayState(true)">
-    <li class="tw-block tw-text-sm tw-leading-4 tw-font-dm-sans tw-text-gray-600 tw-pb-1 tw-px-2 tw-cursor-default tw"
-      *ngFor="let term of termNames$ | async">
-      {{ term }}
-    </li>
-  </ul>
-</ng-template>
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="activities_list"
+    [cdkConnectedOverlayHasBackdrop]="true"
+    [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
+    [cdkConnectedOverlayOpen]="!!(overlayOpen$ | async)"
+  >
+    <ul
+      class="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-py-2 tw-rounded tw-shadow-md tw-shadow-gray-400 tw-relative tw-max-h-28 tw-overflow-y-auto tw-overflow-x-hidden tw-list-disc"
+      (mouseleave)="setOverlayState(false, 300)"
+      (mouseenter)="setOverlayState(true)"
+    >
+      <li
+        class="tw-block tw-text-sm tw-leading-4 tw-font-dm-sans tw-text-gray-600 tw-pb-1 tw-px-2 tw-cursor-default tw"
+        *ngFor="let term of termNames$ | async"
+      >
+        {{ term }}
+      </li>
+    </ul>
+  </ng-template>
+</ng-container>
