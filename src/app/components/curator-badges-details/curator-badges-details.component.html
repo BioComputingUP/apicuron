@@ -31,7 +31,6 @@
     <pagination
       [totalItems]="badges.meta.pagination.total"
       [itemsPerPage]="badges.meta.pagination.limit"
-      [(ngModel)]="currentPage"
       (pageChanged)="update_page($event.page)"
       [maxSize]="5"
     ></pagination>

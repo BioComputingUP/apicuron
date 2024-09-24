@@ -19,9 +19,7 @@
             {{ badge.displayedName }}
           </span>
 
-          <span
-            class="tw-block tw-text-xs tw-text-gray-500 tw-font-light tw-pb-1"
-          >
+          <span class="tw-block tw-text-xs tw-text-gray-500 tw-font-light">
             &emsp;Requires completing
             <span class="tw-font-bold">{{ badge.count_threshold }} </span>
             <span
@@ -33,43 +31,48 @@
             >
               {{ badge.count_threshold > 1 ? "activities" : "activity" }}
             </span>
-          </span>
-          <span *ngIf="badge.state == AchievementState.achieved">
-            <!-- if only start date is defined -->
-            <span *ngIf="!!badge.startDate && !badge.endDate">
-              starting from
-              <span class="tw-font-bold">
-                {{ badge.startDate | date : "dd-MM-yyyy" }} UTC
-              </span>
-            </span>
-            <!-- if only end date is defined -->
-            <span *ngIf="!!badge.endDate && !badge.startDate">
-              before
-              <span class="tw-font-bold">
-                {{ badge.endDate | date : "dd-MM-yyyy" }} UTC
-              </span>
-            </span>
-            <!-- if both start and end dates are defined -->
-            <span *ngIf="!!badge.startDate && !!badge.endDate">
-              between
-              <span class="tw-font-bold">
-                {{ badge.startDate | date : "dd-MM-yyyy" }}
-              </span>
-              and
-              <span class="tw-font-bold">
-                {{ badge.endDate | date : "dd-MM-yyyy" }} UTC
-              </span>
-            </span>
-            <div
-              class="tw-block tw-text-xs tw-text-gray-500 tw-font-light tw-pb-2"
+            <span
+              *ngIf="badge.state == AchievementState.achieved"
             >
-              <span>
-                &emsp; Achievement completed
-                <span class="tw-font-bold">{{
-                  formattedAchievedAt$ | async
-                }}</span>
+              <!-- if only start date is defined -->
+              <span *ngIf="!!badge.startDate && !badge.endDate">
+                starting from
+                <span class="tw-font-bold">
+                  {{ badge.startDate | date : "dd-MM-yyyy" }} UTC
+                </span>
               </span>
-            </div>
+              <!-- if only end date is defined -->
+              <span
+                *ngIf="!!badge.endDate && !badge.startDate"
+                class="tw-text-xs"
+              >
+                before
+                <span class="tw-font-bold">
+                  {{ badge.endDate | date : "dd-MM-yyyy" }} UTC
+                </span>
+              </span>
+              <!-- if both start and end dates are defined -->
+              <span *ngIf="!!badge.startDate && !!badge.endDate">
+                between
+                <span class="tw-font-bold">
+                  {{ badge.startDate | date : "dd-MM-yyyy" }}
+                </span>
+                and
+                <span class="tw-font-bold">
+                  {{ badge.endDate | date : "dd-MM-yyyy" }} UTC
+                </span>
+              </span>
+              <div
+                class="tw-block tw-text-xs tw-text-gray-500 tw-font-light tw-pb-2"
+              >
+                <span>
+                  &emsp; Achievement completed
+                  <span class="tw-font-bold">{{
+                    formattedAchievedAt$ | async
+                  }}</span>
+                </span>
+              </div>
+            </span>
           </span>
 
           <span *ngIf="badge.state == AchievementState.progress">
@@ -84,7 +87,7 @@
               <span
                 class="tw-absolute tw-inset-y-0 tw-right-[-3rem] tw-flex tw-items-center tw-pr-2 tw-text-[10px]/4 tw-font-bold tw-text-black"
               >
-                {{ badge.progressRate }}%
+                {{ badge.progressRate | number : "1.0-2" }}%
               </span>
               <span
                 class="tw-block tw-h-4 tw-rounded-full tw-bg-gradient-to-r tw-from-apicuron-purple tw-to-apicuron-red tw-text-center"

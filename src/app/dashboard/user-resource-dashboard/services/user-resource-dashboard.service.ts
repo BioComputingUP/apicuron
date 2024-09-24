@@ -86,7 +86,7 @@ export class UserResourceDashboardService {
     state: "achieved" | "progress" = "achieved",
     skip: number = 0,
     limit: number = 4,
-    sortBy: "achieved_at" | "count_threshold" = "achieved_at",
+    sortBy: "achieved_at" | "count_threshold" | "progress_rate" = "achieved_at",
     sortOrder: -1 | 1 | "asc" | "desc" = -1
   ) {
     return this.http

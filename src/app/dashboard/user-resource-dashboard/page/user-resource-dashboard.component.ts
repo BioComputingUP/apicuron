@@ -62,14 +62,26 @@ export class UserResourceDashboard {
 
     this.recentlyAchievedBadges$ = this.resourceId$.pipe(
       switchMap((resourceId: string) => {
-        return this.userResourceDashboard.getUserBadges(resourceId, 'achieved', 0, 4);
+        return this.userResourceDashboard.getUserBadges(
+          resourceId,
+          "achieved",
+          0,
+          4
+        );
       }),
       shareReplay(1)
     );
 
     this.badgesInProgress$ = this.resourceId$.pipe(
       switchMap((resourceId: string) => {
-        return this.userResourceDashboard.getUserBadges(resourceId, 'progress', 0, 4);
+        return this.userResourceDashboard.getUserBadges(
+          resourceId,
+          "progress",
+          0,
+          4,
+          "progress_rate",
+          -1
+        );
       }),
       shareReplay(1)
     );
