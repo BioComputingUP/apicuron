@@ -15,7 +15,7 @@ import { map, switchMap } from 'rxjs/operators';
   standalone: true,
   selector: 'lib-leaderboard-lib',
   templateUrl: "../lib/leaderboard-lib.component.html",
-  imports: [CommonModule, CdkTableModule, LeaderboardLibModule, NgComponentOutlet],
+  imports: [CommonModule, CdkTableModule, LeaderboardLibModule, NgComponentOutlet, TableCellComponent],
   styles: []
 })
 export class LeaderboardLibComponent implements OnInit, OnDestroy {
@@ -28,15 +28,17 @@ export class LeaderboardLibComponent implements OnInit, OnDestroy {
     this.destroy$.next(true);
   }
 
-  columns: string[] = [
-    'Medals', 
-    'Badges', 
-    'Generation Contributions', 
-    'Invalidation Contributions', 
-    'Revision Contributions', 
-    'Total Count', 
-    'Last Contribution Date',
-  ];
+  columnMapping = {
+    medals_count: 'Medals',
+    badges_count: 'Badges',
+    generation_count: 'Generation Contributions',
+    invalidation_count: 'Invalidation Contributions',
+    revision_count: 'Revision Contributions',
+    total_score: 'Total Score',
+    last_contribution: 'Last Contribution Date',
+  };
+
+  columns: string[] = Object.keys(this.columnMapping); 
 
   leaderboard$: Observable<Paginated<LeaderboardEntry>>;
   leaderboardFilter$: Observable<LeaderboardFilter>;
@@ -82,10 +84,9 @@ export class LeaderboardLibComponent implements OnInit, OnDestroy {
     return Injector.create({
       providers: [{ 
           provide: ELEMENT_TOKEN, 
-          useValue: element }
+          useValue: element },
         ],
       parent: this.injector
     });
   }
-
 }

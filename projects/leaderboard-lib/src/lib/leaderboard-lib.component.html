@@ -5,9 +5,9 @@
 	<div *ngIf="leaderboard$ | async as leaderboard">
 		<table cdk-table [dataSource]="leaderboard.data">
 			<ng-container *ngFor="let column of columns" [cdkColumnDef]="column">
-				<th cdk-header-cell *cdkHeaderCellDef class="tw-text-center">{{ column }}</th>
-				<td cdk-cell *cdkCellDef="let element" class="tw-text-center">
-					<ng-container *ngComponentOutlet="cellComponent; injector: createInjector(element)"></ng-container>
+				<th cdk-header-cell *cdkHeaderCellDef class="tw-text-center">{{ columnMapping[column] }}</th>
+				<td cdk-cell *cdkCellDef="let row" class="tw-text-center">
+					<ng-container *ngComponentOutlet="cellComponent; injector: createInjector(row.stat[column])"></ng-container>
 				</td>
 			</ng-container>
 			
