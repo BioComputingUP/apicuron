@@ -1,0 +1,55 @@
+<div class="tw-p-1 lg:tw-p-2">
+  <h2 class="tw-text-lg">
+    My Contriburions for
+    <span
+      class="tw-font-bold"
+      [ngStyle]="{ color: (resource$ | async).color }"
+      >{{ (resource$ | async).resource_name }}</span
+    >
+  </h2>
+
+  <!-- Number Cards -->
+  <div
+    *ngIf="mainNumbers$ | async as numbers"
+    class="tw-flex tw-flex-row tw-justify-stretch"
+  >
+    <div *ngFor="let entry of numbers" class="tw-p-1">
+      <number-card [value]="entry.value" [label]="entry.label"></number-card>
+    </div>
+  </div>
+
+  <div class="tw-flex tw-flex-row tw-justify-start">
+    <!-- Achievements -->
+    <div class="tw-w-1/3">
+      <span class="tw-text-lg tw-font-bold tw-font-dm-sans"
+        >Recently Achieved Badges</span
+      >
+      <div
+        class="tw-flex tw-flex-row tw-flex-wrap"
+        *ngIf="recentlyAchievedBadges$ | async as badges"
+      >
+        <div *ngFor="let badge of badges.data" class="tw-p-1 tw-w-1/2">
+          <badge-card [badge]="badge"></badge-card>
+        </div>
+      </div>
+    </div>
+
+    <div class="tw-w-1/3">
+      <span class="tw-text-lg tw-font-bold tw-font-dm-sans"
+        >Badges in progress</span
+      >
+      <div
+        class="tw-flex tw-flex-row tw-flex-wrap"
+        *ngIf="badgesInProgress$ | async as badges"
+      >
+        <div *ngFor="let badge of badges.data" class="tw-p-1 tw-w-1/2">
+          <badge-card [badge]="badge"></badge-card>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- {{ resource$ | async | json }}
+  {{ statistics$ | async | json }}
+  {{ user$ | async | json }}
+  {{ detailedStatistics$ | async | json }} -->
+</div>

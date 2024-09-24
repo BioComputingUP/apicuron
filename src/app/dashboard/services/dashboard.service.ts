@@ -8,7 +8,6 @@ import { combineLatest, Observable, pipe, ReplaySubject, Subject } from "rxjs";
 import { CuratorStatistics } from "../../models/statistics.model";
 import { Resource } from "../../models/resource.model";
 import { Injectable } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
 
 @Injectable()
 export class DashboardService {
@@ -18,8 +17,7 @@ export class DashboardService {
     protected userService: UsersService,
     protected resourceService: ResourcesService,
     protected statService: CuratorStatisticsService,
-    protected auth: AuthService,
-    protected route: ActivatedRoute
+    protected auth: AuthService
   ) {
     this.init();
   }
@@ -52,7 +50,7 @@ export class DashboardService {
           .getResources(resourceIds)
           .pipe(shareReplay(1));
       }),
-	  shareReplay(1)
+      shareReplay(1)
     );
     this.contributedResources$ = combineLatest([
       resources$,
@@ -62,11 +60,6 @@ export class DashboardService {
       resources$,
       managedResourceIds$,
     ]).pipe(this.filterResources);
-
-    this.currentResource$ = this.getCurrentResource().pipe(tap(console.log));
-    this.currentResourceStats$ = this.getCurrentResourceStatistics(
-      this.currentResource$
-    ).pipe(tap(console.log));
   }
 
   private filterResources = pipe(
@@ -93,10 +86,9 @@ export class DashboardService {
   getCuratorStatistics(): Observable<CuratorStatistics[]> {
     return this.auth.user$.pipe(
       switchMap((user: User) =>
-        this.statService
-          .get_curator_statistics(user.orcid_id)
+        this.statService.get_curator_statistics(user.orcid_id)
       ),
-	  shareReplay(1)
+      shareReplay(1)
     );
   }
 
@@ -116,31 +108,14 @@ export class DashboardService {
     );
   }
 
-  getCurrentResource(): Observable<Resource> {
-    return this.route.params.pipe(
-      map((params) => params.resource_id),
-      switchMap((resource_id) =>
-        this.managedResources$.pipe(
-          map((resources) =>
-            resources.find((resource) => resource.resource_id === resource_id)
-          ),
-          tap((resource) => {
-            if (!resource) {
-              throw Error("Resource not found");
-            }
-          })
-        )
-      )
-    );
-  }
-
-  getCurrentResourceStatistics(
-    resource$: Observable<Resource>
-  ): Observable<CuratorStatistics[]> {
-    return combineLatest([this.userStats$, resource$]).pipe(
-      map(([stats, resource]) =>
-        stats.filter((stat) => stat.resource_id === resource.resource_id)
-      )
+  getDetailedStatistics(resourceId: string) {
+    return this.user$.pipe(
+      switchMap((user: User) =>
+        this.statService
+          .getDetailedStatistics(resourceId, user.orcid_id)
+          .pipe(shareReplay(1))
+      ),
+      shareReplay(1)
     );
   }
 }

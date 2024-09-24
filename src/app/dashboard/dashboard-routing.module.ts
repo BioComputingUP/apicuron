@@ -15,7 +15,7 @@ import { AuthModule } from "../auth/auth.module";
 import { UserDashboardComponent } from "./user-dashboard/user-dashboard.component";
 import { UserOverviewComponent } from "src/app/dashboard/user-overview/user-overview.component";
 import { ProfileUpdateComponent } from "./profile-update/profile-update.component";
-import { UserResourceDashboard } from "./user-resource-dashboard/user-resource-dashboard.component";
+import { UserResourceDashboard } from "./user-resource-dashboard/page/user-resource-dashboard.component";
 import { DashboardService } from "./services/dashboard.service";
 import { map } from "rxjs/operators";
 // import { ProfileUpdateComponent } from './profile-update/profile-update.component';

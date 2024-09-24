@@ -24,16 +24,23 @@ import { CuratorReportsDetailsComponent } from "../components/curator-reports-de
 import { CdkMenuModule } from "@angular/cdk/menu";
 import { NumberCardComponent } from "../components/number-card/number-card.component";
 import { DashboardService } from "./services/dashboard.service";
-import { UserResourceDashboard } from "./user-resource-dashboard/user-resource-dashboard.component";
+import { UserResourceDashboard } from "./user-resource-dashboard/page/user-resource-dashboard.component";
+import { UserResourceDashboardService } from "./user-resource-dashboard/services/user-resource-dashboard.service";
+import { BadgeCardComponent } from "../components/badge-card/badge-card.component";
 @NgModule({
   declarations: [
     DashboardSidebarComponent,
     UserDashboardComponent,
     UserOverviewComponent,
     ProfileUpdateComponent,
-    UserResourceDashboard
+    UserResourceDashboard,
   ],
-  providers: [UserOverviewPageService, UsersService, DashboardService],
+  providers: [
+    UserOverviewPageService,
+    UsersService,
+    DashboardService,
+    UserResourceDashboardService,
+  ],
   imports: [
     CommonModule,
     RouterModule,
@@ -47,6 +54,7 @@ import { UserResourceDashboard } from "./user-resource-dashboard/user-resource-d
     NavbarComponent,
     CalendarModule,
     // SvgModule,
+    BadgeCardComponent,
     SpinnerComponent,
     ReportsByDateChartComponent,
     CategoriesPieChartComponent,
