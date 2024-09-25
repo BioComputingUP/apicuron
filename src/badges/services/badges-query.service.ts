@@ -55,6 +55,7 @@ export class BadgesQueryService {
 				userBadgesFilter.getQuery(),
 				privacyFilter,
 				// Only show badges that are achieved or in progress but that are obtainable
+				{ curator_orcid: user.orcid_id },
 				{
 					$or: [
 						{ state: AchievementState.achieved },
