@@ -6,7 +6,12 @@
     <div class="tw-flex tw-flex-row tw-justify-between">
       <div class="tw-flex tw-grow tw-flex-col tw-pl-2">
         <div>
-          <div class="tw-float-right">
+          <div
+            class="tw-float-right"
+            [ngClass]="{
+              'tw-opacity-60': badge.state == AchievementState.progress
+            }"
+          >
             <svg-icon
               src="assets/svg/badge_check.svg"
               svgClass="tw-w-8 lg:tw-w-12 tw-mx-auto"
@@ -15,11 +20,19 @@
           </div>
           <span
             class="tw-block tw-text-sm sm:tw-text-base tw-font-dm-sans tw-font-bold tw-pb-1"
+            [ngClass]="{
+              'tw-opacity-60': badge.state == AchievementState.progress
+            }"
           >
             {{ badge.displayedName }}
           </span>
 
-          <span class="tw-block tw-text-xs tw-text-gray-500 tw-font-light">
+          <span
+            class="tw-block tw-text-xs tw-text-gray-500 tw-font-light"
+            [ngClass]="{
+              'tw-opacity-60': badge.state == AchievementState.progress
+            }"
+          >
             &emsp;Requires completing
             <span class="tw-font-bold">{{ badge.count_threshold }} </span>
             <span
@@ -31,9 +44,7 @@
             >
               {{ badge.count_threshold > 1 ? "activities" : "activity" }}
             </span>
-            <span
-              *ngIf="badge.state == AchievementState.achieved"
-            >
+            <span *ngIf="badge.state == AchievementState.achieved">
               <!-- if only start date is defined -->
               <span *ngIf="!!badge.startDate && !badge.endDate">
                 starting from
