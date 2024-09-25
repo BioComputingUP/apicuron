@@ -28,6 +28,7 @@ import { UserResourceDashboard } from "./user-resource-dashboard/page/user-resou
 import { UserResourceDashboardService } from "./user-resource-dashboard/services/user-resource-dashboard.service";
 import { BadgeCardComponent } from "../components/badge-card/badge-card.component";
 import { MyBadgesDetailsComponent } from "../components/my-badges-details/my-badges-details.component";
+import { DoughtnutPieChartComponent } from "../components/charts/doughnut-pie-chart/doughnut-pie-chart.component";
 @NgModule({
   declarations: [
     DashboardSidebarComponent,
@@ -62,6 +63,7 @@ import { MyBadgesDetailsComponent } from "../components/my-badges-details/my-bad
     CategoriesPieChartComponent,
     CuratorReportsDetailsComponent,
     NumberCardComponent,
-  ],
+    DoughtnutPieChartComponent
+],
 })
 export class DashboardModule {}
