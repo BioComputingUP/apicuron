@@ -1,20 +1,30 @@
 import { Component } from "@angular/core";
 import { DashboardService } from "../../services/dashboard.service";
-import { combineLatest, Observable } from "rxjs";
+import { combineLatest, Observable, Subject } from "rxjs";
 import { CuratorStatistics } from "../../../models/statistics.model";
 import { User } from "../../../models/User.model";
 import { UserResourceDashboardService } from "../services/user-resource-dashboard.service";
 import { ActivatedRoute, ParamMap } from "@angular/router";
-import { map, shareReplay, switchMap, tap } from "rxjs/operators";
+import {
+  map,
+  shareReplay,
+  startWith,
+  switchMap,
+  takeUntil,
+  tap,
+} from "rxjs/operators";
 import { Resource } from "../../../models/resource.model";
 import {
   ActivitiesStatistics,
   DetailedStatistics,
 } from "../../../curator-statistics/models/curator-stats";
-import { Paginated } from "../../../interfaces/paginated";
-import { AchievementState, Badge } from "../../../models/badge.model";
+import { AchievementState } from "../../../models/badge.model";
 import { MyBadgesFilter } from "../../../achievements/interfaces/achievement-filter";
-
+import {
+  BreakpointObserver,
+  Breakpoints,
+  BreakpointState,
+} from "@angular/cdk/layout";
 @Component({
   selector: "user-resource-dashboard",
   templateUrl: "./user-resource-dashboard.component.html",
@@ -31,13 +41,21 @@ export class UserResourceDashboard {
   progressFilter$: Observable<MyBadgesFilter>;
   userActivities$: Observable<ActivitiesStatistics[]>;
   activitiesAndResource$: Observable<[ActivitiesStatistics[], Resource]>;
+  destroy$ = new Subject();
+  limit$: Observable<number>;
 
   constructor(
     protected userResourceDashboard: UserResourceDashboardService,
     protected dashboardService: DashboardService,
-    protected route: ActivatedRoute
+    protected route: ActivatedRoute,
+    protected breakpointObserver: BreakpointObserver
   ) {
     this.init();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   init() {
@@ -71,19 +89,29 @@ export class UserResourceDashboard {
       this.userActivities$,
       this.resource$,
     ]);
+    const screenIsLarge$ = this.breakpointObserver
+      .observe([Breakpoints.XLarge])
+      .pipe(
+        map((state: BreakpointState) => state.breakpoints[Breakpoints.XLarge]),
+        startWith(this.breakpointObserver.isMatched(Breakpoints.XLarge))
+      );
 
-    this.achievedFilter$ = this.resourceId$.pipe(
-      map((resourceId) => {
+    this.limit$ = screenIsLarge$.pipe(map((isLarge) => (isLarge ? 6 : 4)));
+
+    this.achievedFilter$ = combineLatest([this.resourceId$, this.limit$]).pipe(
+      map(([resourceId, limit]) => {
         return MyBadgesFilter.create({
+          limit,
           resource_id: resourceId,
           state: AchievementState.achieved,
         });
       })
     );
 
-    this.progressFilter$ = this.resourceId$.pipe(
-      map((resourceId) => {
+    this.progressFilter$ = combineLatest([this.resourceId$, this.limit$]).pipe(
+      map(([resourceId, limit]) => {
         return MyBadgesFilter.create({
+          limit,
           resource_id: resourceId,
           state: AchievementState.progress,
           sortBy: "progress_rate",

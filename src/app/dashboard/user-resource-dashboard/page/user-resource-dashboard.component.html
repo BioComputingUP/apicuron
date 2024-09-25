@@ -22,7 +22,7 @@
       <div class="tw-p-1">
         <div
           class="tw-flex tw-flex-col tw-bg-white tw-rounded tw-shadow-md"
-          *ngIf="activitiesAndResource$ | async as activitiesAndResource"
+          *ngIf="userActivities$ | async as activities"
         >
           <span
             class="tw-block tw-w-full tw-text-gray-700 tw-font-bold tw-text-lg tw-font-dm-sans tw-px-3 tw-pt-1"
@@ -30,19 +30,10 @@
             Badges in progress
           </span>
           <ng-container *ngIf="progressFilter$ | async as filter">
-            <!-- <my-badges-details
-              class="tw-hidden 2xl:tw-block"
-              [terms]="activitiesAndResource[0]"
-              [filter]="filter"
-              [limit]="6"
-              [resource]="activitiesAndResource[1]"
-            >
-            </my-badges-details> -->
 
             <my-badges-details
-              [terms]="activitiesAndResource[0]"
+              [terms]="activities"
               [filter]="filter"
-              [limit]="4"
             ></my-badges-details>
           </ng-container>
 
@@ -50,13 +41,12 @@
 
           <span
             class="tw-block tw-w-full tw-text-gray-700 tw-font-bold tw-text-lg tw-font-dm-sans tw-px-3 tw-pt-1"
-            >Recently Earned Badges</span
+            >Earned Badges</span
           >
           <ng-container *ngIf="achievedFilter$ | async as filter">
             <my-badges-details
-              [terms]="activitiesAndResource[0]"
+              [terms]="activities"
               [filter]="filter"
-              [limit]="4"
             ></my-badges-details>
           </ng-container>
         </div>

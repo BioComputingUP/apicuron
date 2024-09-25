@@ -7,7 +7,7 @@ import {
   OnInit,
   ViewChild,
 } from "@angular/core";
-import Chart from "chart.js/auto";
+import Chart, { LegendOptions } from "chart.js/auto";
 import { BehaviorSubject, Subject } from "rxjs";
 import { ActivitiesStatistics } from "../../../curator-statistics/models/curator-stats";
 import { map, takeUntil, tap } from "rxjs/operators";
@@ -49,14 +49,20 @@ export class DoughtnutPieChartComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    Chart.overrides.doughnut.plugins.legend = {
+      ...Chart.overrides.doughnut.plugins.legend,
+      display: true,
+      position: "bottom",
+      align: "start",
+    }; // as LegendOptions<'doughnut'>
     this.setup();
   }
 
   groupActivitiesByCategory(activities: ActivitiesStatistics[]) {
     const groupedData = activities.reduce((acc, activity) => {
-      const { activity_term, count } = activity;
+      const { activity_term, count, activity_name } = activity;
       if (!acc[activity_term]) {
-        acc[activity_term] = { totalCount: 0, totalScore: 0 };
+        acc[activity_term] = { totalCount: 0, totalScore: 0, activity_name };
       }
       acc[activity_term].totalCount += count;
       return acc;
@@ -64,8 +70,9 @@ export class DoughtnutPieChartComponent implements OnInit, OnDestroy {
 
     const categories = Object.keys(groupedData);
     const counts = categories.map((cat) => groupedData[cat].totalCount);
+    const labels = categories.map((cat) => groupedData[cat].activity_name);
 
-    return { categories, counts };
+    return { categories, counts, labels };
   }
 
   setup() {
@@ -91,9 +98,8 @@ export class DoughtnutPieChartComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
-  createChart({ categories, counts }: any) {
+  createChart({ categories, counts, labels }: any) {
     return {
-      labels: categories,
       datasets: [
         {
           label: "Count",
@@ -101,6 +107,7 @@ export class DoughtnutPieChartComponent implements OnInit, OnDestroy {
           hoverOffset: 4,
         },
       ],
+      labels,
     };
   }
 }

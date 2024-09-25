@@ -38,7 +38,6 @@ import { AchievementsModule } from "../../achievements/achievements.module";
 export class MyBadgesDetailsComponent implements OnInit {
   @Input() curator: User;
 
-  @Input() limit: number = 16;
   @Input() set filter(value: MyBadgesFilter) {
     this.badgeFilter$.next(value);
   }
@@ -76,10 +75,6 @@ export class MyBadgesDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.badges$ = this.badgeFilter$.pipe(
-      map((filter: MyBadgesFilter) => {
-        filter.limit = this.limit;
-        return filter;
-      }),
       // filter((filter) => !!filter),
       switchMap((badgeFilter: MyBadgesFilter) => {
         return this.badgeService.getMyBadges(badgeFilter).pipe(shareReplay(1));
