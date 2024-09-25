@@ -54,20 +54,18 @@ export class DoughtnutPieChartComponent implements OnInit, OnDestroy {
 
   groupActivitiesByCategory(activities: ActivitiesStatistics[]) {
     const groupedData = activities.reduce((acc, activity) => {
-      const { activity_category, count, score } = activity;
-      if (!acc[activity_category]) {
-        acc[activity_category] = { totalCount: 0, totalScore: 0 };
+      const { activity_term, count } = activity;
+      if (!acc[activity_term]) {
+        acc[activity_term] = { totalCount: 0, totalScore: 0 };
       }
-      acc[activity_category].totalCount += count;
-      acc[activity_category].totalScore += score;
+      acc[activity_term].totalCount += count;
       return acc;
     }, {});
 
     const categories = Object.keys(groupedData);
     const counts = categories.map((cat) => groupedData[cat].totalCount);
-    const scores = categories.map((cat) => groupedData[cat].totalScore);
 
-    return { categories, counts, scores };
+    return { categories, counts };
   }
 
   setup() {
@@ -93,20 +91,13 @@ export class DoughtnutPieChartComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
-  createChart({ categories, counts, scores }: any) {
+  createChart({ categories, counts }: any) {
     return {
       labels: categories,
       datasets: [
         {
           label: "Count",
           data: counts,
-          backgroundColor: ["#59C794", "#EDBF3A", "#F76135"],
-          hoverOffset: 4,
-        },
-        {
-          label: "Score",
-          data: scores,
-          backgroundColor: ["#59C794", "#EDBF3A", "#F76135"],
           hoverOffset: 4,
         },
       ],
