@@ -8,9 +8,6 @@ import {
 } from "../../../curator-statistics/models/curator-stats";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "../../../../environments/environment";
-import { sortBy } from "lodash";
-import { Badge } from "../../../models/badge.model";
-import { Paginated } from "../../../interfaces/paginated";
 
 @Injectable()
 export class UserResourceDashboardService {
@@ -81,35 +78,8 @@ export class UserResourceDashboardService {
     return activityEntries;
   }
 
-  getUserBadges(
-    resourceId: string,
-    state: "achieved" | "progress" = "achieved",
-    skip: number = 0,
-    limit: number = 4,
-    sortBy: "achieved_at" | "count_threshold" | "progress_rate" = "achieved_at",
-    sortOrder: -1 | 1 | "asc" | "desc" = -1
-  ) {
-    return this.http
-      .get(`${this.wsUrl}/achievements/my-badges`, {
-        params: {
-          resource_id: resourceId,
-          state,
-          sortBy,
-          sortOrder,
-          limit,
-          skip,
-        },
-        headers: {
-          Version: "2",
-        },
-      })
-      .pipe(
-        map((response: Paginated<Badge>) => {
-          response.data = response.data.map((badge: Badge) =>
-            new Badge().deserialize(badge)
-          );
-          return response as Paginated<Badge>;
-        })
-      );
-  }
+  //   getUserBadges(
+  //     filter: MyBadgesFilter
+  //   ) {
+  //     return this}
 }

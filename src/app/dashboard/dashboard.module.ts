@@ -27,6 +27,7 @@ import { DashboardService } from "./services/dashboard.service";
 import { UserResourceDashboard } from "./user-resource-dashboard/page/user-resource-dashboard.component";
 import { UserResourceDashboardService } from "./user-resource-dashboard/services/user-resource-dashboard.service";
 import { BadgeCardComponent } from "../components/badge-card/badge-card.component";
+import { MyBadgesDetailsComponent } from "../components/my-badges-details/my-badges-details.component";
 @NgModule({
   declarations: [
     DashboardSidebarComponent,
@@ -54,7 +55,8 @@ import { BadgeCardComponent } from "../components/badge-card/badge-card.componen
     NavbarComponent,
     CalendarModule,
     // SvgModule,
-    BadgeCardComponent,
+    MyBadgesDetailsComponent,
+    // BadgeCardComponent,
     SpinnerComponent,
     ReportsByDateChartComponent,
     CategoriesPieChartComponent,

@@ -1,6 +1,6 @@
-import { Component, Injectable } from "@angular/core";
+import { Component } from "@angular/core";
 import { DashboardService } from "../../services/dashboard.service";
-import { Observable } from "rxjs";
+import { combineLatest, Observable } from "rxjs";
 import { CuratorStatistics } from "../../../models/statistics.model";
 import { User } from "../../../models/User.model";
 import { UserResourceDashboardService } from "../services/user-resource-dashboard.service";
@@ -12,7 +12,8 @@ import {
   DetailedStatistics,
 } from "../../../curator-statistics/models/curator-stats";
 import { Paginated } from "../../../interfaces/paginated";
-import { Badge } from "../../../models/badge.model";
+import { AchievementState, Badge } from "../../../models/badge.model";
+import { MyBadgesFilter } from "../../../achievements/interfaces/achievement-filter";
 
 @Component({
   selector: "user-resource-dashboard",
@@ -26,8 +27,10 @@ export class UserResourceDashboard {
   resource$: Observable<Resource>;
   detailedStatistics$: Observable<DetailedStatistics>;
   mainNumbers$: Observable<{ label: string; value: number | string }[]>;
-  recentlyAchievedBadges$: Observable<Paginated<Badge>>;
-  badgesInProgress$: Observable<Paginated<Badge>>;
+  achievedFilter$: Observable<MyBadgesFilter>;
+  progressFilter$: Observable<MyBadgesFilter>;
+  userActivities$: Observable<ActivitiesStatistics[]>;
+  activitiesAndResource$: Observable<[ActivitiesStatistics[], Resource]>;
 
   constructor(
     protected userResourceDashboard: UserResourceDashboardService,
@@ -53,38 +56,71 @@ export class UserResourceDashboard {
     this.detailedStatistics$ = this.resourceId$.pipe(
       switchMap((resourceId) =>
         this.userResourceDashboard.getDetailedStatistics(resourceId)
-      )
+      ),
+      shareReplay(1)
+    );
+
+    this.userActivities$ = this.detailedStatistics$.pipe(
+      map((stat) => stat.activities)
     );
 
     this.mainNumbers$ = this.detailedStatistics$.pipe(
       map((stat) => this.userResourceDashboard.computeMainNumbers(stat))
     );
 
-    this.recentlyAchievedBadges$ = this.resourceId$.pipe(
-      switchMap((resourceId: string) => {
-        return this.userResourceDashboard.getUserBadges(
-          resourceId,
-          "achieved",
-          0,
-          4
-        );
-      }),
-      shareReplay(1)
+    this.activitiesAndResource$ = combineLatest([this.userActivities$, this.resource$]);
+
+    this.achievedFilter$ = this.resourceId$.pipe(
+      map((resourceId) => {
+        return MyBadgesFilter.create({
+          resource_id: resourceId,
+          state: AchievementState.achieved,
+        });
+      })
     );
 
-    this.badgesInProgress$ = this.resourceId$.pipe(
-      switchMap((resourceId: string) => {
-        return this.userResourceDashboard.getUserBadges(
-          resourceId,
-          "progress",
-          0,
-          4,
-          "progress_rate",
-          -1
-        );
-      }),
-      shareReplay(1)
+    this.progressFilter$ = this.resourceId$.pipe(
+      map((resourceId) => {
+        return MyBadgesFilter.create({
+          resource_id: resourceId,
+          state: AchievementState.progress,
+          sortBy: "progress_rate",
+          sortOrder: -1,
+        });
+      })
     );
+
+    // this.recentlyAchievedBadges$ = this.resourceId$.pipe(
+    //   switchMap((resourceId: string) => {
+    //     const achievedFilter = MyBadgesFilter.create({
+    //       resource_id: resourceId,
+    //       state: AchievementState.achieved,
+    //       limit: 4,
+    //       skip: 0,
+    //     })
+    //     return this.userResourceDashboard.getUserBadges(
+    //       resourceId,
+    //       "achieved",
+    //       0,
+    //       4
+    //     );
+    //   }),
+    //   shareReplay(1)
+    // );
+
+    // this.badgesInProgress$ = this.resourceId$.pipe(
+    //   switchMap((resourceId: string) => {
+    //     return this.userResourceDashboard.getUserBadges(
+    //       resourceId,
+    //       "progress",
+    //       0,
+    //       4,
+    //       "progress_rate",
+    //       -1
+    //     );
+    //   }),
+    //   shareReplay(1)
+    // );
   }
 
   getCurrentResourceId() {
