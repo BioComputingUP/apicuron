@@ -55,11 +55,12 @@ export class DashboardService {
     this.contributedResources$ = combineLatest([
       resources$,
       contributedResourceIds$,
-    ]).pipe(this.filterResources);
-    this.managedResources$ = combineLatest([
+    ]).pipe(this.filterResources, shareReplay(1));
+    (this.managedResources$ = combineLatest([
       resources$,
       managedResourceIds$,
-    ]).pipe(this.filterResources);
+    ]).pipe(this.filterResources)),
+      shareReplay(1);
   }
 
   private filterResources = pipe(

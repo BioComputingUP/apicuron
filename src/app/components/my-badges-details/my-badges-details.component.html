@@ -2,12 +2,9 @@
   class="tw-w-full tw-h-full tw-bg-white tw-px-1 tw-py-2 tw-flex tw-flex-col tw-overflow-y-auto lg:tw-overflow-y-hidden"
 >
   <div class="tw-relative">
-    <div class="tw-flex tw-flex-row tw-flex-wrap">
+    <div class="tw-grid tw-grid-cols-2 2xl:tw-grid-cols-3 tw-gap-2">
       <ng-container *ngIf="badges$ | async as badges">
-        <div
-          class="tw-w-1/3 tw-p-2 md:tw-p-1"
-          *ngFor="let badge of badges.data"
-        >
+        <div class="md:tw-p-1" *ngFor="let badge of badges.data">
           <badge-card [badge]="badge" [terms]="terms$ | async"></badge-card>
         </div>
       </ng-container>
@@ -18,7 +15,9 @@
     class="tw-mt-auto tw-flex tw-flex-row tw-justify-between tw-items-center tw-px-1 tw-pt-2"
     *ngIf="badges$ | async as badges"
   >
-    <span class="tw-block tw-text-sm">Total: {{ badges.meta.pagination.total }}</span>
+    <span class="tw-block tw-text-sm"
+      >Total: {{ badges.meta.pagination.total }}</span
+    >
 
     <pagination
       [totalItems]="badges.meta.pagination.total"

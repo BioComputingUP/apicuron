@@ -6,7 +6,7 @@ import {
   OnInit,
 } from "@angular/core";
 import { BehaviorSubject, Observable, of } from "rxjs";
-import { filter, shareReplay, switchMap } from "rxjs/operators";
+import { filter, map, shareReplay, switchMap } from "rxjs/operators";
 import { MyBadgesFilter } from "src/app/achievements/interfaces/achievement-filter";
 import { BadgesService } from "src/app/achievements/services/badges.service";
 import { BadgeCardComponent } from "src/app/components/badge-card/badge-card.component";
@@ -37,10 +37,11 @@ import { AchievementsModule } from "../../achievements/achievements.module";
 })
 export class MyBadgesDetailsComponent implements OnInit {
   @Input() curator: User;
-  @Input() resource: Resource;
 
   @Input() limit: number = 16;
-  @Input() filter: MyBadgesFilter;
+  @Input() set filter(value: MyBadgesFilter) {
+    this.badgeFilter$.next(value);
+  }
   @Input() terms: Term[];
 
   badges$: Observable<Paginated<Badge>>;
@@ -71,29 +72,17 @@ export class MyBadgesDetailsComponent implements OnInit {
     if (!!this.terms && this.terms instanceof Array && this.terms.length > 0) {
       return of(this.terms);
     }
-    const termFilter = new TermsFilter();
-    termFilter.resource_id = this.resource.resource_id;
-    return this.termService.getTerms(termFilter).pipe(shareReplay(1));
   }
 
   ngOnInit(): void {
-    const initialFilter = this.filter?.serialize() ?? {};
-
-	console.log({ resource_id: this.resource.resource_id, initialFilter });
-
-    const badgeFilter = MyBadgesFilter.create({
-      ...initialFilter,
-      resource_id: this.resource.resource_id,
-      limit: this.limit ?? 16,
-      skip: 0,
-    });
-	
-    this.badgeFilter$.next(badgeFilter);
-
     this.badges$ = this.badgeFilter$.pipe(
-      filter((filter) => !!filter),
+      map((filter: MyBadgesFilter) => {
+        filter.limit = this.limit;
+        return filter;
+      }),
+      // filter((filter) => !!filter),
       switchMap((badgeFilter: MyBadgesFilter) => {
-        return this.badgeService.getMyBadges(badgeFilter);
+        return this.badgeService.getMyBadges(badgeFilter).pipe(shareReplay(1));
       }),
       shareReplay(1)
     );

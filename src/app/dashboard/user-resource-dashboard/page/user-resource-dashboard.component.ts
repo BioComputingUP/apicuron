@@ -47,7 +47,6 @@ export class UserResourceDashboard {
       switchMap((resId) => this.userResourceDashboard.getCurrentResource(resId))
     );
     this.statistics$ = this.resourceId$.pipe(
-      tap((resourceId) => console.log({ resourceId })),
       switchMap((resId) =>
         this.userResourceDashboard.getCurrentResourceStat(resId)
       )
@@ -68,7 +67,10 @@ export class UserResourceDashboard {
       map((stat) => this.userResourceDashboard.computeMainNumbers(stat))
     );
 
-    this.activitiesAndResource$ = combineLatest([this.userActivities$, this.resource$]);
+    this.activitiesAndResource$ = combineLatest([
+      this.userActivities$,
+      this.resource$,
+    ]);
 
     this.achievedFilter$ = this.resourceId$.pipe(
       map((resourceId) => {
@@ -89,38 +91,6 @@ export class UserResourceDashboard {
         });
       })
     );
-
-    // this.recentlyAchievedBadges$ = this.resourceId$.pipe(
-    //   switchMap((resourceId: string) => {
-    //     const achievedFilter = MyBadgesFilter.create({
-    //       resource_id: resourceId,
-    //       state: AchievementState.achieved,
-    //       limit: 4,
-    //       skip: 0,
-    //     })
-    //     return this.userResourceDashboard.getUserBadges(
-    //       resourceId,
-    //       "achieved",
-    //       0,
-    //       4
-    //     );
-    //   }),
-    //   shareReplay(1)
-    // );
-
-    // this.badgesInProgress$ = this.resourceId$.pipe(
-    //   switchMap((resourceId: string) => {
-    //     return this.userResourceDashboard.getUserBadges(
-    //       resourceId,
-    //       "progress",
-    //       0,
-    //       4,
-    //       "progress_rate",
-    //       -1
-    //     );
-    //   }),
-    //   shareReplay(1)
-    // );
   }
 
   getCurrentResourceId() {
