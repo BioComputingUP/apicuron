@@ -1,51 +1,64 @@
+<div class="tw-relative tw-mt-6">
+  <report-filter-form
+    (reportFilter)="updateReportFilter($event)"
+    [terms]="terms$ | async"
+  ></report-filter-form>
+</div>
+
+<div></div>
+
 <div
-    class="tw-flex tw-h-full tw-flex-col tw-overflow-y-auto tw-bg-gray-100 tw-py-6 tw-shadow-xl sm:tw-pt-4 tw-px-2 sm:tw-px-6">
-    <div>
-        <h2 class="tw-text-base tw-font-semibold tw-leading-6 tw-text-gray-900" id="slide-over-title">
-            {{ curator.displayedName }}'s Contributions to
-            <span [ngStyle]="{ color: resource.color }">{{
-                resource.resource_name
-                }}</span>
-        </h2>
+  class="tw-relative tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-pt-2"
+  *ngIf="paginatedReports$ | async as filteredReports"
+>
+  <div class="tw-w-full tw-flex tw-flex-row tw-justify-end tw-gap-1 tw-py-1">
+    <button
+      class="tw-rounded-full tw-p-1"
+      [ngClass]="{
+        'tw-bg-gray-700 tw-text-gray-300': viewType == 'grid',
+        'tw-bg-gray-300 tw-text-gray-700': viewType == 'table'
+      }"
+      (click)="viewType = 'grid'"
+    >
+      <svg-icon src="assets/svg/grid.svg" svgClass="tw-w-4 tw-h-4"></svg-icon>
+    </button>
+    <button
+      class="tw-rounded-full tw-p-1"
+      [ngClass]="{
+        'tw-bg-gray-700 tw-text-gray-300': viewType == 'table',
+        'tw-bg-gray-300 tw-text-gray-700': viewType == 'grid'
+      }"
+      (click)="viewType = 'table'"
+    >
+      <svg-icon src="assets/svg/table.svg" svgClass="tw-w-4 tw-h-4"></svg-icon>
+    </button>
+  </div>
+
+  <div class="tw-overflow-x-auto tw-w-full" *ngIf="viewType == 'table'">
+    <report-table [reports]="filteredReports.data"> </report-table>
+  </div>
+  <ng-container *ngIf="viewType == 'grid'">
+    <div
+      class="tw-w-1/2 sm:tw-w-1/4 tw-p-1"
+      *ngFor="let report of filteredReports.data"
+    >
+      <report-card [term]="report.term" [report]="report"></report-card>
     </div>
-    <div class="tw-relative tw-mt-6">
-            <report-filter-form (reportFilter)="reportFilter$.next($event)" [terms]="terms" [curator]="curator" [resource]="resource"></report-filter-form>
-    </div>
+  </ng-container>
+</div>
 
-    <div></div>
-
-    <div class="tw-relative tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-pt-2"
-        *ngIf="reportsWithTerms$ | async as filteredReports">
-
-        <div class="tw-w-full tw-flex tw-flex-row tw-justify-end tw-gap-1 tw-py-1">
-            <button class="tw-rounded-full  tw-p-1"
-                [ngClass]="{'tw-bg-gray-700 tw-text-gray-300': viewType == 'grid', 'tw-bg-gray-300 tw-text-gray-700': viewType == 'table'  }"
-                (click)="viewType = 'grid'">
-                <svg-icon src="assets/svg/grid.svg" svgClass="tw-w-4 tw-h-4"></svg-icon>
-            </button>
-            <button class="tw-rounded-full tw-p-1"
-                [ngClass]="{'tw-bg-gray-700 tw-text-gray-300': viewType == 'table', 'tw-bg-gray-300 tw-text-gray-700': viewType == 'grid' }"
-                (click)="viewType = 'table'">
-                <svg-icon src="assets/svg/table.svg" svgClass="tw-w-4 tw-h-4"></svg-icon>
-            </button>
-        </div>
-
-        <div class="tw-overflow-x-auto tw-w-full" *ngIf="viewType == 'table'">
-            <report-table [reports]="filteredReports.data">
-            </report-table>
-        </div>
-        <ng-container *ngIf="viewType == 'grid'">
-            <div class="tw-w-1/2 sm:tw-w-1/4 tw-p-1" *ngFor="let report of filteredReports.data">
-                <report-card [term]="report.term" [report]="report"></report-card>
-            </div>
-
-        </ng-container>
-
-    </div>
-
-    <div class="tw-mt-auto tw-flex tw-flex-row tw-justify-center tw-py-2" *ngIf="reportsWithTerms$ | async as reports">
-        <pagination [totalItems]="reports.total" [itemsPerPage]="reports.limit"
-            [page]="currentPage" (pageChanged)="update_page($event.page)" [maxSize]="5"></pagination>
-    </div>
-
+<div
+  class="tw-mt-auto tw-flex tw-flex-row tw-justify-between tw-p-2"
+  *ngIf="paginatedReports$ | async as reports"
+>
+  <div class="tw-block">
+    Total contributions: {{ reports.meta.pagination.total }}
+  </div>
+  <pagination
+    [totalItems]="reports.meta.pagination.total"
+    [itemsPerPage]="reports.meta.pagination.limit"
+    [page]="page$ | async"
+    (pageChanged)="update_page($event.page)"
+    [maxSize]="5"
+  ></pagination>
 </div>

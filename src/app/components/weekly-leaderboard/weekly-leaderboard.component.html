@@ -1,0 +1,213 @@
+<!-- Weekly Leaderboard -->
+<ng-container *ngIf="weeklyLeaderboard$ | async as weeklyLeaderboard">
+  <ng-container *ngIf="resource$ | async as resource">
+    <span
+      *ngIf="weeklyLeaderboard.data.length > 0"
+      class="tw-text-xs tw-text-gray-500 tw-font-light"
+      >This Leaderboard comprises contributions from
+      <span
+        class="tw-underline"
+        >{{ weeklyLeaderboard.data?.[0].stat.weekStart| date: 'EEEE dd-MM-yy':'UTC' }}</span
+      >
+      till
+      <span
+        class="tw-underline"
+        >{{ weeklyLeaderboard.data?.[0].stat.weekEnd| date: 'EEEE dd-MM-yy':"UTC" }}</span
+      >
+      in UTC timezone and is reset every Monday at 00:00 UTC</span
+    >
+    <div class="tw-flex tw-flex-col tw-overflow-x-auto">
+      <table *ngIf="weeklyLeaderboard.data.length > 0" class="tw-table-auto">
+        <thead>
+          <tr class="tw-divide-x tw-divide-gray-200">
+            <th class="tw-px-2 tw-py-1">Ranking</th>
+            <th class="tw-px-2 tw-py-1" colspan="2">Curator</th>
+            <th
+              *ngFor="let column of tableColumnsWeekly"
+              class="tw-px-1 tw-py-1 tw-justify-center"
+            >
+              <span>
+                {{ leaderboardService.getColumnProps(column).name }}
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="tw-divide-y tw-divide-gray-200">
+          <tr
+            *ngFor="
+              let entry of weeklyLeaderboard.data;
+              let indexOfelement = index
+            "
+            class="odd:tw-bg-gray-50"
+          >
+            <td class="tw-text-center tw-font-bold">
+              {{ weeklyLeaderboard.meta.pagination.start + indexOfelement }}
+            </td>
+            <td>
+              <div
+                class="tw-overflow-hidden tw-w-12 tw-h-12 tw-rounded-full tw-border-2 tw-border-apicuron-bright-purple"
+                [ngStyle]="{ borderColor: resource.color }"
+              >
+                <img
+                  [src]="entry.user.generate_avatar()"
+                  class="tw-w-full"
+                  alt=""
+                />
+              </div>
+            </td>
+            <td>
+              <div
+                class="tw-flex tw-flex-row tw-ml-1 md:tw-ml-2 tw-items-center"
+              >
+                <a
+                  class="tw-text-lg tw-block hover:tw-underline tw-whitespace-pre"
+                  [routerLink]="['/curators', entry.user.orcid_id]"
+                >
+                  <span>{{ entry.user.displayedName }}</span>
+                </a>
+                <a
+                  [href]="entry.user.orcid_url()"
+                  class="tw-block tw-w-6 tw-h-6 tw-ml-1 md:tw-ml-2"
+                >
+                  <img
+                    src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
+                    class="tw-w-6 tw-h-6"
+                    alt=""
+                  />
+                </a>
+              </div>
+            </td>
+            <td class="tw-text-center tw-font-bold tw-text-gray-700">
+              {{ entry.stat.generation_count | number : "3.0-0" }}
+            </td>
+            <td class="tw-text-center tw-font-bold tw-text-gray-700">
+              {{ entry.stat.invalidation_count | number : "3.0-0" }}
+            </td>
+            <td class="tw-text-center tw-font-bold tw-text-gray-700">
+              {{ entry.stat.revision_count | number : "3.0-0" }}
+            </td>
+            <!-- <td class="tw-text-center tw-font-bold tw-text-gray-700">
+              {{ entry.stat.first_contribution | date : "dd-MM-yy" }}
+            </td>
+
+            <td class="tw-text-center tw-font-bold tw-text-gray-700">
+              {{ entry.stat.weekEnd | date : "dd-MM-yy" }}
+            </td> -->
+            <td class="tw-text-center tw-font-bold tw-text-gray-700">
+              {{ entry.stat.total_score }}
+            </td>
+            <!-- <td class="tw-text-center tw-font-bold tw-text-gray-700">
+              <weekly-bar-chart [days-of-week]="entry.stat.daysOfWeek"></weekly-bar-chart>
+            </td> -->
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Pagination -->
+    <div
+      class="tw-bg-white tw-p-1 md:tw-p-2 tw-text-gray-700"
+      style="font-family: system-ui"
+    >
+      <ng-container
+        *ngIf="weeklyLeaderboard$ | async as leaderboard; else loading"
+      >
+        <ng-container
+          *ngIf="leaderboard.meta.pagination.total > 0; else emptyList"
+        >
+          <div
+            class="tw-flex tw-flex-row tw-justify-between tw-pt-2 md:tw-pt-4"
+          >
+            <div *ngIf="weeklyContributors$ | async as weeklyContributors">
+              <span
+                >Total Contributors:
+                <span
+                  class="tw-bg-apicuron-bright-purple tw-text-white tw-font-bold tw-rounded-md tw-px-1"
+                  >{{ weeklyContributors }}</span
+                >
+              </span>
+            </div>
+            <div *ngIf="maxPage$ | async as maxPage">
+              <div
+                class="tw-inline-flex tw-justify-center tw-gap-1"
+                *ngIf="page$ | async as page"
+              >
+                <button
+                  (click)="prevPage()"
+                  [disabled]="page == 1"
+                  class="tw-inline-flex tw-h-8 disabled:tw-text-gray-400 tw-w-8 tw-items-center tw-justify-center tw-rounded tw-border tw-border-gray-100 tw-bg-white tw-text-gray-900 rtl:tw-rotate-180"
+                >
+                  <span class="tw-sr-only">Prev Page</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="tw-h-3 tw-w-3 tw-text-inherit"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                      clip-rule="evenodd"
+                    ></path>
+                  </svg>
+                </button>
+
+                <div>
+                  <label for="PaginationPage" class="tw-sr-only">Page</label>
+
+                  <div
+                    type="number"
+                    class="tw-text-gray-700 tw-px-2 tw-py-1 tw-rounded tw-border tw-border-gray-300"
+                  >
+                    {{ page }}
+                  </div>
+                </div>
+
+                <button
+                  (click)="nextPage()"
+                  [disabled]="page >= maxPage"
+                  class="tw-inline-flex tw-h-8 disabled:tw-text-gray-400 tw-w-8 tw-items-center tw-justify-center tw-rounded tw-border tw-border-gray-100 tw-bg-white tw-text-gray-900 rtl:tw-rotate-180"
+                >
+                  <span class="tw-sr-only">Next Page</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="tw-h-3 tw-w-3"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clip-rule="evenodd"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <a [href]="apicuronURL">
+              <img
+                class="tw-w-48 tw-transition-transform hover:tw-scale-110"
+                src="assets/APICURON.svg"
+                alt=""
+              />
+            </a>
+          </div>
+        </ng-container>
+
+        <ng-template #emptyList>
+          <div class="tw-text-center">
+            {{ resource.resource_name }} has no available weekly leaderboard yet
+          </div>
+        </ng-template>
+      </ng-container>
+
+      <ng-template #loading>
+        <span class="tw-block tw-text-center tw-font-bold tw-py-2">
+          <svg-icon
+            src="assets/svg/loading-spinner.svg"
+            svgClass="tw-animate-spin tw-h-10 tw-w-10 tw-mx-auto"
+          ></svg-icon>
+        </span>
+      </ng-template>
+    </div>
+  </ng-container>
+</ng-container>

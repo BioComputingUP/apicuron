@@ -3,6 +3,30 @@ import {
   Serializable,
 } from "src/app/interfaces/deserializable.model";
 import { environment } from "src/environments/environment";
+export class ResourceStats implements Deserializable {
+  contributionCount: any;
+  uniqueContributors: any;
+  lastContributionDate: Date | null;
+  firstContributionDate: Date;
+  lastResourceUpdateDate: Date | null;
+
+  deserialize(input: any): this {
+    this.contributionCount = input.contributionCount;
+    this.uniqueContributors = input.uniqueContributors;
+    this.lastContributionDate = new Date(input.lastContributionDate);
+    this.firstContributionDate = input.firstContributionDate
+      ? new Date(input.firstContributionDate)
+      : null;
+    this.lastResourceUpdateDate = input.lastResourceUpdateDate
+      ? new Date(input.lastResourceUpdateDate)
+      : null;
+    return this;
+  }
+
+  hasLastActivity(): boolean {
+    return !!this.lastContributionDate || !!this.lastResourceUpdateDate;
+  }
+}
 
 export class Resource implements Deserializable, Serializable {
   serialize(): any {
@@ -25,6 +49,9 @@ export class Resource implements Deserializable, Serializable {
     this.resource_uri = new URL(input.resource_uri);
     this.resource_url = new URL(input.resource_url);
     this.color = input.color;
+    if (input.stats) {
+      this.stats = new ResourceStats().deserialize(input.stats);
+    }
 
     if (input.logo && typeof input.logo == "string") {
       if (input.logo.startsWith("assets")) {
@@ -40,7 +67,6 @@ export class Resource implements Deserializable, Serializable {
       }
     }
 
-
     // this.logo = input.logo;
 
     this.color = input.color;
@@ -51,6 +77,11 @@ export class Resource implements Deserializable, Serializable {
     return new URL("/favicon.ico", this.resource_url).href;
   }
 
+  compare(other: Resource): boolean {
+    return this.resource_id === other.resource_id;
+  }
+
+  stats: ResourceStats;
   resource_description: string;
   name: string;
   resource_id: string;

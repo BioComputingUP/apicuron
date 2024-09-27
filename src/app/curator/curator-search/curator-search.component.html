@@ -6,7 +6,7 @@
         <span class="tw-text-gray-400 tw-uppercase" style="font-size: 0.60rem;">Resources</span>
         <div *ngIf="selected_resources$ | async as selected_resources" class="tw-flex tw-flex-row tw-items-center">
 
-            <input #resourcesearch (input)="search_resource($event)" (focus)="search_resource($event)"
+            <input #resourcesearch
                 (keyup.enter)="add_resource($event.target.value)"
                 class="tw-outline-none tw-flex-initial" type="text" name=""
                 id="" placeholder="Filter by resource">

@@ -7,6 +7,7 @@ import { User } from "src/app/models/User.model";
 import { ResourcesService } from "src/app/resource/service/resources.service";
 import { Resource } from "src/app/models/resource.model";
 import { ActivatedRoute } from "@angular/router";
+import { DashboardService } from "../services/dashboard.service";
 
 type ResourceLinks = {
   links: { href: string[]; name: string; icon: string }[]; // extract managed resources from user and request their data
@@ -22,33 +23,22 @@ export class DashboardSidebarComponent implements OnInit {
   ResourceLinks[]
   >;
   user$: Observable<User>;
-  resources$: Observable<Resource[]>;
+  managedResources$: Observable<Resource[]>;
+  contributedResources$: Observable<Resource[]>;
 
   constructor(
-    protected auth: AuthService,
-    protected resourceService: ResourcesService,
+    protected dashboardService: DashboardService,
+    // protected auth: AuthService,
+    // protected resourceService: ResourcesService,
     protected route: ActivatedRoute
   ) {
-    this.user$ = this.auth.user$;
+    this.user$ = this.dashboardService.user$;
 
-    this.resources$ = this.user$.pipe(
-      // extract managed resources from user and request their data
-      map((user: User) => {
-        const resourceIds: string[] = user.resources.map(
-          (resource) => resource.resource_id
-        );
-        return resourceIds.map((resource_id: string) =>
-          this.resourceService.get_resource(resource_id).pipe(shareReplay(1))
-        );
-      }),
-      // Combine these resources into a single observable array
-      switchMap((resources: Observable<Resource>[]) => {
-        return combineLatest(resources);
-      }),
-      shareReplay(1)
-    );
+    this.managedResources$ = this.dashboardService.managedResources$;
 
-    this.links$ = this.resources$.pipe(
+    this.contributedResources$ = this.dashboardService.contributedResources$;
+
+    this.links$ = this.managedResources$.pipe(
       map((resources: Resource[]) => {
         return resources.map((resource: Resource) => {
 

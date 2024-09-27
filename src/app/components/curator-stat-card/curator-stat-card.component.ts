@@ -171,9 +171,7 @@ export class CuratorStatCardComponent implements OnInit {
   }
 
   get phrasing() {
-    return this.statistics.work_type == "contribution"
-      ? "contributed to"
-      : "professionally worked at";
+    return "contributed to";
   }
 
 }

@@ -6,7 +6,11 @@ import { Paginated } from "src/app/interfaces/paginated";
 import { CuratorStatistics } from "src/app/models/statistics.model";
 import { environment } from "src/environments/environment";
 import { StatisticsFilter } from "../models/statistics-filter";
-import { CuratorWithStats } from "../models/curator-stats";
+import {
+  CuratorWithStats,
+  CuratorWithWeeklyStats,
+  DetailedStatistics,
+} from "../models/curator-stats";
 
 @Injectable()
 export class CuratorStatisticsService {
@@ -22,45 +26,12 @@ export class CuratorStatisticsService {
       })
       .pipe(
         pluck("data"),
-        map((data: CuratorStatistics[]) => {
+        map((data: CuratorStatistics[]): CuratorStatistics[] => {
           return data.map((stat: CuratorStatistics) =>
             new CuratorStatistics().deserialize(stat)
           );
         })
       );
-  }
-
-  get_resource_statistics(resource_id: string) {
-    throw new Error("Not Implemented Error !");
-  }
-
-  getResourceLeaderboard(
-    resource_id: string,
-    limit: number = 10,
-    skip: number = 0
-  ): Observable<Paginated<CuratorStatistics>> {
-    const response$ = this.http
-      .get(`${environment.ws}/statistics/leaderboard/${resource_id}`, {
-        responseType: "json",
-        headers: {
-          version: "2",
-        },
-        params: {
-          limit,
-          skip,
-        },
-      })
-      .pipe(
-        map(({ data, meta }: Paginated<CuratorStatistics>) => {
-          return {
-            data: data.map((stat: CuratorStatistics) =>
-              new CuratorStatistics().deserialize(stat)
-            ),
-            meta,
-          };
-        })
-      );
-    return response$;
   }
 
   getStatistics(
@@ -78,6 +49,47 @@ export class CuratorStatisticsService {
         map((response: Paginated<CuratorWithStats>) => {
           response.data = response.data.map((curatorWithStats) =>
             new CuratorWithStats().deserialize(curatorWithStats)
+          );
+          return response;
+        })
+      );
+  }
+
+  getDetailedStatistics(resource_id: string, orcid_id: string): Observable<DetailedStatistics[]> {
+    return this.http
+      .get(`${this.ws}/detailed-statistics/${resource_id}/${orcid_id}`, {
+        headers: {
+          version: "2",
+        },
+      })
+      .pipe(
+        pluck("data"),
+        map((data: DetailedStatistics[]) => {
+          return data.map((stat: DetailedStatistics) =>
+            new DetailedStatistics().deserialize(stat)
+          );
+        })
+      );
+  }
+
+  getWeeklyStatistics(
+    resource_id: string,
+    curator_orcid: string,
+    league: string,
+    statFilter: StatisticsFilter
+  ): Observable<Paginated<CuratorWithWeeklyStats>> {
+    const url = `${this.ws}/weekly-statistics/${resource_id}/${curator_orcid}/${league}`;
+    return this.http
+      .get(url, {
+        headers: {
+          version: "2",
+        },
+        params: statFilter.serialize(),
+      })
+      .pipe(
+        map((response: Paginated<CuratorWithWeeklyStats>) => {
+          response.data = response.data.map((curatorWithWeeklyStats) =>
+            new CuratorWithWeeklyStats().deserialize(curatorWithWeeklyStats)
           );
           return response;
         })
