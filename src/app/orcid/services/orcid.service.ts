@@ -1,14 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable, combineLatest, of, throwError } from "rxjs";
-import {
-  catchError,
-  filter,
-  map,
-  pluck,
-  shareReplay,
-  switchMap,
-} from "rxjs/operators";
+import { Observable, combineLatest, of } from "rxjs";
+import { catchError, filter, map, pluck, shareReplay, switchMap } from "rxjs/operators";
 import { OrcidInformation, OrcidProfileLink } from "src/app/orcid/types/orcid";
 import { environment } from "src/environments/environment";
 import { OrcidProfile } from "../../models/orcid-profile.model";
@@ -163,26 +156,25 @@ export class OrcidService {
   }
 
   getOrcidProfile(orcid_id: string): Observable<OrcidProfile> {
-    return this.http
-      .get(`${environment.ws}/orcid/${orcid_id}`, {
+    return this.http.get(`${this.orcid_url}${orcid_id}`, {
         headers: {
-          version: "2",
+          ...this.base_headers,
         },
       })
       .pipe(
         map((response: any) => {
-          const name = response?.["name"];
-          const [given_names, family_names, credit_name] = [
+          const name = response?.["person"]["name"];
+          const [given_names, family_name, credit_name] = [
             name?.["given-names"]?.["value"],
-            name?.["family-names"]?.["value"],
+            name?.["family-name"]?.["value"],
             name?.["credit-name"]?.["value"],
           ];
 
           const profileObj = {
-            orcid_id,
-            "given-names": response?.["name"]?.["given-names"]?.["value"],
-            "family-names": response?.["name"]?.["family-names"]?.["value"],
-            "credit-name": response?.["name"]?.["credit-name"]?.["value"],
+            "orcid-id": orcid_id,
+            "given-names": given_names,
+            "family-name": family_name,
+            "credit-name": credit_name,
           };
 
           return new OrcidProfile().deserialize(profileObj);
