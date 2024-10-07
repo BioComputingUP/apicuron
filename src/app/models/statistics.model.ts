@@ -26,7 +26,6 @@ export class BaseCuratorStatistics implements Deserializable {
   first_contribution: number;
   last_contribution: number;
 
-  work_type: "contribution" | "professional" = "contribution";
   total_count: any;
 
   deserialize(input: any): this {
@@ -66,6 +65,7 @@ export class CuratorStatistics extends BaseCuratorStatistics {
 
   resource_uri: string;
   resource_id: string;
+  league: string;
 
   generation_count: number;
   generation_score: number;
@@ -83,7 +83,6 @@ export class CuratorStatistics extends BaseCuratorStatistics {
   invalidation_terms: StatisticsTerm[];
   generation_terms: StatisticsTerm[];
 
-  work_type: "contribution" | "professional" = "contribution";
   total_count: any;
 
   deserialize(input: any): this {
@@ -93,6 +92,7 @@ export class CuratorStatistics extends BaseCuratorStatistics {
     this.invalidation_terms = input.invalidation_terms || null;
 
     this.revision_terms = input.revision_terms || null;
+    this.league = input.league;
 
     return this;
   }

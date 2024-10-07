@@ -23,6 +23,7 @@ import { Paginated } from "src/app/interfaces/paginated";
 import { CuratorStatisticsService } from "src/app/curator-statistics/services/curator-statistics.service";
 import { LeaderboardFilter } from "../interfaces/leaderboard-filter";
 import { AngularSvgIconModule } from "angular-svg-icon";
+import { environment } from "../../../../../src/environments/environment";
 import { LeaderboardEntry } from "../interfaces/leaderboard-entry";
 @Component({
   standalone: true,
@@ -39,6 +40,7 @@ export class TotalLeaderboardComponent implements OnInit, OnDestroy {
     this.resource$.next(value);
   }
 
+  apicuronURL= environment.host;
   totalLeaderboard$: Observable<Paginated<LeaderboardEntry>>;
   totalContributors$: Observable<number>;
   leaderboardFilter$: Observable<LeaderboardFilter>;

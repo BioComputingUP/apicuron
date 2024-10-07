@@ -18,21 +18,19 @@ import {
   combineLatest,
 } from "rxjs";
 import { Resource } from "src/app/models/resource.model";
-import { User } from "src/app/models/User.model";
-import { map, shareReplay, startWith, switchMap } from "rxjs/operators";
-import { CuratorWithStats } from "src/app/curator-statistics/models/curator-stats";
-import { StatisticsFilter } from "src/app/curator-statistics/models/statistics-filter";
+import { map, shareReplay, switchMap } from "rxjs/operators";
 import { Paginated } from "src/app/interfaces/paginated";
 import { WeeklyBarChartComponent } from "../weekly-bar-chart/weekly-bar-chart.component";
 import { CuratorStatisticsService } from "src/app/curator-statistics/services/curator-statistics.service";
 import { LeaderboardFilter } from "../interfaces/leaderboard-filter";
 import { WeeklyLeaderboardEntry } from "../interfaces/leaderboard-entry";
-
+import { AngularSvgIconModule } from "angular-svg-icon";
+import { environment } from "../../../../../src/environments/environment";
 @Component({
   standalone: true,
   selector: "weekly-leaderboard",
   templateUrl: "./weekly-leaderboard.component.html",
-  imports: [CommonModule, LeaderboardLibComponent, WeeklyBarChartComponent, RouterModule],
+  imports: [CommonModule, LeaderboardLibComponent, WeeklyBarChartComponent, RouterModule, AngularSvgIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WeeklyLeaderboardComponent implements OnInit, OnDestroy {
@@ -45,6 +43,8 @@ export class WeeklyLeaderboardComponent implements OnInit, OnDestroy {
   limit = 10;
   leaderboardFilter$: Observable<LeaderboardFilter>;
   weeklyLeaderboard$: Observable<Paginated<WeeklyLeaderboardEntry>>;
+
+  apicuronURL= environment.host;
 
   tableColumnsWeekly: string[] = [
     "generation_count",

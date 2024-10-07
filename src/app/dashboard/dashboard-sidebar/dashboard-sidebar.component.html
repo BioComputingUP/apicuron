@@ -24,6 +24,21 @@
                 </a>
             </li>
 
+            <ng-container *ngIf="contributedResources$ | async as contributedResources">
+                <span class="tw-text-gray-400 tw-font-bold tw-text-sm">Contributed Resources</span>
+
+                <ng-container *ngFor="let resource of contributedResources">
+                    <li>
+                        <a [routerLink]="['/dashboard', 'user', 'resources', resource.resource_id]"
+                            routerLinkActive="list-item-active"
+                            class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item list-item-colors">
+                            {{ resource.resource_name }}
+                        </a>
+                    </li>
+                </ng-container>
+
+            </ng-container>
+
             <ng-container *ngIf="links$ | async as resourcesLinks">
                 <span class="tw-text-gray-400 tw-font-bold tw-text-sm">Manage Resources</span>
 

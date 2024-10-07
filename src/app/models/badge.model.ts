@@ -1,6 +1,7 @@
 import { Deserializable } from "src/app/interfaces/deserializable.model";
 import { BadgeDef } from "src/app/models/badge-def.model";
 
+
 type ObjectValues<T> = T[keyof T];
 export const AchievementState = {
   progress: "progress",
@@ -9,10 +10,10 @@ export const AchievementState = {
 export type AchievementState = ObjectValues<typeof AchievementState>;
 
 export class Badge extends BadgeDef implements Deserializable {
-    progressRate: number;
-    displayedName: string;
-    
-    deserialize(input: any): this {
+  progressRate: number;
+  displayedName: string;
+
+  deserialize(input: any): this {
     super.deserialize(input);
     this.curator_orcid = input.curator_orcid;
     this.state =

@@ -4,14 +4,14 @@ import {
 } from "src/app/interfaces/deserializable.model";
 import { environment } from "src/environments/environment";
 export class ResourceStats implements Deserializable {
-  contribution_count: any;
+  contributionCount: any;
   uniqueContributors: any;
   lastContributionDate: Date | null;
   firstContributionDate: Date;
   lastResourceUpdateDate: Date | null;
 
   deserialize(input: any): this {
-    this.contribution_count = input.contribution_count;
+    this.contributionCount = input.contributionCount;
     this.uniqueContributors = input.uniqueContributors;
     this.lastContributionDate = new Date(input.lastContributionDate);
     this.firstContributionDate = input.firstContributionDate
@@ -75,6 +75,10 @@ export class Resource implements Deserializable, Serializable {
 
   faviconLink(): string {
     return new URL("/favicon.ico", this.resource_url).href;
+  }
+
+  compare(other: Resource): boolean {
+    return this.resource_id === other.resource_id;
   }
 
   stats: ResourceStats;
