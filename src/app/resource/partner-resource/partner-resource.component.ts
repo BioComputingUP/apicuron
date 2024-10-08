@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { environment } from '../../../environments/environment';
 import { Resource } from 'src/app/models/resource.model';
 @Component({
   selector: 'partner-resource',
@@ -17,6 +16,17 @@ export class PartnerResourceComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+  }
+
+  isNotSvg(imageUrl?: URL): boolean {
+    if (!imageUrl) return false;
+    const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif'];
+    return imageExtensions.some(ext => imageUrl.toString().endsWith(ext));
+  }
+
+  isSvg(imageUrl?: URL): boolean {
+    if (!imageUrl) return false; 
+    return imageUrl.toString().endsWith('.svg');
   }
 
 }

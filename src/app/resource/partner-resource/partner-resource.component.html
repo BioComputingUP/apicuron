@@ -59,12 +59,15 @@
         </span>
       </span>
     </div>
-    <div class="">
+    <div class="tw-self-center">
       <img
         [src]="resource.logo"
         [alt]="'Logo of ' + resource.resource_name"
-        class="tw-h-24"
-      />
+        [ngClass]="{
+          'tw-h-auto': isNotSvg(resource.logo),
+          'tw-max-h-20': isSvg(resource.logo)
+        }"
+        class="tw-max-w-40"/>
     </div>
   </div>
 </div>
