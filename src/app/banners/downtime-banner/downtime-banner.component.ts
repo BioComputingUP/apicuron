@@ -11,7 +11,7 @@ import { AngularSvgIconModule } from "angular-svg-icon";
 	standalone: true,
 	providers: [{
 		provide: 'DowntimeBannerService',
-		useValue: new BannerService(new Date('2024-10-11T00:00'), new Date('2024-10-12T00:00'), true)
+		useValue: new BannerService(null, new Date('2024-10-12T00:00'), true)
 	}],
 	imports: [CommonModule, AngularSvgIconModule]
 })
@@ -20,8 +20,6 @@ export class DowntimeBannerComponent {
 	startDate: Date;
 	constructor(@Inject('DowntimeBannerService') protected bannerService: BannerService) {
 		this.displayBanner$ = this.bannerService.displayBanner;
-		this.startDate= this.bannerService.startDate;
-		this.endDate = this.bannerService.endDate;
 	  }
 	  displayBanner$: Observable<boolean>;
 	closeBanner() {
