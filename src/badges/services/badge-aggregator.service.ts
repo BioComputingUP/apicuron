@@ -135,7 +135,6 @@ export class BadgeAggregatorService implements Aggregator {
 								: AchievementState.progress,
 						league: badgeDef.league,
 						privacy: computeAggregatePrivacyField(badgeDef, report),
-						progress_rate: 1 / badgeDef.count_threshold,
 					},
 				},
 				{ upsert: true, new: true },

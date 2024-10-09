@@ -19,9 +19,9 @@ import {
 	Subject,
 	catchError,
 	concatMap,
+	of,
 	takeUntil,
 } from 'rxjs';
-import { BaseAggregatorRunner } from '../aggregator-runners/base.runner';
 import { Aggregator } from '../interfaces/aggregator.interface';
 import { SubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
 
@@ -36,6 +36,7 @@ export class ReportSubmittedEventHandler
 	logger = new Logger(ReportSubmittedEventHandler.name);
 
 	onModuleDestroy() {
+		this.logger.debug('Destroying ReportSubmittedEventHandler');
 		this.destroy$.next();
 	}
 
@@ -67,7 +68,7 @@ export class ReportSubmittedEventHandler
 				}),
 				catchError((err) => {
 					this.logger.error('Error processing report', err);
-					return EMPTY;
+					return of();
 				}),
 				takeUntil(this.destroy$),
 			)

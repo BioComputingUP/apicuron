@@ -140,8 +140,9 @@ export class ComputeWeeklyStatisticsService {
 					return await this.updateWithReport(report);
 				}
 				throw new Error(err);
+			} finally {
+				return;
 			}
-			return;
 		}
 
 		const setObj = reportIsLast
