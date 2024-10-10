@@ -20,6 +20,10 @@ export function getWeekStart(momentInstance = moment()): Date {
 	return momentInstance.tz(TIMEZONE).clone().startOf('isoWeek').toDate();
 }
 
+export function getWeekRange(momentInstance = moment()): [Date, Date] {
+	return [getWeekStart(momentInstance), getWeekEnd(momentInstance)];
+}
+
 export function getWeekEnd(momentInstance = moment()): Date {
 	return momentInstance
 		.tz(TIMEZONE)

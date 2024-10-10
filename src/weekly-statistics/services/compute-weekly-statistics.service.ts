@@ -24,7 +24,9 @@ import {
 	getWeekEnd,
 	updateMinDate,
 	updateMaxDate,
+	getWeekRange,
 } from '../../util/date.helper';
+import moment from 'moment';
 @Injectable()
 export class ComputeWeeklyStatisticsService {
 	logger = new Logger(ComputeWeeklyStatisticsService.name);
@@ -116,12 +118,14 @@ export class ComputeWeeklyStatisticsService {
 			  })
 			: termDoc;
 
+		const [weekStart, weekEnd] = getWeekRange(moment(report.timestamp));
+
 		const stat = await this.weeklyStatModel.findOne({
 			resource_id: report.resource_id,
 			league: report.league,
 			curator_orcid: report.curator_orcid,
-			weekStart: { $lte: report.timestamp },
-			weekEnd: { $gte: report.timestamp },
+			weekStart: weekStart,
+			weekEnd: weekEnd,
 		});
 
 		if (!stat) {
@@ -153,13 +157,13 @@ export class ComputeWeeklyStatisticsService {
 			  }
 			: {};
 
-		await this.weeklyStatModel.updateOne(
+		await this.weeklyStatModel.findOneAndUpdate(
 			{
 				resource_id: report.resource_id,
 				league: report.league,
 				curator_orcid: report.curator_orcid,
-				weekStart: { $lte: report.timestamp },
-				weekEnd: { $gte: report.timestamp },
+				weekStart,
+				weekEnd,
 			},
 			{
 				$inc: {
@@ -172,6 +176,7 @@ export class ComputeWeeklyStatisticsService {
 			},
 			{
 				upsert: true,
+				new: true,
 			},
 		);
 	}
