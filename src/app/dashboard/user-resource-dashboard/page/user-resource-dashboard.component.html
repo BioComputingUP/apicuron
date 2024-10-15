@@ -22,7 +22,7 @@
       <div class="tw-p-1">
         <div
           class="tw-flex tw-flex-col tw-bg-white tw-rounded tw-shadow-md"
-          *ngIf="userActivities$ | async as activities"
+          *ngIf="terms$ | async as userTerms"
         >
           <span
             class="tw-block tw-w-full tw-text-gray-700 tw-font-bold tw-text-lg tw-font-dm-sans tw-px-3 tw-pt-1"
@@ -32,7 +32,7 @@
           <ng-container *ngIf="progressFilter$ | async as filter">
 
             <my-badges-details
-              [terms]="activities"
+              [terms]="userTerms"
               [filter]="filter"
             ></my-badges-details>
           </ng-container>
@@ -45,7 +45,7 @@
           >
           <ng-container *ngIf="achievedFilter$ | async as filter">
             <my-badges-details
-              [terms]="activities"
+              [terms]="userTerms"
               [filter]="filter"
             ></my-badges-details>
           </ng-container>

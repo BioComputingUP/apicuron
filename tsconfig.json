@@ -9,6 +9,9 @@
     "declaration": false,
     "module": "es2020",
     "paths": {
+      "apicuron-util": [
+        "dist/apicuron-util"
+      ],
       "leaderboard-lib": [
         "dist/leaderboard-lib"
       ]
@@ -28,6 +31,7 @@
   "angularCompilerOptions": {
     "compilationMode": "full",
     "enableIvy": true,
+    "strictTemplates": true,
     "fullTemplateTypeCheck": true,
     "strictInjectionParameters": true
   }

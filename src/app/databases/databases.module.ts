@@ -15,10 +15,8 @@ import { BadgeDefCardComponent } from "../components/badge-def-card/badge-def-ca
 import { MedalDefCardComponent } from "../components/medal-def-card/medal-def-card.component";
 import { AchievementsDefModule } from "../achievements-def/achievements-def.module";
 import { TermsModule } from "../terms/terms.module";
-import { TotalLeaderboardComponent } from "../../../projects/leaderboard-lib/src/lib/total-leaderboard/total-leaderboard.component";
-import { WeeklyLeaderboardComponent } from "../../../projects/leaderboard-lib/src/lib/weekly-leaderboard/weekly-leaderboard.component";
 import { CdkAccordionModule } from "@angular/cdk/accordion";
-import { LeaderboardLibComponent } from "projects/leaderboard-lib/src/public-api";
+import { LeaderboardModule } from "../../../projects/apicuron-util/src/lib/leaderboard/leaderboard.module";
 @NgModule({
   declarations: [
     DatabasesPageComponent,
@@ -40,9 +38,7 @@ import { LeaderboardLibComponent } from "projects/leaderboard-lib/src/public-api
     MedalDefCardComponent,
     TermsModule,
     AchievementsDefModule,
-    TotalLeaderboardComponent,
-    WeeklyLeaderboardComponent,
-    LeaderboardLibComponent
+    LeaderboardModule
 ],
   providers: [DatabasesService],
   exports: [DatabasesPageComponent],

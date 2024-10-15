@@ -7,7 +7,7 @@
         <div *ngIf="selected_resources$ | async as selected_resources" class="tw-flex tw-flex-row tw-items-center">
 
             <input #resourcesearch
-                (keyup.enter)="add_resource($event.target.value)"
+                (keyup.enter)="add_resource($event.target['value'])"
                 class="tw-outline-none tw-flex-initial" type="text" name=""
                 id="" placeholder="Filter by resource">
             <div *ngFor="let resource of selected_resources"

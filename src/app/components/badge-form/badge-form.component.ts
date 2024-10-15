@@ -20,9 +20,9 @@ import { CalendarModule } from "primeng/calendar";
 import { MultiSelectModule } from "primeng/multiselect";
 import { Subject } from "rxjs";
 import { startWith, takeUntil, tap } from "rxjs/operators";
-import { Badge as BadgeDef } from "src/app/models/badge.model";
 import { Term } from "src/app/models/term.model";
 import { slugifyFieldFromAnother } from "../../util/form-reactivity";
+import { BadgeDef } from "../../models/badge-def.model";
 
 @Component({
   standalone: true,
