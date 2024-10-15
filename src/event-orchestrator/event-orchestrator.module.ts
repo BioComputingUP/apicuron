@@ -14,10 +14,10 @@ import { DiscoveryModule } from '@nestjs/core';
 import { AggregatorLoader } from './services/aggregator-loader.service';
 import { BaseAggregatorRunner } from './aggregator-runners/base.runner';
 import { SubmissionRunner } from './aggregator-runners/bulk-submission.runner';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
-	imports: [DiscoveryModule, CoreApicuronModule, EventEmitter2],
+	imports: [DiscoveryModule, CoreApicuronModule, EventEmitterModule],
 	providers: [
 		InitializationService,
 		ManyReportsSubmittedHandler,

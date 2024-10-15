@@ -41,7 +41,7 @@ async function mockReport(
 		resource_id: resource.resource_id,
 
 		timestamp: faker.date.between({
-			from: moment().utc().startOf('day').toDate(),
+			from: moment().utc().startOf('week').toDate(),
 			to: new Date(),
 		}),
 		privacy: faker.helpers.arrayElement([
@@ -131,12 +131,13 @@ async function bootstrap() {
 
 	await Promise.all(reportSaves$);
 
-	await app
+	const result$ = await app
 		.get(EventEmitter2)
 		.emitAsync(
 			BulkSubmissionEvent.name,
 			new BulkSubmissionEvent(testingOrcidId, [resource.resource_id]),
 		);
+	logger.log(`Bulk submission event emitted: ${result$.length} listeners`);
 
 	await app.close();
 }
