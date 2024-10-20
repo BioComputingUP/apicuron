@@ -26,6 +26,9 @@ export class ResourceLeaderboardService {
     return leaderboard;
   }
   parseOptions(options: LeaderboardOptions): LeaderboardParsedOption[] {
+    if(!options){
+      options = this.availableLeaderboardNames;
+    }
     if (!(options instanceof Array)) {
       throw new Error("Leaderboard options must be an array");
     }

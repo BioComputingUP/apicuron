@@ -16,7 +16,6 @@ import { Paginated } from "src/app/interfaces/paginated";
 import { environment } from "../../../../../../../src/environments/environment";
 import { LeaderboardEntry } from "./leaderboard-entry";
 import { LeaderboardFilter } from "./leaderboard-entry";
-import { ResourceLeaderboardService } from "../../services/resource-leaderboard.service";
 import { CommonModule } from "@angular/common";
 import { AngularSvgIconModule } from "angular-svg-icon";
 import { PaginationComponent } from "../../../pagination/pagination.component";
@@ -24,7 +23,6 @@ import { ProfileRendererComponent } from "../../components/renderers/profile-ren
 import { LoadableComponent } from "../../../loadable";
 import { ColumnConfig } from "../../interfaces/leaderboard-def.interface";
 import { totalLeaderboardDef } from "./leaderboard-def";
-import { loadResource } from "../../util";
 import {
   ColumnManagerService,
   LeaderboardDefToken,

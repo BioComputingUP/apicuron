@@ -288,7 +288,7 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-builders/custom-webpack:browser",
           "options": {
             "outputPath": "dist/leaderboard",
             "index": "projects/leaderboard/src/index.html",
@@ -296,15 +296,17 @@
             "polyfills": [
               "zone.js"
             ],
+            "outputHashing": false,
             "tsConfig": "projects/leaderboard/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               "projects/leaderboard/src/favicon.ico",
               "projects/leaderboard/src/assets"
             ],
-            "styles": [
-              "projects/leaderboard/src/styles.scss"
-            ],
+            "customWebpackConfig": {
+              "path": "projects/leaderboard/src/webpack.config.js"
+            },
+            "styles": [],
             "scripts": []
           },
           "configurations": {
@@ -342,8 +344,9 @@
             },
             "local": {
               "buildOptimizer": false,
+              "outputHashing": false,
               "optimization": false,
-              "vendorChunk": true,
+              "vendorChunk": false,
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true

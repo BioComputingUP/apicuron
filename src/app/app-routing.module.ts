@@ -7,6 +7,7 @@ import { MainLayoutComponent } from "./main-layout/main-layout.component";
 import { environment } from "../environments/environment";
 import { RedirectGuard } from "./guards/redirect.guard";
 import { AppComponent } from "./app.component";
+import { APP_BASE_HREF } from "@angular/common";
 
 const routes: Routes = [
   {
@@ -101,6 +102,12 @@ const routes: Routes = [
       // relativeLinkResolution: "legacy",
       enableTracing: true, // <-- debugging purposes
     }),
+  ],
+  providers: [
+    {
+      provide: APP_BASE_HREF,
+      useValue: environment.host,
+    },
   ],
   exports: [RouterModule],
 })
