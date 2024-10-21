@@ -81,7 +81,7 @@ async function bootstrap() {
 
 	useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
-	const configService = app.get(ConfigService);
+	const configService: ConfigService = app.get(ConfigService);
 	const appLogger = new Logger('APICURONCLIApplicationLogger');
 
 	const envConfig = configService.get<string>('environment');

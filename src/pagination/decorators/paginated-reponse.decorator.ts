@@ -8,7 +8,7 @@ export const ApiResponsePaginated = <DataDto extends Type<unknown>>(
 	description = 'Returns Paginated Response',
 ) =>
 	applyDecorators(
-		ApiExtraModels(Paginated, dataDto),
+		ApiExtraModels(Paginated),
 		ApiResponse({
 			description,
 			status,

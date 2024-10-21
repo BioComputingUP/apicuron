@@ -21,7 +21,7 @@ async function bootstrap() {
 
 	// Logging and config setup
 	const appLogger = new Logger('APICURONApplicationLogger');
-	const configService = app.get(ConfigService);
+	const configService: ConfigService = app.get(ConfigService);
 
 	// retrieving port, host and other configurations
 	const port = configService.get('PORT');

@@ -102,7 +102,7 @@ async function bootstrap() {
 	const reportCount = parseInt(process.argv?.[2] ?? '150');
 
 	logger.verbose(`Generating ${reportCount} reports`);
-	const resource = await resourceModel.findOne({ resource_id: 'disprot' });
+	const resource = await resourceModel.findOne();
 
 	const terms = await termModel.find({
 		resource_id: resource.resource_id,

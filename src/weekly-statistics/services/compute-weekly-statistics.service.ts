@@ -26,7 +26,7 @@ import {
 	updateMaxDate,
 	getWeekRange,
 } from '../../util/date.helper';
-import moment from 'moment';
+import * as moment from 'moment-timezone';
 @Injectable()
 export class ComputeWeeklyStatisticsService {
 	logger = new Logger(ComputeWeeklyStatisticsService.name);

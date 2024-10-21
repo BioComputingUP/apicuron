@@ -9,8 +9,9 @@ export const ApiResponseWrapped = <
 	description = 'Returns Wrapped Response in data property',
 ) => {
 	if (Array.isArray(dataDto)) {
+		const firstDto = dataDto[0] as Type<unknown>;
 		return applyDecorators(
-			ApiExtraModels(dataDto[0]),
+			ApiExtraModels(firstDto),
 			ApiResponse({
 				description,
 				status,
@@ -21,7 +22,7 @@ export const ApiResponseWrapped = <
 								data: {
 									type: 'array',
 									items: {
-										$ref: getSchemaPath(dataDto[0]),
+										$ref: getSchemaPath(firstDto),
 									},
 								},
 							},
