@@ -10,6 +10,7 @@ import { LoadableComponent } from "../loadable";
 import { TotalLeaderboardComponent } from "./leaderboards/total-leaderboard/total-leaderboard.component";
 import { WeeklyLeaderboardComponent } from "./leaderboards/weekly-leaderboard/weekly-leaderboard.component";
 import { ResourceModule } from "../resource";
+import { MonthlyLeaderboardComponent } from "./leaderboards/monthly-leaderboard";
 
 @NgModule({
   declarations: [ResourceLeaderboardComponent],
@@ -17,6 +18,7 @@ import { ResourceModule } from "../resource";
   imports: [
     CommonModule,
     ResourceModule,
+    MonthlyLeaderboardComponent,
     TotalLeaderboardComponent,
     WeeklyLeaderboardComponent,
     PaginationComponent,

@@ -55,6 +55,13 @@
             [columns]="option.columns"
           ></weekly-leaderboard>
         </ng-container>
+
+        <ng-container *ngSwitchCase="'monthly-leaderboard'">
+          <monthly-leaderboard
+            [resource]="resource"
+            [columns]="option.columns"
+          ></monthly-leaderboard>
+        </ng-container>
       </ng-container></div
   ></ng-container>
 </div>
