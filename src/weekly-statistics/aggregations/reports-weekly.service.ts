@@ -32,51 +32,11 @@ export interface AggregatedReportsWeekly {
 /**
  * Represents a pipeline for weekly aggregation reports.
  */
-export class ReportsWeeklyAggregationPipeline implements OnModuleInit {
-	addDaysArrayStage: PipelineStage.AddFields['$addFields'];
-	removeDayPropertiesStage: PipelineStage.Project['$project'];
-	addDayPropertiesStage: { [k: string]: Record<string, any> };
-	dayGroupFields: { [k: string]: AccumulatorOperator };
+export class ReportsWeeklyAggregationPipeline {
 	constructor(
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
 	) {}
-
-	onModuleInit() {
-		this.addDaysArrayStage = {
-			days: DaysOfWeek.map((day) => `$${day}`),
-		};
-
-		this.removeDayPropertiesStage = Object.fromEntries(
-			DaysOfWeek.map((day) => [day, 0]),
-		);
-
-		this.addDayPropertiesStage = Object.fromEntries(
-			DaysOfWeek.map(
-				(day, index): [DayOfWeek, PipelineStage.AddFields['$addFields']] => {
-					return [
-						day,
-						{
-							$cond: {
-								if: {
-									$eq: [{ $dayOfWeek: '$timestamp' }, index + 1],
-								},
-								then: 1,
-								else: 0,
-							},
-						},
-					];
-				},
-			),
-		);
-
-		this.dayGroupFields = Object.fromEntries<AccumulatorOperator>(
-			DaysOfWeek.map(
-				(day: DayOfWeek) =>
-					[day, { $sum: `$${day}` }] as [DayOfWeek, AccumulatorOperator],
-			),
-		);
-	}
 
 	/**
 	 * Aggregates the reports based on the provided filter.

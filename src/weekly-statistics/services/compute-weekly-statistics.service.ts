@@ -95,14 +95,14 @@ export class ComputeWeeklyStatisticsService {
 			| LeanReportDocument,
 		termDoc?: TermDocument,
 	) {
-		if (report.timestamp < getWeekStart()) {
-			return;
-		}
 		const lastSavedReport = await this.reportModel
 			.findOne({
 				resource_id: report.resource_id,
 				league: report.league,
 				curator_orcid: report.curator_orcid,
+				timestamp: {
+					$lte: getWeekEnd(moment(report.timestamp)),
+				},
 			})
 			.sort({ timestamp: -1 });
 

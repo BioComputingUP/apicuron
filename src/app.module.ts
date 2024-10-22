@@ -38,6 +38,7 @@ import { loadSentryModule } from './plugins/sentry';
 import { EventOrchestratorModule } from './event-orchestrator/event-orchestrator.module';
 import { Reflector } from '@nestjs/core';
 import { ResourceStatsModule } from './resource-stats/resource-stats.module';
+import { MonthlyStatisticsModule } from './monthly-statistics/monthly-statistics.module';
 
 const logger = new Logger('AppModule');
 
@@ -107,6 +108,7 @@ const logger = new Logger('AppModule');
 		EmailModule,
 		DetailedStatisticsModule,
 		WeeklyStatisticsModule,
+		MonthlyStatisticsModule,
 		MedalsModule,
 		BadgesModule,
 		AchievementsModule,
