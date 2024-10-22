@@ -3,18 +3,18 @@
 >
   <div class="tw-flex tw-flex-row tw-justify-between">
     <a
-      class="tw-text-xl tw-font-bold hover:tw-underline tw-text-gray-800 tw-cursor-pointer"
+      class="tw-text-xl tw-font-bold hover:tw-underline hover:tw-text-apicuron-purple tw-text-gray-800 tw-cursor-pointer"
       [routerLink]="['/databases', resource.resource_id]"
       >{{ resource.resource_name }}
     </a>
     <a
       target="_blank"
-      class="tw-text-lg tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer hover:tw-underline"
+      class="tw-text-md tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer hover:tw-underline"
       [href]="resource.resource_url"
-      >View Details
+      >Visit Resource
       <svg-icon
         src="assets/svg/external-link.svg"
-        svgClass="tw-h-4 tw-w-4 tw-inline"
+        svgClass="tw-h-3 tw-w-3 tw-inline"
       >
       </svg-icon
     ></a>
@@ -35,14 +35,6 @@
         class="tw-text-gray-800 tw-font-dm-sans tw-flex tw-flex-col tw-pt-2"
         *ngIf="resource?.stats?.hasLastActivity()"
       >
-        <!-- <span>
-          Added to APICURON:
-          {{ 
-            resource?.stats?.firstContributionDate
-            | date : "dd-MM-yyyy" : "UTC" 
-          }}
-          UTC
-        </span> -->
         <span>
           Contributors:
           {{ resource?.stats?.uniqueContributors }}
@@ -67,15 +59,13 @@
       </span>
     </div>
     <div class="tw-self-center">
-      <img
-        [src]="resource.logo"
-        [alt]="'Logo of ' + resource.resource_name"
-        [ngClass]="{
-          'tw-h-auto': isNotSvg(resource.logo),
-          'tw-max-h-20': isSvg(resource.logo)
-        }"
-        class="tw-max-w-40"
-      />
+      <a target="_blank" [href]="resource.resource_url">
+        <img
+          [src]="resource.logo"
+          [alt]="'Logo of ' + resource.resource_name"
+          class="tw-h-20 tw-max-h-20"
+        />
+      </a>
     </div>
   </div>
 </div>

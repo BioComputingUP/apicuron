@@ -18,15 +18,4 @@ export class PartnerResourceComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  isNotSvg(imageUrl?: URL): boolean {
-    if (!imageUrl) return false;
-    const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif'];
-    return imageExtensions.some(ext => imageUrl.toString().endsWith(ext));
-  }
-
-  isSvg(imageUrl?: URL): boolean {
-    if (!imageUrl) return false; 
-    return imageUrl.toString().endsWith('.svg');
-  }
-
 }
