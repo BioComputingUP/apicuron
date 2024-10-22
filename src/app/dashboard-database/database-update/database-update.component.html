@@ -1,7 +1,7 @@
 <div class="tw-p-2 tw-flex-auto" *ngIf="resource$ | async as resource">
 
     <div class="tw-p-2">
-        <span class="tw-text-xl tw-font-bold">Update {{ resource.resource_name }}</span>
+        <span class="tw-text-xl tw-font-bold">Update {{ resource['resource_name'] }}</span>
 
         <form class="tw-flex tw-flex-row tw-flex-wrap" (ngSubmit)="submit()" [formGroup]="form">
 
@@ -121,7 +121,7 @@
 
             <div class="tw-w-full tw-flex tw-justify-center tw-py-1 sm:tw-py-2">
                 <div class="tw-flex tw-justify-center">
-                    <input type="submit" [value]="'Update ' + resource.resource_name"
+                    <input type="submit" [value]="'Update ' + resource['resource_name']"
                         [disabled]="form.invalid || !form.dirty"
                         class=" tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded-md disabled:tw-bg-gray-300 disabled:tw-text-gray-600 enabled:tw-bg-apicuron-purple enabled:tw-text-white enabled:tw-shadow-md enabled:tw-cursor-pointer" />
                 </div>

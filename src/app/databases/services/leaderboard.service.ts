@@ -6,11 +6,11 @@ import { Paginated } from "src/app/interfaces/paginated";
 import { User } from "src/app/models/User.model";
 import { WeeklyCuratorStatistics } from "src/app/models/statistics.model";
 import { environment } from "src/environments/environment";
-import { LeaderboardFilter } from "../interfaces/leaderboard-filter";
+import { LeaderboardFilter } from "../../../../projects/leaderboard-lib/src/lib/interfaces/leaderboard-filter";
 import {
   LeaderboardEntry,
   WeeklyLeaderboardEntry,
-} from "../interfaces/leaderboard-entry";
+} from "../../../../projects/leaderboard-lib/src/lib/interfaces/leaderboard-entry";
 
 @Injectable({
   providedIn: "root",

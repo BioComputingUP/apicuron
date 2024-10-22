@@ -53,7 +53,7 @@ import { RouterModule } from "@angular/router";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CuratorStatCardComponent implements OnInit {
-  terms$: Observable<Object>;
+  terms$: Observable<Term[]>;
   reportsWithTerms$: Observable<Report[]>;
   detailForm: any;
   badges$: Observable<Paginated<Badge>>;

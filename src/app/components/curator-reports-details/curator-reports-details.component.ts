@@ -125,8 +125,6 @@ export class CuratorReportsDetailsComponent implements OnInit {
   paginatedReports$: Observable<Paginated<Report>>;
   reportFilterInput$ = new BehaviorSubject<ReportFilter>(
     ReportFilter.create({
-      from: null,
-      to: new Date(),
       sortBy: "timestamp",
       sortOrder: -1,
       activity_terms: [],
@@ -163,7 +161,6 @@ export class CuratorReportsDetailsComponent implements OnInit {
   }
 
   updateReportFilter(reportFilter: ReportFilter) {
-    console.log("test from parent");
     this.reportFilterInput$.next(reportFilter);
   }
 

@@ -4,7 +4,7 @@
 <div class="tw-p-2 tw-flex-auto" *ngIf="resource$ | async as resource">
 
     <div class="tw-flex tw-flex-row tw-justify-between tw-p-2">
-        <span class="tw-text-xl tw-font-bold tw-capitalize">Manage {{ resource.resource_name }} terms</span>
+        <span class="tw-text-xl tw-font-bold tw-capitalize">Manage {{ resource['resource_name'] }} terms</span>
 
         <button class="tw-bg-apicuron-purple tw-p-2 tw-font-bold tw-text-white tw-rounded tw-shadow-lg tw-text-base"
             (click)="open_create_term()">Create Term</button>
