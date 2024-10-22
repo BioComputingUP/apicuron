@@ -4,7 +4,7 @@ import {
 	MonthlyStatistics,
 	MonthlyStatisticsDocument,
 } from '../../core/schemas/statistics/monthly-statistics.schema';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { MonthlyLeaderboardDto } from '../dto';
 import { getMonthEnd, getMonthStart, TIMEZONE } from '../../util/date.helper';
 import * as moment from 'moment';
@@ -30,13 +30,13 @@ export class MonthlyStatisticsService {
 	): Promise<Paginated<MonthlyLeaderboardDto>> {
 		const privacyFilter = userResourceEntityPrivacyFilter(user);
 
-		const filter = {
+		const filter: FilterQuery<MonthlyStatisticsDocument> = {
 			$and: [
 				privacyFilter,
 				{
 					resource_id,
-					weekStart: getMonthStart(moment().tz(TIMEZONE)),
-					weekEnd: getMonthEnd(moment().tz(TIMEZONE)),
+					monthStart: getMonthStart(moment().tz(TIMEZONE)),
+					monthEnd: getMonthEnd(moment().tz(TIMEZONE)),
 				},
 			],
 		};
