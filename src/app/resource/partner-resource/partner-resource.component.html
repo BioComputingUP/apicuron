@@ -1,34 +1,48 @@
-<div class="tw-border-2 tw-border-gray-400 tw-bg-white tw-rounded-md tw-p-2 md:tw-p-4 focus:tw-shadow-2xl tw-h-full tw-flex tw-flex-col">
+<div
+  class="tw-border-2 tw-border-gray-400 tw-bg-white tw-rounded-md tw-p-2 md:tw-p-4 focus:tw-shadow-2xl tw-h-full tw-flex tw-flex-col"
+>
   <div class="tw-flex tw-flex-row tw-justify-between">
-      <a class="tw-text-xl tw-font-bold hover:tw-underline tw-text-gray-800 tw-cursor-pointer"
-        [routerLink]="['/databases', resource.resource_id]">{{ resource.resource_name }}
+    <a
+      class="tw-text-xl tw-font-bold hover:tw-underline tw-text-gray-800 tw-cursor-pointer"
+      [routerLink]="['/databases', resource.resource_id]"
+      >{{ resource.resource_name }}
+    </a>
+    <a
+      target="_blank"
+      class="tw-text-lg tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer hover:tw-underline"
+      [href]="resource.resource_url"
+      >View Details
       <svg-icon
         src="assets/svg/external-link.svg"
-        svgClass="tw-h-4 tw-w-4 tw-inline">
-      </svg-icon>
-    </a>
-    <a target="_blank" class="tw-text-lg tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer hover:tw-underline"
-      [href]="resource.resource_url">View Details</a>
+        svgClass="tw-h-4 tw-w-4 tw-inline"
+      >
+      </svg-icon
+    ></a>
   </div>
-  <span
-    class="tw-text-gray-400 tw-font-semibold tw-text-left tw-font-dm-sans">
+  <span class="tw-text-gray-400 tw-font-semibold tw-text-left tw-font-dm-sans">
     {{ resource.resource_long_name }}
-    </span>
-  <p class="tw-font-medium tw-text-gray-800 tw-pt-2 md:tw-pt-4 tw-overflow-ellipsis tw-text-justify tw-line-clamp-3">
+  </span>
+  <p
+    class="tw-font-medium tw-text-gray-800 tw-pt-2 md:tw-pt-4 tw-overflow-ellipsis tw-text-justify tw-line-clamp-3"
+  >
     {{ description_formatted }}
   </p>
-  <div class="tw-flex tw-flex-row tw-justify-between tw-pt-2 lg:tw-pt-4 tw-items-end">
+  <div
+    class="tw-flex tw-flex-row tw-justify-between tw-pt-2 lg:tw-pt-4 tw-items-end"
+  >
     <div class="">
-      <span class="tw-text-gray-800 tw-font-dm-sans tw-flex tw-flex-col tw-pt-2"
-        *ngIf="resource?.stats?.hasLastActivity()">
-        <span>
+      <span
+        class="tw-text-gray-800 tw-font-dm-sans tw-flex tw-flex-col tw-pt-2"
+        *ngIf="resource?.stats?.hasLastActivity()"
+      >
+        <!-- <span>
           Added to APICURON:
           {{ 
             resource?.stats?.firstContributionDate
             | date : "dd-MM-yyyy" : "UTC" 
           }}
           UTC
-        </span>
+        </span> -->
         <span>
           Contributors:
           {{ resource?.stats?.uniqueContributors }}
@@ -40,7 +54,8 @@
       </span>
       <span
         class="tw-text-gray-800 tw-font-dm-sans"
-        *ngIf="resource?.stats?.hasLastActivity()">
+        *ngIf="resource?.stats?.hasLastActivity()"
+      >
         <span>
           Last Submission Date:
           {{
@@ -48,7 +63,6 @@
               resource?.stats?.lastContributionDate
               | date : "dd-MM-yyyy" : "UTC"
           }}
-          UTC
         </span>
       </span>
     </div>
@@ -60,7 +74,8 @@
           'tw-h-auto': isNotSvg(resource.logo),
           'tw-max-h-20': isSvg(resource.logo)
         }"
-        class="tw-max-w-40"/>
+        class="tw-max-w-40"
+      />
     </div>
   </div>
 </div>
