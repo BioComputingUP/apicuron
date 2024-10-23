@@ -17,8 +17,6 @@ import {
 import { SubmitReportService } from '../submit-reports/services/submit-reports.service';
 import { OrcidClientService } from '../orcid/orcid-client/orcid-client.service';
 import { UsersService } from '../auth/users/services/users.service';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { BulkSubmissionEvent } from '../submit-reports/events/events';
 import { Logger } from '@nestjs/common';
 import * as moment from 'moment-timezone';
 
@@ -110,9 +108,10 @@ async function bootstrap() {
 	});
 	const activities = terms.map((terms) => terms.activity_term);
 
-	const insertReport = async (report: LeanReportDocument) => {
+	const insertReport = async (reportDoc: LeanReportDocument) => {
 		try {
-			await reportService.insertReport(report, { preventEvents: true });
+			const { report, callback } = await reportService.insertReport(reportDoc);
+			await callback();
 		} catch (err) {
 			logger.error(`Error inserting report: ${err.message}`);
 		}
@@ -126,18 +125,24 @@ async function bootstrap() {
 			activities,
 			orcidIds,
 		);
-		reportSaves$.push(insertReport(report as LeanReportDocument));
+		const rep = new reportModel(report);
+		logger.debug(
+			`Inserting report with date ${report.timestamp.toDateString()} for resource ${
+				report.resource_id
+			}`,
+		);
+		await insertReport(rep.toObject());
 	}
 
 	await Promise.all(reportSaves$);
 
-	const result$ = await app
-		.get(EventEmitter2)
-		.emitAsync(
-			BulkSubmissionEvent.name,
-			new BulkSubmissionEvent(testingOrcidId, [resource.resource_id]),
-		);
-	logger.log(`Bulk submission event emitted: ${result$.length} listeners`);
+	// const result$ = await app
+	// 	.get(EventEmitter2)
+	// 	.emitAsync(
+	// 		BulkSubmissionEvent.name,
+	// 		new BulkSubmissionEvent(testingOrcidId, [resource.resource_id]),
+	// 	);
+	// logger.log(`Bulk submission event emitted: ${result$.length} listeners`);
 
 	await app.close();
 }

@@ -17,6 +17,8 @@ import { PartnerResourcesService } from '../../resources/partner-resources/servi
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { TermDocument } from '../../core/schemas/terms.schema';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
 
 @Injectable()
 @AggregatorClass()
@@ -103,8 +105,15 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 			| (Document<unknown, any, Report> & Report & { _id: Types.ObjectId })
 			| LeanReportDocument,
 		term: TermDocument,
+		resource: PartnerResourceDocument,
+		curator?: UserDocument,
 	) {
-		const result = await this.computeWeeklyStat.updateWithReport(report, term);
+		const result = await this.computeWeeklyStat.updateWithReport(
+			report,
+			term,
+			resource,
+			curator,
+		);
 		this.logger.debug(
 			`Updated Weekly Statistics for user ${report.curator_orcid} at resource ${report.resource_id} and league ${report.league}`,
 		);

@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Document, FilterQuery, Model, Types } from 'mongoose';
+import { Document, FilterQuery, Model, Types, UpdateQuery } from 'mongoose';
 import {
 	LeanReportDocument,
 	Report,
@@ -27,6 +27,9 @@ import {
 	getWeekRange,
 } from '../../util/date.helper';
 import * as moment from 'moment-timezone';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
+import { computePrivacyField } from '../../util/privacy.helper';
 @Injectable()
 export class ComputeWeeklyStatisticsService {
 	logger = new Logger(ComputeWeeklyStatisticsService.name);
@@ -93,7 +96,9 @@ export class ComputeWeeklyStatisticsService {
 			| ReportDocument
 			| (Document<unknown, any, Report> & Report & { _id: Types.ObjectId })
 			| LeanReportDocument,
-		termDoc?: TermDocument,
+		termDoc: TermDocument | null,
+		resource: PartnerResourceDocument,
+		user: UserDocument | null,
 	) {
 		const lastSavedReport = await this.reportModel
 			.findOne({
@@ -120,65 +125,48 @@ export class ComputeWeeklyStatisticsService {
 
 		const [weekStart, weekEnd] = getWeekRange(moment(report.timestamp));
 
-		const stat = await this.weeklyStatModel.findOne({
-			resource_id: report.resource_id,
-			league: report.league,
-			curator_orcid: report.curator_orcid,
-			weekStart: weekStart,
-			weekEnd: weekEnd,
-		});
-
-		if (!stat) {
-			const newStat = this.initStat(report);
-			newStat[`${term.activity_category}_count`] = 1;
-			newStat[`${term.activity_category}_score`] = term.score;
-			newStat.total_count = 1;
-			newStat.total_score = term.score;
-			newStat.first_contribution = report.timestamp;
-			newStat.last_contribution = report.timestamp;
-
-			try {
-				await newStat.save();
-			} catch (err: any) {
-				if (err instanceof MongoServerError && err.code === 11000) {
-					return await this.updateWithReport(report);
-				}
-				throw new Error(err);
-			} finally {
-				return;
-			}
+		const setObj: UpdateQuery<WeeklyStatisticsDocument> = {
+			$set: {
+				privacy: computePrivacyField(resource, user, {
+					league: report.league,
+				}),
+			},
+		};
+		if (reportIsLast) {
+			setObj.$set.last_contribution = report.timestamp;
 		}
-
-		const setObj = reportIsLast
-			? {
-					$set: {
-						last_contribution: report.timestamp,
-					},
-			  }
-			: {};
-
-		await this.weeklyStatModel.findOneAndUpdate(
-			{
-				resource_id: report.resource_id,
-				league: report.league,
-				curator_orcid: report.curator_orcid,
-				weekStart,
-				weekEnd,
-			},
-			{
-				$inc: {
-					[`${term.activity_category}_count`]: 1,
-					[`${term.activity_category}_score`]: term.score,
-					total_count: 1,
-					total_score: term.score,
+		try {
+			await this.weeklyStatModel.findOneAndUpdate(
+				{
+					resource_id: report.resource_id,
+					league: report.league,
+					curator_orcid: report.curator_orcid,
+					weekStart: weekStart,
+					weekEnd: weekEnd,
 				},
-				...setObj,
-			},
-			{
-				upsert: true,
-				new: true,
-			},
-		);
+				{
+					$inc: {
+						[`${term.activity_category}_count`]: 1,
+						[`${term.activity_category}_score`]: term.score,
+						total_count: 1,
+						total_score: term.score,
+					},
+					$setOnInsert: {
+						first_contribution: report.timestamp,
+					},
+					...setObj,
+				},
+				{
+					upsert: true,
+					new: true,
+				},
+			);
+		} catch (err: any) {
+			if (err instanceof MongoServerError && err.code === 11000) {
+				return await this.updateWithReport(report, term, resource, user);
+			}
+			throw new Error(err);
+		}
 	}
 
 	async recomputeWeeklyStatistics() {
