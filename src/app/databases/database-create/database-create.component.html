@@ -6,7 +6,8 @@
         <div class="tw-flex">
             <div class="tw-py-1">
                 <svg class="tw-fill-current tw-h-6 tw-w-6 tw-text-apicuron-purple-500 tw-mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                    <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"></path>
+                    <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z">
+                    </path>
                 </svg>
             </div>
             <div>
@@ -26,25 +27,29 @@
 
     <h3 class="tw-text-2xl tw-font-dm-sans tw-font-bold tw-my-2">Add new resource</h3>
     <div>
-        <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="data$ | async">
-            <div class="tw-flex tw-flex-row tw-flex-wrap tw-mb-2">
-                <div class="form-control-element tw-w-1/2">
-                    <label for="resource_id">Resource Id</label>
-                    <input type="text" formControlName="resource_id">
-                    <small class="tw-text-red-500 tw-text-sm tw-font-light"
-                        *ngIf="resource_id.invalid && resource_id.hasError('resourceIdAlreadyExists')">The Resource Id "{{ resource_id.value }}" is already taken</small>
-                    <small class="tw-text-red-500 tw-text-sm tw-font-light"
-                        *ngIf="resource_id.invalid && resource_id.hasError('onlyLowerCaseUnderscoreDash')">The Resource Id must only contain lower-case letters or underscores</small>
-                    <small class="tw-text-red-500 tw-text-sm tw-font-light"
-                        *ngIf="resource_id.hasError('required') && resource_id.touched">The Resource Id is required
-                    </small>
-                </div>
-                <div class="form-control-element tw-w-1/2">
-                    <label for="resource_name">Resource Name</label>
-                    <input type="text" formControlName="resource_name">
-                    <small class="tw-text-red-500 tw-text-sm tw-font-light"
-                        *ngIf="resource_name.hasError('required') && resource_name.touched">The Resource Name is required
-                    </small>
+    <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="data$ | async">
+        <div class="tw-flex tw-flex-row tw-flex-wrap tw-mb-2">
+            <div class="form-control-element tw-w-1/2">
+                <label for="resource_id">Resource Id</label>
+                <input type="text" formControlName="resource_id">
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_id.invalid && resource_id.hasError('resourceIdAlreadyExists')">The resource Id "{{ resource_id.value }}" is already taken </small>
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_id.invalid && resource_id.hasError('onlyLowerCaseUnderscoreDash')">The resource Id
+                    must
+                    only contain lower-case letters or underscores</small>
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_id.hasError('required') && resource_id.touched">
+                    The Resource Id is required
+                </small>
+            </div>
+            <div class="form-control-element tw-w-1/2">
+                <label for="resource_name">Resource Name</label>
+                <input type="text" formControlName="resource_name">
+                <small class="tw-text-red-500 tw-text-sm tw-font-light"
+                    *ngIf="resource_name.hasError('required') && resource_name.touched">
+                    The Resource Name is required
+                </small>
 
                 </div>
                 <div class="form-control-element tw-w-1/2">
@@ -101,6 +106,6 @@
                     class=" tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded" />
             </div>
 
-        </form>
+    </form>
     </div>
 </div>

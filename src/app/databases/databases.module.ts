@@ -39,8 +39,8 @@ import { FairSharingComponent } from "./fairsharing/fairsharing.component";
     MedalDefCardComponent,
     TermsModule,
     AchievementsDefModule,
-    FairSharingComponent,
     LeaderboardModule,
+    FairSharingComponent
 ],
   providers:[DatabasesService],
   exports: [DatabasesPageComponent],
