@@ -48,23 +48,14 @@ export class ComputeMonthlyStatsService {
 		const relatedMonthlyStatFilter = getRelatedMonthlyStatFilter(report);
 
 		// we retrieve the last saved report from that month
-		const lastSavedReport = await this.reportModel
-			.findOne({
-				resource_id: report.resource_id,
-				league: report.league,
-				curator_orcid: report.curator_orcid,
-				timestamp: {
-					$lte: getMonthEnd(moment(report.timestamp)),
-				},
-			})
-			.sort({ timestamp: -1 });
-
-		// the report is last if lastSavedReport does not exist
-		// or if the lastsavedreport is older than the report timestamp
-		const reportIsLast =
-			!lastSavedReport ||
-			(lastSavedReport &&
-				lastSavedReport.timestamp.getTime() < report.timestamp.getTime());
+		const reportIsLast = !(await this.reportModel.exists({
+			resource_id: report.resource_id,
+			league: report.league,
+			curator_orcid: report.curator_orcid,
+			timestamp: {
+				$gte: report.timestamp,
+			},
+		}));
 
 		const setObj = reportIsLast
 			? {
