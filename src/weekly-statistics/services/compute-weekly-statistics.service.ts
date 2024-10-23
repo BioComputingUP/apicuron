@@ -100,21 +100,14 @@ export class ComputeWeeklyStatisticsService {
 		resource: PartnerResourceDocument,
 		user: UserDocument | null,
 	) {
-		const lastSavedReport = await this.reportModel
-			.findOne({
-				resource_id: report.resource_id,
-				league: report.league,
-				curator_orcid: report.curator_orcid,
-				timestamp: {
-					$lte: getWeekEnd(moment(report.timestamp)),
-				},
-			})
-			.sort({ timestamp: -1 });
-
-		const reportIsLast =
-			!lastSavedReport ||
-			(lastSavedReport &&
-				lastSavedReport.timestamp.getTime() < report.timestamp.getTime());
+		const reportIsLast = !(await this.reportModel.exists({
+			resource_id: report.resource_id,
+			league: report.league,
+			curator_orcid: report.curator_orcid,
+			timestamp: {
+				$gte: report.timestamp,
+			},
+		}));
 
 		const term = !termDoc
 			? await this.termModel.findOne({
@@ -125,15 +118,13 @@ export class ComputeWeeklyStatisticsService {
 
 		const [weekStart, weekEnd] = getWeekRange(moment(report.timestamp));
 
-		const setObj: UpdateQuery<WeeklyStatisticsDocument> = {
-			$set: {
-				privacy: computePrivacyField(resource, user, {
-					league: report.league,
-				}),
-			},
+		const setObj: UpdateQuery<WeeklyStatisticsDocument>['$set'] = {
+			privacy: computePrivacyField(resource, user, {
+				league: report.league,
+			}),
 		};
 		if (reportIsLast) {
-			setObj.$set.last_contribution = report.timestamp;
+			setObj.last_contribution = report.timestamp;
 		}
 		try {
 			await this.weeklyStatModel.findOneAndUpdate(
@@ -154,7 +145,7 @@ export class ComputeWeeklyStatisticsService {
 					$setOnInsert: {
 						first_contribution: report.timestamp,
 					},
-					...setObj,
+					$set: setObj,
 				},
 				{
 					upsert: true,
