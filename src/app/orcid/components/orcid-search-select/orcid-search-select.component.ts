@@ -118,7 +118,7 @@ export class OrcidSearchSelectComponent
     this.destroy$.next();
   }
 
-  change(event: InputEvent) {
+  change(event: Event) {
     const targetElement = event.target as HTMLInputElement;
     this.searchQuery$.next(targetElement.value);
   }

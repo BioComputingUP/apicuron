@@ -1,41 +1,36 @@
-import { ApplicationRef, DoBootstrap, Inject, Injector, NgModule } from '@angular/core';
-import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
-import { createCustomElement } from '@angular/elements';
-import { AppComponent } from './app.component';
-import { LeaderboardComponent } from './leaderboard/leaderboard.component';
-import { CommonModule } from '@angular/common';
-import { CuratorStatisticsModule } from '../../../../src/app/curator-statistics/curator-statistics.module';
-import { ResourceModule } from '../../../../src/app/resource/resource.module';
-import { CuratorModule } from '../../../../src/app/curator/curator.module';
-import { AngularSvgIconModule } from 'angular-svg-icon';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MainService } from './main.service';
-import { HttpClientModule } from '@angular/common/http';
+import { DoBootstrap, Injector, NgModule } from "@angular/core";
+import { BrowserModule } from "@angular/platform-browser";
+import { createCustomElement } from "@angular/elements";
+import { APP_BASE_HREF, CommonModule } from "@angular/common";
+import { LeaderboardModule } from "../../../apicuron-util/src/lib/leaderboard/leaderboard.module";
+import { AngularSvgIconModule } from "angular-svg-icon";
+import { environment } from "../../../../src/environments/environment";
+import { RouterModule } from "@angular/router";
+import { WrapperComponent } from "./wrapper.component";
 
 @NgModule({
-  declarations: [
-    LeaderboardComponent,
-  ],
+  declarations: [WrapperComponent],
   imports: [
     CommonModule,
     BrowserModule,
-    HttpClientModule,
+    LeaderboardModule,
     AngularSvgIconModule.forRoot(),
-    ReactiveFormsModule,
+    RouterModule.forRoot([]),
   ],
   providers: [
-    { provide: 'WS', useValue: 'https://dev.apicuron.org/api/' },
-    MainService
+    {
+      provide: APP_BASE_HREF,
+      useValue: environment.host,
+    },
   ],
 })
 export class AppModule implements DoBootstrap {
-
-  constructor(protected injector: Injector) { }
-
+  constructor(protected injector: Injector) {}
 
   ngDoBootstrap(): void {
-    const el = createCustomElement(LeaderboardComponent, { injector: this.injector });
-    customElements.define('apicuron-leaderboard', el);
+    const el = createCustomElement(WrapperComponent, {
+      injector: this.injector,
+    });
+    customElements.define("apicuron-leaderboard", el);
   }
-
 }

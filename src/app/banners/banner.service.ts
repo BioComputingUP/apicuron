@@ -1,21 +1,15 @@
-import { Injectable } from "@angular/core";
-import { BehaviorSubject, interval, Observable, of, Subject } from "rxjs";
+import { interval, Observable, of, Subject } from "rxjs";
 import { environment } from "../../environments/environment";
 import {
   map,
-  mapTo,
-  shareReplay,
-  startWith,
-  switchMap,
-  tap,
+  mapTo, startWith,
+  switchMap
 } from "rxjs/operators";
-import { initial } from "lodash";
 
-@Injectable()
 export class BannerService {
   constructor(
-    protected startDate?: Date,
-    protected endDate?: Date,
+    public startDate?: Date,
+    public endDate?: Date,
     protected initialState: boolean = environment.env != "production"
   ) {}
 
