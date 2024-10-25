@@ -10,4 +10,15 @@ export class FairSharingService {
   private base_headers = {
     Accept: "application/json",
   };
+
+  get_doi(doi: string) {
+    const url = new URL(`${doi}`, this.fairsharing_url);
+    console.log(url)
+    return this.http.get(
+      url.href, {
+        headers: {
+          ...this.base_headers,
+        },
+      })
+    }
 }

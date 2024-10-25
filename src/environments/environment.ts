@@ -12,7 +12,7 @@ export const environment = {
   resource_logo_path: 'resources',
   orcid_url: 'https://pub.sandbox.orcid.org/v3.0/',
   orcid_main_url: 'https://sandbox.orcid.org/',
-  fairsharing_url: 'https://api.fairsharing.org/'
+  fairsharing_url: 'https://fairsharing.org'
 
   // ws: 'https://apicuron.bio.unipd.it/api/'
   // ws: 'http://localhost:8098/'
