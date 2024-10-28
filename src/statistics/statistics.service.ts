@@ -182,11 +182,6 @@ export class StatisticsService {
 		const orcid_ids = leaderboard.map((stat) => stat.curator_orcid);
 
 		const users = await this.userModel.find({ orcid_id: { $in: orcid_ids } });
-		if (users.length != leaderboard.length) {
-			throw new InternalServerErrorException(
-				`Some users are missing from the database, Could not load users for leaderboard`,
-			);
-		}
 
 		const data = leaderboard.map((stat) => {
 			const user = users.find((u) => u.orcid_id === stat.curator_orcid);

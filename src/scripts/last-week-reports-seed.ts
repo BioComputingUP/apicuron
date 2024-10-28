@@ -79,7 +79,7 @@ async function bootstrap() {
 
 	// Load users
 
-	const query = 'test';
+	const query = 'ng';
 	const searchResults = await app
 		.get(OrcidClientService)
 		.expandedSearch(`given-and-family-names:${query} OR credit-name:${query}`);
@@ -90,9 +90,10 @@ async function bootstrap() {
 
 	const orcidIds = users.map((user) => user.orcid_id);
 
-	for (const user of users) {
-		await app.get(UsersService).createOrUpdateUser(user);
-	}
+	// skips user creation
+	// for (const user of users) {
+	// 	await app.get(UsersService).createOrUpdateUser(user);
+	// }
 	const logger = new Logger('Seed Script Logger');
 
 	const termModel: Model<Term> = app.get(getModelToken(Term.name));

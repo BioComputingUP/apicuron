@@ -80,7 +80,6 @@ export class UsersService implements OnApplicationBootstrap {
 			(orcid_id): UserDocument =>
 				users.find((user) => user.orcid_id === orcid_id),
 		);
-		// .map((user) => user.toObject());
 
 		return sortedUsers;
 	}
