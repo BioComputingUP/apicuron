@@ -24,11 +24,11 @@ export class LeaderboardFilter implements Serializable {
 }
 
 export class WeeklyLeaderboardEntry implements Deserializable {
-  user: User;
+  user: User | null;
   stat: WeeklyCuratorStatistics;
   deserialize(input: any): this {
     const stat = new WeeklyCuratorStatistics().deserialize(input.stat);
-    const user = new User().deserialize(input.user);
+    const user = !!input.user ? new User().deserialize(input.user) : null;
 
     this.stat = stat;
     this.user = user;

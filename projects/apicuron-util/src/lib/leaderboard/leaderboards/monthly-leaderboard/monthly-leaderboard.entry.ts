@@ -63,11 +63,11 @@ export class MonthlyCuratorStatistics implements Deserializable {
 }
 
 export class MonthlyLeaderboardEntry implements Deserializable {
-  user: User;
+  user: User | null;
   stat: MonthlyCuratorStatistics;
   deserialize(input: any): this {
     const stat = new MonthlyCuratorStatistics().deserialize(input.stat);
-    const user = new User().deserialize(input.user);
+    const user = !!input.user ? new User().deserialize(input.user) : null;
 
     this.stat = stat;
     this.user = user;

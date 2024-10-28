@@ -4,12 +4,12 @@ import { User } from "../../../../../../../src/app/models/User.model";
 
 
 export class LeaderboardEntry implements Deserializable {
-  user: User;
+  user: User | null;
   stat: BaseCuratorStatistics;
   constructor() { }
   deserialize(input: any): this {
     const stat = new BaseCuratorStatistics().deserialize(input.stat);
-    const user = new User().deserialize(input.user);
+    const user = !!input.user ? new User().deserialize(input.user) : null;
 
     this.stat = stat;
     this.user = user;
