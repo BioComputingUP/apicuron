@@ -12,35 +12,36 @@
             </div>
             <div>
                 <p class="tw-font-bold">Creating a Resource</p>
-                <p class="tw-text-sm">To create a resource, you can use one of the following two options:</p>
-                <p class="tw-text-sm">1. You can use <span>FairSharing</span> for this you need to press the button <span>Search</span> and you will get the list of available resources. By selecting the resource of interest you can add it to APICURON.
+                <p class="tw-text-sm tw-pb-1">To create a resource, you can use one of the following two options:</p>
+                <p class="tw-text-sm tw-pb-1"><span class="tw-font-bold">1.</span> You can use <span class="tw-font-bold">FairSharing</span>. For this you need to insert <span class="tw-italic tw-underline">DOI of the resource</span> and press the button 
+                <span class="tw-font-bold">Add</span> and you will get the list of available resources. By selecting the resource of interest you can add it to APICURON.
                 If there are no resources to be added, you can move to the second option;</p>
-                <p class="tw-text-sm">2. You can create a new resource to add to APICURON using the form below.</p>
-                <p class="tw-text-sm">The created resource is not public until it is validated by the APICURON team. You can contact us on <a class="tw-underline tw-italic" href="mailto:apicuron@ngp-net.bio.unipd.it">apicuron&#64;ngp-net.bio.unipd.it</a> to request a validation.
+                <p class="tw-text-sm tw-pb-1"><span class="tw-font-bold">2.</span> You can create a new resource to add to APICURON using the form below.</p>
+                <p class="tw-text-sm">The created resource is not public until it is validated by the APICURON team. You can contact us on 
+                <a class="tw-underline tw-italic" href="mailto:apicuron@ngp-net.bio.unipd.it">apicuron&#64;ngp-net.bio.unipd.it</a> to request a validation.
                 Make sure to let us know the ID and the name of your resource and the ORCID ID of the account you used here when you do so.
                 Upon validation you can update the resource and push additional information.</p>
             </div>
         </div>
     </div>
 
-    <fairsharing></fairsharing>
+    <fairsharing (myData)="passData($event)"></fairsharing>
 
     <h3 class="tw-text-2xl tw-font-dm-sans tw-font-bold tw-my-2">Add new resource</h3>
     <div>
     <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="data$ | async">
         <div class="tw-flex tw-flex-row tw-flex-wrap tw-mb-2">
             <div class="form-control-element tw-w-1/2">
-                <label for="resource_id">Resource Id</label>
+                <label for="resource_id">Resource ID</label>
                 <input type="text" formControlName="resource_id">
                 <small class="tw-text-red-500 tw-text-sm tw-font-light"
-                    *ngIf="resource_id.invalid && resource_id.hasError('resourceIdAlreadyExists')">The resource Id "{{ resource_id.value }}" is already taken </small>
+                    *ngIf="resource_id.invalid && resource_id.hasError('resourceIdAlreadyExists')">The resource ID "{{ resource_id.value }}" is already taken </small>
                 <small class="tw-text-red-500 tw-text-sm tw-font-light"
-                    *ngIf="resource_id.invalid && resource_id.hasError('onlyLowerCaseUnderscoreDash')">The resource Id
-                    must
-                    only contain lower-case letters or underscores</small>
+                    *ngIf="resource_id.invalid && resource_id.hasError('onlyLowerCaseUnderscoreDash')">The resource ID
+                    must only contain lower-case letters or underscores</small>
                 <small class="tw-text-red-500 tw-text-sm tw-font-light"
                     *ngIf="resource_id.hasError('required') && resource_id.touched">
-                    The Resource Id is required
+                    The Resource ID is required
                 </small>
             </div>
             <div class="form-control-element tw-w-1/2">

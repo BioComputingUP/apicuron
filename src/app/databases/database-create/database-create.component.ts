@@ -1,9 +1,9 @@
 import { HttpErrorResponse } from "@angular/common/http";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
-import { Observable, of } from "rxjs";
-import { pluck, shareReplay, tap } from "rxjs/operators";
+import { Observable, Subject, of } from "rxjs";
+import { pluck, shareReplay, takeUntil, tap } from "rxjs/operators";
 import { toFormData } from "../../util/toFormData";
 import { DatabasesService } from "../services/databases.service";
 import { ResourceIdValidator } from "../validators/resource-id.validator";
@@ -13,13 +13,14 @@ import { ResourceIdValidator } from "../validators/resource-id.validator";
   templateUrl: "./database-create.component.html",
   styleUrls: ["./database-create.component.scss"],
 })
-export class DatabaseCreateComponent implements OnInit {
+export class DatabaseCreateComponent implements OnInit, OnDestroy {
   data$: Observable<any>;
   clicked = false;
 
   JSON = JSON;
 
   form: FormGroup;
+  destroy$ = new Subject<Boolean>();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -78,26 +79,42 @@ export class DatabaseCreateComponent implements OnInit {
     this.form.controls['logo'].setValue(file)
   }
 
-
   submit() {
-
     const formValue = toFormData(this.form.value);
-
     this.databasesService
       .create_resource(formValue).subscribe((response) => {
       this.toaster.success('Resource submitted successfullly', 'Success')
     }, ({ error }: HttpErrorResponse) => {
-      if(error.message && error.statusCode == 400){
+      if (error.message && error.statusCode == 400) {
         let errors = Array.isArray(error.message) ? error.message.join('\n') : error.message
         this.toaster.warning(errors, 'Validation Error')
-      }else{
+      } else {
         this.toaster.error('An error occured while sending the form, please contact the developers', 'Error');
       }
       return of(error.message)
     })
-    
-    
-  }
+  };
+
+  slugifyId(str: string) {
+    const slug_str = str.toLowerCase().replace(/\s+/g, "_");
+    return slug_str
+  };
+
+  passData($event: any) {
+    $event
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(data => {
+      const { name, homepage, description } = data.metadata;
+      this.form.patchValue({
+        resource_id: this.slugifyId(name) || "",
+        resource_name: name || "",
+        resource_long_name: name || "",
+        resource_url: homepage || "",
+        resource_uri: homepage || "",
+        resource_description: description || "",
+      });
+    }
+  )};
 
   ngOnInit(): void {}
   get resource_uri() {
@@ -126,5 +143,9 @@ export class DatabaseCreateComponent implements OnInit {
 
   get color (){
     return this.form.get("color");
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
   }
 }
