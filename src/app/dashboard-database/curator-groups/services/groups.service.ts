@@ -132,6 +132,14 @@ export class GroupsService implements OnDestroy {
     });
   }
 
+  viewParticipants(resourceGroup: ResourceGroup) {
+    this.dialog.open(ViewParticipantsComponent, {
+      data: {
+        group: resourceGroup,
+      }
+    });
+  }
+
   createNewGroup(group: ResourceGroup) {
     return this.http
       .post(`${this.ws}/leagues`, group.serialize(), {

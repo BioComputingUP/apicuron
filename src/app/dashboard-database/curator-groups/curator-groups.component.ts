@@ -51,6 +51,9 @@ export class CuratorGroupsComponent implements OnInit {
       case "edit":
         this.groupsService.openUpdateGroupForm(clickEvent.group);
         break;
+      case "select":
+        this.groupsService.viewParticipants(clickEvent.group);
+        break
       case "delete":
         try {
           this.groupsService.deleteGroup(clickEvent.group);

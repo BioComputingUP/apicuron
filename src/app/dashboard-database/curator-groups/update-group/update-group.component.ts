@@ -25,7 +25,7 @@ export class UpdateGroupComponent implements OnDestroy {
   curators$: Observable<OrcidProfile[]>;
 
   constructor(
-    @Inject(DIALOG_DATA) 
+    @Inject(DIALOG_DATA)
     protected data: { group: ResourceGroup },
     protected fb: FormBuilder,
     protected orcidService: OrcidService,

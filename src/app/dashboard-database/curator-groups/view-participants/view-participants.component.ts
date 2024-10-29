@@ -1,22 +1,32 @@
-import { DialogRef } from "@angular/cdk/dialog";
-import { Component, OnDestroy, OnInit, Optional } from "@angular/core";
-import { FormBuilder, FormGroup } from "@angular/forms";
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+import { DIALOG_DATA, DialogRef } from "@angular/cdk/dialog";
+import { Component, Inject, OnDestroy } from "@angular/core";
+import { FormGroup, ReactiveFormsModule } from "@angular/forms";
+import { Observable, Subject } from "rxjs";
+import { OrcidProfile } from "src/app/models/orcid-profile.model";
 import { ResourceGroup, ResourceGroupCreateForm } from "src/app/models/resource-group.model";
-import { slugifyFieldFromAnother } from "src/app/util/form-reactivity";
-
+import { OrcidService } from "src/app/orcid/services/orcid.service";
+import { OrcidModule } from "src/app/orcid/orcid.module";
+import { CommonModule } from "@angular/common";
 @Component({
+  standalone: true,
   selector: "view-participants",
   templateUrl: "./view-participants.component.html",
+  imports: [ReactiveFormsModule, OrcidModule, CommonModule],
 })
-export class ViewParticipantsComponent implements OnInit, OnDestroy {
+export class ViewParticipantsComponent implements OnDestroy {
   group: ResourceGroup;
   form: FormGroup<ResourceGroupCreateForm>;
   destroy$ = new Subject<void>();
+  curators$: Observable<OrcidProfile[]>;
 
-  ngOnInit(): void {
-    throw new Error("Method not implemented.");
+  constructor(
+    @Inject(DIALOG_DATA)
+    protected data: { group: ResourceGroup },
+    protected orcidService: OrcidService,
+    public dialogRef: DialogRef<string>
+  ) {
+    this.group = data.group;
+    this.curators$ = this.orcidService.getOrcidProfiles(this.group.defaultMembers);
   }
 
   ngOnDestroy(): void {
@@ -24,6 +34,6 @@ export class ViewParticipantsComponent implements OnInit, OnDestroy {
   }
 
   closeForm() {
-    // this.dialogRef.close();
+    this.dialogRef.close();
   }
 }
