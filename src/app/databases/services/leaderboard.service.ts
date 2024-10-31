@@ -1,10 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable, combineLatest } from "rxjs";
-import { map, pluck, skip, switchMap } from "rxjs/operators";
+import { Observable } from "rxjs";
+import { map, pluck } from "rxjs/operators";
 import { Paginated } from "src/app/interfaces/paginated";
 import { User } from "src/app/models/User.model";
-import { WeeklyCuratorStatistics } from "src/app/models/statistics.model";
 import { environment } from "src/environments/environment";
 import { LeaderboardFilter } from "../../../../projects/leaderboard-lib/src/lib/interfaces/leaderboard-filter";
 import {

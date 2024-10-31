@@ -7,6 +7,7 @@ import { pluck, shareReplay, takeUntil, tap } from "rxjs/operators";
 import { toFormData } from "../../util/toFormData";
 import { DatabasesService } from "../services/databases.service";
 import { ResourceIdValidator } from "../validators/resource-id.validator";
+import * as _ from "lodash";
 
 @Component({
   selector: "app-database-create",
@@ -66,55 +67,59 @@ export class DatabaseCreateComponent implements OnInit, OnDestroy {
             ),
           ],
         ],
-        logo: [null, [Validators.required]]
+        logo: [null, [Validators.required]],
       },
       { validators: Validators.required, updateOn: "change" }
     );
-
-
   }
 
-  onFileSelected(event){
-    const file:File = event.target.files[0]
-    this.form.controls['logo'].setValue(file)
+  onFileSelected(event) {
+    const file: File = event.target.files[0];
+    this.form.controls["logo"].setValue(file);
   }
 
   submit() {
     const formValue = toFormData(this.form.value);
-    this.databasesService
-      .create_resource(formValue).subscribe((response) => {
-      this.toaster.success('Resource submitted successfullly', 'Success')
-    }, ({ error }: HttpErrorResponse) => {
-      if (error.message && error.statusCode == 400) {
-        let errors = Array.isArray(error.message) ? error.message.join('\n') : error.message
-        this.toaster.warning(errors, 'Validation Error')
-      } else {
-        this.toaster.error('An error occured while sending the form, please contact the developers', 'Error');
+    this.databasesService.create_resource(formValue).subscribe(
+      (response) => {
+        this.toaster.success("Resource submitted successfullly", "Success");
+      },
+      ({ error }: HttpErrorResponse) => {
+        if (error.message && error.statusCode == 400) {
+          let errors = Array.isArray(error.message)
+            ? error.message.join("\n")
+            : error.message;
+          this.toaster.warning(errors, "Validation Error");
+        } else {
+          this.toaster.error(
+            "An error occured while sending the form, please contact the developers",
+            "Error"
+          );
+        }
+        return of(error.message);
       }
-      return of(error.message)
-    })
-  };
+    );
+  }
 
   slugifyId(str: string) {
     const slug_str = str.toLowerCase().replace(/\s+/g, "_");
-    return slug_str
-  };
+    return slug_str;
+  }
 
   passData($event: any) {
-    $event
-    .pipe(takeUntil(this.destroy$))
-    .subscribe(data => {
-      const { name, homepage, description } = data.metadata;
-      this.form.patchValue({
-        resource_id: this.slugifyId(name) || "",
-        resource_name: name || "",
-        resource_long_name: name || "",
-        resource_url: homepage || "",
-        resource_uri: homepage || "",
-        resource_description: description || "",
-      });
+    if ($event.loading || $event.error || !$event.data) {
+      return;
     }
-  )};
+    const { name, homepage, description } = $event.data.metadata;
+    this.form.patchValue({
+      resource_id: _.kebabCase(name) || "",
+      resource_name: name || "",
+      resource_long_name: name || "",
+      resource_url: homepage || "",
+      resource_uri: homepage || "",
+      resource_description: description || "",
+    });
+  }
 
   ngOnInit(): void {}
   get resource_uri() {
@@ -141,7 +146,7 @@ export class DatabaseCreateComponent implements OnInit, OnDestroy {
     return this.form.get("resource_url");
   }
 
-  get color (){
+  get color() {
     return this.form.get("color");
   }
 

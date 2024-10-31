@@ -1,31 +1,46 @@
-import { Component, EventEmitter, Output } from "@angular/core";
+import { Component, EventEmitter, OnDestroy, Output } from "@angular/core";
 import { FairSharingService } from "../services/fairsharing.service";
-import { Observable, Subject } from "rxjs";
+import { Observable, ReplaySubject, Subject } from "rxjs";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
+import {
+  debounceTime,
+  distinctUntilChanged,
+  shareReplay,
+  takeUntil,
+  tap,
+} from "rxjs/operators";
+import { LoadingState } from "../../../../projects/apicuron-util/src/lib/loadable";
 
 @Component({
   standalone: true,
   selector: "fairsharing",
   templateUrl: "./fairsharing.component.html",
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule],
 })
-export class FairSharingComponent {
+export class FairSharingComponent implements OnDestroy {
   @Output() myData = new EventEmitter<any>();
   doi: string = "";
-  resource_data$: Observable<any>;
-  destroy$ = new Subject<Boolean>();
+  processing$: Observable<LoadingState<any>>;
+  destroy$ = new Subject<void>();
+  inputSubject$ = new ReplaySubject<string>();
 
-  constructor(protected fairsharingService: FairSharingService) {};
+  constructor(protected fairsharingService: FairSharingService) {
+    this.processing$ = this.fairsharingService
+      .getFairsharingObservable(this.inputSubject$.asObservable())
+      .pipe(shareReplay());
+  }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+  }
 
-  onDOIInputChange(): void {
-    const extractedDOI = this.doi.split("/")[1];
-    if (extractedDOI) {
-      this.resource_data$ = this.fairsharingService.get_doi(extractedDOI);
-    }
-  };
+  onDOIInputChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const value = target.value;
+    this.inputSubject$.next(value);
+  }
 
-  btnClick() {
-    this.myData.emit(this.resource_data$);
+  emitToForm(input: any) {
+    this.myData.emit(input);
   }
 }
