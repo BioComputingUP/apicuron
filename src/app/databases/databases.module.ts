@@ -17,6 +17,8 @@ import { AchievementsDefModule } from "../achievements-def/achievements-def.modu
 import { TermsModule } from "../terms/terms.module";
 import { CdkAccordionModule } from "@angular/cdk/accordion";
 import { LeaderboardModule } from "../../../projects/apicuron-util/src/lib/leaderboard/leaderboard.module";
+import { FairSharingComponent } from "./fairsharing/fairsharing.component";
+import { FairSharingService } from "./services/fairsharing.service";
 @NgModule({
   declarations: [
     DatabasesPageComponent,
@@ -38,9 +40,10 @@ import { LeaderboardModule } from "../../../projects/apicuron-util/src/lib/leade
     MedalDefCardComponent,
     TermsModule,
     AchievementsDefModule,
-    LeaderboardModule
+    LeaderboardModule,
+    FairSharingComponent
 ],
-  providers: [DatabasesService],
+  providers:[DatabasesService, FairSharingService],
   exports: [DatabasesPageComponent],
 })
 export class DatabasesModule {}

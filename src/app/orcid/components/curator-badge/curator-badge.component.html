@@ -1,0 +1,15 @@
+<div
+  class="tw-relative tw-flex tw-flex-row tw-items-center tw-select-none tw-whitespace-nowrap tw-rounded-lg tw-bg-apicuron-purple tw-py-1 tw-px-1 tw-align-baseline tw-font-sans tw-text-xs tw-uppercase tw-leading-none tw-text-white tw-mr-1 tw-mb-1"
+>
+  <span class="tw-block">{{ curator.displayedName }}</span>
+  <button
+    *ngIf="isRemovable"
+    class="tw-block tw-bg-white tw-rounded tw-ml-1 tw-cursor-pointer"
+    (click)="removeCurator()"
+  >
+    <svg-icon
+      src="assets/svg/close.svg"
+      svgClass="tw-w-4 tw-h-4 tw-text-apicuron-purple"
+    ></svg-icon>
+  </button>
+</div>

@@ -29,10 +29,10 @@ export function switchMapWithLoading<T>(
           startWith({ error: null, loading: true })
         )
       ),
-      scan((state: LoadingState<T>, change: LoadingState<T>) => ({
-        ...state,
-        ...change,
-      }))
+      // scan((state: LoadingState<T>, change: LoadingState<T>) => ({
+      //   ...state,
+      //   ...change,
+      // }))
     );
 }
 

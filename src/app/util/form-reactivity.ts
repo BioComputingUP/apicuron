@@ -1,4 +1,4 @@
-import { FormGroup } from "@angular/forms";
+import { FormControl, FormGroup } from "@angular/forms";
 import _ from "lodash";
 import { Observable } from "rxjs";
 import { delay, distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
@@ -22,7 +22,6 @@ export function slugifyFieldFromAnother(
   ];
 
   return sourceControl.valueChanges.pipe(
-	startWith(sourceControl.value),
     delay(50),
     distinctUntilChanged(),
     filter(() => sourceControl.valid), // make sure sourceControl is valid when value changes

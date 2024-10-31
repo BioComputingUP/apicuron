@@ -6,6 +6,8 @@ button:focus {
   @apply tw-mx-auto tw-container tw-max-w-7xl tw-px-2 sm:tw-px-4 2xl:tw-px-0 tw-py-2 xl:tw-py-4;
 }
 
+@import '@angular/cdk/overlay-prebuilt.css';
+
 $apicuron_purple: #4d194d;
 
 
@@ -18,6 +20,10 @@ $apicuron_purple: #4d194d;
 
 html {
   scroll-behavior: smooth;
+}
+
+:focus-visible {
+  outline: none;
 }
 
 // Navbar Styles Section

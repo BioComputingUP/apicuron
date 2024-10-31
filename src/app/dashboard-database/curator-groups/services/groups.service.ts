@@ -13,18 +13,19 @@ import { switchMap, pluck } from "rxjs/operators";
 import { environment } from "src/environments/environment";
 import { User } from "src/app/models/User.model";
 import { ResourceGroup } from "../../../models/resource-group.model";
+import { Dialog } from "@angular/cdk/dialog";
+import { CreateGroupComponent } from "../create-group/create-group.component";
+import { UpdateGroupComponent } from "../update-group/update-group.component";
+import { GroupCreateForm } from "../../../components/group-create-form/group-create-form.component";
 
-// export type CreateLeague = Required<UpdateLeague>
-
-// export type RemoveLeague = Omit<UpdateLeague>
-
-// @Injectable({
-// providedIn: 'root' // This is wrong, there are only some cases where this makes sense
-// })
 @Injectable()
 export class GroupsService {
   resourceGroups$: Observable<ResourceGroup[]>;
-  constructor(protected http: HttpClient, protected route: ActivatedRoute) {}
+  constructor(
+    protected http: HttpClient,
+    protected route: ActivatedRoute,
+    protected dialog: Dialog
+  ) {}
 
   ws = environment.ws;
 
@@ -60,22 +61,35 @@ export class GroupsService {
 
     const firstGroup$: Observable<ResourceGroup> = this.resourceGroups$.pipe(
       map((groups: ResourceGroup[]) => groups[0]),
-      take(1),
+      take(1)
     );
 
     this.currentGroup$ = concat(firstGroup$, this.selectGroup$);
-
-    // this.currentParticipants$ = this.leagues$.pipe(
-    //   map((groups) => {
-    //     return groups.reduce((allParticipants, group) => {
-    //       return allParticipants.concat(
-    //         group.defaultMembers.map((participant) => [participant, group.name])
-    //       );
-    //     }, []);
-    //   })
-    // );
   }
 
+  openCreateGroupForm() {
+    this.dialog.open(GroupCreateForm);
+  }
+
+  openUpdateGroupForm(resourceGroup: ResourceGroup) {
+    this.dialog.open(UpdateGroupComponent, {
+      data: {
+        group: resourceGroup,
+      },
+    });
+  }
+
+  createNewGroup(group: ResourceGroup) {
+    return this.http
+      .post(`${this.ws}/leagues`, group.serialize(), {
+        headers: { version: "2" },
+      })
+      .pipe(
+        map((response: any) => {
+          return new ResourceGroup().deserialize(response);
+        })
+      );
+  }
   getCurrentGroup(): Observable<ResourceGroup> {
     return this.currentGroup$;
   }
@@ -98,45 +112,5 @@ export class GroupsService {
 
   onSelectedGroupChange(groupName) {
     this.selectedGroup$.next(groupName);
-  }
-
-  get_resource_leagues(resource_id: string) {
-    return this.http.get(`${this.ws}/leagues/${resource_id}`, {
-      headers: {
-        version: "2",
-      },
-    });
-  }
-
-  create_league() {
-    return this.http.post(this.ws + "/leagues", {
-      headers: {
-        version: "2",
-      },
-    });
-  }
-
-  delete_league() {
-    return this.http.delete(this.ws + "/leagues", {
-      headers: {
-        version: "2",
-      },
-    });
-  }
-
-  add_league_member(curator) {
-    return this.http.post(this.ws + "/leagues/add-member", curator, {
-      headers: {
-        Version: "2",
-      },
-    });
-  }
-
-  remove_league_member(curator) {
-    // return this.http.delete(this.ws + "/leagues/remove-member", curator, {
-    //   headers: {
-    //     Version: '2'
-    //   }
-    // })
   }
 }
