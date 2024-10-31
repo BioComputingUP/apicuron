@@ -104,6 +104,7 @@ export class SubmittedResourcesService {
 			},
 			{
 				...resource.toObject(),
+				joined_date: new Date(),
 				state: PartnerResource.name,
 			},
 		);

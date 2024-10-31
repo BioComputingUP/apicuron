@@ -65,6 +65,9 @@ export class PartnerResource {
 	})
 	stats?: ResourceStats;
 
+	@Prop({ required: true, type: Date })
+	joined_date: Date;
+
 	getLeague(leagueName: string) {
 		return this.leagues.find((league: League) => league.name == leagueName);
 	}

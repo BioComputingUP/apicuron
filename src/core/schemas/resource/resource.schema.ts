@@ -11,6 +11,7 @@ export type ResourceDocument = HydratedDocument<Resource>;
 @Schema({
 	collection: 'resources_def',
 	discriminatorKey: 'state',
+	timestamps: true,
 	virtuals: true,
 })
 export class Resource {
@@ -37,6 +38,12 @@ export class Resource {
 
 	@Prop()
 	logo: string;
+
+	@Prop({ required: false, type: Date })
+	joined_date?: Date;
+
+	created_at: Date;
+	updated_at: Date;
 
 	@Prop({
 		type: String,

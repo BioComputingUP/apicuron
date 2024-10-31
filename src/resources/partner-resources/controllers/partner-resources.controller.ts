@@ -42,6 +42,7 @@ import {
 import { AuthService } from '../../../auth/auth.service';
 import * as mv from 'mv';
 import { ResourceLogoValidationPipe } from '../../validators/logo-validation.pipe';
+import { plainToClass } from 'class-transformer';
 
 @ApiTags('Partner Resources')
 @ApiHeader(VersionHeader)
@@ -86,7 +87,7 @@ export class PartnerResourcesController {
 			resource_id,
 		);
 		if (resource) {
-			return resource;
+			return plainToClass(PartnerResourceDto, resource.toObject());
 		} else {
 			throw new NotFoundException(`Resource (${resource_id}) Not Found`);
 		}
