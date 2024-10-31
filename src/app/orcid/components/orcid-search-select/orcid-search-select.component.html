@@ -35,10 +35,14 @@
   [cdkConnectedOverlayOpen]="overlayState$ | async"
   [cdkConnectedOverlayHasBackdrop]="true"
   [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
-  [cdkConnectedOverlayPositions]="{
-			'originX': 'start',
-			'originY': 'bottom',
-		  }"
+  [cdkConnectedOverlayPositions]="[
+      {
+        originX: 'start',
+        originY: 'bottom',
+        overlayX: 'start',
+        overlayY: 'top'
+      }
+    ]"
   [cdkConnectedOverlayDisableClose]="false"
   (backdropClick)="closeOverlay()"
 >

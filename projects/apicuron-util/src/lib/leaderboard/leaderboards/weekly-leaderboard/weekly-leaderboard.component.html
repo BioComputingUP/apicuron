@@ -1,0 +1,130 @@
+<div [loadable]="weeklyLeaderboard$">
+  <ng-container *ngIf="weeklyLeaderboard$ | async as weeklyLeaderboard">
+    <ng-container *ngIf="resource$ | async as resource">
+      <span
+        *ngIf="weeklyLeaderboard.data.length > 0"
+        class="tw-text-xs tw-text-gray-500 tw-font-light"
+        >This Leaderboard comprises contributions from
+        <span
+          class="tw-underline"
+          >{{ weeklyLeaderboard.data?.[0].stat.weekStart| date: 'EEEE dd-MM-yy':'UTC' }}</span
+        >
+        till
+        <span
+          class="tw-underline"
+          >{{ weeklyLeaderboard.data?.[0].stat.weekEnd| date: 'EEEE dd-MM-yy':"UTC" }}</span
+        >
+        in UTC timezone and is reset every Monday at 00:00 UTC</span
+      >
+      <table *ngIf="weeklyLeaderboard.data.length > 0" class="tw-table-auto tw-border-collapse tw-w-full">
+        <thead>
+          <tr class="tw-divide-x tw-divide-gray-200">
+            <ng-container *ngFor="let column of columns$ | async">
+              <ng-container [ngSwitch]="column.columnName">
+                <th
+                  *ngSwitchDefault
+                  [title]="column.description"
+                  class="tw-px-2 tw-py-1 tw-text-center tw-text-gray-700"
+                >
+                  {{ column.columnName }}
+                </th>
+              </ng-container>
+            </ng-container>
+          </tr>
+        </thead>
+        <tbody class="tw-divide-y tw-divide-gray-200">
+          <tr
+            *ngFor="
+              let entry of weeklyLeaderboard.data;
+              let indexOfelement = index
+            "
+            class="odd:tw-bg-gray-50"
+          >
+            <ng-container *ngFor="let column of columns$ | async">
+              <ng-container [ngSwitch]="column.columnName">
+                <td
+                  *ngSwitchCase="'Contributor'"
+                  profile-renderer
+                  [profile-renderer-user]="entry.user"
+                ></td>
+                <td
+                  *ngSwitchCase="'last Contribution Date'"
+                  class="tw-text-center tw-font-bold tw-text-gray-700"
+                >
+                  {{
+                    entry.stat.last_contribution | date : "dd-MM-yyyy" : "UTC"
+                  }}
+                </td>
+                <td
+                  *ngSwitchDefault
+                  class="tw-text-center tw-font-bold tw-text-gray-700"
+                >
+                  {{
+                    column.fieldAccessor(
+                      entry,
+                      indexOfelement,
+                      weeklyLeaderboard
+                    )
+                  }}
+                </td>
+              </ng-container>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+      <div
+        class="tw-p-1 md:tw-p-2 tw-text-gray-700"
+        style="font-family: system-ui"
+      >
+        <ng-container
+          *ngIf="weeklyLeaderboard$ | async as leaderboard; else loading"
+        >
+          <ng-container
+            *ngIf="leaderboard.meta.pagination.total > 0; else emptyList"
+          >
+            <div
+              class="tw-flex tw-flex-row tw-justify-between tw-pt-2 md:tw-pt-4"
+            >
+              <div>
+                <span
+                  >Total Contributors:
+                  <span
+                    class="tw-bg-apicuron-bright-purple tw-text-white tw-font-bold tw-rounded-md tw-px-1"
+                    >{{ leaderboard.meta.pagination.total }}</span
+                  >
+                </span>
+              </div>
+              <pagination
+                [paginated]="leaderboard"
+                (pageChanged)="pageChanged($event)"
+              ></pagination>
+              <a [href]="apicuronURL">
+                <img
+                  class="tw-w-48 tw-transition-transform hover:tw-scale-110"
+                  src="assets/APICURON.svg"
+                  alt=""
+                />
+              </a>
+            </div>
+          </ng-container>
+
+          <ng-template #emptyList>
+            <div class="tw-text-center">
+              {{ resource.resource_name }} has no available weekly leaderboard
+              yet
+            </div>
+          </ng-template>
+        </ng-container>
+
+        <ng-template #loading>
+          <span class="tw-block tw-text-center tw-font-bold tw-py-2">
+            <svg-icon
+              src="assets/svg/loading-spinner.svg"
+              svgClass="tw-animate-spin tw-h-10 tw-w-10 tw-mx-auto"
+            ></svg-icon>
+          </span>
+        </ng-template>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>

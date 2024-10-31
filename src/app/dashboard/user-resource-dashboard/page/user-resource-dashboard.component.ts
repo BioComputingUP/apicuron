@@ -5,14 +5,7 @@ import { CuratorStatistics } from "../../../models/statistics.model";
 import { User } from "../../../models/User.model";
 import { UserResourceDashboardService } from "../services/user-resource-dashboard.service";
 import { ActivatedRoute, ParamMap } from "@angular/router";
-import {
-  map,
-  shareReplay,
-  startWith,
-  switchMap,
-  takeUntil,
-  tap,
-} from "rxjs/operators";
+import { map, shareReplay, startWith, switchMap } from "rxjs/operators";
 import { Resource } from "../../../models/resource.model";
 import {
   ActivitiesStatistics,
@@ -25,6 +18,7 @@ import {
   Breakpoints,
   BreakpointState,
 } from "@angular/cdk/layout";
+import { Term } from "../../../models/term.model";
 @Component({
   selector: "user-resource-dashboard",
   templateUrl: "./user-resource-dashboard.component.html",
@@ -43,6 +37,7 @@ export class UserResourceDashboard {
   activitiesAndResource$: Observable<[ActivitiesStatistics[], Resource]>;
   destroy$ = new Subject();
   limit$: Observable<number>;
+  terms$: Observable<Term[]>;
 
   constructor(
     protected userResourceDashboard: UserResourceDashboardService,
@@ -79,6 +74,15 @@ export class UserResourceDashboard {
 
     this.userActivities$ = this.detailedStatistics$.pipe(
       map((stat) => stat.activities)
+    );
+
+    this.terms$ = combineLatest([
+      this.detailedStatistics$,
+      this.resource$,
+    ]).pipe(
+      map(([stat, resource]) =>
+        stat.activities.map((act): Term => act.getTerm(resource.resource_id))
+      )
     );
 
     this.mainNumbers$ = this.detailedStatistics$.pipe(

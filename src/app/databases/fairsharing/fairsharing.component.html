@@ -1,0 +1,75 @@
+<h3 class="tw-text-2xl tw-font-dm-sans tw-font-bold tw-my-2">
+  Load the resource from FairSharing
+</h3>
+
+<div class="tw-pb-2 tw-px-2">
+  <label class="tw-text-lg tw-whitespace-pre tw-font-bold">
+    Fairsharing DOI:
+  </label>
+  <div class="tw-flex tw-flex-row tw-items-center sm:tw-w-1/3 tw-w-2/3">
+    <div>
+      <input
+        type="text"
+        (input)="onDOIInputChange($event)"
+        class="tw-block tw-w-24 md:tw-w-64 tw-text-base tw-py-2 tw-px-1 tw-pl-2 disabled:tw-bg-gray-400 tw-rounded-l"
+        placeholder="00.00000/FAIRsharing.aa0a00"
+        value=""
+      />
+    </div>
+    <ng-container #loadingSpinner *ngIf="processing$ | async as processing">
+      <img
+        [ngClass]="{
+          'tw-block': processing.loading,
+          'tw-hidden': !processing.loading
+        }"
+        src="assets/svg/loading-spinner.svg"
+        class="tw-w-12 tw-h-12 tw-text-apicuron-purple tw-animate-spin"
+        alt="loading spinner"
+      />
+    </ng-container>
+  </div>
+  <ng-container #FoundResult *ngIf="processing$ | async as processing">
+    <div
+      class="tw-ml-2 tw-text-base tw-text-gray-700 tw-whitespace-pre"
+      *ngIf="processing.data && !processing.loading && !processing.error"
+    >
+      <span class=""
+        >Found Resource
+        <a
+          class="tw-font-bold tw-underline"
+          [href]="processing.data.resource_url"
+          >{{ processing.data.metadata.name }}
+          <img
+            src="assets/svg/external-link.svg"
+            class="tw-h-3 tw-w-3 tw-inline"
+          />
+        </a>
+        from Fairsharing</span
+      >
+      <span class="tw-block tw-whitespace-normal">
+        Click
+        <button
+          (click)="emitToForm(processing)"
+          class="tw-inline tw-italic tw-underline tw-text-apicuron-purple tw-font-bold"
+        >
+          here
+        </button>
+        To prefill the form Below
+      </span>
+    </div>
+  </ng-container>
+  <ng-container #errorDisplay *ngIf="processing$ | async as processing">
+    <small
+      class="tw-text-xs tw-font-light tw-text-red-500"
+      *ngIf="processing.error"
+      >{{ processing.error?.message }}</small
+    >
+    <!-- <div
+	  class="tw-py-4"
+	  [ngClass]="{
+		'tw-hidden': processing.error,
+		'tw-block': !processing.error
+	  }"
+	></div> -->
+  </ng-container>
+</div>

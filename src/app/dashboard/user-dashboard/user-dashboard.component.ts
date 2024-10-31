@@ -1,15 +1,10 @@
 import {
   Component,
-  OnInit,
-  ViewChild,
-  AfterViewInit,
-  Inject,
-  ViewEncapsulation,
+  OnInit, ViewEncapsulation
 } from "@angular/core";
 import { AuthService } from "src/app/auth/auth.service";
 import { environment } from "src/environments/environment";
 import { Observable } from "rxjs";
-import { ROUTES, Router, Routes } from "@angular/router";
 @Component({
   selector: "app-user-dashboard",
   templateUrl: "./user-dashboard.component.html",

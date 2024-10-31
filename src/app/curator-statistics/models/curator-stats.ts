@@ -4,6 +4,7 @@ import {
   BaseCuratorStatistics,
   WeeklyCuratorStatistics,
 } from "../../models/statistics.model";
+import { Term } from "../../models/term.model";
 import { PrivacyType } from "../../util/privacy.helper";
 export class CuratorWithStats extends User implements Deserializable {
   stats: BaseCuratorStatistics[];
@@ -55,6 +56,17 @@ export class ActivitiesStatistics implements Deserializable {
   last_week_count: number;
   last_month_count: number;
   last_quarter_count: number;
+
+  getTerm(resource_id: string) {
+    return new Term().deserialize({
+      category: this.activity_category,
+      activity_term: this.activity_term,
+      activity_name: this.activity_name,
+      description: this.description,
+      score: this.score,
+      resource_id: resource_id,
+    });
+  }
 }
 export class DetailedStatistics implements Deserializable {
   deserialize(input: any): this {

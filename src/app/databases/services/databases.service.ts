@@ -72,7 +72,11 @@ export class DatabasesService {
         },
       }
     );
-    return response;
+
+    const instance$ = response.pipe(
+      map(({ data}) => ({ data: new Resource().deserialize(data)}))
+    )
+    return instance$;
   }
 
   get_resource_leaderboard(resource_id: string) {

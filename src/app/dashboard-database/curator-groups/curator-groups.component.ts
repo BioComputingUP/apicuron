@@ -64,7 +64,8 @@ export class CuratorGroupsComponent implements OnInit {
     }
   }
 
-  createGroupClickHandler($event: PointerEvent) {
+  createGroupClickHandler($event: MouseEvent) {
+    const pointerEvent = $event as PointerEvent;
     this.groupsService.openCreateGroupForm();
   }
 

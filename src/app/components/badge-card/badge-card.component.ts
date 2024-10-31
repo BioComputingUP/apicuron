@@ -41,7 +41,7 @@ export class BadgeCardComponent implements OnInit {
         );
       }),
       map((terms: Term[]) => {
-        return this.terms.map((term: Term) => term.activity_name);
+        return terms.map((term: Term) => term.activity_name);
       })
     );
 
@@ -50,7 +50,7 @@ export class BadgeCardComponent implements OnInit {
       .pipe(map((badge: Badge) => badge.state == AchievementState.progress));
   }
 
-  terms$: BehaviorSubject<Term[]> = new BehaviorSubject([]);
+  terms$: ReplaySubject<Term[]> = new ReplaySubject();
   termNames$: Observable<string[]>;
 
   thresholdDate = moment().subtract(30, "days").toDate();
@@ -63,9 +63,6 @@ export class BadgeCardComponent implements OnInit {
   }
 
   @Input()
-  public get terms() {
-    return this.terms$.getValue();
-  }
   public set terms(value) {
     if (!!value && value instanceof Array && value.length > 0) {
       this.terms$.next(value);

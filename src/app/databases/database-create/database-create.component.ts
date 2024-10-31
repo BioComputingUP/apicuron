@@ -1,25 +1,27 @@
 import { HttpErrorResponse } from "@angular/common/http";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
-import { Observable, of } from "rxjs";
-import { pluck, shareReplay, tap } from "rxjs/operators";
+import { Observable, Subject, of } from "rxjs";
+import { pluck, shareReplay, takeUntil, tap } from "rxjs/operators";
 import { toFormData } from "../../util/toFormData";
 import { DatabasesService } from "../services/databases.service";
 import { ResourceIdValidator } from "../validators/resource-id.validator";
+import * as _ from "lodash";
 
 @Component({
   selector: "app-database-create",
   templateUrl: "./database-create.component.html",
   styleUrls: ["./database-create.component.scss"],
 })
-export class DatabaseCreateComponent implements OnInit {
+export class DatabaseCreateComponent implements OnInit, OnDestroy {
   data$: Observable<any>;
   clicked = false;
 
   JSON = JSON;
 
   form: FormGroup;
+  destroy$ = new Subject<Boolean>();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -65,38 +67,58 @@ export class DatabaseCreateComponent implements OnInit {
             ),
           ],
         ],
-        logo: [null, [Validators.required]]
+        logo: [null, [Validators.required]],
       },
       { validators: Validators.required, updateOn: "change" }
     );
-
-
   }
 
-  onFileSelected(event){
-    const file:File = event.target.files[0]
-    this.form.controls['logo'].setValue(file)
+  onFileSelected(event) {
+    const file: File = event.target.files[0];
+    this.form.controls["logo"].setValue(file);
   }
-
 
   submit() {
-
     const formValue = toFormData(this.form.value);
-
-    this.databasesService
-      .create_resource(formValue).subscribe((response) => {
-      this.toaster.success('Resource submitted successfullly', 'Success')
-    }, ({ error }: HttpErrorResponse) => {
-      if(error.message && error.statusCode == 400){
-        let errors = Array.isArray(error.message) ? error.message.join('\n') : error.message
-        this.toaster.warning(errors, 'Validation Error')
-      }else{
-        this.toaster.error('An error occured while sending the form, please contact the developers', 'Error');
+    this.databasesService.create_resource(formValue).subscribe(
+      (response) => {
+        this.toaster.success("Resource submitted successfullly", "Success");
+      },
+      ({ error }: HttpErrorResponse) => {
+        if (error.message && error.statusCode == 400) {
+          let errors = Array.isArray(error.message)
+            ? error.message.join("\n")
+            : error.message;
+          this.toaster.warning(errors, "Validation Error");
+        } else {
+          this.toaster.error(
+            "An error occured while sending the form, please contact the developers",
+            "Error"
+          );
+        }
+        return of(error.message);
       }
-      return of(error.message)
-    })
-    
-    
+    );
+  }
+
+  slugifyId(str: string) {
+    const slug_str = str.toLowerCase().replace(/\s+/g, "_");
+    return slug_str;
+  }
+
+  passData($event: any) {
+    if ($event.loading || $event.error || !$event.data) {
+      return;
+    }
+    const { name, homepage, description } = $event.data.metadata;
+    this.form.patchValue({
+      resource_id: _.kebabCase(name) || "",
+      resource_name: name || "",
+      resource_long_name: name || "",
+      resource_url: homepage || "",
+      resource_uri: homepage || "",
+      resource_description: description || "",
+    });
   }
 
   ngOnInit(): void {}
@@ -124,7 +146,11 @@ export class DatabaseCreateComponent implements OnInit {
     return this.form.get("resource_url");
   }
 
-  get color (){
+  get color() {
     return this.form.get("color");
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
   }
 }
