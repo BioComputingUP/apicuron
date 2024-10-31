@@ -1,3 +1,4 @@
+import _ from "lodash";
 import {
   Deserializable,
   Serializable,
@@ -49,8 +50,15 @@ export class Resource implements Deserializable, Serializable {
     this.resource_uri = new URL(input.resource_uri);
     this.resource_url = new URL(input.resource_url);
     this.color = input.color;
+    this.joined_date = new Date(input.joined_date);
+
     if (input.stats) {
       this.stats = new ResourceStats().deserialize(input.stats);
+      this.lastSubmissionDate = _.max([
+        this.stats.lastContributionDate,
+        this.stats.lastResourceUpdateDate,
+        this.joined_date
+      ])
     }
 
     if (input.logo && typeof input.logo == "string") {
@@ -91,4 +99,6 @@ export class Resource implements Deserializable, Serializable {
   resource_url: URL;
   logo: URL;
   color: string;
+  joined_date: Date;
+  lastSubmissionDate?: Date;
 }

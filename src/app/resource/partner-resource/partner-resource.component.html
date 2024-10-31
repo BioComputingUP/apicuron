@@ -30,7 +30,7 @@
   <div
     class="tw-flex tw-flex-row tw-justify-between tw-pt-2 lg:tw-pt-4 tw-items-end"
   >
-    <div class="">
+    <div class="tw-flex tw-flex-col">
       <span
         class="tw-text-gray-800 tw-font-dm-sans tw-flex tw-flex-col tw-pt-2"
         *ngIf="resource?.stats?.hasLastActivity()"
@@ -44,17 +44,19 @@
           {{ resource?.stats?.contributionCount }}
         </span>
       </span>
-      <span
-        class="tw-text-gray-800 tw-font-dm-sans"
-        *ngIf="resource?.stats?.hasLastActivity()"
-      >
+      <span class="tw-block tw-text-gray-800 tw-font-dm-sans">
         <span>
-          Last Submission Date:
-          {{
-            resource?.stats?.lastResourceUpdateDate ??
-              resource?.stats?.lastContributionDate
-              | date : "dd-MM-yyyy" : "UTC"
-          }}
+          Joined APICURON on:
+          {{ resource?.joined_date | date : "dd-MM-yyyy" : "UTC" }}
+        </span>
+      </span>
+      <span
+        class="tw-block tw-text-gray-800 tw-font-dm-sans"
+        *ngIf="resource.lastSubmissionDate"
+      >
+        <span title="Includes curation events, updates to the resource data">
+          Last Activity:
+          {{ resource.lastSubmissionDate | date : "dd-MM-yyyy" : "UTC" }}
         </span>
       </span>
     </div>
