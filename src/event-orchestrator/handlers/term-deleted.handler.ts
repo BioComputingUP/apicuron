@@ -6,7 +6,6 @@ import {
 	ITermDeletedEventPayload,
 	TermDeletedEvent,
 } from '../../terms/events/events';
-import { AggregatorManager } from '../services/aggregator-manager.service';
 import { BaseAggregatorRunner } from '../aggregator-runners/base.runner';
 
 @Injectable()

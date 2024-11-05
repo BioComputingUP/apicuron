@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { BadgeAggregatorService } from '../../badges/services/badge-aggregator.service';
 import { MedalAggregatorService } from '../../medals/services/medal-aggregator.service';
 import { StatisticsAggregator } from '../../statistics/services/statistics-aggregator.service';
@@ -12,6 +12,7 @@ export class SubmissionRunner implements IRunner, OnModuleInit {
 	badgeAggregator: BadgeAggregatorService;
 	medalAggregator: MedalAggregatorService;
 	parallelizableAggregators: Aggregator[];
+	logger = new Logger(SubmissionRunner.name);
 	constructor(protected manager: AggregatorManager) {}
 
 	relevantAggregatorNames: string[] = [

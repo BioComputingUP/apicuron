@@ -8,6 +8,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { ResourceIdExists } from './partner-resources/validators/resource-id-exists';
 import { CoreApicuronModule } from '../core/core.module';
 import { ResourceLeagueController } from './partner-resources/leagues/resource-league.controller';
+import { LeagueService } from './partner-resources/leagues/services/league.service';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
 	controllers: [
@@ -18,9 +20,10 @@ import { ResourceLeagueController } from './partner-resources/leagues/resource-l
 	providers: [
 		ResourceIdExists,
 		PartnerResourcesService,
+		LeagueService,
 		SubmittedResourcesService,
 	],
 	exports: [PartnerResourcesService, ResourceIdExists],
-	imports: [CoreApicuronModule, AuthModule, JwtModule],
+	imports: [CoreApicuronModule, EventEmitterModule, AuthModule, JwtModule],
 })
 export class ResourcesModule {}

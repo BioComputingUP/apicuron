@@ -27,7 +27,7 @@ export class LeagueDto {
 
 	@IsString()
 	@Expose()
-	resource_id?: string;
+	resource_id: string;
 
 	@Validate(UniqueRule, [
 		PartnerResource.name,

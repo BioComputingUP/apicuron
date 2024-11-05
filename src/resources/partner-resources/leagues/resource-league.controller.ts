@@ -7,6 +7,7 @@ import {
 	NotFoundException,
 	Param,
 	Post,
+	Put,
 } from '@nestjs/common';
 import { AuthProtected } from '../../../auth/decorators/auth.decorator';
 import { UserReq } from '../../../auth/decorators/applyUser.decorator';
@@ -20,14 +21,19 @@ import { DeleteMemberFromLeagueDTO } from './dto/delete-from-league.dto';
 import { DeleteLeagueDTO } from './dto/delete-league.dto';
 import { LeagueDto } from './dto/league.dto';
 import { PartnerResourceDto } from '../../dto/partner-resources.dto';
-import { plainToInstance } from 'class-transformer';
+import { plainToClass, plainToInstance } from 'class-transformer';
 import { ApiResponseWrapped } from '../../../shared/decorators/wrapped-data-response.decorator';
+import { LeagueService } from './services/league.service';
+import { UpdateLeagueDto } from './dto/update-league.dto';
 
 @ApiTags('Leagues')
 @ApiHeader(VersionHeader)
 @Controller({ path: 'leagues', version: '2' })
 export class ResourceLeagueController {
-	constructor(protected resourceService: PartnerResourcesService) {}
+	constructor(
+		protected resourceService: PartnerResourcesService,
+		protected leagueService: LeagueService,
+	) {}
 
 	private userCanAccessResource(user: User | null, resourceId: string) {
 		if (!user) {
@@ -95,6 +101,26 @@ export class ResourceLeagueController {
 		);
 
 		return updatedResource.getLeague(addMemberToLeague.league) as LeagueDto;
+	}
+
+	@ApiOperation({
+		summary: `Updates the data associated with a league`,
+	})
+	@ApiResponseWrapped(
+		LeagueDto,
+		201,
+		`A response containing the updated league`,
+	)
+	@Put('')
+	@AuthProtected()
+	async updateLeague(
+		@Body() updateLeague: UpdateLeagueDto,
+		@UserReq() user: User | null,
+	) {
+		this.userCanAccessResource(user, updateLeague.resource_id);
+		const updatedLeague = await this.leagueService.updateLeague(updateLeague);
+
+		return updatedLeague;
 	}
 
 	@ApiOperation({

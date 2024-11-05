@@ -17,6 +17,12 @@ export class League {
 
 	@Prop({
 		required: true,
+		type: String,
+	})
+	resource_id: string;
+
+	@Prop({
+		required: true,
 		type: [String],
 		default: () => [],
 	})

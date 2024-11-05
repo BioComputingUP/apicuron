@@ -29,6 +29,7 @@ export class PartnerResourcesService {
 
 		resource.leagues.push({
 			name: createLeague.name,
+			resource_id: createLeague.resource_id,
 			displayedName: createLeague.displayedName,
 			visibility: createLeague.visibility,
 			defaultMembers: createLeague.defaultMembers,

@@ -15,12 +15,14 @@ import { AggregatorLoader } from './services/aggregator-loader.service';
 import { BaseAggregatorRunner } from './aggregator-runners/base.runner';
 import { SubmissionRunner } from './aggregator-runners/bulk-submission.runner';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { LeagueUpdatedHandler } from './handlers/league-updated.handler';
 
 @Module({
 	imports: [DiscoveryModule, CoreApicuronModule, EventEmitterModule],
 	providers: [
 		InitializationService,
 		ManyReportsSubmittedHandler,
+		LeagueUpdatedHandler,
 		ReportSubmittedEventHandler,
 		BulkReportSubmissionHandler,
 		ResourceReportsDeletedHandler,

@@ -41,14 +41,17 @@ export class PartnerResource {
 	@Prop({
 		required: true,
 		type: [LeagueSchema],
-		default: (): League[] => [
-			{
-				name: 'default',
-				defaultMembers: [],
-				visibility: PrivacyType.public,
-				displayedName: 'Default Group',
-			},
-		],
+		default: function (): League[] {
+			return [
+				{
+					name: 'default',
+					defaultMembers: [],
+					visibility: PrivacyType.public,
+					displayedName: 'Default Group',
+					resource_id: this.resource_id,
+				},
+			];
+		},
 	})
 	leagues: League[];
 
