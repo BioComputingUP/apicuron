@@ -55,11 +55,11 @@ export class DashboardSidebarComponent implements OnInit {
                 name: `Edit ${resource.resource_name}`,
                 icon: "assets/svg/pencil.svg",
               },
-              // {
-              //   href: ["/dashboard", "database", resource.resource_id, "groups"],
-              //   name: `Manage ${resource.resource_name} Groups`,
-              //   icon: "assets/svg/groups.svg",
-              // },
+              {
+                href: ["/dashboard", "database", resource.resource_id, "groups"],
+                name: `Manage ${resource.resource_name} Groups`,
+                icon: "assets/svg/groups.svg",
+              },
               {
                 href: ["/dashboard", "database", resource.resource_id, "terms"],
                 name: `Manage ${resource.resource_name} Terms`,

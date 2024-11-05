@@ -1,13 +1,12 @@
-<div
-  class="tw-relative tw-w-full tw-flex tw-flex-col tw-border-gray-300 tw-text-gray-900 tw-border tw-shadow-md tw-rounded focus:tw-outline-none focus:tw-ring-1 tw-ring-apicuron-purple"
->
+<div class="tw-relative tw-w-full tw-flex tw-flex-col tw-text-gray-900">
   <!-- Selected users container -->
   <ng-container *ngIf="selectedCuratorsList$ | async as selectedCurators">
     <div
       *ngIf="selectedCurators && selectedCurators.length > 0"
-      class="tw-flex tw-flex-row tw-flex-wrap tw-justify-start tw-py-1 tw-px-1"
+      class="tw-flex tw-flex-col tw-gap-1 tw-mb-1 md:tw-mb-2"
     >
       <curator-badge
+        class="tw-w-full"
         *ngFor="let selected of selectedCurators"
         [curator]="selected"
         [isRemovable]="true"
@@ -16,17 +15,21 @@
     </div>
   </ng-container>
   <!-- Text input -->
-  <input
-    type="text"
-    class="tw-block tw-w-full tw-grow tw-px-1 tw-py-2 disabled:tw-bg-gray-400 tw-rounded"
-    placeholder="search..."
-    value=""
-    (input)="change($event)"
-    cdkOverlayOrigin
-    (focus)="onInputFocus()"
-    #searchBar
-    [disabled]="disabled"
-  />
+  <div
+    class="tw-border-gray-300 tw-border tw-shadow-md tw-rounded focus:tw-outline-none focus:tw-ring-1 tw-ring-apicuron-purple"
+  >
+    <input
+      type="text"
+      class="tw-block tw-w-full tw-grow tw-px-1 tw-py-2 disabled:tw-bg-gray-400 tw-rounded"
+      placeholder="search..."
+      value=""
+      (input)="change($event)"
+      cdkOverlayOrigin
+      (focus)="onInputFocus()"
+      #searchBar
+      [disabled]="disabled"
+    />
+  </div>
 </div>
 <!-- suggestions overlay panel -->
 <ng-template
@@ -36,19 +39,19 @@
   [cdkConnectedOverlayHasBackdrop]="true"
   [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
   [cdkConnectedOverlayPositions]="[
-      {
-        originX: 'start',
-        originY: 'bottom',
-        overlayX: 'start',
-        overlayY: 'top'
-      }
-    ]"
+    {
+      originX: 'start',
+      originY: 'bottom',
+      overlayX: 'start',
+      overlayY: 'top'
+    }
+  ]"
   [cdkConnectedOverlayDisableClose]="false"
   (backdropClick)="closeOverlay()"
 >
   <ul
     *ngIf="(suggestions$ | async)?.data"
-    class="tw-bg-white tw-border tw-border-gray-100 tw-w-full tw-my-2"
+    class="tw-bg-white tw-border tw-border-gray-100 tw-w-full tw-my-2 tw-max-h-64 tw-overflow-y-auto"
   >
     <li
       *ngFor="let suggestion of (suggestions$ | async)?.data"

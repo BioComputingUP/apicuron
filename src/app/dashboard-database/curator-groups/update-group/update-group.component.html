@@ -1,101 +1,112 @@
-<div class="tw-bg-white tw-grid tw-grid-flow-row tw-grid-cols-1 tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4 tw-max-w-2xl tw-max-h-screen tw-overflow-y-auto">
-	<form [formGroup]="form">
-	  <h2 class="tw-text-xl tw-text-center tw-font-bold">
-		Update {{ group.displayedName }}
-	  </h2>
-  
-	  <div class="form-control-element">
-		<label for="displayedName">Group Name</label>
-		<input type="text"
-		  [placeholder]="group.displayedName"
-		  class="tw-mb-2 tw-placeholder-black"
-		  name="displayedName"
-		  formControlName="displayedName"/>
-		<span class="tw-text-xs tw-font-light tw-text-gray-400">
-		  Publically visible name, for the user interface
-		</span>
+<div
+  class="tw-bg-white tw-grid tw-grid-flow-row tw-grid-cols-1 tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4 tw-max-w-2xl tw-max-h-screen tw-overflow-y-auto"
+>
+  <form [formGroup]="form" (submit)="submit()">
+    <h2 class="tw-text-xl tw-text-center tw-font-bold">
+      Update {{ group.displayedName }}
+    </h2>
 
-		<span *ngIf="form.get('displayedName').errors?.['required'] && form.get('displayedName').touched"
-		  class="tw-text-sm tw-text-red-500 tw-font-light">
-		  "Group Name" field is required
-		</span>
-  
-		<span *ngIf="form.get('displayedName').errors?.['minlength']"
-		  class="tw-text-sm tw-text-red-500 tw-font-light">
-		  "Group Name" field has to be at least 3 characters long
-		</span>
-	  </div>
-  
-	  <div class="form-control-element">
-		<label for="name">Identifier Name</label>
-		<input 
-		  [placeholder]="group.name" 
-		  type="text"
-		  class="tw-mb-2 tw-placeholder-black"
-		  name="name"
-		  formControlName="name"/>
-		<span class="tw-text-xs tw-font-light tw-text-gray-400">
-		  Name used for API identification. This field is filled automatically after the Group Name is provided.
-		</span>
+    <div class="form-control-element">
+      <label for="displayedName">Group Name</label>
+      <input
+        type="text"
+        [placeholder]="group.displayedName"
+        class="tw-mb-2 tw-placeholder-black"
+        name="displayedName"
+        formControlName="displayedName"
+      />
+      <span class="tw-text-xs tw-font-light tw-text-gray-400">
+        Publically visible name, for the user interface
+      </span>
 
-		<span *ngIf="form.get('name').errors?.['required'] && form.get('name').touched"
-		  class="tw-text-sm tw-text-red-500 tw-font-light">
-		  "Identifier Name" field is required
-		</span>
-  
-		<span *ngIf="form.get('name').errors?.['minlength']"
-		  class="tw-text-sm tw-text-red-500 tw-font-light">
-		  "Identifier Name" field has to be at least 3 characters long
-		</span>
-	  </div>
-  
-	  <div class="form-control-element">
-		<label for="visibility">Visibility</label>
-		<div class="tw-flex tw-flex-row tw-gap-2 tw-items-center">
-		  <select class="tw-mb-2" name="visibility" formControlName="visibility">
-			<option value="public">Public</option>
-			<option value="private">Private</option>
-		  </select>
-		</div>
-  
-		<small class="tw-text-xs tw-font-light tw-text-gray-400">
-		  Set the visibility of curator's contributions and awards (badges or medals) to outside visitors
-		</small>
-	  </div>
-  
-	  <div class="form-control-element">
-		<label for="defaultMembers">Group Members</label>
-		<div *ngIf="curators$ | async as curators">
-			<ul class="tw-bg-white tw-border tw-border-gray-100 tw-w-full tw-my-2">
-				<li *ngFor="let member of curators" class="tw-px-2 tw-py-1 tw-border-b-2 tw-flex tw-flex-row tw-items-center tw-border-gray-100 tw-relative tw-cursor-pointer hover:tw-bg-gray-200 aria-selected:tw-bg-apicuron-purple aria-selected:tw-text-gray-100">
-					<span class="tw-flex tw-items-center">
-						<a [href]="'http://orcid.org/' + member.orcid_id" target="_blank" class="tw-block tw-w-6 tw-h-6 tw-mr-1">
-							<img src="https://orcid.org/assets/vectors/orcid.logo.icon.svg" class="tw-w-6 tw-h-6" alt="Orcid Logo"/>
-						</a>
-						<span class="tw-block tw-text-sm tw-pl-1">
-							<b>{{ member.displayedName }}</b> - {{ member.orcid_id }}
-						</span>
-					</span>
-				</li>
-			</ul>
-		</div>
+      <span
+        *ngIf="form.get('displayedName').errors?.['required'] && form.get('displayedName').touched"
+        class="tw-text-sm tw-text-red-500 tw-font-light"
+      >
+        "Group Name" field is required
+      </span>
 
+      <span
+        *ngIf="form.get('displayedName').errors?.['minlength']"
+        class="tw-text-sm tw-text-red-500 tw-font-light"
+      >
+        "Group Name" field has to be at least 3 characters long
+      </span>
+    </div>
 
-		<small class="tw-text-xs tw-font-light tw-text-gray-400">
-		  Assigning the members to the group means that all <span class="tw-font-bold">future contributions</span> of these members will be associated with this group 
-		  (unless stated otherwise in the reports). <span class="tw-font-bold">The previous contributions of the curator will NOT be 
-		  assigned to this group.</span><br/> A curator cannot belong to various groups simultaneously.
-		</small>
-	  </div>
-  
-	  <input type="submit"
-	    (click)="submit()"
-		class="tw-w-full tw-p-2 tw-bg-green-500 tw-text-white tw-capitalize tw-cursor-pointer"
-		value="submit"/>
-	</form>
-  
-	<button class="tw-bg-gray-400 tw-text-gray-100 tw-w-full tw-block tw-py-1 lg:tw-py-2" (click)="closeForm()">
-	  Close
-	</button>
-  </div>
-  
+    <div class="form-control-element">
+      <label for="name">Identifier Name</label>
+      <input
+        [placeholder]="group.name"
+        type="text"
+        class="tw-mb-2 tw-placeholder-black disabled:tw-text-gray-500"
+        name="name"
+        formControlName="name"
+      />
+      <span class="tw-text-xs tw-font-light tw-text-gray-400">
+        Name used for API identification. This field is filled automatically
+        after the Group Name is provided.
+      </span>
+
+      <span
+        *ngIf="form.get('name').errors?.['required'] && form.get('name').touched"
+        class="tw-text-sm tw-text-red-500 tw-font-light"
+      >
+        "Identifier Name" field is required
+      </span>
+
+      <span
+        *ngIf="form.get('name').errors?.['minlength']"
+        class="tw-text-sm tw-text-red-500 tw-font-light"
+      >
+        "Identifier Name" field has to be at least 3 characters long
+      </span>
+    </div>
+
+    <div class="form-control-element">
+      <label for="visibility">Visibility</label>
+      <div class="tw-flex tw-flex-row tw-gap-2 tw-items-center">
+        <select class="tw-mb-2" name="visibility" formControlName="visibility">
+          <option value="public">Public</option>
+          <option value="private">Private</option>
+        </select>
+      </div>
+
+      <small class="tw-text-xs tw-font-light tw-text-gray-400">
+        Set the visibility of curator's contributions and awards (badges or
+        medals) to outside visitors
+      </small>
+    </div>
+
+    <div class="form-control-element">
+      <label for="defaultMembers">Group Members</label>
+      <orcid-search-select class="tw-mb-2" formControlName="defaultMembers">
+      </orcid-search-select>
+
+      <small class="tw-text-xs tw-font-light tw-text-gray-400">
+        Assigning the members to the group means that all
+        <span class="tw-font-bold">future contributions</span> of these members
+        will be associated with this group (unless stated otherwise in the
+        reports).
+        <span class="tw-font-bold"
+          >The previous contributions of the curator will NOT be assigned to
+          this group.</span
+        ><br />
+        A curator cannot belong to various groups simultaneously.
+      </small>
+    </div>
+
+    <input
+      type="submit"
+      class="tw-w-full tw-p-2 tw-bg-green-500 tw-text-white tw-capitalize tw-cursor-pointer"
+      value="submit"
+    />
+  </form>
+
+  <button
+    class="tw-bg-gray-400 tw-text-gray-100 tw-w-full tw-block tw-py-1 lg:tw-py-2"
+    (click)="closeForm()"
+  >
+    Close
+  </button>
+</div>

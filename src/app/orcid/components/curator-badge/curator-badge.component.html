@@ -1,10 +1,24 @@
 <div
-  class="tw-relative tw-flex tw-flex-row tw-items-center tw-select-none tw-whitespace-nowrap tw-rounded-lg tw-bg-apicuron-purple tw-py-1 tw-px-1 tw-align-baseline tw-font-sans tw-text-xs tw-uppercase tw-leading-none tw-text-white tw-mr-1 tw-mb-1"
+  class="tw-relative tw-flex tw-flex-row tw-items-center tw-select-none tw-whitespace-nowrap tw-rounded-lg tw-bg-apicuron-purple tw-p-1 md: xl:tw-p-2 tw-align-baseline tw-font-sans tw-text-sm tw-uppercase tw-leading-none tw-text-white"
 >
-  <span class="tw-block">{{ curator.displayedName }}</span>
+  <span class="tw-block"
+    >{{ curator.displayedName }}
+    <a
+      [href]="'http://orcid.org/' + curator.orcid_id"
+      target="_blank"
+      class="tw-inline tw-w-4 tw-h-4 tw-mx-1 tw-cursor-pointer"
+    >
+      <img
+        src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
+        class="tw-inline tw-w-4 tw-h-4"
+        alt="Orcid Logo"
+      />
+    </a>
+    {{ curator.orcid_id }}
+  </span>
   <button
     *ngIf="isRemovable"
-    class="tw-block tw-bg-white tw-rounded tw-ml-1 tw-cursor-pointer"
+    class="tw-block tw-bg-white tw-rounded tw-ml-auto tw-cursor-pointer"
     (click)="removeCurator()"
   >
     <svg-icon

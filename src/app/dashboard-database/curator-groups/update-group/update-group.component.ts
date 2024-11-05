@@ -1,5 +1,15 @@
-import { Component, Inject, OnDestroy } from "@angular/core";
-import { ResourceGroup, ResourceGroupCreateForm } from "../../../models/resource-group.model";
+import {
+  Component,
+  EventEmitter,
+  Inject,
+  OnDestroy,
+  Output,
+} from "@angular/core";
+import {
+  ResourceGroup,
+  ResourceGroupCreateForm,
+  ResourceGroupUpdateForm,
+} from "../../../models/resource-group.model";
 import { DIALOG_DATA, DialogRef } from "@angular/cdk/dialog";
 import { FormGroup, FormBuilder, ReactiveFormsModule } from "@angular/forms";
 import { Observable, Subject } from "rxjs";
@@ -9,20 +19,23 @@ import { OrcidModule } from "src/app/orcid/orcid.module";
 import { CommonModule } from "@angular/common";
 import { OrcidService } from "src/app/orcid/services/orcid.service";
 import { OrcidProfile } from "src/app/models/orcid-profile.model";
+import { LoadableComponent } from "../../../../../projects/apicuron-util/src/lib/loadable";
 
 @Component({
   standalone: true,
   selector: "update-group",
   templateUrl: "./update-group.component.html",
   styleUrls: ["../../../../styles/form-styles.scss"],
-  imports: [ReactiveFormsModule, OrcidModule, CommonModule],
+  imports: [CommonModule, ReactiveFormsModule, OrcidModule, LoadableComponent],
 })
 export class UpdateGroupComponent implements OnDestroy {
   group: ResourceGroup;
-  form: FormGroup<ResourceGroupCreateForm>;
+  form: FormGroup<ResourceGroupUpdateForm>;
   destroy$ = new Subject<void>();
   resourceGroup = new ResourceGroup();
   curators$: Observable<OrcidProfile[]>;
+
+  @Output() formResult = new EventEmitter<ResourceGroup>();
 
   constructor(
     @Inject(DIALOG_DATA)
@@ -31,24 +44,24 @@ export class UpdateGroupComponent implements OnDestroy {
     protected orcidService: OrcidService,
     public dialogRef: DialogRef<string>
   ) {
-      this.group = data.group;
-      this.form = this.resourceGroup.generateUpdateForm(this.fb, this.group);
-      const slugifier$ = slugifyFieldFromAnother(
-        this.form,
-        "displayedName",
-        "name"
-        );
-        slugifier$.pipe(takeUntil(this.destroy$)).subscribe(() => {});
-        this.curators$ = this.orcidService.getOrcidProfiles(this.group.defaultMembers);
-      }
+    this.group = data.group;
+    this.form = this.resourceGroup.generateUpdateForm(this.fb, this.group);
+    this.curators$ = this.orcidService.getOrcidProfiles(
+      this.group.defaultMembers
+    );
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next();
   }
 
   submit() {
-    const resourceGroup = new ResourceGroup().fromForm(this.form);
-    console.log("Modified Resource Group", resourceGroup);
+    if (!this.form.valid) {
+      return;
+    }
+    const updatedGroup = new ResourceGroup().deserialize(this.group);
+    updatedGroup.updateWithForm(this.form);
+    this.formResult.emit(updatedGroup);
   }
 
   closeForm() {

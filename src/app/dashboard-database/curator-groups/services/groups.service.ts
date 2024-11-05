@@ -1,8 +1,23 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { catchError, map, startWith, take, takeUntil } from "rxjs/operators";
-import { Observable, Subject, combineLatest, of, throwError } from "rxjs";
+import {
+  catchError,
+  map,
+  shareReplay,
+  startWith,
+  take,
+  takeUntil,
+  tap,
+} from "rxjs/operators";
+import {
+  Observable,
+  Subject,
+  combineLatest,
+  merge,
+  of,
+  throwError,
+} from "rxjs";
 import { switchMap, pluck } from "rxjs/operators";
 import { environment } from "src/environments/environment";
 import { ResourceGroup } from "../../../models/resource-group.model";
@@ -13,7 +28,7 @@ import { GroupCreateForm } from "../../../components/group-create-form/group-cre
 import { ToastrService } from "ngx-toastr";
 
 export type UpdateGroup = Partial<ResourceGroup> & DeleteGroup;
-export type DeleteGroup = Pick<ResourceGroup, 'name' | 'resource_id'>;
+export type DeleteGroup = Pick<ResourceGroup, "name" | "resource_id">;
 
 type GroupOperation = {
   group: ResourceGroup;
@@ -26,7 +41,7 @@ export class GroupsService implements OnDestroy {
     protected http: HttpClient,
     protected route: ActivatedRoute,
     protected dialog: Dialog,
-    protected toastr: ToastrService,
+    protected toastr: ToastrService
   ) {}
 
   resourceGroups$: Observable<{ data: ResourceGroup[] }>;
@@ -53,7 +68,7 @@ export class GroupsService implements OnDestroy {
         )
       );
   }
-  
+
   init(resource_id$: Observable<string>) {
     this.resource_id$ = resource_id$;
     const resourceGroupList$ = this.resource_id$.pipe(
@@ -93,12 +108,19 @@ export class GroupsService implements OnDestroy {
             (group) => group.name != groupUpdates.group.name
           );
           break;
+        case "update":
+          resourceGroupList.data = resourceGroupList.data.map((group) =>
+            // if the group matches the updated group we replace the value with the new one.
+            // otherwise we keep the old group
+            group.name == groupUpdates.group.name ? groupUpdates.group : group
+          );
+          break;
       }
     }
     return resourceGroupList;
   }
 
-  getResourceGroups(): Observable<{ data: ResourceGroup[]}> {
+  getResourceGroups(): Observable<{ data: ResourceGroup[] }> {
     return this.resourceGroups$;
   }
 
@@ -118,25 +140,49 @@ export class GroupsService implements OnDestroy {
           this.groupUpdates$.next({ group, operation: "create" });
           return group;
         }),
-        takeUntil(this.destroy$)
+        takeUntil(merge(this.destroy$, component.destroy$))
       )
       .subscribe(() => {});
   }
 
   openUpdateGroupForm(resourceGroup: ResourceGroup) {
     // Pass the resourceGroup as an input (use the CreateGroupForm as an example)
-    this.dialog.open(UpdateGroupComponent, {
+    const dialogRef = this.dialog.open(UpdateGroupComponent, {
       data: {
         group: resourceGroup,
       },
     });
+    const component: UpdateGroupComponent = dialogRef.componentInstance;
+
+    component.formResult
+      .pipe(
+        tap(console.log),
+        switchMap((group: ResourceGroup) => {
+          return this.updateGroup(group);
+        }),
+        map(({ data, error }: { data: ResourceGroup; error: string }) => {
+          if (!!error) {
+            this.toastr.error(error, `Error occured when updating Group`);
+            return;
+          }
+          this.toastr.success(
+            `Group Updated Successfully`,
+            `Successfully Updated the ${data.name}`
+          );
+          dialogRef.close();
+          this.groupUpdates$.next({ group: data, operation: "update" });
+          return data;
+        }),
+        takeUntil(merge(this.destroy$, component.destroy$))
+      )
+      .subscribe(() => {});
   }
 
   viewParticipants(resourceGroup: ResourceGroup) {
     this.dialog.open(ViewParticipantsComponent, {
       data: {
         group: resourceGroup,
-      }
+      },
     });
   }
 
@@ -156,68 +202,96 @@ export class GroupsService implements OnDestroy {
   addMemberToLeague(group: ResourceGroup) {
     this.resource_id$.pipe(
       take(1),
-      switchMap(resource_id => {
-        return this.http
-          .post(`${this.ws}/leagues/add-member`, {
-            headers: { version: "2" },
-            body: {
-              // member: 
-              resource_id: resource_id,
-              league: group.name,
-            }
-        })
+      switchMap((resource_id) => {
+        return this.http.post(`${this.ws}/leagues/add-member`, {
+          headers: { version: "2" },
+          body: {
+            // member:
+            resource_id: resource_id,
+            league: group.name,
+          },
+        });
       })
-    )
+    );
   }
 
   deleteMemberFromLeague(group: ResourceGroup) {
     this.resource_id$.pipe(
       take(1),
-      switchMap(resource_id => {
-        return this.http
-          .delete(`${this.ws}/leagues/remove-member`, {
-            headers: { version: "2" },
-            body: {
-              // member: 
-              resource_id: resource_id,
-              league: group.name,
-            }
-        })
+      switchMap((resource_id) => {
+        return this.http.delete(`${this.ws}/leagues/remove-member`, {
+          headers: { version: "2" },
+          body: {
+            // member:
+            resource_id: resource_id,
+            league: group.name,
+          },
+        });
       })
-    )
+    );
   }
 
   deleteGroup(group: ResourceGroup) {
-    this.resource_id$.pipe(
-      take(1),
-      switchMap(resource_id => {
-        return this.http.delete(`${this.ws}/leagues`, {
-          headers: { version: '2' },
-          body: {
-            resource_id: resource_id,
-            league: group.name
+    this.resource_id$
+      .pipe(
+        take(1),
+        switchMap((resource_id) => {
+          return this.http.delete(`${this.ws}/leagues`, {
+            headers: { version: "2" },
+            body: {
+              resource_id: resource_id,
+              league: group.name,
+            },
+          });
+        }),
+        catchError((error) => {
+          console.error("HTTP DELETE Error:", error.status, error.message);
+          const errorMessage = `Error ${error.status}: ${
+            error.error?.message || error.message || "Unknown error"
+          }`;
+          return throwError(() => new Error(errorMessage));
+        })
+      )
+      .subscribe(
+        (response) => {
+          if (response["data"]) {
+            this.toastr.success(
+              `Group ${group.displayedName} is successfully deleted`
+            );
+            this.groupUpdates$.next({ group, operation: "delete" });
           }
-        });
-      }),
-      catchError(error => {
-        console.error("HTTP DELETE Error:", error.status, error.message);
-        const errorMessage = `Error ${error.status}: ${error.error?.message || error.message || 'Unknown error'}`;
-        return throwError(() => new Error(errorMessage));
-      })
-    ).subscribe(
-      (response) => {
-        if (response["data"]) {
-          this.toastr.success(
-            `Group ${group.displayedName} is successfully deleted`,
+        },
+        (error) => {
+          this.toastr.error(
+            `An error occurred while deleting the group ${group.displayedName}: ${error.status}`
           );
-          this.groupUpdates$.next({ group, operation: "delete" });
         }
-      },
-      (error) => {
-        this.toastr.error(
-          `An error occurred while deleting the group ${group.displayedName}: ${error.status}`,
-        );
-      }
-    );
+      );
+  }
+
+  updateGroup(
+    group: ResourceGroup
+  ): Observable<{ data: ResourceGroup; error: string }> {
+    const updateUrl = new URL("leagues", environment.ws + "/");
+    return this.http
+      .put(updateUrl.href, group.serialize(), {
+        headers: {
+          version: "2",
+        },
+      })
+      .pipe(
+        catchError((err, caught) => {
+          return of({
+            error: `Error occured when updating group ${group.name}/ for resource ${group.resource_id}`,
+            data: null
+          });
+        }),
+        map(({ data, error }: { data: ResourceGroup; error?: string }) => {
+          return {
+            data: new ResourceGroup().deserialize(data),
+            error: error,
+          };
+        })
+      );
   }
 }

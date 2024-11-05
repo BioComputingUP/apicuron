@@ -26,6 +26,14 @@ export type ResourceGroupCreateForm = {
   visibility: FormControl<PrivacyType>;
 };
 
+export type ResourceGroupUpdateForm = {
+  name: FormControl<string>;
+  resource_id: FormControl<string>;
+  displayedName: FormControl<string>;
+  defaultMembers: FormControl<string[]>;
+  visibility: FormControl<PrivacyType>;
+};
+
 export class ResourceGroup implements Deserializable, Serializable {
   serialize(): Record<string, any> {
     return {
@@ -55,7 +63,10 @@ export class ResourceGroup implements Deserializable, Serializable {
     fb: FormBuilder
   ): FormGroup<ResourceGroupCreateForm> {
     const form = fb.group({
-      name: ["", [Validators.required, Validators.minLength(3), IdentifierValdiator()]], // matches kebab case
+      name: [
+        "",
+        [Validators.required, Validators.minLength(3), IdentifierValdiator()],
+      ], // matches kebab case
       displayedName: ["", [Validators.required, Validators.minLength(3)]],
       defaultMembers: new FormControl<string[]>([]),
       visibility: new FormControl<PrivacyType>(PrivacyType.public),
@@ -67,12 +78,19 @@ export class ResourceGroup implements Deserializable, Serializable {
   generateUpdateForm(
     fb: FormBuilder,
     group: ResourceGroup
-  ): FormGroup<ResourceGroupCreateForm> {
+  ): FormGroup<ResourceGroupUpdateForm> {
     const form = fb.group({
-      name: [group.name, [Validators.required, Validators.minLength(3), IdentifierValdiator()]], // matches kebab case
-      displayedName: [group.displayedName, [Validators.required, Validators.minLength(3)]],
+      resource_id: [{ value: group.resource_id, disabled: true }],
+      name: [
+        { value: group.name, disabled: true },
+        [Validators.required, Validators.minLength(3), IdentifierValdiator()],
+      ], // matches kebab case
+      displayedName: [
+        group.displayedName,
+        [Validators.required, Validators.minLength(3)],
+      ],
       defaultMembers: [group.defaultMembers],
-      visibility: group.visibility,
+      visibility: [group.visibility],
     });
 
     return form;
@@ -84,5 +102,12 @@ export class ResourceGroup implements Deserializable, Serializable {
     this.defaultMembers = fg.get("defaultMembers").value;
     this.visibility = fg.get("visibility").value;
     return this;
+  }
+
+  updateWithForm(fg: FormGroup<ResourceGroupUpdateForm>): void {
+    this.displayedName = fg.get("displayedName")?.value ?? this.displayedName;
+    this.defaultMembers =
+      fg.get("defaultMembers")?.value ?? this.defaultMembers;
+    this.visibility = fg.get("visibility")?.value ?? this.visibility;
   }
 }
