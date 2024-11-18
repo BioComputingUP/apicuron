@@ -3,6 +3,10 @@
 	  <h2 class="tw-text-xl tw-text-center tw-font-bold">
 		 {{ group.displayedName }} members
 	  </h2>
+
+	  <div>
+		Visibility: <strong class="tw-font-bold">{{ group.visibility }}</strong>
+	  </div>
   
 	  <div *ngIf="curators$ | async as curators">
 		<ul class="tw-bg-white tw-border tw-border-gray-100 tw-w-full tw-my-2">
@@ -18,6 +22,7 @@
 					</span>
 				</span>
 			</li>
+			
 		</ul>
 	</div>
   

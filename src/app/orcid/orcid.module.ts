@@ -7,12 +7,14 @@ import { OrcidService } from "src/app/orcid/services/orcid.service";
 import { OrcidSearchSelectComponent } from "./components/orcid-search-select/orcid-search-select.component";
 import { CuratorBadge } from "./components/curator-badge/curator-badge.component";
 import { NG_VALUE_ACCESSOR } from "@angular/forms";
+import { LoadableComponent } from "../../../projects/apicuron-util/src/lib/loadable";
 
 @NgModule({
   imports: [
     CommonModule,
     HttpClientModule,
     AngularSvgIconModule,
+    LoadableComponent,
     OverlayModule,
   ],
   providers: [OrcidService],

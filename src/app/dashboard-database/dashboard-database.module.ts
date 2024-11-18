@@ -36,6 +36,7 @@ import { GroupsService } from "./curator-groups/services/groups.service";
 import { ResourceGroupCardComponent } from "../components/group-card/resource-group-card.component";
 import { DialogModule } from "@angular/cdk/dialog";
 import { GroupCreateForm } from "../components/group-create-form/group-create-form.component";
+import { ConfirmationModule } from "../../../projects/apicuron-util/src/lib/confirmation";
 
 @NgModule({
   declarations: [
@@ -75,7 +76,8 @@ import { GroupCreateForm } from "../components/group-create-form/group-create-fo
     MedalFormComponent,
     PaginationComponent,
     ResourceGroupCardComponent,
-    GroupCreateForm
+    GroupCreateForm,
+    ConfirmationModule,
 ],
 })
 export class DashboardDatabaseModule {}

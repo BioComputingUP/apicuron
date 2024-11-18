@@ -26,6 +26,7 @@ import { ViewParticipantsComponent } from "../view-participants/view-participant
 import { UpdateGroupComponent } from "../update-group/update-group.component";
 import { GroupCreateForm } from "../../../components/group-create-form/group-create-form.component";
 import { ToastrService } from "ngx-toastr";
+import { ConfirmationService } from "../../../../../projects/apicuron-util/src/lib/confirmation";
 
 export type UpdateGroup = Partial<ResourceGroup> & DeleteGroup;
 export type DeleteGroup = Pick<ResourceGroup, "name" | "resource_id">;
@@ -41,6 +42,7 @@ export class GroupsService implements OnDestroy {
     protected http: HttpClient,
     protected route: ActivatedRoute,
     protected dialog: Dialog,
+    protected confirmationService: ConfirmationService,
     protected toastr: ToastrService
   ) {}
 
@@ -135,7 +137,6 @@ export class GroupsService implements OnDestroy {
           return this.createNewGroup(resourceGroup);
         }),
         map((group: ResourceGroup) => {
-          console.log("Successfully created resource group");
           dialogRef.close();
           this.groupUpdates$.next({ group, operation: "create" });
           return group;
@@ -151,6 +152,7 @@ export class GroupsService implements OnDestroy {
       data: {
         group: resourceGroup,
       },
+      maxWidth: "95vw",
     });
     const component: UpdateGroupComponent = dialogRef.componentInstance;
 
@@ -232,41 +234,61 @@ export class GroupsService implements OnDestroy {
   }
 
   deleteGroup(group: ResourceGroup) {
-    this.resource_id$
-      .pipe(
-        take(1),
-        switchMap((resource_id) => {
-          return this.http.delete(`${this.ws}/leagues`, {
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete the group ${group.displayedName}?`,
+      title: `Delete Group`,
+      iconSrc: "assets/svg/exclamation-circle.svg",
+      accept: async () => {
+        return await this.deleteGroupConfirmed(group);
+      },
+      reject: async () => {},
+    });
+  }
+
+  deleteGroupConfirmed(group: ResourceGroup): Promise<any> {
+    const deletion$ = this.resource_id$.pipe(
+      take(1),
+      switchMap((resource_id) => {
+        return this.http
+          .delete(`${this.ws}/leagues`, {
             headers: { version: "2" },
             body: {
               resource_id: resource_id,
               league: group.name,
             },
-          });
-        }),
-        catchError((error) => {
-          console.error("HTTP DELETE Error:", error.status, error.message);
-          const errorMessage = `Error ${error.status}: ${
-            error.error?.message || error.message || "Unknown error"
-          }`;
-          return throwError(() => new Error(errorMessage));
-        })
-      )
-      .subscribe(
-        (response) => {
+          })
+          .pipe(
+            map((response) => [response, null]),
+            catchError((error) => {
+              const errorMessage =
+                error.error?.message || error.message || "Unknown error";
+              return of([null, errorMessage]);
+            })
+          );
+      })
+    );
+    return new Promise((resolve, reject) => {
+      deletion$.subscribe(
+        ([response, error]) => {
+          if (!response) {
+            this.toastr.error(`${error}`, `Group Delete Error`);
+            reject(error);
+            return;
+          }
           if (response["data"]) {
             this.toastr.success(
               `Group ${group.displayedName} is successfully deleted`
             );
             this.groupUpdates$.next({ group, operation: "delete" });
+            resolve(response);
           }
         },
         (error) => {
-          this.toastr.error(
-            `An error occurred while deleting the group ${group.displayedName}: ${error.status}`
-          );
+          this.toastr.error(`${error}`, `Group Delete Error`);
+          reject(error);
         }
       );
+    });
   }
 
   updateGroup(
@@ -283,7 +305,7 @@ export class GroupsService implements OnDestroy {
         catchError((err, caught) => {
           return of({
             error: `Error occured when updating group ${group.name}/ for resource ${group.resource_id}`,
-            data: null
+            data: null,
           });
         }),
         map(({ data, error }: { data: ResourceGroup; error?: string }) => {
