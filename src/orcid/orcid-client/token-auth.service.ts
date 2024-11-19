@@ -24,7 +24,7 @@ export class OrcidTokenAuthService implements OnModuleInit {
 
 	private async fetchToken() {
 		const response = await this.http.axiosRef.post(
-			'https://api.sandbox.orcid.org/oauth/token',
+			new URL('/oauth/token', this.options.apiUrl).href,
 			`client_id=${this.options.client_id}&client_secret=${this.options.client_secret}&scope=/read-public&grant_type=client_credentials`,
 			{
 				headers: {
