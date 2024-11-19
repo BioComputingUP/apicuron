@@ -29,6 +29,7 @@ export class EntityUriValid implements ValidatorConstraintInterface {
 				new URL(resource.resource_uri).host,
 				new URL(resource.resource_url).host,
 				new URL('https://identifiers.org').host,
+				new URL('https://doi.org').host,
 			];
 
 			return isURL(propertyValue, {
