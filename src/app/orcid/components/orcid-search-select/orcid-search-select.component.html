@@ -54,7 +54,7 @@
     class="tw-bg-white tw-border tw-border-gray-100 tw-w-full tw-my-2 tw-max-h-64 tw-overflow-y-auto"
   >
     <li
-      *ngrFor="let suggestion of (suggestions$ | async)?.data"
+      *ngFor="let suggestion of (suggestions$ | async)?.data"
       (click)="selectSuggestion(suggestion)"
       [attr.aria-selected]="profileSelected(suggestion) | async"
       class="tw-px-2 tw-py-1 tw-border-b-2 tw-flex tw-flex-row tw-items-center tw-border-gray-100 tw-relative tw-cursor-pointer hover:tw-bg-gray-200 aria-selected:tw-bg-apicuron-purple aria-selected:tw-text-gray-100"

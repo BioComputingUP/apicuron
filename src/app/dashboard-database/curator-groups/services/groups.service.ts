@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import {
@@ -11,6 +11,7 @@ import {
   tap,
 } from "rxjs/operators";
 import {
+  EMPTY,
   Observable,
   Subject,
   combineLatest,
@@ -162,15 +163,7 @@ export class GroupsService implements OnDestroy {
         switchMap((group: ResourceGroup) => {
           return this.updateGroup(group);
         }),
-        map(({ data, error }: { data: ResourceGroup; error: string }) => {
-          if (!!error) {
-            this.toastr.error(error, `Error occured when updating Group`);
-            return;
-          }
-          this.toastr.success(
-            `Group Updated Successfully`,
-            `Successfully Updated the ${data.name}`
-          );
+        map((data: ResourceGroup) => {
           dialogRef.close();
           this.groupUpdates$.next({ group: data, operation: "update" });
           return data;
@@ -194,9 +187,16 @@ export class GroupsService implements OnDestroy {
         headers: { version: "2" },
       })
       .pipe(
+        catchError(this.errorHandler("Group Creation Error")),
         pluck("data"),
         map((response: any) => {
           return new ResourceGroup().deserialize(response);
+        }),
+        tap((group: ResourceGroup) => {
+          this.toastr.success(
+            `Group ${group.displayedName} is successfully created`,
+            `Group Created`
+          );
         })
       );
   }
@@ -291,9 +291,7 @@ export class GroupsService implements OnDestroy {
     });
   }
 
-  updateGroup(
-    group: ResourceGroup
-  ): Observable<{ data: ResourceGroup; error: string }> {
+  updateGroup(group: ResourceGroup): Observable<ResourceGroup> {
     const updateUrl = new URL("leagues", environment.ws + "/");
     return this.http
       .put(updateUrl.href, group.serialize(), {
@@ -302,18 +300,31 @@ export class GroupsService implements OnDestroy {
         },
       })
       .pipe(
-        catchError((err, caught) => {
-          return of({
-            error: `Error occured when updating group ${group.name}/ for resource ${group.resource_id}`,
-            data: null,
-          });
+        catchError(this.errorHandler("Group Update Error")),
+        pluck("data"),
+        map((response: any) => {
+          return new ResourceGroup().deserialize(response);
         }),
-        map(({ data, error }: { data: ResourceGroup; error?: string }) => {
-          return {
-            data: new ResourceGroup().deserialize(data),
-            error: error,
-          };
+        tap((group: ResourceGroup) => {
+          this.toastr.success(
+            `Group ${group.displayedName} is successfully updated`,
+            `Group Updated`
+          );
         })
       );
+  }
+
+  private errorHandler(title: string) {
+    return (error: any) => {
+      if (!(error instanceof HttpErrorResponse)) {
+        return throwError(error);
+      }
+      const userError = error.status < 500 && error.status >= 400;
+      this.toastr.error(`${error.error.message}`, title, {
+        disableTimeOut: userError,
+        tapToDismiss: userError,
+      });
+      return EMPTY;
+    };
   }
 }
