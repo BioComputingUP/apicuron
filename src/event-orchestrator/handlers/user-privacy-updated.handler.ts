@@ -3,7 +3,6 @@ import { IEventHandler } from '@nestjs/cqrs';
 import { Aggregator } from '../interfaces/aggregator.interface';
 import { OnEvent } from '@nestjs/event-emitter';
 import { UserPrivacyUpdatedEvent } from '../../auth/users/events/update-privacy';
-import { AggregatorManager } from '../services/aggregator-manager.service';
 import { BaseAggregatorRunner } from '../aggregator-runners/base.runner';
 
 @Injectable()

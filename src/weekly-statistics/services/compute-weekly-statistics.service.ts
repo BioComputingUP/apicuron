@@ -105,7 +105,7 @@ export class ComputeWeeklyStatisticsService {
 			league: report.league,
 			curator_orcid: report.curator_orcid,
 			timestamp: {
-				$gte: report.timestamp,
+				$gt: report.timestamp,
 			},
 		}));
 
