@@ -16,6 +16,7 @@ import {
 	MonthlyStatistics,
 	MonthlyStatisticsDocument,
 } from '../../core/schemas/statistics/monthly-statistics.schema';
+import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
 
 @Injectable()
 @AggregatorClass()
@@ -25,6 +26,26 @@ export class MonthlyStatisticsAggregator implements Aggregator {
 		@InjectModel(MonthlyStatistics.name)
 		protected monthlyStatsModel: Model<MonthlyStatisticsDocument>,
 	) {}
+
+	async updatedLeague(leagueUpdated: LeagueUpdatedEvent): Promise<number> {
+		if (!leagueUpdated.privacyChanged()) {
+			return;
+		}
+
+		const newPrivacy = leagueUpdated.newValue.visibility;
+		const filter = {
+			resource_id: leagueUpdated.resource.resource_id,
+			league: leagueUpdated.newValue.name,
+		};
+
+		const statUpdate = await this.monthlyStatsModel.updateMany(filter, {
+			$set: {
+				privacy: newPrivacy,
+			},
+		});
+
+		return statUpdate.modifiedCount;
+	}
 	async applyReport(
 		report: LeanReportDocument | ReportDocument,
 		term: TermDocument,

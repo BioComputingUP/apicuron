@@ -10,6 +10,7 @@ import { AddMemberToLeague } from '../leagues/dto/add-member-to-league.dto';
 import { DeleteLeagueDTO } from '../leagues/dto/delete-league.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { LeagueDeletedEvent } from '../leagues/events/league-deleted-event';
+import _ from 'lodash';
 
 @Injectable()
 export class PartnerResourcesService {
@@ -22,20 +23,6 @@ export class PartnerResourcesService {
 		filter: FilterQuery<PartnerResourceDocument> = {},
 	): Promise<PartnerResourceDocument[]> {
 		return await this.partnerResourceModel.find(filter);
-	}
-
-	async createLeague(createLeague: CreateLeagueDto): Promise<League> {
-		const resource = await this.get_resource(createLeague.resource_id);
-
-		resource.leagues.push({
-			name: createLeague.name,
-			resource_id: createLeague.resource_id,
-			displayedName: createLeague.displayedName,
-			visibility: createLeague.visibility,
-			defaultMembers: createLeague.defaultMembers,
-		});
-		await resource.save();
-		return resource.getLeague(createLeague.name);
 	}
 
 	async addMemberToLeague(addMemberToLeague: AddMemberToLeague) {

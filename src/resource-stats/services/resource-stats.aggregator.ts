@@ -10,6 +10,7 @@ import {
 import { ComputeResourceStatsService } from './compute-resource-stats.service';
 import { TermDocument } from '../../core/schemas/terms.schema';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
+import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
 
 @Injectable()
 @AggregatorClass()
@@ -19,6 +20,10 @@ export class ResourceStatsAggregatorService implements Aggregator {
 		protected resourceModel: Model<PartnerResourceDocument>,
 		protected computeStats: ComputeResourceStatsService,
 	) {}
+
+	async updatedLeague(leagueUpdated: LeagueUpdatedEvent): Promise<number> {
+		return 0;
+	}
 	termUpdated() {
 		return;
 	}

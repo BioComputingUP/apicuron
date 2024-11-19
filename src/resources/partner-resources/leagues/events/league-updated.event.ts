@@ -7,23 +7,23 @@ export class LeagueUpdatedEvent {
 		public resource: PartnerResourceDocument,
 		public update: UpdateLeagueDto,
 		public oldValue: LeagueDocument,
-		public league: LeagueDocument,
+		public newValue: LeagueDocument,
 		public leagueIndex: number,
 	) {}
 
 	public getNewDefaultMembers() {
-		return this.league.defaultMembers.filter(
+		return this.newValue.defaultMembers.filter(
 			(member) => !this.oldValue.defaultMembers.includes(member),
 		);
 	}
 
 	public getRemovedDefaultMembers() {
 		return this.oldValue.defaultMembers.filter(
-			(member) => !this.league.defaultMembers.includes(member),
+			(member) => !this.newValue.defaultMembers.includes(member),
 		);
 	}
 
 	public privacyChanged() {
-		return this.oldValue.visibility != this.league.visibility;
+		return this.oldValue.visibility != this.newValue.visibility;
 	}
 }

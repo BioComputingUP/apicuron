@@ -81,7 +81,7 @@ export class ResourceLeagueController {
 		@UserReq() user: User | null,
 	): Promise<LeagueDto> {
 		this.userCanAccessResource(user, createLeague.resource_id);
-		const league = await this.resourceService.createLeague(createLeague);
+		const league = await this.leagueService.createLeague(createLeague);
 		return league as LeagueDto;
 	}
 

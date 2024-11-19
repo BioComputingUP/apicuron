@@ -6,6 +6,7 @@ import {
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { TermDocument } from '../../core/schemas/terms.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
+import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
 
 export interface Aggregator {
 	applyReport(
@@ -21,6 +22,7 @@ export interface Aggregator {
 		privacy: PrivacyType,
 	): Promise<any> | any;
 	deleteLeague(resource_id: string, league: string): Promise<number> | number;
+	updatedLeague(leagueUpdated: LeagueUpdatedEvent): Promise<number> | number;
 	recomputeAllResourceAggregates(resource_id: string): Promise<any> | any;
 	termUpdated(oldTerm: TermDocument, term: TermDocument): Promise<any> | any;
 	termDeleted(term: TermDocument): Promise<any> | any;

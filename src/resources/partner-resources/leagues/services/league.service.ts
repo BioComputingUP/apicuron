@@ -12,6 +12,7 @@ import { plainToClass } from 'class-transformer';
 import { LeagueDto } from '../dto/league.dto';
 import { LeagueUpdatedEvent } from '../events/league-updated.event';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { CreateLeagueDto } from '../dto/create-league.dto';
 
 @Injectable()
 export class LeagueService {
@@ -74,6 +75,17 @@ export class LeagueService {
 		}
 	}
 
+	validateLeagueName(resource: PartnerResourceDocument, league_name: string) {
+		const existingLeague = resource.leagues.find(
+			(league) => league.name == league_name,
+		);
+		if (!!existingLeague) {
+			throw new BadRequestException(
+				`A league with the identifier name ${league_name} already exists in the resource ${resource.resource_id}`,
+			);
+		}
+	}
+
 	async updateLeague(leagueUpdate: UpdateLeagueDto): Promise<LeagueDto> {
 		const { resource, league, leagueIndex } = await this.validateLeagueSelector(
 			{
@@ -122,5 +134,27 @@ export class LeagueService {
 		await this.eventEmitter.emitAsync(LeagueUpdatedEvent.name, updateEvent);
 
 		return result;
+	}
+
+	async createLeague(createLeague: CreateLeagueDto) {
+		const resource = await this.resourceService.get_resource(
+			createLeague.resource_id,
+		);
+
+		this.validateLeagueName(resource, createLeague.name);
+
+		createLeague.defaultMembers.forEach((memberOrcid: string) => {
+			this.validateLeagueMember(resource, createLeague.name, memberOrcid);
+		});
+
+		resource.leagues.push({
+			name: createLeague.name,
+			resource_id: createLeague.resource_id,
+			displayedName: createLeague.displayedName,
+			visibility: createLeague.visibility,
+			defaultMembers: createLeague.defaultMembers,
+		});
+		await resource.save();
+		return resource.getLeague(createLeague.name);
 	}
 }

@@ -19,6 +19,7 @@ import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.
 import { TermDocument } from '../../core/schemas/terms.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
+import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
 
 @Injectable()
 @AggregatorClass()
@@ -29,6 +30,27 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 		protected resourceService: PartnerResourcesService,
 		protected computeWeeklyStat: ComputeWeeklyStatisticsService,
 	) {}
+
+	async updatedLeague(leagueUpdated: LeagueUpdatedEvent): Promise<number> {
+		if (!leagueUpdated.privacyChanged()) {
+			return;
+		}
+
+		const newPrivacy = leagueUpdated.newValue.visibility;
+		const filter = {
+			resource_id: leagueUpdated.resource.resource_id,
+			league: leagueUpdated.newValue.name,
+		};
+
+		const statUpdate = await this.weeklyStatModel.updateMany(filter, {
+			$set: {
+				privacy: newPrivacy,
+			},
+		});
+
+		return statUpdate.modifiedCount;
+	}
+
 	async termDeleted(term: TermDocument) {
 		return await this.recomputeAllResourceAggregates(term.resource_id);
 	}

@@ -15,6 +15,7 @@ import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
 import { TermDocument } from '../../core/schemas/terms.schema';
+import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
 @Injectable()
 @AggregatorClass()
 export class StatisticsAggregator implements Aggregator {
@@ -24,6 +25,27 @@ export class StatisticsAggregator implements Aggregator {
 		protected resourceService: PartnerResourcesService,
 		protected computeStats: ComputeStatisticsService,
 	) {}
+
+	async updatedLeague(leagueUpdated: LeagueUpdatedEvent): Promise<number> {
+		if (!leagueUpdated.privacyChanged()) {
+			return;
+		}
+
+		const newPrivacy = leagueUpdated.newValue.visibility;
+		const filter = {
+			resource_id: leagueUpdated.resource.resource_id,
+			league: leagueUpdated.newValue.name,
+		};
+
+		const statUpdate = await this.statModel.updateMany(filter, {
+			$set: {
+				privacy: newPrivacy,
+			},
+		});
+
+		return statUpdate.modifiedCount;
+	}
+
 	async termDeleted(term: TermDocument) {
 		return await this.recomputeAllResourceAggregates(term.resource_id);
 	}

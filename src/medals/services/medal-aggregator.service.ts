@@ -30,6 +30,7 @@ import { PartnerResourcesService } from '../../resources/partner-resources/servi
 import { User, UserDocument } from '../../core/schemas/user.schema';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
 @Injectable()
 @AggregatorClass()
 export class MedalAggregatorService implements Aggregator {
@@ -50,6 +51,37 @@ export class MedalAggregatorService implements Aggregator {
 	async recomputeAllResourceAggregates(resource_id: string) {
 		await this.removeAllResourceAggregates(resource_id);
 		await this.applyAllReports(resource_id);
+	}
+
+	async updatedLeague(leagueUpdated: LeagueUpdatedEvent): Promise<number> {
+		if (!leagueUpdated.privacyChanged()) {
+			return;
+		}
+
+		const newPrivacy = leagueUpdated.newValue.visibility;
+		const filter = {
+			resource_id: leagueUpdated.resource.resource_id,
+			league: leagueUpdated.newValue.name,
+		};
+
+		const medalDefUpdate$ = this.medalDefModel.updateMany(filter, {
+			$set: {
+				privacy: newPrivacy,
+			},
+		});
+
+		const medalUpdate$ = this.medalModel.updateMany(filter, {
+			$set: {
+				privacy: newPrivacy,
+			},
+		});
+
+		const [medalDefUpdate, medalUpdate] = await Promise.all([
+			medalDefUpdate$,
+			medalUpdate$,
+		]);
+
+		return medalDefUpdate.modifiedCount + medalUpdate.modifiedCount;
 	}
 
 	async deleteLeague(resource_id: string, league: string): Promise<number> {

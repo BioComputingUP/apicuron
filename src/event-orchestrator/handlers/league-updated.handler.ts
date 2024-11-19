@@ -17,17 +17,12 @@ export class LeagueUpdatedHandler implements IEventHandler {
 	@OnEvent(LeagueUpdatedEvent.name, { promisify: true, async: true })
 	async handle(payload: LeagueUpdatedEvent) {
 		this.logger.debug(`triggered event ${LeagueUpdatedEvent.name}`);
-		if (
-			!payload.privacyChanged() &&
-			payload.getNewDefaultMembers().length == 0 &&
-			payload.getRemovedDefaultMembers().length == 0
-		) {
+		if (!payload.privacyChanged()) {
 			return;
 		}
-		const { resource } = payload;
 		try {
 			return await this.runner.run(async (aggregator: Aggregator) => {
-				await aggregator.recomputeAllResourceAggregates(resource.resource_id);
+				await aggregator.updatedLeague(payload);
 			});
 		} catch (err: any) {
 			if (err instanceof Error) {
