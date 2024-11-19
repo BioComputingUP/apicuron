@@ -36,7 +36,9 @@ export class OrcidTokenAuthService implements OnModuleInit {
 
 		if (response.status > 400) {
 			this.logger.error(
-				`Failed to retrieve ORCID API credentials (STATUS: ${response.status}:${response.statusText})`,
+				`${response.status}:${response.data.error}${response.data.error_description}`,
+				null,
+				'Failed to retrieve ORCID API credentials',
 			);
 			return;
 		}
