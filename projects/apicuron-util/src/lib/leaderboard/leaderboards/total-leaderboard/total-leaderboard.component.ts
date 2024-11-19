@@ -29,10 +29,12 @@ import {
 } from "../../services/column-manager.service";
 import { TotalLeaderboardService } from "./total-leaderboard.service";
 import { ResourceModule, ResourcesService } from "../../../resource";
+import { ImageSrcOverrideDirective } from "../../../util";
 @Component({
   standalone: true,
   imports: [
     CommonModule,
+    ImageSrcOverrideDirective,
     ResourceModule,
     LoadableComponent,
     PaginationComponent,
@@ -82,7 +84,7 @@ export class TotalLeaderboardComponent implements OnInit {
           (page - 1) * this.limit,
           this.limit
         );
-      }),
+      })
     );
 
     this.totalLeaderboard$ = this.leaderboardFilter$.pipe(

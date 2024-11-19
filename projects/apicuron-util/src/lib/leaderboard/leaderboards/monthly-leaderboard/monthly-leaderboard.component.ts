@@ -32,6 +32,7 @@ import { ColumnConfig } from "../../interfaces/leaderboard-def.interface";
 import { ProfileRendererComponent } from "../../components/renderers/profile-renderer.component";
 import { ResourceModule, ResourcesService } from "../../../resource";
 import { MonthlyLeaderboardService } from "./monthly-leaderboard.service";
+import { ImageSrcOverrideDirective } from "../../../util";
 @Component({
   standalone: true,
   selector: "monthly-leaderboard",
@@ -46,6 +47,7 @@ import { MonthlyLeaderboardService } from "./monthly-leaderboard.service";
   ],
   imports: [
     CommonModule,
+    ImageSrcOverrideDirective,
     ResourceModule,
     RouterModule,
     PaginationComponent,

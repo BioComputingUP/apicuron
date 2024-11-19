@@ -14,9 +14,13 @@
           class="tw-underline"
           >{{ leaderboard.data?.[0].stat.monthEnd| date: 'EEEE dd-MM-yy':"UTC" }}</span
         >
-        in UTC timezone and is reset at the beginning of every Month at 00:00 UTC</span
+        in UTC timezone and is reset at the beginning of every Month at 00:00
+        UTC</span
       >
-      <table *ngIf="leaderboard.data.length > 0" class="tw-table-auto tw-border-collapse tw-w-full">
+      <table
+        *ngIf="leaderboard.data.length > 0"
+        class="tw-table-auto tw-border-collapse tw-w-full"
+      >
         <thead>
           <tr class="tw-divide-x tw-divide-gray-200">
             <ng-container *ngFor="let column of columns$ | async">
@@ -34,10 +38,7 @@
         </thead>
         <tbody class="tw-divide-y tw-divide-gray-200">
           <tr
-            *ngFor="
-              let entry of leaderboard.data;
-              let indexOfelement = index
-            "
+            *ngFor="let entry of leaderboard.data; let indexOfelement = index"
             class="odd:tw-bg-gray-50"
           >
             <ng-container *ngFor="let column of columns$ | async">
@@ -59,13 +60,7 @@
                   *ngSwitchDefault
                   class="tw-text-center tw-font-bold tw-text-gray-700"
                 >
-                  {{
-                    column.fieldAccessor(
-                      entry,
-                      indexOfelement,
-                      leaderboard
-                    )
-                  }}
+                  {{ column.fieldAccessor(entry, indexOfelement, leaderboard) }}
                 </td>
               </ng-container>
             </ng-container>
@@ -76,9 +71,7 @@
         class="tw-p-1 md:tw-p-2 tw-text-gray-700"
         style="font-family: system-ui"
       >
-        <ng-container
-          *ngIf="leaderboard$ | async as leaderboard; else loading"
-        >
+        <ng-container *ngIf="leaderboard$ | async as leaderboard">
           <ng-container
             *ngIf="leaderboard.meta.pagination.total > 0; else emptyList"
           >
@@ -115,15 +108,6 @@
             </div>
           </ng-template>
         </ng-container>
-
-        <ng-template #loading>
-          <span class="tw-block tw-text-center tw-font-bold tw-py-2">
-            <svg-icon
-              src="assets/svg/loading-spinner.svg"
-              svgClass="tw-animate-spin tw-h-10 tw-w-10 tw-mx-auto"
-            ></svg-icon>
-          </span>
-        </ng-template>
       </div>
     </ng-container>
   </ng-container>

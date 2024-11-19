@@ -4,10 +4,11 @@ import { AngularSvgIconModule } from "angular-svg-icon";
 import { Observable } from "rxjs";
 import { createLoadingState } from "../loading-state";
 import { LoadingState } from "../interfaces";
+import { ImageSrcOverrideDirective } from "../../util";
 
 @Component({
   standalone: true,
-  imports: [CommonModule, AngularSvgIconModule],
+  imports: [CommonModule, ImageSrcOverrideDirective, AngularSvgIconModule],
   selector: "[loadable]",
   template: `
     <ng-container *ngIf="loadingData$ | async as loadingState">
