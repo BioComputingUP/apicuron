@@ -19,6 +19,7 @@ import { CdkAccordionModule } from "@angular/cdk/accordion";
 import { LeaderboardModule } from "../../../projects/apicuron-util/src/lib/leaderboard/leaderboard.module";
 import { FairSharingComponent } from "./fairsharing/fairsharing.component";
 import { FairSharingService } from "./services/fairsharing.service";
+import { NumberCardComponent } from "../components/number-card/number-card.component";
 @NgModule({
   declarations: [
     DatabasesPageComponent,
@@ -41,7 +42,9 @@ import { FairSharingService } from "./services/fairsharing.service";
     TermsModule,
     AchievementsDefModule,
     LeaderboardModule,
-    FairSharingComponent
+    FairSharingComponent,
+    NumberCardComponent
+
 ],
   providers:[DatabasesService, FairSharingService],
   exports: [DatabasesPageComponent],

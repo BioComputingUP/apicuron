@@ -19,7 +19,35 @@
       >
         {{ resource.resource_description }}
       </p>
+      <div *ngIf="resource.stats">
+        <span class="tw-font-bold" >Database statistics</span>
 
+        <div class="tw-flex tw-py-2 tw-mb-2 tw-gap-1 tw-flex-row  tw-flex-wrap" >
+          
+          <div class="tw-flex-grow ">
+            <number-card
+            label="Unique Contributors"
+            [value]="resource?.stats?.uniqueContributors"></number-card>
+          </div>
+          
+          <div class="tw-flex-grow ">
+            <number-card 
+            label="Contributions"
+            [value]="resource?.stats?.contributionCount"></number-card>
+ 
+          </div>
+          <div class="tw-flex-grow ">
+            <number-card
+            label="Joined"
+            [value]="resource?.stats?.firstContributionDate.toLocaleDateString()"></number-card>
+          </div>
+            <div class="tw-flex-grow">
+              <number-card
+                label="Latest contribution"
+                [value]="resource?.stats?.lastContributionDate.toLocaleDateString()"></number-card>
+            </div> 
+          </div>
+        
       <div>
         <resource-leaderboard [resource]="resource"></resource-leaderboard>
       </div>
