@@ -27,24 +27,30 @@
           <div class="tw-flex-grow ">
             <number-card
             label="Unique Contributors"
-            [value]="resource?.stats?.uniqueContributors"></number-card>
+            [value]="resource?.stats?.uniqueContributors"
+            iconSrc="assets/svg/member.svg">
+          </number-card>
+           
           </div>
           
           <div class="tw-flex-grow ">
             <number-card 
-            label="Contributions"
-            [value]="resource?.stats?.contributionCount"></number-card>
+            label="Contributions commited"
+            [value]="resource?.stats?.contributionCount"
+            iconSrc="assets/svg/contribution.svg"></number-card>
  
           </div>
           <div class="tw-flex-grow ">
             <number-card
-            label="Joined"
-            [value]="resource?.stats?.firstContributionDate.toLocaleDateString()"></number-card>
+            label="Joined APICURON"
+            [value]="resource?.stats?.firstContributionDate.toLocaleDateString()"
+            iconSrc="assets/svg/calendar.svg"></number-card>
           </div>
             <div class="tw-flex-grow">
               <number-card
-                label="Latest contribution"
-                [value]="resource?.stats?.lastContributionDate.toLocaleDateString()"></number-card>
+                label="Most Recent Contribution"
+                [value]="resource?.stats?.lastContributionDate.toLocaleDateString()"
+                iconSrc="assets/svg/latest.svg"></number-card>
             </div> 
           </div>
         

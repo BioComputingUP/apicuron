@@ -13,4 +13,5 @@ import { AngularSvgIconModule } from "angular-svg-icon";
 export class NumberCardComponent {
 	@Input() label: string;
 	@Input() value: string | number;
+	@Input() iconSrc: string;
 }
