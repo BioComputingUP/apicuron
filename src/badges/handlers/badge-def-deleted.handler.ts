@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { BadgeAggregatorService } from '../services/badge-aggregator.service';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { BadgeDefDeletedEvent } from '../events/badge-def-deleted.event';
 import { InjectModel } from '@nestjs/mongoose';
