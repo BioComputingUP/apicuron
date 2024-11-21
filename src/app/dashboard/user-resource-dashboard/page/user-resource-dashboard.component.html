@@ -12,7 +12,7 @@
     class="tw-flex tw-flex-row tw-justify-stretch tw-flex-wrap"
   >
     <div *ngFor="let entry of numbers" class="tw-p-1 tw-grow">
-      <number-card [value]="entry.value" [label]="entry.label" iconSrc="assets/svg/check-circle.svg"></number-card>
+      <number-card [value]="entry.value" [label]="entry.label" [iconSrc]="entry.iconSrc"></number-card>
     </div>
   </div>
 

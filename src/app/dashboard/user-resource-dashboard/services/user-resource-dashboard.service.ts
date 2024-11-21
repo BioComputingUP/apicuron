@@ -60,19 +60,21 @@ export class UserResourceDashboardService {
       },
       { count: 0 } as ActivitiesStatistics
     );
-    const activityEntries: { label: string; value: number | string }[] = [
-      { label: "Contributions made", value: stat.total_count },
-      { label: "Last month contributions", value: stat.last_month_count },
-      { label: "Last week contributions", value: stat.last_week_count },
+    const activityEntries: { label: string; value: number | string; iconSrc: string }[] = [
+      { label: "Contributions made", value: stat.total_count, iconSrc: "assets/svg/contribution.svg" },
+      { label: "Last month contributions", value: stat.last_month_count, iconSrc: "assets/svg/month.svg" },
+      { label: "Last week contributions", value: stat.last_week_count, iconSrc: "assets/svg/week.svg" },
       {
         label: "Last quarter contributions",
         value: stat.last_quarter_count,
+        iconSrc: "assets/svg/graph.svg"
       },
     ];
     if (mostPerformedActivity.count > 0) {
       activityEntries.push({
         label: `Most performed activitiy, (done ${mostPerformedActivity.count} times)`,
         value: mostPerformedActivity.activity_name,
+        iconSrc: "assets/svg/winner.svg"
       });
     }
     return activityEntries;
