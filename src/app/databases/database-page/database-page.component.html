@@ -20,184 +20,166 @@
         {{ resource.resource_description }}
       </p>
       <div *ngIf="resource.stats">
-        <span class="tw-font-bold" >Database statistics</span>
+        <span class="tw-font-bold">Database statistics</span>
 
-        <div class="tw-flex tw-py-2 tw-mb-2 tw-gap-1 tw-flex-row  tw-flex-wrap" >
-          
-          <div class="tw-flex-grow ">
+        <div class="tw-flex tw-py-2 tw-mb-2 tw-gap-1 tw-flex-row tw-flex-wrap">
+          <div class="tw-flex-grow">
             <number-card
-            label="Unique Contributors"
-            [value]="resource?.stats?.uniqueContributors"
-            iconSrc="assets/svg/member.svg">
-          </number-card>
-           
-          </div>
-          
-          <div class="tw-flex-grow ">
-            <number-card 
-            label="Contributions commited"
-            [value]="resource?.stats?.contributionCount"
-            iconSrc="assets/svg/contribution.svg"></number-card>
- 
-          </div>
-          <div class="tw-flex-grow ">
-            <number-card
-            label="Joined APICURON"
-            [value]="resource?.stats?.firstContributionDate.toLocaleDateString()"
-            iconSrc="assets/svg/joined.svg"></number-card>
-          </div>
-            <div class="tw-flex-grow">
-              <number-card
-                label="Most Recent Contribution"
-                [value]="resource?.stats?.lastContributionDate.toLocaleDateString()"
-                iconSrc="assets/svg/clock-plus.svg"></number-card>
-            </div> 
-          </div>
-        
-      <div>
-        <resource-leaderboard [resource]="resource"></resource-leaderboard>
-      </div>
-
-      <div class="tw-my-2 sm:tw-my-4" *ngIf="terms.length > 0">
-        <cdk-accordion>
-          <cdk-accordion-item #termAccordion="cdkAccordionItem">
-            <div class="tw-flex tw-flex-row tw-justify-between tw-p-1">
-              <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold">
-                What Contributions can be done on {{ resource.resource_name }} ?
-              </h4>
-              <button
-                class="tw-text-blue-400 hover:tw-text-blue-500 tw-bg-transparent tw-text-sm tw-border-0 focus:tw-outline-none hover:tw-underline"
-                (click)="termAccordion.toggle()"
-              >
-                {{ termAccordion.expanded ? "show less" : "show more" }}
-              </button>
-            </div>
-            <div class="tw-flex tw-flex-row tw-flex-wrap">
-              <div
-                *ngFor="let term of terms.slice(0, 4)"
-                class="tw-w-1/4 tw-p-1"
-              >
-                <term-card [term]="term"></term-card>
-              </div>
-            </div>
-            <div
-              #collapsedTerms
-              class="tw-grid tw-overflow-hidden tw-transform tw-transition-all tw-duration-300 tw-ease-in-out"
-              [style.height.px]="
-                termAccordion.expanded ? collapsedTerms.scrollHeight : 0
-              "
+              label="Unique Contributors"
+              [value]="resource?.stats?.uniqueContributors"
+              iconSrc="assets/svg/member.svg"
             >
+            </number-card>
+          </div>
+
+          <div class="tw-flex-grow">
+            <number-card
+              label="Contributions commited"
+              [value]="resource?.stats?.contributionCount"
+              iconSrc="assets/svg/contribution.svg"
+            ></number-card>
+          </div>
+          <div class="tw-flex-grow">
+            <number-card
+              label="Joined APICURON"
+              [value]="
+                resource?.stats?.firstContributionDate | date : 'dd/MM/yyyy'
+              "
+              iconSrc="assets/svg/joined.svg"
+            ></number-card>
+          </div>
+          <div class="tw-flex-grow">
+            <number-card
+              label="Most Recent Contribution"
+              [value]="
+                resource?.stats?.lastContributionDate | date : 'dd/MM/yyyy'
+              "
+              iconSrc="assets/svg/clock-plus.svg"
+            ></number-card>
+          </div>
+        </div>
+
+        <div>
+          <resource-leaderboard [resource]="resource"></resource-leaderboard>
+        </div>
+
+        <div class="tw-my-2 sm:tw-my-4" *ngIf="terms.length > 0">
+          <cdk-accordion>
+            <cdk-accordion-item #termAccordion="cdkAccordionItem">
+              <div class="tw-flex tw-flex-row tw-justify-between tw-p-1">
+                <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold">
+                  What Contributions can be done on
+                  {{ resource.resource_name }} ?
+                </h4>
+                <button
+                  class="tw-text-blue-400 hover:tw-text-blue-500 tw-bg-transparent tw-text-sm tw-border-0 focus:tw-outline-none hover:tw-underline"
+                  (click)="termAccordion.toggle()"
+                >
+                  {{ termAccordion.expanded ? "show less" : "show more" }}
+                </button>
+              </div>
               <div class="tw-flex tw-flex-row tw-flex-wrap">
                 <div
-                  *ngFor="let term of terms.slice(4)"
+                  *ngFor="let term of terms.slice(0, 4)"
                   class="tw-w-1/4 tw-p-1"
                 >
                   <term-card [term]="term"></term-card>
                 </div>
               </div>
-            </div>
-          </cdk-accordion-item>
-        </cdk-accordion>
-      </div>
-
-      <div class="tw-my-2 sm:tw-my-4" *ngIf="firstBadges$ | async as badges">
-        <cdk-accordion>
-          <cdk-accordion-item #badgeAccordion="cdkAccordionItem">
-            <div
-              class="tw-flex tw-flex-row tw-justify-between tw-pr-2"
-              *ngIf="badges.data.length > 0"
-            >
-              <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold">
-                Badges
-              </h4>
-
-              <button
-                *ngIf="badges.meta.pagination.total > badges.data.length"
-                class="tw-text-blue-400 hover:tw-text-blue-500 tw-bg-transparent tw-text-sm tw-border-0 focus:tw-outline-none hover:tw-underline"
-                (click)="badgeAccordion.toggle()"
-              >
-                {{ badgeAccordion.expanded ? "show less" : "show more" }}
-              </button>
-            </div>
-
-            <div class="tw-flex tw-flex-row tw-flex-wrap">
-              <div *ngFor="let badge of badges.data" class="tw-p-2 tw-w-1/4">
-                <badge-def-card
-                  [badge]="badge"
-                  [terms]="terms"
-                ></badge-def-card>
-              </div>
-            </div>
-            <ng-container *ngIf="lastBadges$ | async as lastBadges">
               <div
-                class="tw-flex tw-flex-row tw-flex-wrap tw-overflow-hidden tw-transform tw-transition-all tw-duration-300 tw-ease-in-out"
-                #collapsedBadges
+                #collapsedTerms
+                class="tw-grid tw-overflow-hidden tw-transform tw-transition-all tw-duration-300 tw-ease-in-out"
                 [style.height.px]="
-                  badgeAccordion.expanded ? collapsedBadges.scrollHeight : 0
+                  termAccordion.expanded ? collapsedTerms.scrollHeight : 0
                 "
               >
-                <div
-                  *ngFor="let badge of lastBadges.data"
-                  class="tw-p-2 tw-w-1/4"
+                <div class="tw-flex tw-flex-row tw-flex-wrap">
+                  <div
+                    *ngFor="let term of terms.slice(4)"
+                    class="tw-w-1/4 tw-p-1"
+                  >
+                    <term-card [term]="term"></term-card>
+                  </div>
+                </div>
+              </div>
+            </cdk-accordion-item>
+          </cdk-accordion>
+        </div>
+
+        <div class="tw-my-2 sm:tw-my-4" *ngIf="firstBadges$ | async as badges">
+          <cdk-accordion>
+            <cdk-accordion-item #badgeAccordion="cdkAccordionItem">
+              <div
+                class="tw-flex tw-flex-row tw-justify-between tw-pr-2"
+                *ngIf="badges.data.length > 0"
+              >
+                <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold">
+                  Badges
+                </h4>
+
+                <button
+                  *ngIf="badges.meta.pagination.total > badges.data.length"
+                  class="tw-text-blue-400 hover:tw-text-blue-500 tw-bg-transparent tw-text-sm tw-border-0 focus:tw-outline-none hover:tw-underline"
+                  (click)="badgeAccordion.toggle()"
                 >
+                  {{ badgeAccordion.expanded ? "show less" : "show more" }}
+                </button>
+              </div>
+
+              <div class="tw-flex tw-flex-row tw-flex-wrap">
+                <div *ngFor="let badge of badges.data" class="tw-p-2 tw-w-1/4">
                   <badge-def-card
                     [badge]="badge"
                     [terms]="terms"
                   ></badge-def-card>
                 </div>
               </div>
-            </ng-container>
-          </cdk-accordion-item>
-        </cdk-accordion>
-      </div>
-
-      <div class="tw-my-2 sm:tw-my-4" *ngIf="firstMedals$ | async as medals">
-        <cdk-accordion>
-          <cdk-accordion-item #medalAccordion="cdkAccordionItem">
-            <div
-              class="tw-flex tw-flex-row tw-flex-wrap tw-justify-between tw-pr-2"
-              *ngIf="medals.data.length > 0"
-            >
-              <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold">
-                Medals
-              </h4>
-
-              <button
-                *ngIf="medals.meta.pagination.total > medals.data.length"
-                class="tw-text-blue-400 hover:tw-text-blue-500 tw-bg-transparent tw-text-sm tw-border-0 focus:tw-outline-none hover:tw-underline"
-                (click)="medalAccordion.toggle()"
-              >
-                {{ medalAccordion.expanded ? "show less" : "show more" }}
-              </button>
-            </div>
-
-            <!-- content -->
-            <div class="tw-flex tstatsw-flex-row tw-flex-wrap">
-              <div *ngFor="let medal of medals.data" class="tw-p-2 tw-w-1/4">
-                <medal-def-card
-                  class="tw-h-full"
-                  [medal]="medal"
-                  [terms]="terms"
-                ></medal-def-card>
-              </div>
-            </div>
-
-            <!-- expansion -->
-            <div
-              #collapsedMedals
-              class="tw-grid tw-overflow-hidden tw-transform tw-transition-all tw-duration-300 tw-ease-in-out"
-              [style.height.px]="
-                medalAccordion.expanded ? collapsedMedals.scrollHeight : 0
-              "
-            >
-              <div
-                class="tw-flex tw-flex-row tw-flex-wrap"
-                *ngIf="lastMedals$ | async as lastMedals"
-              >
+              <ng-container *ngIf="lastBadges$ | async as lastBadges">
                 <div
-                  *ngFor="let medal of lastMedals.data"
-                  class="tw-p-2 tw-w-1/4"
+                  class="tw-flex tw-flex-row tw-flex-wrap tw-overflow-hidden tw-transform tw-transition-all tw-duration-300 tw-ease-in-out"
+                  #collapsedBadges
+                  [style.height.px]="
+                    badgeAccordion.expanded ? collapsedBadges.scrollHeight : 0
+                  "
                 >
+                  <div
+                    *ngFor="let badge of lastBadges.data"
+                    class="tw-p-2 tw-w-1/4"
+                  >
+                    <badge-def-card
+                      [badge]="badge"
+                      [terms]="terms"
+                    ></badge-def-card>
+                  </div>
+                </div>
+              </ng-container>
+            </cdk-accordion-item>
+          </cdk-accordion>
+        </div>
+
+        <div class="tw-my-2 sm:tw-my-4" *ngIf="firstMedals$ | async as medals">
+          <cdk-accordion>
+            <cdk-accordion-item #medalAccordion="cdkAccordionItem">
+              <div
+                class="tw-flex tw-flex-row tw-flex-wrap tw-justify-between tw-pr-2"
+                *ngIf="medals.data.length > 0"
+              >
+                <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold">
+                  Medals
+                </h4>
+
+                <button
+                  *ngIf="medals.meta.pagination.total > medals.data.length"
+                  class="tw-text-blue-400 hover:tw-text-blue-500 tw-bg-transparent tw-text-sm tw-border-0 focus:tw-outline-none hover:tw-underline"
+                  (click)="medalAccordion.toggle()"
+                >
+                  {{ medalAccordion.expanded ? "show less" : "show more" }}
+                </button>
+              </div>
+
+              <!-- content -->
+              <div class="tw-flex tstatsw-flex-row tw-flex-wrap">
+                <div *ngFor="let medal of medals.data" class="tw-p-2 tw-w-1/4">
                   <medal-def-card
                     class="tw-h-full"
                     [medal]="medal"
@@ -205,9 +187,34 @@
                   ></medal-def-card>
                 </div>
               </div>
-            </div>
-          </cdk-accordion-item>
-        </cdk-accordion>
+
+              <!-- expansion -->
+              <div
+                #collapsedMedals
+                class="tw-grid tw-overflow-hidden tw-transform tw-transition-all tw-duration-300 tw-ease-in-out"
+                [style.height.px]="
+                  medalAccordion.expanded ? collapsedMedals.scrollHeight : 0
+                "
+              >
+                <div
+                  class="tw-flex tw-flex-row tw-flex-wrap"
+                  *ngIf="lastMedals$ | async as lastMedals"
+                >
+                  <div
+                    *ngFor="let medal of lastMedals.data"
+                    class="tw-p-2 tw-w-1/4"
+                  >
+                    <medal-def-card
+                      class="tw-h-full"
+                      [medal]="medal"
+                      [terms]="terms"
+                    ></medal-def-card>
+                  </div>
+                </div>
+              </div>
+            </cdk-accordion-item>
+          </cdk-accordion>
+        </div>
       </div>
     </div>
   </div>
