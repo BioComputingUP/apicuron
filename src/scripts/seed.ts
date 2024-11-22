@@ -67,6 +67,7 @@ async function bootstrap() {
 		resource_id: 'example_resource',
 		resource_uri: faker.internet.url(),
 		resource_url: faker.internet.url(),
+		joined_date: faker.date.recent({ days: 10 })
 	});
 
 	await exampleResource.save();
