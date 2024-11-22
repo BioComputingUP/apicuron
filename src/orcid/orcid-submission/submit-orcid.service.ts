@@ -40,6 +40,7 @@ export class SubmitOrcidWork {
 				$and: [
 					{
 						privacy: PrivacyType.public,
+						orcid_permission: { $exists: true },
 					},
 					filter,
 				],
