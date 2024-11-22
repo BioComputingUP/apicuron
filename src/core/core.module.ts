@@ -51,7 +51,10 @@ import {
 	WeeklyStatisticsSchemaFactory,
 } from './schemas/statistics/weekly-statistics.schema';
 import { SyncIndexesService } from './services/sync-indexes.service';
-import { MonthlyStatistics, MonthlyStatisticsSchemaFactory } from './schemas/statistics/monthly-statistics.schema';
+import {
+	MonthlyStatistics,
+	MonthlyStatisticsSchemaFactory,
+} from './schemas/statistics/monthly-statistics.schema';
 
 @Module({
 	imports: [
