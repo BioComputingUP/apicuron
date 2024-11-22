@@ -23,6 +23,9 @@ async function bootstrap() {
 				resource.leagues[i].displayedName = resource.leagues[i].name;
 			}
 		}
+		if (!resource.joined_date) {
+			resource.joined_date = resource._id.getTimestamp();
+		}
 
 		const save = resource.save().then(() => {
 			console.log(`Updated resource ${resource.resource_id}`);

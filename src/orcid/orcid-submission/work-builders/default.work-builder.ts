@@ -20,7 +20,7 @@ export class DefaultWorkBuilder implements OrcidWorkBuilder {
 		user: Document<unknown, any, User> & User & { _id: Types.ObjectId },
 	): OrcidWork {
 		const profileUrl = new URL(
-			`${this.frontendHost}curators/${user.orcid_id}#${resource.resource_name}`,
+			`${this.frontendHost}curators/${user.orcid_id}/${resource.resource_id}`,
 		);
 
 		const putCodeEntry = user.getResourcePutCode(resource.resource_id);
@@ -30,7 +30,7 @@ export class DefaultWorkBuilder implements OrcidWorkBuilder {
 			externalIds: [
 				{
 					type: 'uri',
-					value: 'APICURON Profile',
+					value: `APICURON Profile for ${resource.resource_name}`,
 					url: profileUrl,
 					relationship: 'self',
 				},

@@ -5,7 +5,7 @@ import {
 	Statistics,
 	StatisticsDocument,
 } from '../../core/schemas/statistics.schema';
-import { LeanDocument, Model } from 'mongoose';
+import { FilterQuery, LeanDocument, Model } from 'mongoose';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 import {
 	PartnerResource,
@@ -16,6 +16,7 @@ import { OrcidWorkBuilder } from './interfaces/orcid-submission.interface';
 import { OrcidWork } from '../../orcid/orcid-client/interfaces/orcid.interface';
 import { responseHasCode } from '../../orcid/orcid-client/helpers/response-with-code';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { PrivacyType } from '../../core/enums';
 
 @Injectable()
 export class SubmitOrcidWork {
@@ -33,45 +34,53 @@ export class SubmitOrcidWork {
 	logger = new Logger(SubmitOrcidWork.name);
 
 	@Cron(CronExpression.EVERY_DAY_AT_2AM)
-	async submitAllWorks(): Promise<any> {
-		const stats = this.statModel
+	async submitAllWorks(filter: FilterQuery<UserDocument> = {}): Promise<any> {
+		const users = this.userModel
 			.find({
-				privacy: 'public',
+				$and: [
+					{
+						privacy: PrivacyType.public,
+					},
+					filter,
+				],
 			})
-			.sort({
-				resource_id: -1,
-				curator_orcid: -1,
-			})
+			.sort({ displayed_name: 1 })
 			.cursor({ batchSize: this.defaultBatchSize });
-		async function* statIterator() {
-			for await (const stat of stats) {
-				await new Promise((r) => setTimeout(r, 1000));
-				yield stat;
-			}
-		}
-		let currentResource = null;
 
-		for await (const stat of statIterator()) {
-			const user = await this.userModel.findOne({
-				orcid_id: stat.curator_orcid,
-				orcid_permission: { $exists: true },
+		const resources = await this.resourceModel.find();
+
+		const resourcesMap = new Map<string, PartnerResourceDocument>();
+		for (const resource of resources) {
+			resourcesMap.set(resource.resource_id, resource);
+		}
+
+		for await (const user of users) {
+			const stats = await this.statModel.find({
+				curator_orcid: user.orcid_id,
+				privacy: PrivacyType.public,
 			});
-			if (!user) {
+
+			if (stats.length === 0) {
+				this.logger.debug(`No stats found for user ${user.displayedName}`);
 				continue;
 			}
 
-			if (!currentResource) {
-				currentResource = await this.resourceModel.findOne({
-					resource_id: stat.resource_id,
-				});
+			const userData = stats.map((stat) => {
+				return {
+					stat,
+					resource: resourcesMap.get(stat.resource_id),
+				};
+			});
+			const submissions$ = [];
+			for (const data of userData) {
+				const submission$ = this.submitSingleWork(
+					data.stat,
+					data.resource,
+					user,
+				);
+				submissions$.push(submission$);
 			}
-			if (currentResource.resource_id != stat.resource_id) {
-				currentResource = await this.resourceModel.findOne({
-					resource_id: stat.resource_id,
-				});
-			}
-
-			await this.submitSingleWork(stat, currentResource, user);
+			await Promise.all(submissions$);
 		}
 	}
 
@@ -105,4 +114,14 @@ export class SubmitOrcidWork {
 			}
 		}
 	}
+
+	// async submitMultipleWorks(
+	// 	user: UserDocument,
+	// 	resources: {
+	// 		stat: LeanDocument<StatisticsDocument>;
+	// 		resource: LeanDocument<PartnerResourceDocument>;
+	// 	}[],
+	// ) {
+
+	// }
 }

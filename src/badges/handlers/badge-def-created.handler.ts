@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { BadgeAggregatorService } from '../services/badge-aggregator.service';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { BadgeDefCreatedEvent } from '../events/badge-def-created.event';
 import { ComputeBadgesService } from '../services/compute-badges.service';

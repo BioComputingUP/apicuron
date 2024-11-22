@@ -160,9 +160,12 @@ export class ComputeWeeklyStatisticsService {
 		}
 	}
 
-	async recomputeWeeklyStatistics() {
-		await this.weeklyStatModel.deleteMany({});
-		await this.computeWeeklyStatistics({});
+	async recomputeWeeklyStatistics(
+		filter: FilterQuery<ReportDocument> &
+			FilterQuery<WeeklyStatisticsDocument> = {},
+	) {
+		await this.weeklyStatModel.deleteMany(filter);
+		await this.computeWeeklyStatistics(filter);
 	}
 
 	async computeWeeklyStatistics(

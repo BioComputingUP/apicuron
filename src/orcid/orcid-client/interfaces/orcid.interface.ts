@@ -20,6 +20,7 @@ export interface OrcidExternalId {
 export interface OrcidWork {
 	title: string;
 	shortDescription: string;
+	subtitle?: string;
 	type: string;
 	putCode?: string;
 	externalIds: OrcidExternalId[];

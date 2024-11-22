@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OrcidApiUrl } from './constants';
 import {
 	OrcidEmailEntry,
@@ -7,9 +7,9 @@ import {
 	OrcidWork,
 	SubmitWorkResponse,
 } from './interfaces/orcid.interface';
-import { buildExternalId } from './helpers/build-external-id';
 import { inspect } from 'util';
 import { OrcidTokenAuthService } from './token-auth.service';
+import { orcidWorkXmlSerializer } from './helpers/orcid-work-serializer';
 
 @Injectable()
 export class OrcidClientService {
@@ -57,32 +57,31 @@ export class OrcidClientService {
 		return emailsData;
 	}
 
+	/**
+	 * Submits a work to the ORCID API for a given user.
+	 *
+	 * @param user - The ORCID user for whom the work is being submitted.
+	 * @param orcidWork - The work details to be submitted.
+	 * @returns A promise that resolves to a SubmitWorkResponse object containing the status and put-code if applicable.
+	 *
+	 * @throws Will throw an error if the submission fails with a status code outside the range of 200-399.
+	 *
+	 * The function performs the following steps:
+	 * 1. Extracts necessary fields from the orcidWork object.
+	 * 2. Constructs the XML payload for the ORCID API request.
+	 * 3. Determines the appropriate URL path and HTTP method (POST or PUT) based on the presence of a put-code.
+	 * 4. Sends the request to the ORCID API using axios.
+	 * 5. Handles the response, including retrying the request if a conflict (409) occurs and the put-code is missing.
+	 * 6. Logs relevant information and errors.
+	 * 7. Returns the status and put-code if the submission is successful.
+	 */
 	async submitWork(
 		user: OrcidUser,
 		orcidWork: OrcidWork,
 	): Promise<SubmitWorkResponse> {
-		const { externalIds, title, shortDescription, type } = orcidWork;
-		const putCode = orcidWork.putCode ? `put-code="${orcidWork.putCode}"` : '';
+		const { title } = orcidWork;
 
-		const processedExternalIds = externalIds.map(buildExternalId).join('\n');
-
-		const rawData = `
-		<?xml version="1.0" encoding="UTF-8"?>
-		<work:work
-			xmlns:common="http://www.orcid.org/ns/common" xmlns:work="http://www.orcid.org/ns/work"
-			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-			xsi:schemaLocation="http://www.orcid.org/ns/work /work-3.0.xsd"
-			${putCode}>
-			<work:title>
-				<common:title>${title}</common:title>
-			</work:title>
-			<work:short-description>${shortDescription}</work:short-description>
-			<work:type>${type}</work:type>
-			<common:external-ids>
-			${processedExternalIds}
-			</common:external-ids>
-		</work:work>
-		`;
+		const rawData = orcidWorkXmlSerializer(orcidWork);
 
 		const urlPath = orcidWork.putCode
 			? `${user.orcid_id}/work/${orcidWork.putCode}`
@@ -112,6 +111,7 @@ export class OrcidClientService {
 				this.logger.error(
 					`User ${user.orcid_id} has no put-code but work creation failed on code 409`,
 				);
+				this.logger.error(response.data, null, response.status);
 
 				// retry attempt, by retrieving the code from the response message
 				const putCodeMatch = response.data.toString().match(/put-code (\d+)/);
@@ -131,19 +131,19 @@ export class OrcidClientService {
 				}
 
 				throw new Error(
-					`Failed to submit work ${title} for user ${user.orcid_id} \n Missing ORCID Put Code`,
+					`Failed to submit work "${title}" for user ${user.orcid_id} \n Missing ORCID Put Code`,
 				);
 			}
 			this.logger.error(`Error Status ${response.status}`);
 			this.logger.error(`Error Response Header ${inspect(response.headers)}`);
 			this.logger.error(`Error Response Body ${inspect(response.data)}`);
 			throw new Error(
-				`Failed to submit work ${title} for user ${user.orcid_id}`,
+				`Failed to submit work "${title}" for user ${user.orcid_id}`,
 			);
 		}
 
 		this.logger.log(
-			`Work ${title} submitted successfully, status: ${response.status}`,
+			`Work "${title}" submitted successfully, status: ${response.status}`,
 		);
 
 		if (response.status == 201) {
@@ -157,9 +157,37 @@ export class OrcidClientService {
 		return { status: response.status };
 	}
 
+	// async submitWorks(user: OrcidUser, orcidWorks: OrcidWork[]) {
+	// 	if (orcidWorks.length == 0) {
+	// 		throw new Error(`No works to submit for user ${user.orcid_id}`);
+	// 	}
+	// 	if (orcidWorks.length == 1) {
+	// 		this.logger.warn(
+	// 			`Only one work to submit for user ${user.orcid_id}, called submitWorks! instead of submitWork`,
+	// 		);
+	// 		return await this.submitWork(user, orcidWorks[0]);
+	// 	}
+
+	// 	const rawData = orcidBulkWorkXmlSerializer(orcidWorks);
+	// 	// Serialize the works into the ORCID JSON format
+
+	// 	const options = {
+	// 		method: 'POST',
+	// 		url: this.orcidUrl + urlPath,
+	// 		headers: {
+	// 			'Content-Type': 'application/json',
+	// 			Authorization: 'Bearer ' + user.orcid_permission,
+	// 			Accept: '*/*',
+	// 		},
+	// 		data: rawData.trim(),
+	// 		validateStatus: function (status) {
+	// 			return status < 500; // Resolve only if the status code is less than 500
+	// 		},
+	// 	};
+	// }
+
 	async expandedSearch(solrQuery: string) {
 		const token = await this.tokenAuth.getToken();
-		this.logger.debug(`Orcid API URL: ${this.orcidUrl}`);
 		const response = await this.httpService.axiosRef.get(
 			`${this.orcidUrl}expanded-search`,
 			{

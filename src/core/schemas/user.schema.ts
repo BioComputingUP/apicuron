@@ -146,7 +146,7 @@ export class User {
 	getResourcePutCode(resource_id: string): {
 		putCode: string;
 		resource_id: string;
-	} {
+	} | null {
 		return this.orcid_work_put_codes.find(
 			(item) => item.resource_id == resource_id,
 		);
