@@ -22,6 +22,11 @@ export class PublicPartnerResourceDto extends SelectPartnerResourceDto {
 	@IsString()
 	@IsNotEmpty()
 	@Expose()
+	resource_id: string;
+
+	@IsString()
+	@IsNotEmpty()
+	@Expose()
 	resource_uri: string;
 
 	@IsUrl()
