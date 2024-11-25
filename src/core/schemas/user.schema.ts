@@ -73,6 +73,20 @@ export class User {
 	@Prop({ select: false })
 	jwt_token: string;
 
+	@Prop({
+		required: false,
+		default: "No affiliation",
+	})
+	affiliation?: string;
+
+	@Prop({
+		required: false,
+		type: Object
+	})
+	links:{
+		name: string,
+		url: URL
+	}
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop({
 		required: false,
@@ -80,7 +94,7 @@ export class User {
 		type: [String],
 	})
 	keywords?: string[];
-
+	
 	@Prop({
 		default: Date.now(),
 		type: Date,
