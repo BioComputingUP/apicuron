@@ -39,6 +39,7 @@ import { EventOrchestratorModule } from './event-orchestrator/event-orchestrator
 import { Reflector } from '@nestjs/core';
 import { ResourceStatsModule } from './resource-stats/resource-stats.module';
 import { MonthlyStatisticsModule } from './monthly-statistics/monthly-statistics.module';
+import { CuratorRegistryModule } from './curator-registry/curator-registry.module';
 
 const logger = new Logger('AppModule');
 
@@ -114,6 +115,7 @@ const logger = new Logger('AppModule');
 		AchievementsModule,
 		EventOrchestratorModule,
 		ResourceStatsModule,
+		CuratorRegistryModule,
 	],
 	controllers: [AppController],
 	providers: [

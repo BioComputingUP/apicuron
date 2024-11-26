@@ -10,11 +10,13 @@ import { UserDocument } from 'src/core/schemas/user.schema';
 import { PrivacyType } from 'src/core/enums';
 import { LeagueUpdatedEvent } from 'src/resources/partner-resources/leagues/events/league-updated.event';
 import { PartnerResourcesService } from 'src/resources/partner-resources/services/partner-resources.service';
-import { UsersService } from '../../services/users.service';
 import { Report } from 'src/core/schemas/reports.schema';
+import { UsersService } from 'src/auth/users/services/users.service';
+
+
 @Injectable()
 @AggregatorClass()
-export class UserResourceAggregatorService implements Aggregator{
+export class CuratorRegistryAggregatorService implements Aggregator{
 
 	constructor(
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
