@@ -14,6 +14,7 @@ import { JWTStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CoreApicuronModule } from '../core/core.module';
 import { UsersEventHandlers } from './users/services/users-event-handlers.service';
+import { OrcidClientModule } from 'src/orcid/orcid-client/orcid-client.module';
 
 @Module({
 	providers: [
@@ -25,6 +26,7 @@ import { UsersEventHandlers } from './users/services/users-event-handlers.servic
 		UsersEventHandlers,
 		OrcidExists,
 		OrcidGuard,
+		OrcidClientModule
 	],
 	imports: [
 		CoreApicuronModule,

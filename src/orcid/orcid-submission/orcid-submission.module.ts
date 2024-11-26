@@ -10,18 +10,6 @@ import { OrcidClientModuleOptions } from '../orcid-client/interfaces/orcid.inter
 @Module({
 	imports: [
 		CoreApicuronModule,
-		OrcidClientModule.registerAsync({
-			inject: [ConfigService],
-			useFactory: (config: ConfigService): OrcidClientModuleOptions => {
-				return {
-					apiUrl: config.get<string>('ORCID_API_URL'),
-					client_id: config.get<string>('ORCID_CLIENT_ID'),
-					client_secret: config.get<string>('ORCID_CLIENT_SECRET'),
-					scopes: ['/read-limited', '/activities/update'],
-					loadOnStartup: config.get<string>('environment') != 'local',
-				};
-			},
-		}),
 	],
 	controllers: [],
 	providers: [

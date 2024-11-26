@@ -39,6 +39,9 @@ import { EventOrchestratorModule } from './event-orchestrator/event-orchestrator
 import { Reflector } from '@nestjs/core';
 import { ResourceStatsModule } from './resource-stats/resource-stats.module';
 import { MonthlyStatisticsModule } from './monthly-statistics/monthly-statistics.module';
+import { OrcidSearchModule } from './orcid/orcid-search/orcid-search.module';
+import { OrcidClientModuleOptions } from './orcid/orcid-client/interfaces/orcid.interface';
+import { OrcidClientModule } from './orcid/orcid-client/orcid-client.module';
 
 const logger = new Logger('AppModule');
 
@@ -53,6 +56,18 @@ const logger = new Logger('AppModule');
 		}),
 
 		ScheduleModule.forRoot(),
+		OrcidClientModule.registerAsync({
+			inject: [ConfigService],
+			useFactory: (config: ConfigService): OrcidClientModuleOptions => {
+				return {
+					apiUrl: config.get<string>('ORCID_API_URL'),
+					client_id: config.get<string>('ORCID_CLIENT_ID'),
+					client_secret: config.get<string>('ORCID_CLIENT_SECRET'),
+					scopes: ['/read-limited', '/activities/update'],
+					loadOnStartup: config.get<string>('environment') != 'local',
+				};
+			},
+		}),
 		AuthModule,
 		MulterModule.register({
 			dest: '/tmp/apicuron/',
@@ -114,6 +129,7 @@ const logger = new Logger('AppModule');
 		AchievementsModule,
 		EventOrchestratorModule,
 		ResourceStatsModule,
+		OrcidSearchModule,
 	],
 	controllers: [AppController],
 	providers: [
