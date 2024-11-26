@@ -6,7 +6,11 @@ export class CuratorResourceEntry{
 	@Prop({required: true})
 	resource_id: string
 
-	@Prop()
+	@Prop({required: true})
+	resource_displayed_name: string
+
+
+	@Prop({default: ()=>["default"]})
 	visibleGroups : [string]
 
 	@Prop()

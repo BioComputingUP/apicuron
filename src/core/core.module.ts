@@ -52,6 +52,7 @@ import {
 } from './schemas/statistics/weekly-statistics.schema';
 import { SyncIndexesService } from './services/sync-indexes.service';
 import { MonthlyStatistics, MonthlyStatisticsSchemaFactory } from './schemas/statistics/monthly-statistics.schema';
+import { CuratorEntry, CuratorEntrySchemaFactory } from './schemas/curator-registry/curator-entry.schema';
 
 @Module({
 	imports: [
@@ -128,6 +129,10 @@ import { MonthlyStatistics, MonthlyStatisticsSchemaFactory } from './schemas/sta
 				name: MonthlyStatistics.name,
 				useFactory: MonthlyStatisticsSchemaFactory,
 			},
+			{
+				name: CuratorEntry.name,
+				useFactory: CuratorEntrySchemaFactory,
+			}
 		]),
 	],
 

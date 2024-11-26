@@ -14,7 +14,7 @@ export class CuratorEntry {
 	displayedName: string
 	
 	@Prop({required: true})
-	privacy: boolean
+	user_privacy: boolean
 
 	@Prop({type: [CuratorResourceEntrySchema]})
 	contributed_to: CuratorResourceEntry[]
@@ -25,4 +25,11 @@ export class CuratorEntry {
 	
 }
 
-export const CuratorEntrySchema = SchemaFactory.createForClass(CuratorEntry)
+export function CuratorEntrySchemaFactory() {
+	const CuratorEntrySchema =
+		SchemaFactory.createForClass(CuratorEntry).loadClass(
+			CuratorEntry,
+		);
+	return CuratorEntrySchema;
+
+}
