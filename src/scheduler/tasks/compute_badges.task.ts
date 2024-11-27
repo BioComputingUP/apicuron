@@ -5,12 +5,13 @@ import { Model } from 'mongoose';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 import { BadgeAggregatorService } from '../../badges/services/badge-aggregator.service';
+import { UsersService } from '../../auth/users/services/users.service';
 
 @Injectable()
 export class ComputeBadgesTask {
 	constructor(
 		protected partnerResourceService: PartnerResourcesService,
-		@InjectModel(User.name) protected userModel: Model<UserDocument>,
+		protected usersService: UsersService,
 		protected badgeAggregator: BadgeAggregatorService,
 	) {}
 
@@ -35,7 +36,7 @@ export class ComputeBadgesTask {
 				`Computing Badges for user ${orcid_id} for resource ${resource_id}`,
 			);
 
-			const user = await this.userModel.findOne({ orcid_id });
+			const user = await this.usersService.getByOrcid(orcid_id);
 			if (user) {
 				await this.badgeAggregator.applyAllReports(resource_id);
 			} else {

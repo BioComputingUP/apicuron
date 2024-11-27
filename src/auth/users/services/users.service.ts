@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, UpdateQuery } from 'mongoose';
 import { achievements_v1_pipeline } from '../aggregation-pipeline/achievements.pipeline';
 import { browse_v1_pipeline } from '../aggregation-pipeline/browse.pipeline';
 import { User, UserDocument } from '../../../core/schemas/user.schema';
@@ -10,33 +10,17 @@ import { PrivacyType } from '../../../core/enums';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserPrivacyUpdatedEvent } from '../events/update-privacy';
 import { ICreateOrUpdateUser } from '../dto/create-or-update-user.dto';
-import { UserEntity } from '../dto/user';
-import { plainToInstance } from 'class-transformer';
+import { ResourceDocument } from '../../../core/schemas/resource/resource.schema';
+import { UserUpdatedEvent } from '../events/user-updated';
+import { UserCreatedEvent } from '../events/user-created';
 @Injectable()
-export class UsersService implements OnApplicationBootstrap {
+export class UsersService {
 	private readonly logger = new Logger(UsersService.name);
 	constructor(
 		@InjectModel(User.name) private userModel: Model<UserDocument>,
 		protected configService: ConfigService,
 		protected eventEmitter: EventEmitter2,
 	) {}
-	async onApplicationBootstrap(): Promise<void> {
-		const result = await this.userModel.updateMany(
-			{
-				privacy: { $exists: false },
-			},
-			{
-				$set: {
-					privacy: PrivacyType.private,
-				},
-			},
-		);
-
-		this.logger.log(
-			`OnApplicationBootstrap: set ${result.modifiedCount} privacy User entries to private`,
-		);
-		return;
-	}
 
 	public async userExists(orcid_id: string): Promise<boolean> {
 		return !!(await this.userModel.exists({
@@ -84,7 +68,19 @@ export class UsersService implements OnApplicationBootstrap {
 		return sortedUsers;
 	}
 
-	async getPublicUser(orcid_id: string) {
+	/**
+	 * Retrieves a public user profile based on the provided ORCID ID.
+	 *
+	 * @param orcid_id - The ORCID ID of the user to retrieve.
+	 * @param userReq - Optional. The user making the request. If the requesting user is the profile holder, privacy checks are bypassed.
+	 * @returns A promise that resolves to the user profile if found and public, or the full profile if the requesting user is the profile holder.
+	 */
+	async getPublicUser(orcid_id: string, userReq?: User) {
+		// if the user requesting is the profile holder. We do not need to check privacy
+		if (userReq?.orcid_id === orcid_id) {
+			return await this.getByOrcid(orcid_id);
+		}
+		// otherwise (if the user is not the profile holder) we need to check privacy
 		const user_promise = this.userModel.findOne(
 			{
 				orcid_id,
@@ -94,6 +90,7 @@ export class UsersService implements OnApplicationBootstrap {
 				stats: 0,
 				orcid_permission: 0,
 				refresh_token: 0,
+				orcid_work_put_codes: 0,
 			},
 		);
 
@@ -106,13 +103,32 @@ export class UsersService implements OnApplicationBootstrap {
 		});
 	}
 
-	async update_user(orcid_id: string, updates: Partial<User>) {
-		return await this.userModel.updateOne(
+	async updateUser(
+		orcidOrUser: string | UserDocument,
+		updates: UpdateQuery<UserDocument>,
+	) {
+		const receivedOrcid = typeof orcidOrUser === 'string';
+
+		const orcid = receivedOrcid ? orcidOrUser : orcidOrUser.orcid_id;
+
+		const before = receivedOrcid
+			? await this.userModel.findOne({ orcid_id: orcid })
+			: orcidOrUser;
+		const user = await this.userModel.findOneAndUpdate(
 			{
-				orcid_id,
+				orcid_id: orcid,
 			},
 			updates,
+			{
+				new: true,
+			},
 		);
+		await this.eventEmitter.emitAsync(
+			UserUpdatedEvent.name,
+			new UserUpdatedEvent(before, user, updates),
+		);
+
+		return user;
 	}
 
 	async get_user_token(username: string): Promise<string> {
@@ -138,6 +154,11 @@ export class UsersService implements OnApplicationBootstrap {
 
 		await newUser.save();
 
+		await this.eventEmitter.emitAsync(
+			UserCreatedEvent.name,
+			new UserCreatedEvent(newUser),
+		);
+
 		return newUser;
 	}
 
@@ -145,19 +166,32 @@ export class UsersService implements OnApplicationBootstrap {
 		orcid_id,
 		...data
 	}: ICreateOrUpdateUser): Promise<UserDocument> {
-		const exists = await this.userExists(orcid_id);
+		const oldUser = await this.userModel.findOne({ orcid_id });
 
 		// upsert user
-		const newUser = exists
-			? await this.userModel.findOneAndUpdate({ orcid_id }, data, { new: true })
+		const newUser = !!oldUser
+			? await this.updateUser(orcid_id, { $set: data })
 			: await this.createUser({ orcid_id, ...data });
 
-		await this.eventEmitter.emitAsync(
-			UserPrivacyUpdatedEvent.name,
-			new UserPrivacyUpdatedEvent(newUser, newUser.privacy),
-		);
+		if (oldUser?.privacy !== newUser.privacy) {
+			await this.eventEmitter.emitAsync(
+				UserPrivacyUpdatedEvent.name,
+				new UserPrivacyUpdatedEvent(newUser, newUser.privacy),
+			);
+		}
 
 		return newUser;
+	}
+
+	async addManagedResource(orcid_id: string, resource: ResourceDocument) {
+		return await this.updateUser(orcid_id, {
+			$push: {
+				resources: {
+					resource_id: resource.resource_id,
+					name: resource.resource_name,
+				},
+			},
+		});
 	}
 
 	async get_users_with_stats(params) {

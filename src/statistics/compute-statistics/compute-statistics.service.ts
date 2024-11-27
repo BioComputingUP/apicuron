@@ -28,7 +28,6 @@ export class ComputeStatisticsService {
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		@InjectModel(Statistics.name)
 		protected statModel: Model<StatisticsDocument>,
-		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 		protected partnerResourceService: PartnerResourcesService,
 		private reportAggregator: StatisticsReportAggregator,
 	) {}

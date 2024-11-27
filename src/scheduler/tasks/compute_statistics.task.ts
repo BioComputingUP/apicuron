@@ -9,7 +9,6 @@ import { ComputeStatisticsService } from '../../statistics/compute-statistics/co
 @Injectable()
 export class ComputeStatisticsTask {
 	constructor(
-		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 		protected partnerResourceService: PartnerResourcesService,
 		protected computeStatistics: ComputeStatisticsService,
 	) {}

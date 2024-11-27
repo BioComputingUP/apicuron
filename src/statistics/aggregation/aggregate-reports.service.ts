@@ -39,7 +39,6 @@ export class StatisticsReportAggregator {
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
 		@Inject(CACHE_MANAGER) protected cacheManager: Cache,
-		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 		@InjectModel(PartnerResource.name)
 		protected resourceModel: Model<PartnerResourceDocument>,
 	) {}

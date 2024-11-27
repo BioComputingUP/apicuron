@@ -3,7 +3,7 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 
 export type SubmittedResourceDocument = HydratedDocument<SubmittedResource>; // this class defines a partnerSubmittedResource that has been validated and has the ability to have Models, Badges and so on
 
-@Schema({})
+@Schema()
 export class SubmittedResource {
 	// @Prop({ required: true, unique: true })
 	// id: string;
@@ -38,6 +38,8 @@ export class SubmittedResource {
 	creator: string;
 
 	state: string;
+
+	updated_at: Date;
 }
 
 export const SubmittedResourceSchema =

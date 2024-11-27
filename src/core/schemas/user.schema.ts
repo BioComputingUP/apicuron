@@ -168,10 +168,4 @@ const UserSchema = SchemaFactory.createForClass(User).loadClass(User);
 
 UserSchema.loadClass(User);
 
-UserSchema.virtual('reports', {
-	ref: Report.name,
-	localField: 'orcid_id',
-	foreignField: 'curator_orcid',
-});
-
 export { UserSchema };

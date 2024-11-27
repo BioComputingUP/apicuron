@@ -40,7 +40,6 @@ export class MedalAggregatorService implements Aggregator {
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		@InjectModel(Medal.name) protected medalModel: Model<MedalDocument>,
 		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
-		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 		protected resourceService: PartnerResourcesService,
 		protected computeMedals: ComputeMedalsService,
 		protected eventEmitter: EventEmitter2,

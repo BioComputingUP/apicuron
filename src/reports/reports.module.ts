@@ -6,16 +6,11 @@ import { ResourcesModule } from '../resources/resources.module';
 import { HttpModule } from '@nestjs/axios';
 import { TermsModule } from '../terms/terms.module';
 import { CoreApicuronModule } from '../core/core.module';
-import { ReportServiceOnStartup } from './hooks/app-startup.service';
 import { ReportEventsHandlerService } from './services/event-handler.service';
 
 @Module({
 	controllers: [ReportsController],
-	providers: [
-		ReportsService,
-		ReportServiceOnStartup,
-		ReportEventsHandlerService,
-	],
+	providers: [ReportsService, ReportEventsHandlerService],
 	imports: [
 		HttpModule,
 		CoreApicuronModule,

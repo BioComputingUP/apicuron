@@ -129,41 +129,7 @@ export class UserControllerV2 {
 		@Param('orcid_id') orcid_id: string,
 		@UserReq() userReq?: User,
 	) {
-		let user = null;
-
-		if (userReq) {
-			if (userReq.resources && userReq.resources.length > 0) {
-				user = this.userModel.findOne(
-					{
-						orcid_id,
-					},
-					{
-						stats: 0,
-						orcid_permission: 0,
-						refresh_token: 0,
-						orcid_work_put_codes: 0,
-					},
-				);
-			} else {
-				user = this.userModel.findOne(
-					{
-						orcid_id,
-						$or: [
-							{ orcid_id, privacy: 'public' },
-							{ $and: [{ orcid_id: userReq.orcid_id }, { orcid_id }] },
-						],
-					},
-					{
-						stats: 0,
-						orcid_permission: 0,
-						refresh_token: 0,
-						orcid_work_put_codes: 0,
-					},
-				);
-			}
-		} else {
-			user = await this.usersService.getPublicUser(orcid_id);
-		}
+		const user = await this.usersService.getPublicUser(orcid_id, userReq);
 
 		if (!user) {
 			throw new NotFoundException(
