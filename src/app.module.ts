@@ -56,7 +56,7 @@ const logger = new Logger('AppModule');
 		}),
 
 		ScheduleModule.forRoot(),
-		OrcidClientModule.registerAsync({
+		OrcidClientModule.forRootAsync({
 			inject: [ConfigService],
 			useFactory: (config: ConfigService): OrcidClientModuleOptions => {
 				return {

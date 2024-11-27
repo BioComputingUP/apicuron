@@ -5,12 +5,9 @@ import { DefaultWorkBuilder } from './work-builders/default.work-builder';
 import { OrcidWorkBuilderToken } from './constants';
 import { OrcidClientModule } from '../../orcid/orcid-client/orcid-client.module';
 import { CoreApicuronModule } from '../../core/core.module';
-import { OrcidClientModuleOptions } from '../orcid-client/interfaces/orcid.interface';
 
 @Module({
-	imports: [
-		CoreApicuronModule,
-	],
+	imports: [CoreApicuronModule, OrcidClientModule],
 	controllers: [],
 	providers: [
 		{

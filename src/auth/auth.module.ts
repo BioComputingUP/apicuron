@@ -26,7 +26,6 @@ import { OrcidClientModule } from 'src/orcid/orcid-client/orcid-client.module';
 		UsersEventHandlers,
 		OrcidExists,
 		OrcidGuard,
-		OrcidClientModule
 	],
 	imports: [
 		CoreApicuronModule,
@@ -39,6 +38,7 @@ import { OrcidClientModule } from 'src/orcid/orcid-client/orcid-client.module';
 				secret: configService.get('JWT_SECRET'),
 			}),
 		}),
+		OrcidClientModule,
 	],
 	exports: [UsersService, JwtModule, OrcidExists, AuthService],
 	controllers: [AuthController, UsersController, UserControllerV2],

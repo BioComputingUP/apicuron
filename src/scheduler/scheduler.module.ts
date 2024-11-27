@@ -18,6 +18,7 @@ import { SubmitReportModule } from '../submit-reports/submit-reports.module';
 import { BadgesModule } from '../badges/badges.module';
 import { MedalsModule } from '../medals/medals.module';
 import { UpdateAllUsersInfoTask } from './tasks/update_all_user_info.task';
+import { OrcidClientModule } from '../orcid/orcid-client/orcid-client.module';
 @Module({
 	imports: [
 		HttpModule,
@@ -29,6 +30,7 @@ import { UpdateAllUsersInfoTask } from './tasks/update_all_user_info.task';
 		BadgesModule,
 		StatisticsModule,
 		AuthModule,
+		OrcidClientModule,
 	],
 	providers: [
 		SchedulerService,

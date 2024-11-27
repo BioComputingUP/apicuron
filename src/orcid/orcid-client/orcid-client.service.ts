@@ -10,7 +10,6 @@ import {
 import { inspect } from 'util';
 import { OrcidTokenAuthService } from './token-auth.service';
 import { orcidWorkXmlSerializer } from './helpers/orcid-work-serializer';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OrcidClientService {
@@ -18,7 +17,6 @@ export class OrcidClientService {
 		protected httpService: HttpService,
 		@Inject(OrcidApiUrl) protected orcidUrl: string,
 		protected tokenAuth: OrcidTokenAuthService,
-		protected configService: ConfigService,
 	) {}
 
 	logger = new Logger(OrcidClientService.name);
@@ -208,40 +206,49 @@ export class OrcidClientService {
 		return response;
 	}
 
-	async get_user_info(orcid_id: string){
+	async get_user_info(orcid_id: string) {
 		// Gets user biography, keywords, affiliation, and social links from Orcid
-		const requestUrl = `${this.configService.get<string>('ORCID_API_URL')}${orcid_id}/record`
+		const requestUrl = `${this.orcidUrl}${orcid_id}/record`;
 		try {
 			const userRecord = await this.httpService.axiosRef.get(requestUrl, {
 				headers: {
-						Authorization: `Bearer ${(await this.tokenAuth.getToken()).access_token}`,
-						Accept: 'application/vnd.orcid+json',
-					},	
-				});
-				
-				// console.log(userRecord);
-				const userBio: string = userRecord?.data?.person?.biography?.content;
-				const userKeywords: string[] = userRecord?.data?.person?.keywords.keyword.map((keyword)=> keyword.content);				
-				const userAffiliation: string = userRecord?.data?.["activities-summary"]?.employments["affiliation-group"]?.[0].summaries?.[0]?.["employment-summary"].organization?.name;
-				const userLinks : { name: string, url: URL}= userRecord?.data?.person?.["researcher-urls"]?.["researcher-url"].
-				map((link)=>{
-					return {
-						name: link?.["url-name"],
-						url: new URL(link?.url?.value),
-					}
-				})
+					Authorization: `Bearer ${
+						(
+							await this.tokenAuth.getToken()
+						).access_token
+					}`,
+					Accept: 'application/vnd.orcid+json',
+				},
+			});
+
+			// console.log(userRecord);
+			const userBio: string = userRecord?.data?.person?.biography?.content;
+			const userKeywords: string[] =
+				userRecord?.data?.person?.keywords.keyword.map(
+					(keyword) => keyword.content,
+				);
+			const userAffiliation: string =
+				userRecord?.data?.['activities-summary']?.employments[
+					'affiliation-group'
+				]?.[0].summaries?.[0]?.['employment-summary'].organization?.name;
+			const userLinks: { name: string; url: URL } = userRecord?.data?.person?.[
+				'researcher-urls'
+			]?.['researcher-url'].map((link) => {
+				return {
+					name: link?.['url-name'],
+					url: new URL(link?.url?.value),
+				};
+			});
 			return {
 				orcid_id,
 				biography: userBio,
 				keywords: userKeywords,
 				affiliation: userAffiliation,
 				links: userLinks,
-			}
-			
+			};
 		} catch (error) {
 			this.logger.error(`Error Getting info from Orcid for: ${orcid_id} ! `);
 			this.logger.error(error);
 		}
-			
 	}
 }
