@@ -15,7 +15,7 @@ export class OrcidSyncService {
 		protected orcidClientService: OrcidClientService
 	) {}
 	logger = new Logger(OrcidSyncService.name);
-
+	private batch_size = 100;
 
 	async update_user_info(user: User){
 
@@ -36,7 +36,11 @@ export class OrcidSyncService {
 	
 	async update_all_user_info() {
 		// Get all user Ids from database
-		const all_users = await this.userModel.find().lean().select('orcid_id');
+		const all_users = await this.userModel
+		.find()
+		.lean()
+		.select('orcid_id')
+		.cursor({batchSize: this.batch_size});
 
 		const updates = [];
 		this.logger.log('Getting all users information...');
@@ -45,10 +49,11 @@ export class OrcidSyncService {
 		}
 		try {
 			this.logger.log('Updating all users information...');
-			await Promise.all(updates); 
+			await Promise.all(updates);
 			this.logger.log('Done.');
 			return;
 		} catch (err) {
+			this.logger.error("Error while updating all users");
 			this.logger.error(err);
 		}
 	}
