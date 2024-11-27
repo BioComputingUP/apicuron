@@ -3,13 +3,13 @@ import { Model } from "mongoose";
 import { User, UserDocument } from "src/core/schemas/user.schema";
 import { OrcidClientService } from "src/orcid/orcid-client/orcid-client.service";
 import { TaskArgument } from "src/scheduler-client/types/baseTask";
-import { Inject } from "typedi";
+import { InjectModel } from "@nestjs/mongoose";
 
 
 export class UpdateAllUsersInfoTask{
 	constructor(
 		protected orcidClientService : OrcidClientService,
-		@Inject(User.name) protected userModel: Model<UserDocument>,
+		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 	) {}
 	logger = new Logger(UpdateAllUsersInfoTask.name);
 
