@@ -24,12 +24,12 @@ async function bootstrap() {
 	
 	try{
 		let updates = []
-		console.log("Getting all user orcids...");
+		console.log("Getting all users information...");
 		for await (const user of all_users){
 			const extra_orcid_info = await orcidClientService.get_user_info(user.orcid_id);
 			updates.push(userModel.updateOne({orcid_id: user.orcid_id}, {$set: extra_orcid_info}));
 		}
-		console.log("Updating all users informations...");
+		console.log("Updating all users information...");
 		await Promise.all(updates)
 		console.log("Done.");
 	}catch(err){

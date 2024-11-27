@@ -17,6 +17,7 @@ import { StatisticsModule } from '../statistics/statistics.module';
 import { SubmitReportModule } from '../submit-reports/submit-reports.module';
 import { BadgesModule } from '../badges/badges.module';
 import { MedalsModule } from '../medals/medals.module';
+import { UpdateAllUsersInfoTask } from './tasks/update_all_user_info.task';
 @Module({
 	imports: [
 		HttpModule,
@@ -60,6 +61,10 @@ import { MedalsModule } from '../medals/medals.module';
 			provide: 'task:submit-orcid',
 			useClass: OrcidSubmissionTask,
 		},
+		{
+			provide: 'task:update-all-user-info',
+			useClass: UpdateAllUsersInfoTask,
+		},
 	],
 	exports: [
 		{
@@ -89,6 +94,10 @@ import { MedalsModule } from '../medals/medals.module';
 		{
 			provide: 'task:submit-orcid',
 			useClass: OrcidSubmissionTask,
+		},
+		{
+			provide: 'task:update-all-user-info',
+			useClass: UpdateAllUsersInfoTask,
 		},
 	],
 	controllers: [],
