@@ -39,7 +39,7 @@ import { EventOrchestratorModule } from './event-orchestrator/event-orchestrator
 import { Reflector } from '@nestjs/core';
 import { ResourceStatsModule } from './resource-stats/resource-stats.module';
 import { MonthlyStatisticsModule } from './monthly-statistics/monthly-statistics.module';
-import { OrcidSearchModule } from './orcid/orcid-search/orcid-search.module';
+import { OrcidSyncModule } from './orcid/orcid-sync/orcid-sync.module';
 import { OrcidClientModuleOptions } from './orcid/orcid-client/interfaces/orcid.interface';
 import { OrcidClientModule } from './orcid/orcid-client/orcid-client.module';
 
@@ -129,7 +129,7 @@ const logger = new Logger('AppModule');
 		AchievementsModule,
 		EventOrchestratorModule,
 		ResourceStatsModule,
-		OrcidSearchModule,
+		OrcidSyncModule,
 	],
 	controllers: [AppController],
 	providers: [
