@@ -230,7 +230,7 @@ export class OrcidClientService {
 			const userAffiliation: string =
 				userRecord?.data?.['activities-summary']?.employments[
 					'affiliation-group'
-				]?.[0].summaries?.[0]?.['employment-summary'].organization?.name;
+				]?.[0]?.summaries?.[0]?.['employment-summary'].organization?.name;
 			const userLinks: { name: string; url: URL } = userRecord?.data?.person?.[
 				'researcher-urls'
 			]?.['researcher-url'].map((link) => {
