@@ -19,7 +19,7 @@
 
       <div class="tw-hidden sm:tw-block">
         <div class="tw-border-b tw-border-gray-200">
-          <nav class="tw--mb-px tw-flex">
+          <nav class="tw--mb-px tw-flex tw-gap-1">
             <button
               *ngFor="let option of options"
               (click)="selectLeaderboard(option)"
@@ -27,7 +27,8 @@
 				'tw-bg-apicuron-bright-purple tw-text-white': option.leaderboard === (selectedOption$ | async).leaderboard,
 				'tw-bg-white tw-text-gray-700 hover:tw-text-gray-800 ': option.leaderboard != (selectedOption$ | async).leaderboard,
 				}"
-              class="shrink-0 tw-border tw-border-transparent tw-rounded-t-lg tw-p-1 tw-text-sm tw-font-bold"
+              class="shrink-0 tw-border tw-border-transparent tw-rounded-t-lg tw-p-1 tw-text-sm tw-font-bold
+              tw-transition-all tw-duration-200 tw-ease-in"
             >
               {{ option.label }}
             </button>

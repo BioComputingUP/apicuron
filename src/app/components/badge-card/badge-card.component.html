@@ -1,6 +1,7 @@
 <ng-container *ngIf="badge$ | async as badge">
   <div
-    class="tw-flex tw-flex-col tw-bg-white tw-rounded-md tw-px-1 sm:tw-p-2 tw-text-gray-800 tw-h-full"
+    class="tw-flex tw-flex-col tw-bg-white tw-rounded-md tw-px-1 sm:tw-p-2 tw-text-gray-800 tw-h-full hover:tw-shadow-slate-600
+    tw-transition-all tw-duration-200 tw-ease-in"
     [ngClass]="{ 'tw-shadow-md tw-shadow-gray-400': enableShadow }"
   >
     <div class="tw-flex tw-flex-row tw-justify-between">

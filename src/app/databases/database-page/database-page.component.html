@@ -20,9 +20,9 @@
         {{ resource.resource_description }}
       </p>
       <div *ngIf="resource.stats">
-        <span class="tw-font-bold" >Database statistics</span>
+        <span class="tw-text-xl tw-font-bold" >Database statistics</span>
 
-        <div class="tw-flex tw-py-2 tw-mb-2 tw-gap-1 tw-flex-row  tw-flex-wrap" >
+        <div class="tw-flex tw-py-2 tw-mb-2 tw-gap-3 tw-flex-row  tw-flex-wrap" >
           
           <div class="tw-flex-grow ">
             <number-card
@@ -35,7 +35,7 @@
           
           <div class="tw-flex-grow ">
             <number-card 
-            label="Contributions commited"
+            label="Contributions committed"
             [value]="resource?.stats?.contributionCount"
             iconSrc="assets/svg/contribution.svg"></number-card>
  
@@ -72,10 +72,10 @@
                 {{ termAccordion.expanded ? "show less" : "show more" }}
               </button>
             </div>
-            <div class="tw-flex tw-flex-row tw-flex-wrap">
+            <div class="tw-flex tw-gap-2 tw-flex-row tw-flex-no-wrap">
               <div
                 *ngFor="let term of terms.slice(0, 4)"
-                class="tw-w-1/4 tw-p-1"
+                class="tw-w-1/4 "
               >
                 <term-card [term]="term"></term-card>
               </div>
@@ -104,10 +104,10 @@
         <cdk-accordion>
           <cdk-accordion-item #badgeAccordion="cdkAccordionItem">
             <div
-              class="tw-flex tw-flex-row tw-justify-between tw-pr-2"
+              class="tw-flex tw-w-full tw-flex-row tw-justify-between tw-pr-2"
               *ngIf="badges.data.length > 0"
             >
-              <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold">
+              <h4 class="tw-text-xl tw-font-dm-sans tw-font-semibold tw-mb-2">
                 Badges
               </h4>
 
@@ -120,8 +120,8 @@
               </button>
             </div>
 
-            <div class="tw-flex tw-flex-row tw-flex-wrap">
-              <div *ngFor="let badge of badges.data" class="tw-p-2 tw-w-1/4">
+            <div class="tw-flex tw-flex-row tw-gap-3 tw-flex-wrap">
+              <div *ngFor="let badge of badges.data" class="tw-basis-[23%] tw-flex-grow tw-max-w-[25%]">
                 <badge-def-card
                   [badge]="badge"
                   [terms]="terms"
@@ -173,7 +173,7 @@
 
             <!-- content -->
             <div class="tw-flex tstatsw-flex-row tw-flex-wrap">
-              <div *ngFor="let medal of medals.data" class="tw-p-2 tw-w-1/4">
+              <div *ngFor="let medal of medals.data" class="tw-p-2 tw-basis-1/4">
                 <medal-def-card
                   class="tw-h-full"
                   [medal]="medal"
