@@ -18,6 +18,10 @@ export class User implements Deserializable {
     this.given_name = input.given_name ?? null;
     this.avatar = input.avatar ?? null;
     this.privacy = input.privacy ?? "public";
+    this.biography = input.biography ?? "Empty";
+    this.affiliation = input.affiliation ?? "Nothing";
+    this.keywords = input.keywords ?? null;
+    this.links = input.links ?? null;
     return this;
   }
 
@@ -32,6 +36,12 @@ export class User implements Deserializable {
   given_name?: string;
   avatar?: string;
   privacy: "private" | "public";
+
+  biography?: string;
+  affiliation?: string
+  keywords?: [string];
+  links?: Array<{name: string; url: URL }>
+
 
   generate_avatar(scale = 80, radius = 50): URL {
     if (this.avatar) {

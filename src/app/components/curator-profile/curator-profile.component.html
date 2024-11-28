@@ -1,4 +1,4 @@
-<div class="tw-py-2 sm:tw-py-4 tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap" [ngClass]="{'tw-justify-center': !(userInfo$ | async)}">
+<div class="tw-py-2 sm:tw-py-4 tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap" [ngClass]="{'tw-justify-center': !(curatorObs$ | async)}">
     <div class="sm:tw-flex-none tw-flex-1 tw-flex tw-flex-col tw-px-4 tw-w-full sm:tw-w-auto" *ngIf="curatorObs$ | async as curator">
         <!-- <input #fileInput type="file" class="tw-hidden" (change)="onFileSelected($event)" id=""> -->
         <img [src]="curator.generate_avatar()"
@@ -6,6 +6,7 @@
         <h2 class="tw-text-center tw-font-bold tw-font-dm-sans tw-text-2xl tw-whitespace-nowrap">{{
             curator.displayedName }}
         </h2>
+       
         <div class="tw-flex tw-flex-row tw-justify-center">
             <a [href]="curator.orcid_url()">
                 <img class="tw-w-6 tw-mx-auto" src="https://orcid.org/assets/vectors/orcid.logo.icon.svg" alt="" srcset="">
@@ -49,53 +50,56 @@
             </tr>
         </tbody>
     </table> -->
-    <ng-container *ngIf="userInfo$ | async">
+    
+    
+    <ng-container *ngIf="curatorObs$ | async as curator">
         <div class="tw-grid tw-grid-cols-1 tw-gap-4 sm:tw-mb-4 sm:tw-px-2">
-            <div *ngIf="biography$ | async as biography"
+            <div *ngIf="curator.biography"
                 class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
                 <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Biography</div>
                 <div class="tw-ml-2">
                     <p class="tw-leading-relaxed tw-tracking-wider tw-text-justify tw-text-sm sm:tw-text-base">
-                        {{ biography }}
+                        {{ curator.biography }}
                     </p>
                 </div>
             </div>
-            <div *ngIf="employment$ | async as employment"
+            <div *ngIf="curator.affiliation"
                 class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
                 <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Place of Work</div>
                 <div class="tw-ml-2">
                     <p class="tw-leading-relaxed tw-tracking-wider tw-text-justify tw-text-sm sm:tw-text-base">
-                        {{ employment }}
+                        {{ curator.affiliation }}
                     </p>
                 </div>
             </div>
-            <div *ngIf="keywords$ | async as keywords"
+            <div *ngIf="curator.keywords"
                 class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
                 <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Keywords</div>
                 <div class="tw-ml-2 tw-flex tw-flex-row tw-flex-wrap tw-gap-3 tw-items-center">
-                    <span *ngFor="let keyword of keywords"
+                    <span *ngFor="let keyword of curator.keywords"
                         class="tw-px-2 tw-py-1 tw-whitespace-nowrap tw-cursor-default tw-text-sm tw-bg-apicuron-purple tw-text-white tw-font-bold tw-font-dm-sans tw-rounded-full">
                         {{ keyword }}
                     </span>
                 </div>
             </div>
-            <div *ngIf="profileLinks$ | async as orcid_links"
+
+            <div *ngIf="curator.links"
                 class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
                 <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Social Links</div>
                 <div class="tw-ml-2 tw-flex tw-justify-center tw-flex-wrap">
-                    <a *ngFor="let url of orcid_links" class="tw-text-blue-500 tw-cursor-pointer tw-underline tw-mr-3" [href]="url.value.href">
-                        <ng-container *ngIf="!url.error">
-                            <img [src]="'assets/social-links/' + url.host + '.svg'"
-                                [popper]="url.name" [popperTrigger]="'hover'"
+                    <a *ngFor="let link of curator.links" class="tw-text-blue-500 tw-cursor-pointer tw-underline tw-mr-3" [href]="link.url.href">
+                        <!-- <ng-container *ngIf="!link.error"> -->
+                            <img [src]="'assets/social-links/' + link.name + '.svg'"
+                                [popper]="link.name" [popperTrigger]="'hover'"
                                 [popperDisableStyle]="false" 
                                 [popperPlacement]="'top'" 
                                 [popperApplyClass]="'tw-bg-white'"
-                                (error)="url.error = true"
+                               
                                 onerror="this.style.display='none'" >
-                        </ng-container>
-                        <ng-container *ngIf="url.error">
-                            <span>{{ url.name }}</span>
-                        </ng-container>
+                        <!-- </ng-container>  (error)="url.error = true" -->  
+                        <!-- <ng-container *ngIf="link.error"> -->
+                            
+                        <!-- </ng-container> -->
                     </a>
                 </div>
             </div>
