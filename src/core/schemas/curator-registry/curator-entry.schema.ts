@@ -3,7 +3,7 @@ import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 import { User, UserSchema } from "../user.schema";
 import { PartnerResource, PartnerResourceSchema } from "../resource/partner-resource.schema";
 import { League, LeagueSchema } from "../league/league.schema";
-export type CuratorEntryDocument = HydratedDocument<CuratorEntry>
+export type CuratorRegistryEntryDocument = HydratedDocument<CuratorRegistryEntry>
 @Schema()
 export class CuratorGroupEntry{
 
@@ -16,7 +16,7 @@ export class CuratorGroupEntry{
 @Schema({
 	collection: 'curator-registry',
 })
-export class CuratorEntry {
+export class CuratorRegistryEntry {
 	@Prop({
 		required: true,
 		type: UserSchema
@@ -31,11 +31,4 @@ export class CuratorEntry {
 	groups: CuratorGroupEntry;
 }
 
-export function CuratorEntrySchemaFactory() {
-	const CuratorEntrySchema =
-		SchemaFactory.createForClass(CuratorEntry).loadClass(
-			CuratorEntry,
-		);
-	return CuratorEntrySchema;
-
-}
+export const CuratorRegistryEntrySchema = SchemaFactory.createForClass(CuratorRegistryEntry).loadClass(CuratorRegistryEntry);

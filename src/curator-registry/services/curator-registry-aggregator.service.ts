@@ -4,14 +4,15 @@ import { Aggregator } from 'src/event-orchestrator/interfaces/aggregator.interfa
 import { ReportDocument, LeanReportDocument } from 'src/core/schemas/reports.schema';
 import { FilterQuery, Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { PartnerResourceDocument } from 'src/core/schemas/resource/partner-resource.schema';
 import { TermDocument } from 'src/core/schemas/terms.schema';
 import { UserDocument } from 'src/core/schemas/user.schema';
 import { PrivacyType } from 'src/core/enums';
 import { LeagueUpdatedEvent } from 'src/resources/partner-resources/leagues/events/league-updated.event';
 import { Report } from 'src/core/schemas/reports.schema';
-import { UsersService } from 'src/auth/users/services/users.service';
-import { CuratorEntry, CuratorEntryDocument } from 'src/core/schemas/curator-registry/curator-entry.schema';
+
+import { EntityCreatedEvent, EntityUpdatedEvent } from 'src/core/events';
+import { UserRepository } from 'src/core/repositories/user.repository';
+import { CuratorRegistryEntry, CuratorRegistryEntryDocument } from 'src/core/schemas/curator-registry/curator-entry.schema';
 
 
 @Injectable()
@@ -20,10 +21,10 @@ export class CuratorRegistryAggregatorService implements Aggregator{
 
 	constructor(
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-		@InjectModel(CuratorEntry.name) protected curatorEntryModel: Model<CuratorEntryDocument>,
+		@InjectModel(CuratorRegistryEntry.name) protected curatorEntryModel: Model<CuratorRegistryEntryDocument>,
 
 		// protected resourceService: PartnerResourcesService,
-		protected usersService: UsersService,
+		protected userRep: UserRepository,
 	){
 		// maybe update all users here?
 	}
@@ -33,7 +34,7 @@ export class CuratorRegistryAggregatorService implements Aggregator{
 		// Also attach the league if not associated
 
 		//filter for already registered users and associated databases
-		const curatorFilter: FilterQuery<CuratorEntryDocument> = {
+		const curatorFilter: FilterQuery<CuratorRegistryEntryDocument> = {
 			curator_orcid : report.curator_orcid,
 			// contributed_to : {$eleMatch: {resource_id: report.resource_id}}
 		}
@@ -44,6 +45,9 @@ export class CuratorRegistryAggregatorService implements Aggregator{
 			
 		}
 
+	}
+	updatedUser(event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>) {
+		return; 
 	}
 	applyAllReports(resource_id: string) {
 		//idk yet 

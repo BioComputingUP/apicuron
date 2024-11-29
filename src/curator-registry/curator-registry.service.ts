@@ -1,15 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
-import { CuratorEntry, CuratorEntryDocument } from 'src/core/schemas/curator-registry/curator-entry.schema';
+import { CuratorRegistryEntry, CuratorRegistryEntryDocument } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { PartnerResourcesService } from 'src/resources/partner-resources/services/partner-resources.service';
 import { RegistryEntriesDto } from './dto/registry-entries.dto';
 import { User, UserDocument } from 'src/core/schemas/user.schema';
+import { UserRepository } from 'src/core/repositories/user.repository';
 @Injectable()
 export class CuratorRegistryService {
 	constructor(
-		@InjectModel(CuratorEntry.name) protected curatorEntryModel: Model<CuratorEntryDocument>,
-		@InjectModel(User.name) protected userModel: Model<UserDocument>,
+		@InjectModel(CuratorRegistryEntry.name) protected curatorEntryModel: Model<CuratorRegistryEntryDocument>,
+		protected userRep: UserRepository,
 		protected resourceService: PartnerResourcesService, 
 	){}
 	logger = new Logger(CuratorRegistryService.name)
@@ -30,7 +31,7 @@ export class CuratorRegistryService {
 		} = query;
 
 		//build query filter
-		const query_filter: FilterQuery<CuratorEntryDocument> = {};
+		const query_filter: FilterQuery<CuratorRegistryEntryDocument> = {};
 
 		// Search for what the user typed if it's not empty
 		if (!!user_query) query_filter[filtered_field] = { $regex: user_query, $options: "i" };
@@ -74,7 +75,7 @@ export class CuratorRegistryService {
 		// look up the user
 		
 		try {
-			const user = await this.userModel.findOne({
+			const user = await this.userRep.findOne({
 				orcid_id
 			})
 			
