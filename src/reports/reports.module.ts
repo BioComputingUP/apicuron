@@ -7,10 +7,15 @@ import { HttpModule } from '@nestjs/axios';
 import { TermsModule } from '../terms/terms.module';
 import { CoreApicuronModule } from '../core/core.module';
 import { ReportEventsHandlerService } from './services/event-handler.service';
+import { ReportAggregatorService } from './services/report-aggregator.service';
 
 @Module({
 	controllers: [ReportsController],
-	providers: [ReportsService, ReportEventsHandlerService],
+	providers: [
+		ReportsService,
+		ReportEventsHandlerService,
+		ReportAggregatorService,
+	],
 	imports: [
 		HttpModule,
 		CoreApicuronModule,

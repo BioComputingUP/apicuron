@@ -1,6 +1,5 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, UpdateQuery } from 'mongoose';
+import { Injectable } from '@nestjs/common';
+import { FilterQuery, UpdateQuery } from 'mongoose';
 import { achievements_v1_pipeline } from '../aggregation-pipeline/achievements.pipeline';
 import { browse_v1_pipeline } from '../aggregation-pipeline/browse.pipeline';
 import { User, UserDocument } from '../../../core/schemas/user.schema';
@@ -11,25 +10,24 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserPrivacyUpdatedEvent } from '../events/update-privacy';
 import { ICreateOrUpdateUser } from '../dto/create-or-update-user.dto';
 import { ResourceDocument } from '../../../core/schemas/resource/resource.schema';
-import { UserUpdatedEvent } from '../events/user-updated';
 import { UserCreatedEvent } from '../events/user-created';
+import { UserRepository } from '../../../core/repositories/user.repository';
 @Injectable()
 export class UsersService {
-	private readonly logger = new Logger(UsersService.name);
 	constructor(
-		@InjectModel(User.name) private userModel: Model<UserDocument>,
+		private userRepository: UserRepository,
 		protected configService: ConfigService,
 		protected eventEmitter: EventEmitter2,
 	) {}
 
 	public async userExists(orcid_id: string): Promise<boolean> {
-		return !!(await this.userModel.exists({
+		return !!(await this.userRepository.findOne({
 			orcid_id,
 		}));
 	}
 
 	async getPrivateUser(query: Partial<User>): Promise<UserDocument> {
-		const user_promise = this.userModel.findOne(query, {
+		const user_promise = this.userRepository.findOne(query, {
 			stats: 0,
 		});
 
@@ -37,7 +35,7 @@ export class UsersService {
 	}
 
 	async getByOrcid(orcid_id: string): Promise<UserDocument> {
-		const user_promise = await this.userModel.findOne(
+		const user_promise = await this.userRepository.findOne(
 			{
 				orcid_id,
 			},
@@ -58,7 +56,9 @@ export class UsersService {
 	 * @returns list of users from the database
 	 */
 	async getUsersByOrcid(orcid_ids: string[]): Promise<UserDocument[]> {
-		const users = await this.userModel.find({ orcid_id: { $in: orcid_ids } });
+		const users = await this.userRepository.find({
+			orcid_id: { $in: orcid_ids },
+		});
 
 		const sortedUsers = orcid_ids.map(
 			(orcid_id): UserDocument =>
@@ -81,7 +81,7 @@ export class UsersService {
 			return await this.getByOrcid(orcid_id);
 		}
 		// otherwise (if the user is not the profile holder) we need to check privacy
-		const user_promise = this.userModel.findOne(
+		const user_promise = this.userRepository.findOne(
 			{
 				orcid_id,
 				privacy: PrivacyType.public,
@@ -98,7 +98,7 @@ export class UsersService {
 	}
 
 	async get_by_cookie_token(cookie_token: string): Promise<User> {
-		return await this.userModel.findOne({
+		return await this.userRepository.findOne({
 			cookie_token,
 		});
 	}
@@ -111,28 +111,14 @@ export class UsersService {
 
 		const orcid = receivedOrcid ? orcidOrUser : orcidOrUser.orcid_id;
 
-		const before = receivedOrcid
-			? await this.userModel.findOne({ orcid_id: orcid })
-			: orcidOrUser;
-		const user = await this.userModel.findOneAndUpdate(
-			{
-				orcid_id: orcid,
-			},
-			updates,
-			{
-				new: true,
-			},
-		);
-		await this.eventEmitter.emitAsync(
-			UserUpdatedEvent.name,
-			new UserUpdatedEvent(before, user, updates),
-		);
+		const filter = { orcid_id: orcid };
+		const user = await this.userRepository.updateOne(filter, updates);
 
 		return user;
 	}
 
 	async get_user_token(username: string): Promise<string> {
-		return await this.userModel.findOne(
+		const result = await this.userRepository.findOne(
 			{
 				username,
 			},
@@ -140,10 +126,11 @@ export class UsersService {
 				jwt_token: true,
 			},
 		);
+		return result.jwt_token;
 	}
 
 	async createUser(user: ICreateOrUpdateUser): Promise<UserDocument> {
-		const newUser = new this.userModel(user);
+		const newUser = this.userRepository.newDocument(user);
 
 		const avatarLink = await generateAvatar(
 			newUser.displayedName,
@@ -166,7 +153,7 @@ export class UsersService {
 		orcid_id,
 		...data
 	}: ICreateOrUpdateUser): Promise<UserDocument> {
-		const oldUser = await this.userModel.findOne({ orcid_id });
+		const oldUser = await this.userRepository.findOne({ orcid_id });
 
 		// upsert user
 		const newUser = !!oldUser
@@ -197,21 +184,21 @@ export class UsersService {
 	async get_users_with_stats(params) {
 		const aggregation_pipeline = browse_v1_pipeline(params);
 
-		return await this.userModel.aggregate(aggregation_pipeline);
+		return await this.userRepository.aggregate(aggregation_pipeline);
 	}
 
 	async get_achievements(params) {
 		const pipeline = achievements_v1_pipeline(params);
 
-		return await this.userModel.aggregate(pipeline);
+		return await this.userRepository.aggregate(pipeline);
 	}
 
 	async count() {
-		return await this.userModel.count();
+		return await this.userRepository.count();
 	}
 
 	async getUserPrivacy(orcid_id: string): Promise<PrivacyType> {
-		const { privacy } = await this.userModel.findOne(
+		const { privacy } = await this.userRepository.findOne(
 			{ orcid_id },
 			{ privacy: 1 },
 		);
@@ -220,6 +207,6 @@ export class UsersService {
 	}
 
 	async getUsers(filter: FilterQuery<UserDocument>): Promise<UserDocument[]> {
-		return await this.userModel.find(filter);
+		return await this.userRepository.find(filter);
 	}
 }

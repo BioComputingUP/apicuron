@@ -31,6 +31,8 @@ import { BadgeEarnedEvent } from '../events/badge-earned.event';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { TermDocument } from '../../core/schemas/terms.schema';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
+import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { UserDocument } from '../../core/schemas/user.schema';
 @Injectable()
 @AggregatorClass()
 export class BadgeAggregatorService implements Aggregator {
@@ -98,7 +100,18 @@ export class BadgeAggregatorService implements Aggregator {
 
 		return medalDefDeleted.deletedCount + medalDeleted.deletedCount;
 	}
-	async updateUserPrivacy(curator_orcid: string, privacy: PrivacyType) {
+	async updatedUser(
+		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
+	) {
+		let curator_orcid, privacy;
+		if (event instanceof EntityCreatedEvent) {
+			curator_orcid = event.instance.orcid_id;
+			privacy = event.instance.privacy;
+		}
+		if (event instanceof EntityUpdatedEvent) {
+			curator_orcid = event.after.orcid_id;
+			privacy = event.after.privacy;
+		}
 		await this.badgeModel.updateMany(
 			{
 				curator_orcid,

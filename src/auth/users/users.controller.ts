@@ -37,6 +37,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Public } from '../decorators/public.decorator';
 import { UserPrivacyUpdatedEvent } from './events/update-privacy';
 import { UserReq } from '../decorators/applyUser.decorator';
+import { UserRepository } from '../../core/repositories/user.repository';
 
 @ApiTags('First Version')
 @Controller('')
@@ -118,7 +119,7 @@ export class UsersController {
 export class UserControllerV2 {
 	constructor(
 		private usersService: UsersService,
-		@InjectModel(User.name) protected userModel: Model<UserDocument>,
+		protected userModel: UserRepository,
 		private eventEmitter: EventEmitter2,
 	) {}
 

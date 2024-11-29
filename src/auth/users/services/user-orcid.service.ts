@@ -4,12 +4,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../../../core/schemas/user.schema';
 import { HttpService } from '@nestjs/axios';
+import { UserRepository } from '../../../core/repositories/user.repository';
 @Injectable()
 export class UserOrcidService {
 	constructor(
 		protected configService: ConfigService,
 		protected httpService: HttpService,
-		@InjectModel(User.name) private userModel: Model<UserDocument>,
+		private userModel: UserRepository,
 	) {}
 	async check_orcid_update(orcid_id: string) {
 		const user = await this.userModel.findOne({

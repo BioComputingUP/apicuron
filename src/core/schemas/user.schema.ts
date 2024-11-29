@@ -17,6 +17,7 @@ export type UserDocument = HydratedDocument<User>;
 	toJSON: {
 		virtuals: true,
 	},
+	optimisticConcurrency: true,
 })
 export class User {
 	@Prop({
@@ -93,7 +94,7 @@ export class User {
 	@Prop()
 	username: string;
 
-	@Prop({ required: true, unique: true })
+	@Prop({ required: true })
 	orcid_id: string;
 
 	@Prop({
@@ -164,8 +165,16 @@ export class User {
 	}
 }
 
-const UserSchema = SchemaFactory.createForClass(User).loadClass(User);
+export const UserSchema = SchemaFactory.createForClass(User).loadClass(User);
 
-UserSchema.loadClass(User);
+export function userCollectionSchemaFactory() {
+	const UserCollectionSchema =
+		SchemaFactory.createForClass(User).loadClass(User);
 
-export { UserSchema };
+	UserCollectionSchema.index(
+		{ orcid_id: 1 },
+		{ unique: true, name: 'unique_users' },
+	);
+
+	return UserCollectionSchema;
+}

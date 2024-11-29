@@ -23,6 +23,7 @@ import {
 	updateMaxDate,
 	updateMinDate,
 } from '../../util/date.helper';
+import { UserRepository } from '../../core/repositories/user.repository';
 
 export class ComputeDetailedStatisticsService {
 	constructor(
@@ -32,6 +33,7 @@ export class ComputeDetailedStatisticsService {
 		protected reportModel: Model<ReportDocument>,
 		@InjectModel(Term.name)
 		protected termModel: Model<TermDocument>,
+		protected userRepository: UserRepository,
 		protected aggregationPipeline: DetailedStatisticsPipeline,
 	) {}
 
@@ -177,7 +179,7 @@ export class ComputeDetailedStatisticsService {
 			// Check if the currentStat that is being computed is different from the current entry
 			// If it is different, save the currentStat and set the current Stat to null
 			if (
-				currentStat &&
+				!!currentStat &&
 				(currentStat.resource_id !== entry.resource_id ||
 					currentStat.curator_orcid !== entry.curator_orcid ||
 					currentStat.league !== entry.league)
@@ -189,7 +191,11 @@ export class ComputeDetailedStatisticsService {
 
 			// if there is no currentStat, instantiate a new one
 			if (!currentStat) {
+				const user = await this.userRepository.findOne({
+					orcid_id: entry.curator_orcid,
+				});
 				currentStat = new this.detailedStatsModel({
+					user,
 					resource_id: entry.resource_id,
 					curator_orcid: entry.curator_orcid,
 					privacy: entry.privacy,

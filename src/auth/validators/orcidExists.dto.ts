@@ -6,18 +6,17 @@ import {
 } from 'class-validator';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../../core/schemas/user.schema';
+import { UserRepository } from '../../core/repositories/user.repository';
 
 @ValidatorConstraint({ name: 'OrcidExists', async: true })
 export class OrcidExists implements ValidatorConstraintInterface {
-	constructor(
-		@InjectModel(User.name) protected userModel: Model<UserDocument>,
-	) {}
+	constructor(protected userModel: UserRepository) {}
 
 	async validate(
 		orcid_id: any,
 		validationArguments?: ValidationArguments,
 	): Promise<boolean> {
-		return !!(await this.userModel.exists({ orcid_id }));
+		return !!(await this.userModel.findOne({ orcid_id }));
 	}
 
 	defaultMessage(args?: ValidationArguments): string {

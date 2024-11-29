@@ -17,6 +17,7 @@ import { OrcidWork } from '../../orcid/orcid-client/interfaces/orcid.interface';
 import { responseHasCode } from '../../orcid/orcid-client/helpers/response-with-code';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrivacyType } from '../../core/enums';
+import { UserRepository } from '../../core/repositories/user.repository';
 
 @Injectable()
 export class SubmitOrcidWork {
@@ -24,7 +25,7 @@ export class SubmitOrcidWork {
 		protected orcidClientService: OrcidClientService,
 		@InjectModel(Statistics.name)
 		protected statModel: Model<StatisticsDocument>,
-		@InjectModel(User.name) protected userModel: Model<User>,
+		protected userRepository: UserRepository,
 		@InjectModel(PartnerResource.name)
 		protected resourceModel: Model<PartnerResourceDocument>,
 		@Inject(OrcidWorkBuilderToken) protected orcidWorkBuilder: OrcidWorkBuilder,
@@ -35,7 +36,7 @@ export class SubmitOrcidWork {
 
 	@Cron(CronExpression.EVERY_DAY_AT_2AM)
 	async submitAllWorks(filter: FilterQuery<UserDocument> = {}): Promise<any> {
-		const users = this.userModel
+		const users = this.userRepository
 			.find({
 				$and: [
 					{

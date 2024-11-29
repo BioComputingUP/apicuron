@@ -6,6 +6,7 @@ import {
 	ActivitiesStatisticsSchema,
 } from '../components/statistics-terms.schema';
 import { HydratedDocument, LeanDocument } from 'mongoose';
+import { User, UserDocument, UserSchema } from '../user.schema';
 
 export type DetailedStatisticsDocument = HydratedDocument<DetailedStatistics>;
 export type LeanDetailedStatisticsDocument =
@@ -18,6 +19,9 @@ export type LeanDetailedStatisticsDocument =
 export class DetailedStatistics implements IUserResourceEntity {
 	@Prop({ required: true, type: String })
 	curator_orcid: string;
+
+	@Prop({ required: false, type: UserSchema })
+	user?: User;
 
 	@Prop({ required: true, type: String })
 	resource_id: string;

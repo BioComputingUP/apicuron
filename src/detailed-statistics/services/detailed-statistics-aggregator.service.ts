@@ -19,6 +19,7 @@ import { TermDocument } from '../../core/schemas/terms.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
+import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 
 @Injectable()
 @AggregatorClass()
@@ -49,7 +50,7 @@ export class DetailedStatisticsAggregatorService implements Aggregator {
 
 		return statUpdate.modifiedCount;
 	}
-	
+
 	async termDeleted(term: TermDocument) {
 		return await this.computeDetailedStats.reComputeStatsRelatedToTerm(term);
 	}
@@ -96,14 +97,27 @@ export class DetailedStatisticsAggregatorService implements Aggregator {
 	async removeAllResourceAggregates(resource_id: string) {
 		await this.detailedStatsModel.deleteMany({ resource_id });
 	}
-	async updateUserPrivacy(curator_orcid: string, privacy: PrivacyType) {
+	async updatedUser(
+		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
+	) {
+		let curator_orcid, privacy, user;
+		if (event instanceof EntityCreatedEvent) {
+			curator_orcid = event.instance.orcid_id;
+			privacy = event.instance.privacy;
+			user = event.instance;
+		}
+		if (event instanceof EntityUpdatedEvent) {
+			curator_orcid = event.after.orcid_id;
+			privacy = event.after.privacy;
+			user = event.after;
+		}
 		await this.detailedStatsModel.updateMany(
 			{
 				curator_orcid,
 				privacy: PrivacyType.public,
 			},
 			{
-				privacy,
+				$set: { privacy, user },
 			},
 		);
 

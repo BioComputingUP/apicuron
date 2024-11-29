@@ -5,7 +5,7 @@ import {
 } from '../../submit-reports/dto/submit-report.dto';
 
 import * as StreamObject from 'stream-json/streamers/StreamObject';
-import { createReadStream, readFileSync, statSync } from 'fs';
+import { createReadStream, readFileSync } from 'fs';
 import { filter } from 'stream-json/filters/Filter';
 import { parser } from 'stream-json';
 import { Stream, chain } from 'stream-chain';
@@ -24,6 +24,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SubmitReportService } from '../../submit-reports/services/submit-reports.service';
 import { BulkSubmissionEvent } from '../../submit-reports/events/events';
 import { partition } from 'lodash';
+import { UserRepository } from '../../core/repositories/user.repository';
 
 export type ValidatedReport = {
 	report: SubmitReportDto;
@@ -41,7 +42,7 @@ export class SubmitBulkTask {
 	constructor(
 		// protected reportService: ReportsService,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-		@InjectModel(User.name) protected userModel: Model<UserDocument>,
+		protected userModel: UserRepository,
 		protected notificationsService: NotificationsService,
 		protected eventEmitter: EventEmitter2,
 		protected submitReports: SubmitReportService,

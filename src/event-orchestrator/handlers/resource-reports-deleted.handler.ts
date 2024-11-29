@@ -5,10 +5,10 @@ import {
 	AllResourceReportsDeletedEvent,
 	IAllResourceReportsDeletedEventPayload,
 } from '../../submit-reports/events/events';
-import { BaseAggregatorRunner } from '../aggregator-runners/base.runner';
+import { SubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
 
 export class ResourceReportsDeletedHandler implements IEventHandler {
-	constructor(protected aggregatorRunner: BaseAggregatorRunner) {}
+	constructor(protected aggregatorRunner: SubmissionRunner) {}
 
 	@OnEvent(AllResourceReportsDeletedEvent, { async: true, promisify: true })
 	async handle({ resource_id }: IAllResourceReportsDeletedEventPayload) {
