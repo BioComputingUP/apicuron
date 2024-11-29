@@ -184,9 +184,10 @@ export class SubmitReportService {
 				this.logger.error(`Attempt at duplicate report insertion`);
 				// Duplicate key error, return 403
 				const error = new Error(`Duplicate report submission attempt`);
+				// throw err;
 				throw new BadRequestException('Duplicate report submission attempt', {
-					cause: error,
-					description: error.message,
+					cause: err,
+					description: err.message,
 				});
 			}
 			if (err instanceof BadRequestException) {

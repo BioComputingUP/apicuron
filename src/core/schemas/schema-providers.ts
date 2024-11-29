@@ -30,6 +30,7 @@ import { Report, ReportSchema } from './reports.schema';
 import {
 	PartnerResource,
 	PartnerResourceSchema,
+	PartnerResourceSchemaFactory,
 } from './resource/partner-resource.schema';
 import { Resource, ResourceSchema } from './resource/resource.schema';
 import {
@@ -93,14 +94,13 @@ export const ModelDefinitions: ModelDefinition[] = [
 		name: Report.name,
 		schema: ReportSchema,
 	},
-
 	{
 		name: Resource.name,
 		schema: ResourceSchema,
 		discriminators: [
 			{
 				name: PartnerResource.name,
-				schema: PartnerResourceSchema,
+				schema: PartnerResourceSchemaFactory()
 			},
 			{
 				name: SubmittedResource.name,
@@ -108,6 +108,7 @@ export const ModelDefinitions: ModelDefinition[] = [
 			},
 		],
 	},
+
 	{
 		schema: NotificationSchema,
 		name: Notification.name,

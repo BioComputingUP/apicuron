@@ -15,19 +15,19 @@ export class PartnerResource {
 	@Prop()
 	resource_description: string;
 
-	@Prop({ required: true, unique: true })
+	@Prop({ required: true })
 	resource_id: string;
 
 	@Prop()
 	resource_long_name: string;
 
-	@Prop({ required: true, unique: true })
+	@Prop({ required: true })
 	resource_name: string;
 
-	@Prop({ required: true, unique: true })
+	@Prop({ required: true })
 	resource_uri: string;
 
-	@Prop({ required: true, unique: true })
+	@Prop({ required: true })
 	resource_url: string;
 
 	@Prop({ required: false })
@@ -64,9 +64,10 @@ export class PartnerResource {
 
 	@Prop({
 		type: ResourceStatsSchema,
-		required: false,
+		required: true,
+		default: (val) => ({ resource_id: val.resource_id }),
 	})
-	stats?: ResourceStats;
+	stats: ResourceStats;
 
 	@Prop({ required: true, type: Date })
 	joined_date: Date;
@@ -82,6 +83,20 @@ export class ResourceSummary extends PartnerResource {
 	badges: AchievementDef[];
 	medals: AchievementDef[];
 	terms: Term[];
+}
+
+export function PartnerResourceSchemaFactory (){
+	const schema = SchemaFactory.createForClass(PartnerResource).loadClass(PartnerResource);
+
+	schema.index({
+		resource_id: 1,
+		resource_name: 1,
+		resource_uri: 1,
+		resource_url: 1
+
+	})
+
+	return schema;
 }
 
 export { PartnerResourceSchema };
