@@ -3,6 +3,11 @@ import { HydratedDocument, LeanDocument } from 'mongoose';
 import { PrivacyType } from '../enums';
 import { IUserResourceEntity } from '../interfaces/user-resource-entity';
 import { Term, TermSchema } from './terms.schema';
+import { User, UserSchema } from './user.schema';
+import {
+	PartnerResource,
+	PartnerResourceSchema,
+} from './resource/partner-resource.schema';
 
 export type ReportDocument = HydratedDocument<Report>;
 
@@ -44,7 +49,19 @@ export class Report implements IUserResourceEntity {
 		required: false,
 		type: TermSchema,
 	})
-	term: Term;
+	term?: Term;
+
+	@Prop({
+		required: false,
+		type: UserSchema,
+	})
+	user?: User;
+
+	@Prop({
+		required: false,
+		type: PartnerResourceSchema,
+	})
+	resource?: PartnerResource;
 
 	getMetaFields() {
 		return {

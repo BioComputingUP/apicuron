@@ -20,6 +20,7 @@ import { TermDocument } from '../../core/schemas/terms.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
+import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 
 @Injectable()
 @AggregatorClass()
@@ -77,7 +78,18 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 		return deleted.deletedCount;
 	}
 
-	async updateUserPrivacy(curator_orcid: string, privacy: PrivacyType) {
+	async updatedUser(
+		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
+	) {
+		let curator_orcid, privacy;
+		if (event instanceof EntityCreatedEvent) {
+			curator_orcid = event.instance.orcid_id;
+			privacy = event.instance.privacy;
+		}
+		if (event instanceof EntityUpdatedEvent) {
+			curator_orcid = event.after.orcid_id;
+			privacy = event.after.privacy;
+		}
 		await this.weeklyStatModel.updateMany(
 			{
 				privacy: PrivacyType.public,

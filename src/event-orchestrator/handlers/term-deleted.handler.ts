@@ -6,11 +6,11 @@ import {
 	ITermDeletedEventPayload,
 	TermDeletedEvent,
 } from '../../terms/events/events';
-import { BaseAggregatorRunner } from '../aggregator-runners/base.runner';
+import { SubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
 
 @Injectable()
 export class TermDeletedEventHandler implements IEventHandler {
-	constructor(protected aggregatorRunner: BaseAggregatorRunner) {}
+	constructor(protected aggregatorRunner: SubmissionRunner) {}
 
 	@OnEvent(TermDeletedEvent.name, { promisify: true, async: true })
 	async handle(payload: ITermDeletedEventPayload) {

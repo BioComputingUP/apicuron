@@ -9,14 +9,15 @@ import {
 	Statistics,
 	StatisticsDocument,
 } from '../../core/schemas/statistics.schema';
-import { User, UserDocument } from '../../core/schemas/user.schema';
+import { User } from '../../core/schemas/user.schema';
+import { UserRepository } from '../../core/repositories/user.repository';
 
 @Injectable()
 export class OrcidSubmissionTask {
 	constructor(
 		@InjectModel(Statistics.name)
 		protected statModel: Model<StatisticsDocument>,
-		@InjectModel(User.name) protected userModel: Model<UserDocument>,
+		protected userModel: UserRepository,
 		protected config: ConfigService,
 		protected partnerResourceService: PartnerResourcesService,
 		protected httpService: HttpService,
@@ -157,12 +158,22 @@ export class OrcidSubmissionTask {
 				const splitUrl = response.headers.location.split('/');
 
 				const orcid_work_put_code = splitUrl[splitUrl.length - 1];
-				user.orcid_work_put_codes.push({
-					resource_id: stat.resource_id,
-					putCode: orcid_work_put_code,
-				});
-				const userInstance = new this.userModel(user);
-				await userInstance.save();
+				// user.orcid_work_put_codes.push();
+				await this.userModel.updateOne(
+					{
+						orcid_id: user.orcid_id,
+					},
+					{
+						$push: {
+							orcid_work_put_codes: {
+								resource_id: stat.resource_id,
+								putCode: orcid_work_put_code,
+							},
+						},
+					},
+				);
+				// const userInstance = new this.userModel(user);
+				// await userInstance.save();
 				return;
 			}
 		}

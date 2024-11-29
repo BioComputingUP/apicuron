@@ -1,11 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, LeanDocument, Model } from 'mongoose';
 import { PartnerResourceDocument } from '../../../core/schemas/resource/partner-resource.schema';
 import { PartnerResource } from '../../../core/schemas/resource/partner-resource.schema';
 import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
 import { League } from '../../../core/schemas/league/league.schema';
-import { CreateLeagueDto } from '../leagues/dto/create-league.dto';
 import { AddMemberToLeague } from '../leagues/dto/add-member-to-league.dto';
 import { DeleteLeagueDTO } from '../leagues/dto/delete-league.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -19,10 +18,17 @@ export class PartnerResourcesService {
 		private partnerResourceModel: Model<PartnerResourceDocument>, // protected transformService: TransformerService
 		protected eventEmitter: EventEmitter2,
 	) {}
+
+	logger = new Logger(PartnerResourcesService.name);
 	async get_resources(
 		filter: FilterQuery<PartnerResourceDocument> = {},
 	): Promise<PartnerResourceDocument[]> {
-		return await this.partnerResourceModel.find(filter);
+		const resources = await this.partnerResourceModel.find(filter).sort({
+			'stats.contributionCount': -1,
+			'stats.uniqueContributors': -1,
+		});
+
+		return resources;
 	}
 
 	async addMemberToLeague(addMemberToLeague: AddMemberToLeague) {

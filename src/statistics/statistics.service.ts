@@ -1,12 +1,7 @@
-import {
-	Injectable,
-	InternalServerErrorException,
-	Logger,
-	NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
-import { User, UserDocument } from '../core/schemas/user.schema';
+import { User } from '../core/schemas/user.schema';
 import {
 	Statistics,
 	StatisticsDocument,
@@ -16,13 +11,14 @@ import { GetStatisticsDto } from './dto/get-statistics.dto';
 import { plainToClass, plainToInstance } from 'class-transformer';
 import { StatisticsDto, StatLeaderboardDto } from './dto/statistics.dto';
 import { userResourceEntityPrivacyFilter } from '../util/privacy.helper';
+import { UserRepository } from '../core/repositories/user.repository';
 
 @Injectable()
 export class StatisticsService {
 	constructor(
 		@InjectModel(Statistics.name)
 		protected statisticsModel: Model<StatisticsDocument>,
-		@InjectModel(User.name) protected userModel: Model<UserDocument>,
+		protected userRepository: UserRepository,
 		protected partnerResourceService: PartnerResourcesService,
 	) {}
 
@@ -137,16 +133,15 @@ export class StatisticsService {
 		}
 
 		// get the data aggregated
-		const dataPromise = this.userModel.aggregate([
+		const dataPromise = this.userRepository.aggregate([
 			...userStatsAggregation,
 			...sortAggregation,
 			...getStatDto.getMongoAggregation(),
 		]);
 
-		const countPromise = this.userModel.aggregate([
-			...userStatsAggregation,
-			{ $count: 'total_count' },
-		]);
+		const countPromise = this.userRepository.aggregate<{ total_count: number }>(
+			[...userStatsAggregation, { $count: 'total_count' }],
+		);
 
 		const [data, aggregation_count] = await Promise.all([
 			dataPromise,
@@ -181,7 +176,9 @@ export class StatisticsService {
 
 		const orcid_ids = leaderboard.map((stat) => stat.curator_orcid);
 
-		const users = await this.userModel.find({ orcid_id: { $in: orcid_ids } });
+		const users = await this.userRepository.find({
+			orcid_id: { $in: orcid_ids },
+		});
 
 		const data = leaderboard.map((stat) => {
 			const user = users.find((u) => u.orcid_id === stat.curator_orcid);

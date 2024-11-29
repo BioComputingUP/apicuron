@@ -5,9 +5,11 @@ import { StatisticsAggregator } from '../../statistics/services/statistics-aggre
 import { Aggregator } from '../interfaces/aggregator.interface';
 import { AggregatorManager } from '../services/aggregator-manager.service';
 import { IRunner } from '../interfaces/runner.interface';
+import { ReportAggregatorService } from '../../reports/services/report-aggregator.service';
 
 @Injectable()
 export class SubmissionRunner implements IRunner, OnModuleInit {
+	reportAggregator: ReportAggregatorService;
 	statAggregator: StatisticsAggregator;
 	badgeAggregator: BadgeAggregatorService;
 	medalAggregator: MedalAggregatorService;
@@ -16,6 +18,7 @@ export class SubmissionRunner implements IRunner, OnModuleInit {
 	constructor(protected manager: AggregatorManager) {}
 
 	relevantAggregatorNames: string[] = [
+		ReportAggregatorService.name,
 		StatisticsAggregator.name,
 		BadgeAggregatorService.name,
 		MedalAggregatorService.name,
@@ -23,13 +26,22 @@ export class SubmissionRunner implements IRunner, OnModuleInit {
 
 	onModuleInit() {
 		const [sequentialAggregators, parallelizableAggregators] = this.init();
-		[this.statAggregator, this.badgeAggregator, this.medalAggregator] =
-			sequentialAggregators;
+		[
+			this.reportAggregator,
+			this.statAggregator,
+			this.badgeAggregator,
+			this.medalAggregator,
+		] = sequentialAggregators;
 		this.parallelizableAggregators = parallelizableAggregators;
 	}
 
 	init(): [
-		[StatisticsAggregator, BadgeAggregatorService, MedalAggregatorService],
+		[
+			ReportAggregatorService,
+			StatisticsAggregator,
+			BadgeAggregatorService,
+			MedalAggregatorService,
+		],
 		Aggregator[],
 	] {
 		const aggregators: Aggregator[] = this.manager.getAggregators();
@@ -44,11 +56,16 @@ export class SubmissionRunner implements IRunner, OnModuleInit {
 				aggregators.find(
 					(aggregator: Aggregator) => aggregator.constructor.name == name,
 				),
-		) as [StatisticsAggregator, BadgeAggregatorService, MedalAggregatorService];
+		) as [
+			ReportAggregatorService,
+			StatisticsAggregator,
+			BadgeAggregatorService,
+			MedalAggregatorService,
+		];
 
 		if (
 			relevantAggregators.includes(undefined) ||
-			relevantAggregators.length < 3 ||
+			relevantAggregators.length < this.relevantAggregatorNames.length ||
 			relevantAggregators.includes(null)
 		) {
 			throw new Error('Missing aggregators');
@@ -61,6 +78,7 @@ export class SubmissionRunner implements IRunner, OnModuleInit {
 		const parallelizableResults$ = Promise.all(
 			this.parallelizableAggregators.map(fn),
 		);
+		await fn(this.reportAggregator);
 
 		const sequentialResutls$ = (async () => {
 			await fn(this.statAggregator);

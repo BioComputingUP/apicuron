@@ -16,6 +16,7 @@ import {
 	SubmittedResourceDocument,
 } from '../../core/schemas/resource/submitted-resource.schema';
 import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
+import { UsersService } from '../../auth/users/services/users.service';
 
 @Injectable()
 export class SubmittedResourcesService {
@@ -24,8 +25,9 @@ export class SubmittedResourcesService {
 		private submittedResourceModel: Model<SubmittedResourceDocument>,
 		@InjectModel(Resource.name)
 		private resourceModel: Model<ResourceDocument>,
-		@InjectModel(User.name)
-		private userModel: Model<UserDocument>,
+		@InjectModel(PartnerResource.name)
+		private partnerResourceModel: Model<ResourceDocument>,
+		private userService: UsersService,
 		protected configService: ConfigService,
 	) {}
 
@@ -55,6 +57,9 @@ export class SubmittedResourcesService {
 	async make_partner(resource_id: string) {
 		// retrieve the resource object
 		const resource = await this.submittedResourceModel.findOne({ resource_id });
+		if (!resource) {
+			throw new Error(`Resource with id ${resource_id} not found`);
+		}
 
 		// get the current logo path
 		const logo_path = resource.logo.replace(
@@ -64,7 +69,7 @@ export class SubmittedResourcesService {
 
 		// move the logo from the PRIVATE_FILES_PATH to the PUBLIC_FILES_PATH
 		try {
-			rename(
+			await rename(
 				logo_path,
 				join(
 					this.configService.get('PUBLIC_FILES_PATH'),
@@ -81,33 +86,17 @@ export class SubmittedResourcesService {
 		}
 
 		// if the submitted resource has a creator, we set it as an owner of the resource
-		const { creator, resource_name } = resource;
+		const { creator } = resource;
 		if (creator) {
-			await this.userModel.updateOne(
-				{
-					orcid_id: creator,
-				},
-				{
-					$push: {
-						resources: {
-							resource_id,
-							name: resource_name,
-						},
-					},
-				},
-			);
+			await this.userService.addManagedResource(creator, resource);
 		}
-
-		await this.resourceModel.replaceOne(
-			{
-				resource_id,
-			},
-			{
-				...resource.toObject(),
-				joined_date: new Date(),
-				state: PartnerResource.name,
-			},
+		const partnerResource = this.partnerResourceModel.hydrate(
+			resource.toObject(),
 		);
+
+		partnerResource.state = PartnerResource.name;
+		partnerResource.joined_date = new Date();
+		await partnerResource.save();
 	}
 
 	delete_old_resources() {

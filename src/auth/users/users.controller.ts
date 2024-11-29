@@ -37,6 +37,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Public } from '../decorators/public.decorator';
 import { UserPrivacyUpdatedEvent } from './events/update-privacy';
 import { UserReq } from '../decorators/applyUser.decorator';
+import { UserRepository } from '../../core/repositories/user.repository';
 
 @ApiTags('First Version')
 @Controller('')
@@ -118,7 +119,7 @@ export class UsersController {
 export class UserControllerV2 {
 	constructor(
 		private usersService: UsersService,
-		@InjectModel(User.name) protected userModel: Model<UserDocument>,
+		protected userModel: UserRepository,
 		private eventEmitter: EventEmitter2,
 	) {}
 
@@ -129,41 +130,7 @@ export class UserControllerV2 {
 		@Param('orcid_id') orcid_id: string,
 		@UserReq() userReq?: User,
 	) {
-		let user = null;
-
-		if (userReq) {
-			if (userReq.resources && userReq.resources.length > 0) {
-				user = this.userModel.findOne(
-					{
-						orcid_id,
-					},
-					{
-						stats: 0,
-						orcid_permission: 0,
-						refresh_token: 0,
-						orcid_work_put_codes: 0,
-					},
-				);
-			} else {
-				user = this.userModel.findOne(
-					{
-						orcid_id,
-						$or: [
-							{ orcid_id, privacy: 'public' },
-							{ $and: [{ orcid_id: userReq.orcid_id }, { orcid_id }] },
-						],
-					},
-					{
-						stats: 0,
-						orcid_permission: 0,
-						refresh_token: 0,
-						orcid_work_put_codes: 0,
-					},
-				);
-			}
-		} else {
-			user = await this.usersService.getPublicUser(orcid_id);
-		}
+		const user = await this.usersService.getPublicUser(orcid_id, userReq);
 
 		if (!user) {
 			throw new NotFoundException(

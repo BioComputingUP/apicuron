@@ -42,7 +42,9 @@ import {
 import { AuthService } from '../../../auth/auth.service';
 import * as mv from 'mv';
 import { ResourceLogoValidationPipe } from '../../validators/logo-validation.pipe';
-import { plainToClass } from 'class-transformer';
+import { plainToClass, plainToInstance } from 'class-transformer';
+import { PublicPartnerResourceDto } from '../../dto/public-partner-resource.dto';
+import { ApiResponseWrapped } from '../../../shared/decorators/wrapped-data-response.decorator';
 
 @ApiTags('Partner Resources')
 @ApiHeader(VersionHeader)
@@ -57,17 +59,22 @@ export class PartnerResourcesController {
 
 	logger = new Logger(PartnerResourcesController.name);
 
-	@ApiOkResponse({
-		status: 200,
-		description: 'Returns a list of all the partner resources of APICURON',
-		type: [PartnerResourceDto],
-	})
+	@ApiResponseWrapped(
+		[PartnerResourceDto],
+		200,
+		'Returns a list of all the partner resources of APICURON',
+	)
 	@ApiOperation({
 		summary: 'Get the list of all resources on APICURON',
 	})
 	@Get()
-	async list_resources(): Promise<PartnerResourceDto[]> {
-		return await this.partnerResourceService.get_resources();
+	async list_resources(): Promise<PublicPartnerResourceDto[]> {
+		const resources = await this.partnerResourceService.get_resources();
+
+		return plainToInstance(PublicPartnerResourceDto, resources, {
+			excludeExtraneousValues: true,
+			enableCircularCheck: true,
+		});
 	}
 
 	// swagger documentation decorators

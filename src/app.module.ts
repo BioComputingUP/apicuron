@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { loadConfig } from './config/load';
-import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 import { ReportsModule } from './reports/reports.module';
 import { ResourcesModule } from './resources/resources.module';
 import { StatisticsModule } from './statistics/statistics.module';
@@ -25,7 +24,6 @@ import { TransformInterceptor } from './shared/transformer/transform.interceptor
 import { EmailModule } from './email/email.module';
 import { CoreApicuronModule } from './core/core.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { MongoEventsModule } from './mongo-events/mongo-events.module';
 import { SubmitReportModule } from './submit-reports/submit-reports.module';
 import { OrcidSubmissionModule } from './orcid/orcid-submission/orcid-submission.module';
 import { ResourceManagerModule } from './resource-manager/resource-manager.module';
@@ -40,8 +38,6 @@ import { Reflector } from '@nestjs/core';
 import { ResourceStatsModule } from './resource-stats/resource-stats.module';
 import { MonthlyStatisticsModule } from './monthly-statistics/monthly-statistics.module';
 import { CuratorRegistryModule } from './curator-registry/curator-registry.module';
-
-const logger = new Logger('AppModule');
 
 @Module({
 	imports: [
@@ -66,25 +62,7 @@ const logger = new Logger('AppModule');
 		}),
 
 		// MongoEventsModule,
-		// in here we use the forRootAsync https://docs.nestjs.com/techniques/mongodb#async-configuration
-		// to be able to access the configService asnchronously because it cannot be loaded sooner
-		// due to the fact that this is the appmodule
-		MongooseModule.forRootAsync({
-			inject: [ConfigService],
-			imports: [MongoEventsModule],
-			useFactory: async (
-				configService: ConfigService,
-			): Promise<MongooseModuleOptions> => {
-				const db_host = configService.get<string>('db_host');
-				const database = configService.get<string>('database');
-				const port = configService.get<number>('db_port');
-				const uri = `mongodb://${db_host}:${port}/${database}`;
-				logger.log(`MongoDB Connection setup uri: ${uri}`);
-				return {
-					uri,
-				};
-			},
-		}),
+
 		// in here we load the Serve static module to serve static files
 		ServeStaticModule.forRootAsync({
 			inject: [ConfigService],
