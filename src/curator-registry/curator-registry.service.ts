@@ -122,7 +122,8 @@ export class CuratorRegistryService {
 				},
 				{
 					$project:{
-						"_id": 0, 
+						"_id": 0,
+						"resource_id": "_id" 
 
 					}
 				}
