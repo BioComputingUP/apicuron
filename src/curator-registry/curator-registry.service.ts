@@ -35,11 +35,10 @@ export class CuratorRegistryService {
 			query: user_query, // what the user typed in the first filed
 			resources: filtered_resources, // the resource list filtererd by the user
 		} = query;
-
 		//build query filter
 		const query_filter: FilterQuery<CuratorRegistryEntryDocument> = {};
 		if (!!user_query)
-			query_filter[filtered_field] = { $regex: user_query, $options: 'i' };
+			query_filter[`curator.${filtered_field}`] = { $regex: user_query, $options: 'i' };
 
 		if (!!filtered_resources) {
 			query_filter['contributed_to'] = {
@@ -71,12 +70,11 @@ export class CuratorRegistryService {
 			{ $match: { ...query_filter } }, // apply user filter
 			{ $project: { ...fields_to_hide } }, // project out user fields
 		];
-		this.logger.debug(aggregation_pipeline);
 		try {
 			const entries = await this.registryEntryModel.aggregate(
 				aggregation_pipeline,
 			);
-			this.logger.debug(entries);
+			this.logger.debug(`entries: ${entries}`);
 			return entries;
 		} catch (error) {
 			this.logger.error('Error while getting information about all users...');
@@ -236,6 +234,115 @@ export class CuratorRegistryService {
 		} catch (error) {
 			this.logger.error(
 				'Error while updating curator with orcid: ' + curator.orcid_id,
+			);
+			this.logger.error(error);
+		}
+	}
+
+	async recomputeAllEntries() {
+		// yeah...
+
+		const aggregation_pipeline: PipelineStage[] = [
+			{
+				$group: {
+					_id: {
+						curator_orcid: '$curator_orcid',
+						resource_id: '$resource_id',
+					},
+					leagueNames: { $addToSet: '$league' },
+				},
+			},
+			{
+				$lookup: {
+					from: 'resources_def',
+					localField: '_id.resource_id',
+					foreignField: 'resource_id',
+					as: 'resources',
+				},
+			},
+			{ $unwind: { path: '$resources' } },
+			{
+				$addFields: {
+					leagues: {
+						$filter: {
+							input: '$resources.leagues',
+							as: 'league',
+							cond: {
+								$in: ['$$league.name', '$leagueNames'],
+							},
+						},
+					},
+				},
+			},
+			{
+				$group: {
+					_id: '$_id.curator_orcid',
+					resources: {
+						$push: {
+							resource_id: '$_id.resource_id',
+							resource: '$resources',
+							groups: '$leagues',
+						},
+					},
+				},
+			},
+			{
+				$lookup: {
+					from: 'users',
+					localField: '_id',
+					foreignField: 'orcid_id',
+					as: 'curator',
+				},
+			},
+			{
+				$unwind: {
+					path: '$curator',
+					preserveNullAndEmptyArrays: false,
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					curator_orcid: '$_id',
+					curator: 1,
+					resources: 1,
+				},
+			},
+		];
+
+		const aggregation_results =
+			this.reportModel.aggregate(aggregation_pipeline);
+		this.logger.debug('Updating all curator registry entries...');
+		try {
+			const aggregationResults = await this.reportModel.aggregate(
+				aggregation_pipeline,
+			);
+
+			let updates = [];
+			for (const result of aggregationResults) {
+				updates.push(
+					this.registryEntryModel.findOneAndUpdate(
+						{ curator_orcid: result.curator_orcid },
+						{
+							$set: {
+								contributed_to: result.resources,
+								curator: result.curator,
+							},
+						},
+						{ upsert: true },
+					),
+				);
+			}
+
+			await Promise.all(updates);
+			this.logger.debug(
+				'Updated registry collection with aggregation results',
+				'',
+			);
+			return updates;
+		} catch (error) {
+			this.logger.error(
+				'Error while updating registry collection with aggregation results',
 			);
 			this.logger.error(error);
 		}

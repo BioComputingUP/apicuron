@@ -85,8 +85,9 @@ export class CuratorRegistryAggregatorService implements Aggregator{
 		return;
 	}
 	termDeleted(term: TermDocument) {
-		// shouldn't affect
+		
 		return;
 	}
 
 }
+
