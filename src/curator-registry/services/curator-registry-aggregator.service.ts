@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { AggregatorClass } from 'src/event-orchestrator/decorators/aggregator.decorator';
 import { Aggregator } from 'src/event-orchestrator/interfaces/aggregator.interface';
 import { ReportDocument, LeanReportDocument } from 'src/core/schemas/reports.schema';
@@ -14,6 +14,8 @@ import { EntityCreatedEvent, EntityUpdatedEvent } from 'src/core/events';
 import { UserRepository } from 'src/core/repositories/user.repository';
 import { CuratorRegistryEntry, CuratorRegistryEntryDocument } from 'src/core/schemas/curator-registry/curator-entry.schema';
 
+import { CuratorRegistryService } from '../curator-registry.service';
+
 
 @Injectable()
 @AggregatorClass()
@@ -21,32 +23,40 @@ export class CuratorRegistryAggregatorService implements Aggregator{
 
 	constructor(
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-		@InjectModel(CuratorRegistryEntry.name) protected curatorEntryModel: Model<CuratorRegistryEntryDocument>,
+		// @InjectModel(CuratorRegistryEntry.name) protected curatorEntryModel: Model<CuratorRegistryEntryDocument>,
+		protected registryService: CuratorRegistryService,
 
 		// protected resourceService: PartnerResourcesService,
 		protected userRep: UserRepository,
-	){
-		// maybe update all users here?
-	}
-
+	){}
+	private logger = new Logger(CuratorRegistryAggregatorService.name)
 	async applyReport(report: LeanReportDocument | ReportDocument) {
-		// On new report, check if the associated user has the resource attached to them, if not attach it
-		// Also attach the league if not associated
 
-		//filter for already registered users and associated databases
-		const curatorFilter: FilterQuery<CuratorRegistryEntryDocument> = {
-			curator_orcid : report.curator_orcid,
+
+		// const curatorFilter: FilterQuery<CuratorRegistryEntryDocument> = {
+		// 	curator_orcid : report.curator_orcid,
 			// contributed_to : {$eleMatch: {resource_id: report.resource_id}}
-		}
+		// }
 
-		const curator = await this.curatorEntryModel.findOne(curatorFilter)
+		// const curator = await this.curatorEntryModel.findOne(curatorFilter)
 
-		if(!!curator){
+		// if(!!curator){
 			
-		}
+		// }
+		
+
 
 	}
 	updatedUser(event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>) {
+		if (event instanceof EntityCreatedEvent) {
+			this.logger.debug(`[User Created Event] adding curator ${event.instance.orcid_id}`);
+			this.registryService.addCurator(event.instance);
+		}
+		if (event instanceof EntityUpdatedEvent) {
+			this.logger.debug(`[User Updated Event] updating curator ${event.after.orcid_id}`);
+			this.registryService.updateCurator(event.after);
+			this.logger.debug(`user updated`);
+		}
 		return; 
 	}
 	applyAllReports(resource_id: string) {

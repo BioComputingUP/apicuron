@@ -10,6 +10,7 @@ import { RegistryEntriesDto } from './dto/registry-entries.dto';
 // import { User, UserDocument } from 'src/core/schemas/user.schema';
 import { UserRepository } from 'src/core/repositories/user.repository';
 import { Report, ReportDocument } from 'src/core/schemas/reports.schema';
+import { User } from 'src/core/schemas/user.schema';
 @Injectable()
 export class CuratorRegistryService {
 	constructor(
@@ -25,9 +26,7 @@ export class CuratorRegistryService {
 	 * Get all curators from registry that match the user filter query
 	 * @param query : user query
 	 */
-	async getAllEntries(
-		query: RegistryEntriesDto,
-	) {
+	async getAllEntries(query: RegistryEntriesDto) {
 		// TODO: Add pagination
 
 		//extract user query details
@@ -62,11 +61,11 @@ export class CuratorRegistryService {
 			'curator.orcid_work_put_codes': 0,
 			// resource fields
 			'contributed_to.resource._id': 0,
-			"contributed_to.resource.leagues.updatedAt": 0,
-			"contributed_to.resource.leagues.createdAt": 0,
-			"contributed_to.resource.leagues._id": 0,
+			'contributed_to.resource.leagues.updatedAt': 0,
+			'contributed_to.resource.leagues.createdAt': 0,
+			'contributed_to.resource.leagues._id': 0,
 			__v: 0,
-			_id: 0
+			_id: 0,
 		};
 		const aggregation_pipeline = [
 			{ $match: { ...query_filter } }, // apply user filter
@@ -160,7 +159,8 @@ export class CuratorRegistryService {
 					aggregation_pipeline,
 				);
 				this.logger.debug(
-					`Found ${contribution_info.length} contributions for user ${orcid_identifier}`,); 
+					`Found ${contribution_info.length} contributions for user ${orcid_identifier}`,
+				);
 				const userUpdates = [];
 				for (const contribution of contribution_info) {
 					userUpdates.push(
@@ -173,7 +173,7 @@ export class CuratorRegistryService {
 										groups: contribution.leagues,
 										resource: contribution.resource,
 									},
-									curator: user
+									curator: user,
 								},
 							},
 							{ upsert: true },
@@ -182,7 +182,7 @@ export class CuratorRegistryService {
 				}
 
 				await Promise.all(userUpdates);
-				return 
+				return;
 			} catch (error) {
 				this.logger.error('Error updating user contributions');
 				this.logger.error(error);
@@ -208,5 +208,36 @@ export class CuratorRegistryService {
 			this.logger.error(error);
 		}
 		return entry;
+	}
+
+	async addCurator(curator: User) {
+		try {
+			const result = await this.registryEntryModel.create({
+				curator_orcid: curator.orcid_id,
+			});
+			return result;
+		} catch (error) {
+			this.logger.error(
+				'Error while adding curator with orcid: ' + curator.orcid_id,
+			);
+			this.logger.error(error);
+		}
+	}
+
+	async updateCurator(curator: User) {
+		try {
+			const result = await this.registryEntryModel.updateOne(
+				{
+					curator_orcid: curator.orcid_id,
+				},
+				{ curator: curator },
+			);
+			return result;
+		} catch (error) {
+			this.logger.error(
+				'Error while updating curator with orcid: ' + curator.orcid_id,
+			);
+			this.logger.error(error);
+		}
 	}
 }
