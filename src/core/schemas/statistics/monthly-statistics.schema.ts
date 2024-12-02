@@ -21,8 +21,8 @@ export class MonthlyStatistics implements IUserResourceEntity {
 	@Prop({ required: true, type: String })
 	resource_id: string;
 
-	@Prop({ required: true, type: UserSchema })
-	user: User;
+	@Prop({ required: false, type: UserSchema })
+	user: User | null;
 
 	@Prop({ required: true, type: PartnerResourceSchema })
 	resource: PartnerResource;

@@ -61,7 +61,7 @@ export class ReportsWeeklyAggregationPipeline {
 					},
 				},
 				year: {
-					$year: {
+					$isoWeekYear: {
 						date: '$timestamp',
 						timezone: TIMEZONE,
 					},

@@ -74,9 +74,9 @@ export class ComputeWeeklyStatisticsService {
 			curator_orcid: report.curator_orcid,
 			resource_id: report.resource_id,
 			league: report.league,
-			privacy: report.privacy,
+			privacy: computePrivacyField(report.resource, report.user, {}),
 			resource: report.resource,
-			user: report.user,
+			user: report.user ?? null,
 			league_data: report.league_data,
 			term: report.term,
 			invalidation_count: 0,
@@ -102,7 +102,7 @@ export class ComputeWeeklyStatisticsService {
 			| LeanReportDocument,
 		termDoc: TermDocument | null,
 		resource: PartnerResourceDocument,
-		user: UserDocument | null,
+		user: UserDocument | null = null,
 	) {
 		const reportIsLast = !(await this.reportModel.exists({
 			resource_id: report.resource_id,
@@ -192,7 +192,6 @@ export class ComputeWeeklyStatisticsService {
 				curator_orcid,
 				resource_id,
 				league,
-				privacy,
 				activity_category,
 				score,
 				year,
@@ -230,15 +229,25 @@ export class ComputeWeeklyStatisticsService {
 			currentStat[`${activity_category}_count`] += reportAgg.count;
 			currentStat[`${activity_category}_score`] += reportAgg.count * score;
 			currentStat.total_score += reportAgg.count * score;
-
-			currentStat.privacy = privacy as PrivacyType;
 		}
 
 		if (!!currentStat) {
 			saves$.push(currentStat.save());
 		}
-
-		await Promise.all(saves$);
-		this.logger.debug(`Computed ${saves$.length} weekly statistics`);
+		try {
+			await Promise.all(saves$);
+			this.logger.debug(
+				`Computed ${
+					saves$.length
+				} weekly statistics for filter ${JSON.stringify(reportFilter)}`,
+			);
+		} catch (err) {
+			this.logger.error(
+				`Error while computing weekly statistics for filter ${JSON.stringify(
+					reportFilter,
+				)}: ${err}`,
+			);
+			throw err;
+		}
 	}
 }

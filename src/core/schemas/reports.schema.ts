@@ -50,19 +50,19 @@ export class Report implements IUserResourceEntity {
 		required: false,
 		type: TermSchema,
 	})
-	term?: Term;
+	term: Term;
 
 	@Prop({
 		required: false,
 		type: UserSchema,
 	})
-	user?: User;
+	user?: User | null;
 
 	@Prop({
 		required: false,
 		type: PartnerResourceSchema,
 	})
-	resource?: PartnerResource;
+	resource: PartnerResource;
 
 	@Prop({
 		required: false,

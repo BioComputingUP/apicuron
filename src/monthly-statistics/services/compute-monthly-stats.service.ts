@@ -59,7 +59,7 @@ export class ComputeMonthlyStatsService {
 
 		const setObj: UpdateQuery<MonthlyStatisticsDocument>['$set'] = {
 			resource: report.resource ?? resource,
-			user: report.user ?? curator,
+			user: report.user ?? curator ?? null,
 			league_data: report.league_data,
 		};
 		if (reportIsLast) {
@@ -100,7 +100,7 @@ export class ComputeMonthlyStatsService {
 			resource_id: reportAgg.resource_id,
 			league: reportAgg.league,
 			resource: reportAgg.resource,
-			user: reportAgg.user,
+			user: reportAgg.user ?? null,
 			league_data: reportAgg.league_data,
 			privacy: reportAgg.privacy,
 			invalidation_count: 0,

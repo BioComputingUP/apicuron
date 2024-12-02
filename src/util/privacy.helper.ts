@@ -20,7 +20,7 @@ export type IUserLeagueEntity = {
 	curator_orcid: string;
 	league: string;
 	privacy: PrivacyType;
-	user: User;
+	user?: User;
 	resource: Resource;
 	league_data: League;
 };
@@ -47,8 +47,10 @@ export function computePrivacyField(
 	const league = userResourceEntity.league ?? resource.defaultLeague;
 	userResourceEntity.league = league;
 
+	const resourceLeague = resource.leagues.find((l) => l.name === league);
+
 	// we retrieve both the league's privacy and the user's privacy setting
-	const leaguePrivacy = resource.getLeague(league).visibility;
+	const leaguePrivacy = resourceLeague.visibility;
 	const userPrivacy = relatedUser?.privacy ?? PrivacyType.private;
 
 	// if one of them happens to be private, the privacyType of the entity will be private
@@ -159,6 +161,12 @@ export async function updateUserAggregatePrivacy(
 			$and: [
 				{
 					$or: [
+						{
+							user: null,
+						},
+						{
+							user: { $exists: false },
+						},
 						{
 							'user.privacy': PrivacyType.private,
 						},

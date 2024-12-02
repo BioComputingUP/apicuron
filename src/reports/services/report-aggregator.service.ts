@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
@@ -28,6 +28,7 @@ export class ReportAggregatorService implements Aggregator {
 		@InjectModel(Term.name)
 		protected termModel: Model<TermDocument>,
 	) {}
+	logger = new Logger(ReportAggregatorService.name);
 	// Not Implemented
 	applyReport() {
 		return null;
@@ -122,8 +123,11 @@ export class ReportAggregatorService implements Aggregator {
 	async recomputeAllResourceAggregates(resource_id: string) {
 		const resource = await this.resourceModel.findOne({ resource_id });
 
-		const updates$ = [];
+		this.logger.debug(
+			`Assinging resource ${resource.resource_name} to all relevant reports`,
+		);
 		// Update the resource
+		const updates$ = [];
 		const resourceUpdate$ = this.reportModel.updateMany(
 			{ resource_id },
 			{ $set: { resource } },
@@ -142,8 +146,11 @@ export class ReportAggregatorService implements Aggregator {
 
 		await Promise.all(updates$);
 
+		this.logger.debug(
+			`Updating the user attribute for all users in resource ${resource.resource_name} to all relevant reports`,
+		);
 		// Update all users
-		const orcidIds = await this.resourceModel.distinct('curator_orcid', {
+		const orcidIds = await this.reportModel.distinct('curator_orcid', {
 			resource_id,
 		});
 		const userUpdates$ = [];
@@ -158,6 +165,10 @@ export class ReportAggregatorService implements Aggregator {
 			userUpdates$.push(update$);
 		}
 		await Promise.all(userUpdates$);
+
+		this.logger.debug(
+			`Updating the term attribute for all activities in resource ${resource.resource_name} to all relevant reports`,
+		);
 
 		// update all terms
 		const terms = await this.termModel.find({ resource_id });

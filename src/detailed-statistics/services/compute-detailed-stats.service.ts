@@ -123,7 +123,7 @@ export class ComputeDetailedStatisticsService {
 			return newStat;
 		}
 
-		stat.user = report.user;
+		stat.user = report.user ?? null;
 		stat.resource = report.resource;
 		stat.league_data = report.league_data;
 
@@ -204,7 +204,8 @@ export class ComputeDetailedStatisticsService {
 					entry.user ??
 					(await this.userRepository.findOne({
 						orcid_id: entry.curator_orcid,
-					}));
+					})) ??
+					null;
 				const [resource, league_data] = [entry.resource, entry.league_data];
 				currentStat = new this.detailedStatsModel({
 					user,

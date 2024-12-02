@@ -17,8 +17,8 @@ export class Statistics implements IUserResourceEntity {
 	@Prop({ required: true, default: () => 0 })
 	badges_count: number;
 
-	@Prop({ required: true, type: UserSchema })
-	user: User;
+	@Prop({ required: false, type: UserSchema })
+	user: User | null;
 
 	@Prop({ required: true, type: PartnerResourceSchema })
 	resource: PartnerResource;

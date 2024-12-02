@@ -112,7 +112,7 @@ export class ComputeStatisticsService {
 						resource_id,
 						league,
 						resource: report.resource,
-						user: report.user,
+						user: report.user ?? null,
 						league_data: report.league_data,
 					},
 				},
@@ -270,7 +270,7 @@ export class ComputeStatisticsService {
 			first_contribution: report.timestamp,
 			last_contribution: report.timestamp,
 			resource,
-			user,
+			user: user ?? null,
 		});
 		stat.privacy = computePrivacyField(resource, user, stat);
 		try {

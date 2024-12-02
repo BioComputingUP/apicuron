@@ -26,8 +26,8 @@ export class DetailedStatistics implements IUserResourceEntity {
 	@Prop({ required: true, type: String })
 	curator_orcid: string;
 
-	@Prop({ required: true, type: UserSchema })
-	user: User;
+	@Prop({ required: false, type: UserSchema })
+	user: User | null;
 
 	@Prop({ required: true, type: PartnerResourceSchema })
 	resource: PartnerResource;
