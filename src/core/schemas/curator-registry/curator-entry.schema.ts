@@ -3,32 +3,40 @@ import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 import { User, UserSchema } from "../user.schema";
 import { PartnerResource, PartnerResourceSchema } from "../resource/partner-resource.schema";
 import { League, LeagueSchema } from "../league/league.schema";
+
 export type CuratorRegistryEntryDocument = HydratedDocument<CuratorRegistryEntry>
-@Schema()
-export class CuratorGroupEntry{
+@Schema({ _id: false })
+export class ContributionEntry{
 
 	@Prop({required: true})
 	resource_id: string
+	
+	@Prop({type: PartnerResourceSchema})
+	resource: PartnerResource;
 
 	@Prop({type: [LeagueSchema]})
-	groups_ids : [League]
+	groups : [League]
+
 }
+const ContributionEntrySchema = SchemaFactory.createForClass(ContributionEntry).loadClass(ContributionEntry);
 @Schema({
 	collection: 'curator-registry',
 })
 export class CuratorRegistryEntry {
+	@Prop({required: true})
+	curator_orcid: string;
+
 	@Prop({
-		required: true,
+		required: false,
 		type: UserSchema
 	})
 	curator: User;
 
-	@Prop({type: [PartnerResourceSchema]})
-	contributed_to: PartnerResource[];
+	@Prop({type: [ContributionEntrySchema]})
+	contributed_to: ContributionEntry[];
 
 
-	@Prop({required: false})
-	groups: CuratorGroupEntry;
+	
 }
 
 export const CuratorRegistryEntrySchema = SchemaFactory.createForClass(CuratorRegistryEntry).loadClass(CuratorRegistryEntry);
