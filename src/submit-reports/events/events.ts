@@ -4,6 +4,7 @@ import { ReportDto } from '../../reports/dto/report.dto';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
 import { TermDocument } from '../../core/schemas/terms.schema';
+import { League } from '../../core/schemas/league/league.schema';
 
 export const ManyReportsSubmittedEvent = 'post.report.insert.many';
 export interface IManyReportsSubmittedEventPayload {
@@ -19,6 +20,7 @@ export interface IReportSubmittedEventPayload {
 	term: TermDocument;
 	resource: PartnerResourceDocument;
 	user: UserDocument;
+	league_data: League;
 }
 
 export const AllResourceReportsDeletedEvent = 'post.reports.deleteall.resource';

@@ -15,19 +15,19 @@ export class PartnerResource {
 	@Prop()
 	resource_description: string;
 
-	@Prop({ required: true, unique: true })
+	@Prop({ required: true })
 	resource_id: string;
 
 	@Prop()
 	resource_long_name: string;
 
-	@Prop({ required: true, unique: true })
+	@Prop({ required: true })
 	resource_name: string;
 
-	@Prop({ required: true, unique: true })
+	@Prop({ required: true })
 	resource_uri: string;
 
-	@Prop({ required: true, unique: true })
+	@Prop({ required: true })
 	resource_url: string;
 
 	@Prop({ required: false })
@@ -74,6 +74,9 @@ export class PartnerResource {
 	getLeague(leagueName: string) {
 		return this.leagues.find((league: League) => league.name == leagueName);
 	}
+
+	created_at: Date;
+	updated_at: Date;
 }
 const PartnerResourceSchema =
 	SchemaFactory.createForClass(PartnerResource).loadClass(PartnerResource);
@@ -82,6 +85,23 @@ export class ResourceSummary extends PartnerResource {
 	badges: AchievementDef[];
 	medals: AchievementDef[];
 	terms: Term[];
+}
+
+export function PartnerResourceSchemaFactory() {
+	const ResourceSchema =
+		SchemaFactory.createForClass(PartnerResource).loadClass(PartnerResource);
+
+	ResourceSchema.index(
+		{
+			resource_id: 1,
+			resource_name: 1,
+			resource_uri: 1,
+			resource_url: 1,
+		},
+		{ unique: true, name: 'unique_resource' },
+	);
+
+	return ResourceSchema;
 }
 
 export { PartnerResourceSchema };

@@ -75,6 +75,10 @@ export class ComputeWeeklyStatisticsService {
 			resource_id: report.resource_id,
 			league: report.league,
 			privacy: report.privacy,
+			resource: report.resource,
+			user: report.user,
+			league_data: report.league_data,
+			term: report.term,
 			invalidation_count: 0,
 			invalidation_score: 0,
 			revision_count: 0,
@@ -122,6 +126,9 @@ export class ComputeWeeklyStatisticsService {
 			privacy: computePrivacyField(resource, user, {
 				league: report.league,
 			}),
+			user: report.user ?? user,
+			league_data: report.league_data,
+			resource: report.resource ?? resource,
 		};
 		if (reportIsLast) {
 			setObj.last_contribution = report.timestamp;

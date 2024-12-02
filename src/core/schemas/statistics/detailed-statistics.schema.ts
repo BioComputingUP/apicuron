@@ -7,6 +7,12 @@ import {
 } from '../components/statistics-terms.schema';
 import { HydratedDocument, LeanDocument } from 'mongoose';
 import { User, UserDocument, UserSchema } from '../user.schema';
+import { ResourceSchema } from '../resource/resource.schema';
+import {
+	PartnerResource,
+	PartnerResourceSchema,
+} from '../resource/partner-resource.schema';
+import { League, LeagueSchema } from '../league/league.schema';
 
 export type DetailedStatisticsDocument = HydratedDocument<DetailedStatistics>;
 export type LeanDetailedStatisticsDocument =
@@ -20,8 +26,14 @@ export class DetailedStatistics implements IUserResourceEntity {
 	@Prop({ required: true, type: String })
 	curator_orcid: string;
 
-	@Prop({ required: false, type: UserSchema })
-	user?: User;
+	@Prop({ required: true, type: UserSchema })
+	user: User;
+
+	@Prop({ required: true, type: PartnerResourceSchema })
+	resource: PartnerResource;
+
+	@Prop({ required: true, type: LeagueSchema })
+	league_data: League;
 
 	@Prop({ required: true, type: String })
 	resource_id: string;

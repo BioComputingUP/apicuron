@@ -1,16 +1,30 @@
-import { FilterQuery, HydratedDocument, LeanDocument } from 'mongoose';
+import { FilterQuery, HydratedDocument, LeanDocument, Model } from 'mongoose';
 import { PrivacyType } from '../core/enums';
-import {
-	PartnerResource,
-	PartnerResourceDocument,
-} from '../core/schemas/resource/partner-resource.schema';
-import { User, UserDocument } from '../core/schemas/user.schema';
 import {
 	IResourceEntityDocument,
 	IUserResourceEntity,
 	IUserResourceEntityDocument,
 	LeanIResourceEntityDocument,
 } from '../core/interfaces/user-resource-entity';
+import {
+	Resource,
+	User,
+	UserDocument,
+	PartnerResource,
+	PartnerResourceDocument,
+	League,
+} from '../core/schemas';
+
+export type IUserLeagueEntity = {
+	resource_id: string;
+	curator_orcid: string;
+	league: string;
+	privacy: PrivacyType;
+	user: User;
+	resource: Resource;
+	league_data: League;
+};
+export type IUserLeagueEntityDocument = HydratedDocument<IUserLeagueEntity>;
 
 /**
  * Computes the privacy field for a given resource entity based on the resource, related user, and user resource entity.
@@ -123,4 +137,62 @@ export function userResourceEntityPrivacyFilter(
 			},
 		],
 	};
+}
+
+/**
+ * Updates the privacy settings of user league entities based on the provided filter.
+ *
+ * This function performs two update operations:
+ * 1. Updates entities where either the user's privacy or the league data's visibility is set to private.
+ * 2. Updates entities where both the user's privacy and the league data's visibility are set to public.
+ *
+ * @param model - The Mongoose model representing the user league entity.
+ * @param filter - The filter query to select the entities to be updated.
+ * @returns A promise that resolves to an array containing the results of the two update operations.
+ */
+export async function updateUserAggregatePrivacy(
+	model: Model<IUserLeagueEntityDocument>,
+	filter: FilterQuery<IUserLeagueEntityDocument>,
+) {
+	const privateUpdate$ = await model.updateMany(
+		{
+			$and: [
+				{
+					$or: [
+						{
+							'user.privacy': PrivacyType.private,
+						},
+						{
+							'league_data.visibility': PrivacyType.private,
+						},
+					],
+				},
+				filter,
+			],
+		},
+		{
+			$set: {
+				privacy: PrivacyType.private,
+			},
+		},
+	);
+
+	const publicUpdate$ = await model.updateMany(
+		{
+			$and: [
+				{
+					'user.privacy': PrivacyType.public,
+					'league_data.visibility': PrivacyType.public,
+				},
+				filter,
+			],
+		},
+		{
+			$set: {
+				privacy: PrivacyType.public,
+			},
+		},
+	);
+
+	return await Promise.all([privateUpdate$, publicUpdate$]);
 }

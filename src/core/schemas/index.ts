@@ -13,5 +13,7 @@ export * from './resource/submitted-resource.schema';
 export * from './notification.schema';
 export * from './terms.schema';
 export * from './statistics.schema';
+export * from './user.schema';
+export * from './league/league.schema';
 
 export * from './schema-providers';

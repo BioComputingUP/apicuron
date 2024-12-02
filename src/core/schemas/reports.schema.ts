@@ -8,6 +8,7 @@ import {
 	PartnerResource,
 	PartnerResourceSchema,
 } from './resource/partner-resource.schema';
+import { League, LeagueSchema } from './league/league.schema';
 
 export type ReportDocument = HydratedDocument<Report>;
 
@@ -62,6 +63,12 @@ export class Report implements IUserResourceEntity {
 		type: PartnerResourceSchema,
 	})
 	resource?: PartnerResource;
+
+	@Prop({
+		required: false,
+		type: LeagueSchema,
+	})
+	league_data?: League;
 
 	getMetaFields() {
 		return {

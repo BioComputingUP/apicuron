@@ -24,13 +24,6 @@ export class ReportsMonthlyAggregator {
 		return this.reportModel
 			.aggregate()
 			.match(filter)
-			.lookup({
-				from: this.termModel.collection.name,
-				localField: 'activity_term',
-				foreignField: 'activity_term',
-				as: 'term',
-			})
-			.unwind({ path: '$term' })
 			.addFields({
 				score: '$term.score',
 				activity_category: '$term.activity_category',
@@ -47,7 +40,6 @@ export class ReportsMonthlyAggregator {
 					},
 				},
 			})
-			.project({ term: 0 })
 			.group({
 				_id: {
 					curator_orcid: '$curator_orcid',
@@ -71,6 +63,18 @@ export class ReportsMonthlyAggregator {
 				},
 				activity_category: {
 					$first: '$activity_category',
+				},
+				resource: {
+					$first: '$resource',
+				},
+				user: {
+					$first: '$user',
+				},
+				league_data: {
+					$first: '$league_data',
+				},
+				term: {
+					$first: '$term',
 				},
 				year: { $first: '$year' },
 				month: { $first: '$month' },
