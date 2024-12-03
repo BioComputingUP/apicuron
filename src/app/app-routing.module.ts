@@ -60,6 +60,11 @@ const routes: Routes = [
       import("./dashboard/dashboard.module").then((m) => m.DashboardModule),
   },
   {
+    path: "registry",
+    loadChildren: () =>
+      import("./curator-registry/curator-registry.module").then((m) => m.CuratorRegistryModule),
+  },
+  {
     path: "docs",
     // Old Version of the docs
     component: MainLayoutComponent,

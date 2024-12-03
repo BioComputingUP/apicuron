@@ -44,4 +44,4 @@ import { HttpClientModule } from '@angular/common/http';
     CuratorCardComponent
   ]
 })
-export class CuratorModule { }
+export class CuratorModule {}
