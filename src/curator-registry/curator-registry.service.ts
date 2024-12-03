@@ -49,8 +49,9 @@ export class CuratorRegistryService {
 				$elemMatch: { resource_id: { $in: filtered_resources } },
 			};
 		}
-
+		// This stage filters out private groups
 		const league_visibility_stage = {
+			// if you can make this better please do
 			$set: {
 				contributed_to: {
 					$map: {
@@ -65,6 +66,7 @@ export class CuratorRegistryService {
 											input: '$$item.groups',
 											as: 'group',
 											cond: {
+												// Show only public groups unless the requesting user is part of it
 												$or: [
 													{
 														$ne: ['$$group.visibility', 'private'],
@@ -83,7 +85,7 @@ export class CuratorRegistryService {
 				},
 			},
 		};
-
+		// Remove sensitive and unimportant fields
 		const projection_stage = {
 			// hide sensitive and unimportant curator fields
 			$project: {
@@ -108,16 +110,18 @@ export class CuratorRegistryService {
 			},
 		};
 
+		query_filter["curator.privacy"] = "public";
+
 		const aggregation_pipeline = [
 			{ $match: query_filter },
-			league_visibility_stage, // apply user filter
-			projection_stage , // project out user fields
+			league_visibility_stage, 
+			projection_stage , 
 		];
 		try {
 			const entries = await this.registryEntryModel.aggregate(
 				aggregation_pipeline,
 			);
-			this.logger.debug(`entries: ${entries.length}`);
+			this.logger.debug(`Found entries: ${entries.length}`);
 			return entries;
 		} catch (error) {
 			this.logger.error('Error while processing request to get all entries...');
