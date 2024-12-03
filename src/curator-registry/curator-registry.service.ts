@@ -112,17 +112,18 @@ export class CuratorRegistryService {
 
 		query_filter["curator.privacy"] = "public";
 
-		const aggregation_pipeline = [
+		const aggregation_pipeline : PipelineStage[] = [
 			{ $match: query_filter },
 			league_visibility_stage, 
-			projection_stage , 
+			projection_stage,
+			...query.getMongoAggregation()
 		];
 		try {
 			const entries = await this.registryEntryModel.aggregate(
 				aggregation_pipeline,
 			);
 			this.logger.debug(`Found entries: ${entries.length}`);
-			return entries;
+			return { length: entries.length, data: entries };;
 		} catch (error) {
 			this.logger.error('Error while processing request to get all entries...');
 			this.logger.error(error);

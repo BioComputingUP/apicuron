@@ -7,6 +7,7 @@ import { plainToInstance } from 'class-transformer';
 import { UserReq } from 'src/auth/decorators/applyUser.decorator';
 import { User } from 'src/core/schemas/user.schema';
 import { userResourceEntityPrivacyFilter } from 'src/util/privacy.helper';
+import { paginate, Paginated } from 'src/pagination/paginator';
 
 @Controller('curator-registry')
 export class CuratorRegistryController {
@@ -15,16 +16,18 @@ export class CuratorRegistryController {
 	private logger = new Logger(CuratorRegistryController.name);
 
 	@Get('all')
-	async getAllEntries(@Query() query: RegistryEntriesDto, 		
-	@UserReq() user: User) {
+	async getAllEntries(
+		@Query() query: RegistryEntriesDto,
+		@UserReq() user: User,
+	) : Promise<Paginated<any>> | null {
 		const getStatDtoInstance = plainToInstance(RegistryEntriesDto, query);
-		const request_orcid= (!user)? "":user.orcid_id;
+		const request_orcid = !user ? '' : user.orcid_id;
 		try {
-			const result = await this.registryService.getAllEntries(
+			const { data, length } = await this.registryService.getAllEntries(
 				getStatDtoInstance,
-				request_orcid
+				request_orcid,
 			);
-			return { length: result.length, data: result };
+			return paginate(data, getStatDtoInstance, length);
 		} catch (error) {
 			this.logger.error(error);
 		}
