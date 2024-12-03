@@ -26,7 +26,7 @@ export class CuratorRegistryService {
 	 * Get all curators from registry that match the user filter query
 	 * @param query : user query
 	 */
-	async getAllEntries(query: RegistryEntriesDto) {
+	async getAllEntries(query: RegistryEntriesDto, requestUserOrcid: string) {
 		// TODO: Add pagination
 
 		//extract user query details
@@ -37,47 +37,90 @@ export class CuratorRegistryService {
 		} = query;
 		//build query filter
 		const query_filter: FilterQuery<CuratorRegistryEntryDocument> = {};
+		const field =
+			filtered_field === 'orcid_id'
+				? 'curator.orcid_id'
+				: 'curator.displayedName';
 		if (!!user_query)
-			query_filter[`curator.${filtered_field}`] = { $regex: user_query, $options: 'i' };
+			query_filter[field] = { $regex: user_query, $options: 'i' };
 
 		if (!!filtered_resources) {
 			query_filter['contributed_to'] = {
 				$elemMatch: { resource_id: { $in: filtered_resources } },
 			};
 		}
-		const fields_to_hide = {
-			// hide sensitive and unimportant curator fields
-			'curator.role': 0,
-			'curator._id': 0,
-			'curator.__v': 0,
-			'curator.last_update': 0,
-			'curator.orcid_permission': 0,
-			'curator.cookie_token': 0,
-			'curator.resource_settings': 0,
-			'curator.refresh_token': 0,
-			'curator.resources': 0,
-			'curator.orcid_scope': 0,
-			'curator.orcid_work_put_codes': 0,
-			// resource fields
-			'contributed_to.resource._id': 0,
-			'contributed_to.resource.leagues.updatedAt': 0,
-			'contributed_to.resource.leagues.createdAt': 0,
-			'contributed_to.resource.leagues._id': 0,
-			__v: 0,
-			_id: 0,
+
+		const league_visibility_stage = {
+			$set: {
+				contributed_to: {
+					$map: {
+						input: '$contributed_to',
+						as: 'item',
+						in: {
+							$mergeObjects: [
+								'$$item',
+								{
+									groups: {
+										$filter: {
+											input: '$$item.groups',
+											as: 'group',
+											cond: {
+												$or: [
+													{
+														$ne: ['$$group.visibility', 'private'],
+													},
+													{
+														$eq: ['$curator_orcid', requestUserOrcid],
+													},
+												],
+											},
+										},
+									},
+								},
+							],
+						},
+					},
+				},
+			},
 		};
+
+		const projection_stage = {
+			// hide sensitive and unimportant curator fields
+			$project: {
+				'curator.role': 0,
+				'curator._id': 0,
+				'curator.__v': 0,
+				'curator.last_update': 0,
+				'curator.orcid_permission': 0,
+				'curator.cookie_token': 0,
+				'curator.resource_settings': 0,
+				'curator.refresh_token': 0,
+				'curator.resources': 0,
+				'curator.orcid_scope': 0,
+				'curator.orcid_work_put_codes': 0,
+				// resource fields
+				'contributed_to.resource._id': 0,
+				'contributed_to.resource.leagues.updatedAt': 0,
+				'contributed_to.resource.leagues.createdAt': 0,
+				'contributed_to.resource.leagues._id': 0,
+				__v: 0,
+				_id: 0,
+			},
+		};
+
 		const aggregation_pipeline = [
-			{ $match: { ...query_filter } }, // apply user filter
-			{ $project: { ...fields_to_hide } }, // project out user fields
+			{ $match: query_filter },
+			league_visibility_stage, // apply user filter
+			projection_stage , // project out user fields
 		];
 		try {
 			const entries = await this.registryEntryModel.aggregate(
 				aggregation_pipeline,
 			);
-			this.logger.debug(`entries: ${entries}`);
+			this.logger.debug(`entries: ${entries.length}`);
 			return entries;
 		} catch (error) {
-			this.logger.error('Error while getting information about all users...');
+			this.logger.error('Error while processing request to get all entries...');
 			this.logger.error(error);
 		}
 	}
@@ -240,7 +283,7 @@ export class CuratorRegistryService {
 	}
 
 	async recomputeAllEntries() {
-		// yeah...
+		// don't use this unless needed
 
 		const aggregation_pipeline: PipelineStage[] = [
 			{

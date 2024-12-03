@@ -4,6 +4,10 @@ import { Public } from 'src/auth/decorators/public.decorator';
 import { RegistryEntriesDto } from './dto/registry-entries.dto';
 import { plainToInstance } from 'class-transformer';
 
+import { UserReq } from 'src/auth/decorators/applyUser.decorator';
+import { User } from 'src/core/schemas/user.schema';
+import { userResourceEntityPrivacyFilter } from 'src/util/privacy.helper';
+
 @Controller('curator-registry')
 export class CuratorRegistryController {
 	constructor(protected registryService: CuratorRegistryService) {}
@@ -11,12 +15,14 @@ export class CuratorRegistryController {
 	private logger = new Logger(CuratorRegistryController.name);
 
 	@Get('all')
-	async getAllEntries(@Query() query: RegistryEntriesDto) {
+	async getAllEntries(@Query() query: RegistryEntriesDto, 		
+	@UserReq() user: User) {
 		const getStatDtoInstance = plainToInstance(RegistryEntriesDto, query);
-		this.logger.debug(`Query: ${JSON.stringify(getStatDtoInstance)}`);
+		const request_orcid= (!user)? "":user.orcid_id;
 		try {
 			const result = await this.registryService.getAllEntries(
 				getStatDtoInstance,
+				request_orcid
 			);
 			return { length: result.length, data: result };
 		} catch (error) {
