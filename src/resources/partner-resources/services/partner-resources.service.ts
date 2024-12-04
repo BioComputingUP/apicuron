@@ -10,6 +10,7 @@ import { DeleteLeagueDTO } from '../leagues/dto/delete-league.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { LeagueDeletedEvent } from '../leagues/events/league-deleted-event';
 import _ from 'lodash';
+import { PartnerResourceUpdatedEvent } from '../events/resource-updated.event';
 
 @Injectable()
 export class PartnerResourcesService {
@@ -137,10 +138,22 @@ export class PartnerResourcesService {
 	) {
 		const { resource_id } = resource_update;
 
-		return await this.partnerResourceModel.updateOne(
+		const resource = await this.get_resource(resource_id);
+
+		// const update = await resource.update({ $set: resource_update });
+
+		const newResource = await this.partnerResourceModel.findOneAndUpdate(
 			{ resource_id },
-			resource_update,
+			{ $set: resource_update },
+			{ new: true },
 		);
+
+		await this.eventEmitter.emitAsync(
+			PartnerResourceUpdatedEvent.name,
+			new PartnerResourceUpdatedEvent(resource, newResource),
+		);
+
+		return newResource;
 	}
 
 	public getResourceLeagues(

@@ -8,6 +8,9 @@ import {
 	getQuarterStart,
 	getWeekStart,
 } from '../../util/date.helper';
+import { PartnerResourceDocument, TermDocument } from '../../core/schemas';
+import { UserDocument } from '../../core/schemas/user.schema';
+import { LeagueDocument } from '../../core/schemas/league/league.schema';
 
 export interface DetailedStatAggregationResult {
 	_id: {
@@ -27,6 +30,10 @@ export interface DetailedStatAggregationResult {
 	last_week_count: number;
 	last_month_count: number;
 	last_quarter_count: number;
+	resource: PartnerResourceDocument;
+	user: UserDocument;
+	league_data: LeagueDocument;
+	term: TermDocument;
 }
 
 @Injectable()
@@ -62,6 +69,18 @@ export class DetailedStatisticsPipeline {
 				},
 				activity_term: {
 					$first: '$activity_term',
+				},
+				resource: {
+					$first: '$resource',
+				},
+				user: {
+					$first: '$user',
+				},
+				league_data: {
+					$first: '$league_data',
+				},
+				term: {
+					$first: '$term',
 				},
 				privacy: {
 					$first: '$privacy',

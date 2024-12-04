@@ -100,7 +100,7 @@ export const ModelDefinitions: ModelDefinition[] = [
 		discriminators: [
 			{
 				name: PartnerResource.name,
-				schema: PartnerResourceSchemaFactory()
+				schema: PartnerResourceSchemaFactory(),
 			},
 			{
 				name: SubmittedResource.name,

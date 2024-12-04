@@ -12,7 +12,10 @@ import {
 } from '../../core/schemas/statistics/detailed-statistics.schema';
 import { ComputeDetailedStatisticsService } from './compute-detailed-stats.service';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { computeAggregatePrivacyField } from '../../util/privacy.helper';
+import {
+	computeAggregatePrivacyField,
+	updateUserAggregatePrivacy,
+} from '../../util/privacy.helper';
 import { Injectable, Logger } from '@nestjs/common';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { TermDocument } from '../../core/schemas/terms.schema';
@@ -32,23 +35,28 @@ export class DetailedStatisticsAggregatorService implements Aggregator {
 	) {}
 
 	async updatedLeague(leagueUpdated: LeagueUpdatedEvent): Promise<number> {
+		await this.detailedStatsModel.updateMany(
+			{
+				resource_id: leagueUpdated.resource.resource_id,
+				league: leagueUpdated.newValue.name,
+			},
+			{
+				$set: {
+					league_data: leagueUpdated.newValue,
+				},
+			},
+		);
+
 		if (!leagueUpdated.privacyChanged()) {
 			return;
 		}
 
-		const newPrivacy = leagueUpdated.newValue.visibility;
-		const filter = {
+		const updates = await updateUserAggregatePrivacy(this.detailedStatsModel, {
 			resource_id: leagueUpdated.resource.resource_id,
 			league: leagueUpdated.newValue.name,
-		};
-
-		const statUpdate = await this.detailedStatsModel.updateMany(filter, {
-			$set: {
-				privacy: newPrivacy,
-			},
 		});
 
-		return statUpdate.modifiedCount;
+		return updates.reduce((acc, cur) => acc + cur.modifiedCount, 0);
 	}
 
 	async termDeleted(term: TermDocument) {
@@ -100,55 +108,27 @@ export class DetailedStatisticsAggregatorService implements Aggregator {
 	async updatedUser(
 		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
 	) {
-		let curator_orcid, privacy, user;
+		let user;
 		if (event instanceof EntityCreatedEvent) {
-			curator_orcid = event.instance.orcid_id;
-			privacy = event.instance.privacy;
 			user = event.instance;
 		}
 		if (event instanceof EntityUpdatedEvent) {
-			curator_orcid = event.after.orcid_id;
-			privacy = event.after.privacy;
 			user = event.after;
 		}
+
 		await this.detailedStatsModel.updateMany(
 			{
-				curator_orcid,
-				privacy: PrivacyType.public,
+				curator_orcid: user.orcid_id,
 			},
 			{
-				$set: { privacy, user },
+				$set: {
+					user: user.toObject(),
+				},
 			},
 		);
 
-		const resource_ids = await this.detailedStatsModel.distinct('resource_id', {
-			curator_orcid,
+		await updateUserAggregatePrivacy(this.detailedStatsModel, {
+			curator_orcid: user.orcid_id,
 		});
-		const resources = await this.resourceService.get_resources({
-			resource_id: { $in: resource_ids },
-		});
-		const resourceLeagues = resources
-			.map((resource) => this.resourceService.getResourceLeagues(resource))
-			.flat();
-		const updates$ = [];
-		for (const [resource, league] of resourceLeagues) {
-			const update$ = this.detailedStatsModel.updateMany(
-				{
-					resource_id: resource.resource_id,
-					league: league.name,
-					curator_orcid,
-				},
-				{
-					privacy: computeAggregatePrivacyField(
-						{ privacy: league.visibility },
-						{ privacy },
-					),
-				},
-			);
-
-			updates$.push(update$);
-		}
-
-		await Promise.all(updates$);
 	}
 }

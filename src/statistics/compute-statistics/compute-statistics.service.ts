@@ -78,9 +78,9 @@ export class ComputeStatisticsService {
 			);
 		}
 
-		const term = await this.reportAggregator.getTerm(
-			this.getRelatedTermFilter(report),
-		);
+		const term =
+			report.term ??
+			(await this.reportAggregator.getTerm(this.getRelatedTermFilter(report)));
 		if (!term) {
 			this.logger.warn(
 				`Warning, report found with term ${activity_term} but no corresponding term was found, deleting report`,
@@ -111,6 +111,9 @@ export class ComputeStatisticsService {
 						curator_orcid,
 						resource_id,
 						league,
+						resource: report.resource,
+						user: report.user ?? null,
+						league_data: report.league_data,
 					},
 				},
 				{
@@ -151,58 +154,10 @@ export class ComputeStatisticsService {
 		}
 	}
 
-	private reportIsRelatedToStat(
-		report: ReportDocument,
-		stat: StatisticsDocument,
-	): boolean {
-		return (
-			report.resource_id === stat.resource_id &&
-			report.curator_orcid === stat.curator_orcid &&
-			report.league === stat.league
-		);
-	}
-
-	private aggregateReportsByActivity(filter: FilterQuery<ReportDocument> = {}) {
-		return this.reportModel
-			.aggregate()
-			.match(filter)
-			.group({
-				_id: {
-					resource_id: '$resource_id',
-					curator_orcid: '$curator_orcid',
-					league: '$league',
-					activity_term: '$activity_term',
-				},
-				resource_id: {
-					$first: '$resource_id',
-				},
-				curator_orcid: {
-					$first: '$curator_orcid',
-				},
-				league: {
-					$first: '$league',
-				},
-				activity_term: {
-					$first: '$activity_term',
-				},
-				count: {
-					$sum: 1,
-				},
-			})
-			.sort({
-				resource_id: -1,
-				curator_orcid: -1,
-				league: -1,
-				activity_term: -1,
-			});
-	}
-
-	updateSingleStat(
-		stat: StatisticsDocument,
-		{ resource, report, term }: BaseReportIteratorResult<BaseAggregationResult>,
-	) {
+	updateSingleStat(stat: StatisticsDocument, report: BaseAggregationResult) {
+		const { term, league_data } = report;
 		stat.privacy = computeAggregatePrivacyField(
-			{ privacy: resource.getLeague(report.league).visibility },
+			{ privacy: league_data.visibility },
 			report,
 		);
 		const activity_category = term.activity_category;
@@ -244,13 +199,16 @@ export class ComputeStatisticsService {
 		const reportsByTerms = this.reportAggregator.iterate(filter);
 
 		let currentStat = null;
-		for await (const { resource, report, term } of reportsByTerms) {
+		for await (const report of reportsByTerms) {
 			if (!currentStat) {
 				// instantiate a new stat object if the current stat is null
 				currentStat = new this.statModel({
 					resource_id: report.resource_id,
 					curator_orcid: report.curator_orcid,
 					league: report.league,
+					league_data: report.league_data,
+					resource: report.resource,
+					user: report.user,
 				});
 			}
 			if (
@@ -263,10 +221,13 @@ export class ComputeStatisticsService {
 					resource_id: report.resource_id,
 					curator_orcid: report.curator_orcid,
 					league: report.league,
+					league_data: report.league_data,
+					resource: report.resource,
+					user: report.user,
 				});
 			}
 
-			this.updateSingleStat(currentStat, { resource, report, term });
+			this.updateSingleStat(currentStat, report);
 		}
 
 		if (currentStat) {
@@ -280,14 +241,14 @@ export class ComputeStatisticsService {
 
 	async incrementStatByReport(
 		report: ReportDocument | Report | LeanDocument<Report>,
-		resource: PartnerResourceDocument,
 		term: TermDocument,
+		resource: PartnerResourceDocument,
 		user?: UserDocument,
 	) {
 		const statFilter = await this.getRelatedStatsFilter(report);
 
-		const statExists = await this.statModel.exists(statFilter);
-		if (statExists) {
+		const statExists = await this.statModel.findOne(statFilter);
+		if (!!statExists) {
 			return await this.upsertStatByReport(report);
 		}
 
@@ -308,9 +269,16 @@ export class ComputeStatisticsService {
 			],
 			first_contribution: report.timestamp,
 			last_contribution: report.timestamp,
+			resource,
+			user: user ?? null,
 		});
 		stat.privacy = computePrivacyField(resource, user, stat);
-
-		await stat.save();
+		try {
+			await stat.save();
+		} catch (err) {
+			if (err instanceof MongoServerError && err.code == 11000) {
+				return await this.incrementStatByReport(report, term, resource, user);
+			}
+		}
 	}
 }

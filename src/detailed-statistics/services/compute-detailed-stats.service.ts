@@ -44,6 +44,9 @@ export class ComputeDetailedStatisticsService {
 		term: TermDocument,
 	): DetailedStatisticsDocument {
 		const stat = new this.detailedStatsModel({
+			user: report.user,
+			resource: report.resource,
+			league_data: report.league_data,
 			curator_orcid: report.curator_orcid,
 			resource_id: report.resource_id,
 			league: report.league,
@@ -120,6 +123,10 @@ export class ComputeDetailedStatisticsService {
 			return newStat;
 		}
 
+		stat.user = report.user ?? null;
+		stat.resource = report.resource;
+		stat.league_data = report.league_data;
+
 		stat.total_count += 1;
 		stat.total_score += term.score;
 
@@ -170,11 +177,13 @@ export class ComputeDetailedStatisticsService {
 		const statSaves$ = [];
 		for await (const entry of agg) {
 			// load the relevant term
-			const term = await this.termModel.findOne({
-				resource_id: entry.resource_id,
-				activity_term: entry.activity_term,
-				league: entry.league,
-			});
+			const term =
+				entry.term ??
+				(await this.termModel.findOne({
+					resource_id: entry.resource_id,
+					activity_term: entry.activity_term,
+					league: entry.league,
+				}));
 
 			// Check if the currentStat that is being computed is different from the current entry
 			// If it is different, save the currentStat and set the current Stat to null
@@ -191,11 +200,17 @@ export class ComputeDetailedStatisticsService {
 
 			// if there is no currentStat, instantiate a new one
 			if (!currentStat) {
-				const user = await this.userRepository.findOne({
-					orcid_id: entry.curator_orcid,
-				});
+				const user =
+					entry.user ??
+					(await this.userRepository.findOne({
+						orcid_id: entry.curator_orcid,
+					})) ??
+					null;
+				const [resource, league_data] = [entry.resource, entry.league_data];
 				currentStat = new this.detailedStatsModel({
 					user,
+					resource,
+					league_data,
 					resource_id: entry.resource_id,
 					curator_orcid: entry.curator_orcid,
 					privacy: entry.privacy,

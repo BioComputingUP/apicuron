@@ -5,9 +5,10 @@ import {
 } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 import { versionKeyUpdatePlugin } from './plugins';
+import { Logger } from '@nestjs/common';
 
 const mongoosePlugins = [versionKeyUpdatePlugin];
-
+const logger = new Logger('ConnectionFactoryProvider');
 export const ConnectionFactoryProvider: MongooseModuleAsyncOptions = {
 	inject: [ConfigService],
 	useFactory: async (
@@ -17,7 +18,7 @@ export const ConnectionFactoryProvider: MongooseModuleAsyncOptions = {
 		const database = configService.get<string>('database');
 		const port = configService.get<number>('db_port');
 		const uri = `mongodb://${db_host}:${port}/${database}`;
-		// logger.log(`MongoDB Connection setup uri: ${uri}`);
+		logger.log(`MongoDB Connection setup uri: ${uri}`);
 		return {
 			uri,
 			connectionFactory: (connection: Connection) => {
