@@ -1,7 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AggregatorClass } from 'src/event-orchestrator/decorators/aggregator.decorator';
 import { Aggregator } from 'src/event-orchestrator/interfaces/aggregator.interface';
-import { ReportDocument, LeanReportDocument } from 'src/core/schemas/reports.schema';
+import {
+	ReportDocument,
+	LeanReportDocument,
+} from 'src/core/schemas/reports.schema';
 import { FilterQuery, Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { TermDocument } from 'src/core/schemas/terms.schema';
@@ -12,15 +15,17 @@ import { Report } from 'src/core/schemas/reports.schema';
 
 import { EntityCreatedEvent, EntityUpdatedEvent } from 'src/core/events';
 import { UserRepository } from 'src/core/repositories/user.repository';
-import { CuratorRegistryEntry, CuratorRegistryEntryDocument } from 'src/core/schemas/curator-registry/curator-entry.schema';
+import {
+	CuratorRegistryEntry,
+	CuratorRegistryEntryDocument,
+} from 'src/core/schemas/curator-registry/curator-entry.schema';
 
 import { CuratorRegistryService } from '../curator-registry.service';
-
+import { PartnerResourceDocument } from 'src/core/schemas';
 
 @Injectable()
 @AggregatorClass()
-export class CuratorRegistryAggregatorService implements Aggregator{
-
+export class CuratorRegistryAggregatorService implements Aggregator {
 	constructor(
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		// @InjectModel(CuratorRegistryEntry.name) protected curatorEntryModel: Model<CuratorRegistryEntryDocument>,
@@ -28,66 +33,121 @@ export class CuratorRegistryAggregatorService implements Aggregator{
 
 		// protected resourceService: PartnerResourcesService,
 		protected userRep: UserRepository,
-	){}
-	private logger = new Logger(CuratorRegistryAggregatorService.name)
-	async applyReport(report: LeanReportDocument | ReportDocument) {
+	) {}
+	private logger = new Logger(CuratorRegistryAggregatorService.name);
 
-
-		// const curatorFilter: FilterQuery<CuratorRegistryEntryDocument> = {
-		// 	curator_orcid : report.curator_orcid,
-			// contributed_to : {$eleMatch: {resource_id: report.resource_id}}
-		// }
-
-		// const curator = await this.curatorEntryModel.findOne(curatorFilter)
-
-		// if(!!curator){
-			
-		// }
-		
-
-
+	async applyReport(
+		report: LeanReportDocument | ReportDocument,
+		term: TermDocument,
+		resource: PartnerResourceDocument,
+		curator?: UserDocument,
+	) {
+		// check registry for existing curator
+		const curatorEntry = await this.registryService.getCuratorEntry(
+			curator.orcid_id,
+		);
+		// if curator has no entry, insert them with the resource, and add league to groups
+		if (curatorEntry === null) {
+			this.registryService.addEntry(
+				report.curator_orcid,
+				report.resource,
+				report.league_data,
+				report.user,
+			);
+			this.logger.debug(`New curator entry created for ${curator.orcid_id}`);
+			return;
+		}
+		// if curator has entry
+		// if resource not in their entry, add it
+		if (
+			curatorEntry.contributed_to.find(
+				(entry) => entry.resource_id === resource.resource_id,
+			) === undefined
+		) {
+			this.registryService.addResourceToUser(
+				report.curator_orcid,
+				report.resource,
+				report.league_data,
+			);
+			this.logger.debug(
+				`Resource ${report.resource_id} added to curator entry with orcid ${report.curator_orcid}`,
+			);
+			return;
+		}
+		// if league not inside the resource entry add it
+		const userResource = curatorEntry.contributed_to.find(
+			(entry) => entry.resource_id === resource.resource_id,
+		);
+		const userHasContributedToLeague = userResource.groups.find(
+			(league) => league.name === report.league_data.name,
+		);
+		if (!userHasContributedToLeague) {
+			this.registryService.addLeagueToUser(
+				report.curator_orcid,
+				resource.resource_id,
+				report.league_data,
+			);
+			this.logger.debug(
+				`League ${report.league} under ${report.resource_id} added to curator entry`,
+			);
+		}
+		return;
 	}
-	updatedUser(event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>) {
+
+	applyAllReports(resource_id: string) {
+		this.registryService.recomputeAllEntries();
+	}
+	updatedUser(
+		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
+	) {
 		if (event instanceof EntityCreatedEvent) {
-			this.logger.debug(`[User Created Event] adding curator ${event.instance.orcid_id}`);
+			this.logger.debug(
+				`[User Created Event] adding curator ${event.instance.orcid_id}`,
+			);
 			this.registryService.addCurator(event.instance);
 		}
 		if (event instanceof EntityUpdatedEvent) {
-			this.logger.debug(`[User Updated Event] updating curator ${event.after.orcid_id}`);
+			this.logger.debug(
+				`[User Updated Event] updating curator ${event.after.orcid_id}`,
+			);
 			this.registryService.updateCurator(event.after);
 			this.logger.debug(`user updated`);
 		}
-		return; 
-	}
-	applyAllReports(resource_id: string) {
-		//idk yet 
-	}
-	removeAllResourceAggregates(resource_id: string) {
-		//idk yet
-	}
-	updateUserPrivacy(curator_orcid: string, privacy: PrivacyType) {
-		// do it
 		return;
+	}
+
+	async removeAllResourceAggregates(resource_id: string) {
+		const resultCount = await this.registryService.removeAllEntries(
+			resource_id,
+		);
+		this.logger.debug(`Deleted ${resultCount} statistics for ${resource_id}`);
+	}
+
+	async updatedLeague(leagueUpdated: LeagueUpdatedEvent) {
+		// Change privacy for changed leagues.
+		if (!leagueUpdated.privacyChanged()) {
+			return;
+		}
+		this.logger.debug('Updating league privacy');
+		const count = await this.registryService.updateLeague(
+			leagueUpdated.newValue,
+		);
+		this.logger.debug(`Updated League privacy for ${count} curators`);
+	}
+	async recomputeAllResourceAggregates(resource_id: string) {
+		await this.removeAllResourceAggregates(resource_id);
+		await this.applyAllReports(resource_id);
 	}
 	deleteLeague(resource_id: string, league: string): Promise<number> | number {
-		// Check for all users in the league and remove it??
+		// Do nothing
 		return;
-	}
-	updatedLeague(leagueUpdated: LeagueUpdatedEvent): Promise<number> | number {
-		// Add league to added users, remove league from removed users and if league privacy changed
-		return;
-	}
-	recomputeAllResourceAggregates(resource_id: string) {
-		//idk probably nothing
 	}
 	termUpdated(oldTerm: TermDocument, term: TermDocument) {
 		//shouldn't affect
 		return;
 	}
 	termDeleted(term: TermDocument) {
-		
+		// doesn't affect
 		return;
 	}
-
 }
-
