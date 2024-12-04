@@ -6,7 +6,11 @@ import { Paginated } from "src/app/interfaces/paginated";
 import { CuratorStatistics } from "src/app/models/statistics.model";
 import { environment } from "src/environments/environment";
 import { StatisticsFilter } from "../models/statistics-filter";
-import { CuratorWithStats, CuratorWithWeeklyStats } from "../models/curator-stats";
+import {
+  CuratorWithStats,
+  CuratorWithWeeklyStats,
+  DetailedStatistics,
+} from "../models/curator-stats";
 
 @Injectable()
 export class CuratorStatisticsService {
@@ -22,7 +26,7 @@ export class CuratorStatisticsService {
       })
       .pipe(
         pluck("data"),
-        map((data: CuratorStatistics[]) => {
+        map((data: CuratorStatistics[]): CuratorStatistics[] => {
           return data.map((stat: CuratorStatistics) =>
             new CuratorStatistics().deserialize(stat)
           );
@@ -51,12 +55,29 @@ export class CuratorStatisticsService {
       );
   }
 
+  getDetailedStatistics(resource_id: string, orcid_id: string): Observable<DetailedStatistics[]> {
+    return this.http
+      .get(`${this.ws}/detailed-statistics/${resource_id}/${orcid_id}`, {
+        headers: {
+          version: "2",
+        },
+      })
+      .pipe(
+        pluck("data"),
+        map((data: DetailedStatistics[]) => {
+          return data.map((stat: DetailedStatistics) =>
+            new DetailedStatistics().deserialize(stat)
+          );
+        })
+      );
+  }
+
   getWeeklyStatistics(
     resource_id: string,
     curator_orcid: string,
     league: string,
     statFilter: StatisticsFilter
-    ): Observable<Paginated<CuratorWithWeeklyStats>> {
+  ): Observable<Paginated<CuratorWithWeeklyStats>> {
     const url = `${this.ws}/weekly-statistics/${resource_id}/${curator_orcid}/${league}`;
     return this.http
       .get(url, {
@@ -73,5 +94,5 @@ export class CuratorStatisticsService {
           return response;
         })
       );
-    }
+  }
 }

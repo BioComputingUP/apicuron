@@ -1,41 +1,61 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
+import { Injectable, OnDestroy } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { map, startWith, take, tap } from "rxjs/operators";
 import {
-  BehaviorSubject,
+  catchError,
+  map,
+  shareReplay,
+  startWith,
+  take,
+  takeUntil,
+  tap,
+} from "rxjs/operators";
+import {
+  EMPTY,
   Observable,
   Subject,
   combineLatest,
-  concat,
+  merge,
+  of,
+  throwError,
 } from "rxjs";
 import { switchMap, pluck } from "rxjs/operators";
 import { environment } from "src/environments/environment";
-import { User } from "src/app/models/User.model";
 import { ResourceGroup } from "../../../models/resource-group.model";
+import { Dialog } from "@angular/cdk/dialog";
+import { ViewParticipantsComponent } from "../view-participants/view-participants.component";
+import { UpdateGroupComponent } from "../update-group/update-group.component";
+import { GroupCreateForm } from "../../../components/group-create-form/group-create-form.component";
+import { ToastrService } from "ngx-toastr";
+import { ConfirmationService } from "../../../../../projects/apicuron-util/src/lib/confirmation";
 
-// export type CreateLeague = Required<UpdateLeague>
+export type UpdateGroup = Partial<ResourceGroup> & DeleteGroup;
+export type DeleteGroup = Pick<ResourceGroup, "name" | "resource_id">;
 
-// export type RemoveLeague = Omit<UpdateLeague>
+type GroupOperation = {
+  group: ResourceGroup;
+  operation: "update" | "delete" | "create";
+} | null;
 
-// @Injectable({
-// providedIn: 'root' // This is wrong, there are only some cases where this makes sense
-// })
 @Injectable()
-export class GroupsService {
-  resourceGroups$: Observable<ResourceGroup[]>;
-  constructor(protected http: HttpClient, protected route: ActivatedRoute) {}
+export class GroupsService implements OnDestroy {
+  constructor(
+    protected http: HttpClient,
+    protected route: ActivatedRoute,
+    protected dialog: Dialog,
+    protected confirmationService: ConfirmationService,
+    protected toastr: ToastrService
+  ) {}
 
+  resourceGroups$: Observable<{ data: ResourceGroup[] }>;
+  destroy$ = new Subject<void>();
   ws = environment.ws;
-
   resource_id$: Observable<string>;
-  leagues$: Observable<any[]>;
-  currentParticipants$: Observable<any[]>;
-  selectedGroup$ = new Subject<string>();
-  currentGroup$: Observable<ResourceGroup>;
-  curator$: Observable<User>;
+  groupUpdates$ = new Subject<GroupOperation>();
 
-  selectGroup$ = new Subject<ResourceGroup>();
+  ngOnDestroy(): void {
+    this.destroy$.next();
+  }
 
   fetchResourceGroups(resource_id: string): Observable<ResourceGroup[]> {
     return this.http
@@ -54,89 +74,257 @@ export class GroupsService {
 
   init(resource_id$: Observable<string>) {
     this.resource_id$ = resource_id$;
-    this.resourceGroups$ = this.resource_id$.pipe(
-      switchMap((resource_id: string) => this.fetchResourceGroups(resource_id))
+    const resourceGroupList$ = this.resource_id$.pipe(
+      switchMap((resource_id: string) => this.fetchResourceGroups(resource_id)),
+      map((groups: ResourceGroup[]) => ({ data: groups }))
     );
 
-    const firstGroup$: Observable<ResourceGroup> = this.resourceGroups$.pipe(
-      map((groups: ResourceGroup[]) => groups[0]),
-      take(1),
+    this.resourceGroups$ = combineLatest([
+      resourceGroupList$,
+      this.groupUpdates$.pipe(startWith(<string>null)),
+    ]).pipe(
+      map(
+        ([resourceGroupList, groupUpdates]: [
+          { data: ResourceGroup[] },
+          GroupOperation
+        ]) => {
+          return this.loadGroupsList(resourceGroupList, groupUpdates);
+        }
+      )
     );
-
-    this.currentGroup$ = concat(firstGroup$, this.selectGroup$);
-
-    // this.currentParticipants$ = this.leagues$.pipe(
-    //   map((groups) => {
-    //     return groups.reduce((allParticipants, group) => {
-    //       return allParticipants.concat(
-    //         group.defaultMembers.map((participant) => [participant, group.name])
-    //       );
-    //     }, []);
-    //   })
-    // );
   }
 
-  getCurrentGroup(): Observable<ResourceGroup> {
-    return this.currentGroup$;
+  loadGroupsList(
+    resourceGroupList: { data: ResourceGroup[] },
+    groupUpdates: GroupOperation
+  ): { data: ResourceGroup[] } {
+    if (!!groupUpdates) {
+      switch (groupUpdates.operation) {
+        case "create":
+          resourceGroupList.data = [
+            ...resourceGroupList.data,
+            groupUpdates.group,
+          ];
+          break;
+        case "delete":
+          resourceGroupList.data = resourceGroupList.data.filter(
+            (group) => group.name != groupUpdates.group.name
+          );
+          break;
+        case "update":
+          resourceGroupList.data = resourceGroupList.data.map((group) =>
+            // if the group matches the updated group we replace the value with the new one.
+            // otherwise we keep the old group
+            group.name == groupUpdates.group.name ? groupUpdates.group : group
+          );
+          break;
+      }
+    }
+    return resourceGroupList;
   }
 
-  getResourceGroups(): Observable<ResourceGroup[]> {
+  getResourceGroups(): Observable<{ data: ResourceGroup[] }> {
     return this.resourceGroups$;
   }
 
-  getGroups(): Observable<any[]> {
-    return this.leagues$;
+  openCreateGroupForm() {
+    const dialogRef = this.dialog.open(GroupCreateForm);
+    const component: GroupCreateForm = dialogRef.componentInstance;
+
+    combineLatest([component.formResult, this.resource_id$])
+      .pipe(
+        switchMap(([resourceGroup, resource_id]: [ResourceGroup, string]) => {
+          resourceGroup.resource_id = resource_id;
+          return this.createNewGroup(resourceGroup);
+        }),
+        map((group: ResourceGroup) => {
+          dialogRef.close();
+          this.groupUpdates$.next({ group, operation: "create" });
+          return group;
+        }),
+        takeUntil(merge(this.destroy$, component.destroy$))
+      )
+      .subscribe(() => {});
   }
 
-  selectGroup(group: ResourceGroup) {
-    this.selectGroup$.next(group);
+  openUpdateGroupForm(resourceGroup: ResourceGroup) {
+    // Pass the resourceGroup as an input (use the CreateGroupForm as an example)
+    const dialogRef = this.dialog.open(UpdateGroupComponent, {
+      data: {
+        group: resourceGroup,
+      },
+      maxWidth: "95vw",
+    });
+    const component: UpdateGroupComponent = dialogRef.componentInstance;
+
+    component.formResult
+      .pipe(
+        tap(console.log),
+        switchMap((group: ResourceGroup) => {
+          return this.updateGroup(group);
+        }),
+        map((data: ResourceGroup) => {
+          dialogRef.close();
+          this.groupUpdates$.next({ group: data, operation: "update" });
+          return data;
+        }),
+        takeUntil(merge(this.destroy$, component.destroy$))
+      )
+      .subscribe(() => {});
   }
 
-  getParticipants() {
-    return this.currentParticipants$;
-  }
-
-  onSelectedGroupChange(groupName) {
-    this.selectedGroup$.next(groupName);
-  }
-
-  get_resource_leagues(resource_id: string) {
-    return this.http.get(`${this.ws}/leagues/${resource_id}`, {
-      headers: {
-        version: "2",
+  viewParticipants(resourceGroup: ResourceGroup) {
+    this.dialog.open(ViewParticipantsComponent, {
+      data: {
+        group: resourceGroup,
       },
     });
   }
 
-  create_league() {
-    return this.http.post(this.ws + "/leagues", {
-      headers: {
-        version: "2",
+  createNewGroup(group: ResourceGroup) {
+    return this.http
+      .post(`${this.ws}/leagues`, group.serialize(), {
+        headers: { version: "2" },
+      })
+      .pipe(
+        catchError(this.errorHandler("Group Creation Error")),
+        pluck("data"),
+        map((response: any) => {
+          return new ResourceGroup().deserialize(response);
+        }),
+        tap((group: ResourceGroup) => {
+          this.toastr.success(
+            `Group ${group.displayedName} is successfully created`,
+            `Group Created`
+          );
+        })
+      );
+  }
+
+  addMemberToLeague(group: ResourceGroup) {
+    this.resource_id$.pipe(
+      take(1),
+      switchMap((resource_id) => {
+        return this.http.post(`${this.ws}/leagues/add-member`, {
+          headers: { version: "2" },
+          body: {
+            // member:
+            resource_id: resource_id,
+            league: group.name,
+          },
+        });
+      })
+    );
+  }
+
+  deleteMemberFromLeague(group: ResourceGroup) {
+    this.resource_id$.pipe(
+      take(1),
+      switchMap((resource_id) => {
+        return this.http.delete(`${this.ws}/leagues/remove-member`, {
+          headers: { version: "2" },
+          body: {
+            // member:
+            resource_id: resource_id,
+            league: group.name,
+          },
+        });
+      })
+    );
+  }
+
+  deleteGroup(group: ResourceGroup) {
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete the group ${group.displayedName}?`,
+      title: `Delete Group`,
+      iconSrc: "assets/svg/exclamation-circle.svg",
+      accept: async () => {
+        return await this.deleteGroupConfirmed(group);
       },
+      reject: async () => {},
     });
   }
 
-  delete_league() {
-    return this.http.delete(this.ws + "/leagues", {
-      headers: {
-        version: "2",
-      },
+  deleteGroupConfirmed(group: ResourceGroup): Promise<any> {
+    const deletion$ = this.resource_id$.pipe(
+      take(1),
+      switchMap((resource_id) => {
+        return this.http
+          .delete(`${this.ws}/leagues`, {
+            headers: { version: "2" },
+            body: {
+              resource_id: resource_id,
+              league: group.name,
+            },
+          })
+          .pipe(
+            map((response) => [response, null]),
+            catchError((error) => {
+              const errorMessage =
+                error.error?.message || error.message || "Unknown error";
+              return of([null, errorMessage]);
+            })
+          );
+      })
+    );
+    return new Promise((resolve, reject) => {
+      deletion$.subscribe(
+        ([response, error]) => {
+          if (!response) {
+            this.toastr.error(`${error}`, `Group Delete Error`);
+            reject(error);
+            return;
+          }
+          if (response["data"]) {
+            this.toastr.success(
+              `Group ${group.displayedName} is successfully deleted`
+            );
+            this.groupUpdates$.next({ group, operation: "delete" });
+            resolve(response);
+          }
+        },
+        (error) => {
+          this.toastr.error(`${error}`, `Group Delete Error`);
+          reject(error);
+        }
+      );
     });
   }
 
-  add_league_member(curator) {
-    return this.http.post(this.ws + "/leagues/add-member", curator, {
-      headers: {
-        Version: "2",
-      },
-    });
+  updateGroup(group: ResourceGroup): Observable<ResourceGroup> {
+    const updateUrl = new URL("leagues", environment.ws + "/");
+    return this.http
+      .put(updateUrl.href, group.serialize(), {
+        headers: {
+          version: "2",
+        },
+      })
+      .pipe(
+        catchError(this.errorHandler("Group Update Error")),
+        pluck("data"),
+        map((response: any) => {
+          return new ResourceGroup().deserialize(response);
+        }),
+        tap((group: ResourceGroup) => {
+          this.toastr.success(
+            `Group ${group.displayedName} is successfully updated`,
+            `Group Updated`
+          );
+        })
+      );
   }
 
-  remove_league_member(curator) {
-    // return this.http.delete(this.ws + "/leagues/remove-member", curator, {
-    //   headers: {
-    //     Version: '2'
-    //   }
-    // })
+  private errorHandler(title: string) {
+    return (error: any) => {
+      if (!(error instanceof HttpErrorResponse)) {
+        return throwError(error);
+      }
+      const userError = error.status < 500 && error.status >= 400;
+      this.toastr.error(`${error.error.message}`, title, {
+        disableTimeOut: userError,
+        tapToDismiss: userError,
+      });
+      return EMPTY;
+    };
   }
 }

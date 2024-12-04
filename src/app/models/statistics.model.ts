@@ -26,7 +26,6 @@ export class BaseCuratorStatistics implements Deserializable {
   first_contribution: number;
   last_contribution: number;
 
-  work_type: "contribution" | "professional" = "contribution";
   total_count: any;
 
   deserialize(input: any): this {
@@ -66,6 +65,7 @@ export class CuratorStatistics extends BaseCuratorStatistics {
 
   resource_uri: string;
   resource_id: string;
+  league: string;
 
   generation_count: number;
   generation_score: number;
@@ -83,7 +83,6 @@ export class CuratorStatistics extends BaseCuratorStatistics {
   invalidation_terms: StatisticsTerm[];
   generation_terms: StatisticsTerm[];
 
-  work_type: "contribution" | "professional" = "contribution";
   total_count: any;
 
   deserialize(input: any): this {
@@ -93,6 +92,7 @@ export class CuratorStatistics extends BaseCuratorStatistics {
     this.invalidation_terms = input.invalidation_terms || null;
 
     this.revision_terms = input.revision_terms || null;
+    this.league = input.league;
 
     return this;
   }
@@ -110,9 +110,10 @@ export class WeeklyCuratorStatistics implements Deserializable {
   ranking: number;
   total_count: number;
   total_score: number;
-  daysOfWeek: Array< { day: number; count: number } >;
-  first_contribution: number;
-  last_contribution: number;
+  first_contribution: Date;
+  last_contribution: Date;
+  weekStart: Date;
+  weekEnd: Date;
 
   deserialize(input: any): this {
     this.curator_orcid = input.curator_orcid;
@@ -126,9 +127,10 @@ export class WeeklyCuratorStatistics implements Deserializable {
     this.ranking = input.ranking;
     this.total_count = input.total_count;
     this.total_score = input.total_score;
-    this.daysOfWeek = this.processDaysOfWeek(input.daysOfWeek);
     this.first_contribution = input.first_contribution;
     this.last_contribution = input.last_contribution;
+    this.weekStart = input.weekStart;
+    this.weekEnd = input.weekEnd;
     return this;
   }
 

@@ -21,14 +21,28 @@ import { RouterModule } from "@angular/router";
 import { SpinnerComponent } from "../components/utils/spinner/spinner.component";
 import { UsersService } from "./services/users.service";
 import { CuratorReportsDetailsComponent } from "../components/curator-reports-details/curator-reports-details.component";
+import { CdkMenuModule } from "@angular/cdk/menu";
+import { NumberCardComponent } from "../components/number-card/number-card.component";
+import { DashboardService } from "./services/dashboard.service";
+import { UserResourceDashboard } from "./user-resource-dashboard/page/user-resource-dashboard.component";
+import { UserResourceDashboardService } from "./user-resource-dashboard/services/user-resource-dashboard.service";
+import { BadgeCardComponent } from "../components/badge-card/badge-card.component";
+import { MyBadgesDetailsComponent } from "../components/my-badges-details/my-badges-details.component";
+import { DoughtnutPieChartComponent } from "../components/charts/doughnut-pie-chart/doughnut-pie-chart.component";
 @NgModule({
   declarations: [
     DashboardSidebarComponent,
     UserDashboardComponent,
     UserOverviewComponent,
     ProfileUpdateComponent,
+    UserResourceDashboard,
   ],
-  providers: [UserOverviewPageService, UsersService],
+  providers: [
+    UserOverviewPageService,
+    UsersService,
+    DashboardService,
+    UserResourceDashboardService,
+  ],
   imports: [
     CommonModule,
     RouterModule,
@@ -37,14 +51,19 @@ import { CuratorReportsDetailsComponent } from "../components/curator-reports-de
     AuthDropdownComponent,
     ReactiveFormsModule,
     DatabasesModule,
+    CdkMenuModule,
     AngularSvgIconModule,
     NavbarComponent,
     CalendarModule,
-    SvgModule,
+    // SvgModule,
+    MyBadgesDetailsComponent,
+    // BadgeCardComponent,
     SpinnerComponent,
     ReportsByDateChartComponent,
     CategoriesPieChartComponent,
     CuratorReportsDetailsComponent,
-  ],
+    NumberCardComponent,
+    DoughtnutPieChartComponent
+],
 })
 export class DashboardModule {}

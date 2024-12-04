@@ -5,5 +5,5 @@ export interface Deserializable {
 
 
 export interface Serializable {
-    serialize(input: any): this;
+    serialize(input: any): Record<string, any>;
 }

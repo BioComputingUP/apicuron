@@ -6,20 +6,20 @@ import { DatabasesPageComponent } from "./databases-page/databases-page.componen
 import { DatabasesRoutingModule } from "./databases-routing.module";
 import { DatabasePageComponent } from "./database-page/database-page.component";
 import { CuratorModule } from "../curator/curator.module";
-import { SvgModule } from "../svg/svg.module";
 import { DatabaseCreateComponent } from "./database-create/database-create.component";
 import { ReactiveFormsModule } from "@angular/forms";
 import { AuthModule } from "../auth/auth.module";
 import { DatabasesService } from "./services/databases.service";
 import { TermCardComponent } from "../components/term-card/term-card.component";
 import { BadgeDefCardComponent } from "../components/badge-def-card/badge-def-card.component";
-import { ListExpandComponent } from "../components/utils/list-expand/list-expand.component";
 import { MedalDefCardComponent } from "../components/medal-def-card/medal-def-card.component";
 import { AchievementsDefModule } from "../achievements-def/achievements-def.module";
 import { TermsModule } from "../terms/terms.module";
-import { LeaderboardComponent } from "../components/leaderboard/leaderboard.component";
-import { TotalLeaderboardComponent } from "../components/total-leaderboard/total-leaderboard.component";
-import { WeeklyLeaderboardComponent } from "../components/weekly-leaderboard/weekly-leaderboard.component";
+import { CdkAccordionModule } from "@angular/cdk/accordion";
+import { LeaderboardModule } from "../../../projects/apicuron-util/src/lib/leaderboard/leaderboard.module";
+import { FairSharingComponent } from "./fairsharing/fairsharing.component";
+import { FairSharingService } from "./services/fairsharing.service";
+import { NumberCardComponent } from "../components/number-card/number-card.component";
 @NgModule({
   declarations: [
     DatabasesPageComponent,
@@ -28,12 +28,11 @@ import { WeeklyLeaderboardComponent } from "../components/weekly-leaderboard/wee
   ],
   imports: [
     CommonModule,
+    CdkAccordionModule,
     TermCardComponent,
-    ListExpandComponent,
     BadgeDefCardComponent,
     DatabasesRoutingModule,
     AuthModule,
-    SvgModule,
     ResourceModule,
     RouterModule,
     CuratorModule,
@@ -42,11 +41,12 @@ import { WeeklyLeaderboardComponent } from "../components/weekly-leaderboard/wee
     MedalDefCardComponent,
     TermsModule,
     AchievementsDefModule,
-    LeaderboardComponent,
-    TotalLeaderboardComponent,
-    WeeklyLeaderboardComponent,
-  ],
-  providers:[DatabasesService],
+    LeaderboardModule,
+    FairSharingComponent,
+    NumberCardComponent
+
+],
+  providers:[DatabasesService, FairSharingService],
   exports: [DatabasesPageComponent],
 })
 export class DatabasesModule {}

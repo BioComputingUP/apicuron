@@ -1,16 +1,15 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable, combineLatest } from "rxjs";
-import { map, pluck, skip, switchMap } from "rxjs/operators";
+import { Observable } from "rxjs";
+import { map, pluck } from "rxjs/operators";
 import { Paginated } from "src/app/interfaces/paginated";
 import { User } from "src/app/models/User.model";
-import { WeeklyCuratorStatistics } from "src/app/models/statistics.model";
 import { environment } from "src/environments/environment";
-import { LeaderboardFilter } from "../interfaces/leaderboard-filter";
+import { LeaderboardFilter } from "../../../../projects/leaderboard-lib/src/lib/interfaces/leaderboard-filter";
 import {
   LeaderboardEntry,
   WeeklyLeaderboardEntry,
-} from "../interfaces/leaderboard-entry";
+} from "../../../../projects/leaderboard-lib/src/lib/interfaces/leaderboard-entry";
 
 @Injectable({
   providedIn: "root",
@@ -31,8 +30,10 @@ export class LeaderboardService {
     revision_score: { name: "Revision Score" },
     total_score: { name: "Total Score" },
     total_count: { name: "Total Contributions" },
+    first_contribution: { name: "First Contribution Date" },
     last_contribution: { name: "Last Contribution Date" },
-    daysOfWeek: { name: "Weekly Contribution" },
+    weekStart: { name: "Week Start" },
+    weekEnd: { name: "Week End" },
   };
 
   getColumnProps(col: string) {

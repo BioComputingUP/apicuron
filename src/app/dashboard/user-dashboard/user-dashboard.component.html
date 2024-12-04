@@ -10,13 +10,13 @@
 </div>
 
 <div class="tw-flex tw-flex-row tw-w-full tw-items-start">
-    <dashboard-sidebar class="tw-hidden sm:tw-block tw-w-72 tw-flex-none tw-flex-start tw-top-0 tw-sticky"></dashboard-sidebar>
+    <dashboard-sidebar class="tw-hidden sm:tw-block tw-w-52 2xl:tw-w-72 tw-flex-none tw-flex-start tw-top-0 tw-sticky"></dashboard-sidebar>
     <slide-over-panel [(openPanel)]="openMobileMenu">
         <dashboard-sidebar></dashboard-sidebar>
     </slide-over-panel>
 
     <!-- main content -->
-    <div class="tw-w-full sm:tw-w-3/4 md:tw-w-4/5 lg:tw-w-5/6">
+    <div class="tw-grow">
         <!-- navbar -->
         <div class="tw-flex tw-flex-row tw-justify-between tw-shadow-md  tw-px-2 tw-py-4 tw-bg-white tw-sticky tw-top-0 tw-z-20">
             <div class="sm:tw-hidden">

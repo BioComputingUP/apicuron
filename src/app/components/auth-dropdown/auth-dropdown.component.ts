@@ -11,7 +11,7 @@ import {
   ViewEncapsulation,
 } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
-import { BehaviorSubject, Observable, fromEvent, interval } from "rxjs";
+import { BehaviorSubject, Observable, defer, fromEvent, interval } from "rxjs";
 import { filter, map, switchMap, take, takeWhile } from "rxjs/operators";
 import { environment } from "../../../environments/environment";
 import { AuthService } from "../../auth/auth.service";
@@ -23,7 +23,7 @@ import { Notification } from "../../notifications-data/models/Notification";
 import { RouterModule } from "@angular/router";
 import { NgxPopperModule } from "ngx-popper";
 import _ from "lodash";
-import { NgxPopperjsModule } from "ngx-popperjs";
+import { OverlayModule } from "@angular/cdk/overlay";
 // import { NotificationsDataModule } from '../../notifications-data/notifications-data.module';
 @Component({
   selector: "auth-dropdown",
@@ -33,7 +33,8 @@ import { NgxPopperjsModule } from "ngx-popperjs";
     CommonModule,
     RouterModule,
     AngularSvgIconModule,
-    NgxPopperjsModule,
+    // NgxPopperModule,
+    OverlayModule,
   ],
   standalone: true,
 })
@@ -47,12 +48,20 @@ export class AuthDropdownComponent {
   user_has_resource$: Observable<boolean>;
   notifications$: Observable<Notification[]>;
 
+  _isOpen = new BehaviorSubject<boolean>(false);
+
+  isOpen$: Observable<boolean> = defer(() => this._isOpen.asObservable());
+
+  updateIsOpen(value: boolean) {
+    console.log("updateIsOpen");
+    this._isOpen.next(value);
+  }
+
   constructor(
     protected authService: AuthService,
     protected notificationService: NotificationService,
     protected toastr: ToastrService
   ) {
-
     this.login_link = environment.auth_ws + "/auth/orcid";
     this.loggedIn$ = this.authService.loggedIn$;
     this.user$ = this.authService.user$;

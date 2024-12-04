@@ -7,10 +7,10 @@
     "start-dev-external": "ng serve --host 0.0.0.0 --disable-host-check",
     "start-prod": "ng serve --configuration production",
     "compodoc": "npx compodoc -p tsconfig.doc.json",
-    "build": "rm -rf dist/* && ng build apicuron-ui --configuration production",
-    "build-widget-dev": "./projects/leaderboard/widget/build-widget.sh dev",
-    "build-widget": "./projects/leaderboard/widget/build-widget.sh prod",
-    "build-dev": "rm -rf dist/* && ng build apicuron-ui --configuration development --source-map",
+    "build": "rm -rf dist/* && npm run build-widget && ng build apicuron-ui --configuration production",
+    "build-widget-dev": "npx ng build leaderboard --configuration=development --build-optimizer --output-hashing=none",
+    "build-widget": "npx ng build leaderboard --configuration=production --build-optimizer --output-hashing=none",
+    "build-dev": "rm -rf dist/* && npm run build-widget-dev &&  ng build apicuron-ui --configuration development --source-map",
     "deploy-dev": "(colC='\\033[0;36m';colN='\\033[0m'; echo ${colC}Running npm build-dev ...${colN} && npm run build-dev && echo ${colC}Rsyncing dist ...${colN} && rsync -avzh --delete dist biocomp@persefone:/var/www/apicuron-dev/ && echo ${colC}Done with deploy-dev!${colC})",
     "deploy-prod": "(colC='\\033[0;36m';colN='\\033[0m'; echo ${colC}Running npm build ...${colN} && npm run build && echo ${colC}Rsyncing dist ...${colN} && rsync -avh --delete dist biocomp@persefone:/var/www/apicuron/ && echo ${colC}Done with deploy-prod!${colC})",
     "test": "ng test",
@@ -105,6 +105,8 @@
     "tailwindcss": "^3.3.3",
     "ts-node": "~7.0.0",
     "tslint": "~6.1.0",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "webpack": "^5.95.0",
+    "webpack-sources": "^3.2.3"
   }
 }

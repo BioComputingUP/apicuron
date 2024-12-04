@@ -1,7 +1,8 @@
 export type OrcidProfileLink = {
     name: string
     value: URL
-    host: string
+    host: string;
+    error?: any;
 }
 export type OrcidInformation = {
     keywords?: string[]

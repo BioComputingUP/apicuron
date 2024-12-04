@@ -24,7 +24,7 @@ export class NumbersBannerComponent implements OnInit {
           {
             icon: "assets/user.svg",
             count: 88,
-            text: "biocurators",
+            text: "Registered contributors",
           },
           {
             icon: "assets/database.svg",
@@ -34,7 +34,7 @@ export class NumbersBannerComponent implements OnInit {
           {
             icon: "assets/curation-events.svg",
             count: 43700,
-            text: "Curation Events",
+            text: "Contribution Events",
           },
           {
             icon: "assets/medal_icon.svg",

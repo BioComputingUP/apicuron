@@ -17,7 +17,6 @@ import { AuthDropdownComponent } from "./components/auth-dropdown/auth-dropdown.
 import { NotificationsDataModule } from "./notifications-data/notifications-data.module";
 import { NgxPopperModule } from "ngx-popper";
 import { SentryModuleConfig } from "../config/sentry.config";
-import { BannerService } from "./main-layout/banner.service";
 import { MatomoModule } from "ngx-matomo";
 import { NgxPopperjsModule } from "ngx-popperjs";
 @NgModule({
@@ -61,7 +60,6 @@ import { NgxPopperjsModule } from "ngx-popperjs";
     // *** Sentry ErrorHandler and Tracer Setup ***
     SentryModuleConfig,
     // *** end of sentry setup ***
-    BannerService,
   ],
   bootstrap: [AppComponent],
   exports: [RouterModule],

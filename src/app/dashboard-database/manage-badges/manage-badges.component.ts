@@ -44,7 +44,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
   resourceId$: Observable<string>;
 
   resource$: Observable<Resource>;
-  termList$: Observable<any>;
+  termList$: Observable<Term[]>;
   terms$: Observable<any>;
 
   badges$: Observable<Paginated<BadgeDef>>;
@@ -84,8 +84,9 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
 
     this.termList$ = this.resource$.pipe(
       switchMap(({ resource_id }: Resource) => {
-        return this.termsService.getTerms({ resource_id });
-      })
+        return this.termsService.getTerms({ resource_id }).pipe(shareReplay());
+      }),
+      shareReplay()
     );
 
     this.terms$ = this.termList$.pipe(
@@ -109,7 +110,6 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
     );
 
     this.badgeFilter$ = combineLatest([this.resource$, this.page$]).pipe(
-      tap(console.log),
       map(([{ resource_id }, page]: [Resource, number]) => {
         return BadgeDefFilter.create({
           resource_id,
@@ -220,44 +220,21 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
   }
 
   createBadge(badgeDef: BadgeDef) {
-    this.badgeDefService.createBadgeDef(badgeDef).subscribe(
-      ({ data }: { data: BadgeDef }) => {
+    this.badgeDefService
+      .createBadgeDef(badgeDef).pipe(take(1))
+      .subscribe((data: BadgeDef) => {
         if (data) {
-          this.toastr.success(
-            `Badge ${data.name} sucessfully Created`,
-            "Badge Creation Sucessfull"
-          );
           this.addBadgeToUI(data);
         }
-      },
-      (error) => {
-        this.toastr.error(
-          `An error occured while creating the badge ${badgeDef.name}`,
-          "Badge Creation Failed"
-        );
-      }
-    );
+      });
   }
 
   updateBadge(badgeDef: BadgeDef) {
     this.badgeDefService
       .updateBadgeDef(badgeDef)
-      .pipe(
-        take(1),
-        catchError((error, caught) => {
-          this.toastr.error(
-            `An error occured while updating the badge ${badgeDef.name}`,
-            "Badge Update Failed"
-          );
-          throw error;
-        })
-      )
-      .subscribe(({ data }: { data: BadgeDef }) => {
+      .pipe(take(1))
+      .subscribe((data: BadgeDef) => {
         if (data) {
-          this.toastr.success(
-            `Badge ${data.name} sucessfully Updated`,
-            "Badge Update Sucessfull"
-          );
           this.updateBadgeUI(data);
         }
       });

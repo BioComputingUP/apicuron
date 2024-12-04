@@ -4,11 +4,12 @@ import { PartnerResourceComponent } from "./partner-resource/partner-resource.co
 import { RouterModule } from "@angular/router";
 import { ResourcesService } from "./service/resources.service";
 import { HttpClientModule } from "@angular/common/http";
+import { AngularSvgIconModule } from "angular-svg-icon";
 
 @NgModule({
   declarations: [PartnerResourceComponent],
   providers: [ResourcesService],
-  imports: [CommonModule, HttpClientModule, RouterModule],
+  imports: [CommonModule, HttpClientModule, RouterModule, AngularSvgIconModule],
   exports: [PartnerResourceComponent],
 })
 export class ResourceModule {}
