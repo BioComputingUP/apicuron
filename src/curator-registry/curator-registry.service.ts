@@ -7,10 +7,12 @@ import {
 } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { PartnerResourcesService } from 'src/resources/partner-resources/services/partner-resources.service';
 import { RegistryEntriesDto } from './dto/registry-entries.dto';
-// import { User, UserDocument } from 'src/core/schemas/user.schema';
 import { UserRepository } from 'src/core/repositories/user.repository';
 import { Report, ReportDocument } from 'src/core/schemas/reports.schema';
-import { User } from 'src/core/schemas/user.schema';
+import { User, UserDocument } from 'src/core/schemas/user.schema';
+import { League, LeagueDocument, PartnerResource } from 'src/core/schemas';
+import { PrivacyType } from 'src/core/enums';
+import { result } from 'lodash';
 @Injectable()
 export class CuratorRegistryService {
 	constructor(
@@ -110,26 +112,31 @@ export class CuratorRegistryService {
 			},
 		};
 
-		query_filter["curator.privacy"] = "public";
+		query_filter['curator.privacy'] = PrivacyType.public;
 
-		const aggregation_pipeline : PipelineStage[] = [
+		const aggregation_pipeline: PipelineStage[] = [
 			{ $match: query_filter },
-			league_visibility_stage, 
+			league_visibility_stage,
 			projection_stage,
-			...query.getMongoAggregation()
+			...query.getMongoAggregation(),
 		];
 		try {
 			const entries = await this.registryEntryModel.aggregate(
 				aggregation_pipeline,
 			);
 			this.logger.debug(`Found entries: ${entries.length}`);
-			return { length: entries.length, data: entries };;
+			return { length: entries.length, data: entries };
 		} catch (error) {
 			this.logger.error('Error while processing request to get all entries...');
 			this.logger.error(error);
 		}
 	}
 
+	/**
+	 * Update the curator entry for a given user by aggregating all reports
+	 * @param orcid_identifier the orcid id of the user
+	 * @returns a promise that resolves when the update is complete
+	 */
 	async updateCuratorEntry(orcid_identifier: string) {
 		//check if user exists
 		let user = null;
@@ -394,5 +401,153 @@ export class CuratorRegistryService {
 			);
 			this.logger.error(error);
 		}
+	}
+
+	async addLeague(newMembers: string[], league: LeagueDocument): Promise<any> {
+		try {
+			return await this.registryEntryModel.updateMany(
+				{
+					curator_orcid: { $in: newMembers },
+				},
+				{
+					$addToSet: {
+						'contributed_to.$[elem].groups': league,
+					},
+				},
+				{
+					arrayFilters: [{ 'elem.resource_id': league.resource_id }], // add only if curator contributed to the resource
+				},
+			);
+		} catch (error) {
+			this.logger.error(
+				`Error while adding league: ${league.name} to users: ${newMembers}...`,
+			);
+			this.logger.error(error);
+		}
+	}
+
+	async updateLeague(league: LeagueDocument): Promise<number> {
+		const resource_id = league.resource_id;
+		const results = await this.registryEntryModel.updateMany(
+			{
+				contributed_to: { $elemMatch: { resource_id: resource_id } }, // filter by users that have contributed to the resource
+			},
+
+			{
+				$set: {
+					'contributed_to.$[].groups.$[group]': league, //
+				},
+			},
+			{
+				arrayFilters: [
+					{
+						$and: [
+							{ 'group.name': league.name },
+							{ 'group.resource_id': resource_id },
+						],
+					},
+				],
+			},
+		);
+		return results.modifiedCount;
+	}
+
+	async addEntry(
+		curator_orcid: string,
+		resource: PartnerResource,
+		league: League,
+		curator?: User,
+	): Promise<any> {
+		try {
+			const newEntry = await this.registryEntryModel.create({
+				curator_orcid: curator_orcid,
+				curator: curator,
+				contributed_to: [
+					{
+						resource_id: resource.resource_id,
+						resource: resource,
+						groups: [league],
+					},
+				],
+			});
+			return newEntry;
+		} catch(error){
+			this.logger.error(`Error while adding curator ${curator_orcid} to registry`);
+			this.logger.error(error);
+		}
+	}
+
+	async addResourceToUser(
+		curator_orcid: string,
+		resource: PartnerResource,
+		league: League,
+	) {
+		const result = await this.registryEntryModel.updateOne(
+			{
+				curator_orcid: curator_orcid,
+			},
+			{
+				$addToSet: {
+					contributed_to: {
+						resource_id: resource.resource_id,
+						resource: resource,
+						groups: [league],
+					},
+				},
+			},
+		);
+		return result;
+	}
+	async addLeagueToUser(
+		curator_orcid: string,
+		resource_id: string,
+		league: League,
+	) {
+		const result = await this.registryEntryModel.updateOne(
+			{
+				curator_orcid: curator_orcid,
+			},
+			{
+				$addToSet: {
+					'contributed_to.$[elem].groups': league,
+				},
+			},
+			{
+				arrayFilters: [{ 'elem.resource_id': resource_id }],
+			},
+		);
+		return result;
+	}
+
+	/**
+	 * Checks if a curator has contributed to a given resource
+	 * @param curator_orcid the orcid id of the curator
+	 * @param resource_id the id of the resource
+	 * @returns a promise that resolves to true if the curator has contributed to the resource, false otherwise
+	 */
+	async curatorContributedToResource(
+		curator_orcid: string,
+		resource_id: string,
+	): Promise<boolean> {
+		const result = await this.registryEntryModel.findOne({
+			curator_orcid: curator_orcid,
+			contributed_to: {
+				$elemMatch: {
+					resource_id: resource_id,
+				},
+			},
+		});
+		return !!result;
+	}
+
+	async removeAllEntries(resource_id: string){
+		const result = await this.registryEntryModel.deleteMany({
+			contributed_to: {
+				$elemMatch: {
+					resource_id: resource_id,
+				},
+			},
+		});
+		return result.deletedCount;
 	}
 }
