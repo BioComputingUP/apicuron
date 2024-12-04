@@ -30,7 +30,7 @@ export class CuratorRegistryEntry {
 	curator_orcid: string;
 
 	@Prop({
-		required: true,
+		required: false,
 		type: UserSchema,
 	})
 	curator: User;
