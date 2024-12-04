@@ -1,7 +1,7 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { CuratorRegistryPageComponent } from './curator-registry-page/curator-registry-page.component';
-import { CuratorRoutingModule } from '../curator/curator-routing.module';
+import { NgModule } from "@angular/core";
+import { CuratorRegistryPageComponent } from "./curator-registry-page/curator-registry-page.component";
+import { CommonModule } from "@angular/common";
+import { RegistryRoutingModule } from "./registry-routing.module";
 
 
 
@@ -11,7 +11,7 @@ import { CuratorRoutingModule } from '../curator/curator-routing.module';
   ],
   imports: [
     CommonModule,
-    CuratorRoutingModule
+    RegistryRoutingModule
   ]
 })
 export class CuratorRegistryModule { }

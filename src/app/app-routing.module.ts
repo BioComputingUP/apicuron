@@ -43,6 +43,11 @@ const routes: Routes = [
     loadChildren: () =>
       import("./curator/curator.module").then((m) => m.CuratorModule),
   },
+  {
+    path: "registry",
+    loadChildren: () =>
+      import("./curator-registry/curator-registry.module").then((m) => m.CuratorRegistryModule),
+  },
 
   // {
   //   path: '',
@@ -58,11 +63,6 @@ const routes: Routes = [
     path: "dashboard",
     loadChildren: () =>
       import("./dashboard/dashboard.module").then((m) => m.DashboardModule),
-  },
-  {
-    path: "registry",
-    loadChildren: () =>
-      import("./curator-registry/curator-registry.module").then((m) => m.CuratorRegistryModule),
   },
   {
     path: "docs",
