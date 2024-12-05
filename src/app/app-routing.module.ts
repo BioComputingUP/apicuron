@@ -45,6 +45,7 @@ const routes: Routes = [
   },
   {
     path: "registry",
+    component: MainLayoutComponent,
     loadChildren: () =>
       import("./curator-registry/curator-registry.module").then((m) => m.CuratorRegistryModule),
   },
