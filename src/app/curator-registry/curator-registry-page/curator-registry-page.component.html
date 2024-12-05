@@ -1,1 +1,10 @@
-<p>curator-registry-page works!</p>
+<div class = "tw-m-2 tw-p-2">
+  <div *ngIf="entries$ | async as entries">
+    <div>Entries</div>
+    <div class="tw-grid tw-grid-cols-3 tw-gap-2 tw-mx-20">
+      <div *ngFor="let entry of entries">
+        <app-registry-card [entry]="entry"></app-registry-card>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,23 @@
+<div
+  class="tw-m-2 tw-p-2 tw-flex tw-flex-col tw-border tw-border-apicuron-purple tw-h-full tw-bg-slate-100 tw-drop-shadow-lg"
+>
+  <div class="tw-grid tw-grid-cols-10 tw-gap-2">
+    <img class="tw-w-24 tw-h-24': vertical, 'tw-w-20 tw-h-20"
+            [src]="entry.curator.generate_avatar()" alt="">
+  
+    <div class="tw-col-span-9">
+      <h1 class="tw-font-extrabold ">{{entry.curator.displayedName}}</h1>
+      <h2>{{ entry.curator.orcid_id }}</h2>
+      <p>{{entry.curator.affiliation}}</p>
+    </div>
+  </div>
+    <div class="tw-grid ">
+      <p class="tw-row-span-full">Contributions:</p>
+      <ul class="tw-list-disc tw-pl-4">
+        <li *ngFor="let resourceName of getContributionsNames()">
+          {{resourceName}}
+        </li>
+      </ul>
+    </div>
+
+</div>
