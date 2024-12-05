@@ -14,6 +14,7 @@ export class CuratorRegistryPageComponent implements OnInit {
 
   entries$: Observable<Array<RegistryEntry>>;
   ngOnInit(): void {
+    // get entries and build objects
     this.entries$ = this.registryService.getAllCurators().pipe(
       pluck("data"),
       map((data: any[]) => data.map((element) => new RegistryEntry().deserialize(element)))

@@ -1,16 +1,24 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { RegistryEntry } from 'src/app/models/registryEntry.model';
+import { Resource } from 'src/app/models/resource.model';
 
 @Component({
   selector: 'app-registry-card',
   templateUrl: './registry-card.component.html',
 })
-export class RegistryCardComponent {
+export class RegistryCardComponent implements OnInit {
   @Input() entry: RegistryEntry;
   
-
-  getContributionsNames(): string[]{
-    return this.entry.contributed_to.map((resource: any) => resource.resource.resource_name);
+  ngOnInit(): void {
+    this.showGroups = new Array(this.getContributions().length).fill(false);
+  }
+  getContributions(){   
+    return this.entry.contributed_to ?? [];
     
+  }
+
+  showGroups = [];
+  toggleGroups(index) {
+    this.showGroups[index] = !this.showGroups[index];
   }
 }

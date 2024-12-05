@@ -1,8 +1,9 @@
 <div
-  class="tw-m-2 tw-p-2 tw-flex tw-flex-col tw-border tw-border-apicuron-purple tw-h-full tw-bg-slate-100 tw-drop-shadow-lg"
+  class="tw-m-2 tw-p-2 tw-flex tw-flex-col tw-border tw-border-apicuron-purple tw-h-full tw-bg-slate-100 tw-drop-shadow-lg
+  "
 >
   <div class="tw-grid tw-grid-cols-10 tw-gap-2">
-    <img class="tw-w-24 tw-h-24': vertical, 'tw-w-20 tw-h-20"
+    <img class="tw-w-24 tw-h-24 tw-place-content-start tw-justify-self-start"
             [src]="entry.curator.generate_avatar()" alt="">
   
     <div class="tw-col-span-9">
@@ -11,13 +12,17 @@
       <p>{{entry.curator.affiliation}}</p>
     </div>
   </div>
-    <div class="tw-grid ">
-      <p class="tw-row-span-full">Contributions:</p>
-      <ul class="tw-list-disc tw-pl-4">
-        <li *ngFor="let resourceName of getContributionsNames()">
-          {{resourceName}}
-        </li>
-      </ul>
+  <p class="tw-row-span-full">Contributions:</p>
+    <div class="tw-grid tw-grid-cols-3 tw-gap-2">
+        <div *ngFor="let contribution of getContributions(); let i = index">
+          {{contribution.resource.resource_name}}
+          <button (click)="toggleGroups(i)" class="tw-transition-all tw-duration-300 tw-ease-in-out" [class.tw-rotate-180]="showGroups[i]">V</button>
+          <ul class="tw-pl-4" [class.tw-opacity-0]="!showGroups[i]" [class.tw-opacity-100]="showGroups[i]">
+            <li *ngFor="let group of contribution.groups">{{group.displayedName}}</li>
+          </ul>
+        </div>
+
     </div>
 
 </div>
+
