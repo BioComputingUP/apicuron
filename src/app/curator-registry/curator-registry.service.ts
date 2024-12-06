@@ -9,6 +9,10 @@ export class CuratorRegistryService {
 	constructor(private httpClient: HttpClient) {}
 
 	getAllCurators() {
-		return this.httpClient.get(this.wsUrl + "/curator-registry/all");
+		return this.httpClient.get(this.wsUrl + "/registry", {
+			headers: {
+				version: "2",
+			}
+		});
 	}
 }
