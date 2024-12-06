@@ -42,69 +42,55 @@ export class CuratorRegistryService {
 			filtered_field === 'orcid_id'
 				? 'curator.orcid_id'
 				: 'curator.displayedName';
-		if (!!user_query)
-			query_filter[field] = { $regex: user_query, $options: 'i' }; //TODO: clean the userquery
+		if (!!user_query) {
+			// clean the userquery
+			const cleanQuery = user_query
+				.replace(/[-\/\\^$*+?.()|[\]{}]/g, '')
+				.trim();
+			query_filter[field] = { $regex: new RegExp(cleanQuery, 'i') };
+		}
 
 		if (!!filtered_resources) {
 			query_filter['contributed_to'] = {
 				$elemMatch: { resource_id: { $in: filtered_resources } },
 			};
 		}
-		// TODO: better league privacy filter
-		// This stage filters out private groups
-		// const league_visibility_stage = {
-		// 	// if you can make this better please do
-		// 	$set: {
-		// 		contributed_to: {
-		// 			$map: {
-		// 				input: '$contributed_to',
-		// 				as: 'item',
-		// 				in: {
-		// 					$mergeObjects: [
-		// 						'$$item',
-		// 						{
-		// 							groups: {
-		// 								$filter: {
-		// 									input: '$$item.groups',
-		// 									as: 'group',
-		// 									cond: {
-		// 										// Show only public groups unless the requesting user is part of it
-		// 										$or: [
-		// 											{
-		// 												$ne: ['$$group.visibility', 'private'],
-		// 											},
-		// 											{
-		// 												$eq: ['$curator_orcid', requestUserOrcid],
-		// 											},
-		// 										],
-		// 									},
-		// 								},
-		// 							},
-		// 						},
-		// 					],
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// };
-		// Remove sensitive and unimportant fields
-
-		//TODO REMOVE AFTER ADDING DTO
-
+		// always hide private curators
 		query_filter['curator.privacy'] = PrivacyType.public;
 
-		const aggregation_pipeline: PipelineStage[] = [
-			{ $match: query_filter },
-			// league_visibility_stage,
-			
-			...query.getMongoAggregation(),
-		];
+		// TODO: better league privacy filter
+
+		const projections = { ...query.getMongoAggregation() };
 		try {
-			const entries = await this.registryEntryModel.aggregate(
-				aggregation_pipeline,
+			const entries = await this.registryEntryModel.find(
+				query_filter,
+				projections,
 			);
-			this.logger.debug(`Found entries: ${entries.length}`);
-			return { length: entries.length, data: entries };
+			if (!!entries) {
+				const entriesFilteredLeagues = entries.map((entry) => {
+					const plainEntry = entry.toObject(); // Converts the document to a plain object
+
+					return {
+						...plainEntry,
+						contributed_to: plainEntry.contributed_to
+							.map((contribution) => {
+								const filteredGroups = contribution.groups.filter(
+									(group) => group.visibility === PrivacyType.public,
+								);
+								return {
+									...contribution,
+									groups: filteredGroups,
+								};
+							})
+							.filter(Boolean), // Remove null contributions
+					};
+				});
+
+				return {
+					length: entriesFilteredLeagues.length,
+					data: entriesFilteredLeagues,
+				};
+			}
 		} catch (error) {
 			this.logger.error('Error while processing request to get all entries...');
 			this.logger.error(error);
