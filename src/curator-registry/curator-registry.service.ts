@@ -218,7 +218,25 @@ export class CuratorRegistryService {
 		try {
 			entry = await this.registryEntryModel.findOne({
 				curator_orcid: orcid_identifier,
-			});
+			}).lean();
+			if (!entry) {
+				const filtered_groups_entry = entry.contributed_to.map((contribution) => {
+					return {
+						...contribution,
+						groups: contribution.groups.filter(
+							(group) => group.visibility === PrivacyType.public,
+						),
+					};
+				});
+				const resultEntry ={
+					...entry,
+					contributed_to: filtered_groups_entry
+				} 
+				return resultEntry;
+				
+				
+			}
+			
 		} catch (error) {
 			this.logger.error(
 				`Could not retrieve user with orcid: ${orcid_identifier}...`,

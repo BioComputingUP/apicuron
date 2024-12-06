@@ -5,6 +5,8 @@ import { plainToInstance } from 'class-transformer';
 
 import { paginate, Paginated } from 'src/pagination/paginator';
 import { RegistrySearchResultDto } from './dto/registry-search-dto';
+import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiResponsePaginated } from 'src/pagination/decorators/paginated-reponse.decorator';
 
 @Controller({
 	path: 'registry',
@@ -14,7 +16,40 @@ export class CuratorRegistryController {
 	constructor(protected registryService: CuratorRegistryService) {}
 
 	private logger = new Logger(CuratorRegistryController.name);
+	@ApiOkResponse({
+		description:
+			'List of curators and their resources and groups they contribute to',
+	})
+	@ApiOperation({
+		summary:
+			'Get a single curator entry from the registry based on their orcid id',
+	})
+	@Get('curator/:id')
+	async getCuratorEntry(@Param('id') user_orcid: string): Promise<RegistrySearchResultDto> {
+		this.logger.debug(`Retrieving curator: ${user_orcid}`);
+		try {
+			const result = await this.registryService.getCuratorEntry(user_orcid);
+			const desrialized_result = plainToInstance(
+				RegistrySearchResultDto,
+				result,
+				{
+					excludeExtraneousValues: true,
+				}
+			)
+			return desrialized_result;
+		} catch (error) {
+			this.logger.error(error);
+		}
+	}
 
+	@ApiOperation({
+		summary: 'Get all curator entries based on the provided filters',
+	})
+	@ApiResponsePaginated(
+		RegistrySearchResultDto,
+		200,
+		'List of curators and their resources and groups they contribute to ',
+	)
 	@Get()
 	async getAllEntries(
 		@Query() query: GetRegistryEntryDto,
@@ -27,7 +62,7 @@ export class CuratorRegistryController {
 			const responseInstance = plainToInstance(RegistrySearchResultDto, data, {
 				excludeExtraneousValues: true,
 			});
-			
+
 			return paginate<RegistrySearchResultDto>(
 				responseInstance,
 				getStatDtoInstance,
@@ -36,38 +71,5 @@ export class CuratorRegistryController {
 		} catch (error) {
 			this.logger.error(error);
 		}
-	}
-
-	@Get('curator/:id')
-	async getCuratorEntry(@Param('id') user_orcid: string) {
-		this.logger.debug(`getCuratorEntry: ${user_orcid}`);
-		try {
-			const result = await this.registryService.getCuratorEntry(user_orcid);
-			return result;
-		} catch (error) {
-			this.logger.error(error);
-		}
-	}
-	// FIXME: remove this
-	// dev test routes
-	@Get('update-all')
-	async updateAll() {
-		this.registryService.recomputeAllEntries();
-	}
-
-	@Get('update')
-	async updateAndReturnUser(@Query('id') user_orcid: string) {
-		// this.logger.debug(user_orcid);
-		try {
-			const result = await this.registryService.updateCuratorEntry(user_orcid);
-			return result;
-		} catch (error) {
-			this.logger.error(error);
-		}
-	}
-	// catch all
-	@Get()
-	test() {
-		return 'Did you request the correct route?';
 	}
 }
