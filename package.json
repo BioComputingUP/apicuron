@@ -30,6 +30,7 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^16.2.12",
+    "@angular/cdk": "^16.2.14",
     "@angular/common": "^16.2.12",
     "@angular/compiler": "^16.2.12",
     "@angular/core": "^16.2.12",
@@ -92,7 +93,7 @@
     "autoprefixer": "^10.4.7",
     "codelyzer": "^6.0.0",
     "cross-env": "^7.0.3",
-    "jasmine-core": "~3.6.0",
+    "jasmine-core": "3.8",
     "jasmine-spec-reporter": "~5.0.0",
     "karma": "~6.3.19",
     "karma-chrome-launcher": "~3.1.0",
