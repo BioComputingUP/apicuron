@@ -41,10 +41,11 @@ export class RegistryContributedTo {
 	groups: RegistryLeague[];
 }
 
-export class RegistrySearchDto {
+export class RegistrySearchResultDto {
 	@Expose()
 	curator_orcid: string;
 
+	@Type(() => RegistryCurator)
 	@Expose()
 	curator: RegistryCurator;
 

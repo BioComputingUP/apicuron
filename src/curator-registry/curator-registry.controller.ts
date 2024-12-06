@@ -4,9 +4,10 @@ import { GetRegistryEntryDto } from './dto/registry-entries.dto';
 import { plainToInstance } from 'class-transformer';
 
 import { paginate, Paginated } from 'src/pagination/paginator';
+import { RegistrySearchResultDto } from './dto/registry-search-dto';
 
 @Controller({
-	path: 'curator-registry',
+	path: 'registry',
 	version: '2',
 })
 export class CuratorRegistryController {
@@ -14,16 +15,24 @@ export class CuratorRegistryController {
 
 	private logger = new Logger(CuratorRegistryController.name);
 
-	@Get('')
+	@Get()
 	async getAllEntries(
 		@Query() query: GetRegistryEntryDto,
-	) : Promise<Paginated<any>> | null { //TODO: Add DTO
+	): Promise<Paginated<RegistrySearchResultDto>> | null {
 		const getStatDtoInstance = plainToInstance(GetRegistryEntryDto, query);
 		try {
 			const { data, length } = await this.registryService.getAllEntries(
 				getStatDtoInstance,
 			);
-			return paginate(data, getStatDtoInstance, length);
+			const responseInstance = plainToInstance(RegistrySearchResultDto, data, {
+				excludeExtraneousValues: true,
+			});
+			
+			return paginate<RegistrySearchResultDto>(
+				responseInstance,
+				getStatDtoInstance,
+				length,
+			);
 		} catch (error) {
 			this.logger.error(error);
 		}
