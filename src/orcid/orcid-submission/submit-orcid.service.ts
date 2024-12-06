@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { OrcidClientService } from '../../orcid/orcid-client/orcid-client.service';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -6,35 +6,47 @@ import {
 	StatisticsDocument,
 } from '../../core/schemas/statistics.schema';
 import { FilterQuery, LeanDocument, Model } from 'mongoose';
-import { User, UserDocument } from '../../core/schemas/user.schema';
-import {
-	PartnerResource,
-	PartnerResourceDocument,
-} from '../../core/schemas/resource/partner-resource.schema';
-import { OrcidWorkBuilderToken } from './constants';
+import { UserDocument } from '../../core/schemas/user.schema';
+import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
+import { OrcidWorkBuilderToken, RunCronJobs } from './constants';
 import { OrcidWorkBuilder } from './interfaces/orcid-submission.interface';
 import { OrcidWork } from '../../orcid/orcid-client/interfaces/orcid.interface';
 import { responseHasCode } from '../../orcid/orcid-client/helpers/response-with-code';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { PrivacyType } from '../../core/enums';
 import { UserRepository } from '../../core/repositories/user.repository';
+import { CronJob } from 'cron';
 
 @Injectable()
-export class SubmitOrcidWork {
+export class SubmitOrcidWork implements OnModuleInit {
 	constructor(
 		protected orcidClientService: OrcidClientService,
 		@InjectModel(Statistics.name)
 		protected statModel: Model<StatisticsDocument>,
 		protected userRepository: UserRepository,
-		@InjectModel(PartnerResource.name)
-		protected resourceModel: Model<PartnerResourceDocument>,
 		@Inject(OrcidWorkBuilderToken) protected orcidWorkBuilder: OrcidWorkBuilder,
+		@Inject(RunCronJobs) protected runCronJobs: boolean,
+		protected schedulerRegistry: SchedulerRegistry,
 	) {}
+	cronJobName = 'SubmitAllWorks' as const;
+
+	onModuleInit() {
+		const job = new CronJob(CronExpression.EVERY_DAY_AT_2AM, async () => {
+			await this.submitAllWorks();
+		});
+		if (!this.runCronJobs) {
+			this.logger.debug(
+				`runCronJobs is false, skipping ${this.cronJobName} cron job registration`,
+			);
+			return;
+		}
+		this.schedulerRegistry.addCronJob(this.cronJobName, job);
+		job.start();
+	}
 
 	defaultBatchSize = 100;
 	logger = new Logger(SubmitOrcidWork.name);
 
-	@Cron(CronExpression.EVERY_DAY_AT_2AM)
 	async submitAllWorks(filter: FilterQuery<UserDocument> = {}): Promise<any> {
 		const users = this.userRepository
 			.find({
@@ -49,13 +61,6 @@ export class SubmitOrcidWork {
 			.sort({ displayed_name: 1 })
 			.cursor({ batchSize: this.defaultBatchSize });
 
-		const resources = await this.resourceModel.find();
-
-		const resourcesMap = new Map<string, PartnerResourceDocument>();
-		for (const resource of resources) {
-			resourcesMap.set(resource.resource_id, resource);
-		}
-
 		for await (const user of users) {
 			const stats = await this.statModel.find({
 				curator_orcid: user.orcid_id,
@@ -67,19 +72,9 @@ export class SubmitOrcidWork {
 				continue;
 			}
 
-			const userData = stats.map((stat) => {
-				return {
-					stat,
-					resource: resourcesMap.get(stat.resource_id),
-				};
-			});
 			const submissions$ = [];
-			for (const data of userData) {
-				const submission$ = this.submitSingleWork(
-					data.stat,
-					data.resource,
-					user,
-				);
+			for (const stat of stats) {
+				const submission$ = this.submitSingleWork(stat, stat.resource, user);
 				submissions$.push(submission$);
 			}
 			await Promise.all(submissions$);
@@ -116,14 +111,4 @@ export class SubmitOrcidWork {
 			}
 		}
 	}
-
-	// async submitMultipleWorks(
-	// 	user: UserDocument,
-	// 	resources: {
-	// 		stat: LeanDocument<StatisticsDocument>;
-	// 		resource: LeanDocument<PartnerResourceDocument>;
-	// 	}[],
-	// ) {
-
-	// }
 }
