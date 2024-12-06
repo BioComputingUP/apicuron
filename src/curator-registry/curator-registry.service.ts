@@ -58,7 +58,7 @@ export class CuratorRegistryService {
 		// always hide private curators
 		query_filter['curator.privacy'] = PrivacyType.public;
 
-		// TODO: better league privacy filter
+		// TODO: Recheck performance of this with @Adel
 
 		const projections = { ...query.getMongoAggregation() };
 		try {
