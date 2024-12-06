@@ -5,9 +5,17 @@ import { plainToInstance } from 'class-transformer';
 
 import { paginate, Paginated } from 'src/pagination/paginator';
 import { RegistrySearchResultDto } from './dto/registry-search-dto';
-import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import {
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
+	ApiHeader,
+} from '@nestjs/swagger';
 import { ApiResponsePaginated } from 'src/pagination/decorators/paginated-reponse.decorator';
+import { VersionHeader } from 'src/plugins/swagger/config';
 
+@ApiTags('Curator Registry')
+@ApiHeader(VersionHeader)
 @Controller({
 	path: 'registry',
 	version: '2',
@@ -25,8 +33,10 @@ export class CuratorRegistryController {
 			'Get a single curator entry from the registry based on their orcid id',
 	})
 	@Get('curator/:id')
-	async getCuratorEntry(@Param('id') user_orcid: string): Promise<RegistrySearchResultDto> {
-		this.logger.debug(`Retrieving curator: ${user_orcid}`);
+	async getCuratorEntry(
+		@Param('id') user_orcid: string,
+	): Promise<RegistrySearchResultDto> {
+	
 		try {
 			const result = await this.registryService.getCuratorEntry(user_orcid);
 			const desrialized_result = plainToInstance(
@@ -34,8 +44,8 @@ export class CuratorRegistryController {
 				result,
 				{
 					excludeExtraneousValues: true,
-				}
-			)
+				},
+			);
 			return desrialized_result;
 		} catch (error) {
 			this.logger.error(error);
@@ -54,7 +64,8 @@ export class CuratorRegistryController {
 	async getAllEntries(
 		@Query() query: GetRegistryEntryDto,
 	): Promise<Paginated<RegistrySearchResultDto>> | null {
-		const getStatDtoInstance = plainToInstance(GetRegistryEntryDto, query);
+		// const getStatDtoInstance = plainToInstance(GetRegistryEntryDto, query);
+		const getStatDtoInstance = query
 		try {
 			const { data, length } = await this.registryService.getAllEntries(
 				getStatDtoInstance,

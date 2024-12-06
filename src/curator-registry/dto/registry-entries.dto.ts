@@ -1,6 +1,6 @@
 import { IsArray, IsEnum, IsOptional, IsString, ValidateIf } from "class-validator";
 import { BasePaginationDto } from "src/pagination/dto/paginate.dto";
-
+import { ApiPropertyOptional } from "@nestjs/swagger";
 
 export enum SearchFieldFilter {
 	displayedName = 'displayedName',
@@ -12,13 +12,16 @@ export class GetRegistryEntryDto extends BasePaginationDto{
 			SearchFieldFilter,
 		)}`,
 	})
+	@ApiPropertyOptional()
 	@IsOptional()
 	filter_field: SearchFieldFilter;
 
+	@ApiPropertyOptional()
 	@IsString()
 	@ValidateIf((o) => o.filter_field)
 	query: string;
 
+	@ApiPropertyOptional()
 	@IsArray()
 	@IsOptional()
 	resources: string[];

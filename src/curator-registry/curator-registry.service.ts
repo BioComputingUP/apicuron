@@ -60,10 +60,12 @@ export class CuratorRegistryService {
 
 		// TODO: Recheck performance of this with @Adel
 
-		const projections = { ...query.getMongoAggregation() };
+		const projections = { ...query.getMongoQueryOptions() };
+
 		try {
 			const entries = await this.registryEntryModel.find(
 				query_filter,
+				{},
 				projections,
 			);
 			if (!!entries) {
@@ -216,27 +218,28 @@ export class CuratorRegistryService {
 	async getCuratorEntry(orcid_identifier: string) {
 		let entry: CuratorRegistryEntry = null;
 		try {
-			entry = await this.registryEntryModel.findOne({
-				curator_orcid: orcid_identifier,
-			}).lean();
+			entry = await this.registryEntryModel
+				.findOne({
+					curator_orcid: orcid_identifier,
+				})
+				.lean();
 			if (!entry) {
-				const filtered_groups_entry = entry.contributed_to.map((contribution) => {
-					return {
-						...contribution,
-						groups: contribution.groups.filter(
-							(group) => group.visibility === PrivacyType.public,
-						),
-					};
-				});
-				const resultEntry ={
+				const filtered_groups_entry = entry.contributed_to.map(
+					(contribution) => {
+						return {
+							...contribution,
+							groups: contribution.groups.filter(
+								(group) => group.visibility === PrivacyType.public,
+							),
+						};
+					},
+				);
+				const resultEntry = {
 					...entry,
-					contributed_to: filtered_groups_entry
-				} 
+					contributed_to: filtered_groups_entry,
+				};
 				return resultEntry;
-				
-				
 			}
-			
 		} catch (error) {
 			this.logger.error(
 				`Could not retrieve user with orcid: ${orcid_identifier}...`,
