@@ -1,31 +1,27 @@
 import { Controller, Get, Logger, Param, Query } from '@nestjs/common';
 import { CuratorRegistryService } from './curator-registry.service';
-import { Public } from 'src/auth/decorators/public.decorator';
-import { RegistryEntriesDto } from './dto/registry-entries.dto';
+import { GetRegistryEntryDto } from './dto/registry-entries.dto';
 import { plainToInstance } from 'class-transformer';
 
-import { UserReq } from 'src/auth/decorators/applyUser.decorator';
-import { User } from 'src/core/schemas/user.schema';
-import { userResourceEntityPrivacyFilter } from 'src/util/privacy.helper';
 import { paginate, Paginated } from 'src/pagination/paginator';
 
-@Controller('curator-registry')
+@Controller({
+	path: 'curator-registry',
+	version: '2',
+})
 export class CuratorRegistryController {
 	constructor(protected registryService: CuratorRegistryService) {}
 
 	private logger = new Logger(CuratorRegistryController.name);
 
-	@Get('all')
+	@Get('')
 	async getAllEntries(
-		@Query() query: RegistryEntriesDto,
-		@UserReq() user: User,
-	) : Promise<Paginated<any>> | null {
-		const getStatDtoInstance = plainToInstance(RegistryEntriesDto, query);
-		const request_orcid = !user ? '' : user.orcid_id;
+		@Query() query: GetRegistryEntryDto,
+	) : Promise<Paginated<any>> | null { //TODO: Add DTO
+		const getStatDtoInstance = plainToInstance(GetRegistryEntryDto, query);
 		try {
 			const { data, length } = await this.registryService.getAllEntries(
 				getStatDtoInstance,
-				request_orcid,
 			);
 			return paginate(data, getStatDtoInstance, length);
 		} catch (error) {
@@ -35,7 +31,6 @@ export class CuratorRegistryController {
 
 	@Get('curator/:id')
 	async getCuratorEntry(@Param('id') user_orcid: string) {
-		// test request: http://localhost:3000/api/curator-registry/curator/0000-0002-2472-5685
 		this.logger.debug(`getCuratorEntry: ${user_orcid}`);
 		try {
 			const result = await this.registryService.getCuratorEntry(user_orcid);
@@ -44,7 +39,7 @@ export class CuratorRegistryController {
 			this.logger.error(error);
 		}
 	}
-
+	// FIXME: remove this
 	// dev test routes
 	@Get('update-all')
 	async updateAll() {
