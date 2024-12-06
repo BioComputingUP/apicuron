@@ -3,20 +3,17 @@ import { PartnerResourcesService } from '../../resources/partner-resources/servi
 import { UsersService } from '../../auth/users/services/users.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { SubmitReportDto } from '../dto/submit-report.dto';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
-import {
-	computeAggregatePrivacyField,
-	computePrivacyField,
-} from '../../util/privacy.helper';
+import { computePrivacyField } from '../../util/privacy.helper';
 import {
 	hashTermIdentifier,
-	unHashTermIdentifier,
+	ITermIdentifier,
 } from '../../terms/helpers/term-hash';
-import { PrivacyType } from '../../core/enums';
+import { League } from '../../core/schemas/league/league.schema';
 
 @Injectable()
 export class ReportValidatorService {
@@ -39,15 +36,22 @@ export class ReportValidatorService {
 	private assignDefaultLeague(
 		report: SubmitReportDto,
 		resource: PartnerResourceDocument,
-	): string {
+	): League {
 		// check if the user belongs to a league
 		for (const league of resource.leagues) {
 			if (league.defaultMembers.includes(report.curator_orcid)) {
-				return league.name;
+				return league;
 			}
 		}
 		// if not, use the default league
-		return report.league ? report.league : resource.defaultLeague;
+		const name = report.league ?? resource.defaultLeague;
+		const selectedLeague = resource.leagues.find((l) => l.name === name);
+		if (!selectedLeague) {
+			throw new BadRequestException(
+				`League ${report.league} does not exist for resource ${report.resource_id}`,
+			);
+		}
+		return selectedLeague;
 	}
 
 	/**
@@ -122,21 +126,14 @@ export class ReportValidatorService {
 		resource: PartnerResourceDocument;
 		user: UserDocument;
 		term: TermDocument;
+		league_data: League;
 	}> {
 		// validate the resource_id
 		const { resource } = await this.validateReportResource(report, resourceDoc);
 
 		// validate the league
-		if (!!report.league) {
-			const league = resource.leagues.find((l) => l.name === report.league);
-			if (!league) {
-				throw new BadRequestException(
-					`League ${report.league} does not exist for resource ${report.resource_id}`,
-				);
-			}
-		} else {
-			report.league = this.assignDefaultLeague(report, resource);
-		}
+		const relatedLeague = this.assignDefaultLeague(report, resource);
+		report.league = relatedLeague.name;
 
 		// validate the activity term
 		const { term } = await this.validateReportActivityTerm(report, termDoc);
@@ -146,6 +143,9 @@ export class ReportValidatorService {
 
 		const reportDoc = new this.reportModel(report);
 		reportDoc.term = term;
+		reportDoc.resource = resource;
+		reportDoc.user = user;
+		reportDoc.league_data = relatedLeague;
 
 		reportDoc.privacy = computePrivacyField(resource, user, report);
 
@@ -154,15 +154,30 @@ export class ReportValidatorService {
 			resource,
 			term,
 			user,
+			league_data: relatedLeague,
 		};
 	}
 
 	async validateReports(reports: SubmitReportDto[]) {
 		const resourceIds = Array.from(new Set(reports.map((r) => r.resource_id)));
 		const orcidIds = Array.from(new Set(reports.map((r) => r.curator_orcid)));
-		const activities = Array.from(
-			new Set(reports.map((r) => hashTermIdentifier(r))),
-		).map(unHashTermIdentifier);
+
+		const activities: Map<string, ITermIdentifier> = reports.reduce(
+			(acc, curr) => {
+				const hash = hashTermIdentifier(curr);
+				acc.set(hash, {
+					resource_id: curr.resource_id,
+					activity_term: curr.activity_term,
+					league: curr.league,
+				});
+				return acc;
+			},
+			new Map<string, ITermIdentifier>(),
+		);
+
+		const activitiesFilter: FilterQuery<TermDocument>[] = Array.from(
+			activities.values(),
+		);
 
 		const resources$ = this.resourceService.get_resources({
 			resource_id: { $in: resourceIds },
@@ -170,7 +185,7 @@ export class ReportValidatorService {
 
 		const users$ = this.usersService.getUsers({ orcid_id: { $in: orcidIds } });
 
-		const terms$ = this.termModel.find({ $or: activities });
+		const terms$ = this.termModel.find({ $or: activitiesFilter });
 
 		const [resources, users, terms] = await Promise.all([
 			resources$,
@@ -192,6 +207,7 @@ export class ReportValidatorService {
 			user: UserDocument;
 			report: ReportDocument;
 			term: TermDocument;
+			league_data: League;
 		}[] = [];
 		for (const [index, report] of reports.entries()) {
 			try {

@@ -7,6 +7,7 @@ import {
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { TermDocument } from '../../core/schemas/terms.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
+import { PartnerResourceUpdatedEvent } from '../../resources/partner-resources/events/resource-updated.event';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
 
 export interface Aggregator {
@@ -31,6 +32,8 @@ export interface Aggregator {
 	recomputeAllResourceAggregates(resource_id: string): Promise<any> | any;
 	termUpdated(oldTerm: TermDocument, term: TermDocument): Promise<any> | any;
 	termDeleted(term: TermDocument): Promise<any> | any;
+
+	updatedResource?(event: PartnerResourceUpdatedEvent): Promise<any> | any;
 }
 
 export interface AggregatorOptions {

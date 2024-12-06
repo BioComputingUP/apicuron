@@ -1,3 +1,11 @@
+import * as crypto from 'crypto';
+
+export interface ITermIdentifier {
+	resource_id: string;
+	activity_term: string;
+	league: string;
+}
+
 /**
  * Generates a very simple hash for a term.
  *
@@ -11,29 +19,16 @@ export function hashTermIdentifier({
 	resource_id,
 	activity_term,
 	league,
-}: {
-	resource_id: string;
-	activity_term: string;
-	league: string;
-}) {
-	return `${resource_id}::${activity_term}::${league}`;
-}
+}: ITermIdentifier): string {
+	const resourceIdHash = crypto
+		.createHash('sha256')
+		.update(resource_id)
+		.digest('hex');
+	const activityTermHash = crypto
+		.createHash('sha256')
+		.update(activity_term)
+		.digest('hex');
+	const leagueHash = crypto.createHash('sha256').update(league).digest('hex');
 
-/**
- * Converts a hashed term string into its corresponding object representation.
- *
- * @param hash - The hashed term string to be converted.
- * @returns An object containing the properties `resource_id`, `activity_term`, and `league`.
- */
-export function unHashTermIdentifier(hash: string): {
-	resource_id: string;
-	activity_term: string;
-	league: string;
-} {
-	const [resource_id, activity_term, league] = hash.split('::');
-	return {
-		resource_id,
-		activity_term,
-		league,
-	};
+	return resourceIdHash + activityTermHash + leagueHash;
 }

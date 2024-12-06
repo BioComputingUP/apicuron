@@ -75,6 +75,9 @@ export class PartnerResource {
 	getLeague(leagueName: string) {
 		return this.leagues.find((league: League) => league.name == leagueName);
 	}
+
+	created_at: Date;
+	updated_at: Date;
 }
 const PartnerResourceSchema =
 	SchemaFactory.createForClass(PartnerResource).loadClass(PartnerResource);
@@ -85,18 +88,21 @@ export class ResourceSummary extends PartnerResource {
 	terms: Term[];
 }
 
-export function PartnerResourceSchemaFactory (){
-	const schema = SchemaFactory.createForClass(PartnerResource).loadClass(PartnerResource);
+export function PartnerResourceSchemaFactory() {
+	const ResourceSchema =
+		SchemaFactory.createForClass(PartnerResource).loadClass(PartnerResource);
 
-	schema.index({
-		resource_id: 1,
-		resource_name: 1,
-		resource_uri: 1,
-		resource_url: 1
+	ResourceSchema.index(
+		{
+			resource_id: 1,
+			resource_name: 1,
+			resource_uri: 1,
+			resource_url: 1,
+		},
+		{ unique: true, name: 'unique_resource' },
+	);
 
-	})
-
-	return schema;
+	return ResourceSchema;
 }
 
 export { PartnerResourceSchema };

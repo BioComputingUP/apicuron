@@ -162,7 +162,7 @@ export class BadgeAggregatorService implements Aggregator {
 		try {
 			const badge = await this.badgeModel.findOneAndUpdate(
 				{
-					name: BadgeDef.name,
+					name: badgeDef.name,
 					curator_orcid: report.curator_orcid,
 					league: badgeDef.league,
 					resource_id: badgeDef.resource_id,
@@ -184,6 +184,8 @@ export class BadgeAggregatorService implements Aggregator {
 				},
 				{ upsert: true, new: true },
 			);
+
+			this.logger.log(`Badge ${badge.name} updated, count: ${badge.count} `);
 
 			const prevState = badge.state;
 			badge.state =

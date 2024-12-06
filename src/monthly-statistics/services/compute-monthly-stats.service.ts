@@ -3,7 +3,7 @@ import {
 	MonthlyStatistics,
 	MonthlyStatisticsDocument,
 } from '../../core/schemas/statistics/monthly-statistics.schema';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, UpdateQuery } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import {
 	LeanReportDocument,
@@ -25,7 +25,7 @@ import { AggregatedReportsMonthly } from '../interfaces';
 import { PrivacyType } from '../../core/enums';
 import { UserDocument } from '../../core/schemas/user.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-
+import { MongoServerError } from 'mongodb';
 @Injectable()
 export class ComputeMonthlyStatsService {
 	constructor(
@@ -57,33 +57,39 @@ export class ComputeMonthlyStatsService {
 			},
 		}));
 
-		const setObj = reportIsLast
-			? {
-					$set: {
-						last_contribution: report.timestamp,
+		const setObj: UpdateQuery<MonthlyStatisticsDocument>['$set'] = {
+			resource: report.resource ?? resource,
+			user: report.user ?? curator ?? null,
+			league_data: report.league_data,
+		};
+		if (reportIsLast) {
+			setObj.last_contribution = report.timestamp;
+		}
+		try {
+			await this.monthlyStatsModel.findOneAndUpdate(
+				relatedMonthlyStatFilter,
+				{
+					$inc: {
+						[`${term.activity_category}_count`]: 1,
+						[`${term.activity_category}_score`]: term.score,
+						total_count: 1,
+						total_score: term.score,
 					},
-			  }
-			: {};
-
-		await this.monthlyStatsModel.findOneAndUpdate(
-			relatedMonthlyStatFilter,
-			{
-				$inc: {
-					[`${term.activity_category}_count`]: 1,
-					[`${term.activity_category}_score`]: term.score,
-					total_count: 1,
-					total_score: term.score,
+					$set: setObj,
+					$setOnInsert: {
+						first_contribution: report.timestamp,
+					},
 				},
-				...setObj,
-				$setOnInsert: {
-					first_contribution: report.timestamp,
+				{
+					upsert: true,
+					new: true,
 				},
-			},
-			{
-				upsert: true,
-				new: true,
-			},
-		);
+			);
+		} catch (err) {
+			if (err instanceof MongoServerError && err.code == 11000) {
+				await this.applyReport(report, term, resource, curator);
+			}
+		}
 	}
 
 	private initStat(
@@ -93,6 +99,9 @@ export class ComputeMonthlyStatsService {
 			curator_orcid: reportAgg.curator_orcid,
 			resource_id: reportAgg.resource_id,
 			league: reportAgg.league,
+			resource: reportAgg.resource,
+			user: reportAgg.user ?? null,
+			league_data: reportAgg.league_data,
 			privacy: reportAgg.privacy,
 			invalidation_count: 0,
 			invalidation_score: 0,

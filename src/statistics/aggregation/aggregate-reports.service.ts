@@ -10,6 +10,7 @@ import {
 	PartnerResourceDocument,
 } from '../../core/schemas/resource/partner-resource.schema';
 import { PrivacyType } from '../../core/enums';
+import { LeagueDocument } from '../../core/schemas/league/league.schema';
 
 export interface BaseAggregationResult {
 	_id: {
@@ -26,6 +27,10 @@ export interface BaseAggregationResult {
 	count: number;
 	last_contribution: Date;
 	first_contribution: Date;
+	resource: PartnerResourceDocument;
+	term: TermDocument;
+	user: UserDocument;
+	league_data: LeagueDocument;
 }
 
 export type BaseReportIteratorResult<T> = {
@@ -62,14 +67,26 @@ export class StatisticsReportAggregator {
 				resource_id: {
 					$first: '$resource_id',
 				},
+				resource: {
+					$first: '$resource',
+				},
 				curator_orcid: {
 					$first: '$curator_orcid',
+				},
+				user: {
+					$first: '$user',
 				},
 				league: {
 					$first: '$league',
 				},
+				league_data: {
+					$first: '$league_data',
+				},
 				activity_term: {
 					$first: '$activity_term',
+				},
+				term: {
+					$first: '$term',
 				},
 				count: {
 					$sum: 1,
@@ -142,30 +159,13 @@ export class StatisticsReportAggregator {
 
 	async *iterate(
 		filter: FilterQuery<ReportDocument> = {},
-	): AsyncGenerator<BaseReportIteratorResult<BaseAggregationResult>> {
-		const cursor = this.aggregate(filter).cursor({ batchSize: 100 });
-		let currentResource: PartnerResourceDocument | null = null;
+	): AsyncGenerator<BaseAggregationResult> {
+		const cursor = this.aggregate(filter).cursor<BaseAggregationResult>({
+			batchSize: 100,
+		});
 
 		for await (const report of cursor) {
-			if (
-				!currentResource ||
-				currentResource.resource_id !== report.resource_id
-			) {
-				currentResource = await this.resourceModel.findOne({
-					resource_id: report.resource_id,
-				});
-			}
-
-			const term = await this.getTerm({
-				resource_id: report.resource_id,
-				activity_term: report.activity_term,
-				league: report.league,
-			});
-			yield {
-				term,
-				resource: currentResource,
-				report: report,
-			};
+			yield report;
 		}
 	}
 }

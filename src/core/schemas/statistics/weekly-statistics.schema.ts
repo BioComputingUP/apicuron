@@ -1,7 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { PrivacyType } from '../../enums';
 import { IUserResourceEntity } from '../../interfaces/user-resource-entity';
-import { HydratedDocument, IndexDefinition, LeanDocument } from 'mongoose';
+import { HydratedDocument, LeanDocument } from 'mongoose';
+import { LeagueSchema, League } from '../league/league.schema';
+import {
+	PartnerResourceSchema,
+	PartnerResource,
+} from '../resource/partner-resource.schema';
+import { UserSchema, User } from '../user.schema';
 
 export type WeeklyStatisticsDocument = HydratedDocument<WeeklyStatistics>;
 export type LeanWeeklyStatisticsDocument =
@@ -14,6 +20,15 @@ export type LeanWeeklyStatisticsDocument =
 export class WeeklyStatistics implements IUserResourceEntity {
 	@Prop({ required: true, type: String })
 	resource_id: string;
+
+	@Prop({ required: false, type: UserSchema })
+	user: User | null;
+
+	@Prop({ required: true, type: PartnerResourceSchema })
+	resource: PartnerResource;
+
+	@Prop({ required: true, type: LeagueSchema })
+	league_data: League;
 
 	@Prop({ required: true, type: String, enum: PrivacyType })
 	privacy: PrivacyType;
