@@ -1,13 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { IEventHandler } from '@nestjs/cqrs';
 import { SubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { OnEvent } from '@nestjs/event-emitter';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
 import { Aggregator } from '../interfaces/aggregator.interface';
-import { StatisticsAggregator } from '../../statistics/services/statistics-aggregator.service';
 
 @Injectable()
 export class LeagueUpdatedHandler implements IEventHandler {
