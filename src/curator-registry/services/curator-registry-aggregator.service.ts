@@ -147,7 +147,10 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 		return;
 	}
 	termDeleted(term: TermDocument) {
-		// doesn't affect
+		// TODO: rediscuss this
+		// Probably recalulating all resource aggregates is better than doing an aggregation across all 3 collections (terms, reports, registry)
+		// Especially since the old reports with the term would be deleted when this triggers
+		this.recomputeAllResourceAggregates(term.resource_id);
 		return;
 	}
 }

@@ -6,7 +6,7 @@ import {
 	CuratorRegistryEntryDocument,
 } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { PartnerResourcesService } from 'src/resources/partner-resources/services/partner-resources.service';
-import { RegistryEntriesDto } from './dto/registry-entries.dto';
+import { GetRegistryEntryDto } from './dto/registry-entries.dto';
 import { UserRepository } from 'src/core/repositories/user.repository';
 import { Report, ReportDocument } from 'src/core/schemas/reports.schema';
 import { User, UserDocument } from 'src/core/schemas/user.schema';
@@ -28,104 +28,71 @@ export class CuratorRegistryService {
 	 * Get all curators from registry that match the user filter query
 	 * @param query : user query
 	 */
-	async getAllEntries(query: RegistryEntriesDto, requestUserOrcid: string) {
-		// TODO: Add pagination
-
+	async getAllEntries(query: GetRegistryEntryDto) {
 		//extract user query details
 		const {
 			filter_field: filtered_field, //orcid or displayed name
 			query: user_query, // what the user typed in the first filed
 			resources: filtered_resources, // the resource list filtererd by the user
 		} = query;
+
 		//build query filter
 		const query_filter: FilterQuery<CuratorRegistryEntryDocument> = {};
 		const field =
 			filtered_field === 'orcid_id'
 				? 'curator.orcid_id'
 				: 'curator.displayedName';
-		if (!!user_query)
-			query_filter[field] = { $regex: user_query, $options: 'i' };
+		if (!!user_query) {
+			// clean the userquery
+			const cleanQuery = user_query
+				.replace(/[-\/\\^$*+?.()|[\]{}]/g, '')
+				.trim();
+			query_filter[field] = { $regex: new RegExp(cleanQuery, 'i') };
+		}
 
 		if (!!filtered_resources) {
 			query_filter['contributed_to'] = {
 				$elemMatch: { resource_id: { $in: filtered_resources } },
 			};
 		}
-		// This stage filters out private groups
-		const league_visibility_stage = {
-			// if you can make this better please do
-			$set: {
-				contributed_to: {
-					$map: {
-						input: '$contributed_to',
-						as: 'item',
-						in: {
-							$mergeObjects: [
-								'$$item',
-								{
-									groups: {
-										$filter: {
-											input: '$$item.groups',
-											as: 'group',
-											cond: {
-												// Show only public groups unless the requesting user is part of it
-												$or: [
-													{
-														$ne: ['$$group.visibility', 'private'],
-													},
-													{
-														$eq: ['$curator_orcid', requestUserOrcid],
-													},
-												],
-											},
-										},
-									},
-								},
-							],
-						},
-					},
-				},
-			},
-		};
-		// Remove sensitive and unimportant fields
-		const projection_stage = {
-			// hide sensitive and unimportant curator fields
-			$project: {
-				'curator.role': 0,
-				'curator._id': 0,
-				'curator.__v': 0,
-				'curator.last_update': 0,
-				'curator.orcid_permission': 0,
-				'curator.cookie_token': 0,
-				'curator.resource_settings': 0,
-				'curator.refresh_token': 0,
-				'curator.resources': 0,
-				'curator.orcid_scope': 0,
-				'curator.orcid_work_put_codes': 0,
-				// resource fields
-				'contributed_to.resource._id': 0,
-				'contributed_to.resource.leagues.updatedAt': 0,
-				'contributed_to.resource.leagues.createdAt': 0,
-				'contributed_to.resource.leagues._id': 0,
-				__v: 0,
-				_id: 0,
-			},
-		};
-
+		// always hide private curators
 		query_filter['curator.privacy'] = PrivacyType.public;
 
-		const aggregation_pipeline: PipelineStage[] = [
-			{ $match: query_filter },
-			league_visibility_stage,
-			projection_stage,
-			...query.getMongoAggregation(),
-		];
+		// TODO: Recheck performance of this with @Adel
+
+		const projections = { ...query.getMongoQueryOptions() };
+
 		try {
-			const entries = await this.registryEntryModel.aggregate(
-				aggregation_pipeline,
+			const entries = await this.registryEntryModel.find(
+				query_filter,
+				{},
+				projections,
 			);
-			this.logger.debug(`Found entries: ${entries.length}`);
-			return { length: entries.length, data: entries };
+			if (!!entries) {
+				const entriesFilteredLeagues = entries.map((entry) => {
+					const plainEntry = entry.toObject(); // Converts the document to a plain object
+
+					return {
+						...plainEntry,
+						contributed_to: plainEntry.contributed_to
+							.map((contribution) => {
+								const filteredGroups = contribution.groups.filter(
+									(group) => group.visibility === PrivacyType.public,
+								);
+								return {
+									...contribution,
+									groups: filteredGroups,
+								};
+							})
+							.filter(Boolean), // Remove null contributions
+					};
+				});
+
+				return {
+					length: entriesFilteredLeagues.length,
+					data: entriesFilteredLeagues,
+				};
+			}
 		} catch (error) {
 			this.logger.error('Error while processing request to get all entries...');
 			this.logger.error(error);
@@ -251,9 +218,28 @@ export class CuratorRegistryService {
 	async getCuratorEntry(orcid_identifier: string) {
 		let entry: CuratorRegistryEntry = null;
 		try {
-			entry = await this.registryEntryModel.findOne({
-				curator_orcid: orcid_identifier,
-			});
+			entry = await this.registryEntryModel
+				.findOne({
+					curator_orcid: orcid_identifier,
+				})
+				.lean();
+			if (!entry) {
+				const filtered_groups_entry = entry.contributed_to.map(
+					(contribution) => {
+						return {
+							...contribution,
+							groups: contribution.groups.filter(
+								(group) => group.visibility === PrivacyType.public,
+							),
+						};
+					},
+				);
+				const resultEntry = {
+					...entry,
+					contributed_to: filtered_groups_entry,
+				};
+				return resultEntry;
+			}
 		} catch (error) {
 			this.logger.error(
 				`Could not retrieve user with orcid: ${orcid_identifier}...`,
@@ -471,8 +457,10 @@ export class CuratorRegistryService {
 				],
 			});
 			return newEntry;
-		} catch(error){
-			this.logger.error(`Error while adding curator ${curator_orcid} to registry`);
+		} catch (error) {
+			this.logger.error(
+				`Error while adding curator ${curator_orcid} to registry`,
+			);
 			this.logger.error(error);
 		}
 	}
@@ -540,7 +528,7 @@ export class CuratorRegistryService {
 		return !!result;
 	}
 
-	async removeAllEntries(resource_id: string){
+	async removeAllEntries(resource_id: string) {
 		const result = await this.registryEntryModel.deleteMany({
 			contributed_to: {
 				$elemMatch: {
