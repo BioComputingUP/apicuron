@@ -10,8 +10,10 @@ import {
 	ApiOperation,
 	ApiTags,
 	ApiHeader,
+	ApiExtraModels,
 } from '@nestjs/swagger';
 import { ApiResponsePaginated } from 'src/pagination/decorators/paginated-reponse.decorator';
+import { RegistryCurator } from './dto/registry-curator-dto';
 import { VersionHeader } from 'src/plugins/swagger/config';
 
 @ApiTags('Curator Registry')
@@ -20,6 +22,7 @@ import { VersionHeader } from 'src/plugins/swagger/config';
 	path: 'registry',
 	version: '2',
 })
+@ApiExtraModels(RegistrySearchResultDto, RegistryCurator)
 export class CuratorRegistryController {
 	constructor(protected registryService: CuratorRegistryService) {}
 
