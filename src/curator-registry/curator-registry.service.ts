@@ -1,6 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+	Injectable,
+	InternalServerErrorException,
+	Logger,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, PipelineStage } from 'mongoose';
+import { FilterQuery, Model, PipelineStage, ProjectionType } from 'mongoose';
 import {
 	CuratorRegistryEntry,
 	CuratorRegistryEntryDocument,
@@ -9,10 +13,10 @@ import { PartnerResourcesService } from 'src/resources/partner-resources/service
 import { GetRegistryEntryDto } from './dto/registry-entries.dto';
 import { UserRepository } from 'src/core/repositories/user.repository';
 import { Report, ReportDocument } from 'src/core/schemas/reports.schema';
-import { User, UserDocument } from 'src/core/schemas/user.schema';
+import { User } from 'src/core/schemas/user.schema';
 import { League, LeagueDocument, PartnerResource } from 'src/core/schemas';
 import { PrivacyType } from 'src/core/enums';
-import { result } from 'lodash';
+import * as _ from 'lodash';
 @Injectable()
 export class CuratorRegistryService {
 	constructor(
@@ -44,10 +48,8 @@ export class CuratorRegistryService {
 				: 'curator.displayedName';
 		if (!!user_query) {
 			// clean the userquery
-			const cleanQuery = user_query
-				.replace(/[-\/\\^$*+?.()|[\]{}]/g, '')
-				.trim();
-			query_filter[field] = { $regex: new RegExp(cleanQuery, 'i') };
+			const cleanQuery = _.escapeRegExp(user_query);
+			query_filter[field] = { $regex: `.*${cleanQuery}.*`, $options: 'i' };
 		}
 
 		if (!!filtered_resources) {
@@ -58,160 +60,44 @@ export class CuratorRegistryService {
 		// always hide private curators
 		query_filter['curator.privacy'] = PrivacyType.public;
 
-		// TODO: Recheck performance of this with @Adel
-
-		const projections = { ...query.getMongoQueryOptions() };
+		const queryOptions: ProjectionType<CuratorRegistryEntryDocument> =
+			query.getMongoQueryOptions();
 
 		try {
-			const entries = await this.registryEntryModel.find(
-				query_filter,
-				{},
-				projections,
-			);
-			if (!!entries) {
-				const entriesFilteredLeagues = entries.map((entry) => {
-					const plainEntry = entry.toObject(); // Converts the document to a plain object
+			const entries = await this.registryEntryModel
+				.find(query_filter, {}, queryOptions)
+				.lean();
 
-					return {
-						...plainEntry,
-						contributed_to: plainEntry.contributed_to
-							.map((contribution) => {
-								const filteredGroups = contribution.groups.filter(
-									(group) => group.visibility === PrivacyType.public,
-								);
-								return {
-									...contribution,
-									groups: filteredGroups,
-								};
-							})
-							.filter(Boolean), // Remove null contributions
-					};
-				});
-
+			if (entries.length == 0) {
 				return {
-					length: entriesFilteredLeagues.length,
-					data: entriesFilteredLeagues,
+					length: 0,
+					data: [],
 				};
 			}
+			const entriesFilteredLeagues = entries.map((entry) => {
+				const plainEntry = entry; // Converts the document to a plain object
+
+				const filteredContributedTo = plainEntry.contributed_to
+					.map((contribution) => {
+						const filteredGroups = contribution.groups.filter(
+							(group) => group.visibility === PrivacyType.public,
+						);
+						contribution.groups = filteredGroups;
+						return contribution;
+					})
+					.filter((contribution) => contribution.groups.length > 0); // Remove null contributions
+				plainEntry.contributed_to = filteredContributedTo;
+				return plainEntry;
+			});
+
+			return {
+				length: entriesFilteredLeagues.length,
+				data: entriesFilteredLeagues,
+			};
 		} catch (error) {
 			this.logger.error('Error while processing request to get all entries...');
 			this.logger.error(error);
-		}
-	}
-
-	/**
-	 * Update the curator entry for a given user by aggregating all reports
-	 * @param orcid_identifier the orcid id of the user
-	 * @returns a promise that resolves when the update is complete
-	 */
-	async updateCuratorEntry(orcid_identifier: string) {
-		//check if user exists
-		let user = null;
-		try {
-			user = await this.userRep.findOne({ orcid_id: orcid_identifier });
-		} catch (error) {
-			this.logger.error(
-				`Could not retrieve user with orcid: ${orcid_identifier}...`,
-			);
-			this.logger.error(error);
-		}
-		// if user exists
-		if (!!user) {
-			// const resource_ids = await this.reportModel.distinct('resource_id', {
-			// 	curator_orcid: orcid_identifier,
-			// });
-
-			const aggregation_pipeline: PipelineStage[] = [
-				{
-					//filter user reports
-					$match: {
-						curator_orcid: orcid_identifier,
-					},
-				},
-				{
-					// group by resource
-					$group: {
-						_id: '$resource_id',
-						leagueNames: {
-							$addToSet: '$league',
-						},
-					},
-				},
-				{
-					// get the resource information
-					$lookup: {
-						from: 'resources_def',
-						localField: '_id',
-						foreignField: 'resource_id',
-						as: 'resources',
-					},
-				},
-				{
-					$unwind: {
-						path: '$resources',
-					},
-				},
-				{
-					// add league info
-					$addFields: {
-						leagues: {
-							$filter: {
-								input: '$resources.leagues',
-								as: 'league',
-								cond: {
-									$in: ['$$league.name', '$leagueNames'],
-								},
-							},
-						},
-					},
-				},
-				{
-					$project: {
-						_id: 0,
-						resource_id: '$_id',
-						resource: '$resources',
-						leagues: 1,
-					},
-				},
-			];
-			try {
-				const contribution_info = await this.reportModel.aggregate(
-					aggregation_pipeline,
-				);
-				this.logger.debug(
-					`Found ${contribution_info.length} contributions for user ${orcid_identifier}`,
-				);
-				const userUpdates = [];
-				for (const contribution of contribution_info) {
-					userUpdates.push(
-						this.registryEntryModel.findOneAndUpdate(
-							{ curator_orcid: orcid_identifier },
-							{
-								$set: {
-									contributed_to: {
-										resource_id: contribution.resource_id,
-										groups: contribution.leagues,
-										resource: contribution.resource,
-									},
-									curator: user,
-								},
-							},
-							{ upsert: true },
-						),
-					);
-				}
-
-				await Promise.all(userUpdates);
-				return;
-			} catch (error) {
-				this.logger.error('Error updating user contributions');
-				this.logger.error(error);
-			}
-		} else {
-			this.logger.error(
-				`No user was found with the orcid: ${orcid_identifier}`,
-			);
-			return null;
+			throw new InternalServerErrorException(`Error while processing request`);
 		}
 	}
 
@@ -253,6 +139,7 @@ export class CuratorRegistryService {
 		try {
 			const result = await this.registryEntryModel.create({
 				curator_orcid: curator.orcid_id,
+				curator: curator,
 			});
 			return result;
 		} catch (error) {
@@ -351,15 +238,13 @@ export class CuratorRegistryService {
 			},
 		];
 
-		const aggregation_results =
-			this.reportModel.aggregate(aggregation_pipeline);
 		this.logger.debug('Updating all curator registry entries...');
 		try {
 			const aggregationResults = await this.reportModel.aggregate(
 				aggregation_pipeline,
 			);
 
-			let updates = [];
+			const updates = [];
 			for (const result of aggregationResults) {
 				updates.push(
 					this.registryEntryModel.findOneAndUpdate(

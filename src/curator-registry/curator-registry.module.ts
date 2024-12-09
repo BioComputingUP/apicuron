@@ -6,8 +6,8 @@ import { CuratorRegistryService } from './curator-registry.service';
 import { CuratorRegistryController } from './curator-registry.controller';
 import { ResourcesModule } from 'src/resources/resources.module';
 @Module({
-  imports: [CoreApicuronModule, AuthModule, ResourcesModule ],
-  providers: [CuratorRegistryAggregatorService, CuratorRegistryService],
-  controllers: [CuratorRegistryController],
+	imports: [CoreApicuronModule, AuthModule, ResourcesModule],
+	providers: [CuratorRegistryAggregatorService, CuratorRegistryService],
+	controllers: [CuratorRegistryController],
 })
 export class CuratorRegistryModule {}

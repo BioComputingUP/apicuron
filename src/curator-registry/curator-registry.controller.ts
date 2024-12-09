@@ -36,7 +36,6 @@ export class CuratorRegistryController {
 	async getCuratorEntry(
 		@Param('id') user_orcid: string,
 	): Promise<RegistrySearchResultDto> {
-	
 		try {
 			const result = await this.registryService.getCuratorEntry(user_orcid);
 			const desrialized_result = plainToInstance(
@@ -65,22 +64,18 @@ export class CuratorRegistryController {
 		@Query() query: GetRegistryEntryDto,
 	): Promise<Paginated<RegistrySearchResultDto>> | null {
 		// const getStatDtoInstance = plainToInstance(GetRegistryEntryDto, query);
-		const getStatDtoInstance = query
-		try {
-			const { data, length } = await this.registryService.getAllEntries(
-				getStatDtoInstance,
-			);
-			const responseInstance = plainToInstance(RegistrySearchResultDto, data, {
-				excludeExtraneousValues: true,
-			});
+		const getStatDtoInstance = query;
+		const { data, length } = await this.registryService.getAllEntries(
+			getStatDtoInstance,
+		);
+		const responseInstance = plainToInstance(RegistrySearchResultDto, data, {
+			excludeExtraneousValues: true,
+		});
 
-			return paginate<RegistrySearchResultDto>(
-				responseInstance,
-				getStatDtoInstance,
-				length,
-			);
-		} catch (error) {
-			this.logger.error(error);
-		}
+		return paginate<RegistrySearchResultDto>(
+			responseInstance,
+			getStatDtoInstance,
+			length,
+		);
 	}
 }

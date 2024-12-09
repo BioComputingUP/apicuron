@@ -1,4 +1,4 @@
-import { Module, Logger, ClassSerializerInterceptor } from '@nestjs/common';
+import { Module, ClassSerializerInterceptor } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';

@@ -1,6 +1,5 @@
-import { Expose, Type } from "class-transformer";
-import { RegistryCurator } from "./registry-curator-dto";
-
+import { Expose, Type } from 'class-transformer';
+import { RegistryCurator } from './registry-curator-dto';
 
 export class RegistryLeague {
 	@Expose()
@@ -11,7 +10,6 @@ export class RegistryLeague {
 }
 
 export class RegistryResource {
-
 	@Expose()
 	resource_id: string;
 
@@ -26,7 +24,7 @@ export class RegistryResource {
 
 	@Expose()
 	resource_uri: string;
-} 
+}
 
 export class RegistryContributedTo {
 	@Expose()

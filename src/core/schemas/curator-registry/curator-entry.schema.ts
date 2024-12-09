@@ -39,7 +39,22 @@ export class CuratorRegistryEntry {
 	contributed_to: ContributionEntry[];
 }
 
-export const CuratorRegistryEntrySchema =
+const CuratorRegistryEntrySchema =
 	SchemaFactory.createForClass(CuratorRegistryEntry).loadClass(
 		CuratorRegistryEntry,
 	);
+
+CuratorRegistryEntrySchema.index({
+	'curator.displayedName': 'text',
+	'curator.orcid_id': 'text',
+	curator_orcid: 'text',
+});
+
+CuratorRegistryEntrySchema.index({
+	'curator.displayedName': -1,
+	'curator.orcid_id': -1,
+	curator_orcid: -1,
+	'curator.privacy': -1,
+});
+
+export { CuratorRegistryEntrySchema };
