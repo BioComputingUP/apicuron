@@ -1,4 +1,4 @@
-import { Module, Logger, ClassSerializerInterceptor } from '@nestjs/common';
+import { Module, ClassSerializerInterceptor } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -37,6 +37,7 @@ import { EventOrchestratorModule } from './event-orchestrator/event-orchestrator
 import { Reflector } from '@nestjs/core';
 import { ResourceStatsModule } from './resource-stats/resource-stats.module';
 import { MonthlyStatisticsModule } from './monthly-statistics/monthly-statistics.module';
+import { CuratorRegistryModule } from './curator-registry/curator-registry.module';
 
 @Module({
 	imports: [
@@ -92,6 +93,7 @@ import { MonthlyStatisticsModule } from './monthly-statistics/monthly-statistics
 		AchievementsModule,
 		EventOrchestratorModule,
 		ResourceStatsModule,
+		CuratorRegistryModule,
 	],
 	controllers: [AppController],
 	providers: [

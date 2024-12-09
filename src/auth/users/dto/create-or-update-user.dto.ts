@@ -24,4 +24,15 @@ export interface ICreateOrUpdateUser {
 	orcid_scope?: string;
 
 	refresh_token?: string;
+	// user info
+	biography?: string;
+
+	keywords?: string[];
+
+	affiliation?: string;
+
+	links?: {
+		name: string,
+		url: URL
+	}
 }

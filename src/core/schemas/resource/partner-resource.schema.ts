@@ -64,9 +64,10 @@ export class PartnerResource {
 
 	@Prop({
 		type: ResourceStatsSchema,
-		required: false,
+		required: true,
+		default: (val) => ({ resource_id: val.resource_id }),
 	})
-	stats?: ResourceStats;
+	stats: ResourceStats;
 
 	@Prop({ required: true, type: Date })
 	joined_date: Date;

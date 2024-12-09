@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable} from '@nestjs/common';
 import { PartnerResourcesService } from '../../services/partner-resources.service';
 import { UpdateLeagueDto } from '../dto/update-league.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -130,7 +130,6 @@ export class LeagueService {
 			resource.leagues[leagueIndex] as LeagueDocument,
 			leagueIndex,
 		);
-
 		await this.eventEmitter.emitAsync(LeagueUpdatedEvent.name, updateEvent);
 
 		return result;
