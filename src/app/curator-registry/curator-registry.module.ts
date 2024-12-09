@@ -4,7 +4,8 @@ import { CommonModule } from "@angular/common";
 import { RegistryRoutingModule } from "./registry-routing.module";
 import { RegistryCardComponent } from './registry-card/registry-card.component';
 import { CuratorRegistryService } from "./curator-registry.service";
-
+import { CuratorModule } from "../curator/curator.module";
+import { PaginationComponent } from "../pagination/pagination.component";
 
 
 @NgModule({
@@ -14,7 +15,9 @@ import { CuratorRegistryService } from "./curator-registry.service";
   ],
   imports: [
     CommonModule,
-    RegistryRoutingModule
+    RegistryRoutingModule,
+    CuratorModule,
+    PaginationComponent
   ],
   providers:[CuratorRegistryService]
 })

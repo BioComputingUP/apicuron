@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "src/environments/environment";
 
@@ -8,8 +8,9 @@ export class CuratorRegistryService {
 
 	constructor(private httpClient: HttpClient) {}
 
-	getAllCurators() {
+	getAllCurators(params: HttpParams) {
 		return this.httpClient.get(this.wsUrl + "/registry", {
+			params,
 			headers: {
 				version: "2",
 			}
