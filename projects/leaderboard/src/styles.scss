@@ -1,8 +1,8 @@
-@config "../tailwind.config.js"
+@config "../tailwind.config.js";
 
 /* You can add global styles to this file, and also import other style files */
 @tailwind base;
-// @tailwind components;
+@tailwind components;
 @tailwind utilities;
 
 

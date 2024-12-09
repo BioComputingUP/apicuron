@@ -10,12 +10,12 @@
     <div class="tw-flex tw-flex-row tw-flex-wrap tw-py-1" *ngIf="badges$ | async as badges">
         <ng-container *ngIf="terms$ | async as terms">
             <div *ngFor="let badge of badges.data" class="tw-p-1 sm:tw-p-2 tw-w-1/2 sm:tw-w-1/3 lg:tw-w-1/4 tw-relative tw-z-0">
-                <div class="tw-bg-white tw-relative tw-pt-1 tw-h-full tw-shadow-md tw-shadow-gray-400 tw-z-0">
+                <div class="tw-flex tw-flex-col tw-bg-white tw-relative tw-pt-1 tw-h-full tw-shadow-md tw-shadow-gray-400 tw-z-0 tw-rounded-b">
 
                     <div>
-                        <badge-def-card [badge]="badge" [terms]="terms" [enableShadow]="false"></badge-def-card>
+                        <badge-def-card [badge]="badge" [terms]="(termList$ | async)" [enableShadow]="false"></badge-def-card>
                     </div>
-                    <div class="tw-flex tw-flex-row tw-justify-between">
+                    <div class="tw-flex tw-flex-row tw-justify-between tw-mt-auto">
                         <div class="tw-w-1/2">
                             <button (click)="open_form(badge)"
                                 class="tw-bg-green-500 tw-text-white tw-font-bold tw-w-full tw-rounded-bl tw-shadow-md">Edit</button>
@@ -43,7 +43,7 @@
     <div *ngIf="manageForm.show" class="tw-relative tw-z-50 tw-overflow-y-scroll" aria-labelledby="modal-title"
         role="dialog" aria-modal="true">
 
-        <div class="tw-fixed tw-inset-0 tw-bg-gray-500 tw-bg-opacity-75 tw-backdrop-blur-sm tw-transition-opacity tw-duration-200"
+        <div class="tw-fixed tw-inset-0 tw-bg-gray-500 tw-bg-opacity-75 tw-transition-opacity tw-duration-200"
             [ngClass]="{'tw-block':manageForm.show, 'tw-hidden': !manageForm.show}" (click)="manageForm.show = false">
         </div>
 
@@ -52,7 +52,7 @@
                 class="tw-flex tw-min-h-full tw-items-center tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0">
 
                 <div [ngClass]="{'tw-block':manageForm.show, 'tw-hidden': !manageForm.show}"
-                    class="tw-relative tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 ">
+                    class="tw-relative tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 tw-max-h-[90vh] tw-overflow-y-scroll">
                     <badge-form [badge]="manageForm.badge" [type]="manageForm.type" [terms]="(terms$ | async)"
                         (formResult)="formSubmit($event)"></badge-form>
                     <button class="tw-w-full tw-mx-auto tw-p-2 tw-bg-gray-400 tw-text-white tw-capitalize"

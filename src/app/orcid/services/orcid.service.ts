@@ -1,16 +1,17 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable, combineLatest, of, throwError } from "rxjs";
-import { catchError, filter, map, pluck } from "rxjs/operators";
+import { Observable, combineLatest, of } from "rxjs";
+import { catchError, filter, map, pluck, shareReplay, switchMap } from "rxjs/operators";
 import { OrcidInformation, OrcidProfileLink } from "src/app/orcid/types/orcid";
 import { environment } from "src/environments/environment";
+import { OrcidProfile } from "../../models/orcid-profile.model";
 
 function OrcidErrorHandler(field) {
   return (err: any, caught: Observable<any>) => {
-    if(err && err.status == 404){
-        let output = {}
-        output[field] = null;
-        return of(output);    
+    if (err && err.status == 404) {
+      let output = {};
+      output[field] = null;
+      return of(output);
     }
   };
 }
@@ -34,7 +35,7 @@ export class OrcidService {
         },
       })
       .pipe(
-        catchError(OrcidErrorHandler('content')),
+        catchError(OrcidErrorHandler("content")),
         filter((response) => !!response["content"]),
         pluck("content")
       );
@@ -49,11 +50,13 @@ export class OrcidService {
         },
       })
       .pipe(
-        catchError(OrcidErrorHandler('affiliation-group')),
+        catchError(OrcidErrorHandler("affiliation-group")),
         filter((response) => !!response["affiliation-group"]),
         pluck("affiliation-group"),
         map((workplace) => {
-          const name = workplace?.[0].summaries?.[0]?.["employment-summary"]?.organization?.name;
+          const name =
+            workplace?.[0].summaries?.[0]?.["employment-summary"]?.organization
+              ?.name;
           return name;
         })
       );
@@ -69,17 +72,17 @@ export class OrcidService {
         },
       })
       .pipe(
-        catchError(OrcidErrorHandler('researcher-url')),
+        catchError(OrcidErrorHandler("researcher-url")),
         filter(({ "researcher-url": urls }: any) => !!urls && urls),
         pluck("researcher-url"),
         map((url_list) => {
           return url_list.map(({ "url-name": name, url }) => {
             const value = new URL(url.value);
-            const host = value.host.replace('www.', '');
+            const host = value.host.replace("www.", "");
             return { name, value, host };
           });
         }),
-        filter((urls) => !!urls && urls.length > 0),
+        filter((urls) => !!urls && urls.length > 0)
       );
   }
 
@@ -92,8 +95,10 @@ export class OrcidService {
         },
       })
       .pipe(
-        catchError(OrcidErrorHandler('keyword')),
-        filter((response: any) => !!response.keyword && response.keyword.length > 0),
+        catchError(OrcidErrorHandler("keyword")),
+        filter(
+          (response: any) => !!response.keyword && response.keyword.length > 0
+        ),
         pluck("keyword"),
         map((keyword_list: any[]): string[] => {
           return keyword_list.map((keyword) => keyword.content);
@@ -107,7 +112,12 @@ export class OrcidService {
     const profile_links$ = this.get_profile_links(orcid_id);
     const keywords$ = this.get_keywords(orcid_id);
     const employment$ = this.get_employment(orcid_id);
-    return combineLatest([biography$, profile_links$, keywords$, employment$]).pipe(
+    return combineLatest([
+      biography$,
+      profile_links$,
+      keywords$,
+      employment$,
+    ]).pipe(
       map(([biography, profileLinks, keywords, employment]) => {
         return {
           biography,
@@ -115,6 +125,69 @@ export class OrcidService {
           keywords,
           employment,
         };
+      })
+    );
+  }
+
+  searchOrcidProfile(term: string) {
+    return this.http
+      .get(`${environment.ws}/orcid/search`, {
+        headers: {
+          version: "2",
+        },
+        params: {
+          query: term,
+        },
+      })
+      .pipe(
+        shareReplay(),
+        map((response: any) => {
+          if (!response["expanded-result"]) {
+            return [];
+          }
+          return response["expanded-result"];
+        }),
+        map((results: any[]): OrcidProfile[] => {
+          return results.map((result) =>
+            new OrcidProfile().deserialize(result)
+          );
+        })
+      );
+  }
+
+  getOrcidProfile(orcid_id: string): Observable<OrcidProfile> {
+    return this.http.get(`${this.orcid_url}${orcid_id}`, {
+        headers: {
+          ...this.base_headers,
+        },
+      })
+      .pipe(
+        map((response: any) => {
+          const name = response?.["person"]["name"];
+          const [given_names, family_name, credit_name] = [
+            name?.["given-names"]?.["value"],
+            name?.["family-name"]?.["value"],
+            name?.["credit-name"]?.["value"],
+          ];
+
+          const profileObj = {
+            "orcid-id": orcid_id,
+            "given-names": given_names,
+            "family-name": family_name,
+            "credit-name": credit_name,
+          };
+
+          return new OrcidProfile().deserialize(profileObj);
+        })
+      );
+  }
+
+  getOrcidProfiles(orcid_ids: string[]): Observable<OrcidProfile[]> {
+    return of(orcid_ids).pipe(
+      switchMap((ids: string[]) => {
+        const profiles = ids.map((id) => this.getOrcidProfile(id));
+
+        return combineLatest(profiles);
       })
     );
   }

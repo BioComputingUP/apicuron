@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { environment } from '../../../environments/environment';
 import { Resource } from 'src/app/models/resource.model';
 @Component({
   selector: 'partner-resource',

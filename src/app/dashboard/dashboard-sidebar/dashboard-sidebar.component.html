@@ -1,5 +1,5 @@
 <div
-    class="tw-flex tw-h-screen tw-flex-col tw-justify-between tw-border-e tw-bg-white tw-w-full">
+    class="tw-flex tw-h-screen tw-flex-col tw-justify-between tw-border-e tw-bg-white tw-w-full tw-overflow-y-auto">
     <div class="tw-px-4 tw-py-6">
         <a routerLink="/" class="tw-grid tw-h-10 tw-w-32 tw-place-content-center tw-rounded-lg tw-text-xs tw-text-gray-600">
             <svg-icon src="assets/APICURON.svg" svgClass="tw-w-full"></svg-icon>
@@ -23,6 +23,21 @@
                     Edit Profile
                 </a>
             </li>
+
+            <ng-container *ngIf="contributedResources$ | async as contributedResources">
+                <span class="tw-text-gray-400 tw-font-bold tw-text-sm">Contributed Resources</span>
+
+                <ng-container *ngFor="let resource of contributedResources">
+                    <li>
+                        <a [routerLink]="['/dashboard', 'user', 'resources', resource.resource_id]"
+                            routerLinkActive="list-item-active"
+                            class="tw-block tw-rounded-lg tw-px-4 tw-py-2 tw-text-sm  list-item list-item-colors">
+                            {{ resource.resource_name }}
+                        </a>
+                    </li>
+                </ng-container>
+
+            </ng-container>
 
             <ng-container *ngIf="links$ | async as resourcesLinks">
                 <span class="tw-text-gray-400 tw-font-bold tw-text-sm">Manage Resources</span>
@@ -150,7 +165,7 @@
     <div class="tw-sticky tw-inset-x-0 tw-bottom-0 tw-border-t tw-border-gray-100" *ngIf="user$ | async as user">
         <a href="#" class="tw-flex tw-items-center tw-gap-2 tw-bg-white tw-p-4 hover:tw-bg-gray-50">
             <img alt="Man"
-                [src]="user.generate_avatar()"
+                [src]="user.avatar"
                 class="tw-h-10 tw-w-10 tw-rounded-full tw-object-cover">
 
             <div>

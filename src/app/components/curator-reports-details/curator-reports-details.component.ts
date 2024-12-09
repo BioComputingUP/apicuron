@@ -7,15 +7,14 @@ import {
 } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
 import { AngularSvgIconModule } from "angular-svg-icon";
-import { BehaviorSubject, Observable, combineLatest, of } from "rxjs";
 import {
-  filter,
-  map,
-  shareReplay,
-  startWith,
-  switchMap,
-  tap,
-} from "rxjs/operators";
+  BehaviorSubject,
+  Observable,
+  ReplaySubject,
+  combineLatest,
+  of,
+} from "rxjs";
+import { filter, map, shareReplay, switchMap, tap } from "rxjs/operators";
 import { ReportCardComponent } from "src/app/components/report-card/report-card.component";
 import { ReportFilterFormComponent } from "src/app/components/report-filter-form/report-filter-form.component";
 import { ReportTableComponent } from "src/app/components/report-table/report-table.component";
@@ -28,15 +27,22 @@ import { PaginationComponent } from "src/app/pagination/pagination.component";
 import { ReportFilter } from "src/app/reports/interfaces/report-filter.interface";
 import { ReportsModule } from "src/app/reports/reports.module";
 import { ReportsService } from "src/app/reports/services/reports.service";
+import { TermsService } from "../../terms/services/terms.service";
+import { TermsModule } from "../../terms/terms.module";
+import { ResourcesService } from "../../resource/service/resources.service";
+import { ResourceModule } from "../../resource/resource.module";
+import { CuratorService } from "../../curator/curator.service";
 
 @Component({
   standalone: true,
-  selector: "curator-stat-details",
+  selector: "curator-reports-details",
   imports: [
     CommonModule,
     ReportFilterFormComponent,
     ReportCardComponent,
     ReportTableComponent,
+    TermsModule,
+    ResourceModule,
     ReportsModule,
     AngularSvgIconModule,
     PaginationComponent,
@@ -46,13 +52,69 @@ import { ReportsService } from "src/app/reports/services/reports.service";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CuratorReportsDetailsComponent implements OnInit {
+  onInit$ = new ReplaySubject<void>();
+  reportFilter$: Observable<ReportFilter>;
+  resource$: Observable<Resource>;
+  curator$: Observable<User>;
+  terms$: Observable<Term[]>;
+
   constructor(
     protected formBuilder: FormBuilder,
-    protected reportsService: ReportsService
-  ) {}
+    protected reportsService: ReportsService,
+    protected curatorService: CuratorService,
+    protected termService: TermsService,
+    protected resourceService: ResourcesService
+  ) {
+    this.resource$ = this.onInit$.pipe(
+      switchMap(() =>
+        !!this.resource
+          ? of(this.resource)
+          : this.resourceService.get_resource(this.resource_id)
+      )
+    );
+
+    this.curator$ = this.onInit$.pipe(
+      switchMap(() =>
+        !!this.curator
+          ? of(this.curator)
+          : this.curatorService.get_curator(this.curator_orcid)
+      )
+    );
+
+    this.terms$ = this.onInit$.pipe(
+      switchMap(() =>
+        !!this.terms
+          ? of(this.terms)
+          : this.resource$.pipe(
+              switchMap(({ resource_id }: Resource) =>
+                this.termService.getTerms({
+                  resource_id: resource_id,
+                  limit: -1,
+                })
+              )
+            )
+      )
+    );
+    this.reportFilter$ = combineLatest([
+      this.resource$,
+      this.curator$,
+      this.reportFilterInput$,
+      this.page$,
+    ]).pipe(
+      map(([resource, curator, reportFilter, page]) =>
+        ReportFilter.create({
+          resource_id: resource.resource_id,
+          curator_orcid: curator.orcid_id,
+          ...reportFilter.serialize(),
+          limit: this.limit,
+          skip: (page - 1) * this.limit,
+        })
+      )
+    );
+  }
 
   // handle terms prop reactivity
-  terms$: BehaviorSubject<Term[]> = new BehaviorSubject<Term[]>([]);
+  loadTerms$: Observable<boolean>;
   reportsWithTerms$: Observable<{
     data: Report[];
     total: Number;
@@ -61,77 +123,53 @@ export class CuratorReportsDetailsComponent implements OnInit {
   }>;
 
   paginatedReports$: Observable<Paginated<Report>>;
-  reportFilter$: BehaviorSubject<ReportFilter> =
-    new BehaviorSubject<ReportFilter>(null);
+  reportFilterInput$ = new BehaviorSubject<ReportFilter>(
+    ReportFilter.create({
+      sortBy: "timestamp",
+      sortOrder: -1,
+      activity_terms: [],
+    })
+  );
 
   page$ = new BehaviorSubject<number>(1);
 
   get currentPage() {
-    const filter = this.reportFilter$.value;
-    if(!filter){
-      return 1
-    }
-    return Math.floor(filter.skip / filter.limit + 1);
+    return this.page$.value;
   }
 
   update_page(page) {
-    const filter = this.reportFilter$.value;
-    filter.skip = (page - 1) * filter.limit;
-    this.reportFilter$.next(filter);
+    this.page$.next(page);
   }
+
+  limit = 20;
 
   viewType: "table" | "grid" = "grid";
 
   ngOnInit(): void {
-    this.reportFilter$.next(
-      ReportFilter.create({
-        resource_id: this.resource.resource_id,
-        curator_orcid: this.curator.orcid_id,
-        skip: 0,
-        limit: 15,
-      })
-    );
+    this.onInit$.next();
 
     this.paginatedReports$ = this.reportFilter$.pipe(
       filter((filter) => !!filter),
-      switchMap((reportFilter: ReportFilter) => {
-        return this.reportsService.getReports(reportFilter);
-      }),
+      switchMap((reportFilter: ReportFilter) =>
+        this.reportsService.getReportsCombineWithTerms(
+          reportFilter,
+          this.terms$
+        )
+      ),
       shareReplay()
     );
-
-    this.reportsWithTerms$ = combineLatest([
-      this.paginatedReports$,
-      this.terms$,
-    ]).pipe(
-      filter(([reports, terms]) => terms.length > 0),
-      map(([reports, terms]: [Paginated<Report>, Term[]]) => {
-        const {
-          meta: {
-            pagination: { total, start, limit },
-          },
-        } = reports;
-        const data = reports.data.map((report) => {
-          report.term = terms.find(
-            (term) => term.activity_term === report.activity_term
-          );
-          return report;
-        });
-        return { data, total, skip: start - 1, limit };
-      })
-    );
   }
 
+  updateReportFilter(reportFilter: ReportFilter) {
+    this.reportFilterInput$.next(reportFilter);
+  }
+
+  @Input() curator_orcid?: string;
   @Input() curator: User;
-  @Input() resource: Resource;
 
-  @Input()
-  get terms(): Term[] {
-    return this.terms$.value;
-  }
-  set terms(value: Term[]) {
-    if (!!value && value != null) {
-      this.terms$.next(value);
-    }
-  }
+  @Input() resource_id?: string;
+
+  @Input() resource?: Resource;
+
+  @Input() terms: Term[];
 }

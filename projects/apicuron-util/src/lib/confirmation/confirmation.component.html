@@ -1,0 +1,61 @@
+<div
+  class="tw-relative tw-px-4 tw-min-h-screen md:tw-flex md:tw-items-center md:tw-justify-center"
+>
+  <div
+    class="tw-opacity-25 tw-w-full tw-h-full tw-absolute tw-z-10 tw-inset-0"
+  ></div>
+  <div
+    class="tw-bg-white tw-rounded-lg md:tw-max-w-md md:tw-mx-auto tw-pb-4 tw-px-4 tw-fixed tw-inset-x-0 tw-bottom-0 tw-z-50 tw-mb-4 tw-mx-4 md:tw-relative tw-shadow-lg"
+  >
+    <ng-container *ngIf="callbackProcessing$ | async as loading">
+      <div
+        class="tw-bg-gray-700 tw-bg-opacity-60 tw-w-full tw-h-full tw-absolute tw-rounded-lg tw-top-0 tw-left-0 tw-z-50 tw-justify-center tw-items-center"
+        [ngClass]="{ 'tw-hidden': !loading, 'tw-flex': loading }"
+      >
+        <img
+          src="assets/svg/loading-spinner.svg"
+          class="tw-w-16 tw-h-16 md:tw-w-24 md:tw-h-24 tw-text-apicuron-purple tw-animate-spin"
+          alt="loading spinner"
+        />
+      </div>
+    </ng-container>
+    <div class="tw-flex tw-flex-row tw-justify-end tw-pt-1 lg:tw-pt-2">
+      <button (click)="cancel()">
+        <img
+          src="assets/svg/close.svg"
+          class="tw-w-6 tw-h-6"
+          alt="Close Icon"
+        />
+      </button>
+    </div>
+    <div class="md:tw-flex tw-items-center">
+      <div
+        class="tw-rounded-full tw-border tw-border-gray-300 tw-flex tw-items-center tw-justify-center tw-w-16 tw-h-16 tw-flex-shrink-0 tw-mx-auto"
+      >
+        <img [src]="iconSrc" alt="" srcset="" class="tw-w-8 tw-h-8" />
+      </div>
+      <div class="tw-mt-4 md:tw-mt-0 md:tw-ml-6 tw-text-center md:tw-text-left">
+        <p class="tw-font-bold">{{ title }}</p>
+        <p class="tw-text-sm tw-text-gray-700 tw-mt-1">
+          {{ message }}
+        </p>
+      </div>
+    </div>
+    <div
+      class="tw-text-center md:tw-text-right tw-mt-4 md:tw-flex md:tw-justify-end"
+    >
+      <button
+        (click)="accept()"
+        class="tw-block tw-w-full md:tw-inline-block md:tw-w-auto tw-px-4 tw-py-3 md:tw-py-2 tw-bg-red-200 tw-text-red-700 tw-rounded-lg tw-font-semibold tw-text-sm md:tw-ml-2 md:tw-order-2"
+      >
+        {{ confirmationText }}
+      </button>
+      <button
+        (click)="cancel()"
+        class="tw-block tw-w-full md:tw-inline-block md:tw-w-auto tw-px-4 tw-py-3 md:tw-py-2 tw-bg-gray-200 tw-rounded-lg tw-font-semibold tw-text-sm tw-mt-4 md:tw-mt-0 md:tw-order-1"
+      >
+        {{ cancelText }}
+      </button>
+    </div>
+  </div>
+</div>

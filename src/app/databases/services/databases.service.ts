@@ -72,12 +72,32 @@ export class DatabasesService {
         },
       }
     );
-    return response;
+
+    const instance$ = response.pipe(
+      map(({ data}) => ({ data: new Resource().deserialize(data)}))
+    )
+    return instance$;
   }
 
   get_resource_leaderboard(resource_id: string) {
     const response = this.http.get(
       `${environment.ws}/statistics/leaderboard/${resource_id}`,
+      {
+        responseType: "json",
+        headers: {
+          version: "2",
+        },
+        params: {
+          limit: "10",
+        },
+      }
+    );
+    return response;
+  }
+
+  get_resource_weekly_leaderboard(resource_id: string) {
+    const response = this.http.get(
+      `${environment.ws}/weekly-statistics/${resource_id}/leaderboard`,
       {
         responseType: "json",
         headers: {

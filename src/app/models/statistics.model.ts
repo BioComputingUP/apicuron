@@ -23,7 +23,9 @@ export class BaseCuratorStatistics implements Deserializable {
   badges_count: number;
   total_score: number;
 
-  work_type: "contribution" | "professional" = "contribution";
+  first_contribution: number;
+  last_contribution: number;
+
   total_count: any;
 
   deserialize(input: any): this {
@@ -47,6 +49,9 @@ export class BaseCuratorStatistics implements Deserializable {
 
     this.ranking = input.ranking;
 
+    this.first_contribution = input.first_contribution;
+    this.last_contribution = input.last_contribution;
+
     this.total_count =
       input.total_count ||
       input.revision_count + input.generation_count + input.invalidation_count;
@@ -55,12 +60,12 @@ export class BaseCuratorStatistics implements Deserializable {
     return this;
   }
 }
-
 export class CuratorStatistics extends BaseCuratorStatistics {
   curator_orcid: string;
 
   resource_uri: string;
   resource_id: string;
+  league: string;
 
   generation_count: number;
   generation_score: number;
@@ -78,7 +83,6 @@ export class CuratorStatistics extends BaseCuratorStatistics {
   invalidation_terms: StatisticsTerm[];
   generation_terms: StatisticsTerm[];
 
-  work_type: "contribution" | "professional" = "contribution";
   total_count: any;
 
   deserialize(input: any): this {
@@ -88,7 +92,52 @@ export class CuratorStatistics extends BaseCuratorStatistics {
     this.invalidation_terms = input.invalidation_terms || null;
 
     this.revision_terms = input.revision_terms || null;
+    this.league = input.league;
 
     return this;
+  }
+}
+
+export class WeeklyCuratorStatistics implements Deserializable {
+  curator_orcid: string;
+  resource_id: string;
+  generation_count: number;
+  generation_score: number;
+  invalidation_count: number;
+  invalidation_score: number;
+  revision_count: number;
+  revision_score: number;
+  ranking: number;
+  total_count: number;
+  total_score: number;
+  first_contribution: Date;
+  last_contribution: Date;
+  weekStart: Date;
+  weekEnd: Date;
+
+  deserialize(input: any): this {
+    this.curator_orcid = input.curator_orcid;
+    this.resource_id = input.resource_id;
+    this.generation_count = input.generation_count;
+    this.generation_score = input.generation_score;
+    this.invalidation_count = input.invalidation_count;
+    this.invalidation_score = input.invalidation_score;
+    this.revision_count = input.revision_count;
+    this.revision_score = input.revision_score;
+    this.ranking = input.ranking;
+    this.total_count = input.total_count;
+    this.total_score = input.total_score;
+    this.first_contribution = input.first_contribution;
+    this.last_contribution = input.last_contribution;
+    this.weekStart = input.weekStart;
+    this.weekEnd = input.weekEnd;
+    return this;
+  }
+
+  private processDaysOfWeek(daysOfWeek: number[]): Array<{ day: number; count: number }> {
+    return daysOfWeek.map((count, index) => ({
+      day: index,
+      count: count
+    }));
   }
 }

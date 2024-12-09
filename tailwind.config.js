@@ -1,10 +1,14 @@
 module.exports = {
   prefix: "tw-",
-  content: [
-    "./src/**/*.{html,ts}",
-    "./src/app/**/*.{html,ts}",
-  ],
+  content: ["./src/**/*.{html,ts}", "./src/app/**/*.{html,ts}", "./projects/apicuron-util/**/*.{html,ts}"],
   darkMode: "class",
+  safeList: [
+    {
+      pattern: "odd:bg-gray-50",
+      variants: ["odd"],
+    },
+    "odd:bg-gray-50",
+  ],
   // darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {

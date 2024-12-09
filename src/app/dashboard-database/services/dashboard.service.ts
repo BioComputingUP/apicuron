@@ -4,7 +4,6 @@ import { Observable } from "rxjs";
 import { environment } from "../../../environments/environment";
 import { Report } from "../../models/report.model";
 import { ReportStatistics } from "src/app/models/report-statistics";
-import { report } from "process";
 import { map, pluck } from "rxjs/operators";
 import { ReportFilter } from "src/app/reports/interfaces/report-filter.interface";
 const baseHeaders = {
