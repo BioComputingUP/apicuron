@@ -5,20 +5,15 @@ import {
 	ReportDocument,
 	LeanReportDocument,
 } from 'src/core/schemas/reports.schema';
-import { FilterQuery, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { TermDocument } from 'src/core/schemas/terms.schema';
 import { UserDocument } from 'src/core/schemas/user.schema';
-import { PrivacyType } from 'src/core/enums';
 import { LeagueUpdatedEvent } from 'src/resources/partner-resources/leagues/events/league-updated.event';
 import { Report } from 'src/core/schemas/reports.schema';
 
 import { EntityCreatedEvent, EntityUpdatedEvent } from 'src/core/events';
 import { UserRepository } from 'src/core/repositories/user.repository';
-import {
-	CuratorRegistryEntry,
-	CuratorRegistryEntryDocument,
-} from 'src/core/schemas/curator-registry/curator-entry.schema';
 
 import { CuratorRegistryService } from '../curator-registry.service';
 import { PartnerResourceDocument } from 'src/core/schemas';

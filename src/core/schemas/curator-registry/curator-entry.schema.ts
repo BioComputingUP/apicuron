@@ -26,7 +26,7 @@ const ContributionEntrySchema =
 	collection: 'curator-registry',
 })
 export class CuratorRegistryEntry {
-	@Prop({ required: true })
+	@Prop({ required: true, unique: true })
 	curator_orcid: string;
 
 	@Prop({

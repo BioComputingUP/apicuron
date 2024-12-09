@@ -74,10 +74,11 @@ export class CuratorRegistryService {
 					data: [],
 				};
 			}
+			this.logger.debug(
+				`entries for query: ${JSON.stringify(entries, null, 2)}`,
+			);
 			const entriesFilteredLeagues = entries.map((entry) => {
-				const plainEntry = entry; // Converts the document to a plain object
-
-				const filteredContributedTo = plainEntry.contributed_to
+				const filteredContributedTo = entry.contributed_to
 					.map((contribution) => {
 						const filteredGroups = contribution.groups.filter(
 							(group) => group.visibility === PrivacyType.public,
@@ -86,8 +87,8 @@ export class CuratorRegistryService {
 						return contribution;
 					})
 					.filter((contribution) => contribution.groups.length > 0); // Remove null contributions
-				plainEntry.contributed_to = filteredContributedTo;
-				return plainEntry;
+				entry.contributed_to = filteredContributedTo;
+				return entry;
 			});
 
 			return {
@@ -323,12 +324,21 @@ export class CuratorRegistryService {
 		return results.modifiedCount;
 	}
 
+	
+	/**
+	 * Creates a new entry in the registry for a curator even if they don't exist
+	 * @param curator_orcid the orcid id of the curator
+	 * @param resource the contributed to resource object
+	 * @param league the league (object) the curator contributed to
+	 * @param curator curator (object, optional) if it exists
+	 * @returns a promise resolving to the newly created entry
+	 */
 	async addEntry(
 		curator_orcid: string,
 		resource: PartnerResource,
 		league: League,
 		curator?: User,
-	): Promise<any> {
+	): Promise<CuratorRegistryEntryDocument> {
 		try {
 			const newEntry = await this.registryEntryModel.create({
 				curator_orcid: curator_orcid,
@@ -347,6 +357,10 @@ export class CuratorRegistryService {
 				`Error while adding curator ${curator_orcid} to registry`,
 			);
 			this.logger.error(error);
+
+			throw new InternalServerErrorException(
+				`Error while adding curator ${curator_orcid} to registry`,
+			);
 		}
 	}
 
@@ -360,7 +374,7 @@ export class CuratorRegistryService {
 				curator_orcid: curator_orcid,
 			},
 			{
-				$addToSet: {
+				$push: {
 					contributed_to: {
 						resource_id: resource.resource_id,
 						resource: resource,
@@ -381,7 +395,7 @@ export class CuratorRegistryService {
 				curator_orcid: curator_orcid,
 			},
 			{
-				$addToSet: {
+				$push: {
 					'contributed_to.$[elem].groups': league,
 				},
 			},
