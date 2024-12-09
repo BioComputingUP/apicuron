@@ -95,19 +95,9 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 	updatedUser(
 		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
 	) {
-		if (event instanceof EntityCreatedEvent) {
-			this.logger.debug(
-				`[User Created Event] adding curator ${event.instance.orcid_id}`,
-			);
-			this.registryService.addCurator(event.instance);
-		}
-		if (event instanceof EntityUpdatedEvent) {
-			this.logger.debug(
-				`[User Updated Event] updating curator ${event.after.orcid_id}`,
-			);
-			this.registryService.updateCurator(event.after);
-			this.logger.debug(`user updated`);
-		}
+		const user = event instanceof EntityCreatedEvent? event.instance : event.after;
+		// this will update user if they already have an entry, create new entry if not
+		this.registryService.upsertUser(user);
 		return;
 	}
 

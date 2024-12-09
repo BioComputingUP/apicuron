@@ -136,35 +136,25 @@ export class CuratorRegistryService {
 		return entry;
 	}
 
-	async addCurator(curator: User) {
-		try {
-			const result = await this.registryEntryModel.create({
-				curator_orcid: curator.orcid_id,
-				curator: curator,
-			});
-			return result;
-		} catch (error) {
-			this.logger.error(
-				'Error while adding curator with orcid: ' + curator.orcid_id,
-			);
-			this.logger.error(error);
-		}
-	}
-
-	async updateCurator(curator: User) {
+	async upsertUser(curator: User) {
 		try {
 			const result = await this.registryEntryModel.updateOne(
 				{
 					curator_orcid: curator.orcid_id,
 				},
-				{ curator: curator },
-			);
+				{
+					$set: {
+						curator: curator,
+					},
+				},
+				{ upsert: true },
+			)
+			
 			return result;
 		} catch (error) {
-			this.logger.error(
-				'Error while updating curator with orcid: ' + curator.orcid_id,
-			);
+			this.logger.error(`Error while upserting user with orcid: ${curator.orcid_id}...`);
 			this.logger.error(error);
+			throw new InternalServerErrorException(`Error while processing request`);
 		}
 	}
 
@@ -274,30 +264,6 @@ export class CuratorRegistryService {
 			this.logger.error(error);
 		}
 	}
-
-	async addLeague(newMembers: string[], league: LeagueDocument): Promise<any> {
-		try {
-			return await this.registryEntryModel.updateMany(
-				{
-					curator_orcid: { $in: newMembers },
-				},
-				{
-					$addToSet: {
-						'contributed_to.$[elem].groups': league,
-					},
-				},
-				{
-					arrayFilters: [{ 'elem.resource_id': league.resource_id }], // add only if curator contributed to the resource
-				},
-			);
-		} catch (error) {
-			this.logger.error(
-				`Error while adding league: ${league.name} to users: ${newMembers}...`,
-			);
-			this.logger.error(error);
-		}
-	}
-
 	async updateLeague(league: LeagueDocument): Promise<number> {
 		const resource_id = league.resource_id;
 		const results = await this.registryEntryModel.updateMany(
@@ -324,7 +290,6 @@ export class CuratorRegistryService {
 		return results.modifiedCount;
 	}
 
-	
 	/**
 	 * Creates a new entry in the registry for a curator even if they don't exist
 	 * @param curator_orcid the orcid id of the curator
