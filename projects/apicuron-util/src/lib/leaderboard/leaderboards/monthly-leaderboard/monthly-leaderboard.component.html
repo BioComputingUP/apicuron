@@ -1,4 +1,4 @@
-<div [loadable]="leaderboard$">
+<div [loadable]="leaderboard$" class="tw-font-dm-sans">
   <ng-container *ngIf="leaderboard$ | async as leaderboard">
     <ng-container *ngIf="resource$ | async as resource">
       <span

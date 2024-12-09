@@ -1,4 +1,4 @@
-<div [loadable]="weeklyLeaderboard$">
+<div [loadable]="weeklyLeaderboard$" class="tw-font-dm-sans">
   <ng-container *ngIf="weeklyLeaderboard$ | async as weeklyLeaderboard">
     <ng-container *ngIf="resource$ | async as resource">
       <span
@@ -16,7 +16,10 @@
         >
         in UTC timezone and is reset every Monday at 00:00 UTC</span
       >
-      <table *ngIf="weeklyLeaderboard.data.length > 0" class="tw-table-auto tw-border-collapse tw-w-full">
+      <table
+        *ngIf="weeklyLeaderboard.data.length > 0"
+        class="tw-table-auto tw-border-collapse tw-w-full"
+      >
         <thead>
           <tr class="tw-divide-x tw-divide-gray-200">
             <ng-container *ngFor="let column of columns$ | async">
