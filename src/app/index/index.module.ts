@@ -12,6 +12,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { PostAuthPageComponent } from './post-auth/post-auth-page/post-auth-page.component';
+import { AuthModule } from '../auth/auth.module';
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import { PostAuthPageComponent } from './post-auth/post-auth-page/post-auth-page
     IndexRoutingModule,
     RouterModule,
     AngularSvgIconModule,
-    ResourceModule
+    ResourceModule,
+    AuthModule
   ],
   exports: [
     IndexComponent,

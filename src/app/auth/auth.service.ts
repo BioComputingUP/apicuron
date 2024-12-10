@@ -1,37 +1,14 @@
-import { Router, UrlTree } from "@angular/router";
-import {
-  catchError,
-  filter,
-  map,
-  pluck,
-  shareReplay,
-  switchMap,
-  takeUntil,
-  tap,
-} from "rxjs/operators";
+import { Router } from "@angular/router";
+import { filter, map, pluck, shareReplay, switchMap } from "rxjs/operators";
 import { environment } from "../../environments/environment";
-import {
-  BehaviorSubject,
-  combineLatest,
-  Observable,
-  of,
-  Subject,
-  Subscription,
-} from "rxjs";
-import {
-  HttpClient,
-  HttpErrorResponse,
-  HttpEvent,
-  HttpHandler,
-  HttpInterceptor,
-  HttpRequest,
-} from "@angular/common/http";
+import { BehaviorSubject, combineLatest, Observable, of, Subject } from "rxjs";
+import { HttpClient } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { User } from "src/app/models/User.model";
 import * as _ from "lodash";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class AuthService implements OnDestroy {
   login_link = environment.auth_ws + "/auth/orcid";
@@ -89,7 +66,6 @@ export class AuthService implements OnDestroy {
           headers.push([this.jwtHeader, this.jwtPrefix + " " + jwtToken]);
         }
 
-
         return headers || null;
       })
     );
@@ -117,7 +93,6 @@ export class AuthService implements OnDestroy {
       map((user: User) => new User().deserialize(user))
     );
 
-
     const windowMessageEventListener = (event: MessageEvent) => {
       const allowedOrigins = [
         new URL(environment.host).origin,
@@ -132,7 +107,7 @@ export class AuthService implements OnDestroy {
             this.user$.subscribe((user) => {
               this.redirectAfterAuth(user);
             });
-    
+
             window.addEventListener("message", windowMessageEventListener);
           }
         }
@@ -192,9 +167,12 @@ export class AuthService implements OnDestroy {
 
   redirectAfterAuth(user?: User) {
     const source = this.source$.value;
-    console.log(`User info after auth: ${JSON.stringify(user)}`);
-    this.router.navigate(['/first']);
-    
+    const firstTimeLogin = true;
+    if (firstTimeLogin) {
+      this.router.navigate(["/first"]);
+    } else {
+      this.router.navigate(this.loginUrlMapper.get(source) || ["/"]);
+    }
   }
 
   public openOauthDialog(source?: string) {
@@ -213,5 +191,10 @@ export class AuthService implements OnDestroy {
   logout(): void {
     this.dropTokens();
     this.router.navigate([""]);
+  }
+
+  getUser(): Observable<User> {
+    return this.user$;
+
   }
 }
