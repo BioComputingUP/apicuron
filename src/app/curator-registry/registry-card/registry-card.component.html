@@ -1,5 +1,6 @@
 <div
-  class="tw-p-5 tw-flex tw-flex-col tw-border tw-h-full tw-bg-slate-100 tw-drop-shadow-lg tw-rounded-xl tw-transition-all tw-duration-300 tw-ease-in-out"
+  class="tw-p-5 tw-flex tw-flex-col tw-border tw-h-full tw-bg-slate-100 tw-drop-shadow-lg tw-rounded-xl tw-transition-all tw-duration-300 tw-ease-in-out
+  hover:tw-border-violet-400 "
 >
   <div class="tw-grid tw-grid-cols-9 tw-gap-2">
     <img
@@ -18,26 +19,46 @@
       <p>{{ entry.curator.affiliation }}</p>
     </div>
   </div>
-  <div class="tw-grid tw-grid-cols-3 tw-gap-2 tw-justify-items-center tw-transition-all tw-duration-200 tw-ease-out tw-overflow-hidden">
-    <h3 class="tw-font-bold tw-text-lg tw-col-span-full tw-font-dm-sans">
-      Contributions
-    </h3>
+  <div
+    [ngClass]="{
+      'tw-scale-0 tw-hidden': !showContributions,
+      'tw-tw-scale-100 tw-block': showContributions
+    }"
+    class="tw-my-2 tw-transition-all tw-duration-200 tw-ease-out"
+  >
     <div
-      *ngFor="let contribution of getContributions(); let i = index"
-      class="tw-font-dm-sans tw-bg-[#edebf2] tw-rounded tw-px-2 tw-py-2 tw-w-full tw-place-items-center tw-grid tw-gap-1"
+      class="tw-grid tw-grid-cols-3 tw-gap-2 tw-justify-items-center tw-transition-all tw-duration-200 tw-ease-out"
     >
-      <img [src]="contribution.resource.logo" class="tw-h-5 tw-cursor-pointer" (click)="toggleGroups(i)" />
-
-      <ul
-        class="tw-pl-4"
-        [class.tw-max-h-0]="!showGroups[i]"
-        [class.tw-max-h-screen]="showGroups[i]"
-        class="tw-transition-all tw-duration-200 tw-ease-out tw-overflow-hidden "
+      <h3 class="tw-font-bold tw-text-lg tw-col-span-full tw-font-dm-sans">
+        Contributions
+      </h3>
+      <div
+        *ngFor="let contribution of getContributions(); let i = index"
+        class="tw-font-dm-sans tw-bg-[#edebf2] tw-rounded tw-px-2 tw-py-2 tw-w-full tw-place-items-center tw-grid tw-gap-1"
       >
-        <li *ngFor="let group of contribution.groups" class="tw-font-normal">
-          {{ group.displayedName }}
-        </li>
-      </ul>
+        <img
+          [src]="contribution.resource.logo"
+          class="tw-h-5 tw-cursor-pointer"
+          (click)="toggleGroups(i)"
+        />
+
+        <ul
+          class="tw-pl-4"
+          [class.tw-max-h-0]="!showGroups[i]"
+          [class.tw-max-h-screen]="showGroups[i]"
+          class="tw-transition-all tw-duration-200 tw-ease-out tw-overflow-hidden"
+        >
+          <li *ngFor="let group of contribution.groups" class="tw-font-normal">
+            {{ group.displayedName }}
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
+  <button
+    class="tw-w-full tw-py-2 tw-px-4 tw-bg-slate-300 tw-rounded tw-text-sm tw-font-bold tw-text-slate-600 hover:tw-text-slate-700"
+    (click)="showContributions = !showContributions"
+  >
+    {{ showContributions ? "Hide" : "Show" }} Contributions
+  </button>
 </div>

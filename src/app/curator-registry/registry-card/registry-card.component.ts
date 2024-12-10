@@ -7,6 +7,8 @@ import { Resource } from 'src/app/models/resource.model';
   templateUrl: './registry-card.component.html',
 })
 export class RegistryCardComponent implements OnInit {
+  showContributions: boolean = false;
+  showGroups = [];
   @Input() entry: RegistryEntry;
   
   ngOnInit(): void {
@@ -16,8 +18,6 @@ export class RegistryCardComponent implements OnInit {
     return this.entry.contributed_to ?? [];
     
   }
-
-  showGroups = [];
   toggleGroups(index) {
     this.showGroups[index] = !this.showGroups[index];
   }
