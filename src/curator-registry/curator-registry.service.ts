@@ -88,10 +88,6 @@ export class CuratorRegistryService {
 				entry.contributed_to = filteredContributedTo;
 				return entry;
 			});
-			this.logger.debug({
-				length: entriesFilteredLeagues.length,
-				// data: entriesFilteredLeagues,
-			});
 			return {
 				total: count,
 				data: entriesFilteredLeagues,
@@ -255,10 +251,7 @@ export class CuratorRegistryService {
 			}
 
 			await Promise.all(updates);
-			this.logger.debug(
-				'Updated registry collection with aggregation results',
-				'',
-			);
+			this.logger.debug('Updated registry collection with aggregation results');
 			return updates;
 		} catch (error) {
 			this.logger.error(
