@@ -1,54 +1,52 @@
 <div
-  class="tw-p-5 tw-flex tw-flex-col tw-border tw-h-full tw-bg-slate-100 tw-drop-shadow-lg tw-rounded-xl tw-transition-all tw-duration-300 tw-ease-in-out
-  hover:tw-border-violet-400 "
+  class="tw-p-5 tw-flex tw-flex-col tw-border tw-h-full tw-bg-slate-100 tw-drop-shadow-lg tw-rounded-xl tw-transition-all tw-duration-300 tw-ease-in-out hover:tw-border-violet-400"
 >
   <div class="tw-grid tw-grid-cols-9 tw-gap-2">
     <img
-      class="tw-w-20 tw-aspect-square tw-place-content-start tw-justify-self-start tw-col-span-1"
+      class="tw-w-20 tw-aspect-square tw-col-span-1"
       [src]="entry.curator.generate_avatar()"
-      alt=""
+      alt="Curator Avatar"
     />
-
-    <h2 class="tw-col-span-8">{{ entry.curator.orcid_id }}</h2>
     <div class="tw-col-span-8">
+      <h2>{{ entry.curator.orcid_id }}</h2>
       <a
         class="tw-font-extrabold tw-text-xl tw-text-slate-800 hover:tw-text-slate-600 hover:tw-underline"
         [routerLink]="['/curators', entry.curator.orcid_id]"
-        >{{ entry.curator.displayedName }}</a
       >
+        {{ entry.curator.displayedName }}
+      </a>
       <p>{{ entry.curator.affiliation }}</p>
     </div>
   </div>
   <div
     [ngClass]="{
-      'tw-scale-0 tw-hidden': !showContributions,
-      'tw-tw-scale-100 tw-block': showContributions
+      'tw-h-0 tw-hidden tw-opacity-0': !showContributions,
+      'tw-h-auto tw-block tw-opacity-100': showContributions
     }"
-    class="tw-my-2 tw-transition-all tw-duration-200 tw-ease-out"
+    class="tw-my-2 tw-transition-all tw-duration-1000 tw-ease-out"
   >
-    <div
-      class="tw-grid tw-grid-cols-3 tw-gap-2 tw-justify-items-center tw-transition-all tw-duration-200 tw-ease-out"
-    >
-      <h3 class="tw-font-bold tw-text-lg tw-col-span-full tw-font-dm-sans">
+    <div class="tw-grid tw-grid-cols-3 tw-gap-2 tw-justify-items-center">
+      <h3 class="tw-font-bold tw-text-lg tw-col-span-full">
         Contributions
       </h3>
       <div
         *ngFor="let contribution of getContributions(); let i = index"
-        class="tw-font-dm-sans tw-bg-[#edebf2] tw-rounded tw-px-2 tw-py-2 tw-w-full tw-place-items-center tw-grid tw-gap-1"
+        class="tw-font-dm-sans tw-bg-[#edebf2] tw-rounded tw-px-2 tw-py-2 tw-w-full"
       >
         <img
           [src]="contribution.resource.logo"
           class="tw-h-5 tw-cursor-pointer"
           (click)="toggleGroups(i)"
+          alt="Resource Logo"
         />
-
         <ul
-          class="tw-pl-4"
-          [class.tw-max-h-0]="!showGroups[i]"
-          [class.tw-max-h-screen]="showGroups[i]"
-          class="tw-transition-all tw-duration-200 tw-ease-out tw-overflow-hidden"
+          [ngClass]="{
+            'tw-max-h-0': !showGroups[i],
+            'tw-max-h-screen': showGroups[i]
+          }"
+          class="tw-transition-all tw-duration-200 tw-ease-out tw-overflow-hidden tw-pl-4"
         >
-          <li *ngFor="let group of contribution.groups" class="tw-font-normal">
+          <li *ngFor="let group of contribution.groups">
             {{ group.displayedName }}
           </li>
         </ul>
@@ -62,3 +60,4 @@
     {{ showContributions ? "Hide" : "Show" }} Contributions
   </button>
 </div>
+
