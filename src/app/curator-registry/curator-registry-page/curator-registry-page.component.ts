@@ -1,34 +1,37 @@
 import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { CuratorRegistryService } from "../curator-registry.service";
-import { Observable, Subject } from "rxjs";
-import { map, pluck, shareReplay, switchMap, takeUntil } from "rxjs/operators";
+import { combineLatest, Observable, Subject } from "rxjs";
+import {
+  map,
+  pluck,
+  shareReplay,
+  switchMap,
+  takeUntil,
+  tap,
+} from "rxjs/operators";
 import { RegistryEntry } from "src/app/models/registryEntry.model";
 import { BehaviorSubject } from "rxjs";
 import { ActivatedRoute } from "@angular/router";
 import { HttpParams } from "@angular/common/http";
+import { PaginationComponent } from "projects/apicuron-util/src/lib/pagination/pagination.component";
+import { Paginated } from "src/app/interfaces/paginated";
 @Component({
   selector: "curator-registry-page",
   templateUrl: "./curator-registry-page.component.html",
   styleUrls: ["./curator-registry-page.component.scss"],
 })
 export class CuratorRegistryPageComponent implements OnInit, OnDestroy {
+  limit = 9;
+  entries$: Observable<Array<RegistryEntry>>;
+  destroy$: Subject<Boolean> = new Subject();
+  page$ = new BehaviorSubject<number>(1);
+  users_list_response$: Observable<Paginated<RegistryEntry>>;
+  query_params$ = new BehaviorSubject<{ query?: string }>({});
+
   constructor(
     protected registryService: CuratorRegistryService,
     private route: ActivatedRoute
-  ) {}
-  limit = 15;
-  current_page = 1;
-  entries$: Observable<Array<RegistryEntry>>;
-  biocurators_count$: Observable<number>;
-  destroy$: Subject<Boolean> = new Subject();
-  query_params$ = new BehaviorSubject<{ page: number; query?: string }>({
-    page: 1,
-  });
-
-  ngOnDestroy(): void {
-    this.destroy$.next(true);
-  }
-  ngOnInit(): void {
+  ) {
     this.route.queryParams
       .pipe(takeUntil(this.destroy$))
       .subscribe((params) => {
@@ -39,37 +42,46 @@ export class CuratorRegistryPageComponent implements OnInit, OnDestroy {
           });
         }
       });
-
-    const users_list_response$ = this.query_params$.pipe(
-      switchMap((query_params) => {
-        const skip = ((query_params["page"] || 1) - 1) * this.limit;
-
-        return this.registryService
-          .getAllCurators(
-            new HttpParams({
-              fromObject: { ...query_params, skip, limit: this.limit },
-            })
-          )
-          .pipe(shareReplay());
+    //data used for paginator
+    this.users_list_response$ = combineLatest([
+      this.page$,
+      this.query_params$,
+    ]).pipe(
+      switchMap(([page, query_params]) => {
+        const skip = ((page || 1) - 1) * this.limit;
+        return this.registryService.getAllCurators(
+          new HttpParams({
+            fromObject: { ...query_params, limit: this.limit, skip: skip },
+          })
+        );
       }),
       shareReplay()
     );
 
-    this.entries$ = users_list_response$.pipe(
+    // data used to display.
+    this.entries$ = this.users_list_response$.pipe(
       pluck("data"),
       map((data: any[]) =>
         data.map((element) => new RegistryEntry().deserialize(element))
       )
     );
-
-    this.biocurators_count$ = users_list_response$.pipe(
-      pluck("meta", "pagination", "total")
+  }
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+  }
+  ngOnInit(): void {
+    this.users_list_response$.subscribe((data) =>
+      console.log("Updated Users List:", data)
+    );
+    this.query_params$.subscribe((data) =>
+      console.log("Updated Query Params:", data)
     );
   }
 
-  update_page(page: number) {
-    this.query_params$.next({ ...this.query_params$.value, page });
+  pageChanged(event: { page: number }) {
+    this.page$.next(event.page);
   }
+
   update_curator_list(query_params: any) {
     this.query_params$.next(query_params);
   }

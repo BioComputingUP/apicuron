@@ -5,7 +5,8 @@ import { RegistryRoutingModule } from "./registry-routing.module";
 import { RegistryCardComponent } from './registry-card/registry-card.component';
 import { CuratorRegistryService } from "./curator-registry.service";
 import { CuratorModule } from "../curator/curator.module";
-import { PaginationComponent } from "../pagination/pagination.component";
+import { ApicuronUtilModule } from "projects/apicuron-util/src/public-api";
+
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { PaginationComponent } from "../pagination/pagination.component";
     CommonModule,
     RegistryRoutingModule,
     CuratorModule,
-    PaginationComponent
+    ApicuronUtilModule
+    
   ],
   providers:[CuratorRegistryService]
 })
