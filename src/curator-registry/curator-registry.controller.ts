@@ -68,7 +68,7 @@ export class CuratorRegistryController {
 	): Promise<Paginated<RegistrySearchResultDto>> | null {
 		// const getStatDtoInstance = plainToInstance(GetRegistryEntryDto, query);
 		const getStatDtoInstance = query;
-		const { data, length } = await this.registryService.getAllEntries(
+		const { data, total } = await this.registryService.getAllEntries(
 			getStatDtoInstance,
 		);
 		const responseInstance = plainToInstance(RegistrySearchResultDto, data, {
@@ -78,7 +78,7 @@ export class CuratorRegistryController {
 		return paginate<RegistrySearchResultDto>(
 			responseInstance,
 			getStatDtoInstance,
-			length,
+			total,
 		);
 	}
 }

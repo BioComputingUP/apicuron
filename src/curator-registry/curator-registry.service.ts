@@ -64,6 +64,7 @@ export class CuratorRegistryService {
 			query.getMongoQueryOptions();
 
 		try {
+			const count = await this.registryEntryModel.count(query_filter);
 			const entries = await this.registryEntryModel
 				.find(query_filter, {}, queryOptions)
 				.lean();
@@ -74,9 +75,6 @@ export class CuratorRegistryService {
 					data: [],
 				};
 			}
-			this.logger.debug(
-				`entries for query: ${JSON.stringify(entries, null, 2)}`,
-			);
 			const entriesFilteredLeagues = entries.map((entry) => {
 				const filteredContributedTo = entry.contributed_to
 					.map((contribution) => {
@@ -90,9 +88,12 @@ export class CuratorRegistryService {
 				entry.contributed_to = filteredContributedTo;
 				return entry;
 			});
-
-			return {
+			this.logger.debug({
 				length: entriesFilteredLeagues.length,
+				// data: entriesFilteredLeagues,
+			});
+			return {
+				total: count,
 				data: entriesFilteredLeagues,
 			};
 		} catch (error) {
@@ -148,11 +149,13 @@ export class CuratorRegistryService {
 					},
 				},
 				{ upsert: true },
-			)
-			
+			);
+
 			return result;
 		} catch (error) {
-			this.logger.error(`Error while upserting user with orcid: ${curator.orcid_id}...`);
+			this.logger.error(
+				`Error while upserting user with orcid: ${curator.orcid_id}...`,
+			);
 			this.logger.error(error);
 			throw new InternalServerErrorException(`Error while processing request`);
 		}
