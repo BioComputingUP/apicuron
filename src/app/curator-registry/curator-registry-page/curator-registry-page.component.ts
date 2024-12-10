@@ -21,7 +21,7 @@ import { Paginated } from "src/app/interfaces/paginated";
   styleUrls: ["./curator-registry-page.component.scss"],
 })
 export class CuratorRegistryPageComponent implements OnInit, OnDestroy {
-  limit = 9;
+  limit = 15;
   entries$: Observable<Array<RegistryEntry>>;
   destroy$: Subject<Boolean> = new Subject();
   page$ = new BehaviorSubject<number>(1);

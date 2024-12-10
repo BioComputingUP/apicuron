@@ -5,7 +5,7 @@ import { RegistryRoutingModule } from "./registry-routing.module";
 import { RegistryCardComponent } from './registry-card/registry-card.component';
 import { CuratorRegistryService } from "./curator-registry.service";
 import { CuratorModule } from "../curator/curator.module";
-import { ApicuronUtilModule } from "projects/apicuron-util/src/public-api";
+import { ApicuronUtilModule } from "../../../projects/apicuron-util/src/public-api";
 
 
 
