@@ -193,8 +193,8 @@ export class AuthService implements OnDestroy {
   redirectAfterAuth(user?: User) {
     const source = this.source$.value;
     console.log(`User info after auth: ${JSON.stringify(user)}`);
-    this.router.navigate(['/registry']);
-    // this.router.navigate(this.loginUrlMapper.get(source));
+    this.router.navigate(['/first']);
+    
   }
 
   public openOauthDialog(source?: string) {
