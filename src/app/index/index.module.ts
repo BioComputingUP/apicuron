@@ -11,6 +11,7 @@ import { RouterModule } from '@angular/router';
 // import { DatabasesModule } from '../databases/databases.module';
 import { FormsModule } from '@angular/forms';
 import { AngularSvgIconModule } from 'angular-svg-icon';
+import { PostAuthPageComponent } from './post-auth/post-auth-page/post-auth-page.component';
 
 
 @NgModule({
@@ -19,6 +20,7 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
     IndexComponent,
     NumberElementComponent,
     CreditComponent,
+    PostAuthPageComponent,
   ],
   imports: [
     // DatabasesModule,
