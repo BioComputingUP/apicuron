@@ -117,6 +117,7 @@ export class AuthService implements OnDestroy {
       map((user: User) => new User().deserialize(user))
     );
 
+
     const windowMessageEventListener = (event: MessageEvent) => {
       const allowedOrigins = [
         new URL(environment.host).origin,
@@ -128,7 +129,10 @@ export class AuthService implements OnDestroy {
           const access_token = event.data["access_token"];
           if (access_token) {
             this.setOrcidToken(access_token);
-            this.redirectAfterAuth();
+            this.user$.subscribe((user) => {
+              this.redirectAfterAuth(user);
+            });
+    
             window.addEventListener("message", windowMessageEventListener);
           }
         }
@@ -186,10 +190,11 @@ export class AuthService implements OnDestroy {
     this.jwtToken$.next(null);
   }
 
-  redirectAfterAuth() {
+  redirectAfterAuth(user?: User) {
     const source = this.source$.value;
-
-    this.router.navigate(this.loginUrlMapper.get(source));
+    console.log(`User info after auth: ${JSON.stringify(user)}`);
+    this.router.navigate(['/registry']);
+    // this.router.navigate(this.loginUrlMapper.get(source));
   }
 
   public openOauthDialog(source?: string) {
