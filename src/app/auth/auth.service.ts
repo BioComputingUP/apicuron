@@ -12,7 +12,6 @@ import * as _ from "lodash";
 })
 export class AuthService implements OnDestroy {
   login_link = environment.auth_ws + "/auth/orcid";
-
   loginData = new BehaviorSubject<object>({
     authorized: false,
     username: null,
@@ -22,17 +21,20 @@ export class AuthService implements OnDestroy {
     initial: true,
     orcid_id: null,
   });
-
+  
   orcidToken$: BehaviorSubject<string | null> = new BehaviorSubject(null);
   jwtToken$: BehaviorSubject<string | null> = new BehaviorSubject(null);
-
+  
   private readonly jwtPrefix = "bearer";
   private readonly jwtHeader = "authorization";
   private readonly orcidHeader = "orcid-token";
-
+  
   public requestHeaders$: Observable<[string, string][]>;
-
+  
   user$: Observable<any>;
+  private loginEvent = new Subject<any>();
+  loginEvent$ = this.loginEvent.asObservable(); // expose observable to other components
+  private firstLogin = true;
 
   loggedIn$: Observable<boolean>; // = new BehaviorSubject(false);
 
@@ -104,8 +106,11 @@ export class AuthService implements OnDestroy {
           const access_token = event.data["access_token"];
           if (access_token) {
             this.setOrcidToken(access_token);
+            this.redirectAfterAuth();
             this.user$.subscribe((user) => {
-              this.redirectAfterAuth(user);
+             
+              
+              this.postLoginTrigger(user)
             });
 
             window.addEventListener("message", windowMessageEventListener);
@@ -165,16 +170,10 @@ export class AuthService implements OnDestroy {
     this.jwtToken$.next(null);
   }
 
-  redirectAfterAuth(user?: User) {
+  redirectAfterAuth() {
     const source = this.source$.value;
-    const firstTimeLogin = true;
-    if (firstTimeLogin) {
-      this.router.navigate(["/first"]);
-    } else {
-      this.router.navigate(this.loginUrlMapper.get(source) || ["/"]);
-    }
+    this.router.navigate(this.loginUrlMapper.get(source));
   }
-
   public openOauthDialog(source?: string) {
     if (source) {
       this.source$.next(source);
@@ -192,9 +191,11 @@ export class AuthService implements OnDestroy {
     this.dropTokens();
     this.router.navigate([""]);
   }
-
-  getUser(): Observable<User> {
-    return this.user$;
-
+  private postLoginTrigger(user: User){
+    if(this.firstLogin){
+      console.log(`Trigger post Auth event for user ${user.orcid_id}` );
+      // this.firstLogin = false;
+      this.loginEvent.next(user);
+    }
   }
 }

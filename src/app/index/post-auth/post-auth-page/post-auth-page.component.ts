@@ -14,11 +14,8 @@ export class PostAuthPageComponent implements OnInit {
   user;
   constructor(protected router: Router, protected authService: AuthService) {}
   ngOnInit(): void {
-    this.authService.getUser().subscribe({
-      next: (user) => {
-        this.user = user;
-      },
-    });
+    
+   
   }
   goToHome() {
     this.router.navigate(["/"]).then((success) => {
