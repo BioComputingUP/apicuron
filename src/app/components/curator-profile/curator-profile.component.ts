@@ -11,13 +11,13 @@ import { OrcidModule } from "src/app/orcid/orcid.module";
 import { BehaviorSubject, Observable, merge } from "rxjs";
 import { OrcidProfileLink } from "src/app/orcid/types/orcid";
 import { filter, map, shareReplay, switchMap } from "rxjs/operators";
-import { NgxPopperModule } from "ngx-popper";
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   standalone: true,
   selector: "curator-profile",
   templateUrl: "./curator-profile.component.html",
-  imports: [CommonModule, OrcidModule, NgxPopperModule],
+  imports: [CommonModule, OrcidModule,MatTooltipModule],
   styleUrls: ["./curator-profile.component.scss"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

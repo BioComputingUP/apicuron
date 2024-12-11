@@ -26,11 +26,17 @@ html {
   outline: none;
 }
 
+::ng-deep .mat-tooltip {
+  background-color: white !important;
+  color: black !important;
+}
+
 // Navbar Styles Section
 // ------------------------------------
 .nav-item {
   @apply dark:tw-text-gray-100 hover:dark:tw-text-white tw-text-gray-700 hover:tw-text-gray-800 tw-px-2 tw-mx-1 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium;
 }
+
 .hover-underline-animation {
   @apply before:tw-absolute before:tw-h-[4px] before:tw-left-1/2 before:tw-right-1/2 before:tw-content-[""] before:tw-bottom-0 before:tw-transition-all before:tw-duration-200 before:tw-ease-in;
 }
@@ -42,6 +48,7 @@ html {
 .active-underline-animation {
   @apply before:tw-right-0 before:tw-left-0 tw-delay-500;
 }
+
 // ------------------------------------
 
 @import "ngx-toastr/toastr";
@@ -62,5 +69,3 @@ html {
 
 @tailwind components;
 @tailwind utilities;
-
-

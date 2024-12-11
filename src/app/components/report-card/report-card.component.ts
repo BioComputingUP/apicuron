@@ -3,12 +3,12 @@ import { Component, Input, OnInit } from "@angular/core";
 import { Term } from "src/app/models/term.model";
 import { Report } from "../../models/report.model";
 import * as _ from "lodash";
-import { NgxPopperModule } from "ngx-popper";
 import { AngularSvgIconModule } from "angular-svg-icon";
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, AngularSvgIconModule, NgxPopperModule],
+  imports: [CommonModule, AngularSvgIconModule,MatTooltipModule],
   selector: "report-card",
   templateUrl: "./report-card.component.html",
 })

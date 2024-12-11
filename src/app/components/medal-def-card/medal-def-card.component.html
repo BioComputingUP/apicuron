@@ -12,17 +12,32 @@
             <span *ngIf="medal.score_relative == 1"> Requires ranking <span class="tw-not-sr-only">1st</span> <span
                     class="tw-sr-only">First</span> </span>
             in the following
-            <span class="tw-font-bold tw-underline tw-cursor-pointer" [popper]="activitiesList"
+            <!-- <span class="tw-font-bold tw-underline tw-cursor-pointer" [popper]="activitiesList"
                 [popperShowOnStart]="false" [popperTrigger]="'hover'" [popperHideOnScroll]="true"
-                [popperPlacement]="'right'" popperApplyClass="tw-z-40">Contributions</span>
+                [popperPlacement]="'right'" popperApplyClass="tw-z-40">Contributions</span> -->
+            <span class="tw-font-bold tw-underline tw-cursor-pointer"
+                [matTooltip]="'Contributions tooltip content here'" matTooltipPosition="right"
+                (mouseenter)="showActivities = true" (mouseleave)="showActivities = false"
+                [ngClass]="{'tw-z-40': showActivities}">
+                Contributions
+            </span>
         </div>
     </div>
 </div>
 
-<popper-content #activitiesList>
+<!-- <popper-content #activitiesList>
     <div class="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-py-2 tw-rounded tw-shadow-md tw-shadow-gray-400">
         <span
             class="tw-block tw-text-sm tw-font-dm-sans tw-text-gray-600 tw-leading-normal tw-py-1 tw-px-2 tw-text-center"
             *ngFor="let term of (termNames$ | async)">{{ term }}</span>
     </div>
-</popper-content>
+</popper-content> -->
+<ng-template #activitiesList>
+    <div class="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-py-2 tw-rounded tw-shadow-md tw-shadow-gray-400">
+        <span
+            class="tw-block tw-text-sm tw-font-dm-sans tw-text-gray-600 tw-leading-normal tw-py-1 tw-px-2 tw-text-center"
+            *ngFor="let term of (termNames$ | async)">
+            <!-- {{ term }} -->
+        </span>
+    </div>
+</ng-template>
