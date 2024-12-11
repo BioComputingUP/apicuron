@@ -10,6 +10,7 @@
 
 
   <navbar></navbar>
+  <div [ngClass]="popup? 'tw-overflow-hidden' : ''"> Popup test</div>
   <div class="tw-min-h-screen tw-bg-gray-100">
     <router-outlet></router-outlet>
   </div>

@@ -21,20 +21,19 @@ export class AuthService implements OnDestroy {
     initial: true,
     orcid_id: null,
   });
-  
+
   orcidToken$: BehaviorSubject<string | null> = new BehaviorSubject(null);
   jwtToken$: BehaviorSubject<string | null> = new BehaviorSubject(null);
-  
+
   private readonly jwtPrefix = "bearer";
   private readonly jwtHeader = "authorization";
   private readonly orcidHeader = "orcid-token";
-  
+
   public requestHeaders$: Observable<[string, string][]>;
-  
-  user$: Observable<any>;
-  private loginEvent = new Subject<any>();
+
+  user$: Observable<User>;
+  private loginEvent = new Subject<User>();
   loginEvent$ = this.loginEvent.asObservable(); // expose observable to other components
-  private firstLogin = true;
 
   loggedIn$: Observable<boolean>; // = new BehaviorSubject(false);
 
@@ -108,9 +107,7 @@ export class AuthService implements OnDestroy {
             this.setOrcidToken(access_token);
             this.redirectAfterAuth();
             this.user$.subscribe((user) => {
-             
-              
-              this.postLoginTrigger(user)
+              this.postLoginTrigger(user);
             });
 
             window.addEventListener("message", windowMessageEventListener);
@@ -191,11 +188,8 @@ export class AuthService implements OnDestroy {
     this.dropTokens();
     this.router.navigate([""]);
   }
-  private postLoginTrigger(user: User){
-    if(this.firstLogin){
-      console.log(`Trigger post Auth event for user ${user.orcid_id}` );
-      // this.firstLogin = false;
-      this.loginEvent.next(user);
-    }
+  private postLoginTrigger(user: User) {
+    console.log(`[Event] User just logged in ${user.orcid_id}`);
+    this.loginEvent.next(user);
   }
 }

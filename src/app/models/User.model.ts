@@ -57,6 +57,10 @@ export class User implements Deserializable {
   orcid_url(): URL {
     return new URL(this.orcid_id, environment.orcid_main_url);
   }
+
+  firstTimeLogin(): boolean {
+    return true;
+  }
 }
 
   // upload_avatar(scale = 80, radius = 50): URL {
