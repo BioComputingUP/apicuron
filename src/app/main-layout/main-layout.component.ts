@@ -12,6 +12,7 @@ import { User } from "../models/User.model";
 export class MainLayoutComponent implements OnInit {
   banners = [DowntimeBannerComponent, DevBannerComponent];
   popup = false;
+  currentUser!: User;
   constructor(private auth: AuthService) {}
 
   ngOnInit(): void {
@@ -21,7 +22,11 @@ export class MainLayoutComponent implements OnInit {
   }
   showPopup(user: User) {
     if (user.firstTimeLogin()) {
+      this.currentUser = user;
       this.popup = true;
     }
+  }
+  closePopup(){
+    this.popup = false;
   }
 }

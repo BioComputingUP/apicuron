@@ -1,0 +1,19 @@
+<div
+  class="tw-fixed tw-inset-0 tw-bg-black/50 tw-flex tw-items-center tw-justify-center tw-z-[1000]"
+>
+  <div
+    class="tw-bg-white tw-p-6 tw-shadow-xl tw-rounded-lg tw-text-center tw-max-w-md tw-w-full"
+  >
+    <h2 class="tw-text-xl tw-font-semibold tw-mb-4">
+      Welcome, {{ user.displayedName }}!
+    </h2>
+    <p class="tw-mb-2">Affiliation: {{ user.affiliation }}</p>
+    <p class="tw-mb-4">Your profile is: {{ user.privacy }}</p>
+    <button
+      class="tw-bg-blue-500 tw-text-white tw-px-4 tw-py-2 tw-rounded tw-transition hover:tw-bg-blue-600"
+      (click)="click()"
+    >
+      Close
+    </button>
+  </div>
+</div>

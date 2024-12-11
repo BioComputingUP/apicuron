@@ -18,6 +18,7 @@ import { NotificationsDataModule } from "./notifications-data/notifications-data
 import { NgxPopperModule } from "ngx-popper";
 import { SentryModuleConfig } from "../config/sentry.config";
 import { MatomoModule } from "ngx-matomo";
+import { FirstLoginPopupComponent } from "./components/first-login-popup/first-login-popup.component";
 @NgModule({
   declarations: [AppComponent, PageNotFoundComponent, MainLayoutComponent],
   imports: [
@@ -36,6 +37,7 @@ import { MatomoModule } from "ngx-matomo";
     HttpClientModule,
     NavbarComponent,
     FootComponent,
+    FirstLoginPopupComponent,
     AngularSvgIconModule.forRoot(),
     // popper Integration
     NgxPopperModule.forRoot({
