@@ -10,19 +10,21 @@
   </div>
 
   <navbar></navbar>
-  <div
-    [ngClass]="{ 'tw-visible': popup, 'tw-invisible': !popup }"
-    class="tw-relative tw-z-10"
-    aria-labelledby="modal-title"
-    role="dialog"
-    aria-modal="true"
-  >
-    <first-login-popup
-      *ngIf="popup"
-      [user]="currentUser"
-      ($click)="closePopup()"
-    ></first-login-popup>
-  </div>
+  <ng-container *ngIf="currentUser$ | async as currentUser">
+    <div
+      [ngClass]="{ 'tw-visible': popup, 'tw-invisible': !popup }"
+      class="tw-relative tw-z-10"
+      aria-labelledby="modal-title"
+      role="dialog"
+      aria-modal="true"
+    >
+      <first-login-popup
+        *ngIf="popup"
+        [user]="currentUser"
+        ($click)="closePopup()"
+      ></first-login-popup>
+    </div>
+  </ng-container>
   <div class="tw-min-h-screen tw-bg-gray-100">
     <router-outlet></router-outlet>
   </div>
