@@ -1,5 +1,14 @@
 import { Router } from "@angular/router";
-import { filter, map, pluck, shareReplay, switchMap } from "rxjs/operators";
+import {
+  distinctUntilChanged,
+  filter,
+  first,
+  map,
+  pluck,
+  shareReplay,
+  switchMap,
+  tap,
+} from "rxjs/operators";
 import { environment } from "../../environments/environment";
 import { BehaviorSubject, combineLatest, Observable, of, Subject } from "rxjs";
 import { HttpClient } from "@angular/common/http";
@@ -32,7 +41,7 @@ export class AuthService implements OnDestroy {
   public requestHeaders$: Observable<[string, string][]>;
 
   user$: Observable<User>;
-  private loginEvent = new Subject<User>();
+  private loginEvent = new Subject<boolean>();
   loginEvent$ = this.loginEvent.asObservable(); // expose observable to other components
 
   loggedIn$: Observable<boolean>; // = new BehaviorSubject(false);
@@ -54,6 +63,7 @@ export class AuthService implements OnDestroy {
   constructor(public router: Router, private http: HttpClient) {
     this.loadTokens();
 
+    // Header are built using latest orcid token and jwt
     this.requestHeaders$ = combineLatest([
       this.orcidToken$,
       this.jwtToken$,
@@ -71,25 +81,43 @@ export class AuthService implements OnDestroy {
       })
     );
 
-    this.loggedIn$ = combineLatest([this.orcidToken$, this.jwtToken$]).pipe(
-      map(([orcid, jwt]: [string, string]) => {
-        const val = !!orcid || !!jwt;
-
-        return val;
-      })
-    );
-
-    this.user$ = this.requestHeaders$.pipe(
-      filter((headers: [string, string][]) => {
+    // Anytime the headers change, recheck the login state
+    this.loggedIn$ = this.requestHeaders$.pipe(
+      map((headers: [string, string][]) => {
         return headers.length > 0;
       }),
-      switchMap((headers: [string, string][]) => {
-        return this.http.get(environment.ws + "/auth/profile", {
-          headers: {
-            ..._.fromPairs(headers),
-          },
-        });
-      }),
+      tap((loggedIn) => {
+        if (loggedIn) {
+          // if logged emitted true, trigger login event
+          console.log("New Login detected");
+          this.loginEvent.next(true);
+        } else {
+          console.log("Logged Out");
+          this.loginEvent.next(false);
+        }
+      })
+    );
+    // this.loggedIn$ = combineLatest([this.orcidToken$, this.jwtToken$]).pipe(
+    //   map(([orcid, jwt]: [string, string]) => {
+    //     const val = !!orcid || !!jwt;
+
+    //     return val;
+    //   })
+    // );
+
+    this.user$ = this.loggedIn$.pipe(
+      distinctUntilChanged(), // update user only if logged in state changes
+      switchMap(() =>
+        this.requestHeaders$.pipe(
+          switchMap((headers: [string, string][]) => {
+            return this.http.get(environment.ws + "/auth/profile", {
+              headers: {
+                ..._.fromPairs(headers),
+              },
+            });
+          })
+        )
+      ),
       shareReplay(),
       map((user: User) => new User().deserialize(user))
     );
@@ -106,9 +134,6 @@ export class AuthService implements OnDestroy {
           if (access_token) {
             this.setOrcidToken(access_token);
             this.redirectAfterAuth();
-            this.user$.subscribe((user) => {
-              this.postLoginTrigger(user);
-            });
 
             window.addEventListener("message", windowMessageEventListener);
           }
@@ -187,9 +212,5 @@ export class AuthService implements OnDestroy {
   logout(): void {
     this.dropTokens();
     this.router.navigate([""]);
-  }
-  private postLoginTrigger(user: User) {
-    console.log(`[Event] User just logged in ${user.orcid_id}`);
-    this.loginEvent.next(user);
   }
 }
