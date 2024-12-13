@@ -34,11 +34,12 @@ export class FairSharingComponent implements OnDestroy {
     this.destroy$.next();
   }
 
-  onDOIInputChange(event: Event): void {
+  onDOIInputChange(event: InputEvent): void {
     const target = event.target as HTMLInputElement;
     const value = target.value;
     this.inputSubject$.next(value);
   }
+
 
   emitToForm(input: any) {
     this.myData.emit(input);

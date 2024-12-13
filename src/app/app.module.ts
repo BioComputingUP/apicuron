@@ -55,7 +55,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     // *** Sentry ErrorHandler and Tracer Setup ***
     SentryModuleConfig,
     // *** end of sentry setup ***
-    { provide: APP_ID, useValue: 'serverApp' }  // Add APP_ID provider here
+    { provide: APP_ID, useValue: 'serverApp' }
   ],
   bootstrap: [AppComponent],
   exports: [RouterModule],
