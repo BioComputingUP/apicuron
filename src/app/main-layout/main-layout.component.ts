@@ -18,15 +18,15 @@ export class MainLayoutComponent implements OnInit {
   constructor(private auth: AuthService) {}
 
   ngOnInit(): void {
-    this.auth.loginEvent$.subscribe((loginEvent) => {
-      if (loginEvent) {
-        this.auth.user$.subscribe((user) => {
-          if (user.firstTimeLogin()) {
-            this.popup = true;
-          }
-        });
-      }
-    });
+    // this.auth.loginEvent$.subscribe((loginEvent) => {
+    //   if (loginEvent) {
+    //     this.auth.user$.subscribe((user) => {
+    //       if (user.firstTimeLogin()) {
+    //         this.popup = true;
+    //       }
+    //     });
+    //   }
+    // });
   
   }
   closePopup() {
