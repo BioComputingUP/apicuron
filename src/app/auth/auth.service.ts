@@ -119,8 +119,8 @@ export class AuthService implements OnDestroy {
           })
         )
       ),
-      shareReplay(),
-      map((user: User) => new User().deserialize(user))
+      shareReplay(1),
+      map((user: User) => new User().deserialize(user)),
     );
 
     const windowMessageEventListener = (event: MessageEvent) => {

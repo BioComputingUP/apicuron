@@ -32,10 +32,11 @@ export class FirstLoginDialog implements OnInit {
       });
   }
   openDialog(user) {
+
+    
     this.dialog.open(FirstPopupComponent, {
-      data: {
-        userData: user,
-      },
+      data: user,
+      
     });
   }
 }

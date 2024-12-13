@@ -8,5 +8,12 @@ import { User } from 'src/app/models/User.model';
   
 })
 export class FirstPopupComponent {
+  
   constructor(public dialogRef: DialogRef, @Inject(DIALOG_DATA) public data: User) { }
+
+  handleClose(){
+    
+
+    this.dialogRef.close();
+  }
 }
