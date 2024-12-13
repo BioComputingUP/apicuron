@@ -95,7 +95,8 @@ export class AuthService implements OnDestroy {
           console.log("Logged Out");
           this.loginEvent.next(false);
         }
-      })
+      }),
+      shareReplay(1)
     );
     // this.loggedIn$ = combineLatest([this.orcidToken$, this.jwtToken$]).pipe(
     //   map(([orcid, jwt]: [string, string]) => {
