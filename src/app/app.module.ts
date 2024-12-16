@@ -17,7 +17,6 @@ import { AuthDropdownComponent } from "./components/auth-dropdown/auth-dropdown.
 import { NotificationsDataModule } from "./notifications-data/notifications-data.module";
 import { SentryModuleConfig } from "../config/sentry.config";
 import { MatomoModule } from "ngx-matomo";
-import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [AppComponent, PageNotFoundComponent, MainLayoutComponent],
@@ -26,7 +25,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     AuthModule,
     NotificationsDataModule,
     // NotificationsModule,
-    MatTooltipModule,
     AuthDropdownComponent,
     ToastrModule.forRoot(),
     IndexModule,

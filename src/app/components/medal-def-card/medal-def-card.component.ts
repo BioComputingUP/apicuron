@@ -1,55 +1,3 @@
-// import { Component, Input, OnInit, ViewChild, TemplateRef} from "@angular/core";
-// import { CommonModule } from '@angular/common';
-// import { Medal } from "src/app/models/medal.model";
-// import { MedalDef } from "../../models/medal-def.model";
-// import { BehaviorSubject, Observable } from "rxjs";
-// import { Term } from "../../models/term.model";
-// import { map } from "rxjs/operators";
-// import { MatTooltipModule } from '@angular/material/tooltip';
-
-// @Component({
-//     standalone: true,
-//     selector: 'medal-def-card',
-//     imports: [CommonModule,MatTooltipModule],
-//     templateUrl: './medal-def-card.component.html',
-//     styleUrls: []
-// })
-// export class MedalDefCardComponent implements OnInit {
-//     readonly terms$: BehaviorSubject<Term[]> = new BehaviorSubject<Term[]>([]);
-//     termNames$: Observable<string[]>;
-//     showActivities: boolean = false;
-
-//     @ViewChild('activitiesList', { static: true }) activitiesList: TemplateRef<any>;
-
-//     ngOnInit(): void {
-//         this.termNames$ = this.terms$.asObservable().pipe(
-//             map((terms: Term[]) => {
-//                 return terms.filter((term: Term) => this.medal.list_terms.includes(term.activity_term))
-//             }),
-//             map((terms: Term[]) => {
-//                 return terms.map((term: Term) => term.activity_name)
-//             })
-//         )    }
-
-//     @Input()
-//     medal: MedalDef
-
-
-//     @Input()
-//     enableShadow = true;
-
-
-
-//     @Input()
-//     get terms() {
-//         return this.terms$.value;
-//     }
-//     set terms(value: Term[]) {
-//         this.terms$.next(value);
-//     }
-
-// }
-
 import { Component, Input, OnInit, ViewChild, TemplateRef, ElementRef, ViewContainerRef } from "@angular/core";
 import { CommonModule } from '@angular/common';
 import { Medal } from "src/app/models/medal.model";
@@ -102,11 +50,6 @@ export class MedalDefCardComponent implements OnInit {
         this.terms$.next(value);
     }
 
-    /**
-     * Opens the tooltip using the Angular CDK overlay.
-     *
-     * @param target - The event target to which the tooltip will be attached.
-     */
     openTooltip(target: EventTarget | null) {
         if (!target) return; // Check if target is null
         const element = target as HTMLElement; // Type assertion
@@ -132,9 +75,6 @@ export class MedalDefCardComponent implements OnInit {
         this.overlayRef.attach(portal);
     }
 
-    /**
-     * Closes the tooltip on mouse leave.
-     */
     closeTooltip() {
         if (this.overlayRef) {
             this.overlayRef.dispose();
