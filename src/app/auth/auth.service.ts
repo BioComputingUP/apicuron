@@ -82,7 +82,13 @@ export class AuthService implements OnDestroy {
         return headers;
       }),
       distinctUntilChanged((prev, next) => {
-        return prev.length === next.length;
+        if (prev.length !== next.length) {
+          return false; // emit new headers since there's no match
+        }
+        return prev.every((header, index) => {
+          return header[0] === next[index][0] && header[1] === next[index][1];
+        });
+
       }),
       shareReplay(1)
     );
