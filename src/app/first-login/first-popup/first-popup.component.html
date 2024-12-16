@@ -2,19 +2,103 @@
   class="tw-fixed tw-inset-0 tw-bg-black/50 tw-flex tw-items-center tw-justify-center tw-z-[1000]"
 >
   <div
-    class="tw-bg-white tw-p-6 tw-shadow-xl tw-rounded-lg tw-text-center tw-max-w-md tw-w-full"
+    class="tw-bg-white tw-p-6 tw-shadow-xl tw-rounded-lg tw-max-w-md tw-w-full tw-grid tw-grid-cols-1 tw-justify-items-center"
   >
-    <h2>Welcome!</h2>
+    <h2>Welcome to APICURON</h2>
     <h2 class="tw-text-xl tw-font-semibold tw-mb-4">
-      Welcome, {{ data.displayedName }}!
+      {{ data.displayedName }},
     </h2>
-    <p class="tw-mb-2">Affiliation: {{ data.affiliation }}</p>
-    <p class="tw-mb-4">Your profile is: {{ data.privacy }}</p>
-    <button
-      class="tw-bg-blue-500 tw-text-white tw-px-4 tw-py-2 tw-rounded tw-transition hover:tw-bg-blue-600"
-      (click)="dialogRef.close()"
-    >
-      Close
-    </button>
+    <p class="tw-mb-2">Your current affiliation: {{ data.affiliation }}</p>
+
+    <form [formGroup]="form" (submit)="submitForm()">
+      <div class="tw-grid tw-grid-cols-1 tw-gap-2">
+        <label
+          for="email"
+          class="tw-block tw-mb-2 tw-text-sm tw-font-medium tw-text-gray-700"
+          >Please fill in your email address</label
+        >
+        <input
+          type="email"
+          formControlName="email"
+          class="tw-appearance-none tw-block tw-w-full tw-px-3 tw-py-2 tw-border tw-border-gray-300 tw-rounded-md focus:tw-outline-none focus:tw-ring-apicuron-purple focus:tw-border-apicuron-purple focus:tw-shadow-outline-apicuron-purple tw-text-gray-900"
+        />
+        <div class="tw-grid tw-grid-cols-1 tw-gap-2 tw-justify-items-start">
+          <small
+            class="tw-text-sm tw-text-red-500 tw-font-thin"
+            *ngIf="email.errors?.['email'] && (email.dirty || email.touched)"
+            >Please enter a valid email address.</small
+          >
+          <div>
+            <input
+              type="checkbox"
+              id="receiveUpdates"
+              formControlName="receiveUpdates"
+              class="tw-form-checkbox tw-mr-2"
+              checked
+            />
+            <label for="receiveUpdates" class="tw-text-sm tw-text-gray-700">
+              I accept to receive update emails from APICURON
+            </label>
+          </div>
+        </div>
+        <div>
+          <label
+            for="privacy"
+            class="tw-font-bold tw-text-xl tw-text-center tw-w-full"
+            >Privacy Settings:</label
+          >
+          <p class="tw-mb-4">Your profile is currently: {{ data.privacy }}</p>
+          <fieldset class="tw-grid tw-grid-cols-2 tw-gap-2 tw-mb-8">
+            <div>
+              <input
+                type="radio"
+                name="privacy"
+                value="private"
+                id="private"
+                class="peer/private tw-hidden"
+                formControlName="privacy"
+              />
+              <label
+                for="private"
+                (click)="selectRadio('private')"
+                class="tw-block tw-cursor-pointer tw-h-full tw-rounded-lg tw-border-2 tw-border-gray-600 tw-bg-white tw-p-4 tw-text-sm tw-font-medium tw-shadow-md hover:tw-border-gray-200"
+                [ngClass]="{
+                  'tw-border-2 tw-border-apicuron-bright-purple hover:tw-border-apicuron-bright-purple':
+                    privacy == 'private',
+                  'tw-border-gray-100': privacy != 'private'
+                }"
+                >Private</label
+              >
+            </div>
+            <div>
+              <input
+                type="radio"
+                name="privacy"
+                value="public"
+                id="public"
+                class="peer/public tw-hidden"
+                formControlName="privacy"
+              />
+              <label
+                for="public"
+                (click)="selectRadio('public')"
+                class="tw-block tw-cursor-pointer tw-h-full tw-rounded-lg tw-border-2 tw-border-gray-600 tw-bg-white tw-p-4 tw-text-sm tw-font-medium tw-shadow-md hover:tw-border-gray-200"
+                [ngClass]="{
+                  'tw-border-2 tw-border-apicuron-bright-purple hover:tw-border-apicuron-bright-purple':
+                    privacy == 'public',
+                  'tw-border-gray-100': privacy != 'public'
+                }"
+                >Public</label
+              >
+            </div>
+          </fieldset>
+        </div>
+        <input
+          type="submit"
+          value="submit"
+          class="tw-cursor-pointer tw-p-2 tw-mx-1 tw-bg-blue-500 tw-shadow-lg tw-text-white tw-capitalize tw-justify-self-center"
+        />
+      </div>
+    </form>
   </div>
 </div>

@@ -21,8 +21,10 @@ import { MatomoModule } from "ngx-matomo";
 
 import { FirstLoginDialog } from "./first-login/first-login.component";
 import { DialogModule } from "@angular/cdk/dialog";
+import { ReactiveFormsModule } from "@angular/forms";
+import { FirstPopupComponent } from "./first-login/first-popup/first-popup.component";
 @NgModule({
-  declarations: [AppComponent, PageNotFoundComponent, MainLayoutComponent, FirstLoginDialog],
+  declarations: [AppComponent, PageNotFoundComponent, MainLayoutComponent, FirstLoginDialog, FirstPopupComponent],
   imports: [
     AppRoutingModule,
     AuthModule,
@@ -34,7 +36,7 @@ import { DialogModule } from "@angular/cdk/dialog";
     BrowserModule.withServerTransition({ appId: "serverApp" }),
     // TransferHttpCacheModule,
     BrowserAnimationsModule,
-    // ReactiveFormsModule,
+    ReactiveFormsModule,
     // FormsModule,
     HttpClientModule,
     NavbarComponent,
