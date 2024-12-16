@@ -1,5 +1,5 @@
 import { Dialog, DialogRef } from "@angular/cdk/dialog";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { FirstPopupComponent } from "./first-popup/first-popup.component";
 import { AuthService } from "../auth/auth.service";
 
@@ -9,27 +9,34 @@ import {
   map,
   distinct,
   distinctUntilChanged,
+  tap,
+  takeUntil,
 } from "rxjs/operators";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { User } from "../models/User.model";
 @Component({
   selector: "first-login-dialog",
   templateUrl: "first-login.component.html",
 })
-export class FirstLoginDialog implements OnInit {
-  user$ = this.auth.user$;
+export class FirstLoginDialog implements OnInit, OnDestroy {
+  destroy$ = new Subject<void>();
   constructor(public dialog: Dialog, protected auth: AuthService) {}
 
   ngOnInit(): void {
+   console.log("NG on init FirstLoginDialog");
+   
     this.auth.loginEvent$
       .pipe(
-        filter((loginEvent) => loginEvent), // only observe login events
-        switchMap(() => this.auth.user$),
-        filter((user) => user.firstTimeLogin())
+        tap((user) => console.log("FirstLoginDialog", user)),
+        filter((user) => user.firstTimeLogin()), 
+        takeUntil(this.destroy$)
       )
       .subscribe((user) => {
         this.openDialog(user);
       });
+  }
+  ngOnDestroy(): void {
+    this.destroy$.next();
   }
   openDialog(user) {
 
