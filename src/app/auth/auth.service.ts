@@ -126,11 +126,12 @@ export class AuthService implements OnDestroy {
       if (allowedOrigins.includes(event.origin)) {
         if (_.isObject(event.data) && event.data["access_token"]) {
           const access_token = event.data["access_token"];
-          if (access_token) {
-            this.setOrcidToken(access_token);
-            this.redirectAfterAuth();
-            window.addEventListener("message", windowMessageEventListener);
+          if (!access_token) {
+            return;
           }
+          this.setOrcidToken(access_token);
+          this.redirectAfterAuth();
+          window.addEventListener("message", windowMessageEventListener);
         }
       }
     };
