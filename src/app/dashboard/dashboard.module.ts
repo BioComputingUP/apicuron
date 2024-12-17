@@ -9,10 +9,6 @@ import { SvgModule } from "../svg/svg.module";
 import { AngularSvgIconModule } from "angular-svg-icon";
 import { UserDashboardComponent } from "./user-dashboard/user-dashboard.component";
 import { NavbarComponent } from "../alt-navbar/alt-navbar.component";
-import { SlideOverPanelComponent } from "src/app/components/utils/slide-over-panel/slide-over-panel.component";
-import { AuthDropdownComponent } from "src/app/components/auth-dropdown/auth-dropdown.component";
-import { UserOverviewComponent } from "src/app/dashboard/user-overview/user-overview.component";
-import { ReportsByDateChartComponent } from "src/app/components/charts/reports-by-date-chart/reports-by-date-chart.component";
 import { UserOverviewPageService } from "./services/user-overview-page.service";
 import { CalendarModule } from "primeng/calendar";
 import { CategoriesPieChartComponent } from "../components/charts/categories-pie-chart/categories-pie-chart.component";
@@ -29,6 +25,10 @@ import { UserResourceDashboardService } from "./user-resource-dashboard/services
 import { BadgeCardComponent } from "../components/badge-card/badge-card.component";
 import { MyBadgesDetailsComponent } from "../components/my-badges-details/my-badges-details.component";
 import { DoughtnutPieChartComponent } from "../components/charts/doughnut-pie-chart/doughnut-pie-chart.component";
+import { UserOverviewComponent } from "./user-overview/user-overview.component";
+import { SlideOverPanelComponent } from "../components/utils/slide-over-panel/slide-over-panel.component";
+import { AuthDropdownComponent } from "../components/auth-dropdown/auth-dropdown.component";
+import { ReportsByDateChartComponent } from "../components/charts/reports-by-date-chart/reports-by-date-chart.component";
 @NgModule({
   declarations: [
     DashboardSidebarComponent,
