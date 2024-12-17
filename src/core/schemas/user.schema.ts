@@ -76,18 +76,18 @@ export class User {
 
 	@Prop({
 		required: false,
-		default: "No affiliation",
+		default: 'No affiliation',
 	})
 	affiliation?: string;
 
 	@Prop({
 		required: false,
-		type: Object
+		type: Object,
 	})
-	links:{
-		name: string,
-		url: URL
-	}
+	links: {
+		name: string;
+		url: URL;
+	};
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop({
 		required: false,
@@ -95,7 +95,7 @@ export class User {
 		type: [String],
 	})
 	keywords?: string[];
-	
+
 	@Prop({
 		default: Date.now(),
 		type: Date,
@@ -150,6 +150,12 @@ export class User {
 		enum: PrivacyType,
 	})
 	privacy: PrivacyType;
+
+	@Prop({ default: true })
+	isNewLogin?: boolean;
+
+	@Prop({ required: false, default: Date.now() })
+	lastLoginDate?: Date;
 
 	hasResourcePutCode(resource_id: string): boolean {
 		return (
