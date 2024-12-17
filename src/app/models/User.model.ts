@@ -22,6 +22,7 @@ export class User implements Deserializable {
     this.affiliation = input.affiliation ?? "Nothing";
     this.keywords = input.keywords ?? null;
     this.links = input.links ?? null;
+    this.newLogin = input.isNewLogin ?? false;
     return this;
   }
 
@@ -41,7 +42,7 @@ export class User implements Deserializable {
   affiliation?: string
   keywords?: [string];
   links?: Array<{name: string; url: URL }>
-
+  newLogin?: boolean;
 
   generate_avatar(scale = 80, radius = 50): URL {
     if (this.avatar) {

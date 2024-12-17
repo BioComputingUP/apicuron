@@ -6,7 +6,7 @@ import {
   pluck,
   shareReplay,
   switchMap,
-  takeUntil
+  takeUntil,
 } from "rxjs/operators";
 import { environment } from "../../environments/environment";
 import { BehaviorSubject, combineLatest, Observable, of, Subject } from "rxjs";
@@ -137,9 +137,9 @@ export class AuthService implements OnDestroy {
       if (allowedOrigins.includes(event.origin)) {
         if (_.isObject(event.data) && event.data["access_token"]) {
           const access_token = event.data["access_token"];
-          const isNew = event.data["isNew"];
+
           if (access_token) {
-            this.login(access_token, isNew);
+            this.login(access_token);
             window.addEventListener("message", windowMessageEventListener);
           }
         }
@@ -151,16 +151,17 @@ export class AuthService implements OnDestroy {
     this.destroy$.next(true);
   }
 
-  private login(access_token, isNew) {
+  private login(access_token) {
     this.setOrcidToken(access_token);
 
     // emit new login event with the current user info
     this.user$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
       const loginData: LoginEventData = {
         user: user,
-        isNew: isNew,
+        isNew: user.newLogin,
         loginTime: new Date(),
       };
+      console.log("Login Data:", loginData);
       console.log(`[Login Event] Logged in as ${user.orcid_id}`);
       this.loginEvent.next(loginData);
     });
