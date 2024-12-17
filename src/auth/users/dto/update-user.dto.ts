@@ -5,6 +5,7 @@ import {
 	IsOptional,
 	IsString,
 	Validate,
+	IsBoolean
 } from 'class-validator';
 import { User } from '../../../core/schemas/user.schema';
 import { OrcidChecksum } from '../../../submit-reports/validators/orcid-checksum';
@@ -62,4 +63,13 @@ export class UpdateProfileDto {
 	@IsString()
 	@IsOptional()
 	privacy: 'private' | 'public';
+
+	@IsOptional()
+	@IsBoolean()
+	isNewLogin: boolean
+
+	@IsOptional()
+	@IsBoolean()
+	acceptsEmails: boolean
+
 }
