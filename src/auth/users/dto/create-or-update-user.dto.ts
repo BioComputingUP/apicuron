@@ -35,4 +35,5 @@ export interface ICreateOrUpdateUser {
 		name: string,
 		url: URL
 	}
+	lastLoginDate?: Date
 }
