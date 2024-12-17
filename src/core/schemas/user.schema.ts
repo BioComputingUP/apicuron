@@ -157,6 +157,9 @@ export class User {
 	@Prop({ required: false, default: Date.now() })
 	lastLoginDate?: Date;
 
+	@Prop({required:false, default: false})
+	acceptsEmails?: boolean;
+
 	hasResourcePutCode(resource_id: string): boolean {
 		return (
 			this.orcid_work_put_codes.findIndex(
