@@ -36,6 +36,7 @@ export class FirstPopupComponent {
 
   submitForm() {
     console.log(this.form.value);
+    // Use ready form of the angular cdk for the confirmation
     this.dialogRef.close();
   }
 

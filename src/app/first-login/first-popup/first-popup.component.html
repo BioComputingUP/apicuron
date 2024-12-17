@@ -18,12 +18,12 @@
     </div>
 
     <div class="tw-px-6 tw-mt-2.5">
-      <p class="tw-text-lg tw-font-semibold tw-text-center tw-text-gray-700">
+      <p class="tw-text-lg tw-font-normal tw-text-center tw-text-gray-700">
         Please complete your profile
       </p>
     </div>
 
-    <form [formGroup]="form" (submit)="submitForm()" class="tw-mt-1 tw-mb-3 tw-px-6 tw-w-full">
+    <form [formGroup]="form" (submit)="submitForm()" class="tw-mt-1 tw-mb-6 tw-px-6 tw-w-full">
       <div class="tw-grid tw-grid-cols-1 tw-gap-2 tw-w-full">
 
         <!-- Email Address Field -->
@@ -53,27 +53,29 @@
             Settings:</label>
           <span class="tw-font-normal tw-text-xs tw-mb-2">You can later change your privacy setting.</span>
 
-          <fieldset class="tw-grid tw-grid-cols-2 tw-gap-2 tw-mb-3">
+          <fieldset class="tw-grid tw-grid-cols-2 tw-gap-3 tw-my-4">
 
             <!-- Public Radio Button -->
-            <div class="tw-flex tw-items-center tw-gap-2 tw-mt-2"> <!-- Reduced gap here -->
+            <div class="tw-flex tw-items-center tw-gap-2">
               <label for="public" (click)="selectRadio('public')"
                 class="tw-block tw-cursor-pointer tw-h-full tw-rounded-lg tw-border-2 tw-border-purple-600 tw-bg-white tw-p-2 tw-text-sm tw-font-medium tw-shadow-md"
                 [ngClass]="{
-                'tw-border-2 tw-border-apicuron-bright-purple': privacy === 'public',
-                'tw-border-gray-100': privacy !== 'public'
-              }">
-
-                <div class="tw-items-start">
+                  'tw-border-2 tw-border-apicuron-bright-purple': privacy === 'public',
+                  'tw-border-gray-100': privacy !== 'public',
+                  'tw-opacity-50': privacy !== 'public'
+                }">
+                <!-- Reduced opacity for the unselected option (this comment is outside ngClass) -->
+                <div class="tw-grid tw-p-1 tw-gap-2 tw-grid-cols-12 tw-items-start">
+                  <!-- Align items to start for top alignment -->
                   <!-- Left Column (Icon) -->
-                  <div class="tw-col-span-3">
+                  <div class="tw-col-span-2">
                     <img class="tw-h-6 tw-max-w-full tw-max-h-full"
                       src="http://localhost:3000/api/public/resources/public.svg" alt="Public Icon" />
                   </div>
 
                   <!-- Right Column (Text and Current Label) -->
-                  <div class="tw-col-span-9">
-                    <div class="tw-flex tw-items-center tw-gap-2 tw-mb-2">
+                  <div class="tw-col-span-10">
+                    <div class="tw-flex tw-items-center tw-gap-2 tw-pb-2">
                       <span class="tw-font-bold">Public</span>
 
                       <!-- Current Label for Public -->
@@ -93,24 +95,26 @@
             </div>
 
             <!-- Private Radio Button -->
-            <div class="tw-flex tw-items-center tw-gap-2 tw-mt-2"> <!-- Reduced gap here -->
+            <div class="tw-flex tw-items-center tw-gap-2">
               <label for="private" (click)="selectRadio('private')"
                 class="tw-block tw-cursor-pointer tw-h-full tw-rounded-lg tw-border-2 tw-border-purple-600 tw-bg-white tw-p-2 tw-text-sm tw-font-medium tw-shadow-md"
                 [ngClass]="{
-                'tw-border-2 tw-border-apicuron-bright-purple': privacy === 'private',
-                'tw-border-gray-100': privacy !== 'private'
-              }">
-
-                <div class="tw-items-start">
+                  'tw-border-2 tw-border-apicuron-bright-purple': privacy === 'private',
+                  'tw-border-gray-100': privacy !== 'private',
+                  'tw-opacity-50': privacy !== 'private'
+                }">
+                <!-- Reduced opacity for the unselected option (this comment is outside ngClass) -->
+                <div class="tw-grid tw-p-1 tw-grid tw-p-1  tw-gap-2 tw-grid-cols-12 tw-items-start">
+                  <!-- Align items to start for top alignment -->
                   <!-- Left Column (Icon) -->
-                  <div class="tw-col-span-3">
+                  <div class="tw-col-span-2">
                     <img class="tw-h-6 tw-max-w-full tw-max-h-full"
                       src="http://localhost:3000/api/public/resources/private.svg" alt="Private Icon" />
                   </div>
 
                   <!-- Right Column (Text and Current Label) -->
-                  <div class="tw-col-span-9">
-                    <div class="tw-flex tw-items-center tw-gap-2 tw-mb-2">
+                  <div class="tw-col-span-10">
+                    <div class="tw-flex tw-items-center tw-gap-2 tw-pb-2">
                       <span class="tw-font-bold">Private</span>
 
                       <!-- Current Label for Private -->
