@@ -78,8 +78,11 @@ export class UpdateUser implements Deserializable, Serializable {
     if (this.privacy) {
       payload.privacy = this.privacy;
     }
-    if (this.isNewLogin){
+    if (this.isNewLogin !== null) {
       payload.isNewLogin = this.isNewLogin;
+    }
+    if (this.acceptsEmails !== null) {
+      payload.acceptsEmails = this.acceptsEmails;
     }
 
     return payload;
@@ -88,11 +91,13 @@ export class UpdateUser implements Deserializable, Serializable {
     this.email = input.email ?? null;
     this.privacy = input.privacy ?? null;
     this.orcid_id = input.orcid_id;
-    this.isNewLogin = input.isNewLogin ?? true;
+    this.isNewLogin = input.isNewLogin ?? null;
+    this.acceptsEmails = input.acceptsEmails ?? null;
     return this;
   }
   email?: string;
   privacy?: "public" | "private";
   orcid_id: string;
   isNewLogin?: boolean
+  acceptsEmails?: boolean
 }
