@@ -1,103 +1,142 @@
-<div
-  class="tw-fixed tw-inset-0 tw-bg-black/50 tw-flex tw-items-center tw-justify-center tw-z-[1000]"
->
+<div class="tw-fixed tw-inset-0 tw-bg-black/50 tw-flex tw-items-center tw-justify-center tw-z-[1000]">
   <div
-    class="tw-bg-white tw-p-6 tw-shadow-xl tw-rounded-lg tw-max-w-md tw-w-full tw-grid tw-grid-cols-1 tw-justify-items-center"
-  >
-    <h2>Welcome to APICURON</h2>
-    <h2 class="tw-text-xl tw-font-semibold tw-mb-4">
-      {{ data.displayedName }},
-    </h2>
-    <p class="tw-mb-2">Your current affiliation: {{ data.affiliation }}</p>
+    class="popup-container tw-bg-white tw-p-0 tw-shadow-xl tw-rounded-lg tw-max-w-md tw-w-full tw-grid tw-grid-cols-1 tw-justify-items-start tw-mb-8">
 
-    <form [formGroup]="form" (submit)="submitForm()">
-      <div class="tw-grid tw-grid-cols-1 tw-gap-2">
-        <label
-          for="email"
-          class="tw-block tw-mb-2 tw-text-sm tw-font-medium tw-text-gray-700"
-          >Please fill in your email address</label
-        >
-        <input
-          type="email"
-          formControlName="email"
-          class="tw-appearance-none tw-block tw-w-full tw-px-3 tw-py-2 tw-border tw-border-gray-300 tw-rounded-md focus:tw-outline-none focus:tw-ring-apicuron-purple focus:tw-border-apicuron-purple focus:tw-shadow-outline-apicuron-purple tw-text-gray-900"
-        />
+    <div class="christmas-texture-container">
+      <img class="christmas-texture" src="api/public/resources/christmas.jpg" alt="Christmas Texture" />
+    </div>
+
+    <div class="tw-border-b-4 tw-flex tw-items-center tw-px-6 tw-py-4">
+      <img class="tw-w-20 tw-aspect-square tw-mr-4" [src]="'api/' + avatar" alt="Curator Avatar" />
+      <div>
+        <h2 class="tw-text-xs tw-text-left tw-font-bold">Merry Christmas</h2>
+        <h2 class="tw-text-xl tw-font-semibold tw-text-left">
+          {{ data.displayedName }},
+        </h2>
+        <p class="tw-text-xs tw-mb-2 tw-text-left">Your current affiliation: {{ data.affiliation }}</p>
+      </div>
+    </div>
+
+    <div class="tw-px-6 tw-mt-2.5">
+      <p class="tw-text-lg tw-font-semibold tw-text-center tw-text-gray-700">
+        Please complete your profile
+      </p>
+    </div>
+
+    <form [formGroup]="form" (submit)="submitForm()" class="tw-mt-1 tw-mb-3 tw-px-6 tw-w-full">
+      <div class="tw-grid tw-grid-cols-1 tw-gap-2 tw-w-full">
+
+        <!-- Email Address Field -->
+        <label for="email" class="tw-block tw-mb-1 tw-text-sm tw-font-bold tw-text-gray-700">Email Address</label>
+        <input type="email" formControlName="email"
+          class="tw-appearance-none tw-block tw-w-full tw-px-3 tw-py-2 tw-border tw-border-gray-300 tw-rounded-md focus:tw-outline-none focus:tw-ring-apicuron-purple focus:tw-border-apicuron-purple focus:tw-shadow-outline-apicuron-purple tw-text-gray-900" />
+
+        <!-- Email Validation Error Message -->
         <div class="tw-grid tw-grid-cols-1 tw-gap-2 tw-justify-items-start">
-          <small
-            class="tw-text-sm tw-text-red-500 tw-font-thin"
-            *ngIf="email.errors?.['email'] && (email.dirty || email.touched)"
-            >Please enter a valid email address.</small
-          >
-          <div>
-            <input
-              type="checkbox"
-              id="receiveUpdates"
-              formControlName="receiveUpdates"
-              class="tw-form-checkbox tw-mr-2"
-              checked
-            />
-            <label for="receiveUpdates" class="tw-text-sm tw-text-gray-700">
-              I accept to receive update emails from APICURON
-            </label>
-          </div>
+          <small class="tw-text-sm tw-text-red-500 tw-font-medium"
+            *ngIf="email.errors?.['email'] && (email.dirty || email.touched)">Please enter a valid email
+            address.</small>
         </div>
+
+        <!-- Receive Updates Checkbox -->
+        <div class="tw-border-b tw-border-gray-300 tw-pb-4">
+          <input type="checkbox" id="receiveUpdates" formControlName="receiveUpdates" class="tw-form-checkbox tw-mr-2"
+            checked />
+          <label for="receiveUpdates" class="tw-text-sm tw-text-gray-700">
+            I accept to receive update emails from APICURON
+          </label>
+        </div>
+
+        <!-- Privacy Settings Section -->
         <div>
-          <label
-            for="privacy"
-            class="tw-font-bold tw-text-xl tw-text-center tw-w-full"
-            >Privacy Settings:</label
-          >
-          <p class="tw-mb-4">Your profile is currently: {{ data.privacy }}</p>
-          <fieldset class="tw-grid tw-grid-cols-2 tw-gap-2 tw-mb-8">
-            <div>
-              <input
-                type="radio"
-                name="privacy"
-                value="private"
-                id="private"
-                class="peer/private tw-hidden"
-                formControlName="privacy"
-              />
-              <label
-                for="private"
-                (click)="selectRadio('private')"
-                class="tw-block tw-cursor-pointer tw-h-full tw-rounded-lg tw-border-2 tw-border-gray-600 tw-bg-white tw-p-4 tw-text-sm tw-font-medium tw-shadow-md hover:tw-border-gray-200"
+          <label for="privacy" class="tw-block tw-tb-1 tw-text-sm tw-mt-2 tw-font-bold tw-text-gray-700">Privacy
+            Settings:</label>
+          <span class="tw-font-normal tw-text-xs tw-mb-2">You can later change your privacy setting.</span>
+
+          <fieldset class="tw-grid tw-grid-cols-2 tw-gap-2 tw-mb-3">
+
+            <!-- Public Radio Button -->
+            <div class="tw-flex tw-items-center tw-gap-2 tw-mt-2"> <!-- Reduced gap here -->
+              <label for="public" (click)="selectRadio('public')"
+                class="tw-block tw-cursor-pointer tw-h-full tw-rounded-lg tw-border-2 tw-border-purple-600 tw-bg-white tw-p-2 tw-text-sm tw-font-medium tw-shadow-md"
                 [ngClass]="{
-                  'tw-border-2 tw-border-apicuron-bright-purple hover:tw-border-apicuron-bright-purple':
-                    privacy == 'private',
-                  'tw-border-gray-100': privacy != 'private'
-                }"
-                >Private</label
-              >
+                'tw-border-2 tw-border-apicuron-bright-purple': privacy === 'public',
+                'tw-border-gray-100': privacy !== 'public'
+              }">
+
+                <div class="tw-items-start">
+                  <!-- Left Column (Icon) -->
+                  <div class="tw-col-span-3">
+                    <img class="tw-h-6 tw-max-w-full tw-max-h-full"
+                      src="http://localhost:3000/api/public/resources/public.svg" alt="Public Icon" />
+                  </div>
+
+                  <!-- Right Column (Text and Current Label) -->
+                  <div class="tw-col-span-9">
+                    <div class="tw-flex tw-items-center tw-gap-2 tw-mb-2">
+                      <span class="tw-font-bold">Public</span>
+
+                      <!-- Current Label for Public -->
+                      <span *ngIf="privacy === 'public'"
+                        class="tw-text-xs tw-bg-purple-100 tw-text-purple-800 tw-border tw-border-apicuron-bright-purple tw-rounded-full tw-px-2 tw-py-0.5">
+                        Current
+                      </span>
+                    </div>
+                    <span class="tw-text-sm tw-text-gray-600">Your profile is visible to everyone</span>
+                  </div>
+                </div>
+
+                <input type="radio" name="privacy" value="public" id="public" class="peer/public tw-hidden"
+                  formControlName="privacy" />
+
+              </label>
             </div>
-            <div>
-              <input
-                type="radio"
-                name="privacy"
-                value="public"
-                id="public"
-                class="peer/public tw-hidden"
-                formControlName="privacy"
-              />
-              <label
-                for="public"
-                (click)="selectRadio('public')"
-                class="tw-block tw-cursor-pointer tw-h-full tw-rounded-lg tw-border-2 tw-border-gray-600 tw-bg-white tw-p-4 tw-text-sm tw-font-medium tw-shadow-md hover:tw-border-gray-200"
+
+            <!-- Private Radio Button -->
+            <div class="tw-flex tw-items-center tw-gap-2 tw-mt-2"> <!-- Reduced gap here -->
+              <label for="private" (click)="selectRadio('private')"
+                class="tw-block tw-cursor-pointer tw-h-full tw-rounded-lg tw-border-2 tw-border-purple-600 tw-bg-white tw-p-2 tw-text-sm tw-font-medium tw-shadow-md"
                 [ngClass]="{
-                  'tw-border-2 tw-border-apicuron-bright-purple hover:tw-border-apicuron-bright-purple':
-                    privacy == 'public',
-                  'tw-border-gray-100': privacy != 'public'
-                }"
-                >Public</label
-              >
+                'tw-border-2 tw-border-apicuron-bright-purple': privacy === 'private',
+                'tw-border-gray-100': privacy !== 'private'
+              }">
+
+                <div class="tw-items-start">
+                  <!-- Left Column (Icon) -->
+                  <div class="tw-col-span-3">
+                    <img class="tw-h-6 tw-max-w-full tw-max-h-full"
+                      src="http://localhost:3000/api/public/resources/private.svg" alt="Private Icon" />
+                  </div>
+
+                  <!-- Right Column (Text and Current Label) -->
+                  <div class="tw-col-span-9">
+                    <div class="tw-flex tw-items-center tw-gap-2 tw-mb-2">
+                      <span class="tw-font-bold">Private</span>
+
+                      <!-- Current Label for Private -->
+                      <span *ngIf="privacy === 'private'"
+                        class="tw-text-xs tw-bg-purple-100 tw-text-purple-800 tw-border tw-border-apicuron-bright-purple tw-rounded-full tw-px-2 tw-py-0.5">
+                        Current
+                      </span>
+                    </div>
+                    <span class="tw-text-sm tw-text-gray-600">Your profile is only visible to you</span>
+                  </div>
+                </div>
+
+                <input type="radio" name="privacy" value="private" id="private" class="peer/private tw-hidden"
+                  formControlName="privacy" />
+
+              </label>
             </div>
+
           </fieldset>
+
+
         </div>
-        <input
-          type="submit"
-          value="submit"
-          class="tw-cursor-pointer tw-p-2 tw-mx-1 tw-bg-blue-500 tw-shadow-lg tw-text-white tw-capitalize tw-justify-self-center"
-        />
+
+        <!-- Submit Button -->
+        <input type="submit" value="Submit"
+          class="tw-block tw-w-full tw-rounded-md tw-bg-apicuron-bright-purple tw-px-3.5 tw-pt-2.5 tw-pb-3.5 tw-text-center tw-text-sm tw-font-semibold tw-text-white tw-shadow-sm tw-hover:bg-indigo-500 tw-focus-visible:outline tw-focus-visible:outline-2 tw-focus-visible:outline-offset-2 tw-focus-visible:outline-indigo-600" />
       </div>
     </form>
   </div>

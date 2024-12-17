@@ -1,0 +1,17 @@
+/* Christmas Texture Image Styling - No margin or padding */
+.christmas-texture-container {
+	width: 100%;
+	height: 35px;
+	margin: 0;
+	/* Ensures no margin */
+	padding: 0;
+	/* Ensures no padding */
+}
+
+.christmas-texture {
+	width: 100%;
+	height: 100%;
+	object-fit:	 cover;
+	/* Ensures the image covers the full width and height */
+	display: block;
+}
