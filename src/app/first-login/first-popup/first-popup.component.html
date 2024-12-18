@@ -34,14 +34,16 @@
           <small class="tw-text-sm tw-text-red-500 tw-font-medium"
             *ngIf="email.errors?.['email'] && (email.dirty || email.touched)">Please enter a valid email
             address.</small>
-          <div>
-            <input type="checkbox" id="acceptsEmails" formControlName="acceptsEmails" class="tw-form-checkbox tw-mr-2"
-              checked />
-            <label for="acceptsEmails" class="tw-text-sm tw-text-gray-700">
-              I accept to receive update emails from APICURON
-            </label>
-          </div>
         </div>
+
+        <div class="tw-border-b tw-border-gray-300 tw-pb-4">
+          <input type="checkbox" id="acceptsEmails" formControlName="acceptsEmails" class="tw-form-checkbox tw-mr-2"
+            checked />
+          <label for="acceptsEmails" class="tw-text-sm tw-text-gray-700">
+            I accept to receive update emails from APICURON
+          </label>
+        </div>
+
         <div>
           <label for="privacy" class="tw-block tw-tb-1 tw-text-sm tw-mt-2 tw-font-bold tw-text-gray-700">Privacy
             Settings:</label>
@@ -89,7 +91,7 @@
                   'tw-border-gray-100': privacy !== 'private',
                   'tw-opacity-50': privacy !== 'private'
                 }">
-                <div class=" tw-grid tw-p-1  tw-gap-2 tw-grid-cols-12 tw-items-start">
+                <div class="tw-grid tw-p-1 tw-grid tw-p-1  tw-gap-2 tw-grid-cols-12 tw-items-start">
                   <div class="tw-col-span-2">
                     <img class="tw-h-6 tw-max-w-full tw-max-h-full"
                       src="http://localhost:3000/api/public/resources/private.svg" alt="Private Icon" />

@@ -23,7 +23,7 @@ export class FirstPopupComponent {
     acceptsEmails: FormControl<boolean>;
   }> = this.formBuilder.group({
     email: ["", Validators.email],
-    privacy: ["", Validators.pattern(new RegExp("private|public"))],
+    privacy: ["public", Validators.pattern(new RegExp("private|public"))],
     acceptsEmails: [true],
   });
   user: User;
