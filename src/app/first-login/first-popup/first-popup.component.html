@@ -2,14 +2,18 @@
   <div
     class="popup-container tw-bg-white tw-p-0 tw-shadow-xl tw-rounded-lg tw-max-w-md tw-w-full tw-grid tw-grid-cols-1 tw-justify-items-start tw-mb-8">
 
-    <div class="christmas-texture-container">
+    <!-- Conditional rendering for Christmas Image -->
+    <div class="christmas-texture-container" *ngIf="isChristmas">
       <img class="christmas-texture" src="api/public/resources/christmas.jpg" alt="Christmas Texture" />
     </div>
 
     <div class="tw-border-b-4 tw-flex tw-items-center tw-px-6 tw-py-4">
       <img class="tw-w-20 tw-aspect-square tw-mr-4" [src]="'api/' + avatar" alt="Curator Avatar" />
       <div>
-        <h2 class="tw-text-xs tw-text-left tw-font-bold">Merry Christmas</h2>
+        <!-- Conditional Text for Christmas or Welcome -->
+        <h2 class="tw-text-xs tw-text-left tw-font-bold">
+          {{ isChristmas ? 'Merry Christmas' : 'Welcome to Apicuron' }}
+        </h2>
         <h2 class="tw-text-xl tw-font-semibold tw-text-left">
           {{ data.displayedName }},
         </h2>
@@ -23,6 +27,7 @@
       </p>
     </div>
 
+    <!-- Form Section -->
     <form [formGroup]="form" (submit)="submitForm()" class="tw-mt-1 tw-mb-6 tw-px-6 tw-w-full">
       <div class="tw-grid tw-grid-cols-1 tw-gap-2 tw-w-full">
 

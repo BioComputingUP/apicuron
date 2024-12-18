@@ -1,5 +1,5 @@
 import { DIALOG_DATA, DialogRef } from "@angular/cdk/dialog";
-import { Component, Inject } from "@angular/core";
+import { Component, Inject, OnInit } from "@angular/core";
 import {
   FormBuilder,
   FormControl,
@@ -16,7 +16,8 @@ import { UpdateUser, User } from "src/app/models/User.model";
   templateUrl: "./first-popup.component.html",
   styleUrls: ['./first-popup.component.scss']
 })
-export class FirstPopupComponent {
+export class FirstPopupComponent implements OnInit {
+  isChristmas: boolean = false;
   form: FormGroup<{
     email: FormControl<string>;
     privacy: FormControl<string>;
@@ -27,7 +28,8 @@ export class FirstPopupComponent {
     acceptsEmails: [true],
   });
   user: User;
-  avatar: String;
+  avatar: string;
+
   constructor(
     public dialogRef: DialogRef,
     @Inject(DIALOG_DATA) public data: User,
@@ -37,6 +39,15 @@ export class FirstPopupComponent {
   ) {
     this.user = data;
     this.avatar = data.avatar;
+  }
+
+  ngOnInit() {
+    // Check if today is Christmas (December 25)
+    const today = new Date();
+    const christmasDate = new Date(today.getFullYear(), 11, 25);
+
+    // If the current date is on or before Christmas, show Christmas content
+    this.isChristmas = today <= christmasDate;
   }
 
   submitForm() {
@@ -66,10 +77,12 @@ export class FirstPopupComponent {
 
     this.dialogRef.close();
   }
+
   selectRadio(value: string) {
     this.form.controls.privacy.setValue(value);
     this.form.controls.privacy.markAsTouched();
   }
+
   get privacy() {
     return this.form.get("privacy").value;
   }
