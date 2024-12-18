@@ -22,6 +22,7 @@ export class User implements Deserializable {
     this.affiliation = input.affiliation ?? "Nothing";
     this.keywords = input.keywords ?? null;
     this.links = input.links ?? null;
+    this.newLogin = input.isNewLogin ?? false;
     return this;
   }
 
@@ -41,7 +42,7 @@ export class User implements Deserializable {
   affiliation?: string
   keywords?: [string];
   links?: Array<{name: string; url: URL }>
-
+  newLogin?: boolean;
 
   generate_avatar(scale = 80, radius = 50): URL {
     if (this.avatar) {
@@ -77,16 +78,26 @@ export class UpdateUser implements Deserializable, Serializable {
     if (this.privacy) {
       payload.privacy = this.privacy;
     }
+    if (this.isNewLogin !== null) {
+      payload.isNewLogin = this.isNewLogin;
+    }
+    if (this.acceptsEmails !== null) {
+      payload.acceptsEmails = this.acceptsEmails;
+    }
+
     return payload;
   }
   deserialize(input: any): this {
     this.email = input.email ?? null;
     this.privacy = input.privacy ?? null;
     this.orcid_id = input.orcid_id;
-
+    this.isNewLogin = input.isNewLogin ?? null;
+    this.acceptsEmails = input.acceptsEmails ?? null;
     return this;
   }
   email?: string;
   privacy?: "public" | "private";
   orcid_id: string;
+  isNewLogin?: boolean
+  acceptsEmails?: boolean
 }

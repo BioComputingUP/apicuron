@@ -16,15 +16,26 @@ export class FirstLoginDialog implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.auth.loginEvent$
       .pipe(
-        tap((user) => {
-          console.log("FLC:", user.orcid_id);
+        tap((loginData) => {
+          console.log("FLC:", loginData.user.orcid_id);
         }),
-        filter((user) => user.firstTimeLogin()),
+        filter((loginData) => true ),
         takeUntil(this.destroy$)
       )
-      .subscribe((user) => {
-        this.openDialog(user);
+      .subscribe((loginData) => {
+        this.openDialog(loginData.user);
       });
+
+      // .pipe(
+      //   tap((loginData) => {
+      //     console.log("FLC:", loginData.user.orcid_id);
+      //   }),
+      //   filter((loginData) => loginData.isNew ),
+      //   takeUntil(this.destroy$)
+      // )
+      // .subscribe((loginData) => {
+      //   this.openDialog(loginData.user);
+      // });
   }
   ngOnDestroy(): void {
     this.destroy$.next();

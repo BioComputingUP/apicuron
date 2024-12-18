@@ -23,6 +23,7 @@ import { FirstLoginDialog } from "./first-login/first-login.component";
 import { DialogModule } from "@angular/cdk/dialog";
 import { ReactiveFormsModule } from "@angular/forms";
 import { FirstPopupComponent } from "./first-login/first-popup/first-popup.component";
+import { DashboardModule } from "./dashboard/dashboard.module";
 @NgModule({
   declarations: [AppComponent, PageNotFoundComponent, MainLayoutComponent, FirstLoginDialog, FirstPopupComponent],
   imports: [
@@ -41,6 +42,7 @@ import { FirstPopupComponent } from "./first-login/first-popup/first-popup.compo
     HttpClientModule,
     NavbarComponent,
     FootComponent,
+    DashboardModule,
     DialogModule,
     AngularSvgIconModule.forRoot(),
     // popper Integration
