@@ -44,7 +44,10 @@ export class FirstPopupComponent implements OnInit {
   ngOnInit() {
     // Check if today is Christmas (December 25)
     const today = new Date();
-    const christmasDate = new Date(today.getFullYear(), 11, 25);
+    const christmasDate = new Date(2024, 11, 25);
+
+    console.log(christmasDate);
+    console.log(today);
 
     // If the current date is on or before Christmas, show Christmas content
     this.isChristmas = today <= christmasDate;
