@@ -17,6 +17,7 @@ async function bootstrap() {
 		{
 			$set: {
 				isNewLogin: true,
+				acceptsEmails: true,
 			},
 		},
 	);
