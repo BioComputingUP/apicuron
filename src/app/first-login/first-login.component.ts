@@ -14,6 +14,21 @@ export class FirstLoginDialog implements OnInit, OnDestroy {
   constructor(public dialog: Dialog, protected auth: AuthService) {}
 
   ngOnInit(): void {
+
+    //Debug
+    // const test_user = {
+    //   orcid_id: "000000000",
+    //   displayedName: "Albert Einstein",
+    //   affiliation: "Humanity",
+    //   privacy: "public",
+      
+    //   generate_avatar() {
+    //     return "/assets/user.png";
+    //   }
+    // }
+    // this.openDialog(test_user);
+    //End Debug
+  
     this.auth.loginEvent$
       .pipe(
         tap((loginData) => {

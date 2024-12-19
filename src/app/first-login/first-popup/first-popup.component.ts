@@ -14,7 +14,7 @@ import { UpdateUser, User } from "src/app/models/User.model";
 @Component({
   selector: "first-login-popup",
   templateUrl: "./first-popup.component.html",
-  styleUrls: ['./first-popup.component.scss']
+  styleUrls: ["./first-popup.component.scss"],
 })
 export class FirstPopupComponent implements OnInit {
   isChristmas: boolean = false;
@@ -23,7 +23,13 @@ export class FirstPopupComponent implements OnInit {
     privacy: FormControl<string>;
     acceptsEmails: FormControl<boolean>;
   }> = this.formBuilder.group({
-    email: ["", Validators.email],
+    email: [
+      "",
+      [
+        Validators.email,
+        Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"),
+      ],
+    ],
     privacy: ["public", Validators.pattern(new RegExp("private|public"))],
     acceptsEmails: [true],
   });

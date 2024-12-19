@@ -37,7 +37,7 @@
 
         <div class="tw-grid tw-grid-cols-1 tw-gap-2 tw-justify-items-start">
           <small class="tw-text-sm tw-text-red-500 tw-font-medium"
-            *ngIf="email.errors?.['email'] && (email.dirty || email.touched)">Please enter a valid email
+            *ngIf="(email.errors?.['email'] || email.errors?.['pattern']) && (email.dirty || email.touched)">Please enter a valid email
             address.</small>
         </div>
 
