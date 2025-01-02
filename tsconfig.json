@@ -16,6 +16,8 @@
 		"baseUrl": "./",
 		"incremental": true,
 		"skipLibCheck": true,
+		"lib": ["es2015", "DOM", "DOM.Iterable"],
+		"types": ["node"],
 		"strictNullChecks": false,
 		"noImplicitAny": false,
 		"strictBindCallApply": false,
