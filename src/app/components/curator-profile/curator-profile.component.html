@@ -1,56 +1,24 @@
-<div class="tw-py-2 sm:tw-py-4 tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap" [ngClass]="{'tw-justify-center': !(userInfo$ | async)}">
-    <div class="sm:tw-flex-none tw-flex-1 tw-flex tw-flex-col tw-px-4 tw-w-full sm:tw-w-auto" *ngIf="curatorObs$ | async as curator">
-        <!-- <input #fileInput type="file" class="tw-hidden" (change)="onFileSelected($event)" id=""> -->
+<div class="tw-py-2 sm:tw-py-4 tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap"
+    [ngClass]="{'tw-justify-center': !(userInfo$ | async)}">
+
+    <div class="sm:tw-flex-none tw-flex-1 tw-flex tw-flex-col tw-px-4 tw-w-full sm:tw-w-auto"
+        *ngIf="curatorObs$ | async as curator">
         <img [src]="curator.generate_avatar()"
             class="tw-w-24 tw-h-24 tw-mx-auto tw-rounded-full tw-bg-gray-50 tw-border-2 tw-border-gray-150" alt="">
-        <h2 class="tw-text-center tw-font-bold tw-font-dm-sans tw-text-2xl tw-whitespace-nowrap">{{
-            curator.displayedName }}
+        <h2 class="tw-text-center tw-font-bold tw-font-dm-sans tw-text-2xl tw-whitespace-nowrap">
+            {{ curator.displayedName }}
         </h2>
         <div class="tw-flex tw-flex-row tw-justify-center">
             <a [href]="curator.orcid_url()">
-                <img class="tw-w-6 tw-mx-auto" src="https://orcid.org/assets/vectors/orcid.logo.icon.svg" alt="" srcset="">
+                <img class="tw-w-6 tw-mx-auto" src="https://orcid.org/assets/vectors/orcid.logo.icon.svg" alt=""
+                    srcset="">
             </a>
         </div>
     </div>
-    <!-- <table class="tw-table-auto">
-        <tbody>
-            <tr *ngIf="keywords$ | async as keywords">
-                <td class="tw-font-bold tw-text-base sm:tw-text-lg">
-                    Keywords
-                </td>
-                <td>
-                    <span *ngFor="let keyword of keywords"
-                        class="tw-px-2 tw-py-1 tw-mr-1 tw-whitespace-nowrap tw-cursor-default tw-text-sm tw-bg-apicuron-purple tw-text-white tw-font-bold tw-font-dm-sans tw-rounded-full">
-                        {{ keyword }}
-                    </span>
-                </td>
-            </tr>
-            <tr *ngIf="profileLinks$ | async as orcid_links">
-                <td class="tw-font-bold tw-text-base sm:tw-text-lg tw-whitespace-nowrap">
-                    Social Links
-                </td>
-                <td>
-                    <a *ngFor="let url of orcid_links"
-                        class="tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer tw-underline tw-mr-3"
-                        [href]="url.value.href">
-                        {{ url.name }}
-                    </a>
-                </td>
-            </tr>
-            <tr *ngIf="biography$ | async as biography">
-                <td class="tw-font-bold tw-text-base sm:tw-text-lg">
-                    Biography
-                </td>
-                <td>
-                    <p class="tw-leading-relaxed tw-tracking-wider tw-text-justify tw-text-base">
-                        {{ biography }}
-                    </p>
-                </td>
-            </tr>
-        </tbody>
-    </table> -->
+
     <ng-container *ngIf="userInfo$ | async">
         <div class="tw-grid tw-grid-cols-1 tw-gap-4 sm:tw-mb-4 sm:tw-px-2">
+
             <div *ngIf="biography$ | async as biography"
                 class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
                 <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Biography</div>
@@ -60,6 +28,7 @@
                     </p>
                 </div>
             </div>
+
             <div *ngIf="employment$ | async as employment"
                 class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
                 <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Place of Work</div>
@@ -69,6 +38,7 @@
                     </p>
                 </div>
             </div>
+
             <div *ngIf="keywords$ | async as keywords"
                 class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
                 <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Keywords</div>
@@ -79,19 +49,17 @@
                     </span>
                 </div>
             </div>
+
             <div *ngIf="profileLinks$ | async as orcid_links"
                 class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
                 <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Social Links</div>
                 <div class="tw-ml-2 tw-flex tw-justify-center tw-flex-wrap">
-                    <a *ngFor="let url of orcid_links" class="tw-text-blue-500 tw-cursor-pointer tw-underline tw-mr-3" [href]="url.value.href">
+                    <a *ngFor="let url of orcid_links" class="tw-text-blue-500 tw-cursor-pointer tw-underline tw-mr-3"
+                        [href]="url.value.href">
                         <ng-container *ngIf="!url.error">
                             <img [src]="'assets/social-links/' + url.host + '.svg'"
-                                [popper]="url.name" [popperTrigger]="'hover'"
-                                [popperDisableStyle]="false" 
-                                [popperPlacement]="'top'" 
-                                [popperApplyClass]="'tw-bg-white'"
-                                (error)="url.error = true"
-                                onerror="this.style.display='none'" >
+                                (mouseenter)="openTooltip($event, url.name)" (mouseleave)="closeTooltip()"
+                                (error)="url.error = true" onerror="this.style.display='none'">
                         </ng-container>
                         <ng-container *ngIf="url.error">
                             <span>{{ url.name }}</span>
@@ -99,6 +67,14 @@
                     </a>
                 </div>
             </div>
+
         </div>
     </ng-container>
+
 </div>
+
+<ng-template #tooltipTemplate let-tooltipContent>
+    <div class="custom-tooltip">
+        {{ tooltipContent }}
+    </div>
+</ng-template>

@@ -118,50 +118,31 @@ export class ManageMedalsComponent implements OnInit {
       })
     );
 
-    // this.medals$ = combineLatest([
-    //   this.medalsList$,
-    //   this.updateMedal$.pipe(startWith(<string>null)),
-    // ]).pipe(
-    //   map(([medals, update]: [Paginated<MedalDef>, MedalListUpdate]) => {
-    //     if (update != null) {
-    //       if (update.operation == "create") {
-    //         medals.data = [...medals.data, update.medal];
-    //       }
-    //       if (update.operation == "update") {
-    //         const index = medals.data.findIndex(
-    //           ({ name, resource_id }) =>
-    //             name == update.medal.name &&
-    //             update.medal.resource_id == resource_id
-    //         );
-    //         if (index != -1) {
-    //           medals.data[index] = update.medal;
-    //         }
-    //       }
-    //       if (update.operation == "delete") {
-    //         medals.data = medals.data.filter(
-    //           (medal) => medal.name != update.medal.name
-    //         );
-    //       }
-    //     }
-    //     return medals;
-    //   })
-    // );
-
     this.medals$ = this.medalsList$.pipe(
-      switchMap((medals: Paginated<MedalDef>) =>
-        this.updateMedal$.pipe(
-          startWith(medals),
-          scan((medals: Paginated<MedalDef>, update: MedalListUpdate) =>
-            this.applyMedalUpdates(medals, update)
-          )
-        )
+      switchMap(
+        (medals: Paginated<MedalDef>): Observable<Paginated<MedalDef>> => {
+          const medalList$: Observable<Paginated<MedalDef>> =
+            this.updateMedal$.pipe(
+              startWith(medals as Paginated<MedalDef>),
+              scan(
+                (
+                  medals: Paginated<MedalDef>,
+                  update: MedalListUpdate
+                ): Paginated<MedalDef> => this.applyMedalUpdates(medals, update)
+              )
+            ) as Observable<Paginated<MedalDef>>;
+          return medalList$;
+        }
       )
     );
   }
 
   ngOnInit(): void {}
 
-  applyMedalUpdates(medals: Paginated<MedalDef>, update: MedalListUpdate) {
+  applyMedalUpdates(
+    medals: Paginated<MedalDef>,
+    update: MedalListUpdate
+  ): Paginated<MedalDef> {
     switch (update.operation) {
       case "create":
         return {

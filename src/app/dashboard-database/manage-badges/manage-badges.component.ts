@@ -146,7 +146,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
           scan((badges: Paginated<BadgeDef>, update: BadgeListUpdate) => {
             return this.applyBadgeUpdates(badges, update);
           })
-        );
+        ) as Observable<Paginated<BadgeDef>>;
       })
     );
   }
