@@ -1,25 +1,17 @@
-<div class="tw-mx-[10%] tw-p-2 tw-border">
+<div class="tw-mx-[7%] tw-p-2 ">
   <div *ngIf="users_list_response$ | async as users_list_response">
-    <div *ngIf="entries$ | async as entries">
-      <curator-search
-        (urlStringEvent)="update_curator_list($event)"
-      ></curator-search>
-
-      <div
-        class="tw-font-dm-sans tw-font-extrabold tw-my-4 tw-text-3xl tw-pl-2"
-      >
+    <div class="tw-mt-5" *ngIf="entries$ | async as entries">
+      <div class="tw-font-dm-sans tw-font-extrabold tw-my-4 tw-text-3xl tw-pl-2">
         Curators
       </div>
-      <div class="tw-grid tw-grid-cols-3 tw-gap-4">
+      <curator-search (urlStringEvent)="update_curator_list($event)"></curator-search>
+      <div class="tw-mt-5 tw-grid tw-gap-4 sm:tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3">
         <div *ngFor="let entry of entries">
           <app-registry-card [entry]="entry"></app-registry-card>
         </div>
       </div>
       <div class="tw-grid tw-w-full tw-justify-center tw-m-4">
-        <pagination
-          [paginated]="users_list_response"
-          (pageChanged)="pageChanged($event)"
-        ></pagination>
+        <pagination [paginated]="users_list_response" (pageChanged)="pageChanged($event)"></pagination>
       </div>
     </div>
   </div>

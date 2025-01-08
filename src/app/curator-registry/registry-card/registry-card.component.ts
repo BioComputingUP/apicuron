@@ -10,13 +10,13 @@ export class RegistryCardComponent implements OnInit {
   showContributions: boolean = false;
   showGroups = [];
   @Input() entry: RegistryEntry;
-  
+
   ngOnInit(): void {
     this.showGroups = new Array(this.getContributions().length).fill(false);
   }
-  getContributions(){   
+  getContributions(){
     return this.entry.contributed_to ?? [];
-    
+
   }
   toggleGroups(index) {
     this.showGroups[index] = !this.showGroups[index];

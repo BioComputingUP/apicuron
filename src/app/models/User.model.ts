@@ -44,9 +44,9 @@ export class User implements Deserializable {
 
 
   generate_avatar(scale = 80, radius = 50): URL {
-    if (this.avatar) {
-      return new URL(this.avatar, environment.ws + "/");
-    }
+    // if (this.avatar) {
+    //   return new URL(this.avatar, environment.ws + "/");
+    // }
     const hash = encodeURIComponent(this.displayedName);
     const defaultImage = encodeURIComponent(
       `https://api.dicebear.com/5.x/identicon/png/seed=${hash}&scale=${scale}&radius=${radius}`
@@ -58,6 +58,7 @@ export class User implements Deserializable {
     return new URL(this.orcid_id, environment.orcid_main_url);
   }
 }
+
 
   // upload_avatar(scale = 80, radius = 50): URL {
 

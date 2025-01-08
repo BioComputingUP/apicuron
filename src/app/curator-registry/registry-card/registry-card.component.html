@@ -1,63 +1,56 @@
 <div
-  class="tw-p-5 tw-flex tw-flex-col tw-border tw-h-full tw-bg-slate-100 tw-drop-shadow-lg tw-rounded-xl tw-transition-all tw-duration-300 tw-ease-in-out hover:tw-border-violet-400"
->
-  <div class="tw-grid tw-grid-cols-9 tw-gap-2">
-    <img
-      class="tw-w-20 tw-aspect-square tw-col-span-1"
-      [src]="entry.curator.generate_avatar()"
-      alt="Curator Avatar"
-    />
-    <div class="tw-col-span-8">
-      <h2>{{ entry.curator.orcid_id }}</h2>
-      <a
-        class="tw-font-extrabold tw-text-xl tw-text-slate-800 hover:tw-text-slate-600 hover:tw-underline"
-        [routerLink]="['/curators', entry.curator.orcid_id]"
-      >
+  class="tw-p-5 tw-flex tw-flex-col tw-h-full tw-bg-white tw-drop-shadow-sm tw-rounded-md tw-transition-all tw-duration-300 tw-ease-in-out hover:tw-border-violet-400">
+  <!-- First row: Avatar -->
+  <div class="tw-grid tw-grid-cols-1 tw-gap-2 tw-my-2">
+    <img class="tw-aspect-square tw-mx-auto tw-border tw-rounded-full" style="width: 70px; height:auto;"
+      [src]="entry.curator.generate_avatar()" alt="Curator Avatar" />
+  </div>
+
+  <!-- Second row: Curator information -->
+  <div class="tw-grid tw-gap-2 tw-text-center">
+    <div>
+      <a class="tw-font-extrabold tw-text-xl tw-text-slate-800 hover:tw-text-slate-600 hover:tw-underline"
+        [routerLink]="['/curators', entry.curator.orcid_id]">
         {{ entry.curator.displayedName }}
       </a>
+    </div>
+    <div>
+      <p>{{ entry.curator.orcid_id }}<a [href]="entry.curator.orcid_url()" target="_blank"
+          class="tw-cursor-pointer tw-align-top">
+          <img class="tw-ml-2 tw-inline tw-h-6 tw-w-6" src="https://orcid.org/assets/vectors/orcid.logo.icon.svg" alt=""
+            role="tooltip">
+        </a></p>
       <p>{{ entry.curator.affiliation }}</p>
     </div>
   </div>
-  <div
-    [ngClass]="{
-      'tw-h-0 tw-hidden tw-opacity-0': !showContributions,
-      'tw-h-auto tw-block tw-opacity-100': showContributions
-    }"
-    class="tw-my-2 tw-transition-all tw-duration-1000 tw-ease-out"
-  >
-    <div class="tw-grid tw-grid-cols-3 tw-gap-2 tw-justify-items-center">
-      <h3 class="tw-font-bold tw-text-lg tw-col-span-full">
-        Contributions
-      </h3>
-      <div
-        *ngFor="let contribution of getContributions(); let i = index"
-        class="tw-font-dm-sans tw-bg-[#edebf2] tw-rounded tw-px-2 tw-py-2 tw-w-full"
-      >
-        <img
-          [src]="contribution.resource.logo"
-          class="tw-h-5 tw-cursor-pointer"
-          (click)="toggleGroups(i)"
-          alt="Resource Logo"
-        />
-        <ul
-          [ngClass]="{
+
+  <!-- Third row: Contributions and Resources -->
+  <!-- <div class="tw-grid tw-grid-cols-2 tw-gap-2 tw-justify-items-center">
+    <div *ngFor="let contribution of getContributions(); let i = index"
+      class="tw-font-dm-sans tw-bg-[#edebf2] tw-rounded tw-px-2 tw-py-2 tw-w-full">
+      <img [src]="contribution.resource.logo" class="tw-h-5 tw-cursor-pointer" (click)="toggleGroups(i)"
+        alt="Resource Logo" />
+
+      <ul [ngClass]="{
             'tw-max-h-0': !showGroups[i],
             'tw-max-h-screen': showGroups[i]
-          }"
-          class="tw-transition-all tw-duration-200 tw-ease-out tw-overflow-hidden tw-pl-4"
-        >
-          <li *ngFor="let group of contribution.groups">
-            {{ group.displayedName }}
-          </li>
-        </ul>
+          }" class="tw-transition-all tw-duration-200 tw-ease-out tw-overflow-hidden tw-pl-4">
+        <li *ngFor="let group of contribution.groups">
+          {{ group.displayedName }}
+        </li>
+      </ul>
+
+    </div>
+  </div> -->
+  <div class="tw-my-2 tw-transition-all tw-duration-1000 tw-ease-out">
+    <div class="tw-flex tw-flex-wrap tw-gap-2 tw-justify-center">
+      <div *ngFor="let contribution of getContributions(); let i = index"
+        class="tw-font-dm-sans tw-bg-gray-100 tw-rounded-full tw-px-5 tw-py-2 tw-max-w-xs">
+        <img src="https://disprot.org/assets/DisProt_prot_vect_brownonly.svg" class="tw-h-6 tw-cursor-pointer"
+          (click)="toggleGroups(i)" alt="Resource Logo" />
       </div>
     </div>
   </div>
-  <button
-    class="tw-w-full tw-py-2 tw-px-4 tw-bg-slate-300 tw-rounded tw-text-sm tw-font-bold tw-text-slate-600 hover:tw-text-slate-700"
-    (click)="showContributions = !showContributions"
-  >
-    {{ showContributions ? "Hide" : "Show" }} Contributions
-  </button>
-</div>
 
+
+</div>
