@@ -66,7 +66,7 @@ export class ComputeMonthlyStatsService {
 			setObj.last_contribution = report.timestamp;
 		}
 		try {
-			await this.monthlyStatsModel.findOneAndUpdate(
+			const result = await this.monthlyStatsModel.findOneAndUpdate(
 				relatedMonthlyStatFilter,
 				{
 					$inc: {
@@ -85,6 +85,8 @@ export class ComputeMonthlyStatsService {
 					new: true,
 				},
 			);
+			// this.logger.log(`${result.curator_orcid}: ${result.total_score}`);
+			return result;
 		} catch (err) {
 			if (err instanceof MongoServerError && err.code == 11000) {
 				await this.applyReport(report, term, resource, curator);
@@ -183,7 +185,7 @@ export class ComputeMonthlyStatsService {
 			// update the count, score and totalScore
 			currentStat[`${activity_category}_count`] += reportAgg.count;
 			currentStat[`${activity_category}_score`] += reportAgg.count * score;
-			currentStat.total_score += reportAgg.count * score;
+			// currentStat.total_score += reportAgg.count * score;
 
 			currentStat.privacy = privacy as PrivacyType;
 		}

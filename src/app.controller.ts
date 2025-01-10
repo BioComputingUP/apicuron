@@ -43,7 +43,7 @@ export class AppController {
 
 	@Get('jsonschema')
 	async getJsonSchema() {
-		console.log(test);
+		console.log();
 		return 'hello';
 	}
 }
