@@ -93,7 +93,8 @@ export class LeagueService {
 				league_name: leagueUpdate.name,
 			},
 		);
-		const oldValue = league.$clone() ;
+		const oldValue = league.$clone();
+
 		if (!!leagueUpdate.defaultMembers) {
 			const errors: BadRequestException[] = [];
 			for (const member of leagueUpdate.defaultMembers) {

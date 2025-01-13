@@ -37,6 +37,17 @@ export class ReportValidatorService {
 		report: SubmitReportDto,
 		resource: PartnerResourceDocument,
 	): League {
+		if (!!report.league) {
+			const selectedLeague = resource.leagues.find(
+				(l) => l.name === report.league,
+			);
+			if (!selectedLeague) {
+				throw new BadRequestException(
+					`League ${report.league} does not exist for resource ${report.resource_id}`,
+				);
+			}
+			return selectedLeague;
+		}
 		// check if the user belongs to a league
 		for (const league of resource.leagues) {
 			if (league.defaultMembers.includes(report.curator_orcid)) {
@@ -44,7 +55,7 @@ export class ReportValidatorService {
 			}
 		}
 		// if not, use the default league
-		const name = report.league ?? resource.defaultLeague;
+		const name = resource.defaultLeague;
 		const selectedLeague = resource.leagues.find((l) => l.name === name);
 		if (!selectedLeague) {
 			throw new BadRequestException(
@@ -66,17 +77,16 @@ export class ReportValidatorService {
 		report: SubmitReportDto,
 		termDoc: TermDocument = null,
 	) {
-		const { resource_id, activity_term, league } = report;
+		const { resource_id, activity_term } = report;
 		const term =
 			termDoc ??
 			(await this.termModel.findOne({
 				resource_id,
 				activity_term,
-				league,
 			}));
 		if (!term) {
 			throw new BadRequestException(
-				`Activity (${activity_term}) does not exist for resource ${resource_id} and league ${league}`,
+				`Activity (${activity_term}) does not exist for resource ${resource_id}.`,
 			);
 		}
 		return { report, term };

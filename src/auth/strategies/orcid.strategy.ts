@@ -53,7 +53,7 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 				const userAffiliation =
 					userRecord?.data?.['activities-summary']?.employments[
 						'affiliation-group'
-					]?.[0].summaries?.[0]?.['employment-summary'].organization?.name;
+					]?.[0]?.summaries?.[0]?.['employment-summary'].organization?.name;
 				const userLinks = userRecord?.data?.person?.['researcher-urls']?.[
 					'researcher-url'
 				].map((link) => {
@@ -78,7 +78,6 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 						keywords: userKeywords,
 						affiliation: userAffiliation,
 						links: userLinks,
-						lastLoginDate: new Date()
 					});
 
 					done(null, user);
