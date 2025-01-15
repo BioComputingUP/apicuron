@@ -19,12 +19,12 @@ export class ComputeAllMetricsTask {
 
 		const statPromises = resources.map(
 			async ({ resource_id }: PartnerResource) => {
-				await this.computeAchievementsTask.run_task({
-					arguments: [resource_id],
-				});
-				return await this.computeStatisticsTask.run_task({
-					arguments: [resource_id],
-				});
+				// await this.computeAchievementsTask.run({
+				// 	arguments: [resource_id],
+				// });
+				// return await this.computeStatisticsTask.run({
+				// 	arguments: [resource_id],
+				// });
 			},
 		);
 

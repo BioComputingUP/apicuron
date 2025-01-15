@@ -1,42 +1,76 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 import { ComputeStatisticsService } from '../../statistics/compute-statistics/compute-statistics.service';
+import { Command, Option } from 'nest-commander';
+import { Task } from '../interfaces/task.abstract';
 
-@Injectable()
-export class ComputeStatisticsTask {
+interface ComputeStatisticsTaskArgs {
+	resource_id: string;
+	orcid_id?: string;
+}
+@Command({
+	name: 'compute_stats',
+	description: 'Compute statistics for a resource',
+})
+export class ComputeStatisticsTask extends Task {
 	constructor(
 		protected partnerResourceService: PartnerResourcesService,
 		protected computeStatistics: ComputeStatisticsService,
-	) {}
+	) {
+		super();
+	}
 
-	logger = new Logger(ComputeStatisticsTask.name);
-
-	public async run_task(task_arg: TaskArgument) {
-		if (task_arg.logLevel) {
-			this.logger.localInstance.setLogLevels(task_arg.logLevel);
-		}
-		const [resource_id, orcid_id] = task_arg.arguments;
-
+	public async run(extraArgs: string[], task_arg: ComputeStatisticsTaskArgs) {
+		
+		const {resource_id, orcid_id} = task_arg;
+		this.logger.log(`Running ComputeStatisticsTask with ${JSON.stringify(task_arg, null, 2)}`);
 		const resource = await this.partnerResourceService.get_resource(
 			resource_id,
 		);
 
 		if (!resource) {
 			this.logger.error(`Resource ${resource_id} not found ! Aborting`);
-			return;
+			throw new NotFoundException(`Resource ${resource_id} not found\n`);
 		}
-		if (orcid_id) {
+		try {
+			if (orcid_id) {
+				await this.computeStatistics.computeStatistics({
+					resource_id: resource.resource_id,
+					curator_orcid: orcid_id,
+				});
+			}
 			await this.computeStatistics.computeStatistics({
 				resource_id: resource.resource_id,
-				curator_orcid: orcid_id,
-			});
+			});			
+		} catch (error) {
+			this.logger.error(error);
+			return;
 		}
-		await this.computeStatistics.computeStatistics({
-			resource_id: resource.resource_id,
-		});
 	}
+	@Option({
+		name: 'resource_id',
+		flags: '-r, --resource_id <resource_id>',
+		description: 'Resource ID for which to compute stats',
+		required: true,
+	})
+	parseResource(val: string) {
+		return val;
+	}
+
+	@Option({
+		name: 'orcid_id',
+		flags: '-o, --orcid_id <orcid_id>',
+		description: 'Orcid ID for which to compute stats (optional)',
+		required: false,
+	})
+	parseOrcid(val: string) {
+		return val;
+	}
+
+	
+
 }

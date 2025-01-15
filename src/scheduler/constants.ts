@@ -14,3 +14,10 @@ export interface TaskRunOptions {
 	port: number;
 	file?: string;
 }
+
+export type BasicTaskArgs = {
+	resource_id: string;
+};
+export type TaskArgs = BasicTaskArgs & {
+	orcid_id: string;
+};

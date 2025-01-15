@@ -22,6 +22,8 @@ const Tasks = [
 	ComputeBadgesTask,
 	ComputeMedalsTask,
 	SubmitBulkTask,
+	ComputeAchievementsTask,
+	ComputeStatisticsTask,
 ]
 
 @Module({

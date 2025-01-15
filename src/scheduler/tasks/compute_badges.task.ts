@@ -4,11 +4,9 @@ import { BadgeAggregatorService } from '../../badges/services/badge-aggregator.s
 import { UsersService } from '../../auth/users/services/users.service';
 import { Command, Option } from 'nest-commander';
 import { Task } from '../interfaces/task.abstract';
+import { TaskArgs } from '../constants';
 
-interface computeBadgesTaskArgs {
-	resource_id: string;
-	orcid_id?: string;
-}
+
 @Command({
 	name: 'compute_badges',
 	description:
@@ -25,7 +23,7 @@ export class ComputeBadgesTask extends Task {
 
 	public async run(
 		extraArgs: string[],
-		taskArgs: computeBadgesTaskArgs,
+		taskArgs: TaskArgs,
 	): Promise<void> {
 		this.logger.debug(`Running Compute Badges Task with args: ${JSON.stringify(taskArgs, null, 2)}`);
 		this.logger.debug(`Extra Args: ${extraArgs}`);

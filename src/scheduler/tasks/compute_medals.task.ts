@@ -3,10 +3,9 @@ import { PartnerResourcesService } from '../../resources/partner-resources/servi
 import { MedalAggregatorService } from '../../medals/services/medal-aggregator.service';
 import { Command, Option } from 'nest-commander';
 import { Task } from '../interfaces/task.abstract';
+import { BasicTaskArgs } from '../constants';
 
-interface ComputeMedalsTaskArgs {
-	resource_id: string;
-}
+
 @Command({
 	name: 'compute_medals',
 	description: 'Computes medals for a resource',
@@ -18,7 +17,7 @@ export class ComputeMedalsTask extends Task {
 	) {
 		super();
 	}
-	public async run(extraArgs: string[], task_arg: ComputeMedalsTaskArgs) {
+	public async run(extraArgs: string[], task_arg: BasicTaskArgs) {
 		const resource_id = task_arg.resource_id;
 		const resource = await this.partnerResourceService.get_resource(
 			resource_id,
