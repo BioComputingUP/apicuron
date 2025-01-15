@@ -31,65 +31,67 @@ import { MedalsModule } from '../medals/medals.module';
 	],
 	providers: [
 		SchedulerService,
+		ComputeBadgesTask,
 
-		{
-			provide: 'task:submit_report',
-			useClass: SubmitBulkTask,
-		},
-		{
-			provide: 'task:compute_badges',
-			useClass: ComputeBadgesTask,
-		},
-		{
-			provide: 'task:compute_medals',
-			useClass: ComputeMedalsTask,
-		},
-		{
-			provide: 'task:compute_achievements',
-			useClass: ComputeAchievementsTask,
-		},
-		{
-			provide: 'task:compute_statistics',
-			useClass: ComputeStatisticsTask,
-		},
-		{
-			provide: 'task:compute_all_metrics',
-			useClass: ComputeAllMetricsTask,
-		},
-		{
-			provide: 'task:submit-orcid',
-			useClass: OrcidSubmissionTask,
-		},
+		// {
+		// 	provide: 'task:submit_report',
+		// 	useClass: SubmitBulkTask,
+		// },
+		// {
+		// 	provide: 'task:compute_badges',
+		// 	useClass: ComputeBadgesTask,
+		// },
+		// {
+		// 	provide: 'task:compute_medals',
+		// 	useClass: ComputeMedalsTask,
+		// },
+		// {
+		// 	provide: 'task:compute_achievements',
+		// 	useClass: ComputeAchievementsTask,
+		// },
+		// {
+		// 	provide: 'task:compute_statistics',
+		// 	useClass: ComputeStatisticsTask,
+		// },
+		// {
+		// 	provide: 'task:compute_all_metrics',
+		// 	useClass: ComputeAllMetricsTask,
+		// },
+		// {
+		// 	provide: 'task:submit-orcid',
+		// 	useClass: OrcidSubmissionTask,
+		// },
 	],
 	exports: [
-		{
-			provide: 'task:submit_report',
-			useClass: SubmitBulkTask,
-		},
-		{
-			provide: 'task:compute_badges',
-			useClass: ComputeBadgesTask,
-		},
-		{
-			provide: 'task:compute_medals',
-			useClass: ComputeMedalsTask,
-		},
-		{
-			provide: 'task:compute_achievements',
-			useClass: ComputeAchievementsTask,
-		},
-		{
-			provide: 'task:compute_statistics',
-			useClass: ComputeStatisticsTask,
-		},
-		{
-			provide: 'task:compute_all_metrics',
-			useClass: ComputeAllMetricsTask,
-		},
-		{
-			provide: 'task:submit-orcid',
-			useClass: OrcidSubmissionTask,
-		},
+		ComputeBadgesTask,
+		// {
+		// 	provide: 'task:submit_report',
+		// 	useClass: SubmitBulkTask,
+		// },
+		// {
+		// 	provide: 'task:compute_badges',
+		// 	useClass: ComputeBadgesTask,
+		// },
+		// {
+		// 	provide: 'task:compute_medals',
+		// 	useClass: ComputeMedalsTask,
+		// },
+		// {
+		// 	provide: 'task:compute_achievements',
+		// 	useClass: ComputeAchievementsTask,
+		// },
+		// {
+		// 	provide: 'task:compute_statistics',
+		// 	useClass: ComputeStatisticsTask,
+		// },
+		// {
+		// 	provide: 'task:compute_all_metrics',
+		// 	useClass: ComputeAllMetricsTask,
+		// },
+		// {
+		// 	provide: 'task:submit-orcid',
+		// 	useClass: OrcidSubmissionTask,
+		// },
 	],
 	controllers: [],
 })

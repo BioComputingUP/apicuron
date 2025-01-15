@@ -1,37 +1,45 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { TaskArgument } from '../../scheduler-client/types/baseTask';
-import { User, UserDocument } from '../../core/schemas/user.schema';
 import { BadgeAggregatorService } from '../../badges/services/badge-aggregator.service';
 import { UsersService } from '../../auth/users/services/users.service';
+import { Command, Option } from 'nest-commander';
+import { Task } from '../interfaces/task.abstract';
 
-@Injectable()
-export class ComputeBadgesTask {
+interface computeBadgesTaskArgs {
+	resource_id: string;
+	orcid_id?: string;
+}
+@Command({
+	name: 'compute_badges',
+	description:
+		'Computes badges for an entire resource or a single user when specifying optional orcid_id option',
+})
+export class ComputeBadgesTask extends Task {
 	constructor(
 		protected partnerResourceService: PartnerResourcesService,
 		protected usersService: UsersService,
 		protected badgeAggregator: BadgeAggregatorService,
-	) {}
+	) {
+		super();
+	}
 
-	logger = new Logger(ComputeBadgesTask.name);
-
-	public async run_task(task_arg: TaskArgument) {
-		if (task_arg.logLevel) {
-			this.logger.localInstance.setLogLevels(task_arg.logLevel);
-		}
-		const [resource_id, orcid_id] = task_arg.arguments;
+	public async run(
+		extraArgs: string[],
+		taskArgs: computeBadgesTaskArgs,
+	): Promise<void> {
+		this.logger.debug(`Running Compute Badges Task with args: ${JSON.stringify(taskArgs, null, 2)}`);
+		this.logger.debug(`Extra Args: ${extraArgs}`);
+		const resource_id = taskArgs.resource_id;
+		const orcid_id = taskArgs.orcid_id;
+		this.logger.debug(`Running Compute Badges Task for ${resource_id}`);
 		const resource = await this.partnerResourceService.get_resource(
 			resource_id,
 		);
-
 		if (!resource) {
 			this.logger.error(`Resource ${resource_id} not found ! Aborting`);
-			return;
+			throw new NotFoundException(`Resource ${resource_id} not found\n`);
 		}
-
-		if (orcid_id) {
+		if (!!orcid_id) {
 			this.logger.log(
 				`Computing Badges for user ${orcid_id} for resource ${resource_id}`,
 			);
@@ -47,5 +55,25 @@ export class ComputeBadgesTask {
 
 			await this.badgeAggregator.applyAllReports(resource_id);
 		}
+	}
+
+	@Option({
+		name: 'resource_id',
+		flags: '-r, --resource_id <resource_id>',
+		description: 'Resource ID for which to compute badges',
+		required: true,
+	})
+	parseResource(val: string) {
+		return val;
+	}
+
+	@Option({
+		name: 'orcid_id',
+		flags: '-o, --orcid_id [orcid_id]',
+		description: 'ORCID ID for which to compute badges (in the specified resource)',
+		required: false,
+	})
+	parseOrcid(val: string) {
+		return val;
 	}
 }
