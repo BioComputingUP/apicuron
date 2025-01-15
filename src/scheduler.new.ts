@@ -1,7 +1,9 @@
 import { CommandFactory } from 'nest-commander';
 import { AppModule } from './app.module';
+import { LogLevel } from '@nestjs/common';
 async function bootstrap() {
-	await CommandFactory.run(AppModule, ['log', 'debug', 'verbose']);
+	const logLevels: LogLevel[] = ['log', 'error', 'warn', 'debug', 'verbose'];	
+	await CommandFactory.run(AppModule, logLevels);
 	process
 }
 

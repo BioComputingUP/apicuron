@@ -17,6 +17,13 @@ import { StatisticsModule } from '../statistics/statistics.module';
 import { SubmitReportModule } from '../submit-reports/submit-reports.module';
 import { BadgesModule } from '../badges/badges.module';
 import { MedalsModule } from '../medals/medals.module';
+
+const Tasks = [
+	ComputeBadgesTask,
+	ComputeMedalsTask,
+	SubmitBulkTask,
+]
+
 @Module({
 	imports: [
 		HttpModule,
@@ -30,10 +37,8 @@ import { MedalsModule } from '../medals/medals.module';
 		AuthModule,
 	],
 	providers: [
-		SchedulerService,
-		ComputeBadgesTask,
-		ComputeMedalsTask,
-
+		...Tasks,
+		
 		// {
 		// 	provide: 'task:submit_report',
 		// 	useClass: SubmitBulkTask,
@@ -64,8 +69,7 @@ import { MedalsModule } from '../medals/medals.module';
 		// },
 	],
 	exports: [
-		ComputeBadgesTask,
-		ComputeMedalsTask,
+		...Tasks,
 		// {
 		// 	provide: 'task:submit_report',
 		// 	useClass: SubmitBulkTask,

@@ -41,7 +41,7 @@ export type SubmissionProcessingReport = {
 interface SubmitBulkTaskArgs {
 	file: string;
 	orcid_id: string;
-	delete_existing: string;
+	delete_existing: string[];
 }
 @Command({
 	name: 'submit-bulk',
@@ -81,18 +81,17 @@ export class SubmitBulkTask extends Task {
 		name: 'delete_existing',
 		flags: '-d, --delete_existing <delete_existing...>',
 		description:
-			'A list of Resource Ids where the database manager specifies which resources he wishes to delete all the previous \
-			reports (effectively resubmitting everything through this bulk update). The resources are separated by spaces',
+			'A list of Resource Ids where the database manager specifies which resources he wishes to delete all the previous reports (effectively resubmitting everything through this bulk update). The resources are separated by spaces',
 		required: false,
 	})
-	parseDeleteAll(val: string, acc: string[] = []): string[] {
+	parseDeleteExisting(val: string, acc: string[] = []): string[] {
 		acc.push(val);
 		return acc;
 	}
 
 	public async run(extraArgs: string[], task_args: SubmitBulkTaskArgs) {
 		const { file, orcid_id, delete_existing } = task_args;
-
+		this.logger.log(`Running submit in bulk task with arguments: ${JSON.stringify(task_args, null, 2)}`);
 		if (delete_existing) {
 			this.logger.log(
 				`User specified resources ${delete_existing} to be deleted before proceeding`,
