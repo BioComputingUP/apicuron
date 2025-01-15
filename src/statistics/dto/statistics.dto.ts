@@ -72,6 +72,10 @@ export class StatisticsDto {
 	@ApiProperty()
 	@Expose()
 	first_contribution: Date;
+
+	@Expose()
+	@Type(() => UserEntity)
+	user: UserEntity;
 }
 
 export class StatLeaderboardDto {
