@@ -32,6 +32,7 @@ import { MedalsModule } from '../medals/medals.module';
 	providers: [
 		SchedulerService,
 		ComputeBadgesTask,
+		ComputeMedalsTask,
 
 		// {
 		// 	provide: 'task:submit_report',
@@ -64,6 +65,7 @@ import { MedalsModule } from '../medals/medals.module';
 	],
 	exports: [
 		ComputeBadgesTask,
+		ComputeMedalsTask,
 		// {
 		// 	provide: 'task:submit_report',
 		// 	useClass: SubmitBulkTask,

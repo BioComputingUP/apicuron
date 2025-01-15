@@ -40,7 +40,7 @@ export class ComputeBadgesTask extends Task {
 			throw new NotFoundException(`Resource ${resource_id} not found\n`);
 		}
 		if (!!orcid_id) {
-			this.logger.log(
+			this.logger.debug(
 				`Computing Badges for user ${orcid_id} for resource ${resource_id}`,
 			);
 
@@ -49,11 +49,12 @@ export class ComputeBadgesTask extends Task {
 				await this.badgeAggregator.applyAllReports(resource_id);
 			} else {
 				this.logger.error(`User ${orcid_id} Not found !!`);
+				throw new NotFoundException(`User ${orcid_id} Not found !!`);
 			}
 		} else {
 			this.logger.log(`Computing Badges for resource ${resource_id}`);
-
 			await this.badgeAggregator.applyAllReports(resource_id);
+			this.logger.log(`Done Computing Badges for resource ${resource_id}`);
 		}
 	}
 
