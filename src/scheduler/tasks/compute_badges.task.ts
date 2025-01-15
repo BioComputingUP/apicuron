@@ -25,11 +25,9 @@ export class ComputeBadgesTask extends Task {
 		extraArgs: string[],
 		taskArgs: TaskArgs,
 	): Promise<void> {
-		this.logger.debug(`Running Compute Badges Task with args: ${JSON.stringify(taskArgs, null, 2)}`);
-		this.logger.debug(`Extra Args: ${extraArgs}`);
+		this.logger.log(`Running Compute Badges Task with args: ${JSON.stringify(taskArgs, null, 2)}`);
 		const resource_id = taskArgs.resource_id;
 		const orcid_id = taskArgs.orcid_id;
-		this.logger.debug(`Running Compute Badges Task for ${resource_id}`);
 		const resource = await this.partnerResourceService.get_resource(
 			resource_id,
 		);
@@ -45,12 +43,12 @@ export class ComputeBadgesTask extends Task {
 			const user = await this.usersService.getByOrcid(orcid_id);
 			if (user) {
 				await this.badgeAggregator.applyAllReports(resource_id);
+				this.logger.log(`Done Computing Badges for resource ${resource_id}`);
 			} else {
 				this.logger.error(`User ${orcid_id} Not found !!`);
-				throw new NotFoundException(`User ${orcid_id} Not found !!`);
+				// throw new NotFoundException(`User ${orcid_id} Not found !!`);
 			}
 		} else {
-			this.logger.log(`Computing Badges for resource ${resource_id}`);
 			await this.badgeAggregator.applyAllReports(resource_id);
 			this.logger.log(`Done Computing Badges for resource ${resource_id}`);
 		}

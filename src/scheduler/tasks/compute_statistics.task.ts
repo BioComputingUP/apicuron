@@ -1,17 +1,10 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { NotFoundException } from '@nestjs/common';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { TaskArgument } from '../../scheduler-client/types/baseTask';
-import { User, UserDocument } from '../../core/schemas/user.schema';
 import { ComputeStatisticsService } from '../../statistics/compute-statistics/compute-statistics.service';
 import { Command, Option } from 'nest-commander';
 import { Task } from '../interfaces/task.abstract';
+import { TaskArgs } from '../constants';
 
-interface ComputeStatisticsTaskArgs {
-	resource_id: string;
-	orcid_id?: string;
-}
 @Command({
 	name: 'compute_stats',
 	description: 'Compute statistics for a resource',
@@ -24,10 +17,11 @@ export class ComputeStatisticsTask extends Task {
 		super();
 	}
 
-	public async run(extraArgs: string[], task_arg: ComputeStatisticsTaskArgs) {
-		
-		const {resource_id, orcid_id} = task_arg;
-		this.logger.log(`Running ComputeStatisticsTask with ${JSON.stringify(task_arg, null, 2)}`);
+	public async run(extraArgs: string[], task_arg: TaskArgs) {
+		const { resource_id, orcid_id } = task_arg;
+		this.logger.log(
+			`Running ComputeStatisticsTask with ${JSON.stringify(task_arg, null, 2)}`,
+		);
 		const resource = await this.partnerResourceService.get_resource(
 			resource_id,
 		);
@@ -45,7 +39,7 @@ export class ComputeStatisticsTask extends Task {
 			}
 			await this.computeStatistics.computeStatistics({
 				resource_id: resource.resource_id,
-			});			
+			});
 		} catch (error) {
 			this.logger.error(error);
 			return;
@@ -70,7 +64,4 @@ export class ComputeStatisticsTask extends Task {
 	parseOrcid(val: string) {
 		return val;
 	}
-
-	
-
 }
