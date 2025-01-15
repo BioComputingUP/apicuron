@@ -25,6 +25,8 @@ import { SubmitReportService } from '../../submit-reports/services/submit-report
 import { BulkSubmissionEvent } from '../../submit-reports/events/events';
 import { partition } from 'lodash';
 import { UserRepository } from '../../core/repositories/user.repository';
+import { Command, Option } from 'nest-commander';
+import { Task } from '../interfaces/task.abstract';
 
 export type ValidatedReport = {
 	report: SubmitReportDto;
@@ -36,9 +38,16 @@ export type SubmissionProcessingReport = {
 	total_report_count: number;
 	resource_ids: string[];
 };
-
-@Injectable()
-export class SubmitBulkTask {
+interface SubmitBulkTaskArgs {
+	file: string;
+	orcid_id: string;
+	delete_existing: string;
+}
+@Command({
+	name: 'submit-bulk',
+	description: 'Submit many reports in bulk',
+})
+export class SubmitBulkTask extends Task {
 	constructor(
 		// protected reportService: ReportsService,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
@@ -46,30 +55,57 @@ export class SubmitBulkTask {
 		protected notificationsService: NotificationsService,
 		protected eventEmitter: EventEmitter2,
 		protected submitReports: SubmitReportService,
-	) {}
+	) {
+		super();
+	}
+	@Option({
+		name: 'file',
+		flags: '-f, --file <file>',
+		description: 'JSON file containing the reports',
+		required: true,
+	})
+	parseFile(val: string) {
+		return val;
+	}
+	@Option({
+		name: 'orcid_id',
+		flags: '-o, --orcid_id <orcid_id>',
+		description: 'ORCID ID of the user submitting the reports',
+		required: true,
+	})
+	parseOrcid(val: string) {
+		return val;
+	}
 
-	logger = new Logger(SubmitBulkTask.name);
+	@Option({
+		name: 'delete_existing',
+		flags: '-d, --delete_existing <delete_existing...>',
+		description:
+			'A list of Resource Ids where the database manager specifies which resources he wishes to delete all the previous \
+			reports (effectively resubmitting everything through this bulk update). The resources are separated by spaces',
+		required: false,
+	})
+	parseDeleteAll(val: string, acc: string[] = []): string[] {
+		acc.push(val);
+		return acc;
+	}
 
-	public async run_task(task_arg: TaskArgument) {
-		const file = task_arg.file;
+	public async run(extraArgs: string[], task_args: SubmitBulkTaskArgs) {
+		const { file, orcid_id, delete_existing } = task_args;
 
-		const [orcid_id, delete_all] = task_arg.arguments;
-
-		if (delete_all && typeof delete_all == 'string') {
+		if (delete_existing) {
 			this.logger.log(
-				`User specified resources ${delete_all} to be deleted before proceeding`,
+				`User specified resources ${delete_existing} to be deleted before proceeding`,
 			);
-			const resources_delete_all: string[] = delete_all.split(',');
 
-			this.logger.log(`User specified resources ${delete_all}`);
 
-			for (let i = 0; i < resources_delete_all.length; i++) {
-				const currentResourceId = resources_delete_all[i];
+			for (let i = 0; i < delete_existing.length; i++) {
+				const currentResourceId = delete_existing[i];
 				const response = await this.reportModel.deleteMany({
 					resource_id: currentResourceId,
 				});
 				this.logger.log(
-					`Deleted ${response.deletedCount} reports from resource ${resources_delete_all[i]} before proceeding`,
+					`Deleted ${response.deletedCount} reports from resource ${delete_existing[i]} before proceeding`,
 				);
 			}
 		}
