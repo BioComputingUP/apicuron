@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import {
 	SubmitReportDto,
 	SubmitReportsDto,
@@ -14,7 +14,6 @@ import * as StreamArray from 'stream-json/streamers/StreamArray';
 import { validate, ValidationError } from 'class-validator';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 import { NotificationsService } from '../../notifications/notifications.service';
-import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { InjectModel } from '@nestjs/mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Model } from 'mongoose';

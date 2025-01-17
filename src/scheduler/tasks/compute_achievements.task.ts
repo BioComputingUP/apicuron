@@ -1,11 +1,8 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import { ComputeBadgesTask } from './compute_badges.task';
 import { ComputeMedalsTask } from './compute_medals.task';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Command, Option } from 'nest-commander';
 import { Task } from '../interfaces/task.abstract';
-import { TaskArgs } from '../constants';
+import { TaskArguments } from '../constants';
 interface ComputeAchievementsTaskArgs {
 	resource_id: string;
 	orcid_id?: string;
@@ -22,7 +19,7 @@ export class ComputeAchievementsTask extends Task {
 		super();
 	}
 
-	public async run(extraParams: string[], task_arg: TaskArgs) {
+	public async run(extraParams: string[], task_arg: Pick<TaskArguments, 'resource_id' | 'orcid_id'>) {
 		const { orcid_id } = task_arg;
 		this.logger.log(`Running ComputeAchievementsTask with ${JSON.stringify(task_arg, null, 2)}`);
 		if (orcid_id) {

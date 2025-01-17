@@ -1,7 +1,7 @@
 import { Logger, LogLevel } from '@nestjs/common';
 import { log } from 'console';
 import { CommandRunner, Option } from 'nest-commander';
-
+// TODO: add file and database and database host to general options
 /*
 To create a task:
 1. Create a class decorated with @Command that extends Task and implements the run method

@@ -15,9 +15,10 @@ export interface TaskRunOptions {
 	file?: string;
 }
 
-export type BasicTaskArgs = {
-	resource_id: string;
-};
-export type TaskArgs = BasicTaskArgs & {
+export type TaskArguments = {
+	resource_id?: string;
 	orcid_id?: string;
-};
+	file?: Express.Multer.File;
+	delete_existing?: string[];
+
+}

@@ -3,7 +3,7 @@ import { PartnerResourcesService } from '../../resources/partner-resources/servi
 import { ComputeStatisticsService } from '../../statistics/compute-statistics/compute-statistics.service';
 import { Command, Option } from 'nest-commander';
 import { Task } from '../interfaces/task.abstract';
-import { TaskArgs } from '../constants';
+import { TaskArguments } from '../constants';
 
 @Command({
 	name: 'compute_stats',
@@ -17,7 +17,7 @@ export class ComputeStatisticsTask extends Task {
 		super();
 	}
 
-	public async run(extraArgs: string[], task_arg: TaskArgs) {
+	public async run(extraArgs: string[], task_arg: Pick<TaskArguments, 'resource_id' | 'orcid_id'>) {
 		const { resource_id, orcid_id } = task_arg;
 		this.logger.log(
 			`Running ComputeStatisticsTask with ${JSON.stringify(task_arg, null, 2)}`,

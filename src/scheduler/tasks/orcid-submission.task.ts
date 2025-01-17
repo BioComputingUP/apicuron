@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { TaskArgument } from '../../scheduler-client/types/baseTask';
 import {
 	Statistics,
 	StatisticsDocument,
@@ -25,7 +24,7 @@ export class OrcidSubmissionTask {
 
 	logger = new Logger(OrcidSubmissionTask.name);
 
-	async run_task(task_args: TaskArgument) {
+	async run_task(task_args: any) {
 		const [resource_id, orcid_id] = task_args.arguments;
 
 		if (resource_id) {
