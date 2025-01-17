@@ -7,13 +7,17 @@ import { LogLevel } from '@nestjs/common';
 
 export type TaskSubmit = {
 	task_name: string;
-	task_arguments?: string;
+	task_arguments?: TaskArgumentsObject;
 	file?: Express.Multer.File;
-	parent_job?: string;
 };
 
-export type TaskArgument = {
-	file?: string;
-	arguments: any[];
-	logLevel?: LogLevel[];
+
+export type TaskArgumentsObject = {
+	[key: string]: string;
 };
+
+export enum TaskArgFlags {
+	resource_id = "-r",
+	orcid_id = "-o",
+
+}
