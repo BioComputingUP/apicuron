@@ -2,7 +2,16 @@
 <div class="tw-p-2 tw-flex-auto">
   <div class="tw-flex tw-flex-col tw-mx-2">
     <div>
-      <h3 class="tw-text-2xl tw-px-2 tw-font-bold">Manage Curation Groups</h3>
+      <h3
+        class="tw-text-2xl tw-px-2 tw-font-bold"
+        *ngIf="currentResource$ | async as currentResource"
+      >
+        Manage
+        <span [ngStyle]="{ color: currentResource.color }">{{
+          currentResource.resource_name
+        }}</span>
+        Contribution Groups
+      </h3>
     </div>
 
     <div class="tw-w-full tw-justify-between tw-px-1 tw-pt-2">

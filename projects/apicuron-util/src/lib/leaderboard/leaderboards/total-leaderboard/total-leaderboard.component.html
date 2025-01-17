@@ -1,5 +1,5 @@
 <!-- Total Leaderboard -->
-<div [loadable]="totalLeaderboard$">
+<div [loadable]="totalLeaderboard$" class="tw-font-dm-sans">
   <ng-container *ngIf="totalLeaderboard$ | async as totalLeaderboard">
     <ng-container *ngIf="resource$ | async as resource">
       <span class="tw-text-xs tw-text-gray-500 tw-font-light">

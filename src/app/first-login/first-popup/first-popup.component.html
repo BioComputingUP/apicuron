@@ -17,7 +17,8 @@
         <h2 class="tw-text-xl tw-font-semibold tw-text-left">
           {{ data.displayedName }},
         </h2>
-        <p class="tw-text-xs tw-mb-2 tw-text-left">Your current affiliation: {{ data.affiliation }}</p>
+        <p class="tw-text-xs tw-mb-2 tw-text-left">Current affiliation: <span class="tw-font-bold">{{
+            data.affiliation }}</span></p>
       </div>
     </div>
 
@@ -37,7 +38,8 @@
 
         <div class="tw-grid tw-grid-cols-1 tw-gap-2 tw-justify-items-start">
           <small class="tw-text-sm tw-text-red-500 tw-font-medium"
-            *ngIf="(email.errors?.['email'] || email.errors?.['pattern']) && (email.dirty || email.touched)">Please enter a valid email
+            *ngIf="(email.errors?.['email'] || email.errors?.['pattern']) && (email.dirty || email.touched)">Please
+            enter a valid email
             address.</small>
         </div>
 

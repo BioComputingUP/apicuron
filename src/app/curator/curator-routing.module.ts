@@ -11,6 +11,11 @@ const routes: Routes = [
     component: CuratorPageComponent,
     canActivate: [CuratorExistsGuard],
   },
+  {
+    path: ":orcid_id/:resource_id",
+    component: CuratorPageComponent,
+    canActivate: [CuratorExistsGuard],
+  },
 ];
 
 @NgModule({

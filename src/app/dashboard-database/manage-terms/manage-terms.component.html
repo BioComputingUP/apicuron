@@ -4,14 +4,14 @@
 <div class="tw-p-2 tw-flex-auto" *ngIf="resource$ | async as resource">
   <div class="tw-flex tw-flex-row tw-justify-between tw-p-2">
     <span class="tw-text-xl tw-font-bold tw-capitalize"
-      >Manage {{ resource["resource_name"] }} terms</span
+      >Manage {{ resource["resource_name"] }} Activities</span
     >
 
     <button
       class="tw-bg-apicuron-purple tw-p-2 tw-font-bold tw-text-white tw-rounded tw-shadow-lg tw-text-base"
       (click)="open_create_term()"
     >
-      Create Term
+      Define Activity
     </button>
   </div>
 
@@ -24,12 +24,18 @@
           <table class="tw-min-w-full">
             <thead class="tw-border-b">
               <tr class="tw-capitalize">
-                <th scope="col" class="head-cell">#</th>
-                <th scope="col" class="head-cell">Activity Term</th>
+                <th
+                  scope="col"
+                  class="tw-text-sm tw-text-gray-900 tw-px-2 tw-py-2 tw-text-left tw-font-bold"
+                >
+                  #
+                </th>
+                <th scope="col" class="head-cell">Activity Identifier</th>
                 <th scope="col" class="head-cell">Activity Name</th>
                 <th scope="col" class="head-cell">Activity Category</th>
                 <th scope="col" class="head-cell">score</th>
                 <th scope="col" class="head-cell">description</th>
+                <th colspan="2" class="head-cell tw-text-center">Actions</th>
               </tr>
             </thead>
             <tbody *ngIf="terms$ | async as terms">
@@ -38,7 +44,7 @@
                 class="tw-border-b hover:tw-bg-white hover:tw-shadow-lg hover:tw-font-bold"
               >
                 <td
-                  class="tw-px-6 tw-py-4 tw-whitespace-nowrap tw-text-sm tw-font-medium tw-text-gray-900"
+                  class="tw-px-2 tw-py-2 tw-whitespace-nowrap tw-text-sm tw-font-medium tw-text-gray-900"
                 >
                   {{ i + 1 }}
                 </td>
@@ -51,7 +57,7 @@
                 <td class="cell">
                   {{ term.activity_category }}
                 </td>
-                <td class="cell">
+                <td class="cell tw-text-center">
                   {{ term.score }}
                 </td>
                 <td class="cell">
@@ -114,7 +120,7 @@
                 *ngIf="show_form == 'update'"
                 class="tw-text-xl tw-text-center tw-font-bold"
               >
-                update term "{{ form.get("activity_term").value }}"
+                update Activity "{{ form.get("activity_term").value }}"
               </h2>
 
               <!-- for the create Term Form -->
@@ -122,7 +128,7 @@
                 *ngIf="show_form == 'create'"
                 class="tw-text-xl tw-text-center tw-font-bold"
               >
-                Create Term
+                Create Activity
               </h2>
 
               <!-- displayed only on the create form -->

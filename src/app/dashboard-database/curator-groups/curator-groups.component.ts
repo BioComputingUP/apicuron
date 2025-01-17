@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { BehaviorSubject, Observable, Subject, of } from "rxjs";
+import { BehaviorSubject, Observable, Subject, combineLatest, of } from "rxjs";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { HttpClient } from "@angular/common/http";
 import { catchError, map } from "rxjs/operators";
@@ -7,11 +7,13 @@ import { GroupsService } from "./services/groups.service";
 import { ResourceGroup } from "../../models/resource-group.model";
 import { GroupClickEvent } from "../../components/group-card/resource-group-card.component";
 import { ToastrService } from "ngx-toastr";
+import { DashboardService } from "../../dashboard/services/dashboard.service";
+import { Resource } from "../../models/resource.model";
 
 type GroupListUpdate = {
   group: ResourceGroup;
   operation: "update" | "delete" | "create";
-}
+};
 
 @Component({
   selector: "curator-groups",
@@ -20,19 +22,21 @@ type GroupListUpdate = {
 })
 export class CuratorGroupsComponent implements OnInit {
   resource_id$: Observable<string>;
-  groups$: Observable<{ data: ResourceGroup[]}>;
+  groups$: Observable<{ data: ResourceGroup[] }>;
   updateGroup$ = new Subject<GroupListUpdate>();
   manageForm$ = new BehaviorSubject<{
     group: ResourceGroup;
     show: boolean;
     type: "create" | "update";
-  }>({ group: null, show: false, type: "create"});
-  
+  }>({ group: null, show: false, type: "create" });
+  currentResource$: Observable<Resource>;
+
   constructor(
     protected http: HttpClient,
     protected route: ActivatedRoute,
     protected toastr: ToastrService,
     private groupsService: GroupsService,
+    protected dashboardService: DashboardService
   ) {}
 
   ngOnInit(): void {
@@ -41,6 +45,16 @@ export class CuratorGroupsComponent implements OnInit {
         return params.get("resource_id");
       })
     );
+
+    this.currentResource$ = combineLatest([
+      this.dashboardService.managedResources$,
+      this.resource_id$,
+    ]).pipe(
+      map(([resources, resource_id]) =>
+        resources.find((resource) => resource.resource_id === resource_id)
+      )
+    );
+    
 
     this.groupsService.init(this.resource_id$);
     this.groups$ = this.groupsService.getResourceGroups();
@@ -53,7 +67,7 @@ export class CuratorGroupsComponent implements OnInit {
         break;
       case "select":
         this.groupsService.viewParticipants(clickEvent.group);
-        break
+        break;
       case "delete":
         try {
           this.groupsService.deleteGroup(clickEvent.group);
@@ -77,16 +91,15 @@ export class CuratorGroupsComponent implements OnInit {
     this.groupsService.createNewGroup(group).subscribe(
       (data: ResourceGroup) => {
         if (data) {
-          this.toastr.success(
-            `Group ${data.name} successfully created`,
-          );
+          this.toastr.success(`Group ${data.name} successfully created`);
           this.addGroupToUI(data);
         }
       },
       (error) => {
         this.toastr.error(
-          `An error occured while creating the group ${group.name}`, error,
-        )
+          `An error occured while creating the group ${group.name}`,
+          error
+        );
       }
     );
   }
@@ -98,7 +111,7 @@ export class CuratorGroupsComponent implements OnInit {
     group: ResourceGroup;
     operation: "create" | "update";
   }) {
-    console.log({ group, operation })
+    console.log({ group, operation });
     if (operation == "create") {
       console.log("Group created successfully.");
       this.createGroup(group);

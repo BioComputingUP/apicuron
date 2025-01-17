@@ -74,6 +74,6 @@ export class CuratorsPageComponent implements OnInit, OnDestroy {
         });
       }),
     );
-    this.biocurators_count$ = users_list_response$.pipe(pluck("meta", "pagination", "total"));
+    this.biocurators_count$ = users_list_response$.pipe(pluck("meta", "pagination", "total")) as unknown as Observable<number>;
   }
 }
