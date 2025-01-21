@@ -1,4 +1,8 @@
-<div class="tw-fixed tw-inset-0 tw-bg-black/50 tw-flex tw-items-center tw-justify-center tw-z-[1000]">
+<div [ngClass]="{
+      'tw-opacity-100 tw-scale-100': isOpen,
+      'tw-opacity-0 tw-scale-95': !isOpen
+    }" class="tw-fixed tw-inset-0 tw-flex tw-items-center tw-justify-center tw-z-[1000]
+    tw-transition-all tw-duration-700 tw-ease-in-out">
   <div
     class="popup-container tw-bg-white tw-p-0 tw-shadow-xl tw-rounded-lg tw-max-w-md tw-w-full tw-grid tw-grid-cols-1 tw-justify-items-start tw-mb-8">
 
@@ -7,7 +11,7 @@
       <img class="christmas-texture" src="../../assets/christmas.jpg" alt="Christmas Texture" />
     </div>
 
-    <div class="tw-border-b-4 tw-flex tw-items-center tw-px-6 tw-py-4">
+    <div class="tw-border-b-4 tw-flex tw-items-center tw-px-6 tw-py-4 tw-w-full">
       <img class="tw-w-20 tw-aspect-square tw-mr-4" [src]="user.generate_avatar()" alt="Curator Avatar" />
       <div>
         <!-- Conditional Text for Christmas or Welcome -->

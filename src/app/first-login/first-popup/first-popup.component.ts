@@ -47,10 +47,16 @@ export class FirstPopupComponent implements OnInit {
     this.avatar = data.avatar;
   }
 
+  isOpen: boolean = false;
+
   ngOnInit() {
     // Check if today is Christmas (December 25)
     const today = new Date();
     const christmasDate = new Date(2024, 11, 25);
+
+    setTimeout(() => {
+      this.isOpen = true;
+    }, 50);
 
     console.log(christmasDate);
     console.log(today);
@@ -99,4 +105,5 @@ export class FirstPopupComponent implements OnInit {
   get email() {
     return this.form.get("email");
   }
+
 }

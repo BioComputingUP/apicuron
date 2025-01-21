@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { FirstPopupComponent } from "./first-popup/first-popup.component";
 import { AuthService } from "../auth/auth.service";
 
-import { filter, takeUntil, tap } from "rxjs/operators";
+import { filter, takeUntil, tap, delay} from "rxjs/operators";
 import { Subject } from "rxjs";
 @Component({
   selector: "first-login-dialog",
@@ -21,20 +21,21 @@ export class FirstLoginDialog implements OnInit, OnDestroy {
     //   displayedName: "Albert Einstein",
     //   affiliation: "Humanity",
     //   privacy: "public",
-      
+
     //   generate_avatar() {
     //     return "/assets/user.png";
     //   }
     // }
     // this.openDialog(test_user);
     //End Debug
-  
+
     this.auth.loginEvent$
       .pipe(
         tap((loginData) => {
           console.log("FLC:", loginData.user.orcid_id);
         }),
-        filter((loginData) => loginData.isNew ),
+        filter((loginData) => loginData.isNew),
+        delay(500),
         takeUntil(this.destroy$)
       )
       .subscribe((loginData) => {
