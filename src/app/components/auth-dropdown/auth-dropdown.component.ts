@@ -21,7 +21,6 @@ import { AuthModule } from "../../auth/auth.module";
 import { NotificationService } from "../../notifications-data/notification.service";
 import { Notification } from "../../notifications-data/models/Notification";
 import { RouterModule } from "@angular/router";
-import { NgxPopperModule } from "ngx-popper";
 import _ from "lodash";
 import { OverlayModule } from "@angular/cdk/overlay";
 // import { NotificationsDataModule } from '../../notifications-data/notifications-data.module';
@@ -33,7 +32,6 @@ import { OverlayModule } from "@angular/cdk/overlay";
     CommonModule,
     RouterModule,
     AngularSvgIconModule,
-    // NgxPopperModule,
     OverlayModule,
   ],
   standalone: true,

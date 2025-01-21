@@ -62,7 +62,7 @@ export class DashboardSidebarComponent implements OnInit {
               },
               {
                 href: ["/dashboard", "database", resource.resource_id, "terms"],
-                name: `Manage ${resource.resource_name} Terms`,
+                name: `Manage ${resource.resource_name} Activities`,
                 icon: "assets/svg/settings.svg",
               },
               {

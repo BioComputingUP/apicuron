@@ -12,11 +12,11 @@ export class ResourceLeaderboardService {
   availableLeaderboardNames = leaderboardsAvailable.map(
     (availableOption) => availableOption.name
   );
-  getLeaderboardColumnNames(leaderboardDef: LeaderboardDef): string[] {
+  private getLeaderboardColumnNames(leaderboardDef: LeaderboardDef): string[] {
     return leaderboardDef.columns.map((column) => column.columnName);
   }
 
-  getLeaderboardDef(leaderboardName: string): LeaderboardDef {
+  private getLeaderboardDef(leaderboardName: string): LeaderboardDef {
     const leaderboard = leaderboardsAvailable.find(
       (availableOption) => availableOption.name === leaderboardName
     );
@@ -57,11 +57,11 @@ export class ResourceLeaderboardService {
     return processedOptions;
   }
 
-  leaderboardExists(leaderboardName: string): boolean {
+  private leaderboardExists(leaderboardName: string): boolean {
     return this.availableLeaderboardNames.includes(leaderboardName);
   }
 
-  validateOption(option: LeaderboardOption) {
+  private validateOption(option: LeaderboardOption) {
     if (typeof option === "string") {
       if (!this.leaderboardExists(option)) {
         console.warn(

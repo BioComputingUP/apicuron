@@ -11,8 +11,6 @@ import { Injectable } from "@angular/core";
 
 @Injectable()
 export class DashboardService {
-  currentResource$: Observable<any>;
-  currentResourceStats$: Observable<any>;
   constructor(
     protected userService: UsersService,
     protected resourceService: ResourcesService,
@@ -56,11 +54,11 @@ export class DashboardService {
       resources$,
       contributedResourceIds$,
     ]).pipe(this.filterResources, shareReplay(1));
-    (this.managedResources$ = combineLatest([
+
+    this.managedResources$ = combineLatest([
       resources$,
       managedResourceIds$,
-    ]).pipe(this.filterResources)),
-      shareReplay(1);
+    ]).pipe(this.filterResources, shareReplay(1));
   }
 
   private filterResources = pipe(

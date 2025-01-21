@@ -1,5 +1,5 @@
 import { BrowserModule } from "@angular/platform-browser";
-import { NgModule } from "@angular/core";
+import { NgModule, APP_ID } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { HttpClientModule } from "@angular/common/http";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
@@ -15,9 +15,9 @@ import { AngularSvgIconModule } from "angular-svg-icon";
 import { MainLayoutComponent } from "./main-layout/main-layout.component";
 import { AuthDropdownComponent } from "./components/auth-dropdown/auth-dropdown.component";
 import { NotificationsDataModule } from "./notifications-data/notifications-data.module";
-import { NgxPopperModule } from "ngx-popper";
 import { SentryModuleConfig } from "../config/sentry.config";
 import { MatomoModule } from "ngx-matomo";
+
 @NgModule({
   declarations: [AppComponent, PageNotFoundComponent, MainLayoutComponent],
   imports: [
@@ -28,7 +28,6 @@ import { MatomoModule } from "ngx-matomo";
     AuthDropdownComponent,
     ToastrModule.forRoot(),
     IndexModule,
-    BrowserModule.withServerTransition({ appId: "serverApp" }),
     // TransferHttpCacheModule,
     BrowserAnimationsModule,
     // ReactiveFormsModule,
@@ -37,11 +36,6 @@ import { MatomoModule } from "ngx-matomo";
     NavbarComponent,
     FootComponent,
     AngularSvgIconModule.forRoot(),
-    // popper Integration
-    NgxPopperModule.forRoot({
-      disableDefaultStyling: true,
-      disableAnimation: false,
-    }),
     MatomoModule.forRoot({
       scriptUrl: "https://matomo.biocomputingup.it/matomo.js",
       trackers: [
@@ -59,6 +53,7 @@ import { MatomoModule } from "ngx-matomo";
     // *** Sentry ErrorHandler and Tracer Setup ***
     SentryModuleConfig,
     // *** end of sentry setup ***
+    { provide: APP_ID, useValue: 'serverApp' }
   ],
   bootstrap: [AppComponent],
   exports: [RouterModule],

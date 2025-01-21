@@ -25,29 +25,25 @@
   </div>
 
   <!-- Third row: Contributions and Resources -->
-  <!-- <div class="tw-grid tw-grid-cols-2 tw-gap-2 tw-justify-items-center">
-    <div *ngFor="let contribution of getContributions(); let i = index"
-      class="tw-font-dm-sans tw-bg-[#edebf2] tw-rounded tw-px-2 tw-py-2 tw-w-full">
-      <img [src]="contribution.resource.logo" class="tw-h-5 tw-cursor-pointer" (click)="toggleGroups(i)"
-        alt="Resource Logo" />
-
-      <ul [ngClass]="{
-            'tw-max-h-0': !showGroups[i],
-            'tw-max-h-screen': showGroups[i]
-          }" class="tw-transition-all tw-duration-200 tw-ease-out tw-overflow-hidden tw-pl-4">
-        <li *ngFor="let group of contribution.groups">
-          {{ group.displayedName }}
-        </li>
-      </ul>
-
-    </div>
-  </div> -->
   <div class="tw-my-2 tw-transition-all tw-duration-1000 tw-ease-out">
     <div class="tw-flex tw-flex-wrap tw-gap-2 tw-justify-center">
-      <div *ngFor="let contribution of getContributions(); let i = index"
+      <!-- Display only the first two contributions -->
+      <div *ngFor="let contribution of getContributions().slice(0, 2); let i = index"
         class="tw-font-dm-sans tw-bg-gray-100 tw-rounded-full tw-px-5 tw-py-2 tw-max-w-xs">
-        <img src="https://disprot.org/assets/DisProt_prot_vect_brownonly.svg" class="tw-h-6 tw-cursor-pointer"
-          (click)="toggleGroups(i)" alt="Resource Logo" />
+        <img [src]="contribution.resource.logo" class="tw-h-6 tw-cursor-pointer" (click)="toggleGroups(i)"
+          alt="Resource Logo" />
+      </div>
+
+      <!-- Display "+N" if there are more than two contributions -->
+      <div *ngIf="getContributions().length > 2"
+        class="tw-font-dm-sans tw-bg-gray-100 tw-rounded-full tw-px-5 tw-py-2 tw-max-w-xs tw-cursor-pointer"
+        (mouseenter)="showContributions = true" (mouseleave)="showContributions = false">
+        +{{ getContributions().length - 2 }}
+        <div class="tw-absolute tw-bg-gray-100 tw-rounded-lg tw-shadow-lg tw-p-4 tw-mt-2" *ngIf="showContributions">
+          <div *ngFor="let extra of getContributions().slice(2)">
+            <img [src]="extra.resource.logo" class="tw-h-6" alt="Resource Logo" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
