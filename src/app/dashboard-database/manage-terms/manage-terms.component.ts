@@ -46,7 +46,7 @@ export class ManageTermsComponent implements OnInit {
       shareReplay(),
       pluck("data")
     );
-    
+
     this.resourceId$.pipe(
       switchMap((resource_id: string) => {
         return this.termsService.get_resource_terms(resource_id)
@@ -97,7 +97,7 @@ export class ManageTermsComponent implements OnInit {
             // if the term is successfully added
             this.toast.success("Term Sucessfully Created");
 
-            // we append the value to the terms array and then push it to the behavior subject 
+            // we append the value to the terms array and then push it to the behavior subject
             this.terms$.next(this.terms$.getValue().concat(data));
           },
           (err) => {
@@ -122,7 +122,7 @@ export class ManageTermsComponent implements OnInit {
           ({ data }: { data: CreateTerm }) => {
 
             this.toast.success("Term Sucessfully Updated");
-            
+
             // get the list of terms
             const terms = this.terms$.getValue();
             // get the index of the updated element in the list
@@ -156,7 +156,7 @@ export class ManageTermsComponent implements OnInit {
     this.termsService.delete_term(term).subscribe(
       (response) => {
         this.toast.success(`Term ${term.activity_term} Sucessfully Deleted`);
-        
+
         const terms = this.terms$.getValue();
         const updated_terms = terms.filter(x => x.activity_term != term.activity_term)
         this.terms$.next(updated_terms);
