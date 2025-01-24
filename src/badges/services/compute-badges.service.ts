@@ -43,12 +43,7 @@ export class ComputeBadgesService {
 		let achieved_at;
 		if (state == AchievementState.achieved) {
 			const earningReport = await this.reportModel.findOne(
-				{
-					curator_orcid: reportAgg.curator_orcid,
-					league: badgeDef.league,
-					resource_id: badgeDef.resource_id,
-					activity_term: { $in: badgeDef.list_terms },
-				},
+				getMatchingReportFilter(badgeDef),
 				null,
 				{
 					sort: { timestamp: 1 },
