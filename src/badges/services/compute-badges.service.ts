@@ -47,7 +47,6 @@ export class ComputeBadgesService {
 				null,
 				{
 					sort: { timestamp: 1 },
-					limit: badgeDef.count_threshold,
 					skip: badgeDef.count_threshold - 1,
 				},
 			);
