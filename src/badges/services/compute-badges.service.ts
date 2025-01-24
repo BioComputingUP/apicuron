@@ -42,8 +42,12 @@ export class ComputeBadgesService {
 				: AchievementState.progress;
 		let achieved_at;
 		if (state == AchievementState.achieved) {
+			const relevantReportsFilter: FilterQuery<ReportDocument> = {
+				...getMatchingReportFilter(badgeDef),
+				curator_orcid: reportAgg.curator_orcid,
+			};
 			const earningReport = await this.reportModel.findOne(
-				getMatchingReportFilter(badgeDef),
+				relevantReportsFilter,
 				null,
 				{
 					sort: { timestamp: 1 },
