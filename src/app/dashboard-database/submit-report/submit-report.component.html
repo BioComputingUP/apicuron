@@ -1,13 +1,13 @@
 <!-- <div class="tw-flex tw-flex-row tw-justify-start"> -->
 <!-- <dashboard-sidebar [resource]="resource$"></dashboard-sidebar> -->
-<div class="tw-p-2 tw-flex-auto">
-    <h2 class="tw-text-2xl tw-px-2 tw-font-bold">Submit Curation Reports</h2>
+<div class="tw-px-10 tw-pt-6 tw-flex-auto">
+    <h2 class="tw-text-xl  tw-font-bold">Submit Curation Reports</h2>
 
     <div class="tw-my-2 tw-flex tw-flex-row" *ngIf="resource$ | async as resource">
-        <div class="tw-w-1/2 tw-p-2">
+        <div class="tw-w-1/2 tw-pr-3">
             <submit-single [resource]="resource$"></submit-single>
         </div>
-        <div class="tw-w-1/2 tw-p-2">
+        <div class="tw-w-1/2 ">
             <submit-bulk [resource]="resource"></submit-bulk>
         </div>
     </div>

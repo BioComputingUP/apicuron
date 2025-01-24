@@ -93,7 +93,6 @@ export class ManageTermsComponent implements OnInit {
   }
 
   open_create_term() {
-    this.form.reset(); // Reset the form values when creating a new term
     this.form = this.formBuilder.group({
       resource_id: ['', [Validators.required]],  // Resource ID will be set automatically
       activity_term: ["", [Validators.required]],
@@ -103,6 +102,7 @@ export class ManageTermsComponent implements OnInit {
       description: ["", [Validators.required]],
     });
 
+    this.form.reset(); // Reset the form values when creating a new term
     this.show_form = "create";
   }
 

@@ -1,48 +1,32 @@
 <!-- Main page with the information about curation groups -->
-<div class="tw-p-2 tw-flex-auto">
-  <div class="tw-flex tw-flex-col tw-mx-2">
-    <div>
-      <h3
-        class="tw-text-2xl tw-px-2 tw-font-bold"
-        *ngIf="currentResource$ | async as currentResource"
-      >
+<div class="tw-px-10 tw-pt-6 tw-flex-auto">
+  <div class="tw-flex tw-flex-col">
+    <div class="tw-mb-2">
+      <h3 class="tw-text-xl  tw-font-bold" *ngIf="currentResource$ | async as currentResource">
         Manage
         <span [ngStyle]="{ color: currentResource.color }">{{
           currentResource.resource_name
-        }}</span>
+          }}</span>
         Contribution Groups
       </h3>
     </div>
 
-    <div class="tw-w-full tw-justify-between tw-px-1 tw-pt-2">
+    <div class="tw-w-full tw-justify-between tw-pt-2">
       <div class="tw-flex tw-flex-row tw-flex-wrap">
-        <div
-          *ngFor="let grp of (groups$ | async)?.data"
-          class="tw-text-center tw-flex tw-flex-col tw-p-1"
-        >
-          <resource-group-card
-            [group]="grp"
-            class="tw-rounded"
-            (groupEvent)="groupClickEventHandler($event)"
-          >
+        <div *ngFor="let grp of (groups$ | async)?.data" class="tw-text-center tw-flex tw-flex-col tw-p-1">
+          <resource-group-card [group]="grp" class="tw-rounded" (groupEvent)="groupClickEventHandler($event)">
           </resource-group-card>
         </div>
         <!-- Create new Curation group icon -->
         <div class="tw-block tw-p-2 tw-cursor-pointer">
           <div
-            class="tw-flex tw-flex-col tw-border-2 tw-border-dashed tw-border-apicuron-purple-100 tw-rounded-lg tw-w-56 tw-max-h-full tw-h-full tw-justify-center tw-items-center tw-cursor-pointer"
-            (click)="createGroupClickHandler($event)"
-          >
-            <svg-icon
-              class="tw-block tw-h-16 tw-w-16 tw-cursor-pointer"
-              svgClass="tw-text-apicuron-purple"
-              src="assets/svg/create_icon.svg"
-            >
+            class="tw-flex tw-flex-col tw-border-2 tw-border-dashed tw-border-apicuron-purple-500 tw-rounded-lg tw-w-56 tw-max-h-full tw-h-full tw-justify-center tw-items-center tw-cursor-pointer"
+            (click)="createGroupClickHandler($event)">
+            <svg-icon class="tw-block tw-h-16 tw-w-16 tw-cursor-pointer" svgClass="tw-text-apicuron-purple"
+              src="assets/svg/create_icon.svg">
             </svg-icon>
-            <span
-              class="tw-text-apicuron-purple tw-text-center tw-text-sm tw-cursor-pointer tw-p-2"
-              >Create a new Curation Group</span
-            >
+            <span class="tw-text-apicuron-purple tw-text-center tw-text-sm tw-cursor-pointer tw-p-2">Create a new
+              Curation Group</span>
           </div>
         </div>
       </div>

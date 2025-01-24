@@ -30,3 +30,8 @@ textarea,
     @apply tw-flex tw-flex-col tw-my-2 tw-px-2 tw-py-1
 }
 
+#defineActivity {
+    box-shadow: 0 -2px 0 rgba(0, 0, 0, 0.15) inset;
+    -moz-box-shadow: 0 -2px 0 rgba(0, 0, 0, 0.15) inset;
+    -webkit-box-shadow: 0 -2px 0 rgba(0, 0, 0, 0.15) inset;
+}

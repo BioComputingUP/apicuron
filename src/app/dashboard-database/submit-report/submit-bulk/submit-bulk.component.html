@@ -1,22 +1,23 @@
-<div class="tw-border-gray-500 tw-bg-white tw-shadow-lg tw-border tw-rounded tw-p-1 tw-flex tw-flex-col tw-relative">
-    <h2 class="tw-text-xl tw-font-bold tw-text-gray-800">Submit Reports Bulk</h2>
+<div class="tw-border-gray-400 tw-bg-white tw-p-4  tw-border tw-rounded  tw-flex tw-flex-col tw-relative">
+    <h2 class="tw-text-lg tw-font-bold tw-text-gray-800">Submit Reports Bulk</h2>
     <form [formGroup]="form" (ngSubmit)="submit()">
 
         <div class="form-control-element">
-            <label for="reports" class="tw-flex tw-flex-row tw-justify-between tw-items-center">
+            <label for="reports" class="tw-flex tw-flex-row tw-justify-between tw-items-center tw-mb-2">
                 <span>Reports JSON file</span>
                 <a href="http://apicuron.org/docs#bulk-submission"
-                    class="tw-text-sm tw-text-blue-500 tw-underline tw-cursor-pointer">See file specifications
+                    class="tw-text-sm tw-text-apicuron-purple-500 tw-underline tw-cursor-pointer">See file
+                    specifications
                     here</a>
             </label>
-            <!-- <input type="file" name="reports" id=""> -->
             <input type="file" (change)="onFileSelected($event)" accept="application/json"
-                class="tw-block tw-w-full tw-text-sm tw-text-slate-500 file:tw-mr-4 file:tw-py-2 file:tw-px-4 file:tw-rounded file:tw-border-0 file:tw-text-sm file:tw-font-semibold file:tw-bg-white file:tw-shadow-lg file:tw-text-apicuron-purple tw-cursor-pointer">
+                class="tw-block tw-w-full tw-text-sm tw-text-apicuron-purple file:tw-mr-4 file:tw-py-2 file:tw-px-4 file:tw-rounded file:tw-border-0 file:tw-text-sm file:tw-font-semibold file:tw-bg-purple-100 file:tw-text-apicuron-purple-500 file:hover:tw-cursor-pointer">
         </div>
 
+
         <div class="form-control-element">
-            <label for="delete-all">Delete all</label>
-            <div>
+            <label for="delete-all ">Delete all</label>
+            <div class="tw-mt-2">
                 <input type="checkbox" name="delete-all" formControlName="delete-all" id="">
                 <span> Delete all the previous Data</span>
             </div>
