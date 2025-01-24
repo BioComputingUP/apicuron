@@ -17,7 +17,7 @@
     </div>
 
     <ng-container *ngIf="userInfo$ | async">
-        <div class="tw-grid tw-grid-cols-1 tw-gap-4 sm:tw-mb-4 sm:tw-px-2">
+        <div class="tw-grid tw-grid-cols-1 tw-gap-2 sm:tw-mb-4 sm:tw-px-2">
 
             <div *ngIf="biography$ | async as biography"
                 class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
@@ -67,6 +67,8 @@
                     </a>
                 </div>
             </div>
+
+
 
         </div>
     </ng-container>

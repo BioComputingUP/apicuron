@@ -19,9 +19,11 @@ export class ManageTermsComponent implements OnInit {
   resourceId$: Observable<string>;
   resource$: Observable<Object>;
   terms$ = new BehaviorSubject<Array<any>>([]);
+  filteredTerms$: Observable<Array<any>>;  // Observable for filtered terms
   show_form: "update" | "create" | false = false;
   form: FormGroup;
-  activity_categories = ['generation', 'invalidation', 'revision']
+  activity_categories = ['generation', 'invalidation', 'revision'];
+  searchTerm: string = ""; // Holds the search term
 
   constructor(
     protected route: ActivatedRoute,
@@ -29,36 +31,54 @@ export class ManageTermsComponent implements OnInit {
     protected formBuilder: FormBuilder,
     protected toast: ToastrService,
     protected termsService: TermsService
-  ) {
+  ) {}
 
-    // retreive the resourceId from the paramMap
+  ngOnInit(): void {
+    // Retrieve the resourceId from the paramMap
     this.resourceId$ = this.route.paramMap.pipe(
-      map((params: ParamMap) => {
-        return params.get("resource_id");
-      })
+      map((params: ParamMap) => params.get("resource_id"))
     );
 
-    // retrieve the resource from the API
+    // Retrieve the resource from the API
     this.resource$ = this.resourceId$.pipe(
-      switchMap((resource_id: string) => {
-        return this.databaseService.get_resource(resource_id);
-      }),
+      switchMap((resource_id: string) => this.databaseService.get_resource(resource_id)),
       shareReplay(),
       pluck("data")
     );
 
+    // Get terms from the service when resourceId changes
     this.resourceId$.pipe(
-      switchMap((resource_id: string) => {
-        return this.termsService.get_resource_terms(resource_id)
-      }),
+      switchMap((resource_id: string) => this.termsService.get_resource_terms(resource_id)),
       shareReplay(),
       pluck('data')
     ).subscribe((terms: Array<any>) => {
-      this.terms$.next(terms)
-    })
+      this.terms$.next(terms);
+      this.applySearchFilter();  // Apply search filter after updating terms
+    });
   }
 
-  ngOnInit(): void {}
+  // Apply search filter to terms
+ applySearchFilter() {
+  this.filteredTerms$ = this.terms$.pipe(
+    map(terms => {
+      if (!this.searchTerm) {
+        return terms; // If searchTerm is empty, show all terms
+      }
+      const searchTermLower = this.searchTerm.toLowerCase();
+      return terms.filter(term =>
+        term.activity_term.toLowerCase().includes(searchTermLower) ||
+        term.activity_name.toLowerCase().includes(searchTermLower) ||
+        term.activity_category.toLowerCase().includes(searchTermLower) ||
+        term.description.toLowerCase().includes(searchTermLower)
+      );
+    })
+  );
+}
+
+  // Update search term and reapply filter
+  onSearchTermChange() {
+    this.applySearchFilter(); // Reapply the search filter whenever searchTerm changes
+  }
 
   open_edit_term_modal(term) {
     this.form = this.formBuilder.group({
@@ -73,15 +93,14 @@ export class ManageTermsComponent implements OnInit {
   }
 
   open_create_term() {
-    this.resourceId$.subscribe((resource_id: string) => {
-      this.form = this.formBuilder.group({
-        resource_id: [resource_id, [Validators.required]],
-        activity_term: ["", [Validators.required]],
-        activity_category: ["generation", [Validators.required]],
-        activity_name: ["", [Validators.required]],
-        score: ["", [Validators.required, Validators.min(1)]],
-        description: ["", [Validators.required]],
-      });
+    this.form.reset(); // Reset the form values when creating a new term
+    this.form = this.formBuilder.group({
+      resource_id: ['', [Validators.required]],  // Resource ID will be set automatically
+      activity_term: ["", [Validators.required]],
+      activity_category: ["generation", [Validators.required]],
+      activity_name: ["", [Validators.required]],
+      score: ["", [Validators.required, Validators.min(1)]],
+      description: ["", [Validators.required]],
     });
 
     this.show_form = "create";
@@ -89,91 +108,55 @@ export class ManageTermsComponent implements OnInit {
 
   submit_form() {
     if (this.form.valid) {
-      if (this.show_form == "create") {
-        const term: CreateTerm = this.form.value
-
+      if (this.show_form === "create") {
+        const term: CreateTerm = this.form.value;
         this.termsService.create_term(term).subscribe(
-          ({ data } :{ data: CreateTerm }) => {
-            // if the term is successfully added
-            this.toast.success("Term Sucessfully Created");
-
-            // we append the value to the terms array and then push it to the behavior subject
+          ({ data }: { data: CreateTerm }) => {
+            this.toast.success("Term Successfully Created");
             this.terms$.next(this.terms$.getValue().concat(data));
+            this.show_form = false; // Close the form after creation
+            this.applySearchFilter(); // Reapply filter after creating a term
           },
-          (err) => {
-            if (err.error && err.error.message && err.error.statusCode == 400) {
-              let errors = Array.isArray(err.error.message)
-                ? err.error.message.join("\n")
-                : err.error.message;
-              this.toast.warning(errors, "Validation Error");
-            } else {
-              this.toast.error(
-                "An error occured while sending the form, please contact the developers",
-                "Error"
-              );
-            }
-          }
+          (err) => this.handleError(err)
         );
-      }
-      if (this.show_form == "update") {
+      } else if (this.show_form === "update") {
         const term: UpdateTerm = this.form.value;
-
         this.termsService.update_term(term).subscribe(
           ({ data }: { data: CreateTerm }) => {
-
-            this.toast.success("Term Sucessfully Updated");
-
-            // get the list of terms
+            this.toast.success("Term Successfully Updated");
             const terms = this.terms$.getValue();
-            // get the index of the updated element in the list
-            const updated_index = terms.findIndex((term) => data['activity_term'] == term['activity_term'])
-            // if that index is found
-            if(updated_index != -1){
-              // we update the term using the index and push a new value to the behaviorSubject
-              terms[updated_index] = data
+            const updatedIndex = terms.findIndex((term) => data.activity_term === term.activity_term);
+            if (updatedIndex !== -1) {
+              terms[updatedIndex] = data;
               this.terms$.next(terms);
             }
+            this.show_form = false; // Close the form after update
+            this.applySearchFilter(); // Reapply filter after updating a term
           },
-          (error) => {
-            if (error.message && error.statusCode == 400) {
-              let errors = Array.isArray(error.message)
-                ? error.message.join("\n")
-                : error.message;
-              this.toast.warning(errors, "Validation Error");
-            } else {
-              this.toast.error(
-                "An error occured while sending the form, please contact the developers",
-                "Error"
-              );
-            }
-          }
+          (err) => this.handleError(err)
         );
       }
     }
   }
 
+  handleError(error) {
+    if (error.error && error.error.message && error.error.statusCode === 400) {
+      let errors = Array.isArray(error.error.message) ? error.error.message.join("\n") : error.error.message;
+      this.toast.warning(errors, "Validation Error");
+    } else {
+      this.toast.error("An error occurred. Please contact the developers.", "Error");
+    }
+  }
+
   delete_term(term: DeleteTerm) {
     this.termsService.delete_term(term).subscribe(
-      (response) => {
-        this.toast.success(`Term ${term.activity_term} Sucessfully Deleted`);
-
-        const terms = this.terms$.getValue();
-        const updated_terms = terms.filter(x => x.activity_term != term.activity_term)
-        this.terms$.next(updated_terms);
+      () => {
+        this.toast.success(`Term ${term.activity_term} Successfully Deleted`);
+        const terms = this.terms$.getValue().filter(t => t.activity_term !== term.activity_term);
+        this.terms$.next(terms);
+        this.applySearchFilter(); // Reapply filter after deleting a term
       },
-      (error) => {
-        if (error.message && error.statusCode == 400) {
-          let errors = Array.isArray(error.message)
-            ? error.message.join("\n")
-            : error.message;
-          this.toast.warning(errors, "Validation Error");
-        } else {
-          this.toast.error(
-            "An error occured while sending the form, please contact the developers",
-            "Error"
-          );
-        }
-      }
-    )
+      (error) => this.handleError(error)
+    );
   }
 }
