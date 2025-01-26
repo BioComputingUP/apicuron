@@ -61,7 +61,7 @@
     "argparse": "^2.0.1",
     "cache-manager": "^5.3.2",
     "cachegoose": "^2.1.7",
-    "cheerio": "^1.0.0",
+    "cheerio": "^1.0.0-rc.12",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "commander": "^9.4.1",
