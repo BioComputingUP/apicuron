@@ -72,6 +72,13 @@ export class PartnerResource {
 	@Prop({ required: true, type: Date })
 	joined_date: Date;
 
+	@Prop({
+		type: [String],
+		default: ['https://identifiers.org', 'https://doi.org'],
+		required: true,
+	})
+	allowedUrlsPrefix: string[];
+
 	getLeague(leagueName: string) {
 		return this.leagues.find((league: League) => league.name == leagueName);
 	}
