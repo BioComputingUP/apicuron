@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
@@ -8,8 +8,9 @@ import {
   Subject,
   Subscription,
   combineLatest,
+  of,
 } from "rxjs";
-import { map, scan, shareReplay, startWith, switchMap } from "rxjs/operators";
+import { map, switchMap, shareReplay, startWith, scan } from "rxjs/operators";
 import { ResourcesService } from "../../resource/service/resources.service";
 import { Resource } from "../../models/resource.model";
 import { TermsService } from "../../terms/services/terms.service";
@@ -40,6 +41,7 @@ export class ManageMedalsComponent implements OnInit {
   maxDate = new Date();
 
   limit = 15;
+  searchQuery: string = ''; // Added searchQuery to track the input value
 
   medals$: Observable<Paginated<MedalDef>>;
   updateMedal$ = new Subject<MedalListUpdate>();
@@ -55,6 +57,7 @@ export class ManageMedalsComponent implements OnInit {
   page$ = new BehaviorSubject<number>(1);
   medalFilter$: Observable<MedalDefFilter>;
   medalsList$: Observable<Paginated<MedalDef>>;
+  allMedals$: Observable<Paginated<MedalDef>>; // Observable to store all medals
 
   constructor(
     protected route: ActivatedRoute,
@@ -112,32 +115,41 @@ export class ManageMedalsComponent implements OnInit {
       })
     );
 
-    this.medalsList$ = this.medalFilter$.pipe(
+    // Fetch all medals without any search filtering
+    this.allMedals$ = this.medalFilter$.pipe(
       switchMap((filter: MedalDefFilter) => {
-        return this.medalsDefService.getMedalDefs(filter);
+        return this.medalsDefService.getMedalDefs(filter); // Fetch all medals
       })
     );
 
-    this.medals$ = this.medalsList$.pipe(
-      switchMap(
-        (medals: Paginated<MedalDef>): Observable<Paginated<MedalDef>> => {
-          const medalList$: Observable<Paginated<MedalDef>> =
-            this.updateMedal$.pipe(
-              startWith(medals as Paginated<MedalDef>),
-              scan(
-                (
-                  medals: Paginated<MedalDef>,
-                  update: MedalListUpdate
-                ): Paginated<MedalDef> => this.applyMedalUpdates(medals, update)
-              )
-            ) as Observable<Paginated<MedalDef>>;
-          return medalList$;
-        }
-      )
-    );
+    // Use allMedals$ and apply search filtering if needed
+    this.medals$ = combineLatest([this.allMedals$, this.page$]).pipe(
+      switchMap(([medals, page]) => {
+            // Apply the search filter across all medals
+            let filteredMedals = medals;
+
+            if (this.searchQuery) {
+              filteredMedals = {
+                ...medals,
+                data: medals.data.filter((medal) =>
+                  medal.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+                ),
+              };
+            }
+
+            // Return the filtered medals as an observable
+            return of(filteredMedals);
+          })
+      );
+
   }
 
   ngOnInit(): void {}
+
+  onSearchChange() {
+    // Trigger a re-evaluation of the medals whenever the search query changes
+    this.page$.next(1); // Reset the page to 1 when the search query changes
+  }
 
   applyMedalUpdates(
     medals: Paginated<MedalDef>,
@@ -194,12 +206,13 @@ export class ManageMedalsComponent implements OnInit {
     }
     this.manageForm$.next({ medal: null, show: false, type: "create" });
   }
+
   updateMedal(medal: MedalDef) {
     this.medalsDefService.updateMedalDef(medal).subscribe(
       ({ data }: any) => {
         this.toastr.success(
-          `Medal ${medal.name} sucessfully updated`,
-          "Medal Update Sucessfull"
+          `Medal ${medal.name} successfully updated`,
+          "Medal Update Successful"
         );
         this.updateMedal$.next({
           medal: new MedalDef().deserialize(data),
@@ -209,18 +222,19 @@ export class ManageMedalsComponent implements OnInit {
       (error) => {
         console.error(error);
         this.toastr.error(
-          `An error occured while updating the Medal ${medal.name}`,
+          `An error occurred while updating the Medal ${medal.name}`,
           "Medal Update Failed"
         );
       }
     );
   }
+
   createMedal(medal: MedalDef) {
     this.medalsDefService.createMedalDef(medal).subscribe(
       ({ data }: any) => {
         this.toastr.success(
-          `Medal ${medal.name} sucessfully created`,
-          "Medal Creation Sucessfull"
+          `Medal ${medal.name} successfully created`,
+          "Medal Creation Successful"
         );
         this.updateMedal$.next({
           medal: new MedalDef().deserialize(data),
@@ -230,7 +244,7 @@ export class ManageMedalsComponent implements OnInit {
       (error) => {
         console.error(error);
         this.toastr.error(
-          `An error occured while creating the Medal ${medal.name}`,
+          `An error occurred while creating the Medal ${medal.name}`,
           "Medal Creation Failed"
         );
       }
@@ -242,8 +256,8 @@ export class ManageMedalsComponent implements OnInit {
       (response) => {
         if (response["data"]) {
           this.toastr.success(
-            `medal ${medal.name} sucessfully Created`,
-            "medal Creation Sucessfull"
+            `medal ${medal.name} successfully deleted`,
+            "Medal Deletion Successful"
           );
           this.updateMedal$.next({
             medal,
@@ -253,8 +267,8 @@ export class ManageMedalsComponent implements OnInit {
       },
       (error) => {
         this.toastr.error(
-          `An error occured while deleting the medal ${medal.name}`,
-          "medal Delete Failed"
+          `An error occurred while deleting the medal ${medal.name}`,
+          "Medal Delete Failed"
         );
       }
     );
