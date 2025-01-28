@@ -16,7 +16,7 @@ import { Term } from "src/app/models/term.model";
 @Component({
   selector: "medal-form",
   templateUrl: "./medal-form.component.html",
-  styleUrls: ["./medal-form.component.scss", '../../../styles/form-styles.scss'],
+  styleUrls: ["./medal-form.component.scss"],
   standalone: true,
   imports: [
     CommonModule,
@@ -61,6 +61,8 @@ export class MedalFormComponent implements OnInit {
     operation: "create" | "update";
   }>();
 
+  @Output() closeForm = new EventEmitter<void>();
+
   form: FormGroup = this.formBuilder.group({
     color: [
       "gold",
@@ -85,5 +87,8 @@ export class MedalFormComponent implements OnInit {
 
       this.formResult.emit({ medal: medalDef, operation: this.type });
     }
+  }
+  onClose() {
+    this.closeForm.emit();
   }
 }

@@ -79,9 +79,7 @@
                 <div [ngClass]="{'tw-block':manageForm.show, 'tw-hidden': !manageForm.show}"
                     class="tw-relative tw-transform tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 ">
                     <medal-form [medal]="manageForm.medal" [type]="manageForm.type" [terms]="(terms$ | async)"
-                        (formResult)="formSubmit($event)"></medal-form>
-                    <!-- <button class="tw-w-full tw-mx-auto tw-p-2 tw-bg-gray-400 tw-text-white tw-capitalize"
-                        (click)="manageForm.show = false">Close</button> -->
+                        (formResult)="formSubmit($event)" (closeForm)="onCloseForm()"></medal-form>
                 </div>
             </div>
         </div>

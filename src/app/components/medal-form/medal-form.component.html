@@ -2,13 +2,22 @@
     class="tw-py-4 tw-w-full tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
     <!-- Header -->
     <div class="tw-border-b-4 tw-flex tw-items-center tw-pb-4 tw-w-full tw-col-span-2">
-        <h2 *ngIf="type == 'create'" class="tw-px-6 tw-text-xl tw-font-bold tw-text-center">
-            Create a new Medal "{{ this.form.get('name').value }}"
+        <h2 *ngIf="type == 'create'" class="tw-px-6 tw-text-xl tw-font-bold tw-flex tw-items-center">
+            Create Medal
+            <span *ngIf="this.form.get('name').value"
+                class="tw-p-1 tw-ml-2 tw-px-3 tw-text-sm tw-rounded-sm tw-bg-apicuron-purple-100 tw-text-font-bold tw-text-apicuron-purple tw-max-w-[120px] sm:tw-max-w-[300px] tw-truncate">
+                {{ this.form.get('name').value }}
+            </span>
         </h2>
-        <h2 *ngIf="type == 'update'" class="tw-px-6 tw-text-xl tw-font-bold tw-text-center">
-            Updating Medal "{{ this.form.get('name').value }}"
+        <h2 *ngIf="type == 'update'" class="tw-px-6 tw-text-xl tw-font-bold tw-text-center tw-flex tw-items-center">
+            Updating Medal
+            <span *ngIf="this.form.get('name').value"
+                class="tw-p-1 tw-ml-2 tw-px-3 tw-text-sm tw-rounded-sm tw-bg-apicuron-purple-100 tw-text-font-bold tw-text-apicuron-purpletw-max-w-[120px] sm:tw-max-w-[300px] tw-truncate">
+                {{ this.form.get('name').value }}
+            </span>
         </h2>
     </div>
+
 
     <!-- Medal Name -->
     <div class="tw-px-6 tw-col-span-2">
@@ -18,7 +27,7 @@
     </div>
 
     <!-- List of Terms -->
-    <div class="tw-px-6 tw-col-span-2">
+    <div class="tw-px-6 tw-mt-2 tw-col-span-2">
         <label class="tw-block tw-font-bold tw-text-gray-700" for="list_terms">List of Terms</label>
         <p-multiSelect [options]="terms" [group]="true" formControlName="list_terms"
             defaultLabel="Select an activity Term" display="chip" class="tw-w-full"
@@ -31,16 +40,21 @@
         </p-multiSelect>
     </div>
 
-
     <!-- Color Code and Medal Recipients in One Row -->
-    <div class="tw-px-6 tw-col-span-2 sm:tw-grid sm:tw-grid-cols-2 sm:tw-gap-4">
+    <div class="tw-px-6 tw-mt-2 tw-col-span-2 sm:tw-grid sm:tw-grid-cols-2 sm:tw-gap-4">
         <!-- Color Code -->
-        <div>
+        <div class="tw-mt-2 sm:tw-mt-0">
             <label class="tw-block tw-font-bold tw-text-gray-700" for="color">Color Code</label>
-            <div class="tw-flex tw-items-center tw-gap-2">
-                <input type="text" formControlName="color" placeholder="Input Hex Code or any valid CSS color"
-                    class="tw-w-full !tw-px-4 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md" />
-                <div class="tw-h-8 tw-w-8 tw-rounded-md" [ngStyle]="{ 'background-color': form.get('color').value }">
+            <div class="tw-flex tw-items-start tw-gap-2">
+                <div>
+                    <input type="text" formControlName="color" placeholder=""
+                        class="tw-capitalize tw-w-full !tw-px-4 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md" />
+                    <small class="tw-pt-2 tw-leading-tight tw-block tw-text-xs tw-text-gray-500">This field indicates
+                        when
+                        the medal period
+                        ends.</small>
+                </div>
+                <div class="tw-h-10 tw-w-10 tw-rounded-md" [ngStyle]="{ 'background-color': form.get('color').value }">
                 </div>
             </div>
             <small class="tw-pt-2 tw-block tw-leading-tight tw-text-sm tw-text-red-500"
@@ -50,7 +64,7 @@
         </div>
 
         <!-- Medal Recipients -->
-        <div>
+        <div class="tw-mt-2 sm:tw-mt-0">
             <label class="tw-block tw-font-bold tw-text-gray-700" for="score">Medal Recipients</label>
             <input type="number" min="1" formControlName="score_relative" id="score"
                 class="tw-w-full !tw-px-4 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md" />
@@ -64,32 +78,35 @@
         </div>
     </div>
 
-    <!-- Start Date -->
-    <div class="tw-pl-6">
-        <label class="tw-block tw-font-bold tw-text-gray-700" for="first_day">Start Date</label>
-        <p-calendar styleClass="tw-w-full tw-p-2 !tw-px-4  tw-border tw-border-gray-300 tw-rounded-md"
-            formControlName="first_day" [showIcon]="true" [maxDate]="form.get('last_day').value" [showClear]="true"
-            [readonlyInput]="true" class="tw-w-full"></p-calendar>
-        <small class=" tw-pt-2 tw-block tw-leading-tight tw-text-xs tw-text-gray-500">This field indicates when the
-            medal period
-            begins.</small>
-    </div>
+    <!-- Start Date and End Date in One Row -->
+    <div class="tw-px-6 tw-mt-2 tw-col-span-2 sm:tw-grid sm:tw-grid-cols-2 sm:tw-gap-4">
+        <!-- Start Date -->
+        <div class="tw-mt-2 sm:tw-mt-0">
+            <label class="tw-block tw-font-bold tw-text-gray-700" for="first_day">Start Date</label>
+            <p-calendar styleClass="tw-w-full tw-p-2 !tw-px-4  tw-border tw-border-gray-300 tw-rounded-md"
+                formControlName="first_day" [showIcon]="true" [maxDate]="form.get('last_day').value" [showClear]="true"
+                [readonlyInput]="true" class="tw-w-full"></p-calendar>
+            <small class=" tw-pt-2 tw-block tw-leading-tight tw-text-xs tw-text-gray-500">This field indicates when the
+                medal period
+                begins.</small>
+        </div>
 
-    <!-- End Date -->
-    <div class="tw-pr-6">
-        <label class="tw-block tw-font-bold tw-text-gray-700" for="last_day">End Date</label>
-        <p-calendar styleClass="tw-w-full tw-p-2 !tw-px-4  tw-border tw-border-gray-300 tw-rounded-md"
-            formControlName="last_day" [showIcon]="true" [minDate]="form.get('first_day').value" [showClear]="true"
-            [readonlyInput]="true" class="tw-w-full"></p-calendar>
-        <small class="tw-pt-2 tw-leading-tight tw-block tw-text-xs tw-text-gray-500">This field indicates when the medal
-            period
-            ends.</small>
+        <!-- End Date -->
+        <div class="tw-mt-2 sm:tw-mt-0">
+            <label class="tw-block tw-font-bold tw-text-gray-700" for="last_day">End Date</label>
+            <p-calendar styleClass="tw-w-full tw-p-2 !tw-px-4  tw-border tw-border-gray-300 tw-rounded-md"
+                formControlName="last_day" [showIcon]="true" [minDate]="form.get('first_day').value" [showClear]="true"
+                [readonlyInput]="true" class="tw-w-full"></p-calendar>
+            <small class="tw-pt-2 tw-leading-tight tw-block tw-text-xs tw-text-gray-500">This field indicates when the
+                medal
+                period ends.</small>
+        </div>
     </div>
 
     <!-- Submit Button -->
-    <div class="tw-px-6 tw-col-span-2 tw-flex tw-items-center tw-gap-2">
+    <div class="tw-px-6 tw-mt-2 tw-col-span-2 tw-flex tw-items-center tw-gap-2">
         <!-- Close Button -->
-        <button type="button"
+        <button type="button" (click)="onClose()"
             class="tw-w-24 tw-p-2 tw-border tw-border-gray-400 tw-text-gray-400 tw-font-bold tw-rounded-md">
             Close
         </button>

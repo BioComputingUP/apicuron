@@ -289,4 +289,8 @@ export class ManageMedalsComponent implements OnInit {
       type: "update",
     });
   }
+
+  onCloseForm() {
+    this.manageForm$.next({ medal: null, show: false, type: "create" });
+  }
 }
