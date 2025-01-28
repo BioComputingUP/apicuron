@@ -1,22 +1,14 @@
 import { Component, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { FormBuilder } from "@angular/forms";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
-import {
-  BehaviorSubject,
-  Observable,
-  Subject,
-  Subscription,
-  combineLatest,
-  of,
-} from "rxjs";
+import { BehaviorSubject, Observable, Subject, combineLatest, of } from "rxjs";
 import { map, switchMap, shareReplay, startWith, scan } from "rxjs/operators";
 import { ResourcesService } from "../../resource/service/resources.service";
 import { Resource } from "../../models/resource.model";
 import { TermsService } from "../../terms/services/terms.service";
 import { Term } from "../../models/term.model";
 import { MedalDefService } from "../../achievements-def/services/medal-def.service";
-import { AchievementDefFilter } from "../../achievements-def/interfaces/achievment-def.filter";
 import { MedalDef } from "../../models/medal-def.model";
 import { MedalDefFilter } from "../../achievements-def/interfaces/medal-def.filter";
 import { Paginated } from "../../interfaces/paginated";
@@ -32,32 +24,26 @@ type MedalListUpdate = {
   styleUrls: ["./manage-medals.component.scss"],
 })
 export class ManageMedalsComponent implements OnInit {
-  // Data
   resourceId$: Observable<string>;
-
   resource$: Observable<Resource>;
   terms$: Observable<any>;
-
   maxDate = new Date();
-
   limit = 15;
-  searchQuery: string = ''; // Added searchQuery to track the input value
+  searchQuery: string = '';
 
   medals$: Observable<Paginated<MedalDef>>;
+  mergedMedals$: Observable<Paginated<MedalDef>>;
   updateMedal$ = new Subject<MedalListUpdate>();
 
-  // Form
   manageForm$ = new Subject<{
     medal: MedalDef;
     show: boolean;
     type: "create" | "update";
   }>();
 
-  // pagination
   page$ = new BehaviorSubject<number>(1);
   medalFilter$: Observable<MedalDefFilter>;
-  medalsList$: Observable<Paginated<MedalDef>>;
-  allMedals$: Observable<Paginated<MedalDef>>; // Observable to store all medals
+  allMedals$: Observable<Paginated<MedalDef>>;
 
   constructor(
     protected route: ActivatedRoute,
@@ -68,93 +54,89 @@ export class ManageMedalsComponent implements OnInit {
     protected resourceService: ResourcesService
   ) {
     this.resourceId$ = this.route.paramMap.pipe(
-      map((params: ParamMap) => {
-        return params.get("resource_id");
-      })
+      map((params: ParamMap) => params.get("resource_id"))
     );
 
     this.resource$ = this.resourceId$.pipe(
-      switchMap((resource_id: string) => {
-        return this.resourceService.get_resource(resource_id);
-      }),
+      switchMap((resource_id: string) =>
+        this.resourceService.get_resource(resource_id)
+      ),
       shareReplay()
     );
 
     this.terms$ = this.resource$.pipe(
-      switchMap(({ resource_id }: Resource) => {
-        return this.termsService.getTerms({ resource_id });
-      }),
-      shareReplay(),
-      // this function serves to group the terms according to the category values
-      map((terms: Term[]) => {
-        const groupValues = ["generation", "invalidation", "revision"].map(
-          (category: string) => {
-            return { label: category, value: category, items: [] };
-          }
-        );
-        terms.forEach((term: Term) => {
-          const concernedCategory = groupValues.find(
-            (cat) => cat.value == term.category
-          );
-          concernedCategory.items.push({
-            label: term.activity_name,
-            value: term.activity_term,
-          });
-        });
-        return groupValues;
-      })
+      switchMap(({ resource_id }) =>
+        this.termsService.getTerms({ resource_id })
+      ),
+      map((terms: Term[]) => this.groupTerms(terms)),
+      shareReplay()
     );
 
     this.medalFilter$ = combineLatest([this.resource$, this.page$]).pipe(
-      map(([{ resource_id }, page]: [Resource, number]) => {
-        return MedalDefFilter.create({
+      map(([{ resource_id }, page]) =>
+        MedalDefFilter.create({
           resource_id,
           skip: (page - 1) * this.limit,
           limit: this.limit,
-        });
-      })
+        })
+      )
     );
 
-    // Fetch all medals without any search filtering
     this.allMedals$ = this.medalFilter$.pipe(
-      switchMap((filter: MedalDefFilter) => {
-        return this.medalsDefService.getMedalDefs(filter); // Fetch all medals
-      })
+      switchMap((filter: MedalDefFilter) =>
+        this.medalsDefService.getMedalDefs(filter)
+      )
     );
 
-    // Use allMedals$ and apply search filtering if needed
-    this.medals$ = combineLatest([this.allMedals$, this.page$]).pipe(
-      switchMap(([medals, page]) => {
-            // Apply the search filter across all medals
-            let filteredMedals = medals;
+    this.mergedMedals$ = this.allMedals$.pipe(
+      switchMap(initialMedals =>
+        this.updateMedal$.pipe(
+          scan((currentMedals, update) =>
+            this.applyMedalUpdates(currentMedals, update),
+            initialMedals
+          ),
+          startWith(initialMedals)
+        )
+      )
+    );
 
-            if (this.searchQuery) {
-              filteredMedals = {
-                ...medals,
-                data: medals.data.filter((medal) =>
-                  medal.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-                ),
-              };
-            }
+    this.medals$ = this.mergedMedals$.pipe(
+      map(medals => {
+        if (!medals) return medals;
+        let filteredMedals = medals;
+        if (this.searchQuery) {
+          filteredMedals = {
+            ...medals,
+            data: medals.data.filter(medal =>
+              medal.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+            ),
+          };
+        }
+        return filteredMedals;
+      })
+    );
+  }
 
-            // Return the filtered medals as an observable
-            return of(filteredMedals);
-          })
-      );
-
+  private groupTerms(terms: Term[]): any {
+    return ["generation", "invalidation", "revision"].map(category => ({
+      label: category,
+      value: category,
+      items: terms
+        .filter(term => term.category === category)
+        .map(term => ({
+          label: term.activity_name,
+          value: term.activity_term
+        }))
+    }));
   }
 
   ngOnInit(): void {}
 
   onSearchChange() {
-    // Trigger a re-evaluation of the medals whenever the search query changes
-    this.page$.next(1); // Reset the page to 1 when the search query changes
+     this.page$.next(1);
   }
 
-  applyMedalUpdates(
-    medals: Paginated<MedalDef>,
-    update: MedalListUpdate
-  ): Paginated<MedalDef> {
+  applyMedalUpdates(medals: Paginated<MedalDef>, update: MedalListUpdate): Paginated<MedalDef> {
     switch (update.operation) {
       case "create":
         return {
@@ -169,17 +151,14 @@ export class ManageMedalsComponent implements OnInit {
         };
       case "update":
         return {
-          data: medals.data.map((medal) => {
-            if (medal.name == update.medal.name) {
-              return update.medal;
-            }
-            return medal;
-          }),
+          data: medals.data.map(medal =>
+            medal.name === update.medal.name ? update.medal : medal
+          ),
           meta: medals.meta,
         };
       case "delete":
         return {
-          data: medals.data.filter((medal) => medal.name != update.medal.name),
+          data: medals.data.filter(medal => medal.name !== update.medal.name),
           meta: {
             pagination: {
               total: medals.meta.pagination.total - 1,
@@ -188,16 +167,12 @@ export class ManageMedalsComponent implements OnInit {
             },
           },
         };
+      default:
+        return medals;
     }
   }
 
-  formSubmit({
-    medal,
-    operation,
-  }: {
-    medal: MedalDef;
-    operation: "create" | "update";
-  }) {
+  formSubmit({ medal, operation }: { medal: MedalDef; operation: "create" | "update" }) {
     if (operation == "create") {
       this.createMedal(medal);
     }
@@ -251,12 +226,12 @@ export class ManageMedalsComponent implements OnInit {
     );
   }
 
-  delete_medal(medal) {
+  delete_medal(medal: MedalDef) {
     this.medalsDefService.deleteMedal(medal).subscribe(
       (response) => {
         if (response["data"]) {
           this.toastr.success(
-            `medal ${medal.name} successfully deleted`,
+            `Medal ${medal.name} successfully deleted`,
             "Medal Deletion Successful"
           );
           this.updateMedal$.next({

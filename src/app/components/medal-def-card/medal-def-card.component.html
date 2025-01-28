@@ -4,11 +4,14 @@
         <div class="tw-shrink-0">
             <img src="assets/svg/gold_medal.svg" class="tw-w-8 sm:tw-w-10 lg:tw-w-12" alt="">
         </div>
-        <div class="tw-pl-2 tw-flex tw-flex-col tw-grow">
-            <span class="tw-text-sm sm:tw-text-base tw-text-gray-700 tw-font-bold tw-block tw-text-left tw-break-words">
+        <div class="tw-pl-2 tw-flex tw-flex-col tw-grow tw-min-w-0">
+            <!-- Final optimized solution -->
+            <span class="tw-text-sm sm:tw-text-base tw-text-gray-700 tw-font-bold tw-block tw-text-left
+                      tw-line-clamp-3 tw-break-words tw-hyphens-auto tw-whitespace-normal">
                 {{ medal.name }}
             </span>
 
+            <!-- Rest of the content remains unchanged -->
             <span class="tw-font-med tw-block tw-text-gray-500 tw-text-sm tw-leading-relaxed"
                 *ngIf="medal.score_relative > 1">
                 Requires ranking Among {{ medal.score_relative }} biocurators
@@ -28,7 +31,6 @@
     </div>
 </div>
 
-
 <ng-template #activitiesList>
     <div class="custom-tooltip tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-py-2 tw-rounded tw-shadow-md
         tw-shadow-gray-400">
@@ -39,3 +41,16 @@
         </span>
     </div>
 </ng-template>
+
+<style>
+    .tw-line-clamp-3 {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        overflow: hidden;
+    }
+
+    .tw-hyphens-auto {
+        hyphens: auto;
+    }
+</style>
