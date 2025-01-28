@@ -17,9 +17,12 @@ import { AuthDropdownComponent } from "./components/auth-dropdown/auth-dropdown.
 import { NotificationsDataModule } from "./notifications-data/notifications-data.module";
 import { SentryModuleConfig } from "../config/sentry.config";
 import { MatomoModule } from "ngx-matomo";
+import { MedalGeneratorComponent } from './components/medal-generator/medal-generator.component';
+import { FormsModule } from '@angular/forms';
+
 
 @NgModule({
-  declarations: [AppComponent, PageNotFoundComponent, MainLayoutComponent],
+  declarations: [AppComponent, PageNotFoundComponent, MainLayoutComponent, MedalGeneratorComponent],
   imports: [
     AppRoutingModule,
     AuthModule,
@@ -31,7 +34,7 @@ import { MatomoModule } from "ngx-matomo";
     // TransferHttpCacheModule,
     BrowserAnimationsModule,
     // ReactiveFormsModule,
-    // FormsModule,
+    FormsModule,
     HttpClientModule,
     NavbarComponent,
     FootComponent,
