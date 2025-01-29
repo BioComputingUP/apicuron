@@ -52,6 +52,8 @@ export class BadgeFormComponent implements OnInit, OnDestroy {
     operation: "create" | "update";
   }>();
 
+  @Output() closeForm = new EventEmitter<void>();
+
   form: FormGroup = this.formBuilder.group({
     name: ["", [Validators.required]],
     displayedName: ["", [Validators.required]],
@@ -106,5 +108,9 @@ export class BadgeFormComponent implements OnInit, OnDestroy {
 
       this.formResult.emit({ badge: badgeDef, operation: this.type });
     }
+  }
+
+  onClose() {
+    this.closeForm.emit();
   }
 }

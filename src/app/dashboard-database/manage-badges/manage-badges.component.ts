@@ -298,4 +298,10 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
         }
       );
   }
+
+
+  onCloseForm() {
+    this.manageForm$.next({ badge: null, show: false, type: "create" });
+  }
+
 }

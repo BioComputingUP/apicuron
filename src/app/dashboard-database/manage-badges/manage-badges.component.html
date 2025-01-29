@@ -83,11 +83,10 @@
                 class="tw-flex tw-min-h-full tw-items-center tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0">
 
                 <div [ngClass]="{'tw-block':manageForm.show, 'tw-hidden': !manageForm.show}"
-                    class="tw-relative tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 tw-max-h-[90vh] tw-overflow-y-scroll">
+                    class="tw-relative tw-overflow-visible tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 tw-max-h-[90vh]">
                     <badge-form [badge]="manageForm.badge" [type]="manageForm.type" [terms]="(terms$ | async)"
-                        (formResult)="formSubmit($event)"></badge-form>
-                    <button class="tw-w-full tw-mx-auto tw-p-2 tw-bg-gray-400 tw-text-white tw-capitalize"
-                        (click)="manageForm.show = false">Close</button>
+                        (formResult)="formSubmit($event)" (closeForm)="onCloseForm()"></badge-form>
+
                 </div>
             </div>
         </div>
