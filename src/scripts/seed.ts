@@ -34,26 +34,9 @@ async function bootstrap() {
 
 	const termModel: Model<Term> = app.get(getModelToken(Term.name));
 
-	// check if the database is empty, if it is we start seeding,
-	// otherwise we stop the seed
-	const entityCounts: number[] = await Promise.all([
-		userModel.count(),
-		resourceModel.count(),
-		reportModel.count(),
-		termModel.count(),
-	]);
-
-	if (sum(entityCounts) > 0) {
-		logger.error(
-			'Found documents in the database, aborting seed...Closing app',
-		);
-		await app.close();
-		return;
-	}
-
 	// initialize variables
 	const reportCount = 50;
-	const termCount = 30;
+	const termCount = 10;
 	const testingOrcidId = '0000-0002-2472-5685';
 
 	// create mock user
@@ -71,23 +54,40 @@ async function bootstrap() {
 	});
 
 	await exampleResource.save();
-
 	logger.verbose(`Created testing resource successfully`);
 
+	const secondResource = new resourceModel({
+		resource_description: faker.lorem.sentences(2),
+		resource_name: 'Second Resource',
+		resource_id: 'second_resource',
+		resource_uri: faker.internet.url(),
+		resource_url: faker.internet.url(),
+		joined_date: faker.date.recent({ days: 10 }),
+	});
+
+	await secondResource.save();
 	await userModel.updateOne(
 		{ orcid_id: testingOrcidId },
 		{
 			$push: {
 				resources: {
-					resource_id: exampleResource.resource_id,
-					name: exampleResource.resource_name,
+					$each: [
+						{
+							resource_id: exampleResource.resource_id,
+							name: exampleResource.resource_name,
+						},
+						{
+							resource_id: secondResource.resource_id,
+							name: secondResource.resource_name,
+						},
+					],
 				},
 			},
 		},
 	);
 
 	logger.verbose(
-		`Assigned testing resource to testing user: ${testingOrcidId}`,
+		`Assigned testing resources to testing user: ${testingOrcidId}`,
 	);
 
 	//create terms for resource
@@ -115,16 +115,49 @@ async function bootstrap() {
 
 		terms$.push(term.save());
 	}
-
 	await Promise.all(terms$);
 
 	logger.verbose(`Created ${termCount} Mock terms Successfully`);
+	// create terms for second resource
+	const secondResourceTerms$ = [];
+
+	for (let i = 0; i < termCount; i++) {
+		const termName = faker.lorem.words({ min: 1, max: 3 });
+		const term = new termModel({
+			resource_id: secondResource.resource_id,
+			activity_term: faker.helpers.slugify(termName),
+			activity_name: termName,
+			activity_category: faker.helpers.arrayElement([
+				'generation',
+				'invalidation',
+				'revision',
+			]),
+			description: faker.lorem.sentence({ min: 3, max: 6 }),
+			league: secondResource.defaultLeague,
+			privacy: faker.helpers.arrayElement([
+				PrivacyType.private,
+				PrivacyType.public,
+			]),
+			score: faker.number.int({ max: 100, min: 5 }),
+		});
+
+		secondResourceTerms$.push(term.save());
+	}
+
+	await Promise.all(secondResourceTerms$);
+
+	logger.verbose(
+		`Created ${termCount} Mock terms for second resource Successfully`,
+	);
 
 	// create reports for test user
-
 	// get example resource terms
-	const terms: string[] = (
+	const exampleResourceTerms: string[] = (
 		await termModel.find({ resource_id: exampleResource.resource_id })
+	).map((term: Term) => term.activity_term);
+
+	const secondResourceTerms: string[] = (
+		await termModel.find({ resource_id: secondResource.resource_id })
 	).map((term: Term) => term.activity_term);
 
 	const userCount: number = await userModel.count();
@@ -132,10 +165,13 @@ async function bootstrap() {
 	const reports = [];
 
 	for (let index = 0; index < reportCount; index++) {
+		const resource = index % 2 === 0 ? exampleResource : secondResource;
+		const terms = index % 2 === 0 ? exampleResourceTerms : secondResourceTerms;
+
 		const report = await mockReport(
 			userModel,
 			reportModel,
-			exampleResource,
+			resource,
 			userCount,
 			terms,
 		);
@@ -146,8 +182,6 @@ async function bootstrap() {
 	await app
 		.get(SubmitReportService)
 		.insertReports(plainToInstance(SubmitReportsDto, { reports }));
-
-	// await Promise.all(savesPromise);
 
 	logger.verbose(`Created ${reportCount} Mock reports`);
 
