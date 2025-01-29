@@ -1,29 +1,28 @@
 <div class="tw-px-10 tw-pt-6" *ngIf="user$ | async as user">
     <h2 class="tw-text-xl tw-font-dm-sans tw-mb-3 tw-font-bold">{{ (resource$ | async)?.resource_name }}'s Overview</h2>
-    <div class="tw-w-full tw-flex tw-flex-row" *ngIf="resource$ | async as resource">
-        <div class="tw-w-full sm:tw-w-2/3" *ngIf="graphReportData$ | async as graphReportData">
-            <div class="tw-flex tw-flex-col tw-bg-white tw-p-1 sm:tw-p-2">
-                <form class="tw-w-full tw-flex tw-flex-row tw-justify-between sm:tw-justify-end tw-gap-2"
-                    [formGroup]="reportGraphForm" action="">
-                    <div>
-                        <label class="tw-text-sm tw-font-bold tw-text-gray-700 tw-mr-1" for="from">from</label>
-                        <p-calendar p-datepicker="tw-bg-white tw-rounded tw-shadow-gray-700" formControlName="from"
-                            [maxDate]="reportGraphForm.get('to').value"></p-calendar>
+    <div class="tw-bg-white tw-relative tw-rounded-md tw-h-full tw-border tw-w-full tw-flex tw-flex-row"
+        *ngIf="resource$ | async as resource">
+        <div class="tw-w-full" *ngIf="graphReportData$ | async as graphReportData">
+            <div class="tw-flex tw-flex-col tw-bg-white tw-justify-center tw-p-1 sm:tw-p-2 tw-w-full">
+                <form class="tw-w-full tw-py-2 tw-flex tw-justify-center" [formGroup]="reportGraphForm" action="">
+                    <div class="tw-flex tw-items-center tw-space-x-2">
+                        <label class="tw-text-sm tw-font-bold tw-text-gray-700" for="from">From</label>
+                        <p-calendar styleClass="tw-w-full tw-p-2 !tw-px-4 tw-border tw-border-gray-300 tw-rounded-md"
+                            formControlName="from" [maxDate]="reportGraphForm.get('to').value">
+                        </p-calendar>
                     </div>
-                    <div>
-                        <label class="tw-text-sm tw-font-bold tw-text-gray-700 tw-mr-1" for="to">to</label>
-                        <p-calendar formControlName="to" [maxDate]="maxTo"
-                            [minDate]="reportGraphForm.get('from').value"></p-calendar>
+                    <div class="tw-flex tw-ml-2 tw-items-center tw-space-x-2">
+                        <label class="tw-text-sm tw-font-bold tw-text-gray-700" for="to">To</label>
+                        <p-calendar styleClass="tw-w-full tw-p-2 !tw-px-4 tw-border tw-border-gray-300 tw-rounded-md"
+                            formControlName="to" [maxDate]="maxTo" [minDate]="reportGraphForm.get('from').value">
+                        </p-calendar>
                     </div>
-
                 </form>
                 <ng-container *ngIf="reportFilter$ | async as reportFilter">
-                    <reports-by-date-chart [resources]="[resource]" [reportsData]="graphReportData"
-                        [reportFilter]="reportFilter"></reports-by-date-chart>
-
+                    <reports-by-date-chart class="tw-w-full" styleClass="tw-w-full" [resources]="[resource]"
+                        [reportsData]="graphReportData" [reportFilter]="reportFilter"></reports-by-date-chart>
                 </ng-container>
             </div>
-
         </div>
     </div>
 </div>
