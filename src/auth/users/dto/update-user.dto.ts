@@ -10,7 +10,6 @@ import {
 import { User } from '../../../core/schemas/user.schema';
 import { OrcidChecksum } from '../../../submit-reports/validators/orcid-checksum';
 import { EntryExistsRule } from '../../../shared/validators/entry-exists.validator';
-import { UserEmailEntry } from 'src/core/schemas/components/user-email.schema';
 export class UpdateUserDto {
 	@IsOptional()
 	@IsEmail()
@@ -56,7 +55,7 @@ export class UpdateProfileDto {
 	orcid_id: string;
 
 	@IsOptional()
-	email: UserEmailEntry;
+	email: EmailDto;
 
 	@IsIn(['private', 'public'])
 	@IsString()
@@ -70,4 +69,20 @@ export class UpdateProfileDto {
 	@IsOptional()
 	@IsBoolean()
 	acceptsEmails: boolean;
+}
+
+export class EmailDto {
+	@IsEmail()
+	@IsString()
+	email: string;
+
+	@IsString()
+	visibility: string;
+
+	@IsBoolean()
+	verified: boolean;
+
+	@IsOptional()
+	@IsBoolean()
+	primary: boolean;
 }
