@@ -47,6 +47,8 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
   termList$: Observable<Term[]>;
   terms$: Observable<any>;
 
+  searchQuery: string = '';
+
   badges$: Observable<Paginated<BadgeDef>>;
   manageForm$ = new BehaviorSubject<{
     badge: BadgeDef;
@@ -134,28 +136,38 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
 
     this.badges$ = this.badgesList$.pipe(
       switchMap((badgeList: Paginated<BadgeDef>) => {
-        // We switch to the updateBadge$ observable to listen for updates
-        // This makes sure this observable is rebuilt whenever badgeList changes
         return this.updateBadge$.pipe(
-          // We start with the initial badgeList
-          // Making sure the first value is the badgeList
           startWith(badgeList),
-          // We scan over the updates and apply them to the badgeList
-          // This way we can keep track of the badgeList state
-          // and apply updates to it
           scan((badges: Paginated<BadgeDef>, update: BadgeListUpdate) => {
             return this.applyBadgeUpdates(badges, update);
           })
         ) as Observable<Paginated<BadgeDef>>;
+      }),
+      map(badges => {
+        if (!badges) return badges;
+        let filteredBadges = badges;
+        if (this.searchQuery) {
+          filteredBadges = {
+            ...badges,
+            data: badges.data.filter(badge =>
+              badge.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+            ),
+          };
+        }
+        return filteredBadges;
       })
     );
   }
+
   ngOnDestroy(): void {
     this.destroy$.next(true);
   }
 
   ngOnInit(): void {}
 
+  onSearchChange() {
+    this.page$.next(1);
+  }
   private updateBadgeUI(badge: BadgeDef) {
     this.updateBadge$.next({
       operation: "update",
