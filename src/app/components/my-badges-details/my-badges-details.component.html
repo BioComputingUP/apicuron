@@ -1,6 +1,4 @@
-<div
-  class="tw-w-full tw-h-full tw-bg-white tw-px-1 tw-py-2 tw-flex tw-flex-col tw-overflow-y-auto lg:tw-overflow-y-hidden"
->
+<div class="tw-w-full tw-h-full  tw-px-1 tw-py-2 tw-flex tw-flex-col tw-overflow-y-auto lg:tw-overflow-y-hidden">
   <div class="tw-relative">
     <div class="tw-grid tw-grid-cols-2 2xl:tw-grid-cols-3 tw-gap-2">
       <ng-container *ngIf="badges$ | async as badges">
@@ -11,19 +9,11 @@
     </div>
   </div>
 
-  <div
-    class="tw-mt-auto tw-flex tw-flex-row tw-justify-between tw-items-center tw-px-1 tw-pt-2"
-    *ngIf="badges$ | async as badges"
-  >
-    <span class="tw-block tw-text-sm"
-      >Total: {{ badges.meta.pagination.total }}</span
-    >
+  <div class="tw-mt-auto tw-flex tw-flex-row tw-justify-between tw-items-center tw-px-1 tw-pt-4"
+    *ngIf="badges$ | async as badges">
+    <span class="tw-block tw-font-bold tw-text-sm">Total: {{ badges.meta.pagination.total }}</span>
 
-    <pagination
-      [totalItems]="badges.meta.pagination.total"
-      [itemsPerPage]="badges.meta.pagination.limit"
-      (pageChanged)="update_page($event.page)"
-      [maxSize]="5"
-    ></pagination>
+    <pagination [totalItems]="badges.meta.pagination.total" [itemsPerPage]="badges.meta.pagination.limit"
+      (pageChanged)="update_page($event.page)" [maxSize]="5"></pagination>
   </div>
 </div>

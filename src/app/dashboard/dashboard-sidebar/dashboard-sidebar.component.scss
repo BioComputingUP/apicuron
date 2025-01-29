@@ -8,7 +8,7 @@
 // }
 
 .list-item-colors {
-    @apply tw-text-gray-500 hover:tw-bg-gradient-to-r hover:tw-from-apicuron-red hover:tw-to-apicuron-bright-purple hover:tw-text-gray-100
+    @apply tw-text-gray-500 tw-py-2 hover:tw-bg-gradient-to-r hover:tw-from-apicuron-red hover:tw-to-apicuron-bright-purple hover:tw-text-gray-100
 }
 
 .list-item {
