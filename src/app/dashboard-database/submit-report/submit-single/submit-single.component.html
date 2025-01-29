@@ -1,10 +1,10 @@
-<div class="tw-border-gray-400 tw-bg-white  tw-border tw-rounded tw-p-4 tw-flex tw-flex-col">
+<div class="tw-border-gray-300 tw-bg-white tw-border tw-rounded tw-p-4 tw-flex tw-flex-col">
     <h2 class="tw-text-lg tw-font-bold tw-text-gray-800">Submit Report</h2>
     <form [formGroup]="form" (ngSubmit)="submit()">
         <div class="form-control-element">
             <label for="activity_term">Activity Term</label>
             <select *ngIf="terms$ | async as terms" formControlName="activity_term" name="activity_term"
-                class="tw-bg-white">
+                class="tw-py-2 tw-px-4 tw-w-full tw-border tw-border-gray-300 tw-rounded-md">
                 <option *ngFor="let term of terms" [value]="term.activity_term">{{ term.activity_name }}</option>
             </select>
         </div>

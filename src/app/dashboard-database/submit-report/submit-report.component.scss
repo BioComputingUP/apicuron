@@ -1,9 +1,9 @@
 label {
-    @apply tw-font-bold
+    @apply tw-font-bold tw-mb-2
 }
 
-input[type=text], input[type=date], input[type=time], .text-input, select {
-    @apply tw-border-gray-300 tw-text-gray-900 tw-border tw-shadow-md tw-px-1 tw-py-2 tw-rounded focus:tw-outline-none focus:tw-ring-1 tw-ring-apicuron-purple
+input, .text-input {
+    @apply tw-border-gray-300 tw-text-gray-900 tw-border tw-px-4 tw-py-2 tw-rounded focus:tw-outline-none focus:tw-ring-1 focus:tw-ring-apicuron-purple focus:tw-border-apicuron-purple focus:tw-bg-purple-50;
 }
 
 .form-control-element {
