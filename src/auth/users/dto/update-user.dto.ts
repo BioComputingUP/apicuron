@@ -5,11 +5,12 @@ import {
 	IsOptional,
 	IsString,
 	Validate,
-	IsBoolean
+	IsBoolean,
 } from 'class-validator';
 import { User } from '../../../core/schemas/user.schema';
 import { OrcidChecksum } from '../../../submit-reports/validators/orcid-checksum';
 import { EntryExistsRule } from '../../../shared/validators/entry-exists.validator';
+import { UserEmailEntry } from 'src/core/schemas/components/user-email.schema';
 export class UpdateUserDto {
 	@IsOptional()
 	@IsEmail()
@@ -54,10 +55,8 @@ export class UpdateProfileDto {
 	@IsNotEmpty()
 	orcid_id: string;
 
-	@IsEmail()
-	@IsString()
 	@IsOptional()
-	email: string;
+	email: UserEmailEntry;
 
 	@IsIn(['private', 'public'])
 	@IsString()
@@ -66,10 +65,9 @@ export class UpdateProfileDto {
 
 	@IsOptional()
 	@IsBoolean()
-	isNewLogin: boolean
+	isNewLogin: boolean;
 
 	@IsOptional()
 	@IsBoolean()
-	acceptsEmails: boolean
-
+	acceptsEmails: boolean;
 }

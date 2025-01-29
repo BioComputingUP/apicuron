@@ -9,12 +9,7 @@ import { SubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
 
 @Injectable()
 export class UserUpdatedEventHandler implements IEventHandler {
-	constructor(protected aggregatorRunner: SubmissionRunner) {
-		console.log([
-			UserRepository.EntityCreatedEvent,
-			UserRepository.EntityUpdatedEvent,
-		]);
-	}
+	constructor(protected aggregatorRunner: SubmissionRunner) {}
 
 	@OnEvent(UserRepository.EntityUpdatedEvent, { promisify: true, async: true })
 	@OnEvent(UserRepository.EntityCreatedEvent, { promisify: true, async: true })

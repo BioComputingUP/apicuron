@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, SchemaTypes, Types } from 'mongoose';
-import { Report } from './reports.schema';
+import { HydratedDocument, Types } from 'mongoose';
 
 import { PrivacyType } from '../enums';
 import { UserResource } from '../interfaces/user-resource';
@@ -157,7 +156,7 @@ export class User {
 	@Prop({ required: false, default: Date.now() })
 	lastLoginDate?: Date;
 
-	@Prop({required:false, default: false})
+	@Prop({ required: false, default: false })
 	acceptsEmails?: boolean;
 
 	hasResourcePutCode(resource_id: string): boolean {

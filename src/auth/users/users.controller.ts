@@ -157,7 +157,8 @@ export class UserControllerV2 {
 	@Public()
 	@Patch('')
 	async updateProfile(@Req() req, @Body() updateProfile: UpdateProfileDto) {
-		const { orcid_id, ...updateData } = updateProfile;
+		const { orcid_id, email, ...updateData } = updateProfile;
+
 		if (req.user.orcid_id == orcid_id) {
 			const updatedUser = await this.userModel.findOneAndUpdate(
 				{
@@ -165,6 +166,7 @@ export class UserControllerV2 {
 				},
 				{
 					$set: updateData,
+					$addToSet: email ? { emails: email } : {},
 				},
 				{
 					new: true,
