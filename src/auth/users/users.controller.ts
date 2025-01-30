@@ -30,9 +30,7 @@ import {
 	ApiTags,
 } from '@nestjs/swagger';
 import { VersionHeader } from '../../plugins/swagger/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User, UserDocument } from '../../core/schemas/user.schema';
+import { User } from '../../core/schemas/user.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Public } from '../decorators/public.decorator';
 import { UserPrivacyUpdatedEvent } from './events/update-privacy';
@@ -122,6 +120,7 @@ export class UserControllerV2 {
 		protected userModel: UserRepository,
 		private eventEmitter: EventEmitter2,
 	) {}
+	private logger = new Logger(UserControllerV2.name);
 
 	@Get(':orcid_id')
 	@UseGuards(LocalAuthGuard)
@@ -158,29 +157,54 @@ export class UserControllerV2 {
 	@Patch('')
 	async updateProfile(@Req() req, @Body() updateProfile: UpdateProfileDto) {
 		const { orcid_id, email, ...updateData } = updateProfile;
-
-		if (req.user.orcid_id == orcid_id) {
-			const updatedUser = await this.userModel.findOneAndUpdate(
-				{
-					orcid_id,
-				},
-				{
-					$set: updateData,
-					$addToSet: email ? { emails: email } : {},
-				},
-				{
-					new: true,
-				},
-			);
-			if (updateData.privacy) {
-				await this.eventEmitter.emitAsync(
-					UserPrivacyUpdatedEvent.name,
-					new UserPrivacyUpdatedEvent(updatedUser, updateData.privacy),
+		// if (!req.user) {
+		// 	throw new UnauthorizedException('User not authenticated');
+		// }
+		// if (req.user.orcid_id == orcid_id)
+		const updateQuery = {};
+		const updateOptions = {};
+		if (email) {
+			this.logger.debug(`Email: ${JSON.stringify(email)}`);
+			const res = await this.userModel.findOne({
+				emails: { $elemMatch: { email: email.email } },
+			});
+			if (res && res.orcid_id != orcid_id) {
+				// email exist on another user
+				throw new UnauthorizedException(
+					'The provided email is already used by another user',
 				);
+			} else if (res && res.orcid_id == orcid_id) {
+				// email exist on the same user
+				updateQuery['$set'] = { 'emails.$[elem]': email };
+				updateOptions['arrayFilters'] = [{ 'elem.email': email.email }];
+			} else if (!res) {
+				// email does not exist
+				updateQuery['$push'] = { emails: { ...email } };
 			}
-		} else {
-			throw new UnauthorizedException('Cannot update the data of another User');
 		}
+		this.logger.debug(`Update query: ${JSON.stringify(updateQuery, null, 2)}`);
+		this.logger.debug(
+			`Update Options: ${JSON.stringify(updateOptions, null, 2)}`,
+		);
+		const updatedUser = await this.userModel.findOneAndUpdate(
+			{
+				orcid_id,
+			},
+			updateQuery,
+			{
+				...updateOptions,
+				new: true,
+			},
+		);
+		if (updateData.privacy) {
+			await this.eventEmitter.emitAsync(
+				UserPrivacyUpdatedEvent.name,
+				new UserPrivacyUpdatedEvent(updatedUser, updateData.privacy),
+			);
+		}
+		// } else {
+		// 	throw new UnauthorizedException('Cannot update the data of another User');
+		// }
 
 		return updateProfile;
 	}
