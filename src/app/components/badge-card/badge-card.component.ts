@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, ChangeDetectorRef } from "@angular/core";
 import { CommonModule, DatePipe } from "@angular/common";
 import { AchievementState, Badge } from "src/app/models/badge.model";
 import { AngularSvgIconModule } from "angular-svg-icon";
@@ -14,6 +14,7 @@ import {
 import { map, tap } from "rxjs/operators";
 import moment from "moment";
 import { OverlayModule } from "@angular/cdk/overlay";
+
 @Component({
   standalone: true,
   imports: [CommonModule, OverlayModule, AngularSvgIconModule],
@@ -26,7 +27,10 @@ export class BadgeCardComponent implements OnInit {
   AchievementState = AchievementState;
   formattedAchievedAt$: Observable<string>;
 
-  constructor() {
+  currentProgress = 0;
+  progressAnimationInterval: any;
+
+  constructor(private cdRef: ChangeDetectorRef) {
     this.formattedAchievedAt$ = this.formatAchievedAt();
   }
 
@@ -60,6 +64,7 @@ export class BadgeCardComponent implements OnInit {
 
   @Input() set badge(value: Badge) {
     this.badge$.next(value);
+    this.startProgressAnimation(value.progressRate); // Start the animation when the badge changes
   }
 
   @Input()
@@ -68,6 +73,7 @@ export class BadgeCardComponent implements OnInit {
       this.terms$.next(value);
     }
   }
+
   private overlayState$ = new BehaviorSubject<boolean>(false);
 
   overlayOpen$: Observable<boolean> = this.overlayState$.asObservable();
@@ -100,5 +106,24 @@ export class BadgeCardComponent implements OnInit {
           : this.formatBadgeDate(badge.achieved_at)
       )
     );
+  }
+
+  startProgressAnimation(targetProgress: number) {
+    this.currentProgress = 0;
+    const intervalDuration = 20;
+    const increment = 1;
+
+    if (this.progressAnimationInterval) {
+      clearInterval(this.progressAnimationInterval);
+    }
+
+    this.progressAnimationInterval = setInterval(() => {
+      if (this.currentProgress < targetProgress) {
+        this.currentProgress += increment;
+        this.cdRef.detectChanges();
+      } else {
+        clearInterval(this.progressAnimationInterval);
+      }
+    }, intervalDuration);
   }
 }

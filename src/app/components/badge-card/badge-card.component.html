@@ -68,18 +68,27 @@
           <span *ngIf="badge.state == AchievementState.progress">
             <span class="tw-text-xs tw-font-bold tw-text-gray-700">In progress</span>
 
-            <span role="progressbar" class="tw-relative tw-block tw-rounded-full tw-bg-gray-200 tw-w-4/5">
-              <span
-                class="tw-absolute tw-inset-y-0 tw-right-[-3rem] tw-flex tw-items-center tw-pr-2 tw-text-[10px]/4 tw-font-bold tw-text-black">
-                {{ badge.progressRate | number : "1.0-2" }}%
+            <!-- Flex Container for Progress Bar and Percentage Text -->
+            <span class="tw-flex tw-items-center tw-w-full tw-oveerflow-hidden">
+              <!-- Progress Bar Container -->
+              <span role="progressbar"
+                class="tw-relative tw-block tw-overflow-hidden tw-rounded-full tw-bg-gray-200 tw-flex-1">
+                <!-- Progress Bar Fill -->
+                <span
+                  class="tw-block tw-h-4 tw-rounded-full tw-bg-gradient-to-r tw-from-apicuron-purple tw-to-apicuron-red"
+                  [style.width]="currentProgress + '%'"></span>
               </span>
-              <span
-                class="tw-block tw-h-4 tw-rounded-full tw-bg-gradient-to-r tw-from-apicuron-purple tw-to-apicuron-red tw-text-center"
-                [style]="{ width: badge.progressRate + '%' }">
-                <!-- <span class="tw-block tw-h-4 tw-rounded-full tw-bg-gradient-to-r tw-from-apicuron-purple tw-to-apicuron-red tw-text-center" style="width: 50%"> -->
+
+              <!-- Percentage Text Positioned to the Right -->
+              <span class="tw-text-xs tw-font-bold tw-text-gray-700 tw-ml-2">
+                {{ badge.progressRate | number: '1.0-2' }}%
               </span>
             </span>
           </span>
+
+
+
+
         </div>
       </div>
     </div>
@@ -96,3 +105,11 @@
     </ul>
   </ng-template>
 </ng-container>
+
+
+<style>
+  .tw-block {
+    transition: width 1s ease-in-out;
+    /* Smooth transition on width change */
+  }
+</style>
