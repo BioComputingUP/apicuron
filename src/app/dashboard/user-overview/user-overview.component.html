@@ -1,32 +1,38 @@
-<div *ngIf="user$ | async as user" class="tw-p-1 sm:tw-p-2">
-    <h2 class="tw-text-lg lg:tw-text-xl tw-font-bold tw-font-dm-sans">{{ user.displayedName }}'s Statistics</h2>
+<div *ngIf="user$ | async as user" class="tw-px-10 tw-py-6">
+    <h2 class="tw-text-lg lg:tw-text-xl tw-font-bold tw-font-dm-sans"><span class="tw-text-apicuron-purple">{{
+            user.displayedName }}'s </span>Statistics</h2>
 
-    <div class="tw-flex tw-flex-row tw-items-stretch tw-h-auto" *ngIf="statistics$ | async as stats; else loading">
+    <div class="tw-flex tw-gap-4 tw-mt-4 tw-h-auto" *ngIf="statistics$ | async as stats; else loading">
         <ng-container *ngIf="stats.length > 0; else emptyStats">
-            <div class="tw-w-full sm:tw-w-2/3 tw-p-1 tw-block">
+            <div
+                class="tw-w-full lg:tw-w-2/3 tw-p-1 tw-py-2 tw-block tw-bg-white tw-rounded-md tw-border tw-border-gray-300">
                 <!-- reports bar chart card -->
-                <div class="tw-p-1 tw-rounded tw-shadow-md tw-shadow-gray-500 tw-bg-white">
+                <div class="tw-p-1">
                     <div class="tw-w-full tw-px-2">
                         <div>
                             <h3
                                 class="tw-text-md sm:tw-text-lg tw-font-dm-sans tw-font-bold tw-tracking-wide tw-capitalize">
-                                My
-                                Contributions</h3>
+                                My Contributions
+                            </h3>
                             <div>
-                                <form class="tw-w-full tw-flex tw-flex-row tw-justify-end tw-gap-2"
-                                    [formGroup]="reportsChartForm" action="">
-                                    <div>
+                                <form class="tw-w-full tw-py-2 tw-flex tw-justify-start" [formGroup]="reportsChartForm"
+                                    action="">
+                                    <div class="tw-flex tw-items-center tw-space-x-2">
                                         <label class="tw-text-sm tw-font-bold tw-text-gray-700 tw-mr-1"
-                                            for="from">from</label>
+                                            for="from">From</label>
                                         <p-calendar p-datepicker="tw-bg-white tw-rounded tw-shadow-gray-700"
                                             formControlName="from" dateFormat="dd/mm/yy"
-                                            [maxDate]="reportsChartForm.controls.to.value"></p-calendar>
+                                            [maxDate]="reportsChartForm.controls.to.value"
+                                            styleClass="tw-w-full tw-p-2 !tw-px-4 tw-border tw-border-gray-300 tw-rounded-md">
+                                        </p-calendar>
                                     </div>
-                                    <div>
+                                    <div class="tw-flex tw-ml-2 tw-items-center tw-space-x-2">
                                         <label class="tw-text-sm tw-font-bold tw-text-gray-700 tw-mr-1"
-                                            for="to">to</label>
+                                            for="to">To</label>
                                         <p-calendar formControlName="to" [maxDate]="maxTo" dateFormat="dd/mm/yy"
-                                            [minDate]="reportsChartForm.controls.from.value"></p-calendar>
+                                            [minDate]="reportsChartForm.controls.from.value"
+                                            styleClass="tw-w-full tw-p-2 !tw-px-4 tw-border tw-border-gray-300 tw-rounded-md">
+                                        </p-calendar>
                                     </div>
                                 </form>
                             </div>
@@ -42,24 +48,27 @@
 
                 </div>
             </div>
-            <div class="tw-w-1/2 sm:tw-w-1/3 tw-p-1 tw-block">
+            <div
+                class="tw-w-full lg:tw-w-1/3 tw-p-1 tw-py-2 tw-block tw-bg-white tw-rounded-md tw-border tw-border-gray-300 tw-overflow-hidden">
                 <!-- reports category chart -->
-                <div class="tw-py-1 tw-px-2 tw-rounded tw-shadow-md tw-shadow-gray-500 tw-bg-white tw-h-full">
+                <div class="tw-py-1 tw-px-2">
                     <h3 class="tw-text-md sm:tw-text-lg tw-font-dm-sans tw-font-bold tw-tracking-wide tw-capitalize">
-                        Contributions
-                        By Category </h3>
+                        Contributions By Category
+                    </h3>
                     <div class="tw-w-full tw-flex tw-flex-row tw-flex-wrap">
                         <div class="tw-w-full tw-px-2" *ngIf="resources$ | async as resources">
                             <select [formControl]="selectedResource"
                                 class="tw-w-full tw-py-1 tw-mt-1 tw-bg-gray-100 tw-text-gray-700 focus:tw-ring-0">
                                 <option *ngFor="let res of resources" [value]="res.resource_id"
-                                    [ngStyle]="{ color: res.color }" class="focus:tw-ring-0">{{ res.resource_name }}
+                                    [ngStyle]="{ color: res.color }" class="focus:tw-ring-0">
+                                    {{ res.resource_name }}
                                 </option>
                             </select>
                         </div>
-                        <div class="tw-w-full" *ngIf="currResourceStat$ | async as currResourceStat">
-                            <categories-pie-chart [statistics]="currResourceStat"></categories-pie-chart>
-
+                        <div class="tw-w-full tw-my-2" *ngIf="currResourceStat$ | async as currResourceStat">
+                            <div class="tw-w-full  tw-overflow-hidden">
+                                <categories-pie-chart [statistics]="currResourceStat"></categories-pie-chart>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -71,8 +80,8 @@
             <div class="tw-w-full tw-bg-white tw-rounded tw-flex tw-flex-col tw-items-center">
                 <svg-icon class="tw-mx-auto tw-p-2" svgClass="tw-w-24 md:tw-w-32"
                     src="assets/svg/no_data.svg"></svg-icon>
-                <p class="tw-text-center tw-py-2 tw-font-bold tw-text-sm tw-text-gray-700">No Contributions and
-                    Statistics Found for Any Resource yet <br> you can start by Contributing to our
+                <p class="tw-text-center tw-py-2 tw-font-bold tw-text-sm tw-text-gray-700">
+                    No Contributions and Statistics Found for Any Resource yet <br> you can start by Contributing to our
                     <a class="hover:tw-underline tw-text-blue-500 hover:tw-text-blue-400 tw-font-normal"
                         routerLink="/databases">Partner Resources</a>
                 </p>

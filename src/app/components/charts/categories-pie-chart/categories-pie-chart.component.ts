@@ -4,7 +4,6 @@ import {
   ElementRef,
   Input,
   OnDestroy,
-  OnInit,
   ViewChild,
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
@@ -14,6 +13,7 @@ import Plotly from "plotly.js-dist-min";
 import { map, takeUntil } from "rxjs/operators";
 import * as _ from "lodash";
 import tailwindConfig from "../../../../../tailwind.config.js";
+
 @Component({
   selector: "categories-pie-chart",
   standalone: true,
@@ -35,6 +35,7 @@ export class CategoriesPieChartComponent implements AfterViewInit, OnDestroy {
   }
 
   statistics$ = new BehaviorSubject<CuratorStatistics>(null);
+
   constructor() {
     const colors: string[] = ["generation", "invalidation", "revision"].map(
       (name) => tailwindConfig.theme.extend.colors[name]
@@ -58,8 +59,8 @@ export class CategoriesPieChartComponent implements AfterViewInit, OnDestroy {
               colors,
             },
             hoverinfo: "label+percent",
-            texttemplate: "%{value} %{label} Events, (%{percent})",
-            textinfo: "value",
+            texttemplate: "%{value} %{label} (%{percent})",
+            textinfo: "none",
             textposition: "outside",
             automargin: true,
           },
@@ -67,6 +68,7 @@ export class CategoriesPieChartComponent implements AfterViewInit, OnDestroy {
       })
     );
   }
+
   ngOnDestroy(): void {
     this.destroy$.next(true);
   }
@@ -78,7 +80,19 @@ export class CategoriesPieChartComponent implements AfterViewInit, OnDestroy {
         Plotly.newPlot(
           this.pieChart.nativeElement,
           data,
-          { title: "Contributions By Category" },
+          {
+            height: 350,
+            width: 350,
+            margin: { t: 10, b: 50, l: 0, r: 0 },
+            showlegend: true,
+            legend: {
+              orientation: "h", // Make legend horizontal
+              x: 0.5, // Center legend horizontally
+              y: -0.2, // Move legend below the chart
+              xanchor: "center",
+              yanchor: "top",
+            },
+          },
           { responsive: true }
         );
       });
