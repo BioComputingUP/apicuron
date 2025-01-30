@@ -6,10 +6,29 @@ import {
 	IsString,
 	Validate,
 	IsBoolean,
+	ValidateNested,
 } from 'class-validator';
 import { User } from '../../../core/schemas/user.schema';
 import { OrcidChecksum } from '../../../submit-reports/validators/orcid-checksum';
 import { EntryExistsRule } from '../../../shared/validators/entry-exists.validator';
+
+export class EmailDto {
+	@IsEmail()
+	@IsString()
+	@IsNotEmpty()
+	email: string;
+
+	@IsString()
+	visibility: string;
+
+	@IsBoolean()
+	verified: boolean;
+
+	@IsOptional()
+	@IsBoolean()
+	primary: boolean;
+}
+
 export class UpdateUserDto {
 	@IsOptional()
 	@IsEmail()
@@ -54,6 +73,7 @@ export class UpdateProfileDto {
 	@IsNotEmpty()
 	orcid_id: string;
 
+	@ValidateNested()
 	@IsOptional()
 	email: EmailDto;
 
@@ -69,20 +89,4 @@ export class UpdateProfileDto {
 	@IsOptional()
 	@IsBoolean()
 	acceptsEmails: boolean;
-}
-
-export class EmailDto {
-	@IsEmail()
-	@IsString()
-	email: string;
-
-	@IsString()
-	visibility: string;
-
-	@IsBoolean()
-	verified: boolean;
-
-	@IsOptional()
-	@IsBoolean()
-	primary: boolean;
 }
