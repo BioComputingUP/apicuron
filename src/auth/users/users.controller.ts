@@ -157,10 +157,12 @@ export class UserControllerV2 {
 	@Patch('')
 	async updateProfile(@Req() req, @Body() updateProfile: UpdateProfileDto) {
 		const { orcid_id, email, ...updateData } = updateProfile;
-		// if (!req.user) {
-		// 	throw new UnauthorizedException('User not authenticated');
-		// }
-		// if (req.user.orcid_id == orcid_id)
+		if (!req.user) {
+			throw new UnauthorizedException('User not authenticated');
+		}
+		if (req.user.orcid_id !== orcid_id)
+			throw new UnauthorizedException('Cannot update the data of another User');
+
 		const updateQuery = {};
 		const updateOptions = {};
 		if (email) {
@@ -202,10 +204,6 @@ export class UserControllerV2 {
 				new UserPrivacyUpdatedEvent(updatedUser, updateData.privacy),
 			);
 		}
-		// } else {
-		// 	throw new UnauthorizedException('Cannot update the data of another User');
-		// }
-
 		return updateProfile;
 	}
 }
