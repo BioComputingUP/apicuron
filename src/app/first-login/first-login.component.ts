@@ -16,7 +16,7 @@ export class FirstLoginDialog implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     //Debug
-    this.testUser();
+    // this.testUser();
     //End Debug
 
     this.auth.loginEvent$

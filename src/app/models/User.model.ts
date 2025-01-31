@@ -90,9 +90,11 @@ export class UpdateUser implements Deserializable, Serializable {
     return payload;
   }
   deserialize(input: any): this {
+    
     this.emailEntry = {
       email: input.email ?? null,
-      visibility: input.emailVisibility === false ? EmailVisibilityType.hidden : input.emailVisibility,
+      // true -> visible, false/undefined -> hidden
+      visibility: input.emailVisibility === true ? EmailVisibilityType.visible : EmailVisibilityType.hidden,
       primary: input.primary ?? false,
     };
 
