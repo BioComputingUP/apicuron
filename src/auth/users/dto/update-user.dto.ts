@@ -18,9 +18,12 @@ export class EmailDto {
 	@IsNotEmpty()
 	email: string;
 
+	@IsOptional()
 	@IsString()
+	@IsIn(['visible', 'hidden'])
 	visibility: string;
 
+	@IsOptional()
 	@IsBoolean()
 	verified: boolean;
 
