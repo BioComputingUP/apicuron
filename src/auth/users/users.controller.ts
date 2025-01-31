@@ -157,6 +157,9 @@ export class UserControllerV2 {
 	@Patch('')
 	async updateProfile(@Req() req, @Body() updateProfile: UpdateProfileDto) {
 		const { orcid_id, email, ...updateData } = updateProfile;
+		this.logger.debug(
+			`Received update data: ${JSON.stringify(updateData, null, 2)}`,
+		);
 		if (!req.user) {
 			throw new UnauthorizedException('User not authenticated');
 		}
@@ -166,7 +169,6 @@ export class UserControllerV2 {
 		const updateQuery = {};
 		const updateOptions = {};
 		if (email) {
-			this.logger.debug(`Email: ${JSON.stringify(email)}`);
 			const res = await this.userModel.findOne({
 				emails: { $elemMatch: { email: email.email } },
 			});
@@ -192,7 +194,10 @@ export class UserControllerV2 {
 			{
 				orcid_id,
 			},
-			updateQuery,
+			{
+				...updateQuery,
+				...updateData,
+			},
 			{
 				...updateOptions,
 				new: true,
