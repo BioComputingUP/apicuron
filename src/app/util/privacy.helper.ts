@@ -8,3 +8,9 @@ export const PrivacyType = {
 	public: 'public',
 } as const;
 export type PrivacyType = ObjectValues<typeof PrivacyType>;
+
+export const EmailVisibilityType = {
+	hidden: 'hidden',
+	visible: 'visible',
+} as const;
+export type EmailVisibilityType = ObjectValues<typeof EmailVisibilityType>;

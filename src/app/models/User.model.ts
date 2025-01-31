@@ -3,6 +3,8 @@ import {
   Serializable,
 } from "src/app/interfaces/deserializable.model";
 import { environment } from "src/environments/environment";
+import { EmailVisibilityType } from "../util/privacy.helper";
+import { EmailInput } from "../util/types";
 
 export class User implements Deserializable {
   deserialize(input: any): this {
@@ -39,9 +41,9 @@ export class User implements Deserializable {
   privacy: "private" | "public";
 
   biography?: string;
-  affiliation?: string
+  affiliation?: string;
   keywords?: [string];
-  links?: Array<{name: string; url: URL }>
+  links?: Array<{ name: string; url: URL }>;
   newLogin?: boolean;
 
   generate_avatar(scale = 80, radius = 50): URL {
@@ -64,15 +66,15 @@ export class User implements Deserializable {
   }
 }
 
-  // upload_avatar(scale = 80, radius = 50): URL {
+// upload_avatar(scale = 80, radius = 50): URL {
 
-  // }
+// }
 
 export class UpdateUser implements Deserializable, Serializable {
   serialize() {
     const payload: any = { orcid_id: this.orcid_id };
-    if (this.email) {
-      payload.email = this.email;
+    if (this.emailEntry) {
+      payload.email = this.emailEntry;
     }
 
     if (this.privacy) {
@@ -88,16 +90,21 @@ export class UpdateUser implements Deserializable, Serializable {
     return payload;
   }
   deserialize(input: any): this {
-    this.email = input.email ?? null;
+    this.emailEntry = {
+      email: input.email ?? null,
+      visibility: input.emailVisibility === false ? EmailVisibilityType.hidden : input.emailVisibility,
+      primary: input.primary ?? false,
+    };
+
     this.privacy = input.privacy ?? null;
     this.orcid_id = input.orcid_id;
     this.isNewLogin = input.isNewLogin ?? null;
     this.acceptsEmails = input.acceptsEmails ?? null;
     return this;
   }
-  email?: string;
+  emailEntry?: EmailInput;
   privacy?: "public" | "private";
   orcid_id: string;
-  isNewLogin?: boolean
-  acceptsEmails?: boolean
+  isNewLogin?: boolean;
+  acceptsEmails?: boolean;
 }
