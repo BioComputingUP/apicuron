@@ -69,6 +69,7 @@ export class FirstPopupComponent implements OnInit {
     const updateUser = new UpdateUser().deserialize({
       orcid_id: this.user.orcid_id,
       ...this.form.value,
+      primary: true,
       isNewLogin: false,
     });
     console.log("User data to update:");
