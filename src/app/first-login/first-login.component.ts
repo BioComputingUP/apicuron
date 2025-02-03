@@ -16,24 +16,11 @@ export class FirstLoginDialog implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     //Debug
-    // const test_user = {
-    //   orcid_id: "000000000",
-    //   displayedName: "Albert Einstein",
-    //   affiliation: "Humanity",
-    //   privacy: "public",
-
-    //   generate_avatar() {
-    //     return "/assets/user.png";
-    //   }
-    // }
-    // this.openDialog(test_user);
+    // this.testUser();
     //End Debug
 
     this.auth.loginEvent$
       .pipe(
-        tap((loginData) => {
-          console.log("FLC:", loginData.user.orcid_id);
-        }),
         filter((loginData) => loginData.isNew),
         delay(500),
         takeUntil(this.destroy$)
@@ -42,6 +29,20 @@ export class FirstLoginDialog implements OnInit, OnDestroy {
         this.openDialog(loginData.user);
       });
   }
+  private testUser() {
+    const test_user = {
+      orcid_id: "000000000",
+      displayedName: "Albert Einstein",
+      affiliation: "Humanity",
+      privacy: "public",
+
+      generate_avatar() {
+        return "/assets/user.png";
+      }
+    };
+    this.openDialog(test_user);
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
   }

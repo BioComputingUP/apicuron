@@ -22,6 +22,7 @@ export class FirstPopupComponent implements OnInit {
     email: FormControl<string>;
     privacy: FormControl<string>;
     acceptsEmails: FormControl<boolean>;
+    emailVisibility: FormControl<boolean>;
   }> = this.formBuilder.group({
     email: [
       "",
@@ -32,6 +33,7 @@ export class FirstPopupComponent implements OnInit {
     ],
     privacy: ["public", Validators.pattern(new RegExp("private|public"))],
     acceptsEmails: [true],
+    emailVisibility: [true],
   });
   user: User;
   avatar: string;
@@ -58,9 +60,6 @@ export class FirstPopupComponent implements OnInit {
       this.isOpen = true;
     }, 50);
 
-    console.log(christmasDate);
-    console.log(today);
-
     // If the current date is on or before Christmas, show Christmas content
     this.isChristmas = today <= christmasDate;
   }
@@ -70,10 +69,14 @@ export class FirstPopupComponent implements OnInit {
     const updateUser = new UpdateUser().deserialize({
       orcid_id: this.user.orcid_id,
       ...this.form.value,
+      primary: true,
       isNewLogin: false,
     });
+    console.log("User data to update:");
+    console.log(updateUser)
 
-    console.log("Hello");
+    console.log(`serialized user data to update: ${JSON.stringify (updateUser.serialize(), null, 2)}`);
+
     this.userService
       .updateUser(updateUser)
       .pipe(
@@ -105,5 +108,4 @@ export class FirstPopupComponent implements OnInit {
   get email() {
     return this.form.get("email");
   }
-
 }
