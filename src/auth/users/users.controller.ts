@@ -162,7 +162,7 @@ export class UserControllerV2 {
 		}
 		if (req.user.orcid_id !== orcid_id)
 			throw new UnauthorizedException('Cannot update the data of another User');
-		const new_user = await this.usersService.updateUserProfile(updateProfile);
-		return updateProfile;
+		await this.usersService.updateUserProfile(updateProfile);
+		return 'Profile Updated';
 	}
 }
