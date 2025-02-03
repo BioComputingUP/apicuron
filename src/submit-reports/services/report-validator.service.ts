@@ -172,40 +172,49 @@ export class ReportValidatorService {
 		const resourceIds = Array.from(new Set(reports.map((r) => r.resource_id)));
 		const orcidIds = Array.from(new Set(reports.map((r) => r.curator_orcid)));
 
-		const activities: Map<string, ITermIdentifier> = reports.reduce(
-			(acc, curr) => {
+		// obtain a map of resources based on the resource_ids
+		const resourcesMap = (
+			await this.resourceService.get_resources({
+				resource_id: { $in: resourceIds },
+			})
+		).reduce(
+			(
+				acc: Map<string, PartnerResourceDocument>,
+				curr: PartnerResourceDocument,
+			) => acc.set(curr.resource_id, curr),
+			new Map<string, PartnerResourceDocument>(),
+		);
+
+		// obtain a map of activities based on the activity terms/league/resource_id
+		const activities: Map<string, ITermIdentifier> = reports
+			// populate the league field of the report
+			.map((report) => {
+				report.league = this.assignDefaultLeague(
+					report,
+					resourcesMap.get(report.resource_id),
+				).name;
+				return report;
+			})
+			.reduce((acc, curr) => {
 				const hash = hashTermIdentifier(curr);
 				acc.set(hash, {
 					resource_id: curr.resource_id,
 					activity_term: curr.activity_term,
-					league: curr.league,
+					league: curr.league, // Assign the default league using the resource object from the report
 				});
 				return acc;
-			},
-			new Map<string, ITermIdentifier>(),
-		);
+			}, new Map<string, ITermIdentifier>());
 
 		const activitiesFilter: FilterQuery<TermDocument>[] = Array.from(
 			activities.values(),
 		);
 
-		const resources$ = this.resourceService.get_resources({
-			resource_id: { $in: resourceIds },
-		});
-
 		const users$ = this.usersService.getUsers({ orcid_id: { $in: orcidIds } });
 
 		const terms$ = this.termModel.find({ $or: activitiesFilter });
 
-		const [resources, users, terms] = await Promise.all([
-			resources$,
-			users$,
-			terms$,
-		]);
+		const [users, terms] = await Promise.all([users$, terms$]);
 
-		const resourcesMap = new Map<string, PartnerResourceDocument>(
-			resources.map((r) => [r.resource_id, r]),
-		);
 		const usersMap = new Map<string, UserDocument>(
 			users.map((u) => [u.orcid_id, u]),
 		);
