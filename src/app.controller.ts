@@ -40,10 +40,4 @@ export class AppController {
 			achievement_count,
 		};
 	}
-
-	@Get('jsonschema')
-	async getJsonSchema() {
-		console.log();
-		return 'hello';
-	}
 }

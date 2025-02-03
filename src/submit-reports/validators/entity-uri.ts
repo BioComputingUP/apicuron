@@ -25,12 +25,9 @@ export class EntityUriValid implements ValidatorConstraintInterface {
 		const resource = await this.resourcesService.get_resource(resource_id);
 
 		if (resource) {
-			const host_whitelist = [
-				new URL(resource.resource_uri).host,
-				new URL(resource.resource_url).host,
-				new URL('https://identifiers.org').host,
-				new URL('https://doi.org').host,
-			];
+			const host_whitelist: string[] = resource.allowedUrlsPrefix
+				.concat([resource.resource_uri, resource.resource_url])
+				.map((url: string) => new URL(url).host);
 
 			return isURL(propertyValue, {
 				protocols:
@@ -38,6 +35,9 @@ export class EntityUriValid implements ValidatorConstraintInterface {
 						? ['https']
 						: ['http', 'https'],
 				host_whitelist,
+				require_host: true,
+				require_protocol: true,
+				require_valid_protocol: true,
 			});
 		} else {
 			return true;

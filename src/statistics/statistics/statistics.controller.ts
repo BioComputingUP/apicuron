@@ -116,7 +116,7 @@ export class StatisticsController {
 	async get_user_statistics(
 		@Param('orcid_id') orcid_id: string,
 		@UserReq() user: User,
-	) {
+	): Promise<StatisticsDto[]> {
 		const exists = await this.userService.userExists(orcid_id);
 		// if the user doesn't exist we reply with 404
 		if (!exists) {
@@ -145,8 +145,13 @@ export class StatisticsController {
 			},
 			statFilter.getMongoQueryOptions(),
 		);
-
-		return stats;
+		const deserializedData = stats.map((stat) => {
+			return plainToInstance(StatisticsDto, stat, {
+				excludeExtraneousValues: true,
+				enableCircularCheck: true,
+			});
+		});
+		return deserializedData;
 	}
 
 	@ApiOperation({
