@@ -25,10 +25,6 @@ export class EmailDto {
 
 	@IsOptional()
 	@IsBoolean()
-	verified: boolean;
-
-	@IsOptional()
-	@IsBoolean()
 	primary: boolean;
 }
 
