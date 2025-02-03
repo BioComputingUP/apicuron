@@ -9,6 +9,13 @@ export const PrivacyType = {
 } as const;
 export type PrivacyType = ObjectValues<typeof PrivacyType>;
 
+export const VisibilityType = {
+	private: 'private',
+	public: 'public',
+	limited: 'limited',
+} as const;
+export type VisibilityType = ObjectValues<typeof VisibilityType>;
+
 export const ContributionType = {
 	community: 'community',
 	professional: 'professional',

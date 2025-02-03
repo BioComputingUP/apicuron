@@ -7,10 +7,12 @@ import {
 	Validate,
 	IsBoolean,
 	ValidateNested,
+	IsEnum,
 } from 'class-validator';
 import { User } from '../../../core/schemas/user.schema';
 import { OrcidChecksum } from '../../../submit-reports/validators/orcid-checksum';
 import { EntryExistsRule } from '../../../shared/validators/entry-exists.validator';
+import { VisibilityType } from 'src/core/enums';
 
 export class EmailDto {
 	@IsEmail()
@@ -20,12 +22,8 @@ export class EmailDto {
 
 	@IsOptional()
 	@IsString()
-	@IsIn(['visible', 'hidden'])
-	visibility: string;
-
-	@IsOptional()
-	@IsBoolean()
-	verified: boolean;
+	@IsEnum(VisibilityType)
+	visibility: VisibilityType;
 
 	@IsOptional()
 	@IsBoolean()
