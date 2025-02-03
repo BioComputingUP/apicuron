@@ -147,6 +147,13 @@ export class ManageTermsComponent implements OnInit {
       this.toast.error("An error occurred. Please contact the developers.", "Error");
     }
   }
+  confirmDelete(term: any) {
+  const confirmed = confirm(`Are you sure you want to delete ${term.activity_name}?`);
+  if (confirmed) {
+    this.delete_term(term);
+  }
+}
+
 
   delete_term(term: DeleteTerm) {
     this.termsService.delete_term(term).subscribe(
