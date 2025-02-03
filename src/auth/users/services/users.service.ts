@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { FilterQuery, UpdateQuery } from 'mongoose';
 import { achievements_v1_pipeline } from '../aggregation-pipeline/achievements.pipeline';
 import { browse_v1_pipeline } from '../aggregation-pipeline/browse.pipeline';
@@ -12,6 +12,7 @@ import { ICreateOrUpdateUser } from '../dto/create-or-update-user.dto';
 import { ResourceDocument } from '../../../core/schemas/resource/resource.schema';
 import { UserCreatedEvent } from '../events/user-created';
 import { UserRepository } from '../../../core/repositories/user.repository';
+import { UpdateProfileDto } from '../dto/update-user.dto';
 @Injectable()
 export class UsersService {
 	constructor(
@@ -208,5 +209,49 @@ export class UsersService {
 
 	async getUsers(filter: FilterQuery<UserDocument>): Promise<UserDocument[]> {
 		return await this.userRepository.find(filter);
+	}
+
+	async updateUserProfile(updates: UpdateProfileDto): Promise<UserDocument> {
+		const { orcid_id, email, ...otherUpdates } = updates;
+		const emailUpdateQuery = {};
+		const emailUpdateOptions = {};
+		if (email) {
+			const emailMatchedUser = await this.userRepository.findOne({
+				emails: { $elemMatch: { email: email.email } },
+			});
+			if (emailMatchedUser && emailMatchedUser.orcid_id != orcid_id) {
+				// email address belongs to another user
+				throw new UnauthorizedException(
+					'The provided email is already used by another user',
+				);
+			} else if (emailMatchedUser && emailMatchedUser.orcid_id == orcid_id) {
+				// User email updated
+				emailUpdateQuery['$set'] = { 'emails.$[elem]': email };
+				emailUpdateOptions['arrayFilters'] = [{ 'elem.email': email.email }];
+			} else if (!emailMatchedUser) {
+				// new email
+				emailUpdateQuery['$push'] = { emails: { ...email, verified: false } };
+			}
+		}
+		const updatedUser = await this.userRepository.findOneAndUpdate(
+			{
+				orcid_id,
+			},
+			{
+				...emailUpdateQuery,
+				...otherUpdates,
+			},
+			{
+				...emailUpdateOptions,
+				new: true,
+			},
+		);
+		if (otherUpdates.privacy) {
+			await this.eventEmitter.emitAsync(
+				UserPrivacyUpdatedEvent.name,
+				new UserPrivacyUpdatedEvent(updatedUser, otherUpdates.privacy),
+			);
+		}
+		return updatedUser;
 	}
 }

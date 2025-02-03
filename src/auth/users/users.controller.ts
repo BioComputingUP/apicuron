@@ -33,7 +33,7 @@ import { VersionHeader } from '../../plugins/swagger/config';
 import { User } from '../../core/schemas/user.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Public } from '../decorators/public.decorator';
-import { UserPrivacyUpdatedEvent } from './events/update-privacy';
+
 import { UserReq } from '../decorators/applyUser.decorator';
 import { UserRepository } from '../../core/repositories/user.repository';
 
@@ -156,59 +156,13 @@ export class UserControllerV2 {
 	@Public()
 	@Patch('')
 	async updateProfile(@Req() req, @Body() updateProfile: UpdateProfileDto) {
-		const { orcid_id, email, ...updateData } = updateProfile;
-		this.logger.debug(
-			`Received update data: ${JSON.stringify(updateData, null, 2)}`,
-		);
+		const { orcid_id } = updateProfile;
 		if (!req.user) {
 			throw new UnauthorizedException('User not authenticated');
 		}
 		if (req.user.orcid_id !== orcid_id)
 			throw new UnauthorizedException('Cannot update the data of another User');
-
-		const updateQuery = {};
-		const updateOptions = {};
-		if (email) {
-			const res = await this.userModel.findOne({
-				emails: { $elemMatch: { email: email.email } },
-			});
-			if (res && res.orcid_id != orcid_id) {
-				// email exist on another user
-				throw new UnauthorizedException(
-					'The provided email is already used by another user',
-				);
-			} else if (res && res.orcid_id == orcid_id) {
-				// email exist on the same user
-				updateQuery['$set'] = { 'emails.$[elem]': email };
-				updateOptions['arrayFilters'] = [{ 'elem.email': email.email }];
-			} else if (!res) {
-				// email does not exist
-				updateQuery['$push'] = { emails: { ...email } };
-			}
-		}
-		this.logger.debug(`Update query: ${JSON.stringify(updateQuery, null, 2)}`);
-		this.logger.debug(
-			`Update Options: ${JSON.stringify(updateOptions, null, 2)}`,
-		);
-		const updatedUser = await this.userModel.findOneAndUpdate(
-			{
-				orcid_id,
-			},
-			{
-				...updateQuery,
-				...updateData,
-			},
-			{
-				...updateOptions,
-				new: true,
-			},
-		);
-		if (updateData.privacy) {
-			await this.eventEmitter.emitAsync(
-				UserPrivacyUpdatedEvent.name,
-				new UserPrivacyUpdatedEvent(updatedUser, updateData.privacy),
-			);
-		}
+		const new_user = await this.usersService.updateUserProfile(updateProfile);
 		return updateProfile;
 	}
 }
