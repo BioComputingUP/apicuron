@@ -3,6 +3,9 @@ import {
   Serializable,
 } from "src/app/interfaces/deserializable.model";
 import { environment } from "src/environments/environment";
+import { EmailVisibilityType } from "../util/privacy.helper";
+import { EmailInput } from "../util/types";
+import { PrivacyType } from "./resource-group.model";
 
 export class User implements Deserializable {
   deserialize(input: any): this {
@@ -18,6 +21,11 @@ export class User implements Deserializable {
     this.given_name = input.given_name ?? null;
     this.avatar = input.avatar ?? null;
     this.privacy = input.privacy ?? "public";
+    this.biography = input.biography ?? "Empty";
+    this.affiliation = input.affiliation ?? "Nothing";
+    this.keywords = input.keywords ?? null;
+    this.links = input.links ?? null;
+    this.newLogin = input.isNewLogin ?? false;
     return this;
   }
 
@@ -33,6 +41,12 @@ export class User implements Deserializable {
   avatar?: string;
   privacy: "private" | "public";
 
+  biography?: string;
+  affiliation?: string;
+  keywords?: [string];
+  links?: Array<{ name: string; url: URL }>;
+  newLogin?: boolean;
+
   generate_avatar(scale = 80, radius = 50): URL {
     if (this.avatar) {
       return new URL(this.avatar, environment.ws + "/");
@@ -47,32 +61,55 @@ export class User implements Deserializable {
   orcid_url(): URL {
     return new URL(this.orcid_id, environment.orcid_main_url);
   }
+
+  firstTimeLogin(): boolean {
+    return true;
+  }
 }
 
-  // upload_avatar(scale = 80, radius = 50): URL {
+// upload_avatar(scale = 80, radius = 50): URL {
 
-  // }
+// }
 
 export class UpdateUser implements Deserializable, Serializable {
   serialize() {
     const payload: any = { orcid_id: this.orcid_id };
-    if (this.email) {
-      payload.email = this.email;
+    if (this.emailEntry && this.emailEntry.email) {
+      payload.email = this.emailEntry;
     }
-
     if (this.privacy) {
       payload.privacy = this.privacy;
     }
+    if (this.isNewLogin !== null) {
+      payload.isNewLogin = this.isNewLogin;
+    }
+    if (this.acceptsEmails !== null) {
+      payload.acceptsEmails = this.acceptsEmails;
+    }
+
     return payload;
   }
   deserialize(input: any): this {
-    this.email = input.email ?? null;
+    if (input.email) {
+      this.emailEntry = {
+        email: input.email,
+        // checked box -> public email, unchecked/undefined -> hide email
+        visibility:
+          input.emailVisibility === true
+            ? EmailVisibilityType.public
+            : EmailVisibilityType.private,
+        primary: input.primary ?? null,
+      };
+    }
     this.privacy = input.privacy ?? null;
     this.orcid_id = input.orcid_id;
-
+    this.isNewLogin = input.isNewLogin ?? null;
+    this.acceptsEmails = input.acceptsEmails ?? null;
     return this;
   }
-  email?: string;
-  privacy?: "public" | "private";
+  emailEntry?: EmailInput;
+  privacy?: PrivacyType;
   orcid_id: string;
+  isNewLogin?: boolean;
+  acceptsEmails?: boolean;
 }

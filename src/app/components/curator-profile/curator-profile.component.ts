@@ -44,7 +44,6 @@ export class CuratorProfileComponent implements OnInit, AfterViewInit {
   ) {}
 
   curator$ = new BehaviorSubject<User>(null);
-
   @Input() set curator(value: User) {
     this.curator$.next(value);
   }
@@ -60,6 +59,7 @@ export class CuratorProfileComponent implements OnInit, AfterViewInit {
         this.orcidService.get_biography(curator.orcid_id)
       )
     );
+    
     this.keywords$ = this.curatorObs$.pipe(
       switchMap((curator: User) =>
         this.orcidService.get_keywords(curator.orcid_id)
@@ -75,14 +75,13 @@ export class CuratorProfileComponent implements OnInit, AfterViewInit {
         this.orcidService.get_employment(curator.orcid_id)
       )
     );
-
+   
     this.userInfo$ = merge(
       this.biography$,
       this.keywords$,
       this.profileLinks$,
       this.employment$,
-      4
-    ).pipe(map((k) => !!k));
+    ).pipe(map((k) => true));
   }
 
   ngAfterViewInit(): void {}

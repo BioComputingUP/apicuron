@@ -26,6 +26,6 @@ import { MonthlyLeaderboardComponent } from "./leaderboards/monthly-leaderboard"
     ProfileRendererComponent,
     LoadableComponent,
   ],
-  exports: [ResourceLeaderboardComponent],
+  exports: [ResourceLeaderboardComponent, PaginationComponent],
 })
 export class LeaderboardModule {}

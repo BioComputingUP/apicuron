@@ -21,8 +21,13 @@ import { MedalGeneratorComponent } from './components/medal-generator/medal-gene
 import { FormsModule } from '@angular/forms';
 
 
+import { FirstLoginDialog } from "./first-login/first-login.component";
+import { DialogModule } from "@angular/cdk/dialog";
+import { ReactiveFormsModule } from "@angular/forms";
+import { FirstPopupComponent } from "./first-login/first-popup/first-popup.component";
+import { DashboardModule } from "./dashboard/dashboard.module";
 @NgModule({
-  declarations: [AppComponent, PageNotFoundComponent, MainLayoutComponent, MedalGeneratorComponent],
+  declarations: [AppComponent, PageNotFoundComponent, MainLayoutComponent, MedalGeneratorComponent, FirstLoginDialog, FirstPopupComponent],
   imports: [
     AppRoutingModule,
     AuthModule,
@@ -35,9 +40,13 @@ import { FormsModule } from '@angular/forms';
     BrowserAnimationsModule,
     // ReactiveFormsModule,
     FormsModule,
+    ReactiveFormsModule,
+    // FormsModule,
     HttpClientModule,
     NavbarComponent,
     FootComponent,
+    DashboardModule,
+    DialogModule,
     AngularSvgIconModule.forRoot(),
     MatomoModule.forRoot({
       scriptUrl: "https://matomo.biocomputingup.it/matomo.js",

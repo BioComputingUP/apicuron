@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { ApicuronUtilComponent } from './apicuron-util.component';
+import { PaginationComponent } from './pagination/pagination.component';
 
 
 
@@ -8,9 +9,11 @@ import { ApicuronUtilComponent } from './apicuron-util.component';
     ApicuronUtilComponent
   ],
   imports: [
+    PaginationComponent
   ],
   exports: [
-    ApicuronUtilComponent
+    ApicuronUtilComponent,
+    PaginationComponent
   ]
 })
 export class ApicuronUtilModule { }

@@ -21,9 +21,9 @@ module.exports = {
         "apicuron-purple-100": "hsl(300, 51%, 89%)",
         "apicuron-purple-500": "hsl(300, 51%, 40%)",
         "apicuron-red": "#9A031E",
-        invalidation: "#F76135",
-        revision: "#EDBF3A",
-        generation: "#59C794",
+        invalidation: "#b33e27",
+        revision: "#bd9522",
+        generation: "#41915f",
         // orange: {
         //   50: '#fff7ed',
         //   100: '#ffedd5',
