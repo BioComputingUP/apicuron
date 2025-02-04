@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { FirstPopupComponent } from "./first-popup/first-popup.component";
 import { AuthService } from "../auth/auth.service";
 
-import { filter, takeUntil, tap, delay} from "rxjs/operators";
+import { filter, takeUntil, tap, delay } from "rxjs/operators";
 import { Subject } from "rxjs";
 @Component({
   selector: "first-login-dialog",
@@ -14,11 +14,7 @@ export class FirstLoginDialog implements OnInit, OnDestroy {
   constructor(public dialog: Dialog, protected auth: AuthService) {}
 
   ngOnInit(): void {
-
-    //Debug
-    // this.testUser();
-    //End Debug
-
+    this.testUser();
     this.auth.loginEvent$
       .pipe(
         filter((loginData) => loginData.isNew),
@@ -38,7 +34,7 @@ export class FirstLoginDialog implements OnInit, OnDestroy {
 
       generate_avatar() {
         return "/assets/user.png";
-      }
+      },
     };
     this.openDialog(test_user);
   }

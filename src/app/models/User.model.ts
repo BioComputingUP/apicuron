@@ -5,6 +5,7 @@ import {
 import { environment } from "src/environments/environment";
 import { EmailVisibilityType } from "../util/privacy.helper";
 import { EmailInput } from "../util/types";
+import { PrivacyType } from "./resource-group.model";
 
 export class User implements Deserializable {
   deserialize(input: any): this {
@@ -73,10 +74,9 @@ export class User implements Deserializable {
 export class UpdateUser implements Deserializable, Serializable {
   serialize() {
     const payload: any = { orcid_id: this.orcid_id };
-    if (this.emailEntry) {
+    if (this.emailEntry && this.emailEntry.email) {
       payload.email = this.emailEntry;
     }
-
     if (this.privacy) {
       payload.privacy = this.privacy;
     }
@@ -90,14 +90,17 @@ export class UpdateUser implements Deserializable, Serializable {
     return payload;
   }
   deserialize(input: any): this {
-    
-    this.emailEntry = {
-      email: input.email ?? null,
-      // true -> visible, false/undefined -> hidden
-      visibility: input.emailVisibility === true ? EmailVisibilityType.visible : EmailVisibilityType.hidden,
-      primary: input.primary ?? false,
-    };
-
+    if (input.email) {
+      this.emailEntry = {
+        email: input.email,
+        // checked box -> public email, unchecked/undefined -> hide email
+        visibility:
+          input.emailVisibility === true
+            ? EmailVisibilityType.public
+            : EmailVisibilityType.private,
+        primary: input.primary ?? null,
+      };
+    }
     this.privacy = input.privacy ?? null;
     this.orcid_id = input.orcid_id;
     this.isNewLogin = input.isNewLogin ?? null;
@@ -105,7 +108,7 @@ export class UpdateUser implements Deserializable, Serializable {
     return this;
   }
   emailEntry?: EmailInput;
-  privacy?: "public" | "private";
+  privacy?: PrivacyType;
   orcid_id: string;
   isNewLogin?: boolean;
   acceptsEmails?: boolean;
