@@ -228,7 +228,7 @@ export class ComputeWeeklyStatisticsService {
 			// update the count, score and totalScore
 			currentStat[`${activity_category}_count`] += reportAgg.count;
 			currentStat[`${activity_category}_score`] += reportAgg.count * score;
-			currentStat.total_score += reportAgg.count * score;
+			// currentStat.total_score += reportAgg.count * score;
 		}
 
 		if (!!currentStat) {
