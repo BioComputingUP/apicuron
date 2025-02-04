@@ -11,18 +11,18 @@ async function bootstrap() {
 	const userModel: Model<UserDocument> = app.get(getModelToken(User.name));
 
 	const logger = new Logger('UpdateLoginDataScript');
-	logger.debug('Updating Login Data');
+	logger.verbose('Updating Login Data for all users');
 	const updateResult = await userModel.updateMany(
-		{},
+		{ isNewLogin: { $exists: false } },
 		{
 			$set: {
 				isNewLogin: true,
-				acceptsEmails: true,
+				acceptsEmails: false,
 			},
 		},
 	);
 
-	logger.log(
+	logger.debug(
 		`Updated ${updateResult.modifiedCount} login data in user collection`,
 	);
 	await app.close();
