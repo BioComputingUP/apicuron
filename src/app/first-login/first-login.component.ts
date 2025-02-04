@@ -14,7 +14,6 @@ export class FirstLoginDialog implements OnInit, OnDestroy {
   constructor(public dialog: Dialog, protected auth: AuthService) {}
 
   ngOnInit(): void {
-    this.testUser();
     this.auth.loginEvent$
       .pipe(
         filter((loginData) => loginData.isNew),
@@ -24,19 +23,6 @@ export class FirstLoginDialog implements OnInit, OnDestroy {
       .subscribe((loginData) => {
         this.openDialog(loginData.user);
       });
-  }
-  private testUser() {
-    const test_user = {
-      orcid_id: "000000000",
-      displayedName: "Albert Einstein",
-      affiliation: "Humanity",
-      privacy: "public",
-
-      generate_avatar() {
-        return "/assets/user.png";
-      },
-    };
-    this.openDialog(test_user);
   }
 
   ngOnDestroy(): void {
