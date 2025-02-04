@@ -65,18 +65,12 @@ export class FirstPopupComponent implements OnInit {
   }
 
   submitForm() {
-    console.log(this.form.value);
     const updateUser = new UpdateUser().deserialize({
       orcid_id: this.user.orcid_id,
       ...this.form.value,
       primary: true,
       isNewLogin: false,
     });
-    console.log("User data to update:");
-    console.log(updateUser)
-
-    console.log(`serialized user data to update: ${JSON.stringify (updateUser.serialize(), null, 2)}`);
-
     this.userService
       .updateUser(updateUser)
       .pipe(
