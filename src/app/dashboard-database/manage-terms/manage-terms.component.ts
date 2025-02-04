@@ -148,11 +148,11 @@ export class ManageTermsComponent implements OnInit {
     }
   }
   confirmDelete(term: any) {
-  const confirmed = confirm(`Are you sure you want to delete ${term.activity_name}?`);
-  if (confirmed) {
-    this.delete_term(term);
+    const confirmed = confirm(`Are you sure you want to delete ${term.activity_name}?`);
+    if (confirmed) {
+      this.delete_term(term);
+    }
   }
-}
 
 
   delete_term(term: DeleteTerm) {

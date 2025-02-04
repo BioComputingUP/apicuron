@@ -226,6 +226,12 @@ export class ManageMedalsComponent implements OnInit {
     );
   }
 
+  confirmDeleteMedal(medal: MedalDef) {
+    const confirmed = confirm(`Are you sure you want to delete the medal ${medal.name}?`);
+    if (confirmed) {
+      this.delete_medal(medal);
+    }
+  }
   delete_medal(medal: MedalDef) {
     this.medalsDefService.deleteMedal(medal).subscribe(
       (response) => {

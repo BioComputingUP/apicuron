@@ -276,6 +276,12 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
     this.manageForm$.next({ badge: null, show: false, type: "create" });
   }
 
+  confirmDeleteBadge(badge: BadgeDef) {
+      const confirmed = confirm(`Are you sure you want to delete the medal ${badge.name}?`);
+      if (confirmed) {
+        this.delete_badge(badge);
+      }
+  }
   delete_badge(badge) {
     this.badgeDefService
       .deleteBadge(badge)
