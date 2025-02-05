@@ -63,6 +63,7 @@ export class CreateMedalDefDto {
 			'a medal color has to be either a color hexcode, "bronze", "gold" or "silver"',
 	})
 	@IsNotEmpty()
+	@IsOptional()
 	color: string;
 
 	@Min(1)

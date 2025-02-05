@@ -32,6 +32,7 @@ export class CreateBadgeDefDto {
 			'a badge color has to be either a color hexcode, "bronze", "gold" or "silver"',
 	})
 	@IsNotEmpty()
+	@IsOptional()
 	color_code: string;
 
 	@Min(1)
