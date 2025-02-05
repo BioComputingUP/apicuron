@@ -36,8 +36,6 @@ export class MedalDefQueriesService {
 		const filterQuery: FilterQuery<AchievementDef> = {
 			$and: [combinedBadgeFilters, queryFilter],
 		};
-		console.log(JSON.stringify(filterQuery, null, 2));
-
 		const options = medalFilter.getMongoQueryOptions();
 
 		const data$ = this.medalDefModel.find(filterQuery, {}, options);
