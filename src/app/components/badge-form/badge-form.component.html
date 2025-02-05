@@ -21,12 +21,12 @@
   <!-- Badge Name and Identifier in One Row -->
   <div class="tw-px-6 tw-col-span-2 sm:tw-grid sm:tw-grid-cols-2 sm:tw-gap-4">
     <div>
-      <label class="tw-block tw-font-bold tw-text-gray-700">Badge Name</label>
+      <label class="tw-block tw-font-bold tw-text-gray-700">Badge Name<span style="color: red;">*</span></label>
       <input type="text" formControlName="displayedName"
         class="tw-w-full tw-p-2 !tw-px-4 tw-border tw-border-gray-300 tw-rounded-md" />
     </div>
     <div>
-      <label class="tw-block tw-font-bold tw-text-gray-700">Badge Identifier</label>
+      <label class="tw-block tw-font-bold tw-text-gray-700">Badge Identifier<span style="color: red;">*</span></label>
       <input type="text" formControlName="name"
         class="tw-w-full tw-p-2 !tw-px-4 tw-border tw-border-gray-300 tw-rounded-md" [readonly]="type == 'update'" />
       <small class="tw-pt-2 tw-leading-tight tw-block tw-text-xs tw-text-gray-500">This value is used as an identifier
@@ -37,16 +37,16 @@
 
   <!-- List of Terms -->
   <div class="tw-px-6 tw-mt-2 tw-col-span-2">
-    <label class="tw-block tw-font-bold tw-text-gray-700">List of Terms</label>
+    <label class="tw-block tw-font-bold tw-text-gray-700">List of Terms<span style="color: red;">*</span></label>
     <p-multiSelect [options]="terms" [group]="true" formControlName="list_terms" defaultLabel="Select an activity Term"
       display="chip" class="tw-w-full"
       styleClass="tw-w-full tw-border tw-border-gray-300 tw-rounded-md"></p-multiSelect>
   </div>
 
   <!-- Color Code and Number of Contributions in One Row -->
-  <div class="tw-px-6 tw-mt-2 tw-col-span-2 sm:tw-grid sm:tw-grid-cols-2 sm:tw-gap-4">
+  <div class="tw-px-6 tw-mt-2 tw-w-full tw-col-span-2 ">
     <!-- Color Code -->
-    <div class="tw-mt-2 sm:tw-mt-0">
+    <!-- <div class="tw-mt-2 sm:tw-mt-0">
       <label class="tw-block tw-font-bold tw-text-gray-700">Color Code</label>
       <div class="tw-flex tw-items-start tw-gap-2">
         <div>
@@ -63,12 +63,13 @@
         *ngIf="form.get('color_code').hasError('pattern') && form.get('color_code').touched">
         Color Code should be either a hex code (e.g., #333), "bronze", "silver" or "gold"
       </small>
-    </div>
-    <div>
-      <label class="tw-block tw-font-bold tw-text-gray-700">Number of Contributions</label>
-      <input type="number" min="1" formControlName="count_threshold"
-        class="tw-w-full tw-p-2 !tw-px-4 tw-border tw-border-gray-300 tw-rounded-md" />
-    </div>
+    </div> -->
+    <!-- <div> -->
+    <label class="tw-block tw-font-bold tw-text-gray-700">Number of Contributions<span
+        style="color: red;">*</span></label>
+    <input type="number" min="1" formControlName="count_threshold"
+      class="tw-w-full tw-p-2 !tw-px-4 tw-border tw-border-gray-300 tw-rounded-md" />
+    <!-- </div> -->
   </div>
 
   <!-- Start and End Date in One Row -->

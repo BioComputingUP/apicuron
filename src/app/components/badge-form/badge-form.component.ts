@@ -57,15 +57,6 @@ export class BadgeFormComponent implements OnInit, OnDestroy {
   form: FormGroup = this.formBuilder.group({
     name: ["", [Validators.required]],
     displayedName: ["", [Validators.required]],
-    color_code: [
-      "",
-      [
-        Validators.required,
-        Validators.pattern(
-          /(^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$)|^bronze$|^gold$|^silver$/
-        ),
-      ],
-    ],
     count_threshold: [1, [Validators.required, Validators.min(1)]],
     list_terms: [[] as string[], [Validators.minLength(1)]],
     startDate: [null, []],
@@ -94,7 +85,6 @@ export class BadgeFormComponent implements OnInit, OnDestroy {
       name: this.badge.name ?? "",
       displayedName: this.badge.displayedName ?? "",
       list_terms: this.badge.list_terms ?? "",
-      color_code: this.badge.color_code ?? "",
       count_threshold: this.badge.count_threshold ?? "",
       startDate: this.badge.startDate ?? null,
       endDate: this.badge.endDate ?? null,
