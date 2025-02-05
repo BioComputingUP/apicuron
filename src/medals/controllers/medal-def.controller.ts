@@ -89,16 +89,9 @@ export class MedalsDefController {
 		@UserReq() user: User | null,
 	) {
 		const privacyQuery = resourceEntityPrivacyFilter(user);
-
-		const queryFilter = {
-			...medalFilter.omitPagination(),
-			...privacyQuery,
-		};
-		const options = medalFilter.getMongoQueryOptions();
-
 		const { data, count } = await this.queriesService.getMedalDefs(
-			queryFilter,
-			options,
+			medalFilter,
+			privacyQuery,
 		);
 		return paginate(data, medalFilter, count);
 	}
