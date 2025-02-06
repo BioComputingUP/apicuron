@@ -1,52 +1,107 @@
 <div
-  class="tw-p-5 tw-flex tw-flex-col tw-h-full tw-bg-white tw-drop-shadow-sm tw-rounded-md tw-transition-all tw-duration-300 tw-ease-in-out hover:tw-border-violet-400">
+  class="tw-p-5 tw-flex tw-flex-col tw-h-full tw-bg-white tw-drop-shadow-sm tw-rounded-md tw-transition-all tw-duration-300 tw-ease-in-out hover:tw-border-violet-400"
+>
   <!-- First row: Avatar -->
   <div class="tw-grid tw-grid-cols-1 tw-gap-2 tw-my-2">
-    <img class="tw-aspect-square tw-mx-auto tw-border tw-rounded-full" style="width: 70px; height:auto;"
-      [src]="entry.curator.generate_avatar()" alt="Curator Avatar" />
+    <img
+      class="tw-aspect-square tw-mx-auto tw-border tw-rounded-full"
+      style="width: 70px; height: auto"
+      [src]="entry.curator.generate_avatar()"
+      alt="Curator Avatar"
+    />
   </div>
 
   <!-- Second row: Curator information -->
   <div class="tw-grid tw-gap-2 tw-text-center">
     <div>
-      <a class="tw-font-extrabold tw-text-xl tw-text-slate-800 hover:tw-text-slate-600 hover:tw-underline"
-        [routerLink]="['/curators', entry.curator.orcid_id]">
+      <a
+        class="tw-font-extrabold tw-text-xl tw-text-slate-800 hover:tw-text-slate-600 hover:tw-underline"
+        [routerLink]="['/curators', entry.curator.orcid_id]"
+      >
         {{ entry.curator.displayedName }}
       </a>
     </div>
     <div>
-      <p>{{ entry.curator.orcid_id }}<a [href]="entry.curator.orcid_url()" target="_blank"
-          class="tw-cursor-pointer tw-align-top">
-          <img class="tw-ml-2 tw-inline tw-h-6 tw-w-6" src="https://orcid.org/assets/vectors/orcid.logo.icon.svg" alt=""
-            role="tooltip">
-        </a></p>
-      <p>{{ entry.curator.affiliation }}</p>
+      <p>
+        {{ entry.curator.orcid_id }}
+        <a
+          [href]="entry.curator.orcid_url()"
+          target="_blank"
+          class="tw-cursor-pointer tw-align-top"
+        >
+          <img
+            class="tw-ml-2 tw-inline tw-h-6 tw-w-6"
+            src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
+            alt=""
+            role="tooltip"
+          />
+        </a>
+      </p>
+      <p
+        *ngIf="
+          entry.curator.affiliation &&
+          entry.curator.affiliation !== 'No affiliation'
+        "
+        class="tw-text-sm tw-text-gray-600"
+      >
+        {{ entry.curator.affiliation }}
+      </p>
     </div>
   </div>
 
   <!-- Third row: Contributions and Resources -->
-  <div class="tw-my-2 tw-transition-all tw-duration-1000 tw-ease-out">
-    <div class="tw-flex tw-flex-wrap tw-gap-2 tw-justify-center">
-      <!-- Display only the first two contributions -->
-      <div *ngFor="let contribution of getContributions().slice(0, 2); let i = index"
-        class="tw-font-dm-sans tw-bg-gray-100 tw-rounded-full tw-px-5 tw-py-2 tw-max-w-xs">
-        <img [src]="contribution.resource.logo" class="tw-h-6 tw-cursor-pointer" (click)="toggleGroups(i)"
-          alt="Resource Logo" />
+  <div class="tw-my-2">
+    <div
+      class="tw-flex tw-px-2 tw-py-2 tw-rounded-sm tw-gap-3 tw-justify-center tw-items-center"
+    >
+      <!-- Display all contributions -->
+      <div
+        *ngFor="let contribution of getContributions()"
+        class="tw-font-dm-sans tw-max-w-xs tw-flex tw-justify-center tw-items-center"
+      >
+        <a [href]="contribution.resource.resource_url" target="_blank">
+          <img
+            [src]="contribution.resource.logo"
+            class="tw-cursor-pointer"
+            style="width: 70px; height: auto"
+            alt="Resource Logo"
+          />
+        </a>
       </div>
 
-      <!-- Display "+N" if there are more than two contributions -->
-      <div *ngIf="getContributions().length > 2"
-        class="tw-font-dm-sans tw-bg-gray-100 tw-rounded-full tw-px-5 tw-py-2 tw-max-w-xs tw-cursor-pointer"
-        (mouseenter)="showContributions = true" (mouseleave)="showContributions = false">
+      <span
+        #trigger
+        [hidden]="getContributions().length < 3"
+        class="tw-font-dm-sans tw-text-sm tw-bg-gray-200 tw-px-3 tw-py-2 tw-rounded-full tw-cursor-pointer tw-inline-block tw-align-middle tw-max-w-[32px] tw-max-h-[32px] tw-flex tw-items-center tw-justify-center"
+        (mouseenter)="showContributions = true"
+        (mouseleave)="showContributions = false"
+      >
         +{{ getContributions().length - 2 }}
-        <div class="tw-absolute tw-bg-gray-100 tw-rounded-lg tw-shadow-lg tw-p-4 tw-mt-2" *ngIf="showContributions">
-          <div *ngFor="let extra of getContributions().slice(2)">
-            <img [src]="extra.resource.logo" class="tw-h-6" alt="Resource Logo" />
+      </span>
+
+      <!-- Overlay Tooltip -->
+      <ng-template
+        cdkConnectedOverlay
+        [cdkConnectedOverlayOrigin]="trigger"
+        [cdkConnectedOverlayOpen]="
+          showContributions && getContributions().length > 2
+        "
+        [cdkConnectedOverlayOffsetX]="0"
+        [cdkConnectedOverlayOffsetY]="8"
+        [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
+      >
+        <div
+          class="tw-bg-gray-100 tw-rounded-lg tw-shadow-lg tw-p-4 tw-border tw-border-gray-300"
+        >
+          <div *ngFor="let contribution of getContributions()">
+            <img
+              [src]="contribution.resource.logo"
+              style="width: 40px; height: auto"
+              alt="Resource Logo"
+            />
           </div>
         </div>
-      </div>
+      </ng-template>
     </div>
   </div>
-
-
 </div>
