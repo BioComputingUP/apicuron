@@ -38,10 +38,13 @@
         </a>
       </p>
       <p
-        *ngIf="
-          entry.curator.affiliation &&
-          entry.curator.affiliation !== 'No affiliation'
-        "
+        [ngStyle]="{
+          opacity:
+            entry.curator.affiliation &&
+            entry.curator.affiliation !== 'No affiliation'
+              ? 1
+              : 0
+        }"
         class="tw-text-sm tw-text-gray-600"
       >
         {{ entry.curator.affiliation }}
@@ -52,7 +55,7 @@
   <!-- Third row: Contributions and Resources -->
   <div class="tw-my-2">
     <div
-      class="tw-flex tw-px-2 tw-py-2 tw-rounded-sm tw-gap-3 tw-justify-center tw-items-center"
+      class="tw-flex tw-px-2 tw-py-2 tw-rounded-sm tw-gap-3 tw-justify-center tw-items-center tw-min-h-[80px]"
     >
       <!-- Display all contributions -->
       <div
