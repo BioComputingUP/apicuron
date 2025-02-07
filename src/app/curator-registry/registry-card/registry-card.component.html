@@ -70,13 +70,16 @@
       </div>
 
       <span
-        #trigger
-        [hidden]="getContributions().length < 3"
-        class="tw-font-dm-sans tw-text-sm tw-bg-gray-200 tw-px-3 tw-py-2 tw-rounded-full tw-cursor-pointer tw-inline-block tw-align-middle tw-max-w-[32px] tw-max-h-[32px] tw-flex tw-items-center tw-justify-center"
         (mouseenter)="showContributions = true"
         (mouseleave)="showContributions = false"
+        #trigger
       >
-        +{{ getContributions().length - 2 }}
+        <span
+          class="tw-font-dm-sans tw-text-sm tw-bg-gray-200 tw-px-3 tw-py-2 tw-rounded-full tw-cursor-pointer tw-align-middle tw-max-w-[32px] tw-max-h-[32px] tw-flex tw-items-center tw-justify-center"
+          *ngIf="getContributions().length > 2"
+        >
+          +{{ getContributions().length - 2 }}</span
+        >
       </span>
 
       <!-- Overlay Tooltip -->
