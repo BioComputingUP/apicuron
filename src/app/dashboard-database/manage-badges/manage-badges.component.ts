@@ -47,7 +47,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
   termList$: Observable<Term[]>;
   terms$: Observable<any>;
 
-  searchQuery: string = '';
+  searchQuery$ = new BehaviorSubject<string>("");
 
   badges$: Observable<Paginated<BadgeDef>>;
   manageForm$ = new BehaviorSubject<{
@@ -111,14 +111,21 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.badgeFilter$ = combineLatest([this.resource$, this.page$]).pipe(
-      map(([{ resource_id }, page]: [Resource, number]) => {
-        return BadgeDefFilter.create({
-          resource_id,
-          skip: (page - 1) * this.limit,
-          limit: this.limit,
-        });
-      })
+    this.badgeFilter$ = combineLatest([
+      this.resource$,
+      this.page$,
+      this.searchQuery$,
+    ]).pipe(
+      map(
+        ([{ resource_id }, page, searchQuery]: [Resource, number, string]) => {
+          return BadgeDefFilter.create({
+            resource_id,
+            skip: (page - 1) * this.limit,
+            limit: this.limit,
+            search_query: searchQuery, // Pass the search query to the backend.
+          });
+        }
+      )
     );
 
     this.badgesList$ = this.badgeFilter$.pipe(
@@ -136,38 +143,33 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
 
     this.badges$ = this.badgesList$.pipe(
       switchMap((badgeList: Paginated<BadgeDef>) => {
+        // We switch to the updateBadge$ observable to listen for updates
+        // This makes sure this observable is rebuilt whenever badgeList changes
         return this.updateBadge$.pipe(
+          // We start with the initial badgeList
+          // Making sure the first value is the badgeList
           startWith(badgeList),
+          // We scan over the updates and apply them to the badgeList
+          // This way we can keep track of the badgeList state
+          // and apply updates to it
           scan((badges: Paginated<BadgeDef>, update: BadgeListUpdate) => {
             return this.applyBadgeUpdates(badges, update);
           })
         ) as Observable<Paginated<BadgeDef>>;
-      }),
-      map(badges => {
-        if (!badges) return badges;
-        let filteredBadges = badges;
-        if (this.searchQuery) {
-          filteredBadges = {
-            ...badges,
-            data: badges.data.filter(badge =>
-              badge.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-            ),
-          };
-        }
-        return filteredBadges;
       })
     );
   }
-
   ngOnDestroy(): void {
     this.destroy$.next(true);
   }
 
   ngOnInit(): void {}
 
-  onSearchChange() {
-    this.page$.next(1);
+  onSearchChange(newSearch: string): void {
+    this.searchQuery$.next(newSearch);
+    this.page$.next(1); // Reset to page 1 when the search changes.
   }
+
   private updateBadgeUI(badge: BadgeDef) {
     this.updateBadge$.next({
       operation: "update",
@@ -233,7 +235,8 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
 
   createBadge(badgeDef: BadgeDef) {
     this.badgeDefService
-      .createBadgeDef(badgeDef).pipe(take(1))
+      .createBadgeDef(badgeDef)
+      .pipe(take(1))
       .subscribe((data: BadgeDef) => {
         if (data) {
           this.addBadgeToUI(data);
@@ -277,11 +280,15 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
   }
 
   confirmDeleteBadge(badge: BadgeDef) {
-      const confirmed = confirm(`Are you sure you want to delete the medal ${badge.name}?`);
-      if (confirmed) {
-        this.delete_badge(badge);
-      }
+    const confirmed = confirm(
+      `Are you sure you want to delete the medal ${badge.name}?`
+    );
+
+    if (confirmed) {
+      this.delete_badge(badge);
+    }
   }
+
   delete_badge(badge) {
     this.badgeDefService
       .deleteBadge(badge)
@@ -305,9 +312,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
       );
   }
 
-
   onCloseForm() {
     this.manageForm$.next({ badge: null, show: false, type: "create" });
   }
-
 }
