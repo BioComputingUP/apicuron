@@ -1,14 +1,18 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Component, OnInit } from "@angular/core";
+import { FormBuilder, FormGroup } from "@angular/forms";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
-import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { combineLatest, EMPTY, Observable, of, Subject } from "rxjs";
 import {
+  catchError,
+  concatMap,
   map,
   pluck,
   shareReplay,
+  startWith,
   switchMap,
-  takeUntil,
+  switchScan,
+  take,
   tap,
 } from "rxjs/operators";
 import { DatabasesService } from "../../databases/services/databases.service";
@@ -18,7 +22,31 @@ import {
   CreateTerm,
   DeleteTerm,
 } from "../services/terms.service";
+import { Term } from "../../models/term.model";
+import { Resource } from "../../models/resource.model";
 
+type FormCommand =
+  | {
+      type: "create" | "closed";
+    }
+  | {
+      type: "update";
+      term: Term;
+    };
+type FormState = { value: "closed" } | FormOperationState;
+
+type FormOperationState = { value: "create" | "update"; form: FormGroup };
+
+type TermListCommand =
+  | {
+      type: "update" | "create";
+      term: Term;
+    }
+  | {
+      type: "delete";
+      term: Term;
+    }
+  | { type: "filter"; query: string };
 @Component({
   selector: "app-manage-terms",
   templateUrl: "./manage-terms.component.html",
@@ -27,17 +55,16 @@ import {
     class: "tw-flex-auto",
   },
 })
-export class ManageTermsComponent implements OnInit, OnDestroy {
+export class ManageTermsComponent implements OnInit {
   resourceId$: Observable<string>;
   resource$: Observable<Object>;
-  terms$ = new BehaviorSubject<Array<any>>([]);
-  filteredTerms$: Observable<Array<any>>; // Observable for filtered terms
-  show_form: "update" | "create" | false = false;
-  form: FormGroup;
+  terms$: Observable<Term[]>;
+  termsList$: Observable<Array<any>>; // Observable for filtered terms
   activity_categories = ["generation", "invalidation", "revision"];
-  searchTerm: string = ""; // Holds the search term
-  openCreateActivity$ = new Subject<void>();
-  destroy$ = new Subject<void>();
+  searchQuery = new Subject<string>();
+  openForm$ = new Subject<FormCommand>();
+  formState$: Observable<FormState>;
+  termsListUpdateEvents$ = new Subject<TermListCommand>();
 
   constructor(
     protected route: ActivatedRoute,
@@ -46,9 +73,6 @@ export class ManageTermsComponent implements OnInit, OnDestroy {
     protected toast: ToastrService,
     protected termsService: TermsService
   ) {}
-  ngOnDestroy(): void {
-    this.destroy$.next();
-  }
 
   ngOnInit(): void {
     // Retrieve the resourceId from the paramMap
@@ -64,117 +88,150 @@ export class ManageTermsComponent implements OnInit, OnDestroy {
       shareReplay(),
       pluck("data")
     );
-
+    this.terms$ = this.resourceId$.pipe(
+      switchMap((resource_id: string) =>
+        this.termsService.get_resource_terms(resource_id)
+      ),
+      shareReplay()
+    );
     // Get terms from the service when resourceId changes
-    this.resourceId$
-      .pipe(
-        switchMap((resource_id: string) =>
-          this.termsService.get_resource_terms(resource_id)
-        ),
-        shareReplay(),
-        pluck("data"),
-        tap((terms: Array<any>) => {
-          this.terms$.next(terms);
-          this.applySearchFilter();
-        }),
-        takeUntil(this.destroy$)
-      )
-      .subscribe();
 
-    this.openCreateActivity$
-      .pipe(
-        switchMap(() => this.resourceId$),
-        tap((resource_id: string) => {
-          this.form = this.formBuilder.group({
-            resource_id: ['', [Validators.required]], // Resource ID will be set automatically
-            activity_term: ["", [Validators.required]],
-            activity_category: ["generation", [Validators.required]],
-            activity_name: ["", [Validators.required]],
-            score: ["", [Validators.required, Validators.min(1)]],
-            description: ["", [Validators.required]],
-          });
+    this.setupTermsList();
 
-          this.form.reset(); // Reset the form values when creating a new term
-          this.form.get('resource_id').setValue(resource_id);
-          this.show_form = "create";
-        }),
-        takeUntil(this.destroy$)
-      )
-      .subscribe();
-  }
-
-  // Apply search filter to terms
-  applySearchFilter() {
-    this.filteredTerms$ = this.terms$.pipe(
-      map((terms) => {
-        if (!this.searchTerm) {
-          return terms; // If searchTerm is empty, show all terms
+    this.formState$ = combineLatest([this.openForm$, this.resource$]).pipe(
+      startWith("closed"),
+      map(([openFormCommand, resource]: [FormCommand, Resource]) => {
+        if (openFormCommand.type === "closed") {
+          return { value: "closed" };
         }
-        const searchTermLower = this.searchTerm.toLowerCase();
-        return terms.filter(
-          (term) =>
-            term.activity_term.toLowerCase().includes(searchTermLower) ||
-            term.activity_name.toLowerCase().includes(searchTermLower) ||
-            term.activity_category.toLowerCase().includes(searchTermLower) ||
-            term.description.toLowerCase().includes(searchTermLower)
-        );
+        if (openFormCommand.type === "create") {
+          const form = Term.createForm(this.formBuilder, resource.resource_id);
+          return { value: "create", form };
+        }
+        if (openFormCommand.type === "update") {
+          const form = openFormCommand.term.getUpdateForm(this.formBuilder);
+          return { value: "update", form };
+        }
       })
     );
   }
 
-  // Update search term and reapply filter
-  onSearchTermChange() {
-    this.applySearchFilter(); // Reapply the search filter whenever searchTerm changes
+  closeForm() {
+    this.openForm$.next({ type: "closed" });
   }
 
-  open_edit_term_modal(term) {
-    this.form = this.formBuilder.group({
-      resource_id: [term.resource_id, [Validators.required]],
-      activity_term: [term.activity_term, [Validators.required]],
-      activity_category: [term.activity_category, [Validators.required]],
-      activity_name: [term.activity_name, [Validators.required]],
-      score: [term.score, [Validators.required, Validators.min(1)]],
-      description: [term.description, [Validators.required]],
+  search($event: Event) {
+    // console.log(($event.target as HTMLInputElement).value);
+    this.searchQuery.next(($event.target as HTMLInputElement).value);
+    this.termsListUpdateEvents$.next({
+      type: "filter",
+      query: ($event.target as HTMLInputElement).value,
     });
-    this.show_form = "update";
+  }
+
+  // Apply search filter to terms
+  setupTermsList() {
+    // Initialize the termsList$ with the initial list
+    this.termsList$ = this.terms$.pipe(
+      // ConcatMap to listen to the termsListUpdateEvents$ and update the list
+      concatMap((terms) =>
+        // This function should return an observable that emits the updated list
+        this.termsListUpdateEvents$.pipe(
+          // in the initial state there are no updates to the list, we start with a nullish value to get the first emission
+          startWith(null),
+          // switchScan is an accumulator that takes the accumulated list and the event and returns the updated list
+          switchScan((accumulatedList: Term[], command: TermListCommand) => {
+            if (!command) {
+              return of(terms);
+            }
+            if (command.type === "create") {
+              accumulatedList.unshift(command.term);
+              // in here we return the observable that emits the updated list
+              // While making the API call effectively removing the need to subscribe to the observable
+              return this.termsService.create_term(command.term).pipe(
+                catchError(this.handleError),
+                tap(() => {
+                  this.toast.success(
+                    `Term ${command.term.name} Successfully Created`
+                  );
+                  this.closeForm();
+                }),
+                map(() => accumulatedList)
+              );
+            }
+            if (command.type === "update") {
+              const updatedList = accumulatedList.map((term) => {
+                if (term.activity_term === command.term.activity_term) {
+                  return command.term;
+                }
+                return term;
+              });
+              return this.termsService.update_term(command.term).pipe(
+                catchError(this.handleError),
+                tap(() => {
+                  this.toast.success(
+                    `Term ${command.term.name} Successfully Created`
+                  );
+                  this.closeForm();
+                }),
+                map(() => updatedList)
+              );
+            }
+            if (command.type === "delete") {
+              const updatedList = accumulatedList.filter(
+                (term) => term.activity_term !== command.term.activity_term
+              );
+
+              return this.termsService.delete_term(command.term).pipe(
+                catchError(this.handleError),
+                tap(() =>
+                  this.toast.success(
+                    `Term ${command.term.name} Successfully Deleted`
+                  )
+                ),
+                map(() => updatedList)
+              );
+            }
+            if (command.type === "filter") {
+              const filtered = terms.filter(
+                (term) =>
+                  term.activity_term.toLowerCase().includes(command.query) ||
+                  term.activity_name.toLowerCase().includes(command.query) ||
+                  term.category.toLowerCase().includes(command.query) ||
+                  term.description.toLowerCase().includes(command.query)
+              );
+              return of(filtered);
+            }
+          }, terms)
+        )
+      )
+    );
+  }
+
+  open_edit_term_modal(term: Term) {
+    this.openForm$.next({ type: "update", term });
   }
 
   open_create_term() {
-    this.openCreateActivity$.next();
+    this.openForm$.next({ type: "create" });
   }
 
-  submit_form() {
-    if (this.form.valid) {
-      if (this.show_form === "create") {
-        const term: CreateTerm = this.form.value;
-        this.termsService.create_term(term).subscribe(
-          ({ data }: { data: CreateTerm }) => {
-            this.toast.success("Term Successfully Created");
-            this.terms$.next(this.terms$.getValue().concat(data));
-            this.show_form = false; // Close the form after creation
-            this.applySearchFilter(); // Reapply filter after creating a term
-          },
-          (err) => this.handleError(err)
-        );
-      } else if (this.show_form === "update") {
-        const term: UpdateTerm = this.form.value;
-        this.termsService.update_term(term).subscribe(
-          ({ data }: { data: CreateTerm }) => {
-            this.toast.success("Term Successfully Updated");
-            const terms = this.terms$.getValue();
-            const updatedIndex = terms.findIndex(
-              (term) => data.activity_term === term.activity_term
-            );
-            if (updatedIndex !== -1) {
-              terms[updatedIndex] = data;
-              this.terms$.next(terms);
-            }
-            this.show_form = false; // Close the form after update
-            this.applySearchFilter(); // Reapply filter after updating a term
-          },
-          (err) => this.handleError(err)
-        );
-      }
+  submit_form(formState: FormOperationState) {
+    if (!formState.form.valid) {
+      return;
+    }
+    if (formState.value === "create") {
+      const term: CreateTerm = formState.form.value;
+      this.termsListUpdateEvents$.next({
+        type: "create",
+        term: new Term().deserialize(term),
+      });
+    } else if (formState.value === "update") {
+      const term: UpdateTerm = formState.form.value;
+      this.termsListUpdateEvents$.next({
+        type: "update",
+        term: new Term().deserialize(term),
+      });
     }
   }
 
@@ -190,6 +247,7 @@ export class ManageTermsComponent implements OnInit, OnDestroy {
         "Error"
       );
     }
+    return EMPTY;
   }
   confirmDelete(term: any) {
     const confirmed = confirm(
@@ -201,16 +259,11 @@ export class ManageTermsComponent implements OnInit, OnDestroy {
   }
 
   delete_term(term: DeleteTerm) {
-    this.termsService.delete_term(term).subscribe(
-      () => {
+    this.termsService
+      .delete_term(term)
+      .pipe(take(1), catchError(this.handleError))
+      .subscribe(() => {
         this.toast.success(`Term ${term.activity_term} Successfully Deleted`);
-        const terms = this.terms$
-          .getValue()
-          .filter((t) => t.activity_term !== term.activity_term);
-        this.terms$.next(terms);
-        this.applySearchFilter(); // Reapply filter after deleting a term
-      },
-      (error) => this.handleError(error)
-    );
+      });
   }
 }

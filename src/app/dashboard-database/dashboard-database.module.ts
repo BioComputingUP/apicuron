@@ -37,9 +37,11 @@ import { ResourceGroupCardComponent } from "../components/group-card/resource-gr
 import { DialogModule } from "@angular/cdk/dialog";
 import { GroupCreateForm } from "../components/group-create-form/group-create-form.component";
 import { ConfirmationModule } from "../../../projects/apicuron-util/src/lib/confirmation";
+import { ErrorMessagePipe } from "../components/utils/error-messages/error-messages.pipe";
 
 @NgModule({
   declarations: [
+    ErrorMessagePipe,
     DatabaseUpdateComponent,
     SubmitReportComponent,
     SubmitSingleComponent,
@@ -51,7 +53,12 @@ import { ConfirmationModule } from "../../../projects/apicuron-util/src/lib/conf
     CuratorGroupsComponent,
     ModifyGroupsComponent,
   ],
-  providers: [DashboardService, TermsService, MessageService, GroupsService],
+  providers: [
+    DashboardService,
+    TermsService,
+    MessageService,
+    GroupsService,
+  ],
   imports: [
     CommonModule,
     DialogModule,
@@ -78,6 +85,6 @@ import { ConfirmationModule } from "../../../projects/apicuron-util/src/lib/conf
     ResourceGroupCardComponent,
     GroupCreateForm,
     ConfirmationModule,
-],
+  ],
 })
 export class DashboardDatabaseModule {}

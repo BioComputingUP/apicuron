@@ -24,6 +24,7 @@ import { DialogModule } from "@angular/cdk/dialog";
 import { ReactiveFormsModule } from "@angular/forms";
 import { FirstPopupComponent } from "./first-login/first-popup/first-popup.component";
 import { DashboardModule } from "./dashboard/dashboard.module";
+import { ErrorMessagePipe } from "./components/utils/error-messages/error-messages.pipe";
 @NgModule({
   declarations: [
     AppComponent,

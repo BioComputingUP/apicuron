@@ -1,25 +1,35 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
+import {
+  AbstractControl,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from "@angular/forms";
 import { ToastrModule, ToastrService } from "ngx-toastr";
 import { Observable } from "rxjs";
-import { pluck, switchMap } from "rxjs/operators";
+import { map, pluck, switchMap } from "rxjs/operators";
 import { DatabasesService } from "../../../databases/services/databases.service";
 import { DashboardService } from "../../services/dashboard.service";
 import { TermsService } from "../../services/terms.service";
 import { dateTimeValidator } from "../validators/date-time.validator";
 import { orcidIdValidator } from "../validators/orcid-id.validator";
 import { Report } from "../../../models/report.model";
+import { Term } from "../../../models/term.model";
 
 @Component({
   selector: "submit-single",
   templateUrl: "./submit-single.component.html",
-  styleUrls: ["./submit-single.component.scss", "../submit-report.component.scss"],
+  styleUrls: [
+    "./submit-single.component.scss",
+    "../submit-report.component.scss",
+  ],
 })
 export class SubmitSingleComponent implements OnInit {
-  @Input('resource')
+  @Input("resource")
   resource$: Observable<any>;
   form: FormGroup;
-  terms$: Observable<any>;
+  terms$: Observable<Term[]>;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -57,12 +67,10 @@ export class SubmitSingleComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
     this.terms$ = this.resource$.pipe(
       switchMap((resource) => {
-        return this.termsService.get_resource_terms(resource.resource_id)
-      }),
-      pluck('data')
+        return this.termsService.get_resource_terms(resource.resource_id);
+      })
     );
   }
   submit() {

@@ -4,12 +4,19 @@ import {
   Serializable,
 } from "../interfaces/deserializable.model";
 import { Report } from "./report.model";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 
 export type TermCategory = "generation" | "invalidation" | "revision";
 
 export class Term implements Deserializable, Serializable {
   serialize(): any {
-    return Object.assign({}, this);
+    return {
+      activity_term: this.activity_term,
+      resource_id: this.resource_id,
+      activity_category: this.category,
+      score: this.score,
+      description: this.description,
+    }
   }
   category: TermCategory;
   activity_term: string;
@@ -31,6 +38,29 @@ export class Term implements Deserializable, Serializable {
     this.resource_id = input.resource_id;
 
     return this;
+  }
+
+  static createForm(fb: FormBuilder, resource_id: string): FormGroup {
+    return fb.group({
+      resource_id: [resource_id, [Validators.required]], // Resource ID will be set automatically
+      activity_term: ["", [Validators.required, Validators.minLength(3), Validators.maxLength(8)]],
+      activity_category: ["generation", [Validators.required]],
+      activity_name: ["", [Validators.required]],
+      score: ["", [Validators.required, Validators.min(1)]],
+      description: ["", [Validators.required]],
+    });
+  }
+
+  getUpdateForm(fb: FormBuilder): FormGroup {
+    const form = fb.group({
+      resource_id: [this.resource_id, [Validators.required]],
+      activity_term: [this.activity_term, [Validators.required]],
+      activity_category: [this.category, [Validators.required]],
+      activity_name: [this.activity_name, [Validators.required]],
+      score: [this.score, [Validators.required, Validators.min(1)]],
+      description: [this.description, [Validators.required]],
+    });
+    return form;
   }
 
   categoryColor() {
