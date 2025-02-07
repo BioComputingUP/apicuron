@@ -24,7 +24,7 @@
                 <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Biography</div>
                 <div class="tw-ml-2">
                     <p class="tw-leading-relaxed tw-tracking-wider tw-text-justify tw-text-sm sm:tw-text-base">
-                        {{ biography }}
+                        {{ curator.biography }}
                     </p>
                 </div>
             </div>
@@ -34,7 +34,7 @@
                 <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Place of Work</div>
                 <div class="tw-ml-2">
                     <p class="tw-leading-relaxed tw-tracking-wider tw-text-justify tw-text-sm sm:tw-text-base">
-                        {{ employment }}
+                        {{ curator.affiliation }}
                     </p>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                 class="tw-w-full tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
                 <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Keywords</div>
                 <div class="tw-ml-2 tw-flex tw-flex-row tw-flex-wrap tw-gap-3 tw-items-center">
-                    <span *ngFor="let keyword of keywords"
+                    <span *ngFor="let keyword of curator.keywords"
                         class="tw-px-2 tw-py-1 tw-whitespace-nowrap tw-cursor-default tw-text-sm tw-bg-apicuron-purple tw-text-white tw-font-bold tw-font-dm-sans tw-rounded-full">
                         {{ keyword }}
                     </span>

@@ -1,15 +1,31 @@
 <div>
   <!-- banner container -->
 
-  <div class="tw-fixed tw-bottom-0 tw-right-0 tw-left-0 tw-z-30 tw-flex tw-flex-col">
-
+  <div
+    class="tw-fixed tw-bottom-0 tw-right-0 tw-left-0 tw-z-30 tw-flex tw-flex-col"
+  >
     <ng-container *ngFor="let banner of banners">
       <ng-container *ngComponentOutlet="banner"></ng-container>
     </ng-container>
   </div>
-
-
   <navbar></navbar>
+  <first-login-dialog></first-login-dialog>
+  <!-- <ng-container *ngIf="currentUser$ | async as currentUser">
+    <div
+      [ngClass]="{ 'tw-visible': popup, 'tw-invisible': !popup }"
+      class="tw-relative tw-z-10"
+      aria-labelledby="modal-title"
+      role="dialog"
+      aria-modal="true"
+    >
+   
+      <first-login-popup
+        *ngIf="popup"
+        [user]="currentUser"
+        ($click)="closePopup()"
+      ></first-login-popup>
+    </div>
+  </ng-container> -->
   <div class="tw-min-h-screen tw-bg-gray-100">
     <router-outlet></router-outlet>
   </div>

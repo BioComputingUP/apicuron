@@ -43,6 +43,12 @@ const routes: Routes = [
     loadChildren: () =>
       import("./curator/curator.module").then((m) => m.CuratorModule),
   },
+  {
+    path: "registry",
+    component: MainLayoutComponent,
+    loadChildren: () =>
+      import("./curator-registry/curator-registry.module").then((m) => m.CuratorRegistryModule),
+  },
 
   // {
   //   path: '',

@@ -1,22 +1,22 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CuratorCardComponent } from './curator-card/curator-card.component';
-import { CuratorRoutingModule } from './curator-routing.module';
-import { CuratorsPageComponent } from './curators-page.component';
-import { CuratorSearchComponent } from './curator-search/curator-search.component';
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CuratorPageComponent } from './curator-page/curator-page.component';
-import { SvgModule } from '../svg/svg.module';
-import { PaginationComponent } from '../pagination/pagination.component';
-import { CuratorService } from './curator.service';
-import { CuratorPageService } from './curator-page/curator-page.service';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { CuratorProfileComponent } from '../components/curator-profile/curator-profile.component';
-import { CuratorStatCardComponent } from 'src/app/components/curator-stat-card/curator-stat-card.component';
-import { CuratorStatisticsModule } from 'src/app/curator-statistics/curator-statistics.module';
-import { AchievementsModule } from 'src/app/achievements/achievements.module';
-import { HttpClientModule } from '@angular/common/http';
+import { PaginationComponent } from '../pagination/pagination.component';
+import { SvgModule } from '../svg/svg.module';
+import { CuratorCardComponent } from './curator-card/curator-card.component';
+import { CuratorPageComponent } from './curator-page/curator-page.component';
+import { CuratorPageService } from './curator-page/curator-page.service';
+import { CuratorRoutingModule } from './curator-routing.module';
+import { CuratorSearchComponent } from './curator-search/curator-search.component';
+import { CuratorService } from './curator.service';
+import { CuratorsPageComponent } from './curators-page.component';
 
+import { HttpClientModule } from '@angular/common/http';
+import { AchievementsModule } from '../achievements/achievements.module';
+import { CuratorStatCardComponent } from '../components/curator-stat-card/curator-stat-card.component';
+import { CuratorStatisticsModule } from '../curator-statistics/curator-statistics.module';
 @NgModule({
   declarations: [
     CuratorCardComponent,
@@ -41,7 +41,8 @@ import { HttpClientModule } from '@angular/common/http';
   ],
   providers:[CuratorService, CuratorPageService],
   exports: [
-    CuratorCardComponent
+    CuratorCardComponent,
+    CuratorSearchComponent
   ]
 })
-export class CuratorModule { }
+export class CuratorModule {}

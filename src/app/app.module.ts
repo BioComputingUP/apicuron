@@ -17,12 +17,21 @@ import { AuthDropdownComponent } from "./components/auth-dropdown/auth-dropdown.
 import { NotificationsDataModule } from "./notifications-data/notifications-data.module";
 import { SentryModuleConfig } from "../config/sentry.config";
 import { MatomoModule } from "ngx-matomo";
-import { MedalGeneratorComponent } from './components/medal-generator/medal-generator.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule } from "@angular/forms";
 
-
+import { FirstLoginDialog } from "./first-login/first-login.component";
+import { DialogModule } from "@angular/cdk/dialog";
+import { ReactiveFormsModule } from "@angular/forms";
+import { FirstPopupComponent } from "./first-login/first-popup/first-popup.component";
+import { DashboardModule } from "./dashboard/dashboard.module";
 @NgModule({
-  declarations: [AppComponent, PageNotFoundComponent, MainLayoutComponent, MedalGeneratorComponent],
+  declarations: [
+    AppComponent,
+    PageNotFoundComponent,
+    MainLayoutComponent,
+    FirstLoginDialog,
+    FirstPopupComponent,
+  ],
   imports: [
     AppRoutingModule,
     AuthModule,
@@ -35,9 +44,13 @@ import { FormsModule } from '@angular/forms';
     BrowserAnimationsModule,
     // ReactiveFormsModule,
     FormsModule,
+    ReactiveFormsModule,
+    // FormsModule,
     HttpClientModule,
     NavbarComponent,
     FootComponent,
+    DashboardModule,
+    DialogModule,
     AngularSvgIconModule.forRoot(),
     MatomoModule.forRoot({
       scriptUrl: "https://matomo.biocomputingup.it/matomo.js",
@@ -56,7 +69,7 @@ import { FormsModule } from '@angular/forms';
     // *** Sentry ErrorHandler and Tracer Setup ***
     SentryModuleConfig,
     // *** end of sentry setup ***
-    { provide: APP_ID, useValue: 'serverApp' }
+    { provide: APP_ID, useValue: "serverApp" },
   ],
   bootstrap: [AppComponent],
   exports: [RouterModule],

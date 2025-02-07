@@ -1,0 +1,26 @@
+<div class="tw-flex tw-flex-col tw-items-center tw-py-6">
+  
+  <div>Welcome {{ user.displayedName }}</div>
+  <p>Affiliated with {{ user.affiliation }}</p>
+
+  <div class="tw-flex tw-items-center tw-mt-4">
+    <input
+      type="checkbox"
+      id="checkbox"
+      [disabled]="false"
+      [(ngModel)]="checkboxValue"
+      class="tw-form-checkbox tw-mr-2"
+    />
+    <label for="checkbox" class="tw-text-gray-700"
+      >I agree to the terms and conditions</label
+    >
+  </div>
+  <button
+    [ngClass]="{ 'tw-cursor-not-allowed': !checkboxValue }"
+    [disabled]="!checkboxValue"
+    (click)="goToHome()"
+    class="tw-mt-6 tw-py-2 tw-px-6 tw-bg-blue-500 tw-text-white tw-rounded-md tw-shadow-md hover:tw-bg-blue-600 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-300 focus:tw-ring-opacity-50"
+  >
+    Go to home page
+  </button>
+</div>
