@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, ElementRef, ViewChild } from "@angular/core";
 import { RegistryEntry } from "src/app/models/registryEntry.model";
 import { Resource } from "src/app/models/resource.model";
 
@@ -7,17 +7,25 @@ import { Resource } from "src/app/models/resource.model";
   templateUrl: "./registry-card.component.html",
 })
 export class RegistryCardComponent implements OnInit {
-  showContributions: boolean = false;
-  showGroups = [];
+  @ViewChild("trigger", { static: false }) trigger!: ElementRef;
+
   @Input() entry: RegistryEntry;
+  contributions: { resource_id: string; resource: Resource; groups: any[] }[] =
+    [];
+
+  showContributions: boolean = false;
+  showGroups: boolean[] = [];
 
   ngOnInit(): void {
-    this.showGroups = new Array(this.getContributions().length).fill(false);
+    this.contributions = this.entry?.contributed_to ?? [];
+    this.showGroups = new Array(this.contributions.length).fill(false);
   }
+
   getContributions() {
-    return this.entry.contributed_to ?? [];
+    return this.contributions;
   }
-  toggleGroups(index) {
+
+  toggleGroups(index: number) {
     this.showGroups[index] = !this.showGroups[index];
   }
 }
