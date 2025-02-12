@@ -144,15 +144,8 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
 
     this.badges$ = this.badgesList$.pipe(
       switchMap((badgeList: Paginated<BadgeDef>) => {
-        // We switch to the updateBadge$ observable to listen for updates
-        // This makes sure this observable is rebuilt whenever badgeList changes
         return this.updateBadge$.pipe(
-          // We start with the initial badgeList
-          // Making sure the first value is the badgeList
           startWith(badgeList),
-          // We scan over the updates and apply them to the badgeList
-          // This way we can keep track of the badgeList state
-          // and apply updates to it
           scan((badges: Paginated<BadgeDef>, update: BadgeListUpdate) => {
             return this.applyBadgeUpdates(badges, update);
           })

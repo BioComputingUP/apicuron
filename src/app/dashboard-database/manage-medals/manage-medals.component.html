@@ -23,7 +23,8 @@
     </button>
   </div>
 
-  <div class="tw-relative tw-w-full tw-mt-3 tw-mb-4 tw-flex">
+  <div class="tw-relative tw-w-full tw-mt-3 tw-mb-4 tw-flex tw-items-center">
+    <!-- Search Icon (Left) -->
     <span
       class="tw-absolute tw-inset-y-0 tw-left-3 tw-flex tw-items-center tw-pointer-events-none"
     >
@@ -44,17 +45,39 @@
         <line x1="16" y1="16" x2="21" y2="21" stroke="gray" stroke-width="2" />
       </svg>
     </span>
+
+    <!-- Search Input -->
     <input
       id="search_input"
       type="text"
       placeholder="Search medals"
-      class="!tw-pl-12 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md tw-w-full"
+      class="!tw-pl-12 !tw-pr-12 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md tw-w-full"
       [ngModel]="searchInput | async"
       (ngModelChange)="searchInput.next($event)"
       (keydown.enter)="onSearchClick()"
     />
+
     <button
-      class="tw-ml-2 tw-px-4 tw-bg-blue-600 tw-text-white tw-rounded-md"
+      class="tw-absolute tw-inset-y-0 tw-pr-24 tw-right-3 tw-flex tw-items-center tw-pointer-events-none"
+      (click)="onResetClick()"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        width="20"
+        height="20"
+      >
+        <path
+          fill="gray"
+          d="M6 6L18 18M6 18L18 6"
+          stroke="gray"
+          stroke-width="2"
+          stroke-linecap="round"
+        />
+      </svg>
+    </button>
+    <button
+      class="tw-bg-blue-500 tw-text-white tw-py-2 tw-px-4 tw-ml-2 tw-rounded-md hover:tw-bg-blue-600"
       (click)="onSearchClick()"
     >
       Search
@@ -163,7 +186,7 @@
             'tw-block': manageForm.show,
             'tw-hidden': !manageForm.show
           }"
-          class="tw-relative tw-transform tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2"
+          class="tw-relative tw-overflow-visible tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 tw-max-h-[90vh]"
         >
           <medal-form
             [medal]="manageForm.medal"

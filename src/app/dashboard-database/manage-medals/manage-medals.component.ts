@@ -129,6 +129,11 @@ export class ManageMedalsComponent implements OnInit {
     this.searchQuery$.next(this.searchInput.value);
   }
 
+  onResetClick(): void {
+    this.searchInput.next(""); // Clear the search input
+    this.searchQuery$.next(""); // Reset the filter
+  }
+
   applyMedalUpdates(
     medals: Paginated<MedalDef>,
     update: MedalListUpdate
