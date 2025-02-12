@@ -167,7 +167,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
   ngOnInit(): void {}
 
   onSearchClick(): void {
-    this.searchQuery$.next(this.searchInput.value); // Update the search query when the button is clicked
+    this.searchQuery$.next(this.searchInput.value);
   }
 
   private updateBadgeUI(badge: BadgeDef) {
