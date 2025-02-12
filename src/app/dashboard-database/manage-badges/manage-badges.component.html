@@ -24,7 +24,7 @@
     </div>
   </div>
 
-  <div class="tw-relative tw-w-full tw-mt-3 tw-mb-4">
+  <div class="tw-relative tw-w-full tw-mt-3 tw-mb-4 tw-flex">
     <span
       class="tw-absolute tw-inset-y-0 tw-left-3 tw-flex tw-items-center tw-pointer-events-none"
     >
@@ -46,13 +46,19 @@
       </svg>
     </span>
     <input
-      id="search_input"
       type="text"
       placeholder="Search badges"
-      [ngModel]="searchQuery$ | async"
-      class="tw-pl-12 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md !tw-shadow-none tw-w-full"
-      (ngModelChange)="onSearchChange($event)"
+      [ngModel]="searchInput | async"
+      (ngModelChange)="searchInput.next($event)"
+      (keydown.enter)="onSearchClick()"
+      class="!tw-pl-12 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md tw-w-full"
     />
+    <button
+      class="tw-ml-2 tw-px-4 tw-bg-blue-600 tw-text-white tw-rounded-md"
+      (click)="onSearchClick()"
+    >
+      Search
+    </button>
   </div>
 
   <div

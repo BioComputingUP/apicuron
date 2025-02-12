@@ -48,6 +48,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
   terms$: Observable<any>;
 
   searchQuery$ = new BehaviorSubject<string>("");
+  searchInput = new BehaviorSubject<string>("");
 
   badges$: Observable<Paginated<BadgeDef>>;
   manageForm$ = new BehaviorSubject<{
@@ -165,9 +166,8 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {}
 
-  onSearchChange(newSearch: string): void {
-    this.searchQuery$.next(newSearch);
-    this.page$.next(1); // Reset to page 1 when the search changes.
+  onSearchClick(): void {
+    this.searchQuery$.next(this.searchInput.value); // Update the search query when the button is clicked
   }
 
   private updateBadgeUI(badge: BadgeDef) {
