@@ -20,9 +20,9 @@
         <line x1="16" y1="16" x2="21" y2="21" stroke="gray" stroke-width="2" />
       </svg>
     </span>
-    <input id="search_input" type="text" [(ngModel)]="searchTerm"
+    <input id="search_input" type="text"
       class="tw-pl-12 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md !tw-shadow-none tw-w-full"
-      placeholder="Search medals..." (ngModelChange)="onSearchTermChange()" />
+      placeholder="Search terms..." [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange($event)" />
 
   </div>
 
@@ -125,7 +125,8 @@
             Activity Internal ID
           </label>
           <input type="text" formControlName="activity_term"
-            class="tw-w-full tw-px-4 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md" />
+            class="tw-w-full tw-px-4 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md" 
+            [attr.disabled]="show_form === 'update' ? true : null" />
           <small class="tw-leading-tight tw-block tw-pt-2  tw-text-xs tw-text-gray-500">
             A Name used in the API to identify the Activity.
           </small>

@@ -1,30 +1,50 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
-import { BehaviorSubject, Observable } from "rxjs";
-import { map, pluck, shareReplay, switchMap } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, Observable, Subject, tap } from "rxjs";
+import {
+  distinctUntilChanged,
+  map,
+  pluck,
+  shareReplay,
+  switchMap,
+  takeUntil,
+} from "rxjs/operators";
 import { DatabasesService } from "../../databases/services/databases.service";
-import { UpdateTerm, TermsService, CreateTerm, DeleteTerm } from "../services/terms.service";
-
+import {
+  UpdateTerm,
+  TermsService,
+  CreateTerm,
+  DeleteTerm,
+} from "../services/terms.service";
+import { Term } from "src/app/models/term.model";
+import { Resource } from "src/app/models/resource.model";
+import { ActivityCategory } from "src/app/util/types";
 @Component({
   selector: "app-manage-terms",
   templateUrl: "./manage-terms.component.html",
   styleUrls: ["./manage-terms.component.scss"],
   host: {
-    class: 'tw-flex-auto'
-  }
+    class: "tw-flex-auto",
+  },
 })
-export class ManageTermsComponent implements OnInit {
-  resourceId$: Observable<string>;
-  resource$: Observable<Object>;
-  terms$ = new BehaviorSubject<Array<any>>([]);
-  filteredTerms$: Observable<Array<any>>;  // Observable for filtered terms
+export class ManageTermsComponent implements OnInit, OnDestroy {
+  // main properties
+  allTerms$: Observable<Array<any>>;
+  resource$: Observable<Resource>;
+  resource_id: string;
+  // Filtering related properties
+  searchTerm$ = new BehaviorSubject<string>("");
+  searchTerm: string = "";
+  filteredTerms$: Observable<Array<any>>;
+  // form control
   show_form: "update" | "create" | false = false;
   form: FormGroup;
-  activity_categories = ['generation', 'invalidation', 'revision'];
-  searchTerm: string = ""; // Holds the search term
+  activity_categories = Object.values(ActivityCategory);
+  termsChanged$ = new BehaviorSubject<boolean>(false); // trigger this when the terms list update to refresh from the database
 
+  destroy$ = new Subject<void>();
   constructor(
     protected route: ActivatedRoute,
     protected databaseService: DatabasesService,
@@ -33,51 +53,53 @@ export class ManageTermsComponent implements OnInit {
     protected termsService: TermsService
   ) {}
 
-  ngOnInit(): void {
-    // Retrieve the resourceId from the paramMap
-    this.resourceId$ = this.route.paramMap.pipe(
-      map((params: ParamMap) => params.get("resource_id"))
-    );
-
-    // Retrieve the resource from the API
-    this.resource$ = this.resourceId$.pipe(
-      switchMap((resource_id: string) => this.databaseService.get_resource(resource_id)),
-      shareReplay(),
-      pluck("data")
-    );
-
-    // Get terms from the service when resourceId changes
-    this.resourceId$.pipe(
-      switchMap((resource_id: string) => this.termsService.get_resource_terms(resource_id)),
-      shareReplay(),
-      pluck('data')
-    ).subscribe((terms: Array<any>) => {
-      this.terms$.next(terms);
-      this.applySearchFilter();  // Apply search filter after updating terms
-    });
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
+  ngOnInit(): void {
+    this.resource$ = this.route.paramMap.pipe(
+      map((params: ParamMap) => params.get("resource_id")),
+      switchMap((resource_id: string) => {
+        this.resource_id = resource_id;
+        return this.databaseService.get_resource(resource_id);
+      }),
+      map((response) => response.data),
+      shareReplay(),
+      takeUntil(this.destroy$)
+    );
 
-  // Apply search filter to terms
- applySearchFilter() {
-  this.filteredTerms$ = this.terms$.pipe(
-    map(terms => {
-      if (!this.searchTerm) {
-        return terms; // If searchTerm is empty, show all terms
-      }
-      const searchTermLower = this.searchTerm.toLowerCase();
-      return terms.filter(term =>
-        term.activity_term.toLowerCase().includes(searchTermLower) ||
-        term.activity_name.toLowerCase().includes(searchTermLower) ||
-        term.activity_category.toLowerCase().includes(searchTermLower) ||
-        term.description.toLowerCase().includes(searchTermLower)
-      );
-    })
-  );
-}
+    this.allTerms$ = combineLatest([this.resource$, this.termsChanged$]).pipe(
+      switchMap(([resource]) =>
+        this.termsService.get_resource_terms(resource.resource_id)
+      ),
+      map((response) => response.data), // instead of pluck since it's now deperacted
+      takeUntil(this.destroy$),
+      shareReplay(1)
+    );
 
-  // Update search term and reapply filter
-  onSearchTermChange() {
-    this.applySearchFilter(); // Reapply the search filter whenever searchTerm changes
+    this.filteredTerms$ = combineLatest([
+      this.searchTerm$,
+      this.allTerms$,
+    ]).pipe(
+      map(([searchTerm, terms]) => {
+        if (!searchTerm) {
+          return terms;
+        }
+        const searchTermLower = searchTerm.toLowerCase();
+        return terms.filter(
+          (term) =>
+            term.activity_term.toLowerCase().includes(searchTermLower) ||
+            term.activity_name.toLowerCase().includes(searchTermLower) ||
+            term.activity_category.toLowerCase().includes(searchTermLower) ||
+            term.description.toLowerCase().includes(searchTermLower)
+        );
+      }),
+      takeUntil(this.destroy$)
+    );
+  }
+  onSearchTermChange(searchTerm: string) {
+    this.searchTerm$.next(searchTerm);
   }
 
   open_edit_term_modal(term) {
@@ -94,15 +116,15 @@ export class ManageTermsComponent implements OnInit {
 
   open_create_term() {
     this.form = this.formBuilder.group({
-      resource_id: ['', [Validators.required]],  // Resource ID will be set automatically
+      resource_id: [this.resource_id, [Validators.required]], // Resource ID will be set automatically
       activity_term: ["", [Validators.required]],
-      activity_category: ["generation", [Validators.required]],
+      activity_category: [ActivityCategory.generation, [Validators.required]],
       activity_name: ["", [Validators.required]],
       score: ["", [Validators.required, Validators.min(1)]],
       description: ["", [Validators.required]],
     });
 
-    this.form.reset(); // Reset the form values when creating a new term
+    this.form.reset();
     this.show_form = "create";
   }
 
@@ -113,9 +135,8 @@ export class ManageTermsComponent implements OnInit {
         this.termsService.create_term(term).subscribe(
           ({ data }: { data: CreateTerm }) => {
             this.toast.success("Term Successfully Created");
-            this.terms$.next(this.terms$.getValue().concat(data));
-            this.show_form = false; // Close the form after creation
-            this.applySearchFilter(); // Reapply filter after creating a term
+            this.termsChanged$.next(true);
+            this.show_form = false;
           },
           (err) => this.handleError(err)
         );
@@ -124,14 +145,8 @@ export class ManageTermsComponent implements OnInit {
         this.termsService.update_term(term).subscribe(
           ({ data }: { data: CreateTerm }) => {
             this.toast.success("Term Successfully Updated");
-            const terms = this.terms$.getValue();
-            const updatedIndex = terms.findIndex((term) => data.activity_term === term.activity_term);
-            if (updatedIndex !== -1) {
-              terms[updatedIndex] = data;
-              this.terms$.next(terms);
-            }
-            this.show_form = false; // Close the form after update
-            this.applySearchFilter(); // Reapply filter after updating a term
+            this.termsChanged$.next(true);
+            this.show_form = false;
           },
           (err) => this.handleError(err)
         );
@@ -141,27 +156,32 @@ export class ManageTermsComponent implements OnInit {
 
   handleError(error) {
     if (error.error && error.error.message && error.error.statusCode === 400) {
-      let errors = Array.isArray(error.error.message) ? error.error.message.join("\n") : error.error.message;
+      let errors = Array.isArray(error.error.message)
+        ? error.error.message.join("\n")
+        : error.error.message;
       this.toast.warning(errors, "Validation Error");
     } else {
-      this.toast.error("An error occurred. Please contact the developers.", "Error");
+      this.toast.error(
+        "An error occurred. Please contact the developers.",
+        "Error"
+      );
     }
   }
+
   confirmDelete(term: any) {
-    const confirmed = confirm(`Are you sure you want to delete ${term.activity_name}?`);
+    const confirmed = confirm(
+      `Are you sure you want to delete ${term.activity_name}?`
+    );
     if (confirmed) {
       this.delete_term(term);
     }
   }
 
-
   delete_term(term: DeleteTerm) {
     this.termsService.delete_term(term).subscribe(
       () => {
         this.toast.success(`Term ${term.activity_term} Successfully Deleted`);
-        const terms = this.terms$.getValue().filter(t => t.activity_term !== term.activity_term);
-        this.terms$.next(terms);
-        this.applySearchFilter(); // Reapply filter after deleting a term
+        this.termsChanged$.next(true);
       },
       (error) => this.handleError(error)
     );

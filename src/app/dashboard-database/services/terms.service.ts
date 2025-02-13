@@ -1,6 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "../../../environments/environment";
+import { Observable } from "rxjs";
+import { Term } from "src/app/models/term.model";
 
 export type UpdateTerm = {
   activity_term: string;
@@ -20,7 +22,7 @@ export class TermsService {
 
   ws = environment.ws
 
-  get_resource_terms(resource_id: string){
+  get_resource_terms(resource_id: string): Observable<{data: Term[]}> {
     return this.http.get(this.ws + '/terms', {
       headers: {
         version: '2'
@@ -28,7 +30,7 @@ export class TermsService {
       params: {
         resource_id
       }
-    })
+    }) as Observable<{data: Term[]}>
   }
 
   update_term(term: UpdateTerm) {
