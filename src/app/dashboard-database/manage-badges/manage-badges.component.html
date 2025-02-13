@@ -54,6 +54,25 @@
       class="!tw-pl-12 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md tw-w-full"
     />
     <button
+      class="tw-absolute tw-inset-y-0 tw-pr-24 tw-right-3 tw-flex tw-items-center"
+      (click)="onResetClick()"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        width="20"
+        height="20"
+      >
+        <path
+          fill="gray"
+          d="M6 6L18 18M6 18L18 6"
+          stroke="gray"
+          stroke-width="2"
+          stroke-linecap="round"
+        />
+      </svg>
+    </button>
+    <button
       class="tw-ml-2 tw-px-4 tw-bg-blue-600 tw-text-white tw-rounded-md"
       (click)="onSearchClick()"
     >
@@ -68,7 +87,7 @@
     <ng-container *ngIf="terms$ | async as terms">
       <div
         *ngFor="let badge of badges.data"
-        class="tw-p-2 tw-w-1/2 lg:tw-w-1/3 xl:tw-w-1/4"
+        class="tw-p-2 tw-w-full md:tw-w-1/2 lg:tw-w-1/3 xl:tw-w-1/4"
       >
         <div
           class="tw-bg-white tw-relative tw-rounded-md tw-flex tw-flex-col tw-h-full tw-border"

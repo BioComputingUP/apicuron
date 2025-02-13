@@ -163,6 +163,11 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
     this.searchQuery$.next(this.searchInput.value);
   }
 
+  onResetClick(): void {
+    this.searchInput.next(""); // Clear the search input
+    this.searchQuery$.next(""); // Reset the filter
+  }
+
   private updateBadgeUI(badge: BadgeDef) {
     this.updateBadge$.next({
       operation: "update",
