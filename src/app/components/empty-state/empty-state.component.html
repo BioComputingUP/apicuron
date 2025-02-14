@@ -1,8 +1,15 @@
 <div
   class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-8 tw-m-2 tw-border tw-border-gray-300 tw-rounded-lg tw-bg-gray-50 tw-shadow-sm"
 >
-  <ng-container *ngIf="src && src.trim(); else emptyImgTemplate">
-    <img class="tw-w-20 tw-h-auto tw-mb-4" [src]="src" />
+  <ng-container
+    *ngIf="!showFallback && src?.trim().length > 0; else emptyImgTemplate"
+  >
+    <img
+      class="tw-w-20 tw-h-auto tw-mb-4"
+      [src]="src"
+      alt="Content image"
+      (error)="handleImgError()"
+    />
   </ng-container>
 
   <ng-template #emptyImgTemplate>

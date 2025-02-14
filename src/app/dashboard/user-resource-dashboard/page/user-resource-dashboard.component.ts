@@ -79,14 +79,14 @@ export class UserResourceDashboard {
       map((stat) => stat.activities)
     );
 
-    this.terms$ = combineLatest([
-      this.detailedStatistics$,
-      this.resource$,
-    ]).pipe(
-      map(([stat, resource]) =>
-        stat.activities.map((act): Term => act.getTerm(resource.resource_id))
-      )
-    );
+    // this.terms$ = combineLatest([
+    //   this.detailedStatistics$,
+    //   this.resource$,
+    // ]).pipe(
+    //   map(([stat, resource]) =>
+    //     stat.activities.map((act): Term => act.getTerm(resource.resource_id))
+    //   )
+    // );
 
     this.mainNumbers$ = this.detailedStatistics$.pipe(
       map((stat) => this.userResourceDashboard.computeMainNumbers(stat))
