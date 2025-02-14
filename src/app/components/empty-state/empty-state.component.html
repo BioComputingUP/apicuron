@@ -1,20 +1,27 @@
 <div
   class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-8 tw-m-2 tw-border tw-border-gray-300 tw-rounded-lg tw-bg-gray-50 tw-shadow-sm"
 >
-  <svg
-    class="tw-w-20 tw-h-20 tw-text-gray-400 tw-mb-4"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="1.5"
-    viewBox="0 0 24 24"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      d="M9 12h6m-6 4h6m-9 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-    ></path>
-  </svg>
-  <p class="tw-text-lg tw-font-semibold tw-text-gray-600">No items yet</p>
+  <ng-container *ngIf="src && src.trim(); else emptyImgTemplate">
+    <img class="tw-w-20 tw-h-auto tw-mb-4" [src]="src" />
+  </ng-container>
+
+  <ng-template #emptyImgTemplate>
+    <svg
+      class="tw-w-20 tw-h-20 tw-text-gray-400 tw-mb-4"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M9 12h6m-6 4h6m-9 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+      ></path>
+    </svg>
+  </ng-template>
+
+  <p class="tw-text-lg tw-font-semibold tw-text-gray-600">No {{ type }} yet</p>
   <p class="tw-text-sm tw-text-gray-500">Add new elements to get started</p>
 </div>

@@ -23,11 +23,9 @@
   <div
     class="tw-flex tw-flex-col lg:tw-flex-row tw-justify-start tw-mt-2 tw-gap-2"
   >
-    <!-- Achievements -->
     <div class="lg:tw-w-1/2 2xl:tw-w-2/3">
       <div class="tw-p-1">
         <div class="tw-flex tw-flex-col tw-gap-4">
-          <!-- Badges in Progress Container -->
           <div class="tw-flex-1">
             <div
               class="tw-bg-white tw-p-2 tw-rounded tw-border tw-border-gray-300"
@@ -54,14 +52,15 @@
                 </ng-container>
               </ng-container>
 
-              <!-- Template for empty state -->
               <ng-template #emptyStateTemplate>
-                <empty-state type="badge"></empty-state>
+                <empty-state
+                  src="assets/svg/badge_check_dis.svg"
+                  type="in progress badges"
+                ></empty-state>
               </ng-template>
             </div>
           </div>
 
-          <!-- Earned Badges Container -->
           <div class="tw-flex-1">
             <div
               class="tw-bg-white tw-p-2 tw-rounded tw-border tw-border-gray-300"
@@ -72,15 +71,13 @@
                 Earned Badges
               </span>
 
-              <!-- Resolve the terms observable and check if there are terms -->
               <ng-container
-                *ngIf="terms$ | async as userTerms; else emptyStateTemplate"
+                *ngIf="terms$ | async as userTerms; else emptyStateTemplate2"
               >
-                <!-- Resolve the filter observable and pass both to the badges details component -->
                 <ng-container
                   *ngIf="
                     achievedFilter$ | async as filter;
-                    else emptyStateTemplate
+                    else emptyStateTemplate2
                   "
                 >
                   <my-badges-details
@@ -90,9 +87,11 @@
                 </ng-container>
               </ng-container>
 
-              <!-- Template for empty state -->
-              <ng-template #emptyStateTemplate>
-                <empty-state type="badge"></empty-state>
+              <ng-template #emptyStateTemplate2>
+                <empty-state
+                  src="assets/svg/badge_check.svg"
+                  type="earned badges"
+                ></empty-state>
               </ng-template>
             </div>
           </div>
