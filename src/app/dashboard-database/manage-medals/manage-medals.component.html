@@ -84,69 +84,71 @@
     </button>
   </div>
 
-  <div
-    class="tw-flex tw-flex-row tw-flex-wrap tw-py-1"
-    *ngIf="medals$ | async as medals"
-  >
-    <ng-container *ngIf="terms$ | async as terms">
-      <div
-        *ngFor="let medal of medals.data"
-        class="tw-p-2 tw-w-full md:tw-w-1/2 lg:tw-w-1/3 xl:tw-w-1/4"
-      >
+  <div class="tw-flex tw-flex-row tw-flex-wrap tw-py-1">
+    <ng-container *ngIf="medals$ | async as medals; else emptyStateTemplate">
+      <ng-container *ngIf="terms$ | async as terms; else emptyStateTemplate">
         <div
-          class="tw-bg-white tw-relative tw-rounded-md tw-flex tw-flex-col tw-h-full tw-border"
+          *ngFor="let medal of medals.data"
+          class="tw-p-2 tw-w-full md:tw-w-1/2 lg:tw-w-1/3 xl:tw-w-1/4"
         >
-          <div class="tw-flex tw-items-center tw-justify-between tw-px-3">
-            <div class="tw-flex-grow">
-              <medal-def-card
-                [medal]="medal"
-                [terms]="terms"
-                [enableShadow]="false"
-              ></medal-def-card>
+          <div
+            class="tw-bg-white tw-relative tw-rounded-md tw-flex tw-flex-col tw-h-full tw-border"
+          >
+            <div class="tw-flex tw-items-center tw-justify-between tw-px-3">
+              <div class="tw-flex-grow">
+                <medal-def-card
+                  [medal]="medal"
+                  [terms]="terms"
+                  [enableShadow]="false"
+                ></medal-def-card>
+              </div>
+            </div>
+
+            <div
+              class="tw-mt-auto tw-mx-6 tw-pb-3 tw-flex tw-justify-center tw-gap-2"
+            >
+              <button
+                (click)="confirmDeleteMedal(medal)"
+                class="tw-bg-gray-200 tw-p-2 tw-rounded tw-w-full tw-text-gray tw-gap-2 tw-flex tw-items-center tw-justify-center"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                >
+                  <path
+                    fill="gray"
+                    d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM16 3H14V2C14 1.4 13.6 1 13 1H11C10.4 1 10 1.4 10 2V3H8C7.4 3 7 3.4 7 4C7 4.6 7.4 5 8 5H16C16.6 5 17 4.6 17 4C17 3.4 16.6 3 16 3Z"
+                  />
+                </svg>
+                <span class="tw-text-sm"> Delete </span>
+              </button>
+              <button
+                (click)="open_edit_form(medal)"
+                class="tw-bg-green-500 tw-p-2 tw-rounded tw-w-full tw-text-white tw-gap-2 tw-flex tw-items-center tw-justify-center"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                >
+                  <path
+                    fill="white"
+                    d="M3 17.25V20H5.75L15.51 10.24L13.76 8.49L3 17.25ZM20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C18.02 2.94 17.38 2.94 17.03 3.29L15.76 4.56L19.44 8.24L20.71 7.04Z"
+                  />
+                </svg>
+                <span class="tw-text-sm"> Edit </span>
+              </button>
             </div>
           </div>
-
-          <div
-            class="tw-mt-auto tw-mx-6 tw-pb-3 tw-flex tw-justify-center tw-gap-2"
-          >
-            <button
-              (click)="confirmDeleteMedal(medal)"
-              class="tw-bg-gray-200 tw-p-2 tw-rounded tw-w-full tw-text-gray tw-gap-2 tw-flex tw-items-center tw-justify-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="16"
-                height="16"
-              >
-                <path
-                  fill="gray"
-                  d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM16 3H14V2C14 1.4 13.6 1 13 1H11C10.4 1 10 1.4 10 2V3H8C7.4 3 7 3.4 7 4C7 4.6 7.4 5 8 5H16C16.6 5 17 4.6 17 4C17 3.4 16.6 3 16 3Z"
-                />
-              </svg>
-              <span class="tw-text-sm"> Delete </span>
-            </button>
-            <button
-              (click)="open_edit_form(medal)"
-              class="tw-bg-green-500 tw-p-2 tw-rounded tw-w-full tw-text-white tw-gap-2 tw-flex tw-items-center tw-justify-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="16"
-                height="16"
-              >
-                <path
-                  fill="white"
-                  d="M3 17.25V20H5.75L15.51 10.24L13.76 8.49L3 17.25ZM20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C18.02 2.94 17.38 2.94 17.03 3.29L15.76 4.56L19.44 8.24L20.71 7.04Z"
-                />
-              </svg>
-              <span class="tw-text-sm"> Edit </span>
-            </button>
-          </div>
         </div>
-      </div>
+      </ng-container>
     </ng-container>
+    <ng-template #emptyStateTemplate>
+      <empty-state type="medals"></empty-state>
+    </ng-template>
   </div>
 
   <div

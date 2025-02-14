@@ -29,7 +29,6 @@ import { BadgeDefService } from "../../achievements-def/services/badge-def.servi
 import { BadgeDefFilter } from "../../achievements-def/interfaces/badge-def.filter";
 import { BadgeDef } from "../../models/badge-def.model";
 import { Paginated } from "src/app/interfaces/paginated";
-
 type BadgeListUpdate = {
   badge: BadgeDef;
   operation: "update" | "delete" | "create";
