@@ -29,6 +29,7 @@ import { UserOverviewComponent } from "./user-overview/user-overview.component";
 import { SlideOverPanelComponent } from "../components/utils/slide-over-panel/slide-over-panel.component";
 import { AuthDropdownComponent } from "../components/auth-dropdown/auth-dropdown.component";
 import { ReportsByDateChartComponent } from "../components/charts/reports-by-date-chart/reports-by-date-chart.component";
+import { EmptyStateComponent } from "../components/empty-state/empty-state.component";
 @NgModule({
   declarations: [
     DashboardSidebarComponent,
@@ -63,7 +64,8 @@ import { ReportsByDateChartComponent } from "../components/charts/reports-by-dat
     CategoriesPieChartComponent,
     CuratorReportsDetailsComponent,
     NumberCardComponent,
-    DoughtnutPieChartComponent
-],
+    DoughtnutPieChartComponent,
+    EmptyStateComponent,
+  ],
 })
 export class DashboardModule {}

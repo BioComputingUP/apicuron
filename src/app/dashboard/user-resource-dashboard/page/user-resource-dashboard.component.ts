@@ -19,6 +19,7 @@ import {
   BreakpointState,
 } from "@angular/cdk/layout";
 import { Term } from "../../../models/term.model";
+
 @Component({
   selector: "user-resource-dashboard",
   templateUrl: "./user-resource-dashboard.component.html",
@@ -30,7 +31,9 @@ export class UserResourceDashboard {
   resourceId$: Observable<string>;
   resource$: Observable<Resource>;
   detailedStatistics$: Observable<DetailedStatistics>;
-  mainNumbers$: Observable<{ label: string; value: number | string; iconSrc: string }[]>;
+  mainNumbers$: Observable<
+    { label: string; value: number | string; iconSrc: string }[]
+  >;
   achievedFilter$: Observable<MyBadgesFilter>;
   progressFilter$: Observable<MyBadgesFilter>;
   userActivities$: Observable<ActivitiesStatistics[]>;
