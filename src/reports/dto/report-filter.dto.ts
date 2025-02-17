@@ -25,12 +25,12 @@ import { FilterQuery } from 'mongoose';
 import { ReportGroupBy } from '../types/group-by';
 
 export class ReportFilterDto extends BasePaginationDto {
-	@Validate(EntryExistsRule, [
-		User.name,
-		({ curator_orcid }) => {
-			return { orcid_id: curator_orcid };
-		},
-	])
+	// @Validate(EntryExistsRule, [
+	// 	User.name,
+	// 	({ curator_orcid }) => {
+	// 		return { orcid_id: curator_orcid };
+	// 	},
+	// ])
 	@IsOptional()
 	curator_orcid?: string;
 
