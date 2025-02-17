@@ -12,6 +12,8 @@ import {
 	UseInterceptors,
 	InternalServerErrorException,
 	Logger,
+	SerializeOptions,
+	ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { SvgSanitationValidationPipe } from '../../../shared/pipes/svg-sanitation.pipe';
 
@@ -36,15 +38,17 @@ import {
 } from '@nestjs/swagger';
 import { VersionHeader } from '../../../plugins/swagger/config';
 import {
-	PartnerResourceDto,
+	PartnerResourceEntity,
 	SelectPartnerResourceDto,
-} from '../../dto/partner-resources.dto';
+} from '../../dto/partner-resources.entity';
 import { AuthService } from '../../../auth/auth.service';
 import * as mv from 'mv';
 import { ResourceLogoValidationPipe } from '../../validators/logo-validation.pipe';
 import { plainToClass, plainToInstance } from 'class-transformer';
 import { PublicPartnerResourceDto } from '../../dto/public-partner-resource.dto';
 import { ApiResponseWrapped } from '../../../shared/decorators/wrapped-data-response.decorator';
+import { PartnerResourceDocument } from '../../../core/schemas';
+import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
 
 @ApiTags('Partner Resources')
 @ApiHeader(VersionHeader)
@@ -52,15 +56,15 @@ import { ApiResponseWrapped } from '../../../shared/decorators/wrapped-data-resp
 export class PartnerResourcesController {
 	constructor(
 		private partnerResourceService: PartnerResourcesService,
-		private userService: UsersService,
 		private configService: ConfigService,
 		private authService: AuthService,
+		private storage: StorageService,
 	) {}
 
 	logger = new Logger(PartnerResourcesController.name);
 
 	@ApiResponseWrapped(
-		[PartnerResourceDto],
+		[PartnerResourceEntity],
 		200,
 		'Returns a list of all the partner resources of APICURON',
 	)
@@ -71,16 +75,18 @@ export class PartnerResourcesController {
 	async list_resources(): Promise<PublicPartnerResourceDto[]> {
 		const resources = await this.partnerResourceService.get_resources();
 
-		return plainToInstance(PublicPartnerResourceDto, resources, {
-			excludeExtraneousValues: true,
-			enableCircularCheck: true,
-		});
+		const resourceEntities$ = resources.map(
+			async (resource: PartnerResourceDocument) =>
+				await PublicPartnerResourceDto.fromDocument(resource, this.storage),
+		);
+
+		return await Promise.all(resourceEntities$);
 	}
 
 	// swagger documentation decorators
 	@ApiOkResponse({
 		description: 'The specified resource',
-		type: PartnerResourceDto,
+		type: PartnerResourceEntity,
 	})
 	@ApiOperation({
 		summary: 'Get information about a single resource',
@@ -88,13 +94,18 @@ export class PartnerResourcesController {
 	@ApiNotFoundResponse({
 		description: 'A 404 Not Found Response and Error Message',
 	})
+	// @UseInterceptors(ClassSerializerInterceptor)
+	// @SerializeOptions({ type: PartnerResourceEntity })
 	@Get(':resource_id')
 	async get_resource(@Param() { resource_id }: SelectPartnerResourceDto) {
 		const resource = await this.partnerResourceService.get_resource(
 			resource_id,
 		);
 		if (resource) {
-			return plainToClass(PartnerResourceDto, resource.toObject());
+			// const data = plainToInstance(PartnerResourceDto, , {
+			// 	excludeExtraneousValues: true,
+			// });
+			return await PartnerResourceEntity.fromDocument(resource, this.storage);
 		} else {
 			throw new NotFoundException(`Resource (${resource_id}) Not Found`);
 		}
@@ -112,7 +123,7 @@ export class PartnerResourcesController {
 	})
 	@ApiOkResponse({
 		description: 'Returns an update confirmation Object',
-		type: PartnerResourceDto,
+		type: PartnerResourceEntity,
 	})
 	// nestjs logic decorators
 	@Put('')

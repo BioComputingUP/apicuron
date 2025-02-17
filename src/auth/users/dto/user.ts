@@ -42,4 +42,7 @@ export class UserEntity {
 
 	@ApiProperty()
 	username?: string;
+
+	@Expose()
+	avatar: string;
 }

@@ -36,6 +36,7 @@ import { Public } from '../decorators/public.decorator';
 
 import { UserReq } from '../decorators/applyUser.decorator';
 import { UserRepository } from '../../core/repositories/user.repository';
+import { AuthProtected } from '../decorators/auth.decorator';
 
 @ApiTags('First Version')
 @Controller('')
@@ -123,7 +124,7 @@ export class UserControllerV2 {
 	private logger = new Logger(UserControllerV2.name);
 
 	@Get(':orcid_id')
-	@UseGuards(LocalAuthGuard)
+	@AuthProtected()
 	@Public()
 	async get_curator(
 		@Param('orcid_id') orcid_id: string,
@@ -152,16 +153,16 @@ export class UserControllerV2 {
 		description: 'Returns an update confirmation Object',
 		type: UpdateProfileDto,
 	})
-	@UseGuards(LocalAuthGuard)
-	@Public()
+	@AuthProtected()
 	@Patch('')
-	async updateProfile(@Req() req, @Body() updateProfile: UpdateProfileDto) {
+	async updateProfile(
+		@UserReq() user: User,
+		@Body() updateProfile: UpdateProfileDto,
+	) {
 		const { orcid_id } = updateProfile;
-		if (!req.user) {
-			throw new UnauthorizedException('User not authenticated');
-		}
-		if (req.user.orcid_id !== orcid_id)
+		if (user.orcid_id !== orcid_id) {
 			throw new UnauthorizedException('Cannot update the data of another User');
+		}
 		await this.usersService.updateUserProfile(updateProfile);
 		return 'Profile Updated';
 	}

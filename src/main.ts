@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+import { BaseExceptionFilter, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import {
 	ClassSerializerInterceptor,
@@ -37,6 +37,7 @@ async function bootstrap() {
 	// set the global transform pipe
 	const transformer = app.get(TransformInterceptor);
 	app.useGlobalInterceptors(transformer);
+	// app.useGlobalFilters(new BaseExceptionFilter());
 
 	// Load global interceptors
 

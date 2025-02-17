@@ -2,13 +2,11 @@ import { Module, ClassSerializerInterceptor } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { loadConfig } from './config/load';
 import { ReportsModule } from './reports/reports.module';
 import { ResourcesModule } from './resources/resources.module';
 import { StatisticsModule } from './statistics/statistics.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { resolve } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MulterModule } from '@nestjs/platform-express';
 import { NotificationsModule } from './notifications/notifications.module';
@@ -39,11 +37,21 @@ import { ResourceStatsModule } from './resource-stats/resource-stats.module';
 import { MonthlyStatisticsModule } from './monthly-statistics/monthly-statistics.module';
 import { CuratorRegistryModule } from './curator-registry/curator-registry.module';
 import { OrcidFetcherModule } from './github-scraper/github-scraper.module';
-
+import { StorageManagerModule } from '@biocomputingup/nest-storage-manager';
+import { StorageModuleOptions } from './storage/storage.config';
+import { ServeFilesController } from './storage/serve-files.controller';
+import { InjectTransformModule } from 'nestjs-inject-transformer';
+import { StorageReferenceInterceptor } from './storage/storage-reference-transformer';
+import { AutomapperModule } from '@automapper/nestjs';
+import { classes } from '@automapper/classes';
 @Module({
 	imports: [
 		// Sentry Setup
 		...loadSentryModule(),
+
+		AutomapperModule.forRoot({
+			strategyInitializer: classes(),
+		}),
 
 		EventEmitterModule.forRoot({
 			// wildcard: true,
@@ -62,18 +70,23 @@ import { OrcidFetcherModule } from './github-scraper/github-scraper.module';
 			load: [loadConfig()],
 		}),
 
-		// MongoEventsModule,
+		// In here we load the StorageManagerModule to manage the storage of files
+		StorageManagerModule.forRoot(StorageModuleOptions),
+		InjectTransformModule,
 
 		// in here we load the Serve static module to serve static files
-		ServeStaticModule.forRootAsync({
-			inject: [ConfigService],
-			useFactory: async (configService: ConfigService) => [
-				{
-					rootPath: resolve(configService.get('PUBLIC_FILES_PATH')),
-					serveRoot: configService.get('PUBLIC_FILES_URL_PATH'),
-				},
-			],
-		}),
+		// ServeStaticModule.forRootAsync({
+		// 	inject: [ConfigService, InjectEngine(StorageType.public)],
+		// 	useFactory: async (
+		// 		configService: ConfigService,
+		// 		engine: Engine<LocalFsEngine>,
+		// 	) => [
+		// 		{
+		// 			rootPath: resolve(configService.get('PUBLIC_FILES_PATH')),
+		// 			serveRoot: configService.get('PUBLIC_FILES_URL_PATH'),
+		// 		},
+		// 	],
+		// }),
 		OrcidSubmissionModule,
 		CoreApicuronModule,
 		ResourcesModule,
@@ -97,22 +110,24 @@ import { OrcidFetcherModule } from './github-scraper/github-scraper.module';
 		CuratorRegistryModule,
 		OrcidFetcherModule,
 	],
-	controllers: [AppController],
+	controllers: [AppController, ServeFilesController],
 	providers: [
 		AppService,
 		UniqueRule,
 		EntryExistsRule,
 		EntriesExistRule,
-		TransformInterceptor,
+		StorageReferenceInterceptor,
 		{
 			provide: ClassSerializerInterceptor,
 			inject: [Reflector],
 			useFactory: (reflect: Reflector) => {
 				return new ClassSerializerInterceptor(reflect, {
 					enableCircularCheck: true,
+					excludeExtraneousValues: true,
 				});
 			},
 		},
+		TransformInterceptor,
 	],
 })
 export class AppModule {}

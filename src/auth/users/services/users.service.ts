@@ -13,12 +13,15 @@ import { ResourceDocument } from '../../../core/schemas/resource/resource.schema
 import { UserCreatedEvent } from '../events/user-created';
 import { UserRepository } from '../../../core/repositories/user.repository';
 import { UpdateProfileDto } from '../dto/update-user.dto';
+import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
+import { v4 as uuid } from 'uuid';
 @Injectable()
 export class UsersService {
 	constructor(
 		private userRepository: UserRepository,
 		protected configService: ConfigService,
 		protected eventEmitter: EventEmitter2,
+		protected storageService: StorageService,
 	) {}
 
 	public async userExists(orcid_id: string): Promise<boolean> {
@@ -133,11 +136,13 @@ export class UsersService {
 	async createUser(user: ICreateOrUpdateUser): Promise<UserDocument> {
 		const newUser = this.userRepository.newDocument(user);
 
-		const avatarLink = await generateAvatar(
-			newUser.displayedName,
-			this.configService.get('PUBLIC_FILES_PATH'),
-			this.configService.get('PUBLIC_FILES_URL_PATH'),
+		const avatarSvg = await generateAvatar(newUser.displayedName);
+
+		const avatarLink = await this.storageService.put(
+			`users/${uuid()}.svg`,
+			Buffer.from(avatarSvg),
 		);
+
 		newUser.avatar = avatarLink;
 
 		await newUser.save();

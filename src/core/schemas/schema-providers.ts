@@ -39,7 +39,10 @@ import {
 } from './resource/submitted-resource.schema';
 import { Term, TermSchema } from './terms.schema';
 import { User, UserSchema, userCollectionSchemaFactory } from './user.schema';
-import { CuratorRegistryEntry, CuratorRegistryEntrySchema } from './curator-registry/curator-entry.schema';
+import {
+	CuratorRegistryEntry,
+	CuratorRegistryEntrySchema,
+} from './curator-registry/curator-entry.schema';
 
 export const ModelFactories: AsyncModelFactory[] = [
 	{
@@ -86,7 +89,6 @@ export const ModelFactories: AsyncModelFactory[] = [
 		name: User.name,
 		useFactory: userCollectionSchemaFactory,
 	},
-	
 ];
 
 export const ModelDefinitions: ModelDefinition[] = [

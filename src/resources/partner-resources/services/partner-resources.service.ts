@@ -11,6 +11,9 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { LeagueDeletedEvent } from '../leagues/events/league-deleted-event';
 import _ from 'lodash';
 import { PartnerResourceUpdatedEvent } from '../events/resource-updated.event';
+import { PartnerResourceEntity } from '../../dto/partner-resources.entity';
+import { plainToInstance } from 'class-transformer';
+import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
 
 @Injectable()
 export class PartnerResourcesService {
@@ -18,6 +21,7 @@ export class PartnerResourcesService {
 		@InjectModel(PartnerResource.name)
 		private partnerResourceModel: Model<PartnerResourceDocument>, // protected transformService: TransformerService
 		protected eventEmitter: EventEmitter2,
+		protected storage: StorageService,
 	) {}
 
 	logger = new Logger(PartnerResourcesService.name);
@@ -126,7 +130,8 @@ export class PartnerResourcesService {
 	}
 
 	async get_resource(resource_id: string): Promise<PartnerResourceDocument> {
-		return await this.partnerResourceModel.findOne({ resource_id });
+		const doc = await this.partnerResourceModel.findOne({ resource_id });
+		return doc;
 	}
 
 	async exists(resource_id: string): Promise<boolean> {

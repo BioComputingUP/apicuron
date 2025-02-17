@@ -31,6 +31,10 @@ import { RoleGuard } from '../../auth/guards/role.guard';
 import { MakePartner } from '../dto/make-partner.dto';
 import * as mv from 'mv';
 import { ResourceLogoValidationPipe } from '../validators/logo-validation.pipe';
+import { FileUploadDto } from '../../util/file-upload.helper';
+import { AuthProtected } from '../../auth/decorators/auth.decorator';
+import { UserReq } from '../../auth/decorators/applyUser.decorator';
+import { User } from '../../core/schemas';
 
 @ApiTags('Resources')
 @Controller({
@@ -55,50 +59,24 @@ export class SubmittedResourcesController {
 		type: CreateResourceDto,
 	})
 	@Put()
-	@UseGuards(LocalAuthGuard)
+	@AuthProtected()
 	@HttpCode(201)
-	@UseInterceptors(
-		FileInterceptor('logo', {
-			dest: '/tmp/apicuron/submitted_resources/',
-		}),
-	)
+	@UseInterceptors(FileInterceptor('logo'))
 	async create_resource(
-		@Req() req,
+		@UserReq() user: User,
 		@Body() createResource: CreateResourceDto,
 		@UploadedFile(ResourceLogoValidationPipe(true), SvgSanitationValidationPipe)
 		logo: Express.Multer.File,
 	) {
-		const ext = mime.extension(logo.mimetype);
-		const filename = `logo-${createResource.resource_id}.${ext}`;
-		const file_path = join(this.resources_folder, filename);
+		const logoFile = FileUploadDto.fromMulter(logo);
+		logoFile.buffer = logo.buffer;
 
-		try {
-			mv(logo.path, file_path, { mkdirp: true }, function (err) {
-				if (err) {
-					this.logger.error(err.message, err.stack, err.name);
-					throw new InternalServerErrorException();
-				}
-			});
-		} catch (err) {
-			this.logger.error(
-				`Error moving logo file from ${logo.path} to private folder: "${file_path}"`,
-				err.stack,
-				err.message,
-			);
-		}
-
-		const logo_link = file_path.replace(
-			this.configService.get('PRIVATE_FILES_PATH'),
-			this.configService.get('PUBLIC_FILES_URL_PATH'),
+		const data = await this.resourcesService.create_resource(
+			createResource,
+			user.orcid_id,
+			logoFile,
 		);
-
-		return this.resourcesService.create_resource(
-			{
-				...createResource,
-				logo: logo_link,
-			},
-			req.user.orcid_id,
-		);
+		return `Resource created`;
 	}
 
 	@ApiExcludeEndpoint(true)
