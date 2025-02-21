@@ -153,7 +153,7 @@ export class ManageTermsComponent implements OnInit, OnDestroy {
         );
       }
     }else{
-      this.toast.warning("Please fill all the required fields", "Validation Error");
+      this.form.markAllAsTouched();
     }
   }
 

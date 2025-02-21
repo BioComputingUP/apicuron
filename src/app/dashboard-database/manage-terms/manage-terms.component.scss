@@ -1,7 +1,6 @@
 .head-cell {
     @apply tw-text-sm tw-text-gray-900 tw-px-4 tw-py-2 tw-font-bold
 }
-
 .cell {
     @apply tw-text-sm tw-text-gray-900 tw-font-light tw-px-4 tw-py-2
 }
@@ -9,7 +8,9 @@
 .font-weight-inherit {
     font-weight: inherit;
 }
-
+.invalid-field {
+    @apply tw-border-red-800 tw-border-l-2 tw-shadow-red-900 tw-shadow-md #{!important};
+}
 label {
     @apply tw-font-bold tw-mb-2
 }
@@ -35,3 +36,4 @@ textarea,
     -moz-box-shadow: 0 -2px 0 rgba(0, 0, 0, 0.15) inset;
     -webkit-box-shadow: 0 -2px 0 rgba(0, 0, 0, 0.15) inset;
 }
+
