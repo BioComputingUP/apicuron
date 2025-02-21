@@ -4,30 +4,23 @@ import {
 	Expose,
 	plainToClassFromExist,
 	plainToInstance,
+	Type,
 } from 'class-transformer';
 import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
 import { PartnerResourceDocument } from '../../core/schemas';
 import { StorageType } from '../../storage/storage.config';
+import { StorageReference } from 'src/shared/decorators/storage-reference.decorator';
+import { ResourceStatsDto } from './resource-stat.dto';
 export class SelectPartnerResourceDto {
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	resource_id: string;
 }
 export class PartnerResourceEntity extends SelectPartnerResourceDto {
-	static async fromDocument(
-		document: PartnerResourceDocument,
-		storage: StorageService,
-	): Promise<PartnerResourceEntity> {
-		const plainEntity = new PartnerResourceEntity();
-		const entity = plainToClassFromExist(plainEntity, document);
+	@Expose()
+	color: string;
 
-		entity.logo = await storage.getPublicUrl(
-			StorageType.public,
-			entity.logo.replace('public/', ''),
-		);
-
-		return entity;
-	}
 	@IsNotEmpty()
 	@IsString()
 	@Expose()
@@ -63,15 +56,21 @@ export class PartnerResourceEntity extends SelectPartnerResourceDto {
 
 	@IsNotEmpty()
 	@IsString()
+	@StorageReference()
 	@Expose()
 	logo: string;
 
 	@IsNotEmpty()
 	@Expose()
+	@Type(() => LeagueEntity)
 	leagues: LeagueEntity[];
 
 	@IsNotEmpty()
 	@IsString()
 	@Expose()
 	defaultLeague: string;
+
+	@Expose()
+	@Type(() => ResourceStatsDto)
+	stats: ResourceStatsDto;
 }

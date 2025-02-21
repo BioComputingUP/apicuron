@@ -15,7 +15,7 @@ import {
 import { ResourceIdExists } from '../../resources/partner-resources/validators/resource-id-exists';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
-import { Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
 	MaxDateField,
 	MinDateField,
@@ -24,6 +24,7 @@ import { isSlug } from '../../shared/validators/is-slug.validator';
 
 export class CreateBadgeDefDto {
 	@IsOptional()
+	@Expose()
 	category: string;
 
 	// matches that the color is either a hex code or bronze, gold or silver
@@ -32,26 +33,33 @@ export class CreateBadgeDefDto {
 			'a badge color has to be either a color hexcode, "bronze", "gold" or "silver"',
 	})
 	@IsNotEmpty()
+	@Expose()
 	color_code: string;
 
 	@Min(1)
 	@IsNotEmpty()
+	@Expose()
 	count_threshold: number;
 
 	@isSlug()
 	@IsString()
 	@IsNotEmpty()
+	@Expose()
 	name: string;
 
 	@IsNotEmpty()
+	@Expose()
 	displayedName: string;
 
 	@Validate(ResourceIdExists)
 	@IsNotEmpty()
+	@Expose()
 	resource_id: string;
 
+	@Expose()
 	@Validate(ActivityTermExists, [{ each: true }])
 	@IsNotEmpty()
+	@Expose()
 	list_terms: string[];
 
 	@Validate(EntryExistsRule, [
@@ -65,17 +73,20 @@ export class CreateBadgeDefDto {
 	])
 	@IsString()
 	@IsOptional()
+	@Expose()
 	league: string;
 
 	@MaxDateField(['endDate'], true)
 	@IsDate()
 	@IsOptional()
 	@Type(() => Date)
+	@Expose()
 	startDate: Date;
 
 	@MinDateField(['startDate'], true)
 	@IsDate()
 	@IsOptional()
 	@Type(() => Date)
+	@Expose()
 	endDate: Date;
 }

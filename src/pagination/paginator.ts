@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BasePaginationDto } from './dto/paginate.dto';
+import { Expose } from 'class-transformer';
 
 class Pagination {
 	@ApiProperty()
@@ -18,12 +19,14 @@ class Meta {
 }
 export class Paginated<T> {
 	@ApiProperty({ isArray: true })
+	@Expose()
 	data: T[];
 
 	@ApiProperty()
+	@Expose()
 	meta: Meta;
 
-	constructor(data: T[], page: BasePaginationDto, totalCount: number) {
+	constructor(data: T[] = [], page: BasePaginationDto, totalCount: number) {
 		this.data = data;
 		this.meta = {
 			pagination: {

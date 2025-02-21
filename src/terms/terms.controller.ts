@@ -11,6 +11,7 @@ import {
 	Req,
 	ForbiddenException,
 	Res,
+	SerializeOptions,
 } from '@nestjs/common';
 import {
 	ApiHeader,
@@ -24,7 +25,7 @@ import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { VersionHeader } from '../plugins/swagger/config';
 import { CreateTermDto } from './dto/createTerm.dto';
 import { DeleteTermDto } from './dto/deleteTerm.dto';
-import { TermFilterDto } from './dto/term.dto';
+import { TermDto, TermFilterDto } from './dto/term.dto';
 import { UpdateTermDto } from './dto/updateTerm.dto';
 import { TermsService } from './terms.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -72,6 +73,7 @@ export class TermsController {
 	@AuthProtected()
 	@Public()
 	@Get('')
+	@SerializeOptions({ type: TermDto })
 	getTerms(@Query() termFilter: TermFilterDto, @UserReq() user: User | null) {
 		const privacyFilter = resourceEntityPrivacyFilter(user);
 		const filter = {

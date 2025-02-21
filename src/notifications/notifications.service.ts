@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, SerializeOptions } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { Notification } from '../core/schemas/notification.schema';
 import { NotificationFilter } from './dto/notification-filter.dto';
-import { paginate } from '../pagination/paginator';
+import { paginate, Paginated } from '../pagination/paginator';
+import { plainToInstance } from 'class-transformer';
+import { NotificationEntity } from './dto/notification.entity';
 
 @Injectable()
 export class NotificationsService {
@@ -13,21 +15,29 @@ export class NotificationsService {
 	) {}
 
 	async getNotifications(orcid_id: string, filter: NotificationFilter) {
-		const data = await this.notificationModel.find(
-			{
-				orcid_id,
-				...filter.omitPagination(),
-			},
-			{},
-			{ ...filter.getMongoQueryOptions() },
-		);
+		const data =
+			(await this.notificationModel.find(
+				{
+					orcid_id,
+					...filter.omitPagination(),
+				},
+				{},
+				{ ...filter.getMongoQueryOptions() },
+			)) ?? [];
 
 		const count = await this.notificationModel.count({
 			orcid_id,
 			...filter.omitPagination(),
 		});
 
-		return paginate(data, filter, count);
+		const notificationEntities = plainToInstance(NotificationEntity, data, {
+			enableCircularCheck: true,
+			excludeExtraneousValues: true,
+		});
+
+		console.log({ notificationEntities });
+
+		return paginate(notificationEntities, filter, count);
 	}
 
 	async get_new_user_notification(orcid_id: string) {

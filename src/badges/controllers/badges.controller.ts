@@ -1,9 +1,9 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, SerializeOptions } from '@nestjs/common';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
 import { UserReq } from '../../auth/decorators/applyUser.decorator';
 import { AuthProtected } from '../../auth/decorators/auth.decorator';
 import { Public } from '../../auth/decorators/public.decorator';
-import { paginate } from '../../pagination/paginator';
+import { paginate, Paginated } from '../../pagination/paginator';
 import { VersionHeader } from '../../plugins/swagger/config';
 import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
 import { User } from '../../core/schemas/user.schema';
@@ -27,6 +27,7 @@ export class BadgesController {
 	)
 	@AuthProtected()
 	@Public()
+	@SerializeOptions({ type: Paginated<BadgeDto> })
 	@Get('achievements/badges')
 	async get_badges(@Query() filter: BadgeFilter, @UserReq() user: User | null) {
 		const privacyFilter = userResourceEntityPrivacyFilter(user);

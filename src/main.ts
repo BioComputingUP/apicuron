@@ -35,8 +35,8 @@ async function bootstrap() {
 	useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
 	// set the global transform pipe
-	const transformer = app.get(TransformInterceptor);
-	app.useGlobalInterceptors(transformer);
+	// const transformer = app.get(TransformInterceptor);
+	// app.useGlobalInterceptors(transformer);
 	// app.useGlobalFilters(new BaseExceptionFilter());
 
 	// Load global interceptors

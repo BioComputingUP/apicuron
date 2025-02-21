@@ -1,7 +1,7 @@
 import { PrivacyType } from '../../core/enums';
 import { ApiProperty } from '@nestjs/swagger';
 import { Paginated } from '../../pagination/paginator';
-import { UserEntity } from '../../auth/users/dto/user';
+import { UserEntity } from '../../auth/users/dto/user.entity';
 import { Expose, Type } from 'class-transformer';
 
 export class StatisticsDto {

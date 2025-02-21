@@ -13,13 +13,11 @@ import {
 	InternalServerErrorException,
 	Logger,
 	SerializeOptions,
-	ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { SvgSanitationValidationPipe } from '../../../shared/pipes/svg-sanitation.pipe';
 
 import { PartnerResourcesService } from '../services/partner-resources.service';
 import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
-import { UsersService } from '../../../auth/users/services/users.service';
 import { LocalAuthGuard } from '../../../auth/guards/local-auth.guard';
 import { HasAResourceGuard } from '../../../auth/guards/belongs-to-resource.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -44,10 +42,9 @@ import {
 import { AuthService } from '../../../auth/auth.service';
 import * as mv from 'mv';
 import { ResourceLogoValidationPipe } from '../../validators/logo-validation.pipe';
-import { plainToClass, plainToInstance } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import { PublicPartnerResourceDto } from '../../dto/public-partner-resource.dto';
 import { ApiResponseWrapped } from '../../../shared/decorators/wrapped-data-response.decorator';
-import { PartnerResourceDocument } from '../../../core/schemas';
 import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
 
 @ApiTags('Partner Resources')
@@ -71,16 +68,23 @@ export class PartnerResourcesController {
 	@ApiOperation({
 		summary: 'Get the list of all resources on APICURON',
 	})
+	@SerializeOptions({ type: PublicPartnerResourceDto })
 	@Get()
 	async list_resources(): Promise<PublicPartnerResourceDto[]> {
 		const resources = await this.partnerResourceService.get_resources();
 
-		const resourceEntities$ = resources.map(
-			async (resource: PartnerResourceDocument) =>
-				await PublicPartnerResourceDto.fromDocument(resource, this.storage),
+		const resourceEntities = plainToInstance(
+			PublicPartnerResourceDto,
+			resources.map((r) => r.toObject()),
+			{
+				excludeExtraneousValues: true,
+				enableCircularCheck: true,
+			},
 		);
 
-		return await Promise.all(resourceEntities$);
+		console.log(`Parsed Data ${resourceEntities.map((r) => r.resource_name)}`);
+
+		return resourceEntities;
 	}
 
 	// swagger documentation decorators
@@ -94,18 +98,23 @@ export class PartnerResourcesController {
 	@ApiNotFoundResponse({
 		description: 'A 404 Not Found Response and Error Message',
 	})
-	// @UseInterceptors(ClassSerializerInterceptor)
-	// @SerializeOptions({ type: PartnerResourceEntity })
+	@SerializeOptions({ type: PartnerResourceEntity })
 	@Get(':resource_id')
 	async get_resource(@Param() { resource_id }: SelectPartnerResourceDto) {
 		const resource = await this.partnerResourceService.get_resource(
 			resource_id,
 		);
 		if (resource) {
-			// const data = plainToInstance(PartnerResourceDto, , {
-			// 	excludeExtraneousValues: true,
-			// });
-			return await PartnerResourceEntity.fromDocument(resource, this.storage);
+			try {
+				const data = plainToInstance(PartnerResourceEntity, resource, {
+					excludeExtraneousValues: true,
+					enableCircularCheck: true,
+				});
+				return data;
+			} catch (error) {
+				this.logger.error(`Failed to serialize resource ${resource_id}`);
+				throw new InternalServerErrorException();
+			}
 		} else {
 			throw new NotFoundException(`Resource (${resource_id}) Not Found`);
 		}

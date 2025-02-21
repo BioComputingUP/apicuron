@@ -19,22 +19,34 @@ export class TransformInterceptor implements NestInterceptor {
 			map((response) => {
 				// return
 				// return x
+				console.log('TransformInterceptor');
 				const req = context.switchToHttp().getRequest();
 				const meta: object = req.meta_attributes || {};
 				if (req.warnings && Object.keys(req.warnings).length > 0) {
 					meta['warnings'] = req.warnings;
 				}
 				if (!!response && typeof response == 'object' && 'data' in response) {
-					return { ...response, ...meta };
+					const wrappedResponse = { ...response, ...meta };
+					return wrappedResponse;
 				} else {
-					return { data: response, ...meta };
+					console.log({ response });
+					// if the response is not wrapped, wrap it
+					// this assignment approach guarantees that the resulting object is a Pojo
+					// and not an instance of a class
+					const wrappedResponse = Object.create(null);
+					Object.assign(wrappedResponse, { data: response }, meta);
+
+					console.log(
+						Object.getPrototypeOf(wrappedResponse) == null
+							? 'response is a Pojo'
+							: 'response is not a Pojo',
+					);
+					return wrappedResponse;
 				}
 				// the parenthesis are essential
 				// it means we're returning a function that returns the data
 				// don't return a different object,
 				// Rxjs doesn't like when the object reference changes
-				// and acts weird when it does (I don't like how object.assign looks either)
-				// return Object.assign(data, {meta})
 			}),
 		);
 	}

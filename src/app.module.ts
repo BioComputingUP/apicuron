@@ -1,4 +1,4 @@
-import { Module, ClassSerializerInterceptor } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -12,13 +12,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { NotificationsModule } from './notifications/notifications.module';
 import { TermsModule } from './terms/terms.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
-import { UniqueRule } from './shared/validators/unique.validator';
-import {
-	EntriesExistRule,
-	EntryExistsRule,
-} from './shared/validators/entry-exists.validator';
 import { SchedulerClientModule } from './scheduler-client/scheduler-client.module';
-import { TransformInterceptor } from './shared/transformer/transform.interceptor';
 import { EmailModule } from './email/email.module';
 import { CoreApicuronModule } from './core/core.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -32,7 +26,6 @@ import { MedalsModule } from './medals/medals.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { loadSentryModule } from './plugins/sentry';
 import { EventOrchestratorModule } from './event-orchestrator/event-orchestrator.module';
-import { Reflector } from '@nestjs/core';
 import { ResourceStatsModule } from './resource-stats/resource-stats.module';
 import { MonthlyStatisticsModule } from './monthly-statistics/monthly-statistics.module';
 import { CuratorRegistryModule } from './curator-registry/curator-registry.module';
@@ -40,19 +33,16 @@ import { OrcidFetcherModule } from './github-scraper/github-scraper.module';
 import { StorageManagerModule } from '@biocomputingup/nest-storage-manager';
 import { StorageModuleOptions } from './storage/storage.config';
 import { ServeFilesController } from './storage/serve-files.controller';
-import { InjectTransformModule } from 'nestjs-inject-transformer';
-import { StorageReferenceInterceptor } from './storage/storage-reference-transformer';
-import { AutomapperModule } from '@automapper/nestjs';
-import { classes } from '@automapper/classes';
+import { getGlobalInterceptorChain } from './shared/interceptors';
+import {
+	EntriesExistRule,
+	EntryExistsRule,
+	UniqueRule,
+} from './shared/validators';
 @Module({
 	imports: [
 		// Sentry Setup
 		...loadSentryModule(),
-
-		AutomapperModule.forRoot({
-			strategyInitializer: classes(),
-		}),
-
 		EventEmitterModule.forRoot({
 			// wildcard: true,
 			global: true,
@@ -72,7 +62,6 @@ import { classes } from '@automapper/classes';
 
 		// In here we load the StorageManagerModule to manage the storage of files
 		StorageManagerModule.forRoot(StorageModuleOptions),
-		InjectTransformModule,
 
 		// in here we load the Serve static module to serve static files
 		// ServeStaticModule.forRootAsync({
@@ -116,18 +105,7 @@ import { classes } from '@automapper/classes';
 		UniqueRule,
 		EntryExistsRule,
 		EntriesExistRule,
-		StorageReferenceInterceptor,
-		{
-			provide: ClassSerializerInterceptor,
-			inject: [Reflector],
-			useFactory: (reflect: Reflector) => {
-				return new ClassSerializerInterceptor(reflect, {
-					enableCircularCheck: true,
-					excludeExtraneousValues: true,
-				});
-			},
-		},
-		TransformInterceptor,
+		...getGlobalInterceptorChain(),
 	],
 })
 export class AppModule {}

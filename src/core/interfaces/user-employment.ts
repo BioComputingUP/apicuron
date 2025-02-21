@@ -3,3 +3,8 @@ export interface UserEmployment {
 	title: string;
 	url: string;
 }
+
+export interface UserLinks {
+	name: string;
+	url: URL;
+}

@@ -174,17 +174,11 @@ export class StatisticsService {
 			{ ...options, sort: { total_score: -1 } },
 		);
 
-		const orcid_ids = leaderboard.map((stat) => stat.curator_orcid);
-
-		const users = await this.userRepository.find({
-			orcid_id: { $in: orcid_ids },
-		});
-
 		const data = leaderboard.map((stat) => {
-			const user = users.find((u) => u.orcid_id === stat.curator_orcid);
+			const user = stat.user;
 			const leaderboardEntry = {
 				stat: stat.toObject(),
-				user: user ? user.toObject() : null,
+				user: user.toObject(),
 			};
 
 			return plainToClass(StatLeaderboardDto, leaderboardEntry, {

@@ -9,6 +9,7 @@ import {
 	Delete,
 	Param,
 	Query,
+	SerializeOptions,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
@@ -27,12 +28,14 @@ import { User } from '../../core/schemas/user.schema';
 import { UserReq } from '../../auth/decorators/applyUser.decorator';
 import { VersionHeader } from '../../plugins/swagger/config';
 import { AuthService } from '../../auth/auth.service';
-import { paginate } from '../../pagination/paginator';
+import { paginate, Paginated } from '../../pagination/paginator';
 import { UpdateMedalDefDto } from '../dto/update-medal-def.dto';
 import { MedalDefCommandsService } from '../services/medal-def-commands.service';
 import { MedalDefQueriesService } from '../services/medal-def-queries.service';
 import { MedalDefFilter } from '../dto/filter-medal-def.dto';
 import { Response } from 'express';
+import { MedalDefDto } from '../dto/medal.dto';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('Achievements Definition')
 @ApiHeader(VersionHeader)
@@ -62,15 +65,12 @@ export class MedalsDefController {
 	@ApiSecurity('basic')
 	@Post()
 	@AuthProtected()
-	async create_medal(
-		@Body() createMedal: CreateMedalDefDto,
-		@Req() req,
-		@Res() res: Response,
-	) {
+	@SerializeOptions({ type: MedalDefDto })
+	async create_medal(@Body() createMedal: CreateMedalDefDto, @Req() req) {
 		this.can_edit_resource(req.user, createMedal.resource_id);
-		const response = await this.commandsService.createMedalDef(createMedal);
+		const medalDef = await this.commandsService.createMedalDef(createMedal);
 
-		res.send({ data: response });
+		return medalDef;
 	}
 
 	@ApiOperation({
@@ -83,6 +83,7 @@ export class MedalsDefController {
 	@ApiSecurity('basic')
 	@AuthProtected()
 	@Public()
+	@SerializeOptions({ type: Paginated<MedalDefDto> })
 	@Get()
 	async getMedals(
 		@Query() medalFilter: MedalDefFilter,
@@ -100,7 +101,12 @@ export class MedalsDefController {
 			queryFilter,
 			options,
 		);
-		return paginate(data, medalFilter, count);
+		const medalEntities=  plainToInstance(MedalDefDto, data, {
+			excludeExtraneousValues: true,
+			enableCircularCheck: true,
+		});
+		const response = paginate(medalEntities, medalFilter, count);
+		return response;
 	}
 
 	@ApiOperation({

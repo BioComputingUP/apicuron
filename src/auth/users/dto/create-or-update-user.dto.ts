@@ -1,3 +1,5 @@
+import { UserLinks } from '../../../core/interfaces/user-employment';
+
 export class CreateOrUpdateUserDto {
 	displayedName: string;
 
@@ -31,9 +33,7 @@ export interface ICreateOrUpdateUser {
 
 	affiliation?: string;
 
-	links?: {
-		name: string,
-		url: URL
-	}
-	lastLoginDate?: Date
+	links?: UserLinks[];
+
+	lastLoginDate?: Date;
 }

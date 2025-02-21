@@ -55,7 +55,7 @@ export class OrcidSubmissionTask {
 	// const stat = await statModel.findOne({ resource_id: 'disprot', curator_orcid: user.orcid_id })
 	// await submitOrcid.submitWorks(user, stat)
 
-	async submitWorks(user: User, stat: Statistics) {
+	async submitWorks(user: User, stat: StatisticsDocument) {
 		const fontendHost: string = this.config.get<string>('FRONTEND_HOST');
 		const orcidApiUrl: string = this.config.get('ORCID_API_URL'); // this.config.get<string>('ORCID_API_URL');
 

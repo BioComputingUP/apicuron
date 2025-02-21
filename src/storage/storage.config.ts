@@ -2,7 +2,6 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { LocalFsEngine, S3Engine } from '@biocomputingup/nest-storage-manager';
 import {
 	AnyAsyncEngineDefinition,
-	StorageEngine,
 	StorageModuleConfig,
 } from '@biocomputingup/nest-storage-manager/dist/interfaces';
 import { ConfigService } from '@nestjs/config';

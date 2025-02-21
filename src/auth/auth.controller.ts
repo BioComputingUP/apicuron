@@ -5,6 +5,7 @@ import {
 	Req,
 	UseGuards,
 	Render,
+	SerializeOptions,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -21,6 +22,9 @@ import { RoleGuard } from './guards/role.guard';
 import { UsersService } from './users/services/users.service';
 import { UserReq } from './decorators/applyUser.decorator';
 import { User } from '../core/schemas/user.schema';
+import { plainToInstance } from 'class-transformer';
+import { PrivateUserEntity } from './users/dto/user.entity';
+import { AuthProtected } from './decorators/auth.decorator';
 
 @Controller({
 	path: 'auth',
@@ -92,10 +96,13 @@ export class AuthController {
 	})
 	// nestjs logic decorators
 	@Get('profile')
-	@UseGuards(LocalAuthGuard)
-	async get_user_profile(@Req() request) {
+	@AuthProtected()
+	@SerializeOptions({
+		type: PrivateUserEntity,
+	})
+	async get_user_profile(@UserReq() userReq: User) {
 		const user = await this.userService.getPrivateUser({
-			orcid_id: request.user.orcid_id,
+			orcid_id: userReq.orcid_id,
 		});
 		return user;
 	}

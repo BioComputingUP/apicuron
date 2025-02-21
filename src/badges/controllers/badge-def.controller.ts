@@ -9,6 +9,7 @@ import {
 	Delete,
 	Param,
 	Query,
+	SerializeOptions,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
@@ -27,11 +28,13 @@ import { User } from '../../core/schemas/user.schema';
 import { UserReq } from '../../auth/decorators/applyUser.decorator';
 import { VersionHeader } from '../../plugins/swagger/config';
 import { AuthService } from '../../auth/auth.service';
-import { paginate } from '../../pagination/paginator';
+import { paginate, Paginated } from '../../pagination/paginator';
 import { UpdateBadgeDefDto } from '../dto/update-badge-def.dto';
 import { BadgeDefCommandsService } from '../services/badge-def-commands.service';
 import { BadgeDefQueriesService } from '../services/badge-def-queries.service';
 import { BadgeDefFilter } from '../dto/filter-badge-def.dto';
+import { BadgeDefDto } from '../dto/badge.dto';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('Achievements Definition')
 @ApiHeader(VersionHeader)
@@ -74,6 +77,7 @@ export class BadgesDefController {
 		description: 'A list of badges that correspond to the filter',
 		type: [CreateBadgeDefDto],
 	})
+	@SerializeOptions({ type: Paginated<BadgeDefDto> })
 	@AuthProtected()
 	@Public()
 	@Get()
@@ -87,7 +91,12 @@ export class BadgesDefController {
 			privacyQuery,
 		);
 
-		return paginate(data, badges_filter, count);
+		const badgeDefEntities = plainToInstance(BadgeDefDto, data, {
+			excludeExtraneousValues: true,
+			enableCircularCheck: true,
+		})
+
+		return paginate(badgeDefEntities, badges_filter, count);
 	}
 
 	@ApiOperation({
@@ -100,15 +109,15 @@ export class BadgesDefController {
 	@ApiSecurity('basic')
 	@Put('edit')
 	@AuthProtected()
+	@SerializeOptions({ type: BadgeDefDto })
 	async updateBadgeDef(
 		@Body() update_badge: UpdateBadgeDefDto,
 		@Req() req,
-		@Res() res,
 	) {
 		this.can_edit_resource(req.user, update_badge.resource_id);
-		const response = await this.badgeDefCommands.updateBadgeDef(update_badge);
+		const updatedBadge = await this.badgeDefCommands.updateBadgeDef(update_badge);
 
-		res.send({ data: response });
+		return updatedBadge;
 	}
 
 	@ApiOperation({

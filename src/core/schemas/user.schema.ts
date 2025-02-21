@@ -8,7 +8,7 @@ import {
 	UserEmailEntry,
 	UserEmailEntrySchema,
 } from './components/user-email.schema';
-import { UserEmployment } from '../interfaces/user-employment';
+import { UserEmployment, UserLinks } from '../interfaces/user-employment';
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({
@@ -81,12 +81,9 @@ export class User {
 
 	@Prop({
 		required: false,
-		type: Object,
+		default: () => [],
 	})
-	links: {
-		name: string;
-		url: URL;
-	};
+	links: UserLinks[];
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop({
 		required: false,

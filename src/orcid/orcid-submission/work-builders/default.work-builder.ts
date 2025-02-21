@@ -1,7 +1,10 @@
 import { LeanDocument, Types, Document } from 'mongoose';
 import { PartnerResource } from '../../../core/schemas/resource/partner-resource.schema';
-import { Statistics } from '../../../core/schemas/statistics.schema';
-import { User } from '../../../core/schemas/user.schema';
+import {
+	Statistics,
+	StatisticsDocument,
+} from '../../../core/schemas/statistics.schema';
+import { User, UserDocument } from '../../../core/schemas/user.schema';
 import { OrcidWork } from '../../../orcid/orcid-client/interfaces/orcid.interface';
 import { OrcidWorkBuilder } from '../interfaces/orcid-submission.interface';
 import { Injectable } from '@nestjs/common';
@@ -15,9 +18,9 @@ export class DefaultWorkBuilder implements OrcidWorkBuilder {
 
 	frontendHost: string;
 	buildWork(
-		statsitics: LeanDocument<Statistics>,
+		statsitics: LeanDocument<StatisticsDocument>,
 		resource: LeanDocument<PartnerResource>,
-		user: Document<unknown, any, User> & User & { _id: Types.ObjectId },
+		user: UserDocument,
 	): OrcidWork {
 		const profileUrl = new URL(
 			`${this.frontendHost}curators/${user.orcid_id}/${resource.resource_id}`,
