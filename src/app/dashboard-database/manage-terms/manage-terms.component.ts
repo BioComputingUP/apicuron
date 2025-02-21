@@ -60,8 +60,10 @@ export class ManageTermsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.resource$ = this.route.paramMap.pipe(
       map((params: ParamMap) => params.get("resource_id")),
-      switchMap((resource_id: string) => {
+      tap((resource_id) => {
         this.resource_id = resource_id;
+      }),
+      switchMap((resource_id: string) => {
         return this.databaseService.get_resource(resource_id);
       }),
       map((response) => response.data),
@@ -115,16 +117,15 @@ export class ManageTermsComponent implements OnInit, OnDestroy {
   }
 
   open_create_term() {
+    // this.form.reset();
     this.form = this.formBuilder.group({
-      resource_id: [this.resource_id, [Validators.required]], // Resource ID will be set automatically
+      resource_id: [this.resource_id, [Validators.required]],
       activity_term: ["", [Validators.required]],
       activity_category: [ActivityCategory.generation, [Validators.required]],
       activity_name: ["", [Validators.required]],
       score: ["", [Validators.required, Validators.min(1)]],
       description: ["", [Validators.required]],
     });
-
-    this.form.reset();
     this.show_form = "create";
   }
 
@@ -151,6 +152,8 @@ export class ManageTermsComponent implements OnInit, OnDestroy {
           (err) => this.handleError(err)
         );
       }
+    }else{
+      this.toast.warning("Please fill all the required fields", "Validation Error");
     }
   }
 
