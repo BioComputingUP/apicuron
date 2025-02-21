@@ -1,29 +1,46 @@
 <ng-container *ngIf="badge$ | async as badge">
-  <div class="tw-flex tw-flex-col tw-bg-white tw-rounded-md tw-px-1 sm:tw-py-4 sm:tw-p-2 tw-text-gray-800 tw-h-full"
-    [ngClass]="{ 'tw-shadow-sm tw-shadow-gray-400': enableShadow }">
+  <div
+    class="tw-flex tw-flex-col tw-bg-white tw-rounded-md tw-px-1 sm:tw-py-4 sm:tw-p-2 tw-text-gray-800 tw-h-full"
+    [ngClass]="{ 'tw-shadow-sm tw-shadow-gray-400': enableShadow }"
+  >
     <div class="tw-flex tw-flex-row tw-justify-between">
       <div class="tw-flex tw-grow tw-flex-col tw-pl-2">
         <div>
           <div class="tw-float-left">
             <img
-              [src]="badge.state == AchievementState.progress ? 'assets/svg/badge_check_dis.svg' : 'assets/svg/badge_check.svg'"
-              class="tw-mr-2 tw-w-6 lg:tw-w-10 tw-mx-auto" />
-
+              [src]="
+                badge.state == AchievementState.progress
+                  ? 'assets/svg/badge_check_dis.svg'
+                  : 'assets/svg/badge_check.svg'
+              "
+              class="tw-mr-2 tw-w-6 lg:tw-w-10 tw-mx-auto"
+            />
           </div>
-          <div class="tw-flex tw-flex-col ">
-            <span class="tw-block tw-text-sm sm:tw-text-base tw-font-dm-sans tw-font-bold tw-pb-1" [ngClass]="{
-                        'tw-opacity-60': badge.state == AchievementState.progress
-                        }">
+          <div class="tw-flex tw-flex-col">
+            <span
+              class="tw-block tw-text-sm sm:tw-text-base tw-font-dm-sans tw-font-bold tw-pb-1"
+              [ngClass]="{
+                'tw-opacity-60': badge.state == AchievementState.progress
+              }"
+            >
               {{ badge.displayedName }}
             </span>
 
-            <span class="tw-block tw-text-xs tw-text-gray-500 tw-font-light" [ngClass]="{
-                          'tw-opacity-60': badge.state == AchievementState.progress
-                        }">
+            <span
+              class="tw-block tw-text-xs tw-text-gray-500 tw-font-light"
+              [ngClass]="{
+                'tw-opacity-60': badge.state == AchievementState.progress
+              }"
+            >
               &emsp;Requires completing
               <span class="tw-font-bold">{{ badge.count_threshold }} </span>
-              <span cdkOverlayOrigin #activities_list (mouseenter)="setOverlayState(true)"
-                (mouseleave)="setOverlayState(false, 300)" class="tw-font-bold tw-underline tw-cursor-pointer">
+              <span
+                cdkOverlayOrigin
+                #activities_list
+                (mouseenter)="setOverlayState(true)"
+                (mouseleave)="setOverlayState(false, 300)"
+                class="tw-font-bold tw-underline tw-cursor-pointer"
+              >
                 {{ badge.count_threshold > 1 ? "activities" : "activity" }}
               </span>
               <span *ngIf="badge.state == AchievementState.achieved">
@@ -35,7 +52,10 @@
                   </span>
                 </span>
                 <!-- if only end date is defined -->
-                <span *ngIf="!!badge.endDate && !badge.startDate" class="tw-text-xs">
+                <span
+                  *ngIf="!!badge.endDate && !badge.startDate"
+                  class="tw-text-xs"
+                >
                   before
                   <span class="tw-font-bold">
                     {{ badge.endDate | date : "dd-MM-yyyy" }} UTC
@@ -52,60 +72,68 @@
                     {{ badge.endDate | date : "dd-MM-yyyy" }} UTC
                   </span>
                 </span>
-                <div class="tw-block tw-text-xs  tw-text-gray-500 tw-font-light tw-py-1">
+                <div
+                  class="tw-block tw-text-xs tw-text-gray-500 tw-font-light tw-py-1"
+                >
                   <span>
                     &emsp; Achievement completed
                     <span class="tw-font-bold">{{
                       formattedAchievedAt$ | async
-                      }}</span>
+                    }}</span>
                   </span>
                 </div>
               </span>
             </span>
           </div>
 
-
           <span *ngIf="badge.state == AchievementState.progress">
-            <span class="tw-text-xs tw-font-bold tw-text-gray-700">In progress</span>
+            <span class="tw-text-xs tw-font-bold tw-text-gray-700"
+              >In progress</span
+            >
 
             <!-- Flex Container for Progress Bar and Percentage Text -->
             <span class="tw-flex tw-items-center tw-w-full tw-oveerflow-hidden">
               <!-- Progress Bar Container -->
-              <span role="progressbar"
-                class="tw-relative tw-block tw-overflow-hidden tw-rounded-full tw-bg-gray-200 tw-flex-1">
+              <span
+                role="progressbar"
+                class="tw-relative tw-block tw-overflow-hidden tw-rounded-full tw-bg-gray-200 tw-flex-1"
+              >
                 <!-- Progress Bar Fill -->
                 <span
                   class="tw-block tw-h-4 tw-rounded-full tw-bg-gradient-to-r tw-from-apicuron-purple tw-to-apicuron-red"
-                  [style.width]="currentProgress + '%'"></span>
+                  [style.width]="currentProgress + '%'"
+                ></span>
               </span>
 
               <!-- Percentage Text Positioned to the Right -->
               <span class="tw-text-xs tw-font-bold tw-text-gray-700 tw-ml-2">
-                {{ badge.progressRate | number: '1.0-2' }}%
+                {{ badge.progressRate | number : "1.0-2" }}%
               </span>
             </span>
           </span>
-
-
-
-
         </div>
       </div>
     </div>
   </div>
 
-  <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="activities_list" [cdkConnectedOverlayHasBackdrop]="true"
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="activities_list"
+    [cdkConnectedOverlayHasBackdrop]="true"
     [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
-    [cdkConnectedOverlayOpen]="!!(overlayOpen$ | async)">
-    <ul class="custom-tooltip tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-py-2 tw-rounded tw-shadow-md
-        tw-shadow-gray-400" (mouseleave)="setOverlayState(false, 300)" (mouseenter)="setOverlayState(true)">
+    [cdkConnectedOverlayOpen]="!!(overlayOpen$ | async)"
+  >
+    <ul
+      class="custom-tooltip tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-py-2 tw-rounded tw-shadow-md tw-shadow-gray-400"
+      (mouseleave)="setOverlayState(false, 300)"
+      (mouseenter)="setOverlayState(true)"
+    >
       <li *ngFor="let term of termNames$ | async">
         {{ term }}
       </li>
     </ul>
   </ng-template>
 </ng-container>
-
 
 <style>
   .tw-block {

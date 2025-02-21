@@ -29,7 +29,8 @@ export class ManageMedalsComponent implements OnInit {
   terms$: Observable<any>;
   maxDate = new Date();
   limit = 15;
-  searchQuery: string = '';
+  searchQuery$ = new BehaviorSubject<string>("");
+  searchInput = new BehaviorSubject<string>("");
 
   medals$: Observable<Paginated<MedalDef>>;
   mergedMedals$: Observable<Paginated<MedalDef>>;
@@ -72,12 +73,17 @@ export class ManageMedalsComponent implements OnInit {
       shareReplay()
     );
 
-    this.medalFilter$ = combineLatest([this.resource$, this.page$]).pipe(
-      map(([{ resource_id }, page]) =>
+    this.medalFilter$ = combineLatest([
+      this.resource$,
+      this.page$,
+      this.searchQuery$,
+    ]).pipe(
+      map(([{ resource_id }, page, searchQuery]: [Resource, number, string]) =>
         MedalDefFilter.create({
           resource_id,
           skip: (page - 1) * this.limit,
           limit: this.limit,
+          search_query: searchQuery,
         })
       )
     );
@@ -89,10 +95,11 @@ export class ManageMedalsComponent implements OnInit {
     );
 
     this.mergedMedals$ = this.allMedals$.pipe(
-      switchMap(initialMedals =>
+      switchMap((initialMedals) =>
         this.updateMedal$.pipe(
-          scan((currentMedals, update) =>
-            this.applyMedalUpdates(currentMedals, update),
+          scan(
+            (currentMedals, update) =>
+              this.applyMedalUpdates(currentMedals, update),
             initialMedals
           ),
           startWith(initialMedals)
@@ -100,43 +107,37 @@ export class ManageMedalsComponent implements OnInit {
       )
     );
 
-    this.medals$ = this.mergedMedals$.pipe(
-      map(medals => {
-        if (!medals) return medals;
-        let filteredMedals = medals;
-        if (this.searchQuery) {
-          filteredMedals = {
-            ...medals,
-            data: medals.data.filter(medal =>
-              medal.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-            ),
-          };
-        }
-        return filteredMedals;
-      })
-    );
+    this.medals$ = this.mergedMedals$;
   }
 
   private groupTerms(terms: Term[]): any {
-    return ["generation", "invalidation", "revision"].map(category => ({
+    return ["generation", "invalidation", "revision"].map((category) => ({
       label: category,
       value: category,
       items: terms
-        .filter(term => term.category === category)
-        .map(term => ({
+        .filter((term) => term.category === category)
+        .map((term) => ({
           label: term.activity_name,
-          value: term.activity_term
-        }))
+          value: term.activity_term,
+        })),
     }));
   }
 
   ngOnInit(): void {}
 
-  onSearchChange() {
-     this.page$.next(1);
+  onSearchClick(): void {
+    this.searchQuery$.next(this.searchInput.value);
   }
 
-  applyMedalUpdates(medals: Paginated<MedalDef>, update: MedalListUpdate): Paginated<MedalDef> {
+  onResetClick(): void {
+    this.searchInput.next(""); // Clear the search input
+    this.searchQuery$.next(""); // Reset the filter
+  }
+
+  applyMedalUpdates(
+    medals: Paginated<MedalDef>,
+    update: MedalListUpdate
+  ): Paginated<MedalDef> {
     switch (update.operation) {
       case "create":
         return {
@@ -151,14 +152,14 @@ export class ManageMedalsComponent implements OnInit {
         };
       case "update":
         return {
-          data: medals.data.map(medal =>
+          data: medals.data.map((medal) =>
             medal.name === update.medal.name ? update.medal : medal
           ),
           meta: medals.meta,
         };
       case "delete":
         return {
-          data: medals.data.filter(medal => medal.name !== update.medal.name),
+          data: medals.data.filter((medal) => medal.name !== update.medal.name),
           meta: {
             pagination: {
               total: medals.meta.pagination.total - 1,
@@ -172,7 +173,13 @@ export class ManageMedalsComponent implements OnInit {
     }
   }
 
-  formSubmit({ medal, operation }: { medal: MedalDef; operation: "create" | "update" }) {
+  formSubmit({
+    medal,
+    operation,
+  }: {
+    medal: MedalDef;
+    operation: "create" | "update";
+  }) {
     if (operation == "create") {
       this.createMedal(medal);
     }
@@ -227,7 +234,9 @@ export class ManageMedalsComponent implements OnInit {
   }
 
   confirmDeleteMedal(medal: MedalDef) {
-    const confirmed = confirm(`Are you sure you want to delete the medal ${medal.name}?`);
+    const confirmed = confirm(
+      `Are you sure you want to delete the medal ${medal.name}?`
+    );
     if (confirmed) {
       this.delete_medal(medal);
     }

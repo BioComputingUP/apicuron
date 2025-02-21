@@ -29,7 +29,6 @@ import { BadgeDefService } from "../../achievements-def/services/badge-def.servi
 import { BadgeDefFilter } from "../../achievements-def/interfaces/badge-def.filter";
 import { BadgeDef } from "../../models/badge-def.model";
 import { Paginated } from "src/app/interfaces/paginated";
-
 type BadgeListUpdate = {
   badge: BadgeDef;
   operation: "update" | "delete" | "create";
@@ -48,6 +47,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
   terms$: Observable<any>;
 
   searchQuery$ = new BehaviorSubject<string>("");
+  searchInput = new BehaviorSubject<string>("");
 
   badges$: Observable<Paginated<BadgeDef>>;
   manageForm$ = new BehaviorSubject<{
@@ -143,15 +143,8 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
 
     this.badges$ = this.badgesList$.pipe(
       switchMap((badgeList: Paginated<BadgeDef>) => {
-        // We switch to the updateBadge$ observable to listen for updates
-        // This makes sure this observable is rebuilt whenever badgeList changes
         return this.updateBadge$.pipe(
-          // We start with the initial badgeList
-          // Making sure the first value is the badgeList
           startWith(badgeList),
-          // We scan over the updates and apply them to the badgeList
-          // This way we can keep track of the badgeList state
-          // and apply updates to it
           scan((badges: Paginated<BadgeDef>, update: BadgeListUpdate) => {
             return this.applyBadgeUpdates(badges, update);
           })
@@ -165,9 +158,13 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {}
 
-  onSearchChange(newSearch: string): void {
-    this.searchQuery$.next(newSearch);
-    this.page$.next(1); // Reset to page 1 when the search changes.
+  onSearchClick(): void {
+    this.searchQuery$.next(this.searchInput.value);
+  }
+
+  onResetClick(): void {
+    this.searchInput.next(""); // Clear the search input
+    this.searchQuery$.next(""); // Reset the filter
   }
 
   private updateBadgeUI(badge: BadgeDef) {
