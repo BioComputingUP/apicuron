@@ -37,10 +37,11 @@ import { ResourceGroupCardComponent } from "../components/group-card/resource-gr
 import { DialogModule } from "@angular/cdk/dialog";
 import { GroupCreateForm } from "../components/group-create-form/group-create-form.component";
 import { ConfirmationModule } from "../../../projects/apicuron-util/src/lib/confirmation";
-import { EmptyStateComponent } from "../components/empty-state/empty-state.component";
+import { ErrorMessagePipe } from "../components/utils/error-messages/error-messages.pipe";
 
 @NgModule({
   declarations: [
+    ErrorMessagePipe,
     DatabaseUpdateComponent,
     SubmitReportComponent,
     SubmitSingleComponent,
@@ -79,7 +80,6 @@ import { EmptyStateComponent } from "../components/empty-state/empty-state.compo
     ResourceGroupCardComponent,
     GroupCreateForm,
     ConfirmationModule,
-    EmptyStateComponent,
   ],
 })
 export class DashboardDatabaseModule {}

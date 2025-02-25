@@ -1,51 +1,95 @@
-<div class="tw-px-10 tw-pt-4 tw-flex-auto" *ngIf="resource$ | async as resource">
+<div
+  class="tw-px-10 tw-pt-4 tw-flex-auto"
+  *ngIf="resource$ | async as resource"
+>
   <div class="tw-flex tw-flex-row tw-justify-between tw-pt-2">
-    <span class="tw-text-xl tw-font-bold tw-capitalize">Manage {{ resource["resource_name"] }} Activities</span>
-    <button id="defineActivity" style="background: #742573;"
+    <span class="tw-text-xl tw-font-bold tw-capitalize"
+      >Manage {{ resource["resource_name"] }} Activities</span
+    >
+    <button
+      id="defineActivity"
+      style="background: #742573"
       class="tw-px-4 tw-py-2 tw-font-normal tw-text-white tw-rounded tw-text-sm tw-flex tw-items-center"
-      (click)="open_create_term()">
+      (click)="open_create_term()"
+    >
       <!-- Plus Icon -->
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" class="tw-mr-2">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        class="tw-mr-2"
+      >
         <path fill="white" d="M19 13H11V19H9V13H3V11H9V5H11V11H19V13Z" />
       </svg>
       Define Activity
     </button>
-
   </div>
 
   <div class="tw-relative tw-w-full tw-mt-3 tw-mb-4">
-    <span class="tw-absolute tw-inset-y-0 tw-left-3 tw-flex tw-items-center tw-pointer-events-none">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-        <circle cx="11" cy="11" r="8" stroke="gray" stroke-width="2" fill="none" />
+    <span
+      class="tw-absolute tw-inset-y-0 tw-left-3 tw-flex tw-items-center tw-pointer-events-none"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        width="24"
+        height="24"
+      >
+        <circle
+          cx="11"
+          cy="11"
+          r="8"
+          stroke="gray"
+          stroke-width="2"
+          fill="none"
+        />
         <line x1="16" y1="16" x2="21" y2="21" stroke="gray" stroke-width="2" />
       </svg>
     </span>
-    <input id="search_input" type="text" [(ngModel)]="searchTerm"
+    <!-- [(ngModel)]="searchTerm" -->
+    <input
+      id="search_input"
+      type="text"
       class="tw-pl-12 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md !tw-shadow-none tw-w-full"
-      placeholder="Search medals..." (ngModelChange)="onSearchTermChange()" />
-
+      placeholder="Search medals..."
+      (input)="search($event)"
+    />
   </div>
 
-  <div class="tw-flex tw-flex-col  tw-border tw-border-gray-300">
+  <div class="tw-flex tw-flex-col tw-border tw-border-gray-300">
     <div class="tw-overflow-x-auto">
       <div class="tw-bg-white tw-inline-block tw-min-w-full">
         <div class="tw-overflow-x-auto">
           <table class="tw-min-w-full">
             <thead class="tw-border-b">
-              <tr class="tw-capitalize" style="background: #f3f4f6;">
-                <th scope="col" class="tw-text-sm tw-text-gray-900 tw-px-2 tw-py-2 tw-text-left tw-font-bold"></th>
-                <th scope="col" class="tw-text-left head-cell">Activity Identifier</th>
-                <th scope="col" class="tw-text-left head-cell">Activity Name</th>
-                <th scope="col" class="tw-text-left head-cell">Activity Category</th>
-                <th scope="col" class=" head-cell">score</th>
+              <tr class="tw-capitalize" style="background: #f3f4f6">
+                <th
+                  scope="col"
+                  class="tw-text-sm tw-text-gray-900 tw-px-2 tw-py-2 tw-text-left tw-font-bold"
+                ></th>
+                <th scope="col" class="tw-text-left head-cell">
+                  Activity Identifier
+                </th>
+                <th scope="col" class="tw-text-left head-cell">
+                  Activity Name
+                </th>
+                <th scope="col" class="tw-text-left head-cell">
+                  Activity Category
+                </th>
+                <th scope="col" class="head-cell">score</th>
                 <th scope="col" class="tw-text-left head-cell">description</th>
                 <th colspan="2" class="head-cell tw-text-center">Actions</th>
               </tr>
             </thead>
-            <tbody *ngIf="filteredTerms$ | async as terms">
-              <tr *ngFor="let term of terms; let i = index"
-                class="tw-border-b hover:tw-bg-white hover:tw-shadow-lg hover:tw-font-bold">
-                <td class="tw-px-4 tw-py-2 tw-whitespace-nowrap tw-text-sm tw-font-medium tw-text-gray-900">
+            <tbody *ngIf="termsList$ | async as terms">
+              <tr
+                *ngFor="let term of terms; let i = index"
+                class="tw-border-b hover:tw-bg-white hover:tw-shadow-lg hover:tw-font-bold"
+              >
+                <td
+                  class="tw-px-4 tw-py-2 tw-whitespace-nowrap tw-text-sm tw-font-medium tw-text-gray-900"
+                >
                   {{ i + 1 }}
                 </td>
                 <td class="cell">
@@ -55,7 +99,9 @@
                   {{ term.activity_name }}
                 </td>
                 <td class="cell">
-                  {{ term.activity_category }}
+                  <span>
+                    {{ term.category }}
+                  </span>
                 </td>
                 <td class="cell tw-text-center">
                   {{ term.score }}
@@ -65,30 +111,44 @@
                 </td>
                 <td class="cell tw-flex tw-justify-center tw-tw-px-0">
                   <!-- Delete Button with Ictw-on on the Left -->
-                  <button (click)="confirmDelete(term)"
-                    class="tw-bg-gray-200 tw-p-2 tw-rounded tw-text-gray tw-mr-1 tw-flex tw-items-center tw-justify-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
-                      <path fill="gray"
-                        d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM16 3H14V2C14 1.4 13.6 1 13 1H11C10.4 1 10 1.4 10 2V3H8C7.4 3 7 3.4 7 4C7 4.6 7.4 5 8 5H16C16.6 5 17 4.6 17 4C17 3.4 16.6 3 16 3Z" />
+                  <button
+                    (click)="confirmDelete(term)"
+                    class="tw-bg-gray-200 tw-p-2 tw-rounded tw-text-gray tw-mr-1 tw-flex tw-items-center tw-justify-start"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      width="16"
+                      height="16"
+                    >
+                      <path
+                        fill="gray"
+                        d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM16 3H14V2C14 1.4 13.6 1 13 1H11C10.4 1 10 1.4 10 2V3H8C7.4 3 7 3.4 7 4C7 4.6 7.4 5 8 5H16C16.6 5 17 4.6 17 4C17 3.4 16.6 3 16 3Z"
+                      />
                     </svg>
                   </button>
 
                   <!-- Edit Button with Icon on the Right -->
-                  <button (click)="open_edit_term_modal(term)"
-                    class="tw-bg-green-500 tw-p-2 tw-rounded tw-text-white  tw-ml-1 tw-flex tw-items-center tw-justify-end">
+                  <button
+                    (click)="open_edit_term_modal(term)"
+                    class="tw-bg-green-500 tw-p-2 tw-rounded tw-text-white tw-ml-1 tw-flex tw-items-center tw-justify-end"
+                  >
                     <!-- Edit Icon (White color) -->
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
-                      <path fill="white"
-                        d="M3 17.25V20H5.75L15.51 10.24L13.76 8.49L3 17.25ZM20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C18.02 2.94 17.38 2.94 17.03 3.29L15.76 4.56L19.44 8.24L20.71 7.04Z" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      width="16"
+                      height="16"
+                    >
+                      <path
+                        fill="white"
+                        d="M3 17.25V20H5.75L15.51 10.24L13.76 8.49L3 17.25ZM20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C18.02 2.94 17.38 2.94 17.03 3.29L15.76 4.56L19.44 8.24L20.71 7.04Z"
+                      />
                     </svg>
-
                   </button>
                 </td>
-
-
               </tr>
             </tbody>
-
           </table>
         </div>
       </div>
@@ -96,100 +156,204 @@
   </div>
 
   <!-- Edit Terms Form Modal -->
-  <div [ngClass]="{
-        'tw-opacity-100 tw-scale-100': show_form,
-        'tw-opacity-0 tw-scale-95': !show_form
-      }" class="tw-fixed tw-inset-0 tw-z-[1000] tw-flex tw-items-center tw-justify-center
-        tw-transition-all tw-duration-700 tw-ease-in-out" *ngIf="show_form" aria-labelledby="modal-title" role="dialog"
-    aria-modal="true">
-    <!-- Gray Overlay -->
-    <div class="tw-fixed tw-inset-0 tw-bg-gray-700 tw-bg-opacity-75 tw-z-[900]" (click)="show_form = false"></div>
+  <ng-container *ngIf="formState$ | async as formState">
+    <div
+      [ngClass]="{
+        'tw-opacity-100 tw-scale-100':
+          formState.value === 'create' || formState.value === 'update',
+        'tw-opacity-0 tw-scale-95':
+          formState.value != 'create' && formState.value != 'update'
+      }"
+      class="tw-fixed tw-inset-0 tw-z-[1000] tw-flex tw-items-center tw-justify-center tw-transition-all tw-duration-700 tw-ease-in-out"
+      *ngIf="formState.value != 'closed'"
+      aria-labelledby="modal-title"
+      role="dialog"
+      aria-modal="true"
+    >
+      <!-- Gray Overlay -->
+      <div
+        class="tw-fixed tw-inset-0 tw-bg-gray-700 tw-bg-opacity-75 tw-z-[900]"
+        (click)="closeForm()"
+      ></div>
 
-    <!-- Modal Container -->
-    <div class="tw-relative tw-z-[1000] tw-bg-white tw-p-0 tw-shadow-xl tw-rounded-lg
-          tw-max-w-lg tw-w-full tw-max-h-screen tw-overflow-y-auto tw-grid tw-grid-cols-1 tw-justify-items-start">
-      <div class="tw-border-b-4 tw-flex tw-items-center tw-px-6 tw-py-4 tw-w-full">
-        <h2 *ngIf="show_form == 'update'" class="tw-text-xl tw-font-bold tw-text-left">
-          Update Activity "{{ form?.get('activity_term')?.value }}"
-        </h2>
-        <h2 *ngIf="show_form == 'create'" class="tw-text-xl tw-font-bold tw-text-left">
-          Create Activity
-        </h2>
+      <!-- Modal Container -->
+      <div
+        class="tw-relative tw-z-[1000] tw-bg-white tw-p-0 tw-shadow-xl tw-rounded-lg tw-max-w-lg tw-w-full tw-max-h-screen tw-overflow-y-auto tw-grid tw-grid-cols-1 tw-justify-items-start"
+      >
+        <div
+          class="tw-border-b-4 tw-flex tw-items-center tw-px-6 tw-py-4 tw-w-full"
+        >
+          <h2
+            *ngIf="formState.value == 'update'"
+            class="tw-text-xl tw-font-bold tw-text-left"
+          >
+            Update Activity "{{ formState.form.get("activity_name")?.value }}"
+          </h2>
+          <h2
+            *ngIf="formState.value == 'create'"
+            class="tw-text-xl tw-font-bold tw-text-left"
+          >
+            Create Activity
+          </h2>
+        </div>
+
+        <!-- Form -->
+        <form
+          [formGroup]="formState.form"
+          (submit)="submit_form(formState)"
+          class="tw-px-6 tw-py-4 tw-w-full tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4"
+        >
+          <div class="tw-col-span-2">
+            <label
+              class="tw-block tw-font-bold tw-text-gray-700"
+              for="activity_term"
+            >
+              Activity Internal ID
+            </label>
+            <input
+              type="text"
+              formControlName="activity_term"
+              class="tw-w-full tw-px-4 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md"
+            />
+            <small
+              *ngFor="
+                let error of formState.form.get('activity_term')
+                  | ErrorMessage : 'Activity Internal ID'
+                  | async
+              "
+            >
+              <span class="tw-text-red-500">{{ error }}</span> <br />
+            </small>
+            <small
+              class="tw-leading-tight tw-block tw-pt-2 tw-text-xs tw-text-gray-500"
+            >
+              A Name used in the API to identify the Activity.
+            </small>
+          </div>
+
+          <div>
+            <label
+              class="tw-block tw-font-bold tw-text-gray-700"
+              for="activity_name"
+            >
+              Activity Name
+            </label>
+            <input
+              type="text"
+              formControlName="activity_name"
+              class="tw-w-full tw-p-2 tw-border tw-border-gray-300 tw-rounded-md"
+            />
+            <small
+              class="tw-leading-tight tw-block tw-pt-2 tw-text-xs tw-text-gray-500"
+            >
+              A Name used in public indicating the Activity.
+            </small>
+            <small
+              *ngFor="
+                let error of formState.form.get('activity_name')
+                  | ErrorMessage : 'Activity Name'
+                  | async
+              "
+            >
+              <span class="tw-text-red-500">{{ error }}</span> <br />
+            </small>
+          </div>
+
+          <div>
+            <label class="tw-block tw-font-bold tw-text-gray-700" for="score">
+              Score
+            </label>
+            <input
+              type="number"
+              min="1"
+              formControlName="score"
+              class="tw-w-full tw-p-2 tw-border tw-border-gray-300 tw-rounded-md"
+            />
+            <small
+              *ngFor="
+                let error of formState.form.get('score')
+                  | ErrorMessage : 'Score'
+                  | async
+              "
+            >
+              <span class="tw-text-red-500">{{ error }}</span> <br />
+            </small>
+            <small
+              class="tw-leading-tight tw-block tw-pt-2 tw-text-xs tw-text-gray-500"
+            >
+              The value of the activity; when a curator completes this activity,
+              they will earn this score.
+            </small>
+          </div>
+
+          <div class="tw-col-span-2">
+            <label
+              class="tw-block tw-font-bold tw-text-gray-700"
+              for="activity_category"
+            >
+              Activity Category
+            </label>
+            <select
+              class="tw-w-full tw-capitalize tw-p-2 tw-border tw-border-gray-300 tw-rounded-md"
+              formControlName="activity_category"
+            >
+              <option
+                *ngFor="let category of activity_categories"
+                [value]="category"
+                class="tw-bg-white tw-text-gray-900"
+              >
+                {{ category }}
+              </option>
+            </select>
+            <small
+              class="tw-leading-tight tw-block tw-pt-2 tw-text-xs tw-text-gray-500"
+            >
+              The category of an activity describes the type of activity,
+              whether it generates, invalidates, or revises data on the
+              resource.
+            </small>
+          </div>
+
+          <div class="tw-col-span-2">
+            <label
+              class="tw-block tw-font-bold tw-text-gray-700"
+              for="description"
+            >
+              Description
+            </label>
+            <textarea
+              formControlName="description"
+              rows="2"
+              class="tw-w-full tw-p-2 tw-border tw-border-gray-300 tw-rounded-md"
+            ></textarea>
+            <small
+              *ngFor="
+                let error of formState.form.get('description')
+                  | ErrorMessage : 'Description'
+                  | async
+              "
+            >
+              <span class="tw-text-red-500">{{ error }}</span> <br />
+            </small>
+          </div>
+
+          <div class="tw-col-span-2 tw-flex tw-items-center tw-gap-2">
+            <button
+              type="button"
+              class="tw-w-24 tw-p-2 tw-border tw-border-gray-400 tw-text-gray-400 tw-font-bold tw-rounded-md"
+              (click)="closeForm()"
+            >
+              Close
+            </button>
+
+            <input
+              type="submit"
+              class="tw-flex-1 tw-rounded-md tw-bg-apicuron-bright-purple tw-px-3.5 tw-pt-2.5 tw-pb-3.5 tw-text-center tw-text-sm tw-font-semibold tw-text-white tw-shadow-sm tw-hover:bg-indigo-500 tw-focus-visible:outline tw-focus-visible:outline-2 tw-focus-visible:outline-offset-2 tw-focus-visible:outline-indigo-600 tw-cursor-pointer"
+              value="Submit"
+            />
+          </div>
+        </form>
       </div>
-
-      <!-- Form -->
-      <form [formGroup]="form" (submit)="submit_form()"
-        class="tw-px-6 tw-py-4 tw-w-full tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
-        <div class="tw-col-span-2">
-          <label class="tw-block tw-font-bold tw-text-gray-700" for="activity_term">
-            Activity Internal ID
-          </label>
-          <input type="text" formControlName="activity_term"
-            class="tw-w-full tw-px-4 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md" />
-          <small class="tw-leading-tight tw-block tw-pt-2  tw-text-xs tw-text-gray-500">
-            A Name used in the API to identify the Activity.
-          </small>
-        </div>
-
-        <div>
-          <label class="tw-block  tw-font-bold tw-text-gray-700" for="activity_name">
-            Activity Name
-          </label>
-          <input type="text" formControlName="activity_name"
-            class="tw-w-full tw-p-2 tw-border tw-border-gray-300 tw-rounded-md" />
-          <small class="tw-leading-tight tw-block tw-pt-2  tw-text-xs tw-text-gray-500">
-            A Name used in public indicating the Activity.
-          </small>
-        </div>
-
-        <div>
-          <label class="tw-block tw-font-bold tw-text-gray-700" for="score">
-            Score
-          </label>
-          <input type="number" min="1" formControlName="score"
-            class="tw-w-full tw-p-2 tw-border tw-border-gray-300 tw-rounded-md" />
-          <small class="tw-leading-tight tw-block tw-pt-2  tw-text-xs tw-text-gray-500">
-            The value of the activity; when a curator completes this activity,
-            they will earn this score.
-          </small>
-        </div>
-
-        <div class="tw-col-span-2">
-          <label class="tw-block tw-font-bold tw-text-gray-700" for="activity_category">
-            Activity Category
-          </label>
-          <select class="tw-w-full tw-capitalize tw-p-2 tw-border tw-border-gray-300 tw-rounded-md"
-            formControlName="activity_category">
-            <option *ngFor="let category of activity_categories" [value]="category"
-              class="tw-bg-white  tw-text-gray-900">
-              {{ category }}
-            </option>
-          </select>
-          <small class="tw-leading-tight tw-block tw-pt-2 tw-text-xs tw-text-gray-500">
-            The category of an activity describes the type of activity, whether
-            it generates, invalidates, or revises data on the resource.
-          </small>
-        </div>
-
-        <div class="tw-col-span-2">
-          <label class="tw-block tw-font-bold tw-text-gray-700" for="description">
-            Description
-          </label>
-          <textarea formControlName="description" rows="2"
-            class="tw-w-full tw-p-2 tw-border tw-border-gray-300 tw-rounded-md"></textarea>
-        </div>
-
-        <div class="tw-col-span-2 tw-flex tw-items-center tw-gap-2">
-          <button class="tw-w-24 tw-p-2 tw-border tw-border-gray-400 tw-text-gray-400 tw-font-bold tw-rounded-md"
-            (click)="show_form = false">
-            Close
-          </button>
-
-          <input type="submit"
-            class="tw-flex-1 tw-rounded-md tw-bg-apicuron-bright-purple tw-px-3.5 tw-pt-2.5 tw-pb-3.5 tw-text-center tw-text-sm tw-font-semibold tw-text-white tw-shadow-sm tw-hover:bg-indigo-500 tw-focus-visible:outline tw-focus-visible:outline-2 tw-focus-visible:outline-offset-2 tw-focus-visible:outline-indigo-600"
-            value="Submit" />
-        </div>
-      </form>
     </div>
-  </div>
+  </ng-container>
 </div>
