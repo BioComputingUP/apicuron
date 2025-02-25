@@ -126,30 +126,30 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "apicuron-ui:build"
+            "buildTarget": "apicuron-ui:build"
           },
           "configurations": {
             "defaultConfiguration": {
-              "browserTarget": "apicuron-ui:build:development"
+              "buildTarget": "apicuron-ui:build:development"
             },
             "production": {
-              "browserTarget": "apicuron-ui:build:production"
+              "buildTarget": "apicuron-ui:build:production"
             },
             "development": {
-              "browserTarget": "apicuron-ui:build:development"
+              "buildTarget": "apicuron-ui:build:development"
             },
             "build-auth-response": {
-              "browserTarget": "apicuron-ui:build:build-auth-response",
               "host": "0.0.0.0",
               "disableHostCheck": true,
-              "port": 1050
+              "port": 1050,
+              "buildTarget": "apicuron-ui:build:build-auth-response"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "apicuron-ui:build"
+            "buildTarget": "apicuron-ui:build"
           }
         },
         "test": {
@@ -221,7 +221,7 @@
           "defaultConfiguration": "production"
         },
         "serve-ssr": {
-          "builder": "@nguniversal/builders:ssr-dev-server",
+          "builder": "@angular-devkit/build-angular:ssr-dev-server",
           "configurations": {
             "development": {
               "browserTarget": "apicuron-ui:build:development",
@@ -235,7 +235,7 @@
           "defaultConfiguration": "development"
         },
         "prerender": {
-          "builder": "@nguniversal/builders:prerender",
+          "builder": "@angular-devkit/build-angular:prerender",
           "options": {
             "routes": [
               "/docs",
@@ -372,7 +372,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "leaderboard:build"
+            "buildTarget": "leaderboard:build"
           }
         },
         "test": {
