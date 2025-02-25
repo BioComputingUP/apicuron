@@ -2,7 +2,7 @@ ARG UID=1002
 ARG GID=1002
 
 
-FROM node:16.14.2-buster-slim AS development
+FROM node:18.13.0-buster-slim AS development
 
 
 # load arguments in this target

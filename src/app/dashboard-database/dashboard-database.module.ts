@@ -38,6 +38,7 @@ import { DialogModule } from "@angular/cdk/dialog";
 import { GroupCreateForm } from "../components/group-create-form/group-create-form.component";
 import { ConfirmationModule } from "../../../projects/apicuron-util/src/lib/confirmation";
 import { ErrorMessagePipe } from "../components/utils/error-messages/error-messages.pipe";
+import { EmptyStateComponent } from "../components/empty-state/empty-state.component";
 
 @NgModule({
   declarations: [
@@ -80,6 +81,7 @@ import { ErrorMessagePipe } from "../components/utils/error-messages/error-messa
     ResourceGroupCardComponent,
     GroupCreateForm,
     ConfirmationModule,
+    EmptyStateComponent,
   ],
 })
 export class DashboardDatabaseModule {}
