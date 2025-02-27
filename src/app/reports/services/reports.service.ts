@@ -15,7 +15,7 @@ export type ReportsByResourceId = {
 
 @Injectable()
 export class ReportsService {
-  constructor(protected http: HttpClient) {}
+  constructor(protected http: HttpClient) { }
 
   ws = environment.ws + "/";
 
@@ -79,18 +79,4 @@ export class ReportsService {
     );
   }
 
-  getGrouppedReports(
-    reportFilter: ReportFilter,
-    groupBy: "day" | "month" | "activity_term"
-  ): Observable<Paginated<GroupedReports>> {
-    const url: string = new URL(`reports/group-by/${groupBy}`, this.ws).href;
-
-    const httpParams = new HttpParams({ fromObject: reportFilter.serialize() });
-    return this.http.get<Paginated<GroupedReports>>(url, {
-      headers: {
-        version: "2",
-      },
-      params: httpParams,
-    });
-  }
 }

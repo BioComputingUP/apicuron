@@ -41,10 +41,11 @@ export class CuratorProfileComponent implements OnInit, AfterViewInit {
     protected orcidService: OrcidService,
     private overlay: Overlay,
     private viewContainerRef: ViewContainerRef
-  ) {}
+  ) { }
 
   curator$ = new BehaviorSubject<User>(null);
   @Input() set curator(value: User) {
+    console.log(value);
     this.curator$.next(value);
   }
 
@@ -54,37 +55,37 @@ export class CuratorProfileComponent implements OnInit, AfterViewInit {
   );
 
   ngOnInit(): void {
-    this.biography$ = this.curatorObs$.pipe(
-      switchMap((curator: User) =>
-        this.orcidService.get_biography(curator.orcid_id)
-      )
-    );
-    
-    this.keywords$ = this.curatorObs$.pipe(
-      switchMap((curator: User) =>
-        this.orcidService.get_keywords(curator.orcid_id)
-      )
-    );
+    // this.biography$ = this.curatorObs$.pipe(
+    //   switchMap((curator: User) =>
+    //     this.orcidService.get_biography(curator.orcid_id)
+    //   )
+    // );
+
+    // this.keywords$ = this.curatorObs$.pipe(
+    //   switchMap((curator: User) =>
+    //     this.orcidService.get_keywords(curator.orcid_id)
+    //   )
+    // );
     this.profileLinks$ = this.curatorObs$.pipe(
-      switchMap((curator: User) =>
-        this.orcidService.get_profile_links(curator.orcid_id)
-      )
+      map((curator: User) => {
+        return curator.links;
+      }),
     );
-    this.employment$ = this.curatorObs$.pipe(
-      switchMap((curator: User) =>
-        this.orcidService.get_employment(curator.orcid_id)
-      )
-    );
-   
-    this.userInfo$ = merge(
-      this.biography$,
-      this.keywords$,
-      this.profileLinks$,
-      this.employment$,
-    ).pipe(map((k) => true));
+    // this.employment$ = this.curatorObs$.pipe(
+    //   switchMap((curator: User) =>
+    //     this.orcidService.get_employment(curator.orcid_id)
+    //   )
+    // );
+
+    // this.userInfo$ = merge(
+    //   this.biography$,
+    //   this.keywords$,
+    //   this.profileLinks$,
+    //   this.employment$,
+    // ).pipe(map((k) => true));
   }
 
-  ngAfterViewInit(): void {}
+  ngAfterViewInit(): void { }
 
   openTooltip(event: MouseEvent, tooltipContent: string) {
     if (this.overlayRef) {

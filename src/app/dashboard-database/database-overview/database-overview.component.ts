@@ -10,7 +10,7 @@ import {
 } from "rxjs/operators";
 import { combineLatest } from "rxjs";
 import { AuthService } from "../../auth/auth.service";
-import * as moment from "moment";
+import moment from "moment";
 import { ReportFilter } from "src/app/reports/interfaces/report-filter.interface";
 import { Resource } from "../../models/resource.model";
 import { ResourcesService } from "../../resource/service/resources.service";

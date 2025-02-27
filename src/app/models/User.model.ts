@@ -19,7 +19,8 @@ export class User implements Deserializable {
     this.resources = input.resources ?? null;
     this.family_name = input.family_name ?? null;
     this.given_name = input.given_name ?? null;
-    this.avatar = input.avatar ?? null;
+    this._generate_avatar(input.avatar);
+    this.orcid_url = new URL(this.orcid_id, environment.orcid_main_url);
     this.privacy = input.privacy ?? "public";
     this.biography = input.biography ?? "Empty";
     this.affiliation = input.affiliation ?? "Nothing";
@@ -29,6 +30,7 @@ export class User implements Deserializable {
     return this;
   }
 
+  orcid_url: URL;
   displayedName: string;
   full_name?: string;
   last_update?: string;
@@ -47,24 +49,19 @@ export class User implements Deserializable {
   links?: Array<{ name: string; url: URL }>;
   newLogin?: boolean;
 
-  generate_avatar(scale = 80, radius = 50): URL {
-    if (this.avatar) {
-      return new URL(this.avatar, environment.ws + "/");
+
+  private _generate_avatar(avatar: string, scale = 80, radius = 50): void {
+    if (avatar) {
+      this.avatar = new URL(avatar).href;
     }
     const hash = encodeURIComponent(this.displayedName);
     const defaultImage = encodeURIComponent(
       `https://api.dicebear.com/5.x/identicon/png/seed=${hash}&scale=${scale}&radius=${radius}`
     );
-    return new URL(`https://www.gravatar.com/avatar/${hash}?d=${defaultImage}`);
+    this.avatar = new URL(`https://www.gravatar.com/avatar/${hash}?d=${defaultImage}`).href;
   }
 
-  orcid_url(): URL {
-    return new URL(this.orcid_id, environment.orcid_main_url);
-  }
 
-  firstTimeLogin(): boolean {
-    return true;
-  }
 }
 
 // upload_avatar(scale = 80, radius = 50): URL {

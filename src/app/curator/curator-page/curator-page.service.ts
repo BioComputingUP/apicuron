@@ -108,7 +108,7 @@ export class CuratorPageService {
       shareReplay(1),
       map((curator: User) => {
         return new User().deserialize(curator);
-      })
+      }),
     );
 
   }

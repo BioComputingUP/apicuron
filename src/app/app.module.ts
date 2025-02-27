@@ -26,6 +26,8 @@ import { DashboardModule } from "./dashboard/dashboard.module";
 import { ErrorMessagePipe } from "./components/utils/error-messages/error-messages.pipe";
 import { MatomoModule } from "ngx-matomo-client";
 import { MatomoRouterModule } from "ngx-matomo-client";
+import { OrcidToUrl } from "./shared/orcid-to-url.pipe";
+import { SharedUtilsModule } from "./shared/shared-utils.module";
 @NgModule({
   declarations: [
     AppComponent,
@@ -35,6 +37,7 @@ import { MatomoRouterModule } from "ngx-matomo-client";
     FirstPopupComponent,
   ],
   imports: [
+    SharedUtilsModule,
     AppRoutingModule,
     AuthModule,
     NotificationsDataModule,
@@ -66,8 +69,9 @@ import { MatomoRouterModule } from "ngx-matomo-client";
     SentryModuleConfig,
     // *** end of sentry setup ***
     { provide: APP_ID, useValue: "serverApp" },
+    OrcidToUrl,
   ],
   bootstrap: [AppComponent],
   exports: [RouterModule],
 })
-export class AppModule {}
+export class AppModule { }

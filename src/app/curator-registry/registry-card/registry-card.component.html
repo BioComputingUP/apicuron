@@ -3,7 +3,7 @@
   <!-- First row: Avatar -->
   <div class="tw-grid tw-grid-cols-1 tw-gap-2 tw-my-2">
     <img class="tw-aspect-square tw-mx-auto tw-border tw-rounded-full" style="width: 70px; height:auto;"
-      [src]="entry.curator.generate_avatar()" alt="Curator Avatar" />
+      [src]="entry.curator.avatar" alt="Curator Avatar" />
   </div>
 
   <!-- Second row: Curator information -->
@@ -15,7 +15,7 @@
       </a>
     </div>
     <div>
-      <p>{{ entry.curator.orcid_id }}<a [href]="entry.curator.orcid_url()" target="_blank"
+      <p>{{ entry.curator.orcid_id }}<a [href]="entry.curator.orcid_url" target="_blank"
           class="tw-cursor-pointer tw-align-top">
           <img class="tw-ml-2 tw-inline tw-h-6 tw-w-6" src="https://orcid.org/assets/vectors/orcid.logo.icon.svg" alt=""
             role="tooltip">
