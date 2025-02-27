@@ -4,6 +4,7 @@ import {
 	NotFoundException,
 	Param,
 	Query,
+	SerializeOptions,
 } from '@nestjs/common';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { VersionHeader } from '../../plugins/swagger/config';
@@ -47,6 +48,7 @@ export class WeeklyStatisticsController {
 	)
 	@AuthProtected()
 	@Public()
+	@SerializeOptions({ type: Paginated<WeeklyLeaderboardDto> })
 	@Get(':resource_id/leaderboard')
 	async getWeeklyLeaderboard(
 		@Param('resource_id') resource_id: string,
@@ -68,7 +70,7 @@ export class WeeklyStatisticsController {
 				pagination.getMongoQueryOptions(),
 			);
 
-		return paginate<WeeklyLeaderboardDto>(data, pagination, count);
+		return paginate<WeeklyLeaderboardDto>(WeeklyLeaderboardDto, data, pagination, count);
 	}
 
 	@ApiOperation({

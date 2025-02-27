@@ -1,10 +1,7 @@
 import { AchievementState, PrivacyType } from '../../core/enums';
 import { Expose } from 'class-transformer';
 
-export class MedalDto {
-	@Expose()
-	curator_orcid: string;
-
+export class MedalDefDto {
 	@Expose()
 	privacy: PrivacyType;
 
@@ -31,6 +28,11 @@ export class MedalDto {
 
 	@Expose()
 	league: string;
+}
+
+export class MedalDto extends MedalDefDto {
+	@Expose()
+	curator_orcid: string;
 
 	@Expose()
 	score_total: number;

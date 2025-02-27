@@ -1,5 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, LeanDocument } from 'mongoose';
+import { HydratedDocument, LeanDocument, Types } from 'mongoose';
 import { PrivacyType } from '../enums';
 import { IUserResourceEntity } from '../interfaces/user-resource-entity';
 import { Term, TermSchema } from './terms.schema';
@@ -10,7 +10,14 @@ import {
 } from './resource/partner-resource.schema';
 import { League, LeagueSchema } from './league/league.schema';
 
-export type ReportDocument = HydratedDocument<Report>;
+export type ReportDocumentOverride = {
+	term: Types.Subdocument<Types.ObjectId> & Term;
+	user?: Types.Subdocument<Types.ObjectId> & User;
+	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;
+	league_data?: Types.Subdocument<Types.ObjectId> & League;
+};
+
+export type ReportDocument = HydratedDocument<Report, ReportDocumentOverride>;
 
 export type LeanReportDocument = LeanDocument<ReportDocument>;
 @Schema({
@@ -50,25 +57,25 @@ export class Report implements IUserResourceEntity {
 		required: false,
 		type: TermSchema,
 	})
-	term: Term;
+	term: Types.Subdocument<Types.ObjectId> & Term;
 
 	@Prop({
 		required: false,
 		type: UserSchema,
 	})
-	user?: User | null;
+	user?: Types.Subdocument<Types.ObjectId> & User;
 
 	@Prop({
 		required: false,
 		type: PartnerResourceSchema,
 	})
-	resource: PartnerResource;
+	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;
 
 	@Prop({
 		required: false,
 		type: LeagueSchema,
 	})
-	league_data?: League;
+	league_data?: Types.Subdocument<Types.ObjectId> & League;
 
 	getMetaFields() {
 		return {

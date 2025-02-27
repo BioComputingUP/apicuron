@@ -18,19 +18,15 @@ export class MedalsQueryService {
 	async getMedals(
 		filter: FilterQuery<MedalDocument>,
 		options: QueryOptions<MedalDocument>,
-	): Promise<{ data: MedalDto[]; count: number }> {
+	): Promise<{ data: MedalDocument[]; count: number }> {
 		filter.state = AchievementState.achieved;
 		const dataPromise = this.medalModel.find(filter, {}, options);
 		const countPromise = this.medalModel.count(filter);
 
 		const [medals, count] = await Promise.all([dataPromise, countPromise]);
 
-		const data = plainToInstance(MedalDto, medals, {
-			excludeExtraneousValues: true,
-		});
-
 		return {
-			data,
+			data: medals,
 			count,
 		};
 	}

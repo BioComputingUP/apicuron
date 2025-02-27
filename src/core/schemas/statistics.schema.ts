@@ -1,5 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { PrivacyType } from '../enums';
 import { IUserResourceEntity } from '../interfaces/user-resource-entity';
 import { User, UserSchema } from './user.schema';
@@ -9,7 +9,17 @@ import {
 } from './resource/partner-resource.schema';
 import { League, LeagueSchema } from './league/league.schema';
 
-export type StatisticsDocument = HydratedDocument<Statistics>;
+type StatisticsDocumentOverride = {
+	user: Types.Subdocument<Types.ObjectId> & User;
+	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;
+	league_data: Types.Subdocument<Types.ObjectId> & League;
+};
+
+export type StatisticsDocument = HydratedDocument<
+	Statistics,
+	StatisticsDocumentOverride
+>;
+
 @Schema({
 	collection: 'statistics',
 })
@@ -18,13 +28,13 @@ export class Statistics implements IUserResourceEntity {
 	badges_count: number;
 
 	@Prop({ required: false, type: UserSchema })
-	user: User | null;
+	user: Types.Subdocument<Types.ObjectId> & User;
 
 	@Prop({ required: true, type: PartnerResourceSchema })
-	resource: PartnerResource;
+	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;
 
 	@Prop({ required: true, type: LeagueSchema })
-	league_data: League;
+	league_data: Types.Subdocument<Types.ObjectId> & League;
 
 	@Prop({ required: true })
 	curator_orcid: string;

@@ -8,8 +8,17 @@ import {
 	UserEmailEntry,
 	UserEmailEntrySchema,
 } from './components/user-email.schema';
-import { UserEmployment } from '../interfaces/user-employment';
-export type UserDocument = HydratedDocument<User>;
+import { UserEmploymentSchema, UserLinks, UserLinksSchema } from "./components/user-fields.schema";
+import { UserEmployment } from "./components/user-fields.schema";
+
+export type UserDocumentOvrride = {
+	emails: Types.DocumentArray<UserEmailEntry>;
+	employment: Types.DocumentArray<UserEmployment>;
+	links:  Types.DocumentArray<UserLinks>;
+};
+
+export type UserDocument = HydratedDocument<User, UserDocumentOvrride>;
+
 
 @Schema({
 	collection: 'users',
@@ -44,14 +53,15 @@ export class User {
 		default: [],
 		required: true,
 	})
-	emails: UserEmailEntry[];
+	emails: Types.DocumentArray<UserEmailEntry>;
 
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop({
 		required: false,
+		type: [UserEmploymentSchema],
 		default: () => [],
 	})
-	employment?: UserEmployment[] = [];
+	employment: Types.DocumentArray<UserEmployment>;
 
 	@Prop()
 	family_name?: string;
@@ -81,12 +91,10 @@ export class User {
 
 	@Prop({
 		required: false,
-		type: Object,
+		type: [UserLinksSchema],
+		default: () => [],
 	})
-	links: {
-		name: string;
-		url: URL;
-	};
+	links: Types.DocumentArray<UserLinks>;
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop({
 		required: false,

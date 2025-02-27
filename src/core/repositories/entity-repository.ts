@@ -57,20 +57,6 @@ export abstract class EntityRepository<T extends Document> {
 		instance.save = async (...options): Promise<HydratedDocument<T>> => {
 			this.logger.warn(`Avoid using save method, perform query instead !`);
 			return await ogSave.call(instance, options);
-
-			// if (instance.isNew) {
-			// 	const response = await ogSave.call(instance, options);
-			// 	const event = new EntityCreated(
-			// 		this.model,
-			// 		instance._id.toString(),
-			// 		instance,
-			// 		new Date(),
-			// 	);
-			// 	await this.eventEmitter.emitAsync(event.eventName, event);
-			// 	return response;
-			// }
-
-			// return;
 		};
 
 		return instance;

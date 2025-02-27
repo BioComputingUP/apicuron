@@ -40,7 +40,7 @@ async function addLeagueToResources(app: INestApplicationContext) {
 		logger.debug(
 			`Resource ${resource.resource_id} has no leagues or has wrong type`,
 		);
-		resource.leagues = [];
+		resource.set('leagues', []);
 		// }
 		if (resource.leagues.length === 0) {
 			logger.debug(`Resource ${resource.resource_id} has empty league list`);

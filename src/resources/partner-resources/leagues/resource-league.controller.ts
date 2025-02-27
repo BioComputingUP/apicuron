@@ -19,8 +19,8 @@ import { CreateLeagueDto } from './dto/create-league.dto';
 import { AddMemberToLeague } from './dto/add-member-to-league.dto';
 import { DeleteMemberFromLeagueDTO } from './dto/delete-from-league.dto';
 import { DeleteLeagueDTO } from './dto/delete-league.dto';
-import { LeagueDto } from './dto/league.dto';
-import { PartnerResourceDto } from '../../dto/partner-resources.dto';
+import { LeagueEntity } from './dto/league.dto';
+import { PartnerResourceEntity } from '../../dto/partner-resources.entity';
 import { plainToClass, plainToInstance } from 'class-transformer';
 import { ApiResponseWrapped } from '../../../shared/decorators/wrapped-data-response.decorator';
 import { LeagueService } from './services/league.service';
@@ -51,20 +51,20 @@ export class ResourceLeagueController {
 	@ApiOperation({
 		summary: 'Get the leagues of a resource',
 	})
-	@ApiResponseWrapped([LeagueDto])
+	@ApiResponseWrapped([LeagueEntity])
 	@AuthProtected()
 	@Get(':resource_id')
 	async getLeagues(
 		@UserReq() user: User,
 		@Param('resource_id') resourceId: string,
-	): Promise<{ data: LeagueDto[] }> {
+	): Promise<{ data: LeagueEntity[] }> {
 		const resource = await this.resourceService.get_resource(resourceId);
 		if (!resource) {
 			throw new NotFoundException(`Resource (${resourceId}) Not Found`);
 		}
 		this.userCanAccessResource(user, resourceId);
 
-		const leagues = plainToInstance(LeagueDto, resource.leagues, {
+		const leagues = plainToInstance(LeagueEntity, resource.leagues, {
 			excludeExtraneousValues: true,
 		});
 
@@ -79,10 +79,10 @@ export class ResourceLeagueController {
 	async createLeague(
 		@Body() createLeague: CreateLeagueDto,
 		@UserReq() user: User | null,
-	): Promise<LeagueDto> {
+	): Promise<LeagueEntity> {
 		this.userCanAccessResource(user, createLeague.resource_id);
 		const league = await this.leagueService.createLeague(createLeague);
-		return league as LeagueDto;
+		return league as LeagueEntity;
 	}
 
 	@ApiOperation({
@@ -100,14 +100,14 @@ export class ResourceLeagueController {
 			addMemberToLeague,
 		);
 
-		return updatedResource.getLeague(addMemberToLeague.league) as LeagueDto;
+		return updatedResource.getLeague(addMemberToLeague.league) as LeagueEntity;
 	}
 
 	@ApiOperation({
 		summary: `Updates the data associated with a league`,
 	})
 	@ApiResponseWrapped(
-		LeagueDto,
+		LeagueEntity,
 		201,
 		`A response containing the updated league`,
 	)
@@ -131,7 +131,7 @@ export class ResourceLeagueController {
 	async removeMemberFromLeague(
 		@Body() removeMemberFromLeague: DeleteMemberFromLeagueDTO,
 		@UserReq() user: User | null,
-	): Promise<LeagueDto> {
+	): Promise<LeagueEntity> {
 		this.userCanAccessResource(user, removeMemberFromLeague.resource_id);
 
 		const updatedResource = await this.resourceService.removeMemberFromLeague(
@@ -140,7 +140,7 @@ export class ResourceLeagueController {
 
 		return updatedResource.getLeague(
 			removeMemberFromLeague.league,
-		) as LeagueDto;
+		) as LeagueEntity;
 	}
 
 	@Delete()
@@ -148,7 +148,7 @@ export class ResourceLeagueController {
 	async deleteLeague(
 		@Body() deleteLeague: DeleteLeagueDTO,
 		@UserReq() user: User | null,
-	): Promise<PartnerResourceDto> {
+	): Promise<PartnerResourceEntity> {
 		this.userCanAccessResource(user, deleteLeague.resource_id);
 
 		const updatedResource = await this.resourceService.deleteLeague(
@@ -157,6 +157,6 @@ export class ResourceLeagueController {
 
 		delete updatedResource._id;
 
-		return updatedResource.toObject() as PartnerResourceDto;
+		return updatedResource.toObject() as PartnerResourceEntity;
 	}
 }

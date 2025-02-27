@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, QueryOptions } from 'mongoose';
-import { User } from '../core/schemas/user.schema';
+import { FilterQuery, LeanDocument, Model, QueryOptions } from 'mongoose';
+import { User, UserDocument } from '../core/schemas/user.schema';
 import {
 	Statistics,
 	StatisticsDocument,
@@ -20,7 +20,7 @@ export class StatisticsService {
 		protected statisticsModel: Model<StatisticsDocument>,
 		protected userRepository: UserRepository,
 		protected partnerResourceService: PartnerResourcesService,
-	) {}
+	) { }
 
 	logger = new Logger(StatisticsService.name);
 
@@ -158,7 +158,7 @@ export class StatisticsService {
 	async getResourceLeaderboard(
 		filter: FilterQuery<StatisticsDocument> & { resource_id: string },
 		options: QueryOptions<StatisticsDocument>,
-	): Promise<{ data: StatLeaderboardDto[]; count: number }> {
+	): Promise<{ data: { stat: LeanDocument<StatisticsDocument>, user: LeanDocument<UserDocument> | null }[]; count: number }> {
 		const resource = await this.partnerResourceService.get_resource(
 			filter.resource_id,
 		);
@@ -174,22 +174,14 @@ export class StatisticsService {
 			{ ...options, sort: { total_score: -1 } },
 		);
 
-		const orcid_ids = leaderboard.map((stat) => stat.curator_orcid);
-
-		const users = await this.userRepository.find({
-			orcid_id: { $in: orcid_ids },
-		});
-
 		const data = leaderboard.map((stat) => {
-			const user = users.find((u) => u.orcid_id === stat.curator_orcid);
+			const user = stat.user;
 			const leaderboardEntry = {
 				stat: stat.toObject(),
-				user: user ? user.toObject() : null,
+				user: user.toObject<LeanDocument<UserDocument>>(),
 			};
 
-			return plainToClass(StatLeaderboardDto, leaderboardEntry, {
-				excludeExtraneousValues: true,
-			});
+			return leaderboardEntry
 		});
 
 		const count = await this.statisticsModel.count(filter);

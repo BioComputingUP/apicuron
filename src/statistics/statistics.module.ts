@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import {
-	OldStatisticsController,
 	StatisticsController,
 } from './statistics/statistics.controller';
 import { StatisticsService } from './statistics.service';
@@ -12,9 +11,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { StatisticsEventHandlerService } from './events/event-handler.service';
 import { BadgesModule } from '../badges/badges.module';
 import { MedalsModule } from '../medals/medals.module';
-import { EventOrchestratorModule } from '../event-orchestrator/event-orchestrator.module';
 import { StatisticsAggregator } from './services/statistics-aggregator.service';
-import { EventOrchestratorModuleOptions } from '../event-orchestrator/interfaces/event-orchestrator-options.interface';
 import { StatisticsReportAggregator } from './aggregation/aggregate-reports.service';
 
 @Module({
@@ -29,7 +26,7 @@ import { StatisticsReportAggregator } from './aggregation/aggregate-reports.serv
 			shouldCloneBeforeSet: false,
 		}),
 	],
-	controllers: [StatisticsController, OldStatisticsController],
+	controllers: [StatisticsController],
 	providers: [
 		StatisticsReportAggregator,
 		StatisticsService,
@@ -39,4 +36,4 @@ import { StatisticsReportAggregator } from './aggregation/aggregate-reports.serv
 	],
 	exports: [ComputeStatisticsService, StatisticsAggregator],
 })
-export class StatisticsModule {}
+export class StatisticsModule { }

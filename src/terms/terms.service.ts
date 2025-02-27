@@ -19,6 +19,7 @@ import {
 } from './events/events';
 import { IResourceEntity } from '../core/interfaces/user-resource-entity';
 import { getRelatedReportFilter } from './helpers/related-report';
+import { TermDto } from './dto/term.dto';
 
 @Injectable()
 export class TermsService {

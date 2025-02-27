@@ -10,6 +10,10 @@ export class RegistryLeague {
 	@ApiProperty()
 	@Expose()
 	resource_id: string;
+
+	@ApiProperty()
+	@Expose()
+	name: string;
 }
 
 export class RegistryResource {
@@ -60,7 +64,7 @@ export class RegistrySearchResultDto {
 	@Expose()
 	curator: RegistryCurator;
 
-	@ApiProperty({type: () => [RegistryContributedTo]})
+	@ApiProperty({ type: () => [RegistryContributedTo] })
 	@Type(() => RegistryContributedTo)
 	@Expose()
 	contributed_to: RegistryResource[];

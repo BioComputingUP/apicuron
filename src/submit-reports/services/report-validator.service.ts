@@ -3,7 +3,7 @@ import { PartnerResourcesService } from '../../resources/partner-resources/servi
 import { UsersService } from '../../auth/users/services/users.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, LeanDocument, Model } from 'mongoose';
 import { SubmitReportDto } from '../dto/submit-report.dto';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
@@ -13,7 +13,7 @@ import {
 	hashTermIdentifier,
 	ITermIdentifier,
 } from '../../terms/helpers/term-hash';
-import { League } from '../../core/schemas/league/league.schema';
+import { League, LeagueDocument } from '../../core/schemas/league/league.schema';
 
 @Injectable()
 export class ReportValidatorService {
@@ -22,7 +22,7 @@ export class ReportValidatorService {
 		protected usersService: UsersService,
 		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-	) {}
+	) { }
 
 	logger = new Logger(ReportValidatorService.name);
 
@@ -36,7 +36,7 @@ export class ReportValidatorService {
 	private assignDefaultLeague(
 		report: SubmitReportDto,
 		resource: PartnerResourceDocument,
-	): League {
+	): LeanDocument<LeagueDocument> {
 		if (!!report.league) {
 			const selectedLeague = resource.leagues.find(
 				(l) => l.name === report.league,
@@ -46,12 +46,12 @@ export class ReportValidatorService {
 					`League ${report.league} does not exist for resource ${report.resource_id}`,
 				);
 			}
-			return selectedLeague;
+			return selectedLeague.toObject();
 		}
 		// check if the user belongs to a league
 		for (const league of resource.leagues) {
 			if (league.defaultMembers.includes(report.curator_orcid)) {
-				return league;
+				return league.toObject();
 			}
 		}
 		// if not, use the default league
@@ -62,7 +62,7 @@ export class ReportValidatorService {
 				`League ${report.league} does not exist for resource ${report.resource_id}`,
 			);
 		}
-		return selectedLeague;
+		return selectedLeague.toObject();
 	}
 
 	/**
@@ -151,11 +151,12 @@ export class ReportValidatorService {
 		const user =
 			userDoc ?? (await this.usersService.getByOrcid(report.curator_orcid));
 
-		const reportDoc = new this.reportModel(report);
-		reportDoc.term = term;
-		reportDoc.resource = resource;
-		reportDoc.user = user;
-		reportDoc.league_data = relatedLeague;
+		const reportDoc = new this.reportModel({
+			...report,
+			term,
+			resource,
+			league_data: relatedLeague
+		});
 
 		reportDoc.privacy = computePrivacyField(resource, user, report);
 

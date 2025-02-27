@@ -1,6 +1,6 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { PrivacyType } from '../../enums';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { AchievementDef } from '../achievements-def/achievement-def.schema';
 import { Term } from '../terms.schema';
 import { League, LeagueSchema } from '../league/league.schema';
@@ -53,7 +53,7 @@ export class PartnerResource {
 			];
 		},
 	})
-	leagues: League[];
+	leagues: Types.DocumentArray<League>;
 
 	@Prop({
 		required: true,

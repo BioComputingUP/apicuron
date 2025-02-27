@@ -24,7 +24,7 @@ export class ReportsService {
 		protected partnerResourcesService: PartnerResourcesService,
 		protected userService: UsersService,
 		protected termsService: TermsService,
-	) {}
+	) { }
 
 	logger = new Logger(ReportsService.name);
 
@@ -126,68 +126,14 @@ export class ReportsService {
 			.lean();
 		const data = reports;
 
-		// if (reportFilter.extend.includes('term')) {
-		// 	const { resource_id } = reportFilter;
-
-		// 	const activity_term_list = [
-		// 		...new Set(reports.map((report) => report.activity_term)),
-		// 	];
-
-		// 	const terms_list = await this.termsService.getTerms(activity_term_list, {
-		// 		resource_id,
-		// 		league: reportFilter.league,
-		// 	});
-
-		// 	const reports_with_terms = reports.map((report) => {
-		// 		report['term'] = terms_list.find(
-		// 			(term) => term.activity_term == report.activity_term,
-		// 		);
-		// 		return report;
-		// 	});
-		// 	data = reports_with_terms;
-		// }
-
-		const reportsData = plainToInstance(ReportWithTermDto, data, {
-			excludeExtraneousValues: true,
-		});
-
 		const reports_count: number = await this.reportModel.count(query);
 
 		return paginate<ReportWithTermDto>(
-			reportsData,
+			ReportWithTermDto,
+			data,
 			reportFilter,
 			reports_count,
 		);
-	}
-
-	async getGroupedReports(
-		reportFilter: ReportFilterGroupedDto,
-		baseReportFilter: FilterQuery<ReportDocument> = {},
-	) {
-		const { filter, options } = this.buildReportsQuery(reportFilter);
-
-		const [paginationPipeline, limitAggregation]: PaginationAggregation =
-			reportFilter.getMongoAggregation();
-		const groupByAggregation: PipelineStage[] =
-			this.buildReportGroupAggregation(reportFilter);
-
-		const aggregationPipeline: PipelineStage[] = [
-			{ $match: baseReportFilter },
-			{ $match: filter },
-			...groupByAggregation,
-			paginationPipeline,
-		];
-		const data$ = this.reportModel.aggregate(aggregationPipeline);
-		const reports_count$ = this.reportModel.aggregate([
-			...aggregationPipeline.filter((stage) => !stage['$limit']), // remove the stage that limits the data for counting
-			{ $count: 'total_count' },
-		]);
-
-		const [data, reports_count] = await Promise.all([data$, reports_count$]);
-
-		const totalCount: number = reports_count[0]?.['total_count'] || 0;
-
-		return paginate(data, reportFilter, totalCount);
 	}
 
 	async all_reports_count() {
@@ -262,102 +208,5 @@ export class ReportsService {
 		return pipelineArray;
 	}
 
-	private buildReportGroupAggregation({
-		groupBy,
-		sortOrder,
-	}: ReportFilterGroupedDto): PipelineStage[] {
-		const converter = {
-			day: [
-				{
-					$group: {
-						_id: { $dateToString: { date: '$timestamp', format: '%Y-%m-%d' } },
-						// reports: {
-						// 	$push: {
-						// 		activity_term: '$activity_term',
-						// 		resource_id: '$resource_id',
-						// 		curator_orcid: '$curator_orcid',
-						// 		timestamp: '$timestamp',
-						// 		entity_uri: '$entity_uri',
-						// 	},
-						// },
-						count: { $sum: 1 },
-					},
-				},
-				{
-					$project: {
-						groupKey: '$_id',
-						_id: 0,
-						// reports: 1,
-						count: 1,
-					},
-				},
-				{
-					$sort: {
-						groupKey: sortOrder as any,
-					},
-				},
-			],
-			month: [
-				{
-					$group: {
-						_id: { $dateToString: { date: '$timestamp', format: '%Y-%m' } },
-						reports: {
-							$push: {
-								activity_term: '$activity_term',
-								resource_id: '$resource_id',
-								curator_orcid: '$curator_orcid',
-								timestamp: '$timestamp',
-								entity_uri: '$entity_uri',
-							},
-						},
-						count: { $sum: 1 },
-					},
-				},
-				{
-					$project: {
-						groupKey: '$_id',
-						_id: 0,
-						reports: 1,
-						count: 1,
-					},
-				},
-				{
-					$sort: {
-						groupKey: sortOrder as any,
-					},
-				},
-			],
-			activity_term: [
-				{
-					$group: {
-						_id: '$activity_term',
-						reports: {
-							$push: {
-								activity_term: '$activity_term',
-								resource_id: '$resource_id',
-								curator_orcid: '$curator_orcid',
-								timestamp: '$timestamp',
-								entity_uri: '$entity_uri',
-							},
-						},
-						count: { $sum: 1 },
-					},
-				},
-				{
-					$project: {
-						groupKey: '$_id',
-						_id: 0,
-						reports: 1,
-						count: 1,
-					},
-				},
-				{
-					$sort: {
-						groupKey: sortOrder as any,
-					},
-				},
-			],
-		};
-		return converter[groupBy];
-	}
+
 }

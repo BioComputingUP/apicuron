@@ -1,22 +1,21 @@
-import { Controller, Get, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
-import { AppService } from './app.service';
 import { UsersService } from './auth/users/services/users.service';
 import { ReportsService } from './reports/reports.service';
 import { PartnerResourcesService } from './resources/partner-resources/services/partner-resources.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { AchievementDef } from './core/schemas/achievements-def/achievement-def.schema';
 import { Model } from 'mongoose';
-
+import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
 @Controller()
 export class AppController {
 	constructor(
-		private readonly appService: AppService,
 		protected partnerResourceService: PartnerResourcesService,
 		protected userService: UsersService,
 		protected reportService: ReportsService,
 		@InjectModel(AchievementDef.name)
 		protected achievementDefModel: Model<AchievementDef>,
+		protected storageService: StorageService,
 	) {}
 
 	@ApiExcludeEndpoint()

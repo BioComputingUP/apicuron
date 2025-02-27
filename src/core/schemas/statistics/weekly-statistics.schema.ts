@@ -1,15 +1,19 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { PrivacyType } from '../../enums';
 import { IUserResourceEntity } from '../../interfaces/user-resource-entity';
-import { HydratedDocument, LeanDocument } from 'mongoose';
+import { HydratedDocument, LeanDocument, Types } from 'mongoose';
 import { LeagueSchema, League } from '../league/league.schema';
 import {
 	PartnerResourceSchema,
 	PartnerResource,
 } from '../resource/partner-resource.schema';
 import { UserSchema, User } from '../user.schema';
-
-export type WeeklyStatisticsDocument = HydratedDocument<WeeklyStatistics>;
+type WeeklyStatisticsDocumentOverride = {
+	user: (Types.Subdocument<Types.ObjectId> & User) | null;
+	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;
+	league_data: Types.Subdocument<Types.ObjectId> & League;
+}
+export type WeeklyStatisticsDocument = HydratedDocument<WeeklyStatistics, WeeklyStatisticsDocumentOverride>;
 export type LeanWeeklyStatisticsDocument =
 	LeanDocument<WeeklyStatisticsDocument>;
 
@@ -22,13 +26,13 @@ export class WeeklyStatistics implements IUserResourceEntity {
 	resource_id: string;
 
 	@Prop({ required: false, type: UserSchema })
-	user: User | null;
+	user: (Types.Subdocument<Types.ObjectId> & User) | null;
 
 	@Prop({ required: true, type: PartnerResourceSchema })
-	resource: PartnerResource;
+	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;
 
 	@Prop({ required: true, type: LeagueSchema })
-	league_data: League;
+	league_data: Types.Subdocument<Types.ObjectId> & League;
 
 	@Prop({ required: true, type: String, enum: PrivacyType })
 	privacy: PrivacyType;

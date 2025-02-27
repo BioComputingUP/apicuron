@@ -23,6 +23,8 @@ import {
 	MedalDef,
 	MedalDefDocument,
 } from '../../core/schemas/achievements-def/medal-def.schema';
+import { plainToInstance } from 'class-transformer';
+import { MedalDefDto } from '../dto/medal.dto';
 
 @Injectable()
 export class MedalDefCommandsService {
@@ -68,7 +70,12 @@ export class MedalDefCommandsService {
 			new MedalDefUpdatedEvent(medal),
 		);
 
-		return medal;
+		const medalDefEntity = plainToInstance(MedalDefDto, medal, {
+			enableCircularCheck: true,
+			excludeExtraneousValues: true,
+		})
+
+		return medalDefEntity;
 	}
 
 	async deleteMedalDef(deleteMedalDef: DeleteMedalDefDto) {

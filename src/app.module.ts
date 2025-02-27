@@ -1,26 +1,18 @@
-import { Module, ClassSerializerInterceptor } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { loadConfig } from './config/load';
 import { ReportsModule } from './reports/reports.module';
 import { ResourcesModule } from './resources/resources.module';
 import { StatisticsModule } from './statistics/statistics.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { resolve } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MulterModule } from '@nestjs/platform-express';
 import { NotificationsModule } from './notifications/notifications.module';
 import { TermsModule } from './terms/terms.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
-import { UniqueRule } from './shared/validators/unique.validator';
-import {
-	EntriesExistRule,
-	EntryExistsRule,
-} from './shared/validators/entry-exists.validator';
 import { SchedulerClientModule } from './scheduler-client/scheduler-client.module';
-import { TransformInterceptor } from './shared/transformer/transform.interceptor';
 import { EmailModule } from './email/email.module';
 import { CoreApicuronModule } from './core/core.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -34,17 +26,23 @@ import { MedalsModule } from './medals/medals.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { loadSentryModule } from './plugins/sentry';
 import { EventOrchestratorModule } from './event-orchestrator/event-orchestrator.module';
-import { Reflector } from '@nestjs/core';
 import { ResourceStatsModule } from './resource-stats/resource-stats.module';
 import { MonthlyStatisticsModule } from './monthly-statistics/monthly-statistics.module';
 import { CuratorRegistryModule } from './curator-registry/curator-registry.module';
 import { OrcidFetcherModule } from './github-scraper/github-scraper.module';
-
+import { StorageManagerModule } from '@biocomputingup/nest-storage-manager';
+import { StorageModuleOptions } from './storage/storage.config';
+import { ServeFilesController } from './storage/serve-files.controller';
+import { getGlobalInterceptorChain } from './shared/interceptors';
+import {
+	EntriesExistRule,
+	EntryExistsRule,
+	UniqueRule,
+} from './shared/validators';
 @Module({
 	imports: [
 		// Sentry Setup
 		...loadSentryModule(),
-
 		EventEmitterModule.forRoot({
 			// wildcard: true,
 			global: true,
@@ -62,18 +60,22 @@ import { OrcidFetcherModule } from './github-scraper/github-scraper.module';
 			load: [loadConfig()],
 		}),
 
-		// MongoEventsModule,
+		// In here we load the StorageManagerModule to manage the storage of files
+		StorageManagerModule.forRoot(StorageModuleOptions),
 
 		// in here we load the Serve static module to serve static files
-		ServeStaticModule.forRootAsync({
-			inject: [ConfigService],
-			useFactory: async (configService: ConfigService) => [
-				{
-					rootPath: resolve(configService.get('PUBLIC_FILES_PATH')),
-					serveRoot: configService.get('PUBLIC_FILES_URL_PATH'),
-				},
-			],
-		}),
+		// ServeStaticModule.forRootAsync({
+		// 	inject: [ConfigService, InjectEngine(StorageType.public)],
+		// 	useFactory: async (
+		// 		configService: ConfigService,
+		// 		engine: Engine<LocalFsEngine>,
+		// 	) => [
+		// 		{
+		// 			rootPath: resolve(configService.get('PUBLIC_FILES_PATH')),
+		// 			serveRoot: configService.get('PUBLIC_FILES_URL_PATH'),
+		// 		},
+		// 	],
+		// }),
 		OrcidSubmissionModule,
 		CoreApicuronModule,
 		ResourcesModule,
@@ -97,22 +99,13 @@ import { OrcidFetcherModule } from './github-scraper/github-scraper.module';
 		CuratorRegistryModule,
 		OrcidFetcherModule,
 	],
-	controllers: [AppController],
+	controllers: [AppController, ServeFilesController],
 	providers: [
 		AppService,
 		UniqueRule,
 		EntryExistsRule,
 		EntriesExistRule,
-		TransformInterceptor,
-		{
-			provide: ClassSerializerInterceptor,
-			inject: [Reflector],
-			useFactory: (reflect: Reflector) => {
-				return new ClassSerializerInterceptor(reflect, {
-					enableCircularCheck: true,
-				});
-			},
-		},
+		...getGlobalInterceptorChain(),
 	],
 })
 export class AppModule {}
