@@ -69,5 +69,5 @@ export class RegistrySearchResultDto {
 	@ApiProperty({ type: () => [RegistryContributedTo] })
 	@Type(() => RegistryContributedTo)
 	@Expose()
-	contributed_to: RegistryResource[];
+	contributed_to: RegistryContributedTo[];
 }

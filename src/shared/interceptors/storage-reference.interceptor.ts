@@ -21,7 +21,7 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 	}
 	async processStorageReference(value: string): Promise<string> {
 		const url = await this.storageService.getPublicUrl(value);
-		this.logger.debug(`Processed storage reference ${value} to ${url}`);
+		// this.logger.debug(`Processed storage reference ${value} to ${url}`);
 		return url;
 	}
 
@@ -31,7 +31,7 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 		}
 		if (Array.isArray(obj)) {
 			const promises = obj.map((item) => this.checkStorageReference(item));
-			return Promise.all(promises);
+			return await Promise.all(promises);
 		}
 		for (const [key, value] of Object.entries(obj) as [string, unknown][]) {
 			if (key.startsWith('_')) {
@@ -45,7 +45,7 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 				key,
 			);
 			if (metadata && typeof value === 'string') {
-				this.logger.debug(`found key ${key}`);
+				// this.logger.debug(`found key ${key}`);
 				const currObj = obj as { [k: string]: string };
 				currObj[key] = await this.processStorageReference(currObj[key]);
 				// if the value is a string and it's processed, there's no more recurive checks to perform on this value
@@ -53,7 +53,7 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 			}
 
 			// Recursively process nested objects or arrays
-			this.checkStorageReference(value);
+			obj[key] = await this.checkStorageReference(value);
 		}
 		return obj;
 	}
@@ -63,6 +63,9 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 		next: CallHandler<any>,
 	): Observable<any> | Promise<Observable<any>> {
 		return next.handle().pipe(
+			tap((prev) => {
+				this.logger.debug(`Before Storage Reference Interceptor: ${JSON.stringify(prev, null, 2)}`);
+			}),
 			switchMap((data: unknown) => {
 				// if the data is a simple Pojo, return it as-is skip checks
 				if (!!data && Object.getPrototypeOf(data) == null) {
@@ -71,6 +74,9 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 				}
 				this.logger.log('checking storage references');
 				return from(this.checkStorageReference(data));
+			}),
+			tap((prev) => {
+				this.logger.debug(`After Storage Reference Interceptor: ${JSON.stringify(prev, null, 2)}`);
 			}),
 		);
 	}
