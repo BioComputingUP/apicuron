@@ -41,8 +41,8 @@ export class PublicPartnerResourceDto extends SelectPartnerResourceDto {
 
 	@IsNotEmpty()
 	@IsString()
-	@StorageReference()
 	@Expose()
+	@StorageReference()
 	logo: string;
 
 	@IsNotEmpty()

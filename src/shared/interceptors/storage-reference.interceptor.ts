@@ -4,8 +4,9 @@ import {
 	NestInterceptor,
 	ExecutionContext,
 	CallHandler,
+	Logger,
 } from '@nestjs/common';
-import { Observable, switchMap, of, from, map } from 'rxjs';
+import { Observable, switchMap, of, from, map, tap } from 'rxjs';
 import { StorageType } from '../../storage/storage.config';
 import { StorageReferenceMetadataKey } from '../decorators/storage-reference.decorator';
 
@@ -13,11 +14,15 @@ import { StorageReferenceMetadataKey } from '../decorators/storage-reference.dec
 export class StorageReferenceInterceptor implements NestInterceptor {
 	private readonly storageService: StorageService;
 
+	logger = new Logger(StorageReferenceInterceptor.name);
+
 	constructor(storageService: StorageService) {
 		this.storageService = storageService;
 	}
 	async processStorageReference(value: string): Promise<string> {
-		return await this.storageService.getPublicUrl(value);
+		const url = await this.storageService.getPublicUrl(value);
+		this.logger.debug(`Processed storage reference ${value} to ${url}`);
+		return url;
 	}
 
 	async checkStorageReference(obj: unknown): Promise<unknown> {
@@ -25,11 +30,12 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 			return obj;
 		}
 		if (Array.isArray(obj)) {
-			return obj.map((item) => this.checkStorageReference(item));
+			const promises = obj.map((item) => this.checkStorageReference(item));
+			return Promise.all(promises);
 		}
 		for (const [key, value] of Object.entries(obj) as [string, unknown][]) {
 			if (key.startsWith('_')) {
-				console.warn(`Ignoring private key ${key}`);
+				this.logger.debug(`Ignoring private key ${key}`);
 				continue;
 			}
 			// If metadata exists, run the processing function
@@ -39,7 +45,7 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 				key,
 			);
 			if (metadata && typeof value === 'string') {
-				console.log(`found key ${key}`);
+				this.logger.debug(`found key ${key}`);
 				const currObj = obj as { [k: string]: string };
 				currObj[key] = await this.processStorageReference(currObj[key]);
 				// if the value is a string and it's processed, there's no more recurive checks to perform on this value
@@ -59,13 +65,12 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 		return next.handle().pipe(
 			switchMap((data: unknown) => {
 				// if the data is a simple Pojo, return it as-is skip checks
-				console.log(StorageReferenceInterceptor.name);
 				if (!!data && Object.getPrototypeOf(data) == null) {
-					console.log('skipping checks');
+					this.logger.log('skipping checks');
 					return of(data);
 				}
-				console.log('checking storage references');
-				return from(this.checkStorageReference(data)).pipe(map(() => data));
+				this.logger.log('checking storage references');
+				return from(this.checkStorageReference(data));
 			}),
 		);
 	}
