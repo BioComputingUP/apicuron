@@ -1,4 +1,7 @@
-module.exports = {
+import typography from "@tailwindcss/typography";
+import containerQueries from "@tailwindcss/container-queries";
+
+export default {
   prefix: "tw-",
   content: ["./src/**/*.{html,ts}", "./src/app/**/*.{html,ts}", "./projects/apicuron-util/**/*.{html,ts}"],
   darkMode: "class",
@@ -44,7 +47,7 @@ module.exports = {
     extend: {},
   },
   plugins: [
-    require("@tailwindcss/typography"),
-    require("@tailwindcss/container-queries"),
+    typography,
+    containerQueries
   ],
 };
