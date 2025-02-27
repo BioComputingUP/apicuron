@@ -101,11 +101,7 @@ export class MedalsDefController {
 			queryFilter,
 			options,
 		);
-		const medalEntities=  plainToInstance(MedalDefDto, data, {
-			excludeExtraneousValues: true,
-			enableCircularCheck: true,
-		});
-		const response = paginate(medalEntities, medalFilter, count);
+		const response = paginate(MedalDefDto, data, medalFilter, count);
 		return response;
 	}
 
@@ -127,7 +123,7 @@ export class MedalsDefController {
 		this.can_edit_resource(req.user, update_medal.resource_id);
 		const response = await this.commandsService.updateMedalDef(update_medal);
 
-		res.send({ data: response });
+		return response
 	}
 
 	@ApiOperation({

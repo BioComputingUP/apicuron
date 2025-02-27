@@ -1,20 +1,40 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose, Type } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { StorageReference } from 'src/shared/decorators/storage-reference.decorator';
 import { UserResourcePutCode } from '../../../core/interfaces/user-resource-put-code';
 import { UserResource } from '../../../core/interfaces/user-resource';
 import { UserEmailEntry } from '../../../core/schemas/components/user-email.schema';
-import { UserLinks } from '../../../core/interfaces/user-employment';
+import { UserLinks } from "src/core/schemas/components/user-fields.schema";
+import { PrivacyType } from 'src/core/enums';
 
+/**
+ * Represents a user entity with various properties related to user information and authentication. But filters sensitive fields.
+ */
 export class UserEntity {
 	@ApiProperty()
 	gmail?: string;
+
+	@Expose()
+	privacy: PrivacyType;
+
+	@Expose()
+	@Type(() => UserResource)
+	@Transform((params) => params.value ?? [], { toClassOnly: true })
+	resources: UserResource[];
+
+	@Expose()
+	affiliation?: string;
+
+	@Expose()
+	@Type(() => UserLinks)
+	links: UserLinks[];
 
 	@ApiProperty()
 	@Expose()
 	orcid_id: string;
 
 	@ApiProperty()
+	@Expose()
 	biography?: string;
 
 	@ApiProperty()
@@ -25,6 +45,7 @@ export class UserEntity {
 	email?: string;
 
 	@ApiProperty()
+	@Expose()
 	employment?: string;
 
 	@ApiProperty()
@@ -43,6 +64,7 @@ export class UserEntity {
 	institution?: string;
 
 	@ApiProperty()
+	@Expose()
 	keywords?: string;
 
 	@ApiProperty()
@@ -51,11 +73,28 @@ export class UserEntity {
 	@StorageReference()
 	@Expose()
 	avatar: string;
+
+
+	@Exclude()
+	orcid_permission: string;
+
+	@Exclude()
+	orcid_scope: string;
+
+	@Exclude()
+	@Type(() => UserResourcePutCode)
+	@Transform((params) => params.value ?? [], { toClassOnly: true })
+	orcid_work_put_codes: UserResourcePutCode[];
+
+	@Exclude()
+	refresh_token: string;
 }
 
+/**
+ * Represents a private user entity (meaning that it does not filter sensitive fields) with various properties related to user information and authentication.
+ */
 export class PrivateUserEntity {
-	@Expose()
-	resources: UserResource[];
+	
 
 	@Expose()
 	isNewLogin: boolean;
@@ -64,7 +103,17 @@ export class PrivateUserEntity {
 	affiliation?: string;
 
 	@Expose()
+	@Type(() => UserResource)
+	@Transform((params) => params.value ?? [], { toClassOnly: true })
 	contributedTo: UserResource[];
+
+	@Expose()
+	privacy: PrivacyType;
+
+	@Expose()
+	@Type(() => UserResource)
+	@Transform((params) => params.value ?? [], { toClassOnly: true })
+	resources: UserResource[];
 
 	@Expose()
 	emails: UserEmailEntry[];
@@ -73,6 +122,7 @@ export class PrivateUserEntity {
 	employment?: string | string[];
 
 	@Expose()
+	@Type(() => UserLinks)
 	links: UserLinks[];
 
 	@ApiProperty()
@@ -123,15 +173,15 @@ export class PrivateUserEntity {
 	@StorageReference()
 	avatar: string;
 
-	@Exclude()
+	@Expose()
 	orcid_permission: string;
 
-	@Exclude()
+	@Expose()
 	orcid_scope: string;
 
-	@Exclude()
+	@Expose()
 	orcid_work_put_codes: UserResourcePutCode[];
 
-	@Exclude()
+	@Expose()
 	refresh_token: string;
 }

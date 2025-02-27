@@ -18,7 +18,7 @@ import { ApiResponsePaginated } from '../../pagination/decorators/paginated-repo
 	version: '2',
 })
 export class BadgesController {
-	constructor(protected badgesQueryService: BadgesQueryService) {}
+	constructor(protected badgesQueryService: BadgesQueryService) { }
 
 	@ApiResponsePaginated(
 		BadgeDto,
@@ -41,7 +41,7 @@ export class BadgesController {
 			filter.getMongoQueryOptions(),
 		);
 
-		return paginate<BadgeDto>(data, filter, count);
+		return paginate<BadgeDto>(BadgeDto, data, filter, count);
 	}
 
 	@ApiResponsePaginated(
@@ -50,6 +50,7 @@ export class BadgesController {
 		'A list of the current user badges matching the filter, includes achieved and unachieved badges',
 	)
 	@AuthProtected()
+	@SerializeOptions({ type: Paginated<PrivateBadgeDto> })
 	@Get('achievements/my-badges')
 	async getUserBadges(
 		@Query() filter: UserBadgesFilter,
@@ -60,6 +61,6 @@ export class BadgesController {
 			user,
 		);
 
-		return paginate<PrivateBadgeDto>(data, filter, count);
+		return paginate<PrivateBadgeDto>(PrivateBadgeDto, data, filter, count);
 	}
 }

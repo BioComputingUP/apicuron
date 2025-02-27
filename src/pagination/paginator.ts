@@ -1,24 +1,42 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BasePaginationDto } from './dto/paginate.dto';
-import { Expose } from 'class-transformer';
+import { Exclude, Expose, plainToClassFromExist, Type, TypeHelpOptions } from 'class-transformer';
 
 class Pagination {
 	@ApiProperty()
+	@Expose()
 	start: number;
 
 	@ApiProperty()
+	@Expose()
 	limit: number;
 
 	@ApiProperty()
+	@Expose()
 	total: number;
 }
 
 class Meta {
 	@ApiProperty()
+	@Expose()
 	pagination: Pagination;
 }
-export class Paginated<T> {
+
+
+class DtoGeneric<T = unknown> {
+	@Exclude()
+	_type: new () => T;
+
+
+	constructor(type: new () => T) {
+		this._type = type;
+	}
+}
+export class Paginated<T> extends DtoGeneric<T> {
 	@ApiProperty({ isArray: true })
+	@Type((options: TypeHelpOptions) => {
+		return (options.newObject as Paginated<T>)._type;
+	})
 	@Expose()
 	data: T[];
 
@@ -26,21 +44,26 @@ export class Paginated<T> {
 	@Expose()
 	meta: Meta;
 
-	constructor(data: T[] = [], page: BasePaginationDto, totalCount: number) {
-		this.data = data;
-		this.meta = {
+}
+export function paginate<T>(
+	Class: new () => T,
+	data: any[],
+	page: BasePaginationDto,
+	totalCount: number,
+): Paginated<T> {
+	return plainToClassFromExist(new Paginated<T>(Class), {
+		data, meta: {
 			pagination: {
 				start: page.skip + 1,
 				limit: page.limit || -1,
 				total: totalCount,
-			},
-		};
-	}
+			}
+		}
+	}, {
+		excludeExtraneousValues: true,
+		enableCircularCheck: true
+	})
+
+
 }
-export function paginate<T>(
-	data: T[],
-	page: BasePaginationDto,
-	totalCount: number,
-): Paginated<T> {
-	return new Paginated<T>(data, page, totalCount);
-}
+

@@ -5,6 +5,7 @@ import {
 	Query,
 	UseGuards,
 	Logger,
+	SerializeOptions,
 } from '@nestjs/common';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
 
@@ -23,12 +24,13 @@ import { userResourceEntityPrivacyFilter } from '../util/privacy.helper';
 import { AuthProtected } from '../auth/decorators/auth.decorator';
 import { ApiResponsePaginated } from '../pagination/decorators/paginated-reponse.decorator';
 import { ReportWithTermDto } from './dto/report.dto';
+import { Paginated } from 'src/pagination/paginator';
 
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
 @Controller({ path: 'reports', version: '2' })
 export class ReportsController {
-	constructor(private reportService: ReportsService) {}
+	constructor(private reportService: ReportsService) { }
 
 	logger = new Logger(ReportsController.name);
 
@@ -38,6 +40,7 @@ export class ReportsController {
 		'List of reports matching filter',
 	)
 	@AuthProtected()
+	@SerializeOptions({ type: Paginated<ReportWithTermDto> })
 	@Public()
 	@Get()
 	async getReports(
@@ -57,23 +60,4 @@ export class ReportsController {
 		);
 	}
 
-	@Get('group-by/:groupBy')
-	async getGroupedReports(
-		@Query() filter: ReportFilterDto,
-		@Param() groupBy: Pick<ReportFilterGroupedDto, 'groupBy'>,
-		@UserReq() user: User,
-	) {
-		// const filterInstance: ReportFilterDto = plainToInstance(ReportFilterDto, filter);
-		const groupByInstance: ReportFilterGroupedDto = plainToInstance(
-			ReportFilterGroupedDto,
-			{ ...filter, ...groupBy },
-		);
-
-		const privacyFilter = userResourceEntityPrivacyFilter(user);
-
-		return await this.reportService.getGroupedReports(
-			groupByInstance,
-			privacyFilter,
-		);
-	}
 }

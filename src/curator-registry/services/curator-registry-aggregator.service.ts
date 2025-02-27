@@ -8,7 +8,7 @@ import {
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { TermDocument } from 'src/core/schemas/terms.schema';
-import { UserDocument } from 'src/core/schemas/user.schema';
+import { User, UserDocument } from 'src/core/schemas/user.schema';
 import { LeagueUpdatedEvent } from 'src/resources/partner-resources/leagues/events/league-updated.event';
 import { Report } from 'src/core/schemas/reports.schema';
 
@@ -16,7 +16,7 @@ import { EntityCreatedEvent, EntityUpdatedEvent } from 'src/core/events';
 import { UserRepository } from 'src/core/repositories/user.repository';
 
 import { CuratorRegistryService } from '../curator-registry.service';
-import { PartnerResourceDocument } from 'src/core/schemas';
+import { PartnerResource, PartnerResourceDocument } from 'src/core/schemas';
 
 @Injectable()
 @AggregatorClass()
@@ -41,13 +41,14 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 		const curatorEntry = await this.registryService.getCuratorEntry(
 			curator.orcid_id,
 		);
+		
 		// if curator has no entry, insert them with the resource, and add league to groups
 		if (curatorEntry === null) {
 			this.registryService.addEntry(
 				report.curator_orcid,
-				report.resource,
+				report.resource as PartnerResource,
 				report.league_data,
-				report.user,
+				report.user as User,
 			);
 			this.logger.debug(`New curator entry created for ${curator.orcid_id}`);
 			return;
@@ -61,7 +62,7 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 		) {
 			this.registryService.addResourceToUser(
 				report.curator_orcid,
-				report.resource,
+				report.resource as PartnerResource,
 				report.league_data,
 			);
 			this.logger.debug(

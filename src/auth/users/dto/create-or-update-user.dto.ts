@@ -1,4 +1,4 @@
-import { UserLinks } from '../../../core/interfaces/user-employment';
+import { UserLinks } from "src/core/schemas/components/user-fields.schema";
 
 export class CreateOrUpdateUserDto {
 	displayedName: string;

@@ -77,9 +77,9 @@ export class BadgesDefController {
 		description: 'A list of badges that correspond to the filter',
 		type: [CreateBadgeDefDto],
 	})
-	@SerializeOptions({ type: Paginated<BadgeDefDto> })
 	@AuthProtected()
 	@Public()
+	@SerializeOptions({ type: Paginated<BadgeDefDto> })
 	@Get()
 	async getBadgeDefs(
 		@Query() badges_filter: BadgeDefFilter,
@@ -91,12 +91,8 @@ export class BadgesDefController {
 			privacyQuery,
 		);
 
-		const badgeDefEntities = plainToInstance(BadgeDefDto, data, {
-			excludeExtraneousValues: true,
-			enableCircularCheck: true,
-		})
 
-		return paginate(badgeDefEntities, badges_filter, count);
+		return paginate<BadgeDefDto>(BadgeDefDto, data, badges_filter, count);
 	}
 
 	@ApiOperation({
@@ -110,12 +106,11 @@ export class BadgesDefController {
 	@Put('edit')
 	@AuthProtected()
 	@SerializeOptions({ type: BadgeDefDto })
-	async updateBadgeDef(
-		@Body() update_badge: UpdateBadgeDefDto,
-		@Req() req,
-	) {
+	async updateBadgeDef(@Body() update_badge: UpdateBadgeDefDto, @Req() req) {
 		this.can_edit_resource(req.user, update_badge.resource_id);
-		const updatedBadge = await this.badgeDefCommands.updateBadgeDef(update_badge);
+		const updatedBadge = await this.badgeDefCommands.updateBadgeDef(
+			update_badge,
+		);
 
 		return updatedBadge;
 	}
@@ -130,15 +125,18 @@ export class BadgesDefController {
 	@ApiSecurity('basic')
 	@Delete(':name/partner-resource/:resource_id')
 	@AuthProtected()
-	async deleteBadgeDef(
-		@Param() delete_badge: DeleteBadgeDefDto,
-		@Req() req,
-		@Res() res,
-	) {
-		this.can_edit_resource(req.user, delete_badge.resource_id);
+	async deleteBadgeDef(@Param() deleteBadgeDef: DeleteBadgeDefDto, @Req() req) {
+		this.can_edit_resource(req.user, deleteBadgeDef.resource_id);
 
-		const response = await this.badgeDefCommands.deleteBadgeDef(delete_badge);
+		const deletedBadgeDef = await this.badgeDefCommands.deleteBadgeDef(
+			deleteBadgeDef,
+		);
 
-		res.send({ data: response });
+		const badgeDefEntity = plainToInstance(BadgeDefDto, deletedBadgeDef, {
+			enableCircularCheck: true,
+			excludeExtraneousValues: true,
+		});
+
+		return badgeDefEntity;
 	}
 }

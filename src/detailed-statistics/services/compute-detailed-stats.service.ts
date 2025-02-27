@@ -123,9 +123,9 @@ export class ComputeDetailedStatisticsService {
 			return newStat;
 		}
 
-		stat.user = report.user ?? null;
-		stat.resource = report.resource;
-		stat.league_data = report.league_data;
+		stat.set('user', report.user);
+		stat.set('resource', report.resource);
+		stat.set('league_data', report.league_data);
 
 		stat.total_count += 1;
 		stat.total_score += term.score;

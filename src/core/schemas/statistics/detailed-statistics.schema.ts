@@ -5,7 +5,7 @@ import {
 	ActivitiesStatistics,
 	ActivitiesStatisticsSchema,
 } from '../components/statistics-terms.schema';
-import { HydratedDocument, LeanDocument } from 'mongoose';
+import { HydratedDocument, LeanDocument, Types } from 'mongoose';
 import { User, UserDocument, UserSchema } from '../user.schema';
 import { ResourceSchema } from '../resource/resource.schema';
 import {
@@ -14,7 +14,13 @@ import {
 } from '../resource/partner-resource.schema';
 import { League, LeagueSchema } from '../league/league.schema';
 
-export type DetailedStatisticsDocument = HydratedDocument<DetailedStatistics>;
+export type DetailedStatisticsDocumentOverride = {
+	user: Types.Subdocument<Types.ObjectId> & User | null;
+	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;
+	league_data: Types.Subdocument<Types.ObjectId> & League;
+}
+
+export type DetailedStatisticsDocument = HydratedDocument<DetailedStatistics, DetailedStatisticsDocumentOverride>;
 export type LeanDetailedStatisticsDocument =
 	LeanDocument<DetailedStatisticsDocument>;
 
@@ -27,13 +33,13 @@ export class DetailedStatistics implements IUserResourceEntity {
 	curator_orcid: string;
 
 	@Prop({ required: false, type: UserSchema })
-	user: User | null;
+	user: Types.Subdocument<Types.ObjectId> & User | null;
 
 	@Prop({ required: true, type: PartnerResourceSchema })
-	resource: PartnerResource;
+	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;
 
 	@Prop({ required: true, type: LeagueSchema })
-	league_data: League;
+	league_data: Types.Subdocument<Types.ObjectId> & League;
 
 	@Prop({ required: true, type: String })
 	resource_id: string;
@@ -57,7 +63,7 @@ export class DetailedStatistics implements IUserResourceEntity {
 	first_contribution: Date;
 
 	@Prop({ required: true, type: [ActivitiesStatisticsSchema] })
-	activities: ActivitiesStatistics[];
+	activities: Types.DocumentArray<ActivitiesStatistics>;
 
 	@Prop({ required: true, default: () => 0 })
 	last_week_count: number;

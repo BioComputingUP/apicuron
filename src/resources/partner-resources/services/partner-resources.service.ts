@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, LeanDocument, Model } from 'mongoose';
+import { FilterQuery, LeanDocument, Model, Types } from 'mongoose';
 import { PartnerResourceDocument } from '../../../core/schemas/resource/partner-resource.schema';
 import { PartnerResource } from '../../../core/schemas/resource/partner-resource.schema';
 import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
-import { League } from '../../../core/schemas/league/league.schema';
+import { League, LeagueDocument } from '../../../core/schemas/league/league.schema';
 import { AddMemberToLeague } from '../leagues/dto/add-member-to-league.dto';
 import { DeleteLeagueDTO } from '../leagues/dto/delete-league.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -22,7 +22,7 @@ export class PartnerResourcesService {
 		private partnerResourceModel: Model<PartnerResourceDocument>, // protected transformService: TransformerService
 		protected eventEmitter: EventEmitter2,
 		protected storage: StorageService,
-	) {}
+	) { }
 
 	logger = new Logger(PartnerResourcesService.name);
 	async get_resources(
@@ -162,10 +162,10 @@ export class PartnerResourcesService {
 	}
 
 	public getResourceLeagues(
-		resource: PartnerResourceDocument | LeanDocument<PartnerResource>,
-	): [PartnerResourceDocument | LeanDocument<PartnerResource>, League][] {
-		return resource.leagues.map((league) => {
-			return [resource, league];
+		resource: PartnerResourceDocument | LeanDocument<PartnerResourceDocument>,
+	): [PartnerResourceDocument | LeanDocument<PartnerResourceDocument>, LeanDocument<LeagueDocument>][] {
+		return resource.leagues.map((league: Types.Subdocument<Types.ObjectId> & League): [PartnerResourceDocument | LeanDocument<PartnerResourceDocument>, LeanDocument<LeagueDocument>] => {
+			return [resource, league.toObject()];
 		});
 	}
 

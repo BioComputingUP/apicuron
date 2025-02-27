@@ -12,7 +12,7 @@ export class NotificationsService {
 	constructor(
 		@InjectModel(Notification.name)
 		protected notificationModel: Model<Notification>,
-	) {}
+	) { }
 
 	async getNotifications(orcid_id: string, filter: NotificationFilter) {
 		const data =
@@ -30,14 +30,8 @@ export class NotificationsService {
 			...filter.omitPagination(),
 		});
 
-		const notificationEntities = plainToInstance(NotificationEntity, data, {
-			enableCircularCheck: true,
-			excludeExtraneousValues: true,
-		});
 
-		console.log({ notificationEntities });
-
-		return paginate(notificationEntities, filter, count);
+		return paginate<NotificationEntity>(NotificationEntity, data, filter, count);
 	}
 
 	async get_new_user_notification(orcid_id: string) {

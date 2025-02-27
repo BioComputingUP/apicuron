@@ -107,7 +107,7 @@ export class CuratorRegistryService {
 					curator_orcid: orcid_identifier,
 				})
 				.lean();
-			if (!entry) {
+			if (!!entry) {
 				const filtered_groups_entry = entry.contributed_to.map(
 					(contribution) => {
 						return {

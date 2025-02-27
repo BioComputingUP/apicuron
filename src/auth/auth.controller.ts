@@ -57,6 +57,7 @@ export class AuthController {
 	@Render('auth')
 	@UseGuards(OrcidGuard)
 	orcid_redirect(@UserReq() user: User) {
+		console.log(user);
 		return {
 			displayedName: user.displayedName,
 			access_token: user.orcid_permission,

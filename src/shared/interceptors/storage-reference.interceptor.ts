@@ -17,9 +17,7 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 		this.storageService = storageService;
 	}
 	async processStorageReference(value: string): Promise<string> {
-		return await this.storageService
-			.getEngine(StorageType.public)
-			.getUrl(value);
+		return await this.storageService.getPublicUrl(value);
 	}
 
 	async checkStorageReference(obj: unknown): Promise<unknown> {
@@ -60,9 +58,9 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 	): Observable<any> | Promise<Observable<any>> {
 		return next.handle().pipe(
 			switchMap((data: unknown) => {
-				// if the data is a simple Pojo, return it as is/ skip checks
+				// if the data is a simple Pojo, return it as-is skip checks
 				console.log(StorageReferenceInterceptor.name);
-				if (Object.getPrototypeOf(data) == null) {
+				if (!!data && Object.getPrototypeOf(data) == null) {
 					console.log('skipping checks');
 					return of(data);
 				}
