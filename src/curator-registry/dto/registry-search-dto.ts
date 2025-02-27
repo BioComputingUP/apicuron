@@ -1,6 +1,7 @@
 import { Expose, Type } from 'class-transformer';
 import { RegistryCurator } from './registry-curator-dto';
 import { ApiProperty } from '@nestjs/swagger';
+import { StorageReference } from 'src/shared/decorators';
 
 export class RegistryLeague {
 	@ApiProperty()
@@ -31,6 +32,7 @@ export class RegistryResource {
 
 	@ApiProperty()
 	@Expose()
+	@StorageReference()
 	logo: string;
 
 	@ApiProperty()

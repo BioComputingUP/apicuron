@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
+import { StorageReference } from 'src/shared/decorators';
 
 export class RegistryCurator {
 	@ApiProperty()
@@ -16,5 +17,6 @@ export class RegistryCurator {
 
 	@ApiProperty()
 	@Expose()
+	@StorageReference()
 	avatar: string;
 }
