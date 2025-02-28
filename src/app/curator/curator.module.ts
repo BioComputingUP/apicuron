@@ -17,6 +17,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AchievementsModule } from '../achievements/achievements.module';
 import { CuratorStatCardComponent } from '../components/curator-stat-card/curator-stat-card.component';
 import { CuratorStatisticsModule } from '../curator-statistics/curator-statistics.module';
+import { SharedUtilsModule } from '../shared/shared-utils.module';
 @NgModule({
   declarations: [
     CuratorCardComponent,
@@ -26,6 +27,7 @@ import { CuratorStatisticsModule } from '../curator-statistics/curator-statistic
     
   ],
   imports: [
+    SharedUtilsModule,
     SvgModule,
     HttpClientModule,
     PaginationComponent,

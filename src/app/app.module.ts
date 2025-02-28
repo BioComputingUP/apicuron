@@ -16,7 +16,6 @@ import { MainLayoutComponent } from "./main-layout/main-layout.component";
 import { AuthDropdownComponent } from "./components/auth-dropdown/auth-dropdown.component";
 import { NotificationsDataModule } from "./notifications-data/notifications-data.module";
 import { SentryModuleConfig } from "../config/sentry.config";
-import { MatomoModule } from "ngx-matomo";
 import { FormsModule } from "@angular/forms";
 
 import { FirstLoginDialog } from "./first-login/first-login.component";
@@ -25,6 +24,10 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { FirstPopupComponent } from "./first-login/first-popup/first-popup.component";
 import { DashboardModule } from "./dashboard/dashboard.module";
 import { ErrorMessagePipe } from "./components/utils/error-messages/error-messages.pipe";
+import { MatomoModule } from "ngx-matomo-client";
+import { MatomoRouterModule } from "ngx-matomo-client";
+import { OrcidToUrl } from "./shared/orcid-to-url.pipe";
+import { SharedUtilsModule } from "./shared/shared-utils.module";
 @NgModule({
   declarations: [
     AppComponent,
@@ -34,6 +37,7 @@ import { ErrorMessagePipe } from "./components/utils/error-messages/error-messag
     FirstPopupComponent,
   ],
   imports: [
+    SharedUtilsModule,
     AppRoutingModule,
     AuthModule,
     NotificationsDataModule,
@@ -54,25 +58,20 @@ import { ErrorMessagePipe } from "./components/utils/error-messages/error-messag
     DialogModule,
     AngularSvgIconModule.forRoot(),
     MatomoModule.forRoot({
+      trackerUrl: "https://matomo.biocomputingup.it/matomo.php",
+      siteId: "10",
       scriptUrl: "https://matomo.biocomputingup.it/matomo.js",
-      trackers: [
-        {
-          trackerUrl: "https://matomo.biocomputingup.it/matomo.php",
-          siteId: 10,
-        },
-      ],
-      routeTracking: {
-        enable: true,
-      },
     }),
+    MatomoRouterModule,
   ],
   providers: [
     // *** Sentry ErrorHandler and Tracer Setup ***
     SentryModuleConfig,
     // *** end of sentry setup ***
     { provide: APP_ID, useValue: "serverApp" },
+    OrcidToUrl,
   ],
   bootstrap: [AppComponent],
   exports: [RouterModule],
 })
-export class AppModule {}
+export class AppModule { }

@@ -9,7 +9,7 @@ import {
   Output,
   ViewChild,
 } from "@angular/core";
-import * as moment from "moment";
+import moment from "moment";
 import { ToastrService } from "ngx-toastr";
 import { NotificationService } from "../../notifications-data/notification.service";
 import { Notification } from "../../notifications-data/models/Notification";

@@ -5,34 +5,24 @@ import {
   ReportsService,
 } from "../../reports/services/reports.service";
 import { AuthService } from "../../auth/auth.service";
-import { BehaviorSubject, Observable, combineLatest, of } from "rxjs";
+import { Observable, combineLatest } from "rxjs";
 import { User } from "../../models/User.model";
 import { ReportFilter } from "../../reports/interfaces/report-filter.interface";
 import {
-  delay,
-  filter,
-  map,
-  mapTo,
-  pairwise,
-  shareReplay,
+  map, shareReplay,
   startWith,
-  switchMap,
-  take,
-  tap,
+  switchMap, tap
 } from "rxjs/operators";
-import * as moment from "moment";
-import { Paginated } from "../../interfaces/paginated";
+import moment from "moment";
 import { Resource } from "../../models/resource.model";
 import {
-  AbstractControl,
   FormBuilder,
   FormControl,
   FormGroup,
-  Validators,
+  Validators
 } from "@angular/forms";
 import { CuratorStatisticsService } from "../../curator-statistics/services/curator-statistics.service";
 import { CuratorStatistics } from "../../models/statistics.model";
-import * as _ from "lodash";
 
 @Injectable()
 export class UserOverviewPageService {
@@ -60,26 +50,26 @@ export class UserOverviewPageService {
 
     this.setReportPlot();
 
-    
+
 
     this.userStatistics$ = this.user$.pipe(
       switchMap((user: User) => {
         return this.stats.get_curator_statistics(user.orcid_id);
       }),
       tap((stats: CuratorStatistics[]) => {
-        if(stats && stats.length > 0){
+        if (stats && stats.length > 0) {
           this.selectedResource.setValue(stats[0].resource_id);
         }
       })
     );
 
     this.resources$ = this.userStatistics$.pipe(
-        map((stats: CuratorStatistics[]) => {
-            return stats.map((stat: CuratorStatistics) => stat.resource_id)
-        }),
-        switchMap((resourceIds: string[]) => this.resourceService.getResources(resourceIds))
+      map((stats: CuratorStatistics[]) => {
+        return stats.map((stat: CuratorStatistics) => stat.resource_id)
+      }),
+      switchMap((resourceIds: string[]) => this.resourceService.getResources(resourceIds))
     )
-    
+
     // pie chart
     this.selectedResource = new FormControl("", {
       nonNullable: true,

@@ -16,7 +16,7 @@ import { AngularSvgIconModule } from "angular-svg-icon";
       <div
         class="tw-overflow-hidden tw-w-12 tw-h-12 tw-rounded-full tw-border-2 tw-border-apicuron-bright-purple"
       >
-        <img [src]="user.generate_avatar()" class="tw-w-full" alt="" />
+        <img [src]="user.avatar" class="tw-w-full" alt="" />
       </div>
       <a
         class="tw-text-lg tw-block hover:tw-underline tw-whitespace-pre"
@@ -25,7 +25,7 @@ import { AngularSvgIconModule } from "angular-svg-icon";
         <span>{{ user.displayedName }}</span>
       </a>
       <a
-        [href]="user.orcid_url()"
+        [href]="user.orcid_url"
         class="tw-block tw-w-6 tw-h-6 tw-ml-1 md:tw-ml-2"
       >
         <img

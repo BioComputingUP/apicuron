@@ -1,4 +1,4 @@
-import * as moment from "moment";
+import moment from "moment";
 import { Deserializable } from "src/app/interfaces/deserializable.model";
 import { Term } from "src/app/models/term.model";
 

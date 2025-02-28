@@ -1,85 +1,67 @@
-import { Component, Input, OnInit, ViewChild, TemplateRef, ElementRef, ViewContainerRef } from "@angular/core";
-import { CommonModule } from '@angular/common';
-import { Medal } from "src/app/models/medal.model";
+import { Component, Input, OnInit } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { AngularSvgIconModule } from "angular-svg-icon";
+import { Term } from "src/app/models/term.model";
+import { BehaviorSubject, Observable, Subscription, timer } from "rxjs";
+import { map, tap } from "rxjs/operators";
 import { MedalDef } from "../../models/medal-def.model";
-import { BehaviorSubject, Observable } from "rxjs";
-import { Term } from "../../models/term.model";
-import { map } from "rxjs/operators";
-import { Overlay, OverlayRef } from '@angular/cdk/overlay';
-import { TemplatePortal } from '@angular/cdk/portal';
+import { OverlayModule } from "@angular/cdk/overlay";
 
 @Component({
-    standalone: true,
-    selector: 'medal-def-card',
-    imports: [CommonModule],
-    templateUrl: './medal-def-card.component.html',
-    styleUrls: []
+  standalone: true,
+  selector: "medal-def-card",
+  imports: [CommonModule, AngularSvgIconModule, OverlayModule],
+  templateUrl: "./medal-def-card.component.html",
+  styleUrls: [],
 })
 export class MedalDefCardComponent implements OnInit {
-    readonly terms$: BehaviorSubject<Term[]> = new BehaviorSubject<Term[]>([]);
-    termNames$: Observable<string[]>;
-    showActivities: boolean = false;
-
-    @ViewChild('activitiesList', { static: true }) activitiesList: TemplateRef<any>;
-    overlayRef!: OverlayRef; // Reference to the active overlay
-
-    constructor(private overlay: Overlay, private viewContainerRef: ViewContainerRef) {}
-
-    ngOnInit(): void {
-        this.termNames$ = this.terms$.asObservable().pipe(
-            map((terms: Term[]) => {
-                return terms.filter((term: Term) => this.medal.list_terms.includes(term.activity_term));
-            }),
-            map((terms: Term[]) => {
-                return terms.map((term: Term) => term.activity_name);
-            })
+  ngOnInit(): void {
+    this.termNames$ = this.terms$.asObservable().pipe(
+      map((terms: Term[]) => {
+        return terms.filter((term: Term) =>
+          this.medal.list_terms.includes(term.activity_term)
         );
+      }),
+      map((terms: Term[]) => {
+        return terms.map((term: Term) => term.activity_name);
+      })
+    );
+  }
+
+  terms$: BehaviorSubject<Term[]> = new BehaviorSubject([]);
+  termNames$: Observable<string[]>;
+
+  @Input()
+  medal: MedalDef;
+
+  @Input()
+  enableShadow = true;
+
+  public get terms() {
+    return this.terms$.getValue();
+  }
+  @Input()
+  public set terms(value) {
+    if (!!value && value instanceof Array && value.length > 0) {
+      this.terms$.next(value);
     }
+  }
 
-    @Input()
-    medal: MedalDef;
+  private overlayState$ = new BehaviorSubject<boolean>(false);
 
-    @Input()
-    enableShadow = true;
+  overlayOpen$: Observable<boolean> = this.overlayState$.asObservable();
+  closeTimeoutSubscription: Subscription | undefined;
 
-    @Input()
-    get terms() {
-        return this.terms$.value;
+  setOverlayState(state: boolean, timeout = 100) {
+    if (!state) {
+      this.closeTimeoutSubscription = timer(timeout)
+        .pipe(tap(() => this.overlayState$.next(state)))
+        .subscribe();
+      return;
     }
-    set terms(value: Term[]) {
-        this.terms$.next(value);
+    if (this.closeTimeoutSubscription) {
+      this.closeTimeoutSubscription.unsubscribe();
     }
-
-    openTooltip(target: EventTarget | null) {
-        if (!target) return; // Check if target is null
-        const element = target as HTMLElement; // Type assertion
-        if (!element) return; // Ensure target is an HTMLElement
-
-        if (this.overlayRef) {
-            return; // Prevent multiple overlays from opening
-        }
-
-        const positionStrategy = this.overlay.position()
-            .flexibleConnectedTo(element)
-            .withPositions([
-                { originX: 'end', originY: 'center', overlayX: 'start', overlayY: 'center' }
-            ]);
-
-        this.overlayRef = this.overlay.create({
-            positionStrategy,
-            scrollStrategy: this.overlay.scrollStrategies.reposition(),
-            hasBackdrop: false
-        });
-
-        const portal = new TemplatePortal(this.activitiesList, this.viewContainerRef);
-        this.overlayRef.attach(portal);
-    }
-
-    closeTooltip() {
-        if (this.overlayRef) {
-            this.overlayRef.dispose();
-            this.overlayRef = null!;
-        }
-    }
+    this.overlayState$.next(state);
+  }
 }
-

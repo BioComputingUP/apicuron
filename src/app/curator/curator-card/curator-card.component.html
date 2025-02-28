@@ -3,7 +3,7 @@
     <div [ngClass]="{'tw-p-2': !vertical}">
         <!-- <img [ngClass]="{'tw-w-24 tw-h-24': vertical, 'tw-w-20 tw-h-20': !vertical, 'tw-rounded-full tw-bg-gray-50 tw-border-2 tw-border-gray-100 tw-text-gray-800': true}" [src]="'https://api.dicebear.com/5.x/identicon/svg?scale=80&radius=50&seed=' + displayedName" alt=""> -->
         <img [ngClass]="{'tw-w-24 tw-h-24': vertical, 'tw-w-20 tw-h-20': !vertical, 'tw-rounded-full tw-bg-gray-50 tw-border-2 tw-border-gray-100 tw-text-gray-800': true}"
-            [src]="biocurator.generate_avatar()" alt="">
+            [src]="biocurator.avatar" alt="">
     </div>
     <div class="tw-flex tw-flex-col" [ngClass]="{'tw-items-center': vertical, 'tw-ml-2': !vertical}">
         <div class="tw-gap-2">
@@ -12,7 +12,7 @@
                 displayedName
                 }}
             </a>
-            <a [href]="biocurator.orcid_url()" target="_blank" class="tw-cursor-pointer tw-align-top">
+            <a [href]="biocurator.orcid_id | orcidToUrl " target="_blank" class="tw-cursor-pointer tw-align-top">
                 <img class="tw-inline tw-h-6 tw-w-6" src="https://orcid.org/assets/vectors/orcid.logo.icon.svg" alt=""
                     role="tooltip">
             </a>

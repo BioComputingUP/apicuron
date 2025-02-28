@@ -29,7 +29,6 @@ import { BadgeDefService } from "../../achievements-def/services/badge-def.servi
 import { BadgeDefFilter } from "../../achievements-def/interfaces/badge-def.filter";
 import { BadgeDef } from "../../models/badge-def.model";
 import { Paginated } from "src/app/interfaces/paginated";
-
 type BadgeListUpdate = {
   badge: BadgeDef;
   operation: "update" | "delete" | "create";
@@ -47,7 +46,8 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
   termList$: Observable<Term[]>;
   terms$: Observable<any>;
 
-  searchQuery: string = '';
+  searchQuery$ = new BehaviorSubject<string>("");
+  searchInput = new BehaviorSubject<string>("");
 
   badges$: Observable<Paginated<BadgeDef>>;
   manageForm$ = new BehaviorSubject<{
@@ -111,14 +111,21 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.badgeFilter$ = combineLatest([this.resource$, this.page$]).pipe(
-      map(([{ resource_id }, page]: [Resource, number]) => {
-        return BadgeDefFilter.create({
-          resource_id,
-          skip: (page - 1) * this.limit,
-          limit: this.limit,
-        });
-      })
+    this.badgeFilter$ = combineLatest([
+      this.resource$,
+      this.page$,
+      this.searchQuery$,
+    ]).pipe(
+      map(
+        ([{ resource_id }, page, searchQuery]: [Resource, number, string]) => {
+          return BadgeDefFilter.create({
+            resource_id,
+            skip: (page - 1) * this.limit,
+            limit: this.limit,
+            search_query: searchQuery, // Pass the search query to the backend.
+          });
+        }
+      )
     );
 
     this.badgesList$ = this.badgeFilter$.pipe(
@@ -142,32 +149,24 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
             return this.applyBadgeUpdates(badges, update);
           })
         ) as Observable<Paginated<BadgeDef>>;
-      }),
-      map(badges => {
-        if (!badges) return badges;
-        let filteredBadges = badges;
-        if (this.searchQuery) {
-          filteredBadges = {
-            ...badges,
-            data: badges.data.filter(badge =>
-              badge.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-            ),
-          };
-        }
-        return filteredBadges;
       })
     );
   }
-
   ngOnDestroy(): void {
     this.destroy$.next(true);
   }
 
   ngOnInit(): void {}
 
-  onSearchChange() {
-    this.page$.next(1);
+  onSearchClick(): void {
+    this.searchQuery$.next(this.searchInput.value);
   }
+
+  onResetClick(): void {
+    this.searchInput.next(""); // Clear the search input
+    this.searchQuery$.next(""); // Reset the filter
+  }
+
   private updateBadgeUI(badge: BadgeDef) {
     this.updateBadge$.next({
       operation: "update",
@@ -233,7 +232,8 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
 
   createBadge(badgeDef: BadgeDef) {
     this.badgeDefService
-      .createBadgeDef(badgeDef).pipe(take(1))
+      .createBadgeDef(badgeDef)
+      .pipe(take(1))
       .subscribe((data: BadgeDef) => {
         if (data) {
           this.addBadgeToUI(data);
@@ -277,11 +277,15 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
   }
 
   confirmDeleteBadge(badge: BadgeDef) {
-      const confirmed = confirm(`Are you sure you want to delete the medal ${badge.name}?`);
-      if (confirmed) {
-        this.delete_badge(badge);
-      }
+    const confirmed = confirm(
+      `Are you sure you want to delete the medal ${badge.name}?`
+    );
+
+    if (confirmed) {
+      this.delete_badge(badge);
+    }
   }
+
   delete_badge(badge) {
     this.badgeDefService
       .deleteBadge(badge)
@@ -305,9 +309,7 @@ export class ManageBadgesComponent implements OnInit, OnDestroy {
       );
   }
 
-
   onCloseForm() {
     this.manageForm$.next({ badge: null, show: false, type: "create" });
   }
-
 }

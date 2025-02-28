@@ -66,11 +66,8 @@ export class Resource implements Deserializable, Serializable {
         this.logo = new URL(input.logo, environment.host + "/");
       } else {
         this.logo = new URL(
-          input.logo
-            .split("/")
-            .filter((el) => el)
-            .join("/"),
-          environment.ws + "/"
+          input.logo,
+          environment.ws
         );
       }
     }
