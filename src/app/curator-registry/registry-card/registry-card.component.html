@@ -6,7 +6,7 @@
     <img
       class="tw-aspect-square tw-mx-auto tw-border tw-rounded-full"
       style="width: 70px; height: auto"
-      [src]="entry.curator.avatar"
+      [src]="(entry$ | async).curator.avatar"
       alt="Curator Avatar"
     />
   </div>
@@ -16,16 +16,16 @@
     <div>
       <a
         class="tw-font-extrabold tw-text-xl tw-text-slate-800 hover:tw-text-slate-600 hover:tw-underline"
-        [routerLink]="['/curators', entry.curator.orcid_id]"
+        [routerLink]="['/curators', (entry$ | async).curator.orcid_id]"
       >
-        {{ entry.curator.displayedName }}
+        {{ (entry$ | async).curator.displayedName }}
       </a>
     </div>
     <div>
       <p>
-        {{ entry.curator.orcid_id }}
+        {{ (entry$ | async).curator.orcid_id }}
         <a
-          [href]="entry.curator.avatar"
+          [href]="(entry$ | async).curator.avatar"
           target="_blank"
           class="tw-cursor-pointer tw-align-top"
         >
@@ -38,16 +38,10 @@
         </a>
       </p>
       <p
-        [ngStyle]="{
-          opacity:
-            entry.curator.affiliation &&
-            entry.curator.affiliation !== 'No affiliation'
-              ? 1
-              : 0
-        }"
         class="tw-text-sm tw-text-gray-600"
+        [ngClass]="{ 'tw-hidden': !(entry$ | async).curator.affiliation || (entry$ | async).curator.affiliation === 'No affiliation' }"
       >
-        {{ entry.curator.affiliation }}
+        {{ (entry$ | async).curator.affiliation }}
       </p>
     </div>
   </div>
@@ -59,7 +53,7 @@
     >
       <!-- Display up to two contributions -->
       <div
-        *ngFor="let contribution of getContributions().slice(0, 2)"
+        *ngFor="let contribution of (firstContributions$ | async)"
         class="tw-font-dm-sans tw-max-w-xs tw-flex tw-justify-center tw-items-center"
       >
         <a [href]="contribution.resource.resource_url" target="_blank">
@@ -74,15 +68,15 @@
 
       <!-- Show remaining contributions count -->
       <span
-        *ngIf="getContributions().length > 2"
-        (mouseenter)="showContributions = true"
-        (mouseleave)="showContributions = false"
+        *ngIf="(contributions$ | async).length > 2"
+        (mouseenter)="showGroups(true)"
+        (mouseleave)="showGroups(false)"
         #trigger
       >
         <span
           class="tw-font-dm-sans tw-text-sm tw-bg-gray-200 tw-px-3 tw-py-2 tw-rounded-full tw-cursor-pointer tw-align-middle tw-max-w-[32px] tw-max-h-[32px] tw-flex tw-items-center tw-justify-center"
         >
-          +{{ getContributions().length - 2 }}
+          +{{ (contributions$ | async).length - 2 }}
         </span>
       </span>
 
@@ -90,7 +84,7 @@
       <ng-template
         cdkConnectedOverlay
         [cdkConnectedOverlayOrigin]="trigger"
-        [cdkConnectedOverlayOpen]="showContributions"
+        [cdkConnectedOverlayOpen]="(showGroups$ | async) == true"
         [cdkConnectedOverlayOffsetY]="8"
         [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
       >
@@ -98,7 +92,7 @@
           class="tw-bg-gray-100 tw-rounded-lg tw-col-1 tw-flex tw-flex-wrap tw-justify-center tw-items-start !tw-min-w-60 !tw-max-w-72 tw-shadow-lg tw-p-4 tw-border tw-border-gray-300"
         >
           <div
-            *ngFor="let contribution of getContributions().slice(2)"
+            *ngFor="let contribution of (remainingContributions$ | async)"
             class="tw-pr-2"
           >
             <a [href]="contribution.resource.resource_url" target="_blank">
