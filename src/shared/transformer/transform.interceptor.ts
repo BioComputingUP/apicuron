@@ -29,18 +29,18 @@ export class TransformInterceptor implements NestInterceptor {
 					const wrappedResponse = { ...response, ...meta };
 					return wrappedResponse;
 				} else {
-					console.log({ response });
+					// console.log({ response });
 					// if the response is not wrapped, wrap it
 					// this assignment approach guarantees that the resulting object is a Pojo
 					// and not an instance of a class
 					const wrappedResponse = Object.create(null);
 					Object.assign(wrappedResponse, { data: response }, meta);
 
-					console.log(
-						Object.getPrototypeOf(wrappedResponse) == null
-							? 'response is a Pojo'
-							: 'response is not a Pojo',
-					);
+					// console.log(
+					// 	Object.getPrototypeOf(wrappedResponse) == null
+					// 		? 'response is a Pojo'
+					// 		: 'response is not a Pojo',
+					// );
 					return wrappedResponse;
 				}
 				// the parenthesis are essential

@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
-import { getModelToken } from '@nestjs/mongoose';
+import { getConnectionToken, getModelToken } from '@nestjs/mongoose';
 import { AppModule } from '../app.module';
 import { Report } from '../core/schemas/reports.schema';
 import { faker } from '@faker-js/faker';
 import { Term } from '../core/schemas/terms.schema';
-import { Model } from 'mongoose';
+import { Connection, Model } from 'mongoose';
 import { User } from '../core/schemas/user.schema';
 import { random, sum } from 'lodash';
 import {
@@ -17,9 +17,15 @@ import { UsersService } from '../auth/users/services/users.service';
 import { SubmitReportService } from '../submit-reports/services/submit-reports.service';
 import { plainToInstance } from 'class-transformer';
 import { SubmitReportsDto } from '../submit-reports/dto/submit-report.dto';
+import { PartnerResourcesService } from 'src/resources/partner-resources/services/partner-resources.service';
+import { SubmittedResourcesService } from 'src/resources/submitted-resources/resources.service';
+import { FileUploadDto } from 'src/util/file-upload.helper';
+import { HttpService } from '@nestjs/axios';
 
 async function bootstrap() {
 	const app = await NestFactory.createApplicationContext(AppModule);
+
+	await (app.get(getConnectionToken()) as Connection).db.dropDatabase();
 
 	const logger = new Logger('SeederLogger');
 
@@ -29,6 +35,8 @@ async function bootstrap() {
 	const resourceModel: Model<PartnerResource> = app.get(
 		getModelToken(PartnerResource.name),
 	);
+	const resourceService: SubmittedResourcesService = app.get(SubmittedResourcesService);
+	const http: HttpService = app.get(HttpService)
 
 	const userService = app.get(UsersService);
 
@@ -42,49 +50,40 @@ async function bootstrap() {
 	// create mock user
 	await userService.createUser({
 		orcid_id: testingOrcidId,
+		privacy: PrivacyType.public,
 	});
 
-	const exampleResource = new resourceModel({
+	const tempResource = await resourceService.create_resource({
 		resource_description: faker.lorem.sentences(2),
 		resource_name: 'Testing Resource',
+		resource_long_name: 'Testing Resource Long Name',
+		color: '#000000',
 		resource_id: 'example_resource',
 		resource_uri: faker.internet.url(),
 		resource_url: faker.internet.url(),
-		joined_date: faker.date.recent({ days: 10 }),
-	});
+	}, testingOrcidId, await FileUploadDto.fromPicsum('https://picsum.photos/300/200.jpg', http))
 
-	await exampleResource.save();
+	await resourceService.make_partner(tempResource.resource_id);
+
+	const exampleResource = await resourceModel.findOne({ resource_id: tempResource.resource_id });
+
+
 	logger.verbose(`Created testing resource successfully`);
 
-	const secondResource = new resourceModel({
+	const secondResourceTemp = await resourceService.create_resource({
 		resource_description: faker.lorem.sentences(2),
 		resource_name: 'Second Resource',
+		resource_long_name: 'Second Resource Long Name',
+		color: '#000000',
 		resource_id: 'second_resource',
 		resource_uri: faker.internet.url(),
 		resource_url: faker.internet.url(),
-		joined_date: faker.date.recent({ days: 10 }),
-	});
+	}, testingOrcidId, await FileUploadDto.fromPicsum('https://picsum.photos/300/200.jpg', http));
 
-	await secondResource.save();
-	await userModel.updateOne(
-		{ orcid_id: testingOrcidId },
-		{
-			$push: {
-				resources: {
-					$each: [
-						{
-							resource_id: exampleResource.resource_id,
-							name: exampleResource.resource_name,
-						},
-						{
-							resource_id: secondResource.resource_id,
-							name: secondResource.resource_name,
-						},
-					],
-				},
-			},
-		},
-	);
+	await resourceService.make_partner(secondResourceTemp.resource_id);
+	const secondResource = await resourceModel.findOne({ resource_id: secondResourceTemp.resource_id });
+
+	logger.verbose(`Created second resource successfully logo: ${secondResource.logo}`);
 
 	logger.verbose(
 		`Assigned testing resources to testing user: ${testingOrcidId}`,

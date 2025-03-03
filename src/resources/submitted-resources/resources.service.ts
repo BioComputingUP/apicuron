@@ -20,7 +20,7 @@ import {
 	SubmittedResource,
 	SubmittedResourceDocument,
 } from '../../core/schemas/resource/submitted-resource.schema';
-import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
+import { PartnerResource, PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { UsersService } from '../../auth/users/services/users.service';
 import { FileUploadDto } from '../../util/file-upload.helper';
 import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
@@ -34,11 +34,11 @@ export class SubmittedResourcesService {
 		@InjectModel(Resource.name)
 		private resourceModel: Model<ResourceDocument>,
 		@InjectModel(PartnerResource.name)
-		private partnerResourceModel: Model<ResourceDocument>,
+		private partnerResourceModel: Model<PartnerResourceDocument>,
 		private userService: UsersService,
 		protected configService: ConfigService,
 		protected storageService: StorageService,
-	) {}
+	) { }
 
 	private logger = new Logger(SubmittedResourcesService.name);
 
@@ -90,24 +90,30 @@ export class SubmittedResourcesService {
 		const logoRef = await this.storageService.move(
 			StorageType.private,
 			StorageType.public,
-			resource.logo,
+			this.storageService.parseCanonicalUrl(resource.logo).path,
 			{ deleteFromSource: true },
 		);
+		const newLogoRef = this.storageService.getEngine(StorageType.public).buildCanonicalUrl(logoRef);
+		this.logger.debug(`Moved logo from private to public: ${newLogoRef}`);
 
-		resource.logo = logoRef;
+		const partnerResource = new this.partnerResourceModel({
+			...resource.toObject(),
+			logo: newLogoRef,
+			joined_date: new Date(),
+		});
+
+
+		await this.submittedResourceModel.deleteOne({ resource_id });
+
+		await this.partnerResourceModel.create(partnerResource.toObject());
+
+		this.logger.debug(`Creating PartnerResource with logo ${partnerResource.logo}`);
 
 		// if the submitted resource has a creator, we set it as an owner of the resource
 		const { creator } = resource;
 		if (creator) {
 			await this.userService.addManagedResource(creator, resource);
 		}
-		const partnerResource = this.partnerResourceModel.hydrate(
-			resource.toObject(),
-		);
-
-		partnerResource.state = PartnerResource.name;
-		partnerResource.joined_date = new Date();
-		await partnerResource.save();
 	}
 
 	delete_old_resources() {

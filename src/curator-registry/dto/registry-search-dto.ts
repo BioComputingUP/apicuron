@@ -31,8 +31,8 @@ export class RegistryResource {
 	resource_description: string;
 
 	@ApiProperty()
-	@Expose()
 	@StorageReference()
+	@Expose()
 	logo: string;
 
 	@ApiProperty()

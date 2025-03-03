@@ -45,11 +45,16 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 				key,
 			);
 			if (metadata && typeof value === 'string') {
-				// this.logger.debug(`found key ${key}`);
+				this.logger.debug(`found key ${key}`);
 				const currObj = obj as { [k: string]: string };
 				currObj[key] = await this.processStorageReference(currObj[key]);
 				// if the value is a string and it's processed, there's no more recurive checks to perform on this value
 				continue;
+			}
+			if(key == 'logo') {
+				this.logger.debug(`Checked Key ${key} is not a storage reference`);
+				this.logger.debug(`Metadata is ${!!metadata}`);
+				this.logger.debug(`typeof value is ${typeof value} and value is ${value}`);
 			}
 
 			// Recursively process nested objects or arrays
@@ -63,9 +68,6 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 		next: CallHandler<any>,
 	): Observable<any> | Promise<Observable<any>> {
 		return next.handle().pipe(
-			tap((prev) => {
-				this.logger.debug(`Before Storage Reference Interceptor: ${JSON.stringify(prev, null, 2)}`);
-			}),
 			switchMap((data: unknown) => {
 				// if the data is a simple Pojo, return it as-is skip checks
 				if (!!data && Object.getPrototypeOf(data) == null) {
@@ -74,9 +76,6 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 				}
 				this.logger.log('checking storage references');
 				return from(this.checkStorageReference(data));
-			}),
-			tap((prev) => {
-				this.logger.debug(`After Storage Reference Interceptor: ${JSON.stringify(prev, null, 2)}`);
 			}),
 		);
 	}
