@@ -15,16 +15,7 @@ export function getGlobalInterceptorChain(): Provider<NestInterceptor>[] {
 			provide: APP_INTERCEPTOR,
 			inject: [Reflector],
 			useFactory: (reflect: Reflector) => {
-				class ProxyClassSerializerInterceptor extends ClassSerializerInterceptor {
-					intercept(context: any, next: any) {
-						// console.log(ClassSerializerInterceptor.name);
-						return super
-							.intercept(context, next)
-							.pipe(tap((x) => console.log(ClassSerializerInterceptor.name)));
-					}
-				}
-
-				return new ProxyClassSerializerInterceptor(reflect, {
+				return new ClassSerializerInterceptor(reflect, {
 					enableCircularCheck: true,
 					excludeExtraneousValues: true,
 				});
