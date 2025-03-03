@@ -17,6 +17,6 @@ export class CuratorRegistryService {
         version: "2",
       },
     });
-	return result$ as Observable<Paginated<RegistryEntry>>;
+    return result$ as Observable<Paginated<RegistryEntry>>;
   }
 }
