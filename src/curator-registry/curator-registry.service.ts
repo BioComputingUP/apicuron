@@ -6,8 +6,12 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, PipelineStage, ProjectionType } from 'mongoose';
 import {
+	ContributionEntry,
+	ContributionEntryDocument,
 	CuratorRegistryEntry,
 	CuratorRegistryEntryDocument,
+	LeanContributionEntryDocument,
+	LeanCuratorRegistryEntryDocument,
 } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { PartnerResourcesService } from 'src/resources/partner-resources/services/partner-resources.service';
 import { GetRegistryEntryDto } from './dto/registry-entries.dto';
@@ -77,7 +81,7 @@ export class CuratorRegistryService {
 			}
 			const entriesFilteredLeagues = entries.map((entry) => {
 				const filteredContributedTo = entry.contributed_to
-					.map((contribution) => {
+					.map((contribution: LeanContributionEntryDocument) => {
 						const filteredGroups = contribution.groups.filter(
 							(group) => group.visibility === PrivacyType.public,
 						);
@@ -99,31 +103,16 @@ export class CuratorRegistryService {
 		}
 	}
 
-	async getCuratorEntry(orcid_identifier: string) {
-		let entry: CuratorRegistryEntry = null;
+	async getCuratorEntry(orcid_identifier: string): Promise<LeanCuratorRegistryEntryDocument | null> {
+		let entry: LeanCuratorRegistryEntryDocument | null = null;
 		try {
-			entry = await this.registryEntryModel
+			entry =  await this.registryEntryModel
 				.findOne({
 					curator_orcid: orcid_identifier,
 				})
 				.lean();
-			if (!!entry) {
-				const filtered_groups_entry = entry.contributed_to.map(
-					(contribution) => {
-						return {
-							...contribution,
-							groups: contribution.groups.filter(
-								(group) => group.visibility === PrivacyType.public,
-							),
-						};
-					},
-				);
-				const resultEntry = {
-					...entry,
-					contributed_to: filtered_groups_entry,
-				};
-				return resultEntry;
-			}
+			return entry ?? null;
+			
 		} catch (error) {
 			this.logger.error(
 				`Could not retrieve user with orcid: ${orcid_identifier}...`,

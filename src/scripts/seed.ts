@@ -116,6 +116,7 @@ async function bootstrap() {
 	}
 	await Promise.all(terms$);
 
+
 	logger.verbose(`Created ${termCount} Mock terms Successfully`);
 	// create terms for second resource
 	const secondResourceTerms$ = [];

@@ -17,7 +17,7 @@ export class ManyReportsSubmittedHandler implements IEventHandler {
 	constructor(
 		protected runner: SubmissionRunner,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-	) {}
+	) { }
 
 	payloadProcessorFactory(payload: IManyReportsSubmittedEventPayload) {
 		const reportDocuments = payload.reports.map(
@@ -26,11 +26,11 @@ export class ManyReportsSubmittedHandler implements IEventHandler {
 		reportDocuments.sort(
 			(a, b) => a.timestamp.getTime() - b.timestamp.getTime(),
 		);
-		
+
 		const resources = payload.resources;
 		const users = payload.users;
 		const terms = payload.terms;
-		
+
 		return async (aggregator: Aggregator) => {
 			this.logger.debug(
 				`Processing ${reportDocuments.length} reports using aggregator: ${aggregator.constructor.name}`,

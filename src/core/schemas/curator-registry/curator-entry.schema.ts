@@ -1,25 +1,30 @@
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, LeanDocument, ObjectId, Types } from 'mongoose';
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { User, UserSchema } from '../user.schema';
 import {
 	PartnerResource,
 	PartnerResourceSchema,
 } from '../resource/partner-resource.schema';
-import { League, LeagueSchema } from '../league/league.schema';
+import { League, LeagueDocument, LeagueSchema } from '../league/league.schema';
 
 export type CuratorRegistryEntryDocument =
 	HydratedDocument<CuratorRegistryEntry>;
+export type LeanCuratorRegistryEntryDocument = LeanDocument<CuratorRegistryEntryDocument>;
 @Schema({ _id: false })
 export class ContributionEntry {
 	@Prop({ required: true })
 	resource_id: string;
 
 	@Prop({ type: PartnerResourceSchema })
-	resource: PartnerResource;
+	resource: Types.Subdocument<ObjectId> & PartnerResource;
 
 	@Prop({ type: [LeagueSchema] })
-	groups: [League];
+	groups: Types.DocumentArray<LeagueDocument>;
 }
+
+export type ContributionEntryDocument = HydratedDocument<ContributionEntry>;
+export type LeanContributionEntryDocument = LeanDocument<ContributionEntryDocument>;
+
 const ContributionEntrySchema =
 	SchemaFactory.createForClass(ContributionEntry).loadClass(ContributionEntry);
 @Schema({
@@ -33,11 +38,12 @@ export class CuratorRegistryEntry {
 		required: false,
 		type: UserSchema,
 	})
-	curator: User;
+	curator: Types.Subdocument<ObjectId> & User;
 
-	@Prop({ required: false, type: [ContributionEntrySchema] })
-	contributed_to: ContributionEntry[];
+	@Prop({ required: true, type: [ContributionEntrySchema], default: () => [] })
+	contributed_to: Types.DocumentArray<ContributionEntryDocument>;
 }
+
 
 const CuratorRegistryEntrySchema =
 	SchemaFactory.createForClass(CuratorRegistryEntry).loadClass(
