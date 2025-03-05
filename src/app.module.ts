@@ -42,6 +42,7 @@ import {
 	EntryExistsRule,
 	UniqueRule,
 } from './shared/validators';
+import { ConfigService } from '@nestjs/config';
 @Module({
 	imports: [
 		// Sentry Setup

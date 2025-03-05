@@ -10,6 +10,7 @@ import {
 import { inspect } from 'util';
 import { OrcidTokenAuthService } from './token-auth.service';
 import { orcidWorkXmlSerializer } from './helpers/orcid-work-serializer';
+import { UserLinks } from 'src/core/schemas/components/user-fields.schema';
 
 @Injectable()
 export class OrcidClientService {
@@ -157,7 +158,6 @@ export class OrcidClientService {
 		return { status: response.status };
 	}
 
-
 	async expandedSearch(solrQuery: string) {
 		const token = await this.tokenAuth.getToken();
 		const response = await this.httpService.axiosRef.get(
@@ -203,7 +203,7 @@ export class OrcidClientService {
 				userRecord?.data?.['activities-summary']?.employments[
 					'affiliation-group'
 				]?.[0]?.summaries?.[0]?.['employment-summary'].organization?.name;
-			const userLinks: { name: string; url: URL } = userRecord?.data?.person?.[
+			const userLinks: UserLinks[] = userRecord?.data?.person?.[
 				'researcher-urls'
 			]?.['researcher-url'].map((link) => {
 				return {

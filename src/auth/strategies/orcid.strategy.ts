@@ -4,8 +4,6 @@ import { PassportStrategy } from '@nestjs/passport';
 import { AuthService } from '../auth.service';
 import { Strategy } from 'passport-oauth2';
 import { UsersService } from '../users/services/users.service';
-import { plainToInstance } from 'class-transformer';
-import { CreateOrUpdateUserDto } from '../users/dto/create-or-update-user.dto';
 import { HttpService } from '@nestjs/axios';
 import { OrcidClientService } from 'src/orcid/orcid-client/orcid-client.service';
 
@@ -33,7 +31,6 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 
 			async function (accessToken, refreshToken, params, profile, done) {
 				const orcid_id: string = params.orcid;
-
 
 				// const user = { orcid_id, username: params.name };
 				// console.log({ params });
