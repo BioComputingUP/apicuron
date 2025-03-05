@@ -157,34 +157,6 @@ export class OrcidClientService {
 		return { status: response.status };
 	}
 
-	// async submitWorks(user: OrcidUser, orcidWorks: OrcidWork[]) {
-	// 	if (orcidWorks.length == 0) {
-	// 		throw new Error(`No works to submit for user ${user.orcid_id}`);
-	// 	}
-	// 	if (orcidWorks.length == 1) {
-	// 		this.logger.warn(
-	// 			`Only one work to submit for user ${user.orcid_id}, called submitWorks! instead of submitWork`,
-	// 		);
-	// 		return await this.submitWork(user, orcidWorks[0]);
-	// 	}
-
-	// 	const rawData = orcidBulkWorkXmlSerializer(orcidWorks);
-	// 	// Serialize the works into the ORCID JSON format
-
-	// 	const options = {
-	// 		method: 'POST',
-	// 		url: this.orcidUrl + urlPath,
-	// 		headers: {
-	// 			'Content-Type': 'application/json',
-	// 			Authorization: 'Bearer ' + user.orcid_permission,
-	// 			Accept: '*/*',
-	// 		},
-	// 		data: rawData.trim(),
-	// 		validateStatus: function (status) {
-	// 			return status < 500; // Resolve only if the status code is less than 500
-	// 		},
-	// 	};
-	// }
 
 	async expandedSearch(solrQuery: string) {
 		const token = await this.tokenAuth.getToken();

@@ -1,3 +1,10 @@
+import {
+	PartnerResourceDocument,
+	UserDocument,
+	LeagueDocument,
+	TermDocument,
+} from '../../core/schemas';
+
 export interface AggregatedReportsMonthly {
 	resource_id: string;
 	curator_orcid: string;
@@ -12,4 +19,8 @@ export interface AggregatedReportsMonthly {
 	privacy: string;
 	first_contribution: Date;
 	last_contribution: Date;
+	resource: PartnerResourceDocument;
+	user: UserDocument;
+	league_data: LeagueDocument;
+	term: TermDocument;
 }

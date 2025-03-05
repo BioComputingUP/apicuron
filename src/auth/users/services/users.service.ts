@@ -1,6 +1,5 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { FilterQuery, UpdateQuery } from 'mongoose';
 import { achievements_v1_pipeline } from '../aggregation-pipeline/achievements.pipeline';
 import { browse_v1_pipeline } from '../aggregation-pipeline/browse.pipeline';
 import { User, UserDocument } from '../../../core/schemas/user.schema';
@@ -10,50 +9,44 @@ import { PrivacyType } from '../../../core/enums';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserPrivacyUpdatedEvent } from '../events/update-privacy';
 import { ICreateOrUpdateUser } from '../dto/create-or-update-user.dto';
-import { UserEntity } from '../dto/user';
+import { ResourceDocument } from '../../../core/schemas/resource/resource.schema';
+import { UserCreatedEvent } from '../events/user-created';
+import { UserRepository } from '../../../core/repositories/user.repository';
+import { UpdateProfileDto } from '../dto/update-user.dto';
+import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
+import { v4 as uuid } from 'uuid';
+import { PrivateUserEntity, UserEntity } from '../dto/user.entity';
 import { plainToInstance } from 'class-transformer';
 @Injectable()
-export class UsersService implements OnApplicationBootstrap {
-	private readonly logger = new Logger(UsersService.name);
+export class UsersService {
 	constructor(
-		@InjectModel(User.name) private userModel: Model<UserDocument>,
+		private userRepository: UserRepository,
 		protected configService: ConfigService,
 		protected eventEmitter: EventEmitter2,
-	) {}
-	async onApplicationBootstrap(): Promise<void> {
-		const result = await this.userModel.updateMany(
-			{
-				privacy: { $exists: false },
-			},
-			{
-				$set: {
-					privacy: PrivacyType.private,
-				},
-			},
-		);
-
-		this.logger.log(
-			`OnApplicationBootstrap: set ${result.modifiedCount} privacy User entries to private`,
-		);
-		return;
-	}
+		protected storageService: StorageService,
+	) { }
 
 	public async userExists(orcid_id: string): Promise<boolean> {
-		return !!(await this.userModel.exists({
+		return !!(await this.userRepository.findOne({
 			orcid_id,
 		}));
 	}
 
-	async getPrivateUser(query: Partial<User>): Promise<UserDocument> {
-		const user_promise = this.userModel.findOne(query, {
+	async getPrivateUser(query: Partial<User>): Promise<PrivateUserEntity> {
+		const userDoc = await this.userRepository.findOne(query, {
 			stats: 0,
 		});
 
-		return await user_promise;
+		const userEntity = plainToInstance(PrivateUserEntity, userDoc, {
+			enableCircularCheck: true,
+			excludeExtraneousValues: true,
+		})
+
+		return userEntity;
 	}
 
 	async getByOrcid(orcid_id: string): Promise<UserDocument> {
-		const user_promise = await this.userModel.findOne(
+		const user_promise = await this.userRepository.findOne(
 			{
 				orcid_id,
 			},
@@ -74,7 +67,9 @@ export class UsersService implements OnApplicationBootstrap {
 	 * @returns list of users from the database
 	 */
 	async getUsersByOrcid(orcid_ids: string[]): Promise<UserDocument[]> {
-		const users = await this.userModel.find({ orcid_id: { $in: orcid_ids } });
+		const users = await this.userRepository.find({
+			orcid_id: { $in: orcid_ids },
+		});
 
 		const sortedUsers = orcid_ids.map(
 			(orcid_id): UserDocument =>
@@ -84,8 +79,20 @@ export class UsersService implements OnApplicationBootstrap {
 		return sortedUsers;
 	}
 
-	async getPublicUser(orcid_id: string) {
-		const user_promise = this.userModel.findOne(
+	/**
+	 * Retrieves a public user profile based on the provided ORCID ID.
+	 *
+	 * @param orcid_id - The ORCID ID of the user to retrieve.
+	 * @param userReq - Optional. The user making the request. If the requesting user is the profile holder, privacy checks are bypassed.
+	 * @returns A promise that resolves to the user profile if found and public, or the full profile if the requesting user is the profile holder.
+	 */
+	async getPublicUser(orcid_id: string, userReq?: User): Promise<UserEntity | PrivateUserEntity> {
+		// if the user requesting is the profile holder. We do not need to check privacy
+		if (userReq?.orcid_id === orcid_id) {
+			return await this.getPrivateUser({ orcid_id });
+		}
+		// otherwise (if the user is not the profile holder) we need to check privacy
+		const user = await this.userRepository.findOne(
 			{
 				orcid_id,
 				privacy: PrivacyType.public,
@@ -94,29 +101,55 @@ export class UsersService implements OnApplicationBootstrap {
 				stats: 0,
 				orcid_permission: 0,
 				refresh_token: 0,
+				orcid_work_put_codes: 0,
 			},
 		);
 
-		return await user_promise;
+		const userObj: UserEntity = this.mapDocumentToEntity(user);
+
+		const userEntity = plainToInstance(UserEntity, userObj, {
+			excludeExtraneousValues: true,
+			enableCircularCheck: true,
+		});
+
+		return userEntity;
 	}
 
-	async get_by_cookie_token(cookie_token: string): Promise<User> {
-		return await this.userModel.findOne({
+	mapDocumentToEntity(userDoc: UserDocument): UserEntity {
+		return {
+			...userDoc.toObject(),
+			// employment: userDoc.employment[userDoc.employment.length - 1].name,
+			employment: userDoc.affiliation
+		}
+	}
+
+	async get_by_cookie_token(cookie_token: string): Promise<UserDocument> {
+		return await this.userRepository.findOne({
 			cookie_token,
 		});
 	}
 
-	async update_user(orcid_id: string, updates: Partial<User>) {
-		return await this.userModel.updateOne(
-			{
-				orcid_id,
-			},
-			updates,
-		);
+	async updateUser(
+		orcidOrUser: string | UserDocument,
+		updates: UpdateQuery<UserDocument>,
+	): Promise<PrivateUserEntity> {
+		const receivedOrcid = typeof orcidOrUser === 'string';
+
+		const orcid = receivedOrcid ? orcidOrUser : orcidOrUser.orcid_id;
+
+		const filter = { orcid_id: orcid };
+		const user = await this.userRepository.updateOne(filter, updates);
+
+		const userEntity = plainToInstance(PrivateUserEntity, user, {
+			excludeExtraneousValues: true,
+			enableCircularCheck: true,
+		});
+
+		return userEntity;
 	}
 
 	async get_user_token(username: string): Promise<string> {
-		return await this.userModel.findOne(
+		const result = await this.userRepository.findOne(
 			{
 				username,
 			},
@@ -124,60 +157,86 @@ export class UsersService implements OnApplicationBootstrap {
 				jwt_token: true,
 			},
 		);
+		return result.jwt_token;
 	}
 
-	async createUser(user: ICreateOrUpdateUser): Promise<UserDocument> {
-		const newUser = new this.userModel(user);
+	async createUser(user: ICreateOrUpdateUser): Promise<PrivateUserEntity> {
+		const newUser = this.userRepository.newDocument(user);
 
-		const avatarLink = await generateAvatar(
-			newUser.displayedName,
-			this.configService.get('PUBLIC_FILES_PATH'),
-			this.configService.get('PUBLIC_FILES_URL_PATH'),
+		const avatarSvg = await generateAvatar(newUser.displayedName);
+
+		const avatarLink = await this.storageService.put(
+			`users/${uuid()}.svg`,
+			Buffer.from(avatarSvg),
 		);
+
 		newUser.avatar = avatarLink;
 
 		await newUser.save();
 
-		return newUser;
+		await this.eventEmitter.emitAsync(
+			UserCreatedEvent.name,
+			new UserCreatedEvent(newUser),
+		);
+
+		const userEntity = plainToInstance(PrivateUserEntity, newUser, {
+			excludeExtraneousValues: true,
+			enableCircularCheck: true,
+		});
+
+		return userEntity;
 	}
 
 	async createOrUpdateUser({
 		orcid_id,
 		...data
-	}: ICreateOrUpdateUser): Promise<UserDocument> {
-		const exists = await this.userExists(orcid_id);
+	}: ICreateOrUpdateUser): Promise<PrivateUserEntity> {
+		const oldUser = await this.userRepository.findOne({ orcid_id });
 
 		// upsert user
-		const newUser = exists
-			? await this.userModel.findOneAndUpdate({ orcid_id }, data, { new: true })
+		const newUser = !!oldUser
+			? await this.updateUser(orcid_id, { $set: data })
 			: await this.createUser({ orcid_id, ...data });
 
-		await this.eventEmitter.emitAsync(
-			UserPrivacyUpdatedEvent.name,
-			new UserPrivacyUpdatedEvent(newUser, newUser.privacy),
-		);
+		if (oldUser?.privacy !== newUser.privacy) {
+			await this.eventEmitter.emitAsync(
+				UserPrivacyUpdatedEvent.name,
+				new UserPrivacyUpdatedEvent(newUser, newUser.privacy),
+			);
+		}
 
 		return newUser;
+	}
+
+	async addManagedResource(orcid_id: string, resource: ResourceDocument) {
+		return await this.updateUser(orcid_id, {
+			$push: {
+				resources: {
+					resource_id: resource.resource_id,
+					name: resource.resource_name,
+				},
+			},
+		});
 	}
 
 	async get_users_with_stats(params) {
 		const aggregation_pipeline = browse_v1_pipeline(params);
 
-		return await this.userModel.aggregate(aggregation_pipeline);
+		return await this.userRepository.aggregate(aggregation_pipeline);
 	}
 
 	async get_achievements(params) {
 		const pipeline = achievements_v1_pipeline(params);
 
-		return await this.userModel.aggregate(pipeline);
+		return await this.userRepository.aggregate(pipeline);
 	}
 
 	async count() {
-		return await this.userModel.count();
+		return await this.userRepository.count();
 	}
 
 	async getUserPrivacy(orcid_id: string): Promise<PrivacyType> {
-		const { privacy } = await this.userModel.findOne(
+		const { privacy } = await this.userRepository.findOne(
 			{ orcid_id },
 			{ privacy: 1 },
 		);
@@ -186,6 +245,50 @@ export class UsersService implements OnApplicationBootstrap {
 	}
 
 	async getUsers(filter: FilterQuery<UserDocument>): Promise<UserDocument[]> {
-		return await this.userModel.find(filter);
+		return await this.userRepository.find(filter);
+	}
+
+	async updateUserProfile(updates: UpdateProfileDto): Promise<UserDocument> {
+		const { orcid_id, email, ...otherUpdates } = updates;
+		const emailUpdateQuery = {};
+		const emailUpdateOptions = {};
+		if (email) {
+			const emailMatchedUser = await this.userRepository.findOne({
+				emails: { $elemMatch: { email: email.email } },
+			});
+			if (emailMatchedUser && emailMatchedUser.orcid_id != orcid_id) {
+				// email address belongs to another user
+				throw new UnauthorizedException(
+					'The provided email is already used by another user',
+				);
+			} else if (emailMatchedUser && emailMatchedUser.orcid_id == orcid_id) {
+				// User email updated
+				emailUpdateQuery['$set'] = { 'emails.$[elem]': email };
+				emailUpdateOptions['arrayFilters'] = [{ 'elem.email': email.email }];
+			} else if (!emailMatchedUser) {
+				// new email
+				emailUpdateQuery['$push'] = { emails: { ...email, verified: false } };
+			}
+		}
+		const updatedUser = await this.userRepository.findOneAndUpdate(
+			{
+				orcid_id,
+			},
+			{
+				...emailUpdateQuery,
+				...otherUpdates,
+			},
+			{
+				...emailUpdateOptions,
+				new: true,
+			},
+		);
+		if (otherUpdates.privacy) {
+			await this.eventEmitter.emitAsync(
+				UserPrivacyUpdatedEvent.name,
+				new UserPrivacyUpdatedEvent(updatedUser, otherUpdates.privacy),
+			);
+		}
+		return updatedUser;
 	}
 }

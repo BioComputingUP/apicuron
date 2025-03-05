@@ -1,9 +1,21 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IUserResourceEntity } from '../../interfaces/user-resource-entity';
 import { PrivacyType } from '../../enums';
-import { HydratedDocument, LeanDocument } from 'mongoose';
+import { HydratedDocument, LeanDocument, Types } from 'mongoose';
+import {
+	PartnerResource,
+	PartnerResourceSchema,
+} from '../resource/partner-resource.schema';
+import { LeagueSchema, League } from '../league/league.schema';
+import { UserSchema, User } from '../user.schema';
 
-export type MonthlyStatisticsDocument = HydratedDocument<MonthlyStatistics>;
+type MonthlyStatisticsDocumentOverride = {
+	user: (Types.Subdocument<Types.ObjectId> & User) | null;
+	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;
+	league_data: Types.Subdocument<Types.ObjectId> & League;
+}
+
+export type MonthlyStatisticsDocument = HydratedDocument<MonthlyStatistics, MonthlyStatisticsDocumentOverride>;
 export type LeanMonthlyStatisticsDocument =
 	LeanDocument<MonthlyStatisticsDocument>;
 
@@ -14,6 +26,15 @@ export type LeanMonthlyStatisticsDocument =
 export class MonthlyStatistics implements IUserResourceEntity {
 	@Prop({ required: true, type: String })
 	resource_id: string;
+
+	@Prop({ required: false, type: UserSchema })
+	user: (Types.Subdocument<Types.ObjectId> & User) | null;
+
+	@Prop({ required: true, type: PartnerResourceSchema })
+	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;
+
+	@Prop({ required: true, type: LeagueSchema })
+	league_data: Types.Subdocument<Types.ObjectId> & League;
 
 	@Prop({ required: true, type: String, enum: PrivacyType })
 	privacy: PrivacyType;

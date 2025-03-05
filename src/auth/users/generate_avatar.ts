@@ -7,8 +7,8 @@ import { unlink } from 'fs/promises';
 
 export async function generateAvatar(
 	username: string,
-	publicFolderPath: string,
-	publicUrlPath: string,
+	// publicFolderPath: string,
+	// publicUrlPath: string,
 ): Promise<string> {
 	const { createAvatar } = await import('@dicebear/core');
 	const { identicon } = await import('@dicebear/collection');
@@ -18,19 +18,21 @@ export async function generateAvatar(
 		radius: 50,
 	});
 
-	const filename = `${kebabCase(username)}-${uuid().split('-').shift()}.svg`;
+	return avatar.toString();
 
-	const avatarFilepath = join(publicFolderPath, 'users', filename);
+	// const filename = `${uuid()}.svg`;
 
-	await mkdir(dirname(avatarFilepath), { recursive: true });
+	// const avatarFilepath = join(publicFolderPath, 'users', filename);
 
-	if (existsSync(avatarFilepath)) {
-		await unlink(avatarFilepath);
-	}
+	// await mkdir(dirname(avatarFilepath), { recursive: true });
 
-	await avatar.toFile(avatarFilepath);
+	// if (existsSync(avatarFilepath)) {
+	// 	await unlink(avatarFilepath);
+	// }
 
-	return avatarFilepath
-		.replace(publicFolderPath, publicUrlPath)
-		.replace(/^\/+/, '');
+	// await avatar.toFile(avatarFilepath);
+
+	// return avatarFilepath
+	// 	.replace(publicFolderPath, publicUrlPath)
+	// 	.replace(/^\/+/, '');
 }

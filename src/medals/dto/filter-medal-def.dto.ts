@@ -4,6 +4,9 @@ import { ResourceIdExists } from '../../resources/partner-resources/validators/r
 import { Type } from 'class-transformer';
 import { MaxDateField, MinDateField } from '../validators/date-comparison';
 import { MedalUnique } from '../validators/achievement-exists';
+import { EntryExistsRule } from 'src/shared/validators/entry-exists.validator';
+import { AchievementDef } from 'src/core/schemas/achievements-def/achievement-def.schema';
+import { AchievementType } from 'src/core/enums';
 
 export class MedalDefFilter extends BasePaginationDto {
 	static create(obj: any) {
@@ -26,11 +29,20 @@ export class MedalDefFilter extends BasePaginationDto {
 
 	@IsOptional()
 	@IsString()
-	@Validate(MedalUnique)
+	@Validate(EntryExistsRule, [
+		AchievementDef.name,
+		({ name }) => {
+			return { name, type: AchievementType.medal };
+		},
+	])
 	name?: string;
 
 	@IsOptional()
 	@IsString()
 	@Validate(ResourceIdExists)
 	resource_id?: string;
+
+	@IsOptional()
+	@IsString()
+	search_query?: string;
 }

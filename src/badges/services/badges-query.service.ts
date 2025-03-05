@@ -18,7 +18,7 @@ export class BadgesQueryService {
 	constructor(
 		@InjectModel(Badge.name) protected badgeModel: Model<BadgeDocument>,
 		protected partnerResourceService: PartnerResourcesService,
-	) {}
+	) { }
 	logger = new Logger(BadgesQueryService.name);
 
 	async getBadges(
@@ -31,7 +31,7 @@ export class BadgesQueryService {
 
 		const [data, count] = await Promise.all([dataPromise, countPromise]);
 		return {
-			data: plainToInstance(BadgeDto, data, { excludeExtraneousValues: true }),
+			data,
 			count,
 		};
 	}
@@ -77,9 +77,7 @@ export class BadgesQueryService {
 
 		const [data, count] = await Promise.all([dataPromise, countPromise]);
 		return {
-			data: plainToInstance(PrivateBadgeDto, data, {
-				excludeExtraneousValues: true,
-			}),
+			data,
 			count,
 		};
 	}

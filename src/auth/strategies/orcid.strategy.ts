@@ -34,6 +34,7 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 			async function (accessToken, refreshToken, params, profile, done) {
 				const orcid_id: string = params.orcid;
 
+
 				// const user = { orcid_id, username: params.name };
 				// console.log({ params });
 				// const requestUrl = `${configService.get<string>('ORCID_API_URL')}${orcid_id}/record`

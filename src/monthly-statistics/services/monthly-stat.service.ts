@@ -9,7 +9,7 @@ import { MonthlyLeaderboardDto } from '../dto';
 import { getMonthEnd, getMonthStart, TIMEZONE } from '../../util/date.helper';
 import * as moment from 'moment';
 import { UsersService } from '../../auth/users/services/users.service';
-import { plainToInstance } from 'class-transformer';
+import { plainToClass, plainToInstance } from 'class-transformer';
 import { User } from '../../core/schemas/user.schema';
 import { BasePaginationDto } from '../../pagination/dto/paginate.dto';
 import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
@@ -21,7 +21,7 @@ export class MonthlyStatisticsService {
 		@InjectModel(MonthlyStatistics.name)
 		protected monthlyStatModel: Model<MonthlyStatisticsDocument>,
 		protected userService: UsersService,
-	) {}
+	) { }
 
 	async getLeaderboard(
 		resource_id: string,
@@ -48,22 +48,15 @@ export class MonthlyStatisticsService {
 			this.monthlyStatModel.count(filter),
 		]);
 
-		const orcid_ids = statistics.map((stat) => stat.curator_orcid);
-		const users = await this.userService.getUsersByOrcid(orcid_ids);
 
-		const statLeaderboard = statistics.map((stat, index) => {
-			const user = users[index];
-			const leaderboardEntry = plainToInstance(
-				MonthlyLeaderboardDto,
-				{ stat, user },
-				{ excludeExtraneousValues: true },
-			);
-
-			return leaderboardEntry;
-		});
+		const leaderboardEntries = statistics.map((stat) => ({
+			stat,
+			user: stat.user
+		}));
 
 		return paginate<MonthlyLeaderboardDto>(
-			statLeaderboard,
+			MonthlyLeaderboardDto,
+			leaderboardEntries,
 			paginationDto,
 			count,
 		);

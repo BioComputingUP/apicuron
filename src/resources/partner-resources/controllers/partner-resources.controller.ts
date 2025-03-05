@@ -12,12 +12,12 @@ import {
 	UseInterceptors,
 	InternalServerErrorException,
 	Logger,
+	SerializeOptions,
 } from '@nestjs/common';
 import { SvgSanitationValidationPipe } from '../../../shared/pipes/svg-sanitation.pipe';
 
 import { PartnerResourcesService } from '../services/partner-resources.service';
 import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
-import { UsersService } from '../../../auth/users/services/users.service';
 import { LocalAuthGuard } from '../../../auth/guards/local-auth.guard';
 import { HasAResourceGuard } from '../../../auth/guards/belongs-to-resource.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -36,13 +36,16 @@ import {
 } from '@nestjs/swagger';
 import { VersionHeader } from '../../../plugins/swagger/config';
 import {
-	PartnerResourceDto,
+	PartnerResourceEntity,
 	SelectPartnerResourceDto,
-} from '../../dto/partner-resources.dto';
+} from '../../dto/partner-resources.entity';
 import { AuthService } from '../../../auth/auth.service';
 import * as mv from 'mv';
 import { ResourceLogoValidationPipe } from '../../validators/logo-validation.pipe';
-import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
+import { PublicPartnerResourceDto } from '../../dto/public-partner-resource.dto';
+import { ApiResponseWrapped } from '../../../shared/decorators/wrapped-data-response.decorator';
+import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
 
 @ApiTags('Partner Resources')
 @ApiHeader(VersionHeader)
@@ -50,30 +53,44 @@ import { plainToClass } from 'class-transformer';
 export class PartnerResourcesController {
 	constructor(
 		private partnerResourceService: PartnerResourcesService,
-		private userService: UsersService,
 		private configService: ConfigService,
 		private authService: AuthService,
+		private storage: StorageService,
 	) {}
 
 	logger = new Logger(PartnerResourcesController.name);
 
-	@ApiOkResponse({
-		status: 200,
-		description: 'Returns a list of all the partner resources of APICURON',
-		type: [PartnerResourceDto],
-	})
+	@ApiResponseWrapped(
+		[PartnerResourceEntity],
+		200,
+		'Returns a list of all the partner resources of APICURON',
+	)
 	@ApiOperation({
 		summary: 'Get the list of all resources on APICURON',
 	})
+	@SerializeOptions({ type: PublicPartnerResourceDto })
 	@Get()
-	async list_resources(): Promise<PartnerResourceDto[]> {
-		return await this.partnerResourceService.get_resources();
+	async list_resources(): Promise<PublicPartnerResourceDto[]> {
+		const resources = await this.partnerResourceService.get_resources();
+
+		const resourceEntities = plainToInstance(
+			PublicPartnerResourceDto,
+			resources.map((r) => r.toObject()),
+			{
+				excludeExtraneousValues: true,
+				enableCircularCheck: true,
+			},
+		);
+
+		console.log(`Parsed Data ${resourceEntities.map((r) => r.resource_name)}`);
+
+		return resourceEntities;
 	}
 
 	// swagger documentation decorators
 	@ApiOkResponse({
 		description: 'The specified resource',
-		type: PartnerResourceDto,
+		type: PartnerResourceEntity,
 	})
 	@ApiOperation({
 		summary: 'Get information about a single resource',
@@ -81,13 +98,23 @@ export class PartnerResourcesController {
 	@ApiNotFoundResponse({
 		description: 'A 404 Not Found Response and Error Message',
 	})
+	@SerializeOptions({ type: PartnerResourceEntity })
 	@Get(':resource_id')
 	async get_resource(@Param() { resource_id }: SelectPartnerResourceDto) {
 		const resource = await this.partnerResourceService.get_resource(
 			resource_id,
 		);
 		if (resource) {
-			return plainToClass(PartnerResourceDto, resource.toObject());
+			try {
+				const data = plainToInstance(PartnerResourceEntity, resource, {
+					excludeExtraneousValues: true,
+					enableCircularCheck: true,
+				});
+				return data;
+			} catch (error) {
+				this.logger.error(`Failed to serialize resource ${resource_id}`);
+				throw new InternalServerErrorException();
+			}
 		} else {
 			throw new NotFoundException(`Resource (${resource_id}) Not Found`);
 		}
@@ -105,7 +132,7 @@ export class PartnerResourcesController {
 	})
 	@ApiOkResponse({
 		description: 'Returns an update confirmation Object',
-		type: PartnerResourceDto,
+		type: PartnerResourceEntity,
 	})
 	// nestjs logic decorators
 	@Put('')

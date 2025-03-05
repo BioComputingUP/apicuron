@@ -39,6 +39,6 @@ export class MedalsController {
 			filter.getMongoQueryOptions(),
 		);
 
-		return paginate<MedalDto>(data, filter, count);
+		return paginate<MedalDto>(MedalDto, data, filter, count);
 	}
 }

@@ -1,16 +1,31 @@
-import { FilterQuery, HydratedDocument, LeanDocument } from 'mongoose';
+import { FilterQuery, HydratedDocument, LeanDocument, Model } from 'mongoose';
 import { PrivacyType } from '../core/enums';
-import {
-	PartnerResource,
-	PartnerResourceDocument,
-} from '../core/schemas/resource/partner-resource.schema';
-import { User, UserDocument } from '../core/schemas/user.schema';
 import {
 	IResourceEntityDocument,
 	IUserResourceEntity,
 	IUserResourceEntityDocument,
 	LeanIResourceEntityDocument,
 } from '../core/interfaces/user-resource-entity';
+import {
+	Resource,
+	User,
+	UserDocument,
+	PartnerResource,
+	PartnerResourceDocument,
+	League,
+} from '../core/schemas';
+import { PrivateUserEntity, UserEntity } from 'src/auth/users/dto/user.entity';
+
+export type IUserLeagueEntity = {
+	resource_id: string;
+	curator_orcid: string;
+	league: string;
+	privacy: PrivacyType;
+	user?: User;
+	resource: Resource;
+	league_data: League;
+};
+export type IUserLeagueEntityDocument = HydratedDocument<IUserLeagueEntity>;
 
 /**
  * Computes the privacy field for a given resource entity based on the resource, related user, and user resource entity.
@@ -23,7 +38,7 @@ import {
  */
 export function computePrivacyField(
 	resource: PartnerResourceDocument | LeanDocument<PartnerResource>,
-	relatedUser: UserDocument | LeanDocument<User> | null,
+	relatedUser: UserDocument | LeanDocument<User> | null | PrivateUserEntity,
 	userResourceEntity:
 		| LeanDocument<IUserResourceEntity>
 		| HydratedDocument<IUserResourceEntity>
@@ -33,8 +48,10 @@ export function computePrivacyField(
 	const league = userResourceEntity.league ?? resource.defaultLeague;
 	userResourceEntity.league = league;
 
+	const resourceLeague = resource.leagues.find((l) => l.name === league);
+
 	// we retrieve both the league's privacy and the user's privacy setting
-	const leaguePrivacy = resource.getLeague(league).visibility;
+	const leaguePrivacy = resourceLeague.visibility;
 	const userPrivacy = relatedUser?.privacy ?? PrivacyType.private;
 
 	// if one of them happens to be private, the privacyType of the entity will be private
@@ -123,4 +140,68 @@ export function userResourceEntityPrivacyFilter(
 			},
 		],
 	};
+}
+
+/**
+ * Updates the privacy settings of user league entities based on the provided filter.
+ *
+ * This function performs two update operations:
+ * 1. Updates entities where either the user's privacy or the league data's visibility is set to private.
+ * 2. Updates entities where both the user's privacy and the league data's visibility are set to public.
+ *
+ * @param model - The Mongoose model representing the user league entity.
+ * @param filter - The filter query to select the entities to be updated.
+ * @returns A promise that resolves to an array containing the results of the two update operations.
+ */
+export async function updateUserAggregatePrivacy(
+	model: Model<IUserLeagueEntityDocument>,
+	filter: FilterQuery<IUserLeagueEntityDocument>,
+) {
+	const privateUpdate$ = await model.updateMany(
+		{
+			$and: [
+				{
+					$or: [
+						{
+							user: null,
+						},
+						{
+							user: { $exists: false },
+						},
+						{
+							'user.privacy': PrivacyType.private,
+						},
+						{
+							'league_data.visibility': PrivacyType.private,
+						},
+					],
+				},
+				filter,
+			],
+		},
+		{
+			$set: {
+				privacy: PrivacyType.private,
+			},
+		},
+	);
+
+	const publicUpdate$ = await model.updateMany(
+		{
+			$and: [
+				{
+					'user.privacy': PrivacyType.public,
+					'league_data.visibility': PrivacyType.public,
+				},
+				filter,
+			],
+		},
+		{
+			$set: {
+				privacy: PrivacyType.public,
+			},
+		},
+	);
+
+	return await Promise.all([privateUpdate$, publicUpdate$]);
 }

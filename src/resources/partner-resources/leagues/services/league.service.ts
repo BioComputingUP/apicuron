@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable} from '@nestjs/common';
 import { PartnerResourcesService } from '../../services/partner-resources.service';
 import { UpdateLeagueDto } from '../dto/update-league.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,7 +9,7 @@ import {
 import { Model } from 'mongoose';
 import { LeagueDocument } from '../../../../core/schemas/league/league.schema';
 import { plainToClass } from 'class-transformer';
-import { LeagueDto } from '../dto/league.dto';
+import { LeagueEntity } from '../dto/league.dto';
 import { LeagueUpdatedEvent } from '../events/league-updated.event';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CreateLeagueDto } from '../dto/create-league.dto';
@@ -86,14 +86,14 @@ export class LeagueService {
 		}
 	}
 
-	async updateLeague(leagueUpdate: UpdateLeagueDto): Promise<LeagueDto> {
+	async updateLeague(leagueUpdate: UpdateLeagueDto): Promise<LeagueEntity> {
 		const { resource, league, leagueIndex } = await this.validateLeagueSelector(
 			{
 				resource_id: leagueUpdate.resource_id,
 				league_name: leagueUpdate.name,
 			},
 		);
-		const oldValue = Object.assign({}, league);
+		const oldValue = league.$clone();
 
 		if (!!leagueUpdate.defaultMembers) {
 			const errors: BadRequestException[] = [];
@@ -118,7 +118,7 @@ export class LeagueService {
 
 		await resource.save();
 
-		const result = plainToClass(LeagueDto, resource.leagues[leagueIndex], {
+		const result = plainToClass(LeagueEntity, resource.leagues[leagueIndex], {
 			excludeExtraneousValues: true,
 			enableCircularCheck: true,
 		});
@@ -130,7 +130,6 @@ export class LeagueService {
 			resource.leagues[leagueIndex] as LeagueDocument,
 			leagueIndex,
 		);
-
 		await this.eventEmitter.emitAsync(LeagueUpdatedEvent.name, updateEvent);
 
 		return result;

@@ -1,6 +1,6 @@
 import { IsDate, IsNotEmpty, IsString } from 'class-validator';
 import { PrivacyType } from '../../core/enums';
-import { UserEntity } from '../../auth/users/dto/user';
+import { UserEntity } from '../../auth/users/dto/user.entity';
 import { Expose, Type } from 'class-transformer';
 
 export class MonthlyStatisticsDto {

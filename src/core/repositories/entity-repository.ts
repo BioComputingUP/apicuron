@@ -1,26 +1,66 @@
 import {
+	Aggregate,
+	AggregateOptions,
+	AnyObject,
 	Document,
 	FilterQuery,
+	HydratedDocument,
+	LeanDocument,
 	Model,
-	ObjectId,
+	ObjectId as ObjectIdType,
+	PipelineStage,
 	ProjectionType,
+	Query,
 	QueryOptions,
 	UpdateQuery,
 	UpdateWithAggregationPipeline,
 } from 'mongoose';
-import { DeleteResult, UpdateResult } from 'mongodb';
+import { DeleteResult, ObjectId, UpdateResult } from 'mongodb';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
 	EntityDeletedEvent,
-	MassEntityUpdated,
+	ManyEntityUpdated,
 	EntityUpdatedEvent,
+	EntityCreatedEvent,
 } from '../events';
+import { Logger } from '@nestjs/common';
 
 export abstract class EntityRepository<T extends Document> {
 	constructor(
 		protected readonly model: Model<T>,
 		protected readonly eventEmitter: EventEmitter2,
 	) {}
+
+	private static getRepository() {
+		return this;
+	}
+
+	private logger = new Logger(EntityRepository.name);
+
+	/**
+	 * Creates a new document instance of the model.
+	 *
+	 * @param doc - An optional partial document to initialize the new document with.
+	 * @param fields - Optional fields to include in the new document.
+	 * @param options - Optional settings for the document creation. Can be a boolean or an object.
+	 * @returns A new instance of the model.
+	 */
+	public newDocument(
+		doc?: Partial<LeanDocument<T>> | null,
+		fields?: any | null,
+		options?: boolean | AnyObject,
+	): T {
+		const instance = new this.model(doc, fields, options);
+
+		const ogSave = instance.save;
+
+		instance.save = async (...options): Promise<HydratedDocument<T>> => {
+			this.logger.warn(`Avoid using save method, perform query instead !`);
+			return await ogSave.call(instance, options);
+		};
+
+		return instance;
+	}
 
 	/**
 	 * Deletes a document from the database by its ID.
@@ -31,8 +71,14 @@ export abstract class EntityRepository<T extends Document> {
 	async deleteById(id: string): Promise<T> {
 		const doc = await this.model.findByIdAndDelete(id);
 
-		const event = new EntityDeletedEvent(this.model, id, doc, new Date());
-		this.eventEmitter.emit(event.name, event);
+		const event = new EntityDeletedEvent(
+			this.model,
+			Object.getPrototypeOf(this),
+			id,
+			doc,
+			new Date(),
+		);
+		await this.eventEmitter.emitAsync(event.eventName, event);
 		return doc;
 	}
 
@@ -50,11 +96,12 @@ export abstract class EntityRepository<T extends Document> {
 		const doc = await this.model.findOneAndDelete(filter, options);
 		const event = new EntityDeletedEvent(
 			this.model,
+			Object.getPrototypeOf(this),
 			doc._id.toString(),
 			doc,
 			new Date(),
 		);
-		this.eventEmitter.emit(event.name, event);
+		this.eventEmitter.emit(event.eventName, event);
 		return doc;
 	}
 
@@ -86,9 +133,23 @@ export abstract class EntityRepository<T extends Document> {
 		options?: QueryOptions<T>,
 	): Promise<UpdateResult> {
 		const result = await this.model.updateMany(filter, update, options);
-		const event = new MassEntityUpdated(this.model, filter, update, new Date());
-		this.eventEmitter.emit(event.name, event);
+		const event = new ManyEntityUpdated(
+			this.model,
+			Object.getPrototypeOf(this),
+			filter,
+			update,
+			new Date(),
+		);
+		this.eventEmitter.emit(event.eventName, event);
 		return result;
+	}
+
+	async findOneAndUpdate(
+		filter: FilterQuery<T>,
+		update: UpdateQuery<T>,
+		options: QueryOptions<T> = {},
+	) {
+		return await this.updateOne(filter, update, options);
 	}
 
 	/**
@@ -102,21 +163,32 @@ export abstract class EntityRepository<T extends Document> {
 	async updateOne(
 		filter: FilterQuery<T>,
 		update: UpdateQuery<T>,
-		options?: QueryOptions<T>,
-	): Promise<UpdateResult | T> {
-		const before = await this.model.findOne(filter, options);
-		const result = await this.model.findOneAndUpdate(filter, update, {
-			...options,
-			new: true,
-		});
+		options: QueryOptions<T> = {},
+	): Promise<T | null> {
+		const before = await this.model.findOne(filter, null, options);
+		if (!before) {
+			return null;
+		}
+		const updateQuery$ = this.model.findOneAndUpdate(
+			{ ...filter, __v: before.__v },
+			update,
+			{
+				...options,
+				new: true,
+			},
+		);
+
+		const result = await updateQuery$;
 		const event = new EntityUpdatedEvent(
 			this.model,
+			this.constructor as typeof EntityRepository,
 			before._id.toString(),
 			before,
 			result,
 			new Date(),
 		);
-		this.eventEmitter.emit(event.name, event);
+		this.logger.debug(`Emitting ${event.eventName}`);
+		await this.eventEmitter.emitAsync(event.eventName, event);
 
 		return result;
 	}
@@ -130,26 +202,13 @@ export abstract class EntityRepository<T extends Document> {
 	 * @returns A Promise that resolves to the updated document.
 	 */
 	async findByIdAndUpdate(
-		id: string | ObjectId,
+		id: string | ObjectIdType,
 		update: UpdateQuery<T>,
 		options?: QueryOptions<T>,
 	) {
-		const before = await this.model.findById(id);
-		const doc = await this.model.findByIdAndUpdate(id, update, {
-			...options,
-			new: true,
-		});
-		const event = new EntityUpdatedEvent(
-			this.model,
-			id.toString(),
-			before,
-			doc,
-			new Date(),
-		);
+		const filter = { _id: typeof id === 'string' ? new ObjectId(id) : id };
 
-		this.eventEmitter.emit(event.name, event);
-
-		return doc;
+		return await this.updateOne(filter, update, options);
 	}
 
 	/**
@@ -167,14 +226,19 @@ export abstract class EntityRepository<T extends Document> {
 	 * @param filter - The filter query to apply when searching for documents.
 	 * @param projection - The optional projection to apply when retrieving the documents.
 	 * @param options - The optional query options to customize the search behavior.
-	 * @returns A promise that resolves to an array of documents or a single document.
+	 * @returns A promise that resolves to an array of documents
 	 */
-	async find(
+	find(
 		filter: FilterQuery<T>,
 		projection?: ProjectionType<T>,
 		options?: QueryOptions<T>,
-	): Promise<T[] | T> {
-		return await this.model.find(filter, projection, options);
+	): Query<
+		HydratedDocument<T, any, any>[],
+		HydratedDocument<T, any, any>,
+		any,
+		T
+	> {
+		return this.model.find(filter, projection, options);
 	}
 
 	/**
@@ -207,12 +271,17 @@ export abstract class EntityRepository<T extends Document> {
 	 * @param options - The optional query options.
 	 * @returns A promise that resolves to the found document, or null if no document matches the filter.
 	 */
-	async findOne(
+	findOne(
 		filter: FilterQuery<T>,
 		projection?: ProjectionType<T>,
 		options?: QueryOptions<T>,
-	): Promise<T> {
-		return await this.model.findOne(filter, projection, options);
+	): Query<
+		HydratedDocument<T, any, any>,
+		HydratedDocument<T, any, any>,
+		any,
+		T
+	> {
+		return this.model.findOne(filter, projection, options);
 	}
 
 	/**
@@ -222,11 +291,8 @@ export abstract class EntityRepository<T extends Document> {
 	 * @param options - Optional query options.
 	 * @returns A promise that resolves to the number of matching documents.
 	 */
-	async count(
-		filter: FilterQuery<T>,
-		options?: QueryOptions<T>,
-	): Promise<number> {
-		return await this.model.countDocuments(filter, options);
+	async count(filter: FilterQuery<T> = {}): Promise<number> {
+		return await this.model.count(filter);
 	}
 
 	/**
@@ -236,5 +302,19 @@ export abstract class EntityRepository<T extends Document> {
 	 */
 	async create(entity: T): Promise<T> {
 		return this.model.create(entity);
+	}
+
+	/**
+	 * Executes an aggregation framework pipeline on the model's collection.
+	 *
+	 * @param pipeline - An array of aggregation pipeline stages to be executed.
+	 * @param options - Optional settings for the aggregation operation.
+	 * @returns A promise that resolves to the aggregation result.
+	 */
+	aggregate<R = unknown>(
+		pipeline: PipelineStage[],
+		options?: AggregateOptions,
+	): Aggregate<R[]> {
+		return this.model.aggregate<R>(pipeline, options);
 	}
 }

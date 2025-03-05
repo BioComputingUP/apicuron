@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, SchemaTypes, Types } from 'mongoose';
-import { Report } from './reports.schema';
+import { HydratedDocument, Types } from 'mongoose';
 
 import { PrivacyType } from '../enums';
 import { UserResource } from '../interfaces/user-resource';
@@ -9,14 +8,24 @@ import {
 	UserEmailEntry,
 	UserEmailEntrySchema,
 } from './components/user-email.schema';
-import { UserEmployment } from '../interfaces/user-employment';
-export type UserDocument = HydratedDocument<User>;
+import { UserEmploymentSchema, UserLinks, UserLinksSchema } from "./components/user-fields.schema";
+import { UserEmployment } from "./components/user-fields.schema";
+
+export type UserDocumentOvrride = {
+	emails: Types.DocumentArray<UserEmailEntry>;
+	employment: Types.DocumentArray<UserEmployment>;
+	links:  Types.DocumentArray<UserLinks>;
+};
+
+export type UserDocument = HydratedDocument<User, UserDocumentOvrride>;
+
 
 @Schema({
 	collection: 'users',
 	toJSON: {
 		virtuals: true,
 	},
+	optimisticConcurrency: true,
 })
 export class User {
 	@Prop({
@@ -44,14 +53,15 @@ export class User {
 		default: [],
 		required: true,
 	})
-	emails: UserEmailEntry[];
+	emails: Types.DocumentArray<UserEmailEntry>;
 
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop({
 		required: false,
+		type: [UserEmploymentSchema],
 		default: () => [],
 	})
-	employment?: UserEmployment[] = [];
+	employment: Types.DocumentArray<UserEmployment>;
 
 	@Prop()
 	family_name?: string;
@@ -75,18 +85,16 @@ export class User {
 
 	@Prop({
 		required: false,
-		default: "No affiliation",
+		default: 'No affiliation',
 	})
 	affiliation?: string;
 
 	@Prop({
 		required: false,
-		type: Object
+		type: [UserLinksSchema],
+		default: () => [],
 	})
-	links:{
-		name: string,
-		url: URL
-	}
+	links: Types.DocumentArray<UserLinks>;
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop({
 		required: false,
@@ -94,7 +102,7 @@ export class User {
 		type: [String],
 	})
 	keywords?: string[];
-	
+
 	@Prop({
 		default: Date.now(),
 		type: Date,
@@ -107,7 +115,7 @@ export class User {
 	@Prop()
 	username: string;
 
-	@Prop({ required: true, unique: true })
+	@Prop({ required: true })
 	orcid_id: string;
 
 	@Prop({
@@ -150,6 +158,15 @@ export class User {
 	})
 	privacy: PrivacyType;
 
+	@Prop({ default: true })
+	isNewLogin?: boolean;
+
+	@Prop({ required: false, default: Date.now() })
+	lastLoginDate?: Date;
+
+	@Prop({ required: false, default: false })
+	acceptsEmails?: boolean;
+
 	hasResourcePutCode(resource_id: string): boolean {
 		return (
 			this.orcid_work_put_codes.findIndex(
@@ -178,14 +195,16 @@ export class User {
 	}
 }
 
-const UserSchema = SchemaFactory.createForClass(User).loadClass(User);
+export const UserSchema = SchemaFactory.createForClass(User).loadClass(User);
 
-UserSchema.loadClass(User);
+export function userCollectionSchemaFactory() {
+	const UserCollectionSchema =
+		SchemaFactory.createForClass(User).loadClass(User);
 
-UserSchema.virtual('reports', {
-	ref: Report.name,
-	localField: 'orcid_id',
-	foreignField: 'curator_orcid',
-});
+	UserCollectionSchema.index(
+		{ orcid_id: 1 },
+		{ unique: true, name: 'unique_users' },
+	);
 
-export { UserSchema };
+	return UserCollectionSchema;
+}

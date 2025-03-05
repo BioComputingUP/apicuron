@@ -4,7 +4,7 @@ import { ManyReportsSubmittedHandler } from './handlers/many-reports-submitted.h
 import { ReportSubmittedEventHandler } from './handlers/report-submitted.handler';
 import { ResourceReportsDeletedHandler } from './handlers/resource-reports-deleted.handler';
 import { TermDeletedEventHandler } from './handlers/term-deleted.handler';
-import { UserPrivacyUpdatedEventHandler } from './handlers/user-privacy-updated.handler';
+import { UserUpdatedEventHandler } from './handlers/user-updated.handler';
 import { TermUpdatedEventHandler } from './handlers/term-updated.handler';
 import { InitializationService } from './services/initialization.service';
 import { BulkReportSubmissionHandler } from './handlers/bulk-submission.handler';
@@ -12,7 +12,6 @@ import { DeleteLeagueHandler } from './handlers/delete-league.handler';
 import { AggregatorManager } from './services/aggregator-manager.service';
 import { DiscoveryModule } from '@nestjs/core';
 import { AggregatorLoader } from './services/aggregator-loader.service';
-import { BaseAggregatorRunner } from './aggregator-runners/base.runner';
 import { SubmissionRunner } from './aggregator-runners/bulk-submission.runner';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { LeagueUpdatedHandler } from './handlers/league-updated.handler';
@@ -26,13 +25,12 @@ import { LeagueUpdatedHandler } from './handlers/league-updated.handler';
 		ReportSubmittedEventHandler,
 		BulkReportSubmissionHandler,
 		ResourceReportsDeletedHandler,
-		UserPrivacyUpdatedEventHandler,
+		UserUpdatedEventHandler,
 		TermUpdatedEventHandler,
 		TermDeletedEventHandler,
 		DeleteLeagueHandler,
 		AggregatorLoader,
 		AggregatorManager,
-		BaseAggregatorRunner,
 		SubmissionRunner,
 	],
 	exports: [],

@@ -17,7 +17,7 @@ import { UniqueRule } from '../../../../shared/validators/unique.validator';
 import { OrcidChecksum } from '../../../../submit-reports/validators/orcid-checksum';
 import { Expose } from 'class-transformer';
 
-export class LeagueDto {
+export class LeagueEntity {
 	@Validate(OrcidChecksum, { each: true })
 	@IsString({ each: true })
 	@IsArray()

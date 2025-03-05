@@ -1,10 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { LeanDocument, Model, SortOrder } from 'mongoose';
+import { LeanDocument, Model } from 'mongoose';
 import { UpdateResult } from 'mongodb';
 import { ResourceStatsDocument } from '../../core/schemas/resource/resource-stats.schema';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { User, UserDocument } from '../../core/schemas/user.schema';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
@@ -15,9 +14,9 @@ export class ComputeResourceStatsService {
 		@InjectModel(PartnerResource.name)
 		protected resourceModel: Model<PartnerResourceDocument>,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 	) {}
 
+	logger = new Logger(ComputeResourceStatsService.name);
 	bufferThreshold = 50 as const;
 
 	async getFirstOrLastSubmissionDate(
@@ -88,7 +87,9 @@ export class ComputeResourceStatsService {
 			uniqueContributors: uniqueContributors,
 		};
 
-		return await this.setResourceStats(stats);
+		const update = await this.setResourceStats(stats);
+		this.logger.log(`Updated stats for resource ${resource_id}`);
+		return update;
 	}
 
 	async setResourceStats(

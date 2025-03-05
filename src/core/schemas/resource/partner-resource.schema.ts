@@ -1,12 +1,18 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { PrivacyType } from '../../enums';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { AchievementDef } from '../achievements-def/achievement-def.schema';
 import { Term } from '../terms.schema';
 import { League, LeagueSchema } from '../league/league.schema';
 import { ResourceStats, ResourceStatsSchema } from './resource-stats.schema';
 
-export type PartnerResourceDocument = HydratedDocument<PartnerResource>;
+type PartnerResourceDocumentOverride = {
+	leagues: Types.DocumentArray<League>;
+	stats: Types.Subdocument<Types.ObjectId> & ResourceStats;
+}
+
+
+export type PartnerResourceDocument = HydratedDocument<PartnerResource, PartnerResourceDocumentOverride>;
 
 // this class defines a partnerResource that has been validated and has the ability to have Models, Badges and so on
 
@@ -15,19 +21,19 @@ export class PartnerResource {
 	@Prop()
 	resource_description: string;
 
-	@Prop({ required: true, unique: true })
+	@Prop({ required: true })
 	resource_id: string;
 
 	@Prop()
 	resource_long_name: string;
 
-	@Prop({ required: true, unique: true })
+	@Prop({ required: true })
 	resource_name: string;
 
-	@Prop({ required: true, unique: true })
+	@Prop({ required: true })
 	resource_uri: string;
 
-	@Prop({ required: true, unique: true })
+	@Prop({ required: true })
 	resource_url: string;
 
 	@Prop({ required: false })
@@ -53,7 +59,7 @@ export class PartnerResource {
 			];
 		},
 	})
-	leagues: League[];
+	leagues: Types.DocumentArray<League>;
 
 	@Prop({
 		required: true,
@@ -64,16 +70,27 @@ export class PartnerResource {
 
 	@Prop({
 		type: ResourceStatsSchema,
-		required: false,
+		required: true,
+		default: (val) => ({ resource_id: val.resource_id }),
 	})
-	stats?: ResourceStats;
+	stats: Types.Subdocument<Types.ObjectId> & ResourceStats;
 
 	@Prop({ required: true, type: Date })
 	joined_date: Date;
 
+	@Prop({
+		type: [String],
+		default: ['https://identifiers.org', 'https://doi.org'],
+		required: true,
+	})
+	allowedUrlsPrefix: string[];
+
 	getLeague(leagueName: string) {
 		return this.leagues.find((league: League) => league.name == leagueName);
 	}
+
+	created_at: Date;
+	updated_at: Date;
 }
 const PartnerResourceSchema =
 	SchemaFactory.createForClass(PartnerResource).loadClass(PartnerResource);
@@ -82,6 +99,23 @@ export class ResourceSummary extends PartnerResource {
 	badges: AchievementDef[];
 	medals: AchievementDef[];
 	terms: Term[];
+}
+
+export function PartnerResourceSchemaFactory() {
+	const ResourceSchema =
+		SchemaFactory.createForClass(PartnerResource).loadClass(PartnerResource);
+
+	ResourceSchema.index(
+		{
+			resource_id: 1,
+			resource_name: 1,
+			resource_uri: 1,
+			resource_url: 1,
+		},
+		{ unique: true, name: 'unique_resource' },
+	);
+
+	return ResourceSchema;
 }
 
 export { PartnerResourceSchema };

@@ -26,10 +26,10 @@ export function getMatchingReportFilter(
 		activity_term: { $in: badgeDef.list_terms },
 	};
 
-	if (badgeDef.startDate) {
+	if (!!badgeDef.startDate) {
 		filter.timestamp = { $gte: badgeDef.startDate, ...filter.timestamp };
 	}
-	if (badgeDef.endDate) {
+	if (!!badgeDef.endDate) {
 		filter.timestamp = { $lte: badgeDef.endDate, ...filter.timestamp };
 	}
 	return filter;

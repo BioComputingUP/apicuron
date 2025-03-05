@@ -91,17 +91,19 @@ export class SubmitReportService {
 		options = { preventEvents: false },
 	): Promise<{ report: ReportDocument; callback?: () => any | Promise<any> }> {
 		try {
-			const { resource, user, term, report } =
+			const { resource, user, term, report, league_data } =
 				await this.reportValidator.validateReport(submittedReport);
 			await report.save();
 
 			const emitEvent = async () => {
-				await this.eventEmitter.emitAsync(ReportSubmittedEvent, {
+				const payload: IReportSubmittedEventPayload = {
 					report: report,
 					user,
 					resource,
 					term,
-				} as IReportSubmittedEventPayload);
+					league_data,
+				};
+				await this.eventEmitter.emitAsync(ReportSubmittedEvent, payload);
 			};
 			if (!options.preventEvents) {
 				await emitEvent();
@@ -183,11 +185,7 @@ export class SubmitReportService {
 			if (err instanceof MongoServerError && err.code === 11000) {
 				this.logger.error(`Attempt at duplicate report insertion`);
 				// Duplicate key error, return 403
-				const error = new Error(`Duplicate report submission attempt`);
-				throw new BadRequestException('Duplicate report submission attempt', {
-					cause: error,
-					description: error.message,
-				});
+				throw err;
 			}
 			if (err instanceof BadRequestException) {
 				throw err;

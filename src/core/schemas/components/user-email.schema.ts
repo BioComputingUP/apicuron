@@ -1,14 +1,17 @@
+import { VisibilityType } from 'src/core/enums';
 import { IUserEmailEntry } from '../../../auth/users/interfaces/user.interface';
 import { OrcidEmailEntry } from '../../../orcid/orcid-client/interfaces/orcid.interface';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-@Schema()
+@Schema({
+	_id: false,
+})
 export class UserEmailEntry implements OrcidEmailEntry, IUserEmailEntry {
 	@Prop({
 		required: true,
-		default: 'limited',
+		default: VisibilityType.limited,
 	})
-	visibility: string;
+	visibility: VisibilityType;
 
 	@Prop({
 		required: true,

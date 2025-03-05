@@ -17,6 +17,8 @@ import {
 	MonthlyStatisticsDocument,
 } from '../../core/schemas/statistics/monthly-statistics.schema';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
+import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { updateUserAggregatePrivacy } from '../../util/privacy.helper';
 
 @Injectable()
 @AggregatorClass()
@@ -28,23 +30,29 @@ export class MonthlyStatisticsAggregator implements Aggregator {
 	) {}
 
 	async updatedLeague(leagueUpdated: LeagueUpdatedEvent): Promise<number> {
-		if (!leagueUpdated.privacyChanged()) {
-			return;
-		}
-
-		const newPrivacy = leagueUpdated.newValue.visibility;
 		const filter = {
 			resource_id: leagueUpdated.resource.resource_id,
 			league: leagueUpdated.newValue.name,
 		};
-
-		const statUpdate = await this.monthlyStatsModel.updateMany(filter, {
+		const update = await this.monthlyStatsModel.updateMany(filter, {
 			$set: {
-				privacy: newPrivacy,
+				league_data: leagueUpdated.newValue,
 			},
 		});
 
-		return statUpdate.modifiedCount;
+		if (!leagueUpdated.privacyChanged()) {
+			return update.modifiedCount;
+		}
+
+		const updates = await updateUserAggregatePrivacy(
+			this.monthlyStatsModel,
+			filter,
+		);
+
+		return (
+			updates.reduce((acc, cur) => acc + cur.modifiedCount, 0) +
+			update.modifiedCount
+		);
 	}
 	async applyReport(
 		report: LeanReportDocument | ReportDocument,
@@ -60,17 +68,30 @@ export class MonthlyStatisticsAggregator implements Aggregator {
 	async removeAllResourceAggregates(resource_id: string) {
 		await this.computeMonthlyStats.deleteStats({ resource_id });
 	}
-	async updateUserPrivacy(curator_orcid: string, privacy: PrivacyType) {
-		return await this.monthlyStatsModel.updateMany(
+	async updatedUser(
+		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
+	) {
+		let user: UserDocument;
+		if (event instanceof EntityCreatedEvent) {
+			user = event.instance;
+		}
+		if (event instanceof EntityUpdatedEvent) {
+			user = event.after;
+		}
+		await this.monthlyStatsModel.updateMany(
 			{
-				curator_orcid,
+				curator_orcid: user.orcid_id,
 			},
 			{
 				$set: {
-					privacy,
+					user,
 				},
 			},
 		);
+
+		await updateUserAggregatePrivacy(this.monthlyStatsModel, {
+			curator_orcid: user.orcid_id,
+		});
 	}
 	async deleteLeague(resource_id: string, league: string): Promise<number> {
 		const result = await this.computeMonthlyStats.deleteStats({

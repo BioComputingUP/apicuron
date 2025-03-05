@@ -1,16 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, LeanDocument, Model } from 'mongoose';
+import { FilterQuery, LeanDocument, Model, Types } from 'mongoose';
 import { PartnerResourceDocument } from '../../../core/schemas/resource/partner-resource.schema';
 import { PartnerResource } from '../../../core/schemas/resource/partner-resource.schema';
 import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
-import { League } from '../../../core/schemas/league/league.schema';
-import { CreateLeagueDto } from '../leagues/dto/create-league.dto';
+import { League, LeagueDocument } from '../../../core/schemas/league/league.schema';
 import { AddMemberToLeague } from '../leagues/dto/add-member-to-league.dto';
 import { DeleteLeagueDTO } from '../leagues/dto/delete-league.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { LeagueDeletedEvent } from '../leagues/events/league-deleted-event';
 import _ from 'lodash';
+import { PartnerResourceUpdatedEvent } from '../events/resource-updated.event';
+import { PartnerResourceEntity } from '../../dto/partner-resources.entity';
+import { plainToInstance } from 'class-transformer';
+import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
 
 @Injectable()
 export class PartnerResourcesService {
@@ -18,11 +21,19 @@ export class PartnerResourcesService {
 		@InjectModel(PartnerResource.name)
 		private partnerResourceModel: Model<PartnerResourceDocument>, // protected transformService: TransformerService
 		protected eventEmitter: EventEmitter2,
-	) {}
+		protected storage: StorageService,
+	) { }
+
+	logger = new Logger(PartnerResourcesService.name);
 	async get_resources(
 		filter: FilterQuery<PartnerResourceDocument> = {},
 	): Promise<PartnerResourceDocument[]> {
-		return await this.partnerResourceModel.find(filter);
+		const resources = await this.partnerResourceModel.find(filter).sort({
+			'stats.contributionCount': -1,
+			'stats.uniqueContributors': -1,
+		});
+
+		return resources;
 	}
 
 	async addMemberToLeague(addMemberToLeague: AddMemberToLeague) {
@@ -119,7 +130,8 @@ export class PartnerResourcesService {
 	}
 
 	async get_resource(resource_id: string): Promise<PartnerResourceDocument> {
-		return await this.partnerResourceModel.findOne({ resource_id });
+		const doc = await this.partnerResourceModel.findOne({ resource_id });
+		return doc;
 	}
 
 	async exists(resource_id: string): Promise<boolean> {
@@ -131,17 +143,29 @@ export class PartnerResourcesService {
 	) {
 		const { resource_id } = resource_update;
 
-		return await this.partnerResourceModel.updateOne(
+		const resource = await this.get_resource(resource_id);
+
+		// const update = await resource.update({ $set: resource_update });
+
+		const newResource = await this.partnerResourceModel.findOneAndUpdate(
 			{ resource_id },
-			resource_update,
+			{ $set: resource_update },
+			{ new: true },
 		);
+
+		await this.eventEmitter.emitAsync(
+			PartnerResourceUpdatedEvent.name,
+			new PartnerResourceUpdatedEvent(resource, newResource),
+		);
+
+		return newResource;
 	}
 
 	public getResourceLeagues(
-		resource: PartnerResourceDocument | LeanDocument<PartnerResource>,
-	): [PartnerResourceDocument | LeanDocument<PartnerResource>, League][] {
-		return resource.leagues.map((league) => {
-			return [resource, league];
+		resource: PartnerResourceDocument | LeanDocument<PartnerResourceDocument>,
+	): [PartnerResourceDocument | LeanDocument<PartnerResourceDocument>, LeanDocument<LeagueDocument>][] {
+		return resource.leagues.map((league: Types.Subdocument<Types.ObjectId> & League): [PartnerResourceDocument | LeanDocument<PartnerResourceDocument>, LeanDocument<LeagueDocument>] => {
+			return [resource, league.toObject()];
 		});
 	}
 

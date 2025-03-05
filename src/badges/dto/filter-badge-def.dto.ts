@@ -42,4 +42,8 @@ export class BadgeDefFilter extends BasePaginationDto {
 	@IsString()
 	@IsOptional()
 	league: string;
+
+	@IsString()
+	@IsOptional()
+	search_query?: string;
 }

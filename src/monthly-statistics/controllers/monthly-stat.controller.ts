@@ -4,6 +4,7 @@ import {
 	NotFoundException,
 	Param,
 	Query,
+	SerializeOptions,
 } from '@nestjs/common';
 import { VersionHeader } from '../../plugins/swagger/config';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -42,6 +43,7 @@ export class MonthlyStatisticsController {
 	@AuthProtected()
 	@Public()
 	@Get(':resource_id/leaderboard')
+	@SerializeOptions({ type: Paginated<MonthlyLeaderboardDto> })
 	async getWeeklyLeaderboard(
 		@Param('resource_id') resource_id: string,
 		@Query() pagination: BasePaginationDto,

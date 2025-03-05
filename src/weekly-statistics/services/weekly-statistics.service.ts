@@ -4,15 +4,15 @@ import {
 	WeeklyStatistics,
 	WeeklyStatisticsDocument,
 } from '../../core/schemas/statistics/weekly-statistics.schema';
-import { FilterQuery, Model, QueryOptions } from 'mongoose';
+import { FilterQuery, LeanDocument, Model, QueryOptions } from 'mongoose';
 import { plainToInstance } from 'class-transformer';
 import {
-	WeeklyLeaderboardDto,
-	WeeklyStatisticsDto,
+	WeeklyStatisticsDto
 } from '../dto/weekly-statistics.dto';
 import { UsersService } from '../../auth/users/services/users.service';
 import * as moment from 'moment-timezone';
 import { getWeekEnd, getWeekStart, TIMEZONE } from '../../util/date.helper';
+import { UserDocument } from 'src/core/schemas';
 
 @Injectable()
 export class WeeklyStatisticsService {
@@ -20,7 +20,7 @@ export class WeeklyStatisticsService {
 		@InjectModel(WeeklyStatistics.name)
 		protected WeeklyStatistics: Model<WeeklyStatisticsDocument>,
 		protected userService: UsersService,
-	) {}
+	) { }
 
 	async getUserWeeklyStatistics(
 		filter: FilterQuery<WeeklyStatisticsDocument> = {},
@@ -33,7 +33,7 @@ export class WeeklyStatisticsService {
 	async getWeeklyLeaderboard(
 		filter: FilterQuery<WeeklyStatisticsDocument> = {},
 		queryOptions: QueryOptions,
-	): Promise<{ data: WeeklyLeaderboardDto[]; count: number }> {
+	): Promise<{ data: { stat: LeanDocument<WeeklyStatisticsDocument>, user: LeanDocument<UserDocument> }[]; count: number }> {
 		const statFilter = {
 			$and: [
 				filter,
@@ -56,11 +56,7 @@ export class WeeklyStatisticsService {
 
 		const statLeaderboard = statistics.map((stat, index) => {
 			const user = users[index];
-			const leaderboardEntry = plainToInstance(
-				WeeklyLeaderboardDto,
-				{ stat, user },
-				{ excludeExtraneousValues: true },
-			);
+			const leaderboardEntry = { stat: stat.toObject(), user: user.toObject() };
 
 			return leaderboardEntry;
 		});

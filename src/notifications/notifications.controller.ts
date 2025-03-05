@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Delete, Param, Query } from '@nestjs/common';
+import { Controller, Get, Req, Delete, Param, Query, SerializeOptions } from '@nestjs/common';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import mongoose from 'mongoose';
 import { VersionHeader } from '../plugins/swagger/config';
@@ -7,6 +7,8 @@ import { UserReq } from '../auth/decorators/applyUser.decorator';
 import { User as UserModel } from '../core/schemas/user.schema';
 import { NotificationFilter } from './dto/notification-filter.dto';
 import { AuthProtected } from '../auth/decorators/auth.decorator';
+import { NotificationEntity } from './dto/notification.entity';
+import { Paginated } from '../pagination/paginator';
 
 @ApiTags('Notifications')
 @ApiHeader(VersionHeader)
@@ -21,6 +23,7 @@ export class NotificationsController {
 		description: 'Get the list of notifications for the loggedIn User',
 	})
 	@Get()
+	@SerializeOptions({ type: Paginated<NotificationEntity>})
 	@AuthProtected()
 	async getNotifications(
 		@UserReq() user: UserModel,

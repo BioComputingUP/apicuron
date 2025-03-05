@@ -13,5 +13,6 @@ export class TermUpdatedEvent {
 	constructor(
 		public readonly oldTerm: TermDocument,
 		public readonly newTerm: TermDocument,
+		public readonly date: Date = new Date(),
 	) {}
 }

@@ -61,7 +61,7 @@ export class ResourceStatsAggregatorService implements Aggregator {
 	async removeAllResourceAggregates(resource_id: string) {
 		await this.computeStats.computeResourceStats(resource_id);
 	}
-	updateUserPrivacy() {
+	updatedUser() {
 		return null;
 	}
 

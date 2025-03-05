@@ -12,14 +12,14 @@ import {
 	WeeklyStatisticsDocument,
 } from '../../core/schemas/statistics/weekly-statistics.schema';
 import { ComputeWeeklyStatisticsService } from './compute-weekly-statistics.service';
-import { PrivacyType } from '../../core/enums';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { computeAggregatePrivacyField } from '../../util/privacy.helper';
+import { updateUserAggregatePrivacy } from '../../util/privacy.helper';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { TermDocument } from '../../core/schemas/terms.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
+import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 
 @Injectable()
 @AggregatorClass()
@@ -32,23 +32,29 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 	) {}
 
 	async updatedLeague(leagueUpdated: LeagueUpdatedEvent): Promise<number> {
-		if (!leagueUpdated.privacyChanged()) {
-			return;
-		}
-
-		const newPrivacy = leagueUpdated.newValue.visibility;
 		const filter = {
 			resource_id: leagueUpdated.resource.resource_id,
 			league: leagueUpdated.newValue.name,
 		};
-
 		const statUpdate = await this.weeklyStatModel.updateMany(filter, {
 			$set: {
-				privacy: newPrivacy,
+				league_data: leagueUpdated.newValue,
 			},
 		});
 
-		return statUpdate.modifiedCount;
+		if (!leagueUpdated.privacyChanged()) {
+			return statUpdate.modifiedCount;
+		}
+
+		const updates = await updateUserAggregatePrivacy(
+			this.weeklyStatModel,
+			filter,
+		);
+
+		return (
+			updates.reduce((acc, cur) => acc + cur.modifiedCount, 0) +
+			statUpdate.modifiedCount
+		);
 	}
 
 	async termDeleted(term: TermDocument) {
@@ -77,49 +83,24 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 		return deleted.deletedCount;
 	}
 
-	async updateUserPrivacy(curator_orcid: string, privacy: PrivacyType) {
-		await this.weeklyStatModel.updateMany(
-			{
-				privacy: PrivacyType.public,
-				curator_orcid,
-			},
-			{
-				$set: { privacy },
-			},
-		);
-
-		const resource_ids = await this.weeklyStatModel.distinct('resource_id', {
-			curator_orcid,
-		});
-
-		const resources = await this.resourceService.get_resources({
-			resource_id: { $in: resource_ids },
-		});
-
-		const updates$ = [];
-
-		for (const resource of resources) {
-			for (const league of resource.leagues) {
-				const update$ = this.weeklyStatModel.updateMany(
-					{
-						curator_orcid,
-						resource_id: resource.resource_id,
-						league: league.name,
-					},
-					{
-						$set: {
-							privacy: computeAggregatePrivacyField(
-								{ privacy: league.visibility },
-								{ privacy },
-							),
-						},
-					},
-				);
-				updates$.push(update$);
-			}
+	async updatedUser(
+		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
+	) {
+		let user: UserDocument;
+		if (event instanceof EntityCreatedEvent) {
+			user = event.instance;
 		}
+		if (event instanceof EntityUpdatedEvent) {
+			user = event.after;
+		}
+		const filter = {
+			curator_orcid: user.orcid_id,
+		};
+		await this.weeklyStatModel.updateMany(filter, {
+			$set: { user },
+		});
 
-		await Promise.all(updates$);
+		await updateUserAggregatePrivacy(this.weeklyStatModel, filter);
 	}
 
 	async applyReport(

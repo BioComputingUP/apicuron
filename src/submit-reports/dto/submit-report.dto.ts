@@ -38,6 +38,7 @@ export class SubmitReportDto {
 	@Validate(EntityUriValid, [
 		({ resource_id }: SubmitReportDto): string => resource_id,
 	])
+	@IsString()
 	@IsNotEmpty()
 	entity_uri: string;
 
@@ -45,6 +46,7 @@ export class SubmitReportDto {
 		description:
 			'The resource_id of the resource where the activity was performed',
 	})
+	@IsString()
 	@IsNotEmpty()
 	resource_id: string;
 

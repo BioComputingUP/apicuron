@@ -1,5 +1,6 @@
 import { Expose, Type } from 'class-transformer';
 import { StatisticsDto } from './statistics.dto';
+import { StorageReference } from 'src/shared/decorators';
 
 export class StatSearchResponseDto {
 	@Expose()
@@ -9,6 +10,7 @@ export class StatSearchResponseDto {
 	displayedName: string;
 
 	@Expose()
+	@StorageReference()
 	avatar: string;
 
 	@Expose()
