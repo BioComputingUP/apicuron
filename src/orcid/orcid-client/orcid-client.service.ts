@@ -16,6 +16,7 @@ import {
 	UserLinks,
 } from 'src/core/schemas/components/user-fields.schema';
 import { get } from 'lodash';
+import { parseDateObjectIntoString } from './helpers/utils';
 
 @Injectable()
 export class OrcidClientService {
@@ -243,15 +244,28 @@ export class OrcidClientService {
 						'summaries[0].employment-summary',
 						null,
 					);
-					return summary
-						? {
-								name: get(summary, 'organization.name', 'Unknown'),
-								title: get(summary, 'role-title', 'Unknown'),
-								url: get(summary, 'url.value', null),
-						  }
-						: null;
+					if (!summary) return null;
+
+					const org_name = get(summary, 'organization.name', null);
+					const role_title = get(summary, 'role-title', null);
+					const org_url = get(summary, 'url.value', null);
+					const start_date = parseDateObjectIntoString(
+						get(summary, 'start-date', null),
+					);
+					const end_date = parseDateObjectIntoString(
+						get(summary, 'end-date', null),
+					);
+
+					if (!org_name) return null;
+					return {
+						name: org_name,
+						title: role_title,
+						url: org_url,
+						start_date: start_date,
+						end_date: end_date,
+					};
 				})
-				.filter(Boolean); // Remove null values
+				.filter(Boolean);
 
 			this.logger.debug(
 				'Returned User info' +

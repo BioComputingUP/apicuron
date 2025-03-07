@@ -13,10 +13,10 @@ export class UserEmployment {
 	url?: string;
 
 	@Prop()
-	start_date: string;
+	start_date?: string;
 
 	@Prop()
-	end_date: string;
+	end_date?: string;
 }
 
 export const UserEmploymentSchema =
