@@ -1,3 +1,8 @@
+import {
+	UserEmployment,
+	UserLinks,
+} from 'src/core/schemas/components/user-fields.schema';
+
 export interface OrcidEmailEntry {
 	visibility: string;
 	verified: boolean;
@@ -52,4 +57,13 @@ export interface OrcidAuthToken {
 	expires_at: number;
 	scope: string;
 	orcid: null;
+}
+
+export interface OrcidUserInfo {
+	orcid_id: string;
+	biography: string;
+	keywords: string[];
+	affiliation: string;
+	links: UserLinks[];
+	user_employment: UserEmployment;
 }

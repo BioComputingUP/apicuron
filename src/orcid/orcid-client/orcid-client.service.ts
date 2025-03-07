@@ -4,13 +4,18 @@ import { OrcidApiUrl } from './constants';
 import {
 	OrcidEmailEntry,
 	OrcidUser,
+	OrcidUserInfo,
 	OrcidWork,
 	SubmitWorkResponse,
 } from './interfaces/orcid.interface';
 import { inspect } from 'util';
 import { OrcidTokenAuthService } from './token-auth.service';
 import { orcidWorkXmlSerializer } from './helpers/orcid-work-serializer';
-import { UserLinks } from 'src/core/schemas/components/user-fields.schema';
+import {
+	UserEmployment,
+	UserLinks,
+} from 'src/core/schemas/components/user-fields.schema';
+import { get } from 'lodash';
 
 @Injectable()
 export class OrcidClientService {
@@ -178,7 +183,7 @@ export class OrcidClientService {
 		return response;
 	}
 
-	async get_user_info(orcid_id: string) {
+	async get_user_info(orcid_id: string): Promise<OrcidUserInfo> {
 		// Gets user biography, keywords, affiliation, and social links from Orcid
 		const requestUrl = `${this.orcidUrl}${orcid_id}/record`;
 		try {
@@ -192,31 +197,80 @@ export class OrcidClientService {
 					Accept: 'application/vnd.orcid+json',
 				},
 			});
+			const data = userRecord?.data;
 
-			// console.log(userRecord);
-			const userBio: string = userRecord?.data?.person?.biography?.content;
-			const userKeywords: string[] =
-				userRecord?.data?.person?.keywords.keyword.map(
-					(keyword) => keyword.content,
-				);
-			const userAffiliation: string =
-				userRecord?.data?.['activities-summary']?.employments[
-					'affiliation-group'
-				]?.[0]?.summaries?.[0]?.['employment-summary'].organization?.name;
-			const userLinks: UserLinks[] = userRecord?.data?.person?.[
-				'researcher-urls'
-			]?.['researcher-url'].map((link) => {
-				return {
-					name: link?.['url-name'],
-					url: new URL(link?.url?.value),
-				};
-			});
+			const user_bio: string = get(data, 'person.biography.content', null);
+
+			const user_keywords: string[] = get(
+				data,
+				'person.keywords.keyword',
+				[],
+			).map((k) => k.content);
+
+			// for now affiliation is the most recent employment.
+			const user_affiliation: string = get(
+				data,
+				'activities-summary.employments.affiliation-group[0].summaries[0].employment-summary.organization.name',
+				null,
+			);
+
+			const user_links: UserLinks[] = get(
+				data,
+				'person.researcher-urls.researcher-url',
+				[],
+			)
+				.map((link) => {
+					const url_name = get(link, 'url-name', null);
+					const url_value = get(link, 'url.value', null) as URL;
+					if (!url_name || !url_value) {
+						return null;
+					}
+					return {
+						name: url_name,
+						url: url_value,
+					};
+				})
+				.filter((link) => link.url);
+
+			const user_employment: UserEmployment = get(
+				data,
+				'activities-summary.employments.affiliation-group',
+				[],
+			)
+				.map((affiliation) => {
+					const summary = get(
+						affiliation,
+						'summaries[0].employment-summary',
+						null,
+					);
+					return summary
+						? {
+								name: get(summary, 'organization.name', 'Unknown'),
+								title: get(summary, 'role-title', 'Unknown'),
+								url: get(summary, 'url.value', null),
+						  }
+						: null;
+				})
+				.filter(Boolean); // Remove null values
+
+			this.logger.debug(
+				'Returned User info' +
+					{
+						orcid_id,
+						biography: user_bio,
+						keywords: user_keywords,
+						affiliation: user_affiliation,
+						links: user_links,
+						employments: user_employment,
+					},
+			);
 			return {
 				orcid_id,
-				biography: userBio,
-				keywords: userKeywords,
-				affiliation: userAffiliation,
-				links: userLinks,
+				biography: user_bio,
+				keywords: user_keywords,
+				affiliation: user_affiliation,
+				links: user_links,
+				user_employment: user_employment,
 			};
 		} catch (error) {
 			this.logger.error(`Error Getting info from Orcid for: ${orcid_id} ! `);

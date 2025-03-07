@@ -1,6 +1,5 @@
-import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
-import { Expose } from "class-transformer";
-
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Expose } from 'class-transformer';
 
 @Schema()
 export class UserEmployment {
@@ -11,14 +10,20 @@ export class UserEmployment {
 	title: string;
 
 	@Prop()
-	url: string;
+	url?: string;
+
+	@Prop()
+	start_date: string;
+
+	@Prop()
+	end_date: string;
 }
 
-export const UserEmploymentSchema = SchemaFactory.createForClass(UserEmployment);
+export const UserEmploymentSchema =
+	SchemaFactory.createForClass(UserEmployment);
 
 @Schema()
 export class UserLinks {
-
 	@Prop()
 	@Expose()
 	name: string;
@@ -29,4 +34,3 @@ export class UserLinks {
 }
 
 export const UserLinksSchema = SchemaFactory.createForClass(UserLinks);
-
