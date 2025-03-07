@@ -65,5 +65,5 @@ export interface OrcidUserInfo {
 	keywords: string[];
 	affiliation: string;
 	links: UserLinks[];
-	user_employment: UserEmployment;
+	user_employment: UserEmployment[];
 }

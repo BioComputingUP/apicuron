@@ -1,5 +1,8 @@
-import { PrivacyType } from "src/core/enums";
-import { UserLinks } from "src/core/schemas/components/user-fields.schema";
+import { PrivacyType } from 'src/core/enums';
+import {
+	UserEmployment,
+	UserLinks,
+} from 'src/core/schemas/components/user-fields.schema';
 
 export class CreateOrUpdateUserDto {
 	displayedName: string;
@@ -39,4 +42,6 @@ export interface ICreateOrUpdateUser {
 	privacy?: PrivacyType;
 
 	lastLoginDate?: Date;
+
+	employment?: UserEmployment[];
 }

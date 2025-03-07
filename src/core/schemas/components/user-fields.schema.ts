@@ -7,7 +7,7 @@ export class UserEmployment {
 	name: string;
 
 	@Prop()
-	title: string;
+	title?: string;
 
 	@Prop()
 	url?: string;

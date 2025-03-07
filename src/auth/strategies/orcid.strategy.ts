@@ -31,25 +31,21 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 
 			async function (accessToken, refreshToken, params, profile, done) {
 				const orcid_id: string = params.orcid;
-
-				// const user = { orcid_id, username: params.name };
-				// console.log({ params });
-				// const requestUrl = `${configService.get<string>('ORCID_API_URL')}${orcid_id}/record`
 				const user_info = await orcid_client.get_user_info(orcid_id);
 				try {
 					const user = await usersService.createOrUpdateUser({
-						// displayed Name obtained from orcid
 						displayedName: params.name,
 						username: params.name,
 						orcid_id,
 						// orcid_permission authorization token for updating a user information (/works)
 						orcid_permission: accessToken ?? params.access_token,
 						orcid_scope: params.scope,
-						// biography: params.content,
 						refresh_token: refreshToken,
+						// fetched user info
 						biography: user_info.biography,
 						keywords: user_info.keywords,
 						affiliation: user_info.affiliation,
+						employment: user_info.user_employment,
 						links: user_info.links,
 					});
 

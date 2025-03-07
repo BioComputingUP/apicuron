@@ -233,7 +233,7 @@ export class OrcidClientService {
 				})
 				.filter((link) => link.url);
 
-			const user_employment: UserEmployment = get(
+			const user_employment: UserEmployment[] = get(
 				data,
 				'activities-summary.employments.affiliation-group',
 				[],
@@ -246,14 +246,14 @@ export class OrcidClientService {
 					);
 					if (!summary) return null;
 
-					const org_name = get(summary, 'organization.name', null);
-					const role_title = get(summary, 'role-title', null);
-					const org_url = get(summary, 'url.value', null);
+					const org_name = get(summary, 'organization.name', undefined);
+					const role_title = get(summary, 'role-title', undefined);
+					const org_url = get(summary, 'url.value', undefined);
 					const start_date = parseDateObjectIntoString(
-						get(summary, 'start-date', null),
+						get(summary, 'start-date', undefined),
 					);
 					const end_date = parseDateObjectIntoString(
-						get(summary, 'end-date', null),
+						get(summary, 'end-date', undefined),
 					);
 
 					if (!org_name) return null;
@@ -266,18 +266,6 @@ export class OrcidClientService {
 					};
 				})
 				.filter(Boolean);
-
-			this.logger.debug(
-				'Returned User info' +
-					{
-						orcid_id,
-						biography: user_bio,
-						keywords: user_keywords,
-						affiliation: user_affiliation,
-						links: user_links,
-						employments: user_employment,
-					},
-			);
 			return {
 				orcid_id,
 				biography: user_bio,
