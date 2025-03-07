@@ -25,12 +25,14 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 		return url;
 	}
 
-	async checkStorageReference(obj: unknown): Promise<unknown> {
+	async checkStorageReference(obj: unknown, heap: any[]): Promise<unknown> {
+		if(heap.indexOf(obj) !== -1) return obj;
+		heap.push(obj);
 		if (obj == null || typeof obj !== 'object') {
 			return obj;
 		}
 		if (Array.isArray(obj)) {
-			const promises = obj.map((item) => this.checkStorageReference(item));
+			const promises = obj.map((item) => this.checkStorageReference(item, heap));
 			return await Promise.all(promises);
 		}
 		for (const [key, value] of Object.entries(obj) as [string, unknown][]) {
@@ -58,7 +60,7 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 			}
 
 			// Recursively process nested objects or arrays
-			obj[key] = await this.checkStorageReference(value);
+			obj[key] = await this.checkStorageReference(value, heap);
 		}
 		return obj;
 	}
@@ -75,7 +77,8 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 					return of(data);
 				}
 				this.logger.log('checking storage references');
-				return from(this.checkStorageReference(data));
+				const historyHeap = [];
+				return from(this.checkStorageReference(data, historyHeap));
 			}),
 		);
 	}
