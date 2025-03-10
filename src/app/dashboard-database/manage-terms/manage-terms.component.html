@@ -206,34 +206,6 @@
           <div class="tw-col-span-2">
             <label
               class="tw-block tw-font-bold tw-text-gray-700"
-              for="activity_term"
-            >
-              Activity Internal ID
-            </label>
-            <input
-              type="text"
-              formControlName="activity_term"
-              class="tw-w-full tw-px-4 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md"
-            />
-            <small
-              *ngFor="
-                let error of formState.form.get('activity_term')
-                  | ErrorMessage : 'Activity Internal ID'
-                  | async
-              "
-            >
-              <span class="tw-text-red-500">{{ error }}</span> <br />
-            </small>
-            <small
-              class="tw-leading-tight tw-block tw-pt-2 tw-text-xs tw-text-gray-500"
-            >
-              A Name used in the API to identify the Activity.
-            </small>
-          </div>
-
-          <div>
-            <label
-              class="tw-block tw-font-bold tw-text-gray-700"
               for="activity_name"
             >
               Activity Name
@@ -256,6 +228,33 @@
               "
             >
               <span class="tw-text-red-500">{{ error }}</span> <br />
+            </small>
+          </div>
+          <div class="">
+            <label
+              class="tw-block tw-font-bold tw-text-gray-700"
+              for="activity_term"
+            >
+              Activity Internal ID
+            </label>
+            <input
+              type="text"
+              formControlName="activity_term"
+              class="tw-w-full tw-px-4 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md"
+            />
+            <small
+              *ngFor="
+                let error of formState.form.get('activity_term')
+                  | ErrorMessage : 'Activity Internal ID'
+                  | async
+              "
+            >
+              <span class="tw-text-red-500">{{ error }}</span> <br />
+            </small>
+            <small
+              class="tw-leading-tight tw-block tw-pt-2 tw-text-xs tw-text-gray-500"
+            >
+              A Name used in the API to identify the Activity.
             </small>
           </div>
 

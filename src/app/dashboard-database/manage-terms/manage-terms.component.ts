@@ -121,7 +121,6 @@ export class ManageTermsComponent implements OnInit {
   }
 
   search($event: Event) {
-    // console.log(($event.target as HTMLInputElement).value);
     this.searchQuery.next(($event.target as HTMLInputElement).value);
     this.termsListUpdateEvents$.next({
       type: "filter",
@@ -144,16 +143,17 @@ export class ManageTermsComponent implements OnInit {
             if (!command) {
               return of(terms);
             }
+
             if (command.type === "create") {
-              accumulatedList.unshift(command.term);
               // in here we return the observable that emits the updated list
               // While making the API call effectively removing the need to subscribe to the observable
               return this.termsService.create_term(command.term).pipe(
-                catchError(this.handleError),
+                catchError(this.handleError.bind(this)),
                 tap(() => {
                   this.toast.success(
                     `Term ${command.term.name} Successfully Created`
                   );
+                  accumulatedList.unshift(command.term);
                   this.closeForm();
                 }),
                 map(() => accumulatedList)
@@ -178,10 +178,6 @@ export class ManageTermsComponent implements OnInit {
               );
             }
             if (command.type === "delete") {
-              const updatedList = accumulatedList.filter(
-                (term) => term.activity_term !== command.term.activity_term
-              );
-
               return this.termsService.delete_term(command.term).pipe(
                 catchError(this.handleError),
                 tap(() =>
@@ -189,7 +185,11 @@ export class ManageTermsComponent implements OnInit {
                     `Term ${command.term.name} Successfully Deleted`
                   )
                 ),
-                map(() => updatedList)
+                map(() =>
+                  accumulatedList.filter(
+                    (term) => term.activity_term != command.term.activity_term
+                  )
+                )
               );
             }
             if (command.type === "filter") {
@@ -254,7 +254,7 @@ export class ManageTermsComponent implements OnInit {
       `Are you sure you want to delete ${term.activity_name}?`
     );
     if (confirmed) {
-      this.delete_term(term);
+      this.termsListUpdateEvents$.next({ type: "delete", term });
     }
   }
 

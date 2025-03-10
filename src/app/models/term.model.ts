@@ -12,6 +12,7 @@ export class Term implements Deserializable, Serializable {
   serialize(): any {
     return {
       activity_term: this.activity_term,
+      activity_name: this.activity_name,
       resource_id: this.resource_id,
       activity_category: this.category,
       score: this.score,

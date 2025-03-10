@@ -26,10 +26,10 @@ export class ErrorMessagePipe implements PipeTransform {
 
   displayErrorMessages = (control: AbstractControl, label: string) => {
     return control.statusChanges.pipe(
-      filter(
-        (status) => status === "INVALID" && control.dirty
-      ),
       map(() => {
+        if(!control.errors){
+          return [];
+        }
         return Object.keys(control.errors).map((key) => {
           return this.errorMessages[key](label, control.errors[key]);
         });
