@@ -155,7 +155,8 @@ export class ReportValidatorService {
 			...report,
 			term,
 			resource,
-			league_data: relatedLeague
+			league_data: relatedLeague,
+			user: user,
 		});
 
 		reportDoc.privacy = computePrivacyField(resource, user, report);
