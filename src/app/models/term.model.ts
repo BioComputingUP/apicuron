@@ -44,7 +44,7 @@ export class Term implements Deserializable, Serializable {
   static createForm(fb: FormBuilder, resource_id: string): FormGroup {
     return fb.group({
       resource_id: [resource_id, [Validators.required]], // Resource ID will be set automatically
-      activity_term: ["", [Validators.required, Validators.minLength(3), Validators.maxLength(8)]],
+      activity_term: ["", [Validators.required, Validators.minLength(3)]],
       activity_category: ["generation", [Validators.required]],
       activity_name: ["", [Validators.required]],
       score: ["", [Validators.required, Validators.min(1)]],
