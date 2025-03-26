@@ -4,12 +4,19 @@ import { OrcidApiUrl } from './constants';
 import {
 	OrcidEmailEntry,
 	OrcidUser,
+	OrcidUserInfo,
 	OrcidWork,
 	SubmitWorkResponse,
 } from './interfaces/orcid.interface';
 import { inspect } from 'util';
 import { OrcidTokenAuthService } from './token-auth.service';
 import { orcidWorkXmlSerializer } from './helpers/orcid-work-serializer';
+import {
+	UserEmployment,
+	UserLinks,
+} from 'src/core/schemas/components/user-fields.schema';
+import { get } from 'lodash';
+import { parseDateObjectIntoString } from './helpers/utils';
 
 @Injectable()
 export class OrcidClientService {
@@ -157,7 +164,6 @@ export class OrcidClientService {
 		return { status: response.status };
 	}
 
-
 	async expandedSearch(solrQuery: string) {
 		const token = await this.tokenAuth.getToken();
 		const response = await this.httpService.axiosRef.get(
@@ -176,5 +182,101 @@ export class OrcidClientService {
 		);
 
 		return response;
+	}
+
+	async get_user_info(orcid_id: string): Promise<OrcidUserInfo> {
+		// Gets user biography, keywords, affiliation, and social links from Orcid
+		const requestUrl = `${this.orcidUrl}${orcid_id}/record`;
+		try {
+			const userRecord = await this.httpService.axiosRef.get(requestUrl, {
+				headers: {
+					Authorization: `Bearer ${
+						(
+							await this.tokenAuth.getToken()
+						).access_token
+					}`,
+					Accept: 'application/vnd.orcid+json',
+				},
+			});
+			const data = userRecord?.data;
+
+			const user_bio: string = get(data, 'person.biography.content', null);
+
+			const user_keywords: string[] = get(
+				data,
+				'person.keywords.keyword',
+				[],
+			).map((k) => k.content);
+
+			// for now affiliation is the most recent employment.
+			const user_affiliation: string = get(
+				data,
+				'activities-summary.employments.affiliation-group[0].summaries[0].employment-summary.organization.name',
+				null,
+			);
+
+			const user_links: UserLinks[] = get(
+				data,
+				'person.researcher-urls.researcher-url',
+				[],
+			)
+				.map((link) => {
+					const url_name = get(link, 'url-name', null);
+					const url_value = get(link, 'url.value', null) as URL;
+					if (!url_name || !url_value) {
+						return null;
+					}
+					return {
+						name: url_name,
+						url: url_value,
+					};
+				})
+				.filter((link) => link.url);
+
+			const user_employment: UserEmployment[] = get(
+				data,
+				'activities-summary.employments.affiliation-group',
+				[],
+			)
+				.map((affiliation) => {
+					const summary = get(
+						affiliation,
+						'summaries[0].employment-summary',
+						null,
+					);
+					if (!summary) return null;
+
+					const org_name = get(summary, 'organization.name', undefined);
+					const role_title = get(summary, 'role-title', undefined);
+					const org_url = get(summary, 'url.value', undefined);
+					const start_date = parseDateObjectIntoString(
+						get(summary, 'start-date', undefined),
+					);
+					const end_date = parseDateObjectIntoString(
+						get(summary, 'end-date', undefined),
+					);
+
+					if (!org_name) return null;
+					return {
+						name: org_name,
+						title: role_title,
+						url: org_url,
+						start_date: start_date,
+						end_date: end_date,
+					};
+				})
+				.filter(Boolean);
+			return {
+				orcid_id,
+				biography: user_bio,
+				keywords: user_keywords,
+				affiliation: user_affiliation,
+				links: user_links,
+				user_employment: user_employment,
+			};
+		} catch (error) {
+			this.logger.error(`Error Getting info from Orcid for: ${orcid_id} ! `);
+			this.logger.error(error);
+		}
 	}
 }

@@ -5,7 +5,6 @@ import {
 	OrcidClientModuleOptions,
 } from './interfaces/orcid.interface';
 import { HttpService } from '@nestjs/axios';
-import * as util from 'node:util';
 @Injectable()
 export class OrcidTokenAuthService implements OnModuleInit {
 	constructor(
@@ -48,9 +47,6 @@ export class OrcidTokenAuthService implements OnModuleInit {
 		const token = tokenObj as OrcidAuthToken;
 
 		this.token = token;
-
-		this.logger.debug(`Loaded ORCID API Key ${util.inspect(token)}`);
-
 		return token;
 	}
 

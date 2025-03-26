@@ -1,6 +1,6 @@
 import { Controller, Get, Query, Res } from '@nestjs/common';
-import { AuthProtected } from '../../../auth/decorators/auth.decorator';
-import { OrcidClientService } from '../orcid-client.service';
+import { AuthProtected } from '../../auth/decorators/auth.decorator';
+import { OrcidClientService } from '../orcid-client/orcid-client.service';
 import { Response } from 'express';
 
 @Controller({

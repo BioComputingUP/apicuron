@@ -4,7 +4,7 @@ import { StorageReference } from 'src/shared/decorators/storage-reference.decora
 import { UserResourcePutCode } from '../../../core/interfaces/user-resource-put-code';
 import { UserResource } from '../../../core/interfaces/user-resource';
 import { UserEmailEntry } from '../../../core/schemas/components/user-email.schema';
-import { UserLinks } from "src/core/schemas/components/user-fields.schema";
+import { UserLinks } from 'src/core/schemas/components/user-fields.schema';
 import { PrivacyType } from 'src/core/enums';
 
 /**
@@ -74,7 +74,6 @@ export class UserEntity {
 	@Expose()
 	avatar: string;
 
-
 	@Exclude()
 	orcid_permission: string;
 
@@ -94,8 +93,6 @@ export class UserEntity {
  * Represents a private user entity (meaning that it does not filter sensitive fields) with various properties related to user information and authentication.
  */
 export class PrivateUserEntity {
-	
-
 	@Expose()
 	isNewLogin: boolean;
 

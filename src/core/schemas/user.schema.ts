@@ -8,17 +8,20 @@ import {
 	UserEmailEntry,
 	UserEmailEntrySchema,
 } from './components/user-email.schema';
-import { UserEmploymentSchema, UserLinks, UserLinksSchema } from "./components/user-fields.schema";
-import { UserEmployment } from "./components/user-fields.schema";
+import {
+	UserEmploymentSchema,
+	UserLinks,
+	UserLinksSchema,
+} from './components/user-fields.schema';
+import { UserEmployment } from './components/user-fields.schema';
 
 export type UserDocumentOvrride = {
 	emails: Types.DocumentArray<UserEmailEntry>;
 	employment: Types.DocumentArray<UserEmployment>;
-	links:  Types.DocumentArray<UserLinks>;
+	links: Types.DocumentArray<UserLinks>;
 };
 
 export type UserDocument = HydratedDocument<User, UserDocumentOvrride>;
-
 
 @Schema({
 	collection: 'users',
@@ -85,7 +88,6 @@ export class User {
 
 	@Prop({
 		required: false,
-		default: 'No affiliation',
 	})
 	affiliation?: string;
 

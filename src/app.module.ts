@@ -28,6 +28,9 @@ import { loadSentryModule } from './plugins/sentry';
 import { EventOrchestratorModule } from './event-orchestrator/event-orchestrator.module';
 import { ResourceStatsModule } from './resource-stats/resource-stats.module';
 import { MonthlyStatisticsModule } from './monthly-statistics/monthly-statistics.module';
+import { OrcidSyncModule } from './orcid/orcid-sync/orcid-sync.module';
+import { OrcidClientModuleOptions } from './orcid/orcid-client/interfaces/orcid.interface';
+import { OrcidClientModule } from './orcid/orcid-client/orcid-client.module';
 import { CuratorRegistryModule } from './curator-registry/curator-registry.module';
 import { OrcidFetcherModule } from './github-scraper/github-scraper.module';
 import { StorageManagerModule } from '@biocomputingup/nest-storage-manager';
@@ -39,6 +42,7 @@ import {
 	EntryExistsRule,
 	UniqueRule,
 } from './shared/validators';
+import { ConfigService } from '@nestjs/config';
 @Module({
 	imports: [
 		// Sentry Setup
@@ -49,6 +53,18 @@ import {
 		}),
 
 		ScheduleModule.forRoot(),
+		OrcidClientModule.forRootAsync({
+			inject: [ConfigService],
+			useFactory: (config: ConfigService): OrcidClientModuleOptions => {
+				return {
+					apiUrl: config.get<string>('ORCID_API_URL'),
+					client_id: config.get<string>('ORCID_CLIENT_ID'),
+					client_secret: config.get<string>('ORCID_CLIENT_SECRET'),
+					scopes: ['/read-limited', '/activities/update'],
+					loadOnStartup: config.get<string>('environment') != 'local',
+				};
+			},
+		}),
 		AuthModule,
 		MulterModule.register({
 			dest: '/tmp/apicuron/',
@@ -98,6 +114,7 @@ import {
 		ResourceStatsModule,
 		CuratorRegistryModule,
 		OrcidFetcherModule,
+		OrcidSyncModule,
 	],
 	controllers: [AppController, ServeFilesController],
 	providers: [

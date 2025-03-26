@@ -4,9 +4,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import { AuthService } from '../auth.service';
 import { Strategy } from 'passport-oauth2';
 import { UsersService } from '../users/services/users.service';
-import { plainToInstance } from 'class-transformer';
-import { CreateOrUpdateUserDto } from '../users/dto/create-or-update-user.dto';
 import { HttpService } from '@nestjs/axios';
+import { OrcidClientService } from 'src/orcid/orcid-client/orcid-client.service';
 
 const orcid_scopes = '/read-limited /activities/update';
 
@@ -17,6 +16,7 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 		configService: ConfigService,
 		usersService: UsersService,
 		protected httpService: HttpService,
+		protected orcid_client: OrcidClientService,
 	) {
 		const logger = new Logger(OrcidStrategy.name);
 		super(
@@ -31,53 +31,22 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 
 			async function (accessToken, refreshToken, params, profile, done) {
 				const orcid_id: string = params.orcid;
-
-				// const user = { orcid_id, username: params.name };
-				// console.log({ params });
-				const requestUrl = `${configService.get<string>(
-					'ORCID_API_URL',
-				)}${orcid_id}/record`;
-				const userRecord = await this.httpService.axiosRef.get(requestUrl, {
-					headers: {
-						Authorization: `Bearer ${accessToken ?? params.access_token}`,
-						Accept: 'application/vnd.orcid+json',
-					},
-				});
-
-				// console.log(userRecord);
-				const userBio: string = userRecord?.data?.person?.biography?.content;
-				const userKeywords: string[] =
-					userRecord?.data?.person?.keywords.keyword.map(
-						(keyword) => keyword.content,
-					);
-				const userAffiliation =
-					userRecord?.data?.['activities-summary']?.employments[
-						'affiliation-group'
-					]?.[0]?.summaries?.[0]?.['employment-summary'].organization?.name;
-				const userLinks = userRecord?.data?.person?.['researcher-urls']?.[
-					'researcher-url'
-				].map((link) => {
-					return {
-						name: link?.['url-name'],
-						url: new URL(link?.url?.value),
-					};
-				});
-
+				const user_info = await orcid_client.get_user_info(orcid_id);
 				try {
 					const user = await usersService.createOrUpdateUser({
-						// displayed Name obtained from orcid
 						displayedName: params.name,
 						username: params.name,
 						orcid_id,
 						// orcid_permission authorization token for updating a user information (/works)
 						orcid_permission: accessToken ?? params.access_token,
 						orcid_scope: params.scope,
-						// biography: params.content,
 						refresh_token: refreshToken,
-						biography: userBio,
-						keywords: userKeywords,
-						affiliation: userAffiliation,
-						links: userLinks,
+						// fetched user info
+						biography: user_info.biography,
+						keywords: user_info.keywords,
+						affiliation: user_info.affiliation,
+						employment: user_info.user_employment,
+						links: user_info.links,
 					});
 
 					done(null, user);
