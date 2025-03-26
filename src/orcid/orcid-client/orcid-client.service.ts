@@ -231,7 +231,7 @@ export class OrcidClientService {
 						url: url_value,
 					};
 				})
-				.filter((link) => link.url);
+				.filter((link) => !!link && link.url);
 
 			const user_employment: UserEmployment[] = get(
 				data,
