@@ -37,7 +37,6 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 		}
 		for (const [key, value] of Object.entries(obj) as [string, unknown][]) {
 			if (key.startsWith('_')) {
-				this.logger.debug(`Ignoring private key ${key}`);
 				continue;
 			}
 			// If metadata exists, run the processing function
@@ -54,9 +53,9 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 				continue;
 			}
 			if(key == 'logo') {
-				this.logger.debug(`Checked Key ${key} is not a storage reference`);
-				this.logger.debug(`Metadata is ${!!metadata}`);
-				this.logger.debug(`typeof value is ${typeof value} and value is ${value}`);
+				// this.logger.debug(`Checked Key ${key} is not a storage reference`);
+				// this.logger.debug(`Metadata is ${!!metadata}`);
+				// this.logger.debug(`typeof value is ${typeof value} and value is ${value}`);
 			}
 
 			// Recursively process nested objects or arrays
@@ -73,10 +72,8 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 			switchMap((data: unknown) => {
 				// if the data is a simple Pojo, return it as-is skip checks
 				if (!!data && Object.getPrototypeOf(data) == null) {
-					this.logger.log('skipping checks');
 					return of(data);
 				}
-				this.logger.log('checking storage references');
 				const historyHeap = [];
 				return from(this.checkStorageReference(data, historyHeap));
 			}),

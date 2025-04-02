@@ -41,7 +41,7 @@ export class Badge implements IUserResourceEntity {
 	})
 	count: number;
 	@Prop({
-		required: true,
+		required: false,
 	})
 	color_code: string;
 	@Prop({
