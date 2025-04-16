@@ -27,6 +27,8 @@ const Tasks = [
 	ComputeAllMetricsTask,
 ]
 
+import { UpdateAllUsersInfoTask } from './tasks/update_all_user_info.task';
+import { OrcidClientModule } from '../orcid/orcid-client/orcid-client.module';
 @Module({
 	imports: [
 		HttpModule,
@@ -38,6 +40,7 @@ const Tasks = [
 		BadgesModule,
 		StatisticsModule,
 		AuthModule,
+		OrcidClientModule,
 	],
 	providers: [
 		...Tasks,

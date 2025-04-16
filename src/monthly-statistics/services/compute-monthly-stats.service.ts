@@ -26,6 +26,7 @@ import { PrivacyType } from '../../core/enums';
 import { UserDocument } from '../../core/schemas/user.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { MongoServerError } from 'mongodb';
+import { computePrivacyField } from 'src/util/privacy.helper';
 @Injectable()
 export class ComputeMonthlyStatsService {
 	constructor(
@@ -187,7 +188,11 @@ export class ComputeMonthlyStatsService {
 			currentStat[`${activity_category}_score`] += reportAgg.count * score;
 			// currentStat.total_score += reportAgg.count * score;
 
-			currentStat.privacy = privacy as PrivacyType;
+			currentStat.privacy = computePrivacyField(
+				reportAgg.resource,
+				reportAgg.user,
+				{},
+			);
 		}
 
 		if (!!currentStat) {

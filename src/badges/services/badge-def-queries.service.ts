@@ -7,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery } from 'mongoose';
 import { BadgeDefFilter } from '../dto/filter-badge-def.dto';
 import { AchievementDef } from '../../core/schemas/achievements-def/achievement-def.schema';
-
+import * as _ from 'lodash';
 @Injectable()
 export class BadgeDefQueriesService {
 	constructor(
@@ -18,8 +18,23 @@ export class BadgeDefQueriesService {
 		badgeFilter: BadgeDefFilter,
 		queryFilter: FilterQuery<BadgeDefDocument> = {},
 	) {
+		const { search_query, ...remainingFilters } = badgeFilter.omitPagination();
+
+		const displayedNameSearchFilter = {};
+		if (search_query) {
+			// process the search query into a regex and pass it as name
+			const cleanQuery = _.escapeRegExp(search_query);
+			displayedNameSearchFilter['displayedName'] = {
+				$regex: `.*${cleanQuery}.*`,
+				$options: 'i',
+			};
+		}
+		const combinedBadgeFilters = {
+			...remainingFilters,
+			...displayedNameSearchFilter,
+		};
 		const filterQuery: FilterQuery<AchievementDef> = {
-			$and: [badgeFilter.omitPagination(), queryFilter],
+			$and: [combinedBadgeFilters, queryFilter],
 		};
 		const dataPromise = this.badgeDefModel.find(
 			filterQuery,

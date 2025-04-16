@@ -3,7 +3,7 @@ import { PartnerResourcesService } from '../../resources/partner-resources/servi
 import { UsersService } from '../../auth/users/services/users.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, LeanDocument, Model } from 'mongoose';
 import { SubmitReportDto } from '../dto/submit-report.dto';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
@@ -13,7 +13,7 @@ import {
 	hashTermIdentifier,
 	ITermIdentifier,
 } from '../../terms/helpers/term-hash';
-import { League } from '../../core/schemas/league/league.schema';
+import { League, LeagueDocument } from '../../core/schemas/league/league.schema';
 
 @Injectable()
 export class ReportValidatorService {
@@ -22,7 +22,7 @@ export class ReportValidatorService {
 		protected usersService: UsersService,
 		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-	) {}
+	) { }
 
 	logger = new Logger(ReportValidatorService.name);
 
@@ -36,7 +36,7 @@ export class ReportValidatorService {
 	private assignDefaultLeague(
 		report: SubmitReportDto,
 		resource: PartnerResourceDocument,
-	): League {
+	): LeanDocument<LeagueDocument> {
 		if (!!report.league) {
 			const selectedLeague = resource.leagues.find(
 				(l) => l.name === report.league,
@@ -46,12 +46,12 @@ export class ReportValidatorService {
 					`League ${report.league} does not exist for resource ${report.resource_id}`,
 				);
 			}
-			return selectedLeague;
+			return selectedLeague.toObject();
 		}
 		// check if the user belongs to a league
 		for (const league of resource.leagues) {
 			if (league.defaultMembers.includes(report.curator_orcid)) {
-				return league;
+				return league.toObject();
 			}
 		}
 		// if not, use the default league
@@ -62,7 +62,7 @@ export class ReportValidatorService {
 				`League ${report.league} does not exist for resource ${report.resource_id}`,
 			);
 		}
-		return selectedLeague;
+		return selectedLeague.toObject();
 	}
 
 	/**
@@ -151,11 +151,13 @@ export class ReportValidatorService {
 		const user =
 			userDoc ?? (await this.usersService.getByOrcid(report.curator_orcid));
 
-		const reportDoc = new this.reportModel(report);
-		reportDoc.term = term;
-		reportDoc.resource = resource;
-		reportDoc.user = user;
-		reportDoc.league_data = relatedLeague;
+		const reportDoc = new this.reportModel({
+			...report,
+			term,
+			resource,
+			league_data: relatedLeague,
+			user: user,
+		});
 
 		reportDoc.privacy = computePrivacyField(resource, user, report);
 
@@ -172,40 +174,49 @@ export class ReportValidatorService {
 		const resourceIds = Array.from(new Set(reports.map((r) => r.resource_id)));
 		const orcidIds = Array.from(new Set(reports.map((r) => r.curator_orcid)));
 
-		const activities: Map<string, ITermIdentifier> = reports.reduce(
-			(acc, curr) => {
+		// obtain a map of resources based on the resource_ids
+		const resourcesMap = (
+			await this.resourceService.get_resources({
+				resource_id: { $in: resourceIds },
+			})
+		).reduce(
+			(
+				acc: Map<string, PartnerResourceDocument>,
+				curr: PartnerResourceDocument,
+			) => acc.set(curr.resource_id, curr),
+			new Map<string, PartnerResourceDocument>(),
+		);
+
+		// obtain a map of activities based on the activity terms/league/resource_id
+		const activities: Map<string, ITermIdentifier> = reports
+			// populate the league field of the report
+			.map((report) => {
+				report.league = this.assignDefaultLeague(
+					report,
+					resourcesMap.get(report.resource_id),
+				).name;
+				return report;
+			})
+			.reduce((acc, curr) => {
 				const hash = hashTermIdentifier(curr);
 				acc.set(hash, {
 					resource_id: curr.resource_id,
 					activity_term: curr.activity_term,
-					league: curr.league,
+					league: curr.league, // Assign the default league using the resource object from the report
 				});
 				return acc;
-			},
-			new Map<string, ITermIdentifier>(),
-		);
+			}, new Map<string, ITermIdentifier>());
 
 		const activitiesFilter: FilterQuery<TermDocument>[] = Array.from(
 			activities.values(),
 		);
 
-		const resources$ = this.resourceService.get_resources({
-			resource_id: { $in: resourceIds },
-		});
-
 		const users$ = this.usersService.getUsers({ orcid_id: { $in: orcidIds } });
 
 		const terms$ = this.termModel.find({ $or: activitiesFilter });
 
-		const [resources, users, terms] = await Promise.all([
-			resources$,
-			users$,
-			terms$,
-		]);
+		const [users, terms] = await Promise.all([users$, terms$]);
 
-		const resourcesMap = new Map<string, PartnerResourceDocument>(
-			resources.map((r) => [r.resource_id, r]),
-		);
 		const usersMap = new Map<string, UserDocument>(
 			users.map((u) => [u.orcid_id, u]),
 		);

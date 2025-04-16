@@ -17,24 +17,24 @@ export class ManyReportsSubmittedHandler implements IEventHandler {
 	constructor(
 		protected runner: SubmissionRunner,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-	) {}
+	) { }
 
 	payloadProcessorFactory(payload: IManyReportsSubmittedEventPayload) {
+		const reportDocuments = payload.reports.map(
+			(report) => new this.reportModel(report),
+		);
+		reportDocuments.sort(
+			(a, b) => a.timestamp.getTime() - b.timestamp.getTime(),
+		);
+
+		const resources = payload.resources;
+		const users = payload.users;
+		const terms = payload.terms;
+
 		return async (aggregator: Aggregator) => {
 			this.logger.debug(
-				`Processing ${payload.reports.length} reports using aggregator: ${aggregator.constructor.name}`,
+				`Processing ${reportDocuments.length} reports using aggregator: ${aggregator.constructor.name}`,
 			);
-			const reportDocuments = payload.reports.map(
-				(report) => new this.reportModel(report),
-			);
-			reportDocuments.sort(
-				(a, b) => a.timestamp.getTime() - b.timestamp.getTime(),
-			);
-
-			const resources = payload.resources;
-			const users = payload.users;
-			const terms = payload.terms;
-
 			for (const report of reportDocuments) {
 				const resource = resources.find(
 					(r) => r.resource_id === report.resource_id,

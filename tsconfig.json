@@ -17,7 +17,7 @@
 		"incremental": true,
 		"skipLibCheck": true,
 		"lib": ["es2015", "DOM", "DOM.Iterable"],
-		"types": ["node"],
+		"types": ["node", "jest"],
 		"strictNullChecks": false,
 		"noImplicitAny": false,
 		"strictBindCallApply": false,

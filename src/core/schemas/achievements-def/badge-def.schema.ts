@@ -40,7 +40,6 @@ export class BadgeDef {
 	// badge field
 	@Prop({
 		type: String,
-		required: true,
 	})
 	color_code: string;
 

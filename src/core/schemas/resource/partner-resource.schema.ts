@@ -1,12 +1,18 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { PrivacyType } from '../../enums';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { AchievementDef } from '../achievements-def/achievement-def.schema';
 import { Term } from '../terms.schema';
 import { League, LeagueSchema } from '../league/league.schema';
 import { ResourceStats, ResourceStatsSchema } from './resource-stats.schema';
 
-export type PartnerResourceDocument = HydratedDocument<PartnerResource>;
+type PartnerResourceDocumentOverride = {
+	leagues: Types.DocumentArray<League>;
+	stats: Types.Subdocument<Types.ObjectId> & ResourceStats;
+}
+
+
+export type PartnerResourceDocument = HydratedDocument<PartnerResource, PartnerResourceDocumentOverride>;
 
 // this class defines a partnerResource that has been validated and has the ability to have Models, Badges and so on
 
@@ -53,7 +59,7 @@ export class PartnerResource {
 			];
 		},
 	})
-	leagues: League[];
+	leagues: Types.DocumentArray<League>;
 
 	@Prop({
 		required: true,
@@ -67,10 +73,17 @@ export class PartnerResource {
 		required: true,
 		default: (val) => ({ resource_id: val.resource_id }),
 	})
-	stats: ResourceStats;
+	stats: Types.Subdocument<Types.ObjectId> & ResourceStats;
 
 	@Prop({ required: true, type: Date })
 	joined_date: Date;
+
+	@Prop({
+		type: [String],
+		default: ['https://identifiers.org', 'https://doi.org'],
+		required: true,
+	})
+	allowedUrlsPrefix: string[];
 
 	getLeague(leagueName: string) {
 		return this.leagues.find((league: League) => league.name == leagueName);

@@ -245,11 +245,18 @@ export class SchedulerClientService {
 		});
 	}
 
+	async update_all_userr_info(){
+		return await this.submit_task({
+			task_name: 'update-all-user-info',
+		})
+	}
+
 	@Cron(CronExpression.EVERY_DAY_AT_2AM)
 	private async daily_periodic_compute() {
 		const currentEnv = this.config.get('environment');
 		if (currentEnv == 'production') {
 			await this.compute_all_metrics();
+			await this.update_all_userr_info();
 			return;
 		}
 		if (currentEnv == 'development') {

@@ -42,17 +42,15 @@ export class ComputeBadgesService {
 				: AchievementState.progress;
 		let achieved_at;
 		if (state == AchievementState.achieved) {
+			const relevantReportsFilter: FilterQuery<ReportDocument> = {
+				...getMatchingReportFilter(badgeDef),
+				curator_orcid: reportAgg.curator_orcid,
+			};
 			const earningReport = await this.reportModel.findOne(
-				{
-					curator_orcid: reportAgg.curator_orcid,
-					league: badgeDef.league,
-					resource_id: badgeDef.resource_id,
-					activity_term: { $in: badgeDef.list_terms },
-				},
+				relevantReportsFilter,
 				null,
 				{
 					sort: { timestamp: 1 },
-					limit: badgeDef.count_threshold,
 					skip: badgeDef.count_threshold - 1,
 				},
 			);

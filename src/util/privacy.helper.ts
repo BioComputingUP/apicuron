@@ -14,6 +14,7 @@ import {
 	PartnerResourceDocument,
 	League,
 } from '../core/schemas';
+import { PrivateUserEntity, UserEntity } from 'src/auth/users/dto/user.entity';
 
 export type IUserLeagueEntity = {
 	resource_id: string;
@@ -37,7 +38,7 @@ export type IUserLeagueEntityDocument = HydratedDocument<IUserLeagueEntity>;
  */
 export function computePrivacyField(
 	resource: PartnerResourceDocument | LeanDocument<PartnerResource>,
-	relatedUser: UserDocument | LeanDocument<User> | null,
+	relatedUser: UserDocument | LeanDocument<User> | null | PrivateUserEntity,
 	userResourceEntity:
 		| LeanDocument<IUserResourceEntity>
 		| HydratedDocument<IUserResourceEntity>

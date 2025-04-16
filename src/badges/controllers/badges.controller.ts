@@ -1,9 +1,9 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, SerializeOptions } from '@nestjs/common';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
 import { UserReq } from '../../auth/decorators/applyUser.decorator';
 import { AuthProtected } from '../../auth/decorators/auth.decorator';
 import { Public } from '../../auth/decorators/public.decorator';
-import { paginate } from '../../pagination/paginator';
+import { paginate, Paginated } from '../../pagination/paginator';
 import { VersionHeader } from '../../plugins/swagger/config';
 import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
 import { User } from '../../core/schemas/user.schema';
@@ -18,7 +18,7 @@ import { ApiResponsePaginated } from '../../pagination/decorators/paginated-repo
 	version: '2',
 })
 export class BadgesController {
-	constructor(protected badgesQueryService: BadgesQueryService) {}
+	constructor(protected badgesQueryService: BadgesQueryService) { }
 
 	@ApiResponsePaginated(
 		BadgeDto,
@@ -27,6 +27,7 @@ export class BadgesController {
 	)
 	@AuthProtected()
 	@Public()
+	@SerializeOptions({ type: Paginated<BadgeDto> })
 	@Get('achievements/badges')
 	async get_badges(@Query() filter: BadgeFilter, @UserReq() user: User | null) {
 		const privacyFilter = userResourceEntityPrivacyFilter(user);
@@ -40,7 +41,7 @@ export class BadgesController {
 			filter.getMongoQueryOptions(),
 		);
 
-		return paginate<BadgeDto>(data, filter, count);
+		return paginate<BadgeDto>(BadgeDto, data, filter, count);
 	}
 
 	@ApiResponsePaginated(
@@ -49,6 +50,7 @@ export class BadgesController {
 		'A list of the current user badges matching the filter, includes achieved and unachieved badges',
 	)
 	@AuthProtected()
+	@SerializeOptions({ type: Paginated<PrivateBadgeDto> })
 	@Get('achievements/my-badges')
 	async getUserBadges(
 		@Query() filter: UserBadgesFilter,
@@ -59,6 +61,6 @@ export class BadgesController {
 			user,
 		);
 
-		return paginate<PrivateBadgeDto>(data, filter, count);
+		return paginate<PrivateBadgeDto>(PrivateBadgeDto, data, filter, count);
 	}
 }

@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, SchemaTypes, Types } from 'mongoose';
-import { Report } from './reports.schema';
+import { HydratedDocument, Types } from 'mongoose';
 
 import { PrivacyType } from '../enums';
 import { UserResource } from '../interfaces/user-resource';
@@ -9,8 +8,20 @@ import {
 	UserEmailEntry,
 	UserEmailEntrySchema,
 } from './components/user-email.schema';
-import { UserEmployment } from '../interfaces/user-employment';
-export type UserDocument = HydratedDocument<User>;
+import {
+	UserEmploymentSchema,
+	UserLinks,
+	UserLinksSchema,
+} from './components/user-fields.schema';
+import { UserEmployment } from './components/user-fields.schema';
+
+export type UserDocumentOvrride = {
+	emails: Types.DocumentArray<UserEmailEntry>;
+	employment: Types.DocumentArray<UserEmployment>;
+	links: Types.DocumentArray<UserLinks>;
+};
+
+export type UserDocument = HydratedDocument<User, UserDocumentOvrride>;
 
 @Schema({
 	collection: 'users',
@@ -45,14 +56,15 @@ export class User {
 		default: [],
 		required: true,
 	})
-	emails: UserEmailEntry[];
+	emails: Types.DocumentArray<UserEmailEntry>;
 
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop({
 		required: false,
+		type: [UserEmploymentSchema],
 		default: () => [],
 	})
-	employment?: UserEmployment[] = [];
+	employment: Types.DocumentArray<UserEmployment>;
 
 	@Prop()
 	family_name?: string;
@@ -76,18 +88,15 @@ export class User {
 
 	@Prop({
 		required: false,
-		default: "No affiliation",
 	})
 	affiliation?: string;
 
 	@Prop({
 		required: false,
-		type: Object
+		type: [UserLinksSchema],
+		default: () => [],
 	})
-	links:{
-		name: string,
-		url: URL
-	}
+	links: Types.DocumentArray<UserLinks>;
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop({
 		required: false,
@@ -95,7 +104,7 @@ export class User {
 		type: [String],
 	})
 	keywords?: string[];
-	
+
 	@Prop({
 		default: Date.now(),
 		type: Date,
@@ -150,6 +159,15 @@ export class User {
 		enum: PrivacyType,
 	})
 	privacy: PrivacyType;
+
+	@Prop({ default: true })
+	isNewLogin?: boolean;
+
+	@Prop({ required: false, default: Date.now() })
+	lastLoginDate?: Date;
+
+	@Prop({ required: false, default: false })
+	acceptsEmails?: boolean;
 
 	hasResourcePutCode(resource_id: string): boolean {
 		return (

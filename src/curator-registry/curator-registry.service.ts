@@ -6,8 +6,12 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, PipelineStage, ProjectionType } from 'mongoose';
 import {
+	ContributionEntry,
+	ContributionEntryDocument,
 	CuratorRegistryEntry,
 	CuratorRegistryEntryDocument,
+	LeanContributionEntryDocument,
+	LeanCuratorRegistryEntryDocument,
 } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { PartnerResourcesService } from 'src/resources/partner-resources/services/partner-resources.service';
 import { GetRegistryEntryDto } from './dto/registry-entries.dto';
@@ -64,6 +68,7 @@ export class CuratorRegistryService {
 			query.getMongoQueryOptions();
 
 		try {
+			const count = await this.registryEntryModel.count(query_filter);
 			const entries = await this.registryEntryModel
 				.find(query_filter, {}, queryOptions)
 				.lean();
@@ -74,12 +79,9 @@ export class CuratorRegistryService {
 					data: [],
 				};
 			}
-			this.logger.debug(
-				`entries for query: ${JSON.stringify(entries, null, 2)}`,
-			);
 			const entriesFilteredLeagues = entries.map((entry) => {
 				const filteredContributedTo = entry.contributed_to
-					.map((contribution) => {
+					.map((contribution: LeanContributionEntryDocument) => {
 						const filteredGroups = contribution.groups.filter(
 							(group) => group.visibility === PrivacyType.public,
 						);
@@ -90,9 +92,8 @@ export class CuratorRegistryService {
 				entry.contributed_to = filteredContributedTo;
 				return entry;
 			});
-
 			return {
-				length: entriesFilteredLeagues.length,
+				total: count,
 				data: entriesFilteredLeagues,
 			};
 		} catch (error) {
@@ -102,31 +103,16 @@ export class CuratorRegistryService {
 		}
 	}
 
-	async getCuratorEntry(orcid_identifier: string) {
-		let entry: CuratorRegistryEntry = null;
+	async getCuratorEntry(orcid_identifier: string): Promise<LeanCuratorRegistryEntryDocument | null> {
+		let entry: LeanCuratorRegistryEntryDocument | null = null;
 		try {
-			entry = await this.registryEntryModel
+			entry =  await this.registryEntryModel
 				.findOne({
 					curator_orcid: orcid_identifier,
 				})
 				.lean();
-			if (!entry) {
-				const filtered_groups_entry = entry.contributed_to.map(
-					(contribution) => {
-						return {
-							...contribution,
-							groups: contribution.groups.filter(
-								(group) => group.visibility === PrivacyType.public,
-							),
-						};
-					},
-				);
-				const resultEntry = {
-					...entry,
-					contributed_to: filtered_groups_entry,
-				};
-				return resultEntry;
-			}
+			return entry ?? null;
+			
 		} catch (error) {
 			this.logger.error(
 				`Could not retrieve user with orcid: ${orcid_identifier}...`,
@@ -148,11 +134,13 @@ export class CuratorRegistryService {
 					},
 				},
 				{ upsert: true },
-			)
-			
+			);
+
 			return result;
 		} catch (error) {
-			this.logger.error(`Error while upserting user with orcid: ${curator.orcid_id}...`);
+			this.logger.error(
+				`Error while upserting user with orcid: ${curator.orcid_id}...`,
+			);
 			this.logger.error(error);
 			throw new InternalServerErrorException(`Error while processing request`);
 		}
@@ -252,10 +240,7 @@ export class CuratorRegistryService {
 			}
 
 			await Promise.all(updates);
-			this.logger.debug(
-				'Updated registry collection with aggregation results',
-				'',
-			);
+			this.logger.debug('Updated registry collection with aggregation results');
 			return updates;
 		} catch (error) {
 			this.logger.error(

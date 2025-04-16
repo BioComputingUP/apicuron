@@ -30,14 +30,13 @@ import {
 	ApiTags,
 } from '@nestjs/swagger';
 import { VersionHeader } from '../../plugins/swagger/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User, UserDocument } from '../../core/schemas/user.schema';
+import { User } from '../../core/schemas/user.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Public } from '../decorators/public.decorator';
-import { UserPrivacyUpdatedEvent } from './events/update-privacy';
+
 import { UserReq } from '../decorators/applyUser.decorator';
 import { UserRepository } from '../../core/repositories/user.repository';
+import { AuthProtected } from '../decorators/auth.decorator';
 
 @ApiTags('First Version')
 @Controller('')
@@ -122,9 +121,10 @@ export class UserControllerV2 {
 		protected userModel: UserRepository,
 		private eventEmitter: EventEmitter2,
 	) {}
+	private logger = new Logger(UserControllerV2.name);
 
 	@Get(':orcid_id')
-	@UseGuards(LocalAuthGuard)
+	@AuthProtected()
 	@Public()
 	async get_curator(
 		@Param('orcid_id') orcid_id: string,
@@ -153,33 +153,17 @@ export class UserControllerV2 {
 		description: 'Returns an update confirmation Object',
 		type: UpdateProfileDto,
 	})
-	@UseGuards(LocalAuthGuard)
-	@Public()
+	@AuthProtected()
 	@Patch('')
-	async updateProfile(@Req() req, @Body() updateProfile: UpdateProfileDto) {
-		const { orcid_id, ...updateData } = updateProfile;
-		if (req.user.orcid_id == orcid_id) {
-			const updatedUser = await this.userModel.findOneAndUpdate(
-				{
-					orcid_id,
-				},
-				{
-					$set: updateData,
-				},
-				{
-					new: true,
-				},
-			);
-			if (updateData.privacy) {
-				await this.eventEmitter.emitAsync(
-					UserPrivacyUpdatedEvent.name,
-					new UserPrivacyUpdatedEvent(updatedUser, updateData.privacy),
-				);
-			}
-		} else {
+	async updateProfile(
+		@UserReq() user: User,
+		@Body() updateProfile: UpdateProfileDto,
+	) {
+		const { orcid_id } = updateProfile;
+		if (user.orcid_id !== orcid_id) {
 			throw new UnauthorizedException('Cannot update the data of another User');
 		}
-
-		return updateProfile;
+		await this.usersService.updateUserProfile(updateProfile);
+		return 'Profile Updated';
 	}
 }

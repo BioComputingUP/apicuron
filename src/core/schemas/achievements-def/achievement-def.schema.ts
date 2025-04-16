@@ -54,9 +54,6 @@ export class AchievementDef implements IResourceEntity {
 	// badge field
 	@Prop({
 		type: String,
-		required() {
-			return this.type == AchievementType.badge;
-		},
 	})
 	color_code?: string;
 

@@ -24,21 +24,17 @@ export async function bootstrap(app: INestApplicationContext) {
 	const userSavePromises: Promise<UserDocument>[] = [];
 
 	async function addAvatarToUser(user: UserDocument) {
-		const avatarPath = await generateAvatar(
-			user.displayedName,
-			config.get('PUBLIC_FILES_PATH'),
-			config.get('PUBLIC_FILES_URL_PATH'),
-		);
+		const avatarSvg = await generateAvatar(user.displayedName);
 
 		if (existsSync(join(config.get('PUBLIC_FILES_PATH'), user.avatar))) {
 			return null;
 		}
 
 		logger.log(
-			`Generated Avatar for user "${user.displayedName} saved in ${avatarPath}"`,
+			`Generated Avatar for user "${user.displayedName} saved in ${avatarSvg}"`,
 		);
 
-		user.avatar = avatarPath;
+		user.avatar = avatarSvg;
 		const updatedUser = await user.save();
 
 		logger.log(`Updated user ${user.displayedName}"`);

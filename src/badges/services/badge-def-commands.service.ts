@@ -80,9 +80,7 @@ export class BadgeDefCommandsService {
 			new BadgeDefDeletedEvent(badgeDef),
 		);
 
-		return {
-			data: `Badge ${deleteBadge.name} deleted successfully`,
-		};
+		return badgeDef;
 	}
 
 	async createBadgeDef(badgeDef: CreateBadgeDefDto) {

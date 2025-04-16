@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotImplementedException } from '@nestjs/common';
+import {
+	Injectable,
+	InternalServerErrorException,
+	Logger,
+	NotImplementedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { rename } from 'fs/promises';
@@ -15,8 +20,11 @@ import {
 	SubmittedResource,
 	SubmittedResourceDocument,
 } from '../../core/schemas/resource/submitted-resource.schema';
-import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
+import { PartnerResource, PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { UsersService } from '../../auth/users/services/users.service';
+import { FileUploadDto } from '../../util/file-upload.helper';
+import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
+import { StorageType } from '../../storage/storage.config';
 
 @Injectable()
 export class SubmittedResourcesService {
@@ -26,10 +34,11 @@ export class SubmittedResourcesService {
 		@InjectModel(Resource.name)
 		private resourceModel: Model<ResourceDocument>,
 		@InjectModel(PartnerResource.name)
-		private partnerResourceModel: Model<ResourceDocument>,
+		private partnerResourceModel: Model<PartnerResourceDocument>,
 		private userService: UsersService,
 		protected configService: ConfigService,
-	) {}
+		protected storageService: StorageService,
+	) { }
 
 	private logger = new Logger(SubmittedResourcesService.name);
 
@@ -37,13 +46,30 @@ export class SubmittedResourcesService {
 	public_logo_dir: string;
 
 	async create_resource(
-		resource_obj: CreateResourceDto & { logo: string },
+		resource_obj: CreateResourceDto,
 		creator: string,
+		resourceLogo: FileUploadDto,
 	) {
-		const res = new this.submittedResourceModel({ ...resource_obj, creator });
+		try {
+			const privateEngine = this.storageService.getEngine(StorageType.private);
 
-		res.save();
-		return res.toObject();
+			const logoReference = await privateEngine.put(
+				join('resources', resourceLogo.filename),
+				resourceLogo.buffer,
+			);
+
+			const res = new this.submittedResourceModel({
+				...resource_obj,
+				creator,
+				logo: logoReference,
+			});
+
+			await res.save();
+			return res.toObject();
+		} catch (err) {
+			this.logger.error('Error creating resource', err.stack, err.message);
+			throw new InternalServerErrorException('Error creating resource');
+		}
 	}
 
 	async list_submitted_resources() {
@@ -61,42 +87,33 @@ export class SubmittedResourcesService {
 			throw new Error(`Resource with id ${resource_id} not found`);
 		}
 
-		// get the current logo path
-		const logo_path = resource.logo.replace(
-			this.configService.get('PUBLIC_FILES_URL_PATH'),
-			this.configService.get('PRIVATE_FILES_PATH'),
+		const logoRef = await this.storageService.move(
+			StorageType.private,
+			StorageType.public,
+			this.storageService.parseCanonicalUrl(resource.logo).path,
+			{ deleteFromSource: true },
 		);
+		const newLogoRef = this.storageService.getEngine(StorageType.public).buildCanonicalUrl(logoRef);
+		this.logger.debug(`Moved logo from private to public: ${newLogoRef}`);
 
-		// move the logo from the PRIVATE_FILES_PATH to the PUBLIC_FILES_PATH
-		try {
-			await rename(
-				logo_path,
-				join(
-					this.configService.get('PUBLIC_FILES_PATH'),
-					'resources',
-					basename(logo_path),
-				),
-			);
-		} catch (err) {
-			this.logger.error(
-				'Error moving logo file from private to public folder',
-				err.stack,
-				err.message,
-			);
-		}
+		const partnerResource = new this.partnerResourceModel({
+			...resource.toObject(),
+			logo: newLogoRef,
+			joined_date: new Date(),
+		});
+
+
+		await this.submittedResourceModel.deleteOne({ resource_id });
+
+		await this.partnerResourceModel.create(partnerResource.toObject());
+
+		this.logger.debug(`Creating PartnerResource with logo ${partnerResource.logo}`);
 
 		// if the submitted resource has a creator, we set it as an owner of the resource
 		const { creator } = resource;
 		if (creator) {
 			await this.userService.addManagedResource(creator, resource);
 		}
-		const partnerResource = this.partnerResourceModel.hydrate(
-			resource.toObject(),
-		);
-
-		partnerResource.state = PartnerResource.name;
-		partnerResource.joined_date = new Date();
-		await partnerResource.save();
 	}
 
 	delete_old_resources() {

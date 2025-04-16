@@ -7,7 +7,10 @@ import {
 } from '../../core/schemas/statistics.schema';
 import { FilterQuery, LeanDocument, Model } from 'mongoose';
 import { UserDocument } from '../../core/schemas/user.schema';
-import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
+import {
+	PartnerResource,
+	PartnerResourceDocument,
+} from '../../core/schemas/resource/partner-resource.schema';
 import { OrcidWorkBuilderToken, RunCronJobs } from './constants';
 import { OrcidWorkBuilder } from './interfaces/orcid-submission.interface';
 import { OrcidWork } from '../../orcid/orcid-client/interfaces/orcid.interface';
@@ -74,7 +77,11 @@ export class SubmitOrcidWork implements OnModuleInit {
 
 			const submissions$ = [];
 			for (const stat of stats) {
-				const submission$ = this.submitSingleWork(stat, stat.resource, user);
+				const submission$ = this.submitSingleWork(
+					stat,
+					stat.resource.toObject(),
+					user,
+				);
 				submissions$.push(submission$);
 			}
 			await Promise.all(submissions$);
@@ -83,7 +90,7 @@ export class SubmitOrcidWork implements OnModuleInit {
 
 	async submitSingleWork(
 		statsitics: LeanDocument<StatisticsDocument>,
-		resource: LeanDocument<PartnerResource>,
+		resource: LeanDocument<PartnerResourceDocument>,
 		user: UserDocument,
 	): Promise<any> {
 		const work: OrcidWork = this.orcidWorkBuilder.buildWork(

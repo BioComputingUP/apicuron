@@ -1,4 +1,4 @@
-import { Controller, Get, Logger, Param, Query } from '@nestjs/common';
+import { Controller, Get, Logger, Param, Query, SerializeOptions } from '@nestjs/common';
 import { CuratorRegistryService } from './curator-registry.service';
 import { GetRegistryEntryDto } from './dto/registry-entries.dto';
 import { plainToInstance } from 'class-transformer';
@@ -24,7 +24,7 @@ import { VersionHeader } from 'src/plugins/swagger/config';
 })
 @ApiExtraModels(RegistrySearchResultDto, RegistryCurator)
 export class CuratorRegistryController {
-	constructor(protected registryService: CuratorRegistryService) {}
+	constructor(protected registryService: CuratorRegistryService) { }
 
 	private logger = new Logger(CuratorRegistryController.name);
 	@ApiOkResponse({
@@ -62,23 +62,21 @@ export class CuratorRegistryController {
 		200,
 		'List of curators and their resources and groups they contribute to ',
 	)
+	@SerializeOptions({ type: Paginated<RegistrySearchResultDto> })
 	@Get()
 	async getAllEntries(
 		@Query() query: GetRegistryEntryDto,
 	): Promise<Paginated<RegistrySearchResultDto>> | null {
 		// const getStatDtoInstance = plainToInstance(GetRegistryEntryDto, query);
 		const getStatDtoInstance = query;
-		const { data, length } = await this.registryService.getAllEntries(
+		const { data, total } = await this.registryService.getAllEntries(
 			getStatDtoInstance,
 		);
-		const responseInstance = plainToInstance(RegistrySearchResultDto, data, {
-			excludeExtraneousValues: true,
-		});
 
-		return paginate<RegistrySearchResultDto>(
-			responseInstance,
+		return paginate<RegistrySearchResultDto>(RegistrySearchResultDto,
+			data,
 			getStatDtoInstance,
-			length,
+			total,
 		);
 	}
 }

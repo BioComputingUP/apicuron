@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { FilterQuery, UpdateQuery } from 'mongoose';
 import { achievements_v1_pipeline } from '../aggregation-pipeline/achievements.pipeline';
 import { browse_v1_pipeline } from '../aggregation-pipeline/browse.pipeline';
@@ -12,13 +12,19 @@ import { ICreateOrUpdateUser } from '../dto/create-or-update-user.dto';
 import { ResourceDocument } from '../../../core/schemas/resource/resource.schema';
 import { UserCreatedEvent } from '../events/user-created';
 import { UserRepository } from '../../../core/repositories/user.repository';
+import { UpdateProfileDto } from '../dto/update-user.dto';
+import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
+import { v4 as uuid } from 'uuid';
+import { PrivateUserEntity, UserEntity } from '../dto/user.entity';
+import { plainToInstance } from 'class-transformer';
 @Injectable()
 export class UsersService {
 	constructor(
 		private userRepository: UserRepository,
 		protected configService: ConfigService,
 		protected eventEmitter: EventEmitter2,
-	) {}
+		protected storageService: StorageService,
+	) { }
 
 	public async userExists(orcid_id: string): Promise<boolean> {
 		return !!(await this.userRepository.findOne({
@@ -26,12 +32,17 @@ export class UsersService {
 		}));
 	}
 
-	async getPrivateUser(query: Partial<User>): Promise<UserDocument> {
-		const user_promise = this.userRepository.findOne(query, {
+	async getPrivateUser(query: Partial<User>): Promise<PrivateUserEntity> {
+		const userDoc = await this.userRepository.findOne(query, {
 			stats: 0,
 		});
 
-		return await user_promise;
+		const userEntity = plainToInstance(PrivateUserEntity, userDoc, {
+			enableCircularCheck: true,
+			excludeExtraneousValues: true,
+		})
+
+		return userEntity;
 	}
 
 	async getByOrcid(orcid_id: string): Promise<UserDocument> {
@@ -75,13 +86,13 @@ export class UsersService {
 	 * @param userReq - Optional. The user making the request. If the requesting user is the profile holder, privacy checks are bypassed.
 	 * @returns A promise that resolves to the user profile if found and public, or the full profile if the requesting user is the profile holder.
 	 */
-	async getPublicUser(orcid_id: string, userReq?: User) {
+	async getPublicUser(orcid_id: string, userReq?: User): Promise<UserEntity | PrivateUserEntity> {
 		// if the user requesting is the profile holder. We do not need to check privacy
 		if (userReq?.orcid_id === orcid_id) {
-			return await this.getByOrcid(orcid_id);
+			return await this.getPrivateUser({ orcid_id });
 		}
 		// otherwise (if the user is not the profile holder) we need to check privacy
-		const user_promise = this.userRepository.findOne(
+		const user = await this.userRepository.findOne(
 			{
 				orcid_id,
 				privacy: PrivacyType.public,
@@ -94,10 +105,25 @@ export class UsersService {
 			},
 		);
 
-		return await user_promise;
+		const userObj: UserEntity = this.mapDocumentToEntity(user);
+
+		const userEntity = plainToInstance(UserEntity, userObj, {
+			excludeExtraneousValues: true,
+			enableCircularCheck: true,
+		});
+
+		return userEntity;
 	}
 
-	async get_by_cookie_token(cookie_token: string): Promise<User> {
+	mapDocumentToEntity(userDoc: UserDocument): UserEntity {
+		return {
+			...userDoc.toObject(),
+			// employment: userDoc.employment[userDoc.employment.length - 1].name,
+			employment: userDoc.affiliation
+		}
+	}
+
+	async get_by_cookie_token(cookie_token: string): Promise<UserDocument> {
 		return await this.userRepository.findOne({
 			cookie_token,
 		});
@@ -106,7 +132,7 @@ export class UsersService {
 	async updateUser(
 		orcidOrUser: string | UserDocument,
 		updates: UpdateQuery<UserDocument>,
-	) {
+	): Promise<PrivateUserEntity> {
 		const receivedOrcid = typeof orcidOrUser === 'string';
 
 		const orcid = receivedOrcid ? orcidOrUser : orcidOrUser.orcid_id;
@@ -114,7 +140,12 @@ export class UsersService {
 		const filter = { orcid_id: orcid };
 		const user = await this.userRepository.updateOne(filter, updates);
 
-		return user;
+		const userEntity = plainToInstance(PrivateUserEntity, user, {
+			excludeExtraneousValues: true,
+			enableCircularCheck: true,
+		});
+
+		return userEntity;
 	}
 
 	async get_user_token(username: string): Promise<string> {
@@ -129,14 +160,16 @@ export class UsersService {
 		return result.jwt_token;
 	}
 
-	async createUser(user: ICreateOrUpdateUser): Promise<UserDocument> {
+	async createUser(user: ICreateOrUpdateUser): Promise<PrivateUserEntity> {
 		const newUser = this.userRepository.newDocument(user);
 
-		const avatarLink = await generateAvatar(
-			newUser.displayedName,
-			this.configService.get('PUBLIC_FILES_PATH'),
-			this.configService.get('PUBLIC_FILES_URL_PATH'),
+		const avatarSvg = await generateAvatar(newUser.displayedName);
+
+		const avatarLink = await this.storageService.put(
+			`users/${uuid()}.svg`,
+			Buffer.from(avatarSvg),
 		);
+
 		newUser.avatar = avatarLink;
 
 		await newUser.save();
@@ -146,13 +179,18 @@ export class UsersService {
 			new UserCreatedEvent(newUser),
 		);
 
-		return newUser;
+		const userEntity = plainToInstance(PrivateUserEntity, newUser, {
+			excludeExtraneousValues: true,
+			enableCircularCheck: true,
+		});
+
+		return userEntity;
 	}
 
 	async createOrUpdateUser({
 		orcid_id,
 		...data
-	}: ICreateOrUpdateUser): Promise<UserDocument> {
+	}: ICreateOrUpdateUser): Promise<PrivateUserEntity> {
 		const oldUser = await this.userRepository.findOne({ orcid_id });
 
 		// upsert user
@@ -208,5 +246,49 @@ export class UsersService {
 
 	async getUsers(filter: FilterQuery<UserDocument>): Promise<UserDocument[]> {
 		return await this.userRepository.find(filter);
+	}
+
+	async updateUserProfile(updates: UpdateProfileDto): Promise<UserDocument> {
+		const { orcid_id, email, ...otherUpdates } = updates;
+		const emailUpdateQuery = {};
+		const emailUpdateOptions = {};
+		if (email) {
+			const emailMatchedUser = await this.userRepository.findOne({
+				emails: { $elemMatch: { email: email.email } },
+			});
+			if (emailMatchedUser && emailMatchedUser.orcid_id != orcid_id) {
+				// email address belongs to another user
+				throw new UnauthorizedException(
+					'The provided email is already used by another user',
+				);
+			} else if (emailMatchedUser && emailMatchedUser.orcid_id == orcid_id) {
+				// User email updated
+				emailUpdateQuery['$set'] = { 'emails.$[elem]': email };
+				emailUpdateOptions['arrayFilters'] = [{ 'elem.email': email.email }];
+			} else if (!emailMatchedUser) {
+				// new email
+				emailUpdateQuery['$push'] = { emails: { ...email, verified: false } };
+			}
+		}
+		const updatedUser = await this.userRepository.findOneAndUpdate(
+			{
+				orcid_id,
+			},
+			{
+				...emailUpdateQuery,
+				...otherUpdates,
+			},
+			{
+				...emailUpdateOptions,
+				new: true,
+			},
+		);
+		if (otherUpdates.privacy) {
+			await this.eventEmitter.emitAsync(
+				UserPrivacyUpdatedEvent.name,
+				new UserPrivacyUpdatedEvent(updatedUser, otherUpdates.privacy),
+			);
+		}
+		return updatedUser;
 	}
 }

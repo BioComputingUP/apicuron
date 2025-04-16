@@ -9,6 +9,7 @@ import {
 	Delete,
 	Param,
 	Query,
+	SerializeOptions,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
@@ -27,11 +28,13 @@ import { User } from '../../core/schemas/user.schema';
 import { UserReq } from '../../auth/decorators/applyUser.decorator';
 import { VersionHeader } from '../../plugins/swagger/config';
 import { AuthService } from '../../auth/auth.service';
-import { paginate } from '../../pagination/paginator';
+import { paginate, Paginated } from '../../pagination/paginator';
 import { UpdateBadgeDefDto } from '../dto/update-badge-def.dto';
 import { BadgeDefCommandsService } from '../services/badge-def-commands.service';
 import { BadgeDefQueriesService } from '../services/badge-def-queries.service';
 import { BadgeDefFilter } from '../dto/filter-badge-def.dto';
+import { BadgeDefDto } from '../dto/badge.dto';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('Achievements Definition')
 @ApiHeader(VersionHeader)
@@ -76,6 +79,7 @@ export class BadgesDefController {
 	})
 	@AuthProtected()
 	@Public()
+	@SerializeOptions({ type: Paginated<BadgeDefDto> })
 	@Get()
 	async getBadgeDefs(
 		@Query() badges_filter: BadgeDefFilter,
@@ -87,7 +91,8 @@ export class BadgesDefController {
 			privacyQuery,
 		);
 
-		return paginate(data, badges_filter, count);
+
+		return paginate<BadgeDefDto>(BadgeDefDto, data, badges_filter, count);
 	}
 
 	@ApiOperation({
@@ -100,15 +105,14 @@ export class BadgesDefController {
 	@ApiSecurity('basic')
 	@Put('edit')
 	@AuthProtected()
-	async updateBadgeDef(
-		@Body() update_badge: UpdateBadgeDefDto,
-		@Req() req,
-		@Res() res,
-	) {
+	@SerializeOptions({ type: BadgeDefDto })
+	async updateBadgeDef(@Body() update_badge: UpdateBadgeDefDto, @Req() req) {
 		this.can_edit_resource(req.user, update_badge.resource_id);
-		const response = await this.badgeDefCommands.updateBadgeDef(update_badge);
+		const updatedBadge = await this.badgeDefCommands.updateBadgeDef(
+			update_badge,
+		);
 
-		res.send({ data: response });
+		return updatedBadge;
 	}
 
 	@ApiOperation({
@@ -121,15 +125,18 @@ export class BadgesDefController {
 	@ApiSecurity('basic')
 	@Delete(':name/partner-resource/:resource_id')
 	@AuthProtected()
-	async deleteBadgeDef(
-		@Param() delete_badge: DeleteBadgeDefDto,
-		@Req() req,
-		@Res() res,
-	) {
-		this.can_edit_resource(req.user, delete_badge.resource_id);
+	async deleteBadgeDef(@Param() deleteBadgeDef: DeleteBadgeDefDto, @Req() req) {
+		this.can_edit_resource(req.user, deleteBadgeDef.resource_id);
 
-		const response = await this.badgeDefCommands.deleteBadgeDef(delete_badge);
+		const deletedBadgeDef = await this.badgeDefCommands.deleteBadgeDef(
+			deleteBadgeDef,
+		);
 
-		res.send({ data: response });
+		const badgeDefEntity = plainToInstance(BadgeDefDto, deletedBadgeDef, {
+			enableCircularCheck: true,
+			excludeExtraneousValues: true,
+		});
+
+		return badgeDefEntity;
 	}
 }

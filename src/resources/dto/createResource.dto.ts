@@ -87,5 +87,5 @@ export class CreateResourceDto {
 	color: string;
 
 	@IsEmpty()
-	logo: string;
+	logo?: string;
 }

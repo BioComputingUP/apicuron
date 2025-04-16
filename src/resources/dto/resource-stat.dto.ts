@@ -2,6 +2,10 @@ import { Expose } from 'class-transformer';
 import { IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class ResourceStatsDto {
+	/**
+	 * @remark Use fromDocument instead
+	 */
+
 	@IsNotEmpty()
 	@IsString()
 	@Expose()
@@ -19,13 +23,13 @@ export class ResourceStatsDto {
 
 	@IsDate()
 	@Expose()
-	lastContributionDate: Date;
+	lastContributionDate?: Date; // <- optional
 
 	@IsDate()
 	@Expose()
-	firstContributionDate: Date;
+	firstContributionDate?: Date;
 
 	@IsDate()
 	@Expose()
-	lastResourceUpdateDate: Date;
+	lastResourceUpdateDate?: Date;
 }

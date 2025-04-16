@@ -30,7 +30,7 @@ export class ComputeStatisticsService {
 		protected statModel: Model<StatisticsDocument>,
 		protected partnerResourceService: PartnerResourcesService,
 		private reportAggregator: StatisticsReportAggregator,
-	) {}
+	) { }
 
 	private getRelatedStatsFilter(
 		report: ReportDocument | Report | LeanDocument<Report>,
@@ -245,6 +245,7 @@ export class ComputeStatisticsService {
 		resource: PartnerResourceDocument,
 		user?: UserDocument,
 	) {
+		this.logger.debug(`Incrementing stat for resource ${resource.resource_id} by report from ${report.curator_orcid}`);
 		const statFilter = await this.getRelatedStatsFilter(report);
 
 		const statExists = await this.statModel.findOne(statFilter);
@@ -269,6 +270,7 @@ export class ComputeStatisticsService {
 			],
 			first_contribution: report.timestamp,
 			last_contribution: report.timestamp,
+			league_data: resource.getLeague(report.league),
 			resource,
 			user: user ?? null,
 		});
@@ -276,7 +278,12 @@ export class ComputeStatisticsService {
 		try {
 			await stat.save();
 		} catch (err) {
+			this.logger.error(
+				`Failed to insert stat for user ${report.curator_orcid} at resource ${report}: \n${err}`,
+			)
 			if (err instanceof MongoServerError && err.code == 11000) {
+				this.logger.error(
+					`Failed to insert stat for user ${report.curator_orcid} at resource ${report.resource_id}, retrying`,)
 				return await this.incrementStatByReport(report, term, resource, user);
 			}
 		}

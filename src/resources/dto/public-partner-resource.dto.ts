@@ -1,7 +1,8 @@
 import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
 import { Expose, Type } from 'class-transformer';
-import { SelectPartnerResourceDto } from './partner-resources.dto';
+import { SelectPartnerResourceDto } from './partner-resources.entity';
 import { ResourceStatsDto } from './resource-stat.dto';
+import { StorageReference } from 'src/shared/decorators/storage-reference.decorator';
 
 export class PublicPartnerResourceDto extends SelectPartnerResourceDto {
 	@IsNotEmpty()
@@ -41,6 +42,7 @@ export class PublicPartnerResourceDto extends SelectPartnerResourceDto {
 	@IsNotEmpty()
 	@IsString()
 	@Expose()
+	@StorageReference()
 	logo: string;
 
 	@IsNotEmpty()
