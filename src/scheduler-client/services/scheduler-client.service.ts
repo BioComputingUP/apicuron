@@ -1,14 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { IncomingMessage, request } from 'http';
 import * as FormData from 'form-data';
 import { TaskSubmit } from '../types/baseTask';
 import { ConfigService } from '@nestjs/config';
-import { createReadStream, fstatSync } from 'fs';
-import { HttpModule, HttpService } from '@nestjs/axios';
+import { createReadStream } from 'fs';
+import { HttpService } from '@nestjs/axios';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { config } from 'process';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { AxiosResponse } from 'axios';
 import { buildTaskArgumentString } from '../helpers';
 // const FormData = require('form-data')
 @Injectable()
