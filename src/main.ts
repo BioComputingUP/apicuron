@@ -9,7 +9,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { useContainer } from 'class-validator';
-import { TransformInterceptor } from 'src/shared/transformer/transform.interceptor';
 import { setupSwagger } from 'src/plugins/swagger/setup';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';

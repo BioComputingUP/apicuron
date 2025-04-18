@@ -46,7 +46,7 @@ export class StorageReferenceInterceptor implements NestInterceptor {
 				key,
 			);
 			if (metadata && typeof value === 'string') {
-				this.logger.debug(`found key ${key}`);
+				// this.logger.debug(`found key ${key}`);
 				const currObj = obj as { [k: string]: string };
 				currObj[key] = await this.processStorageReference(currObj[key]);
 				// if the value is a string and it's processed, there's no more recurive checks to perform on this value

@@ -51,7 +51,13 @@ export class SchedulerClientService {
 			);
 
 			return response;
-		} catch (error) {}
+		} catch (error) {
+			this.schedulerLogger.error(
+				`Failed to submit Job ${task.task_name} !`,
+				error?.message,
+				error?.response?.data,
+			);
+		}
 	}
 	// async submit_task(task: TaskSubmit): Promise<AxiosResponse> {
 	// 	const form = this.base_form();
@@ -143,9 +149,9 @@ export class SchedulerClientService {
 		delete_all: string[] = [],
 	) {
 		const response = await this.submit_task({
-			task_name: 'submit_report',
+			task_name: 'submit-bulk',
 			// task_arguments: `${orcid_id} ${delete_all.join(',')}`,
-			task_arguments:{
+			task_arguments: {
 				orcid_id: orcid_id,
 				delete_all: delete_all.join(','),
 			},
@@ -173,7 +179,7 @@ export class SchedulerClientService {
 			task_arguments: {
 				resource_id: resource_id,
 				orcid_id: orcid_id,
-			}
+			},
 		};
 		if (parent_job) {
 			task['parent_job'] = parent_job;
@@ -201,7 +207,7 @@ export class SchedulerClientService {
 			task_arguments: {
 				resource_id: resource_id,
 				orcid_id: orcid_id,
-			}
+			},
 		};
 		if (parent_job) {
 			task['parent_job'] = parent_job;
@@ -231,7 +237,7 @@ export class SchedulerClientService {
 				: 'apicuron_update';
 		const response = await this.submit_task({
 			task_name: 'disprot_update',
-			task_arguments: {curation_database},
+			task_arguments: { curation_database },
 		});
 		return response;
 	}
@@ -242,10 +248,10 @@ export class SchedulerClientService {
 		});
 	}
 
-	async update_all_userr_info(){
+	async update_all_userr_info() {
 		return await this.submit_task({
 			task_name: 'update-all-user-info',
-		})
+		});
 	}
 
 	@Cron(CronExpression.EVERY_DAY_AT_2AM)

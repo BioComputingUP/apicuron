@@ -8,6 +8,8 @@ import { SchedulerClientModule } from '../scheduler-client/scheduler-client.modu
 import { EntityUriValid } from './validators/entity-uri';
 import { LeagueValidator } from './validators/league-validator';
 import { ReportValidatorService } from './services/report-validator.service';
+import { SubmitBulkTask } from 'src/scheduler/tasks/submit_bulk.task';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module({
 	imports: [
@@ -15,12 +17,14 @@ import { ReportValidatorService } from './services/report-validator.service';
 		AuthModule,
 		ResourcesModule,
 		SchedulerClientModule,
+		NotificationsModule
 	],
 	providers: [
 		SubmitReportService,
 		EntityUriValid,
 		ReportValidatorService,
 		LeagueValidator,
+		SubmitBulkTask
 	],
 	controllers: [SubmitReportsController],
 	exports: [SubmitReportService],

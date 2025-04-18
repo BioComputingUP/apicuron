@@ -37,7 +37,7 @@ export type SubmissionProcessingReport = {
 	total_report_count: number;
 	resource_ids: string[];
 };
-interface SubmitBulkTaskArgs {
+export interface SubmitBulkTaskArgs {
 	file: string;
 	orcid_id: string;
 	delete_existing: string[];
@@ -90,12 +90,17 @@ export class SubmitBulkTask extends Task {
 
 	public async run(extraArgs: string[], task_args: SubmitBulkTaskArgs) {
 		const { file, orcid_id, delete_existing } = task_args;
-		this.logger.log(`Running submit in bulk task with arguments: ${JSON.stringify(task_args, null, 2)}`);
+		this.logger.log(
+			`Running submit in bulk task with arguments: ${JSON.stringify(
+				task_args,
+				null,
+				2,
+			)}`,
+		);
 		if (delete_existing) {
 			this.logger.log(
 				`User specified resources ${delete_existing} to be deleted before proceeding`,
 			);
-
 
 			for (let i = 0; i < delete_existing.length; i++) {
 				const currentResourceId = delete_existing[i];
@@ -125,7 +130,8 @@ export class SubmitBulkTask extends Task {
 		const reportProcessing$ = reports.map(
 			async (reportEntry): Promise<ValidatedReport> => {
 				const report = { ...defaultReport, ...reportEntry };
-				const reportObj = plainToClass(SubmitReportDto, report);
+				report.timestamp = new Date(report.timestamp);
+				const reportObj = plainToInstance(SubmitReportDto, report);
 
 				const reportValidation: ValidatedReport = await this.validate_report(
 					reportObj,
@@ -362,17 +368,17 @@ export class SubmitBulkTask extends Task {
 			reportsStream.on('data', async ({ errors, report }: ValidatedReport) => {
 				total_report_count++;
 				if (errors.length == 0) {
-					successful_reports_count += 1;
 					try {
-						const reportDocument = new this.reportModel(report);
-
-						await this.submitReports.insertReport(reportDocument, {
-							preventEvents: true,
-						});
-
-						this.logger.log(
-							`Sucessfully inserted Report for ${report.resource_id} by ${report.curator_orcid}`,
-						);
+						await this.submitReports
+							.insertReport(report, {
+								preventEvents: true,
+							})
+							.then(() => {
+								this.logger.log(
+									`Sucessfully inserted Report for ${report.resource_id} by ${report.curator_orcid}`,
+								);
+								successful_reports_count += 1;
+							});
 					} catch (e) {
 						if (e) {
 							this.logger.error(e?.message);
@@ -585,7 +591,13 @@ export class SubmitBulkTask extends Task {
 	}
 
 	private convert_object_to_report(obj: SubmitReportDto) {
-		return plainToClass(SubmitReportDto, obj);
+		const instance = plainToInstance(SubmitReportDto, obj);
+		console.log(
+			'Converting object to report',
+			obj.timestamp,
+			instance.timestamp,
+		);
+		return instance;
 		// const report = new SubmitReportDto();
 		// report.activity_term = obj.activity_term;
 		// report.curator_orcid = obj.curator_orcid;

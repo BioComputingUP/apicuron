@@ -37,6 +37,10 @@ import { SchedulerClientService } from '../../scheduler-client/services/schedule
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { isArray } from 'lodash';
 import { AuthProtected } from '../../auth/decorators/auth.decorator';
+import {
+	SubmitBulkTask,
+	SubmitBulkTaskArgs,
+} from 'src/scheduler/tasks/submit_bulk.task';
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
 @Controller({ path: 'reports', version: '2' })
@@ -45,6 +49,7 @@ export class SubmitReportsController {
 		protected reportService: SubmitReportService,
 		private schedulerClientService: SchedulerClientService,
 		private resourceService: PartnerResourcesService,
+		private submitBulkTask: SubmitBulkTask,
 	) {}
 
 	private can_edit_resource(user, resource_id) {
@@ -90,6 +95,7 @@ export class SubmitReportsController {
 		@Request() req,
 		@Body() body: SubmitBulkDto,
 		@Query('delete-all') deleteAll: string[] | string,
+		@Res() res: Response,
 	) {
 		let delete_all = [];
 		const deleteAllInput = deleteAll ?? body.delete_all;
@@ -113,11 +119,18 @@ export class SubmitReportsController {
 			);
 		}
 
-		const response = await this.schedulerClientService.submit_reports(
-			reports,
-			req.user.orcid_id,
-			delete_all || [],
-		);
+		const command: SubmitBulkTaskArgs = {
+			file: reports.path,
+			orcid_id: req.user.orcid_id,
+			delete_existing: delete_all,
+		};
+
+		const response = this.submitBulkTask.run([], command);
+		// .submit_reports(
+		// 	reports,
+		// 	req.user.orcid_id,
+		// 	delete_all || [],
+		// );
 
 		if (response instanceof Error) {
 			throw new InternalServerErrorException(
@@ -125,10 +138,13 @@ export class SubmitReportsController {
 			);
 		}
 
-		return {
+		res.send({
 			status:
 				'reports submitted successfully. You will receive a notification containing the submission report',
-		};
+		});
+		await response;
+		
+		return;
 	}
 
 	@ApiOperation({
