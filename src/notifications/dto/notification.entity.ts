@@ -1,6 +1,12 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { ObjectId } from 'mongoose';
 
 export class NotificationEntity {
+
+	@Expose()
+	@Type(() => String)
+	_id: string;
+	
 	@Expose()
 	title: string;
 
