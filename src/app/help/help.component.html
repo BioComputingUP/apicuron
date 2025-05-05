@@ -1,97 +1,112 @@
 <div id="anchor1" class="tw-container tw-mx-auto sm:tw-px-4 tw-max-w-full">
-  <div class="tw-flex tw-flex-wrap  tw-pt-3">
+  <div class="tw-flex tw-flex-wrap tw-pt-3">
     <div class="lg:tw-w-1/5 tw-pr-4 tw-pl-4 tw-hidden lg:tw-block xl:tw-block">
       <div class="tw-sticky tw-top-28 sidebar">
         <div
-          class="tw-relative tw-flex tw-flex-col tw-min-w-0 tw-rounded tw-break-words tw-border tw-bg-white border-1 tw-border-gray-300">
-          <div class="tw-py-3 tw-px-6 tw-mb-0 tw-bg-gray-200 border-b-1 tw-border-gray-300 tw-text-gray-900">
-            <h5 class="tw-text-lg ">Navigate</h5>
+          class="tw-relative tw-flex tw-flex-col tw-min-w-0 tw-rounded tw-break-words tw-border tw-bg-white border-1 tw-border-gray-300"
+        >
+          <div
+            class="tw-py-3 tw-px-6 tw-mb-0 tw-bg-gray-200 border-b-1 tw-border-gray-300 tw-text-gray-900"
+          >
+            <h5 class="tw-text-lg">Navigate</h5>
           </div>
           <div class="tw-flex-auto tw-p-6">
-
-            <a class="tw-block" routerLink="." [fragment]="link.href" *ngFor="let link of navigation_panel">{{
-              link.text }}</a>
-
+            <a
+              class="tw-block"
+              routerLink="."
+              [fragment]="link.href"
+              *ngFor="let link of navigation_panel"
+              >{{ link.text }}</a
+            >
           </div>
         </div>
-
       </div>
     </div>
-
 
     <div class="lg:tw-w-4/5 tw-pr-4 tw-pl-4 tw-text-justify tw-mb-5">
       <!-- <a routerLink="/about"> Read more</a> -->
 
-
       <!-- web interface-->
       <h1 #top>Help</h1>
-      <hr>
+      <hr />
       <h2 class="tw-pt-3 tw-mb-3 tw-mt-5" id="gui" #gui>Web interface</h2>
 
       <p class="tw-mb-3">
-        The APICURON graphical user interface allows easy access to the biocuration activities of our partner databases
-        in a graphical way. Further details can be found <a href="/docs/main/guide/#the-web-interface">here</a>
+        The APICURON graphical user interface allows easy access to the
+        biocuration activities of our partner databases in a graphical way.
+        Further details can be found
+        <a href="/docs/main/guide/#the-web-interface">here</a>
       </p>
-
 
       <h4 class="tw-mt-2" #databases id="databases">Databases page</h4>
       <p class="tw-mb-3">
-        The <a routerLink="/databases">Databases page</a> lists all member databases registered to APICURON. It's use
-        and details are futher exaplained <a href="/docs/main/guide/#databases-page">here</a>
+        The <a routerLink="/databases">Databases page</a> lists all member
+        databases registered to APICURON. It's use and details are futher
+        exaplained <a href="/docs/main/guide/#databases-page">here</a>
       </p>
 
       <h4 class="tw-mt-2" #database id="database">Single Database page</h4>
       <p>
-        The single Database page displays details regarding one database only, further details explained <a
-          href="/docs/main/guide/#single-database-page">here</a>
+        The single Database page displays details regarding one database only,
+        further details explained
+        <a href="/docs/main/guide/#single-database-page">here</a>
       </p>
-
 
       <h4 class="tw-mt-2" #browse id="browse">Curators page</h4>
 
       <p>
-
-        <a routerLink="/curators">The curators page</a> shows a list of curators, further details can be found <a
-          href="/docs/main/guide/#curators-page">here</a>
+        <a routerLink="/curators">The curators page</a> shows a list of
+        curators, further details can be found
+        <a href="/docs/main/guide/#curators-page">here</a>
       </p>
-
 
       <h4 class="tw-mt-2" #biocurator id="biocurator">Personal profile page</h4>
       <p>
-        Each curator registered on APICURON has a personal profile page, further details can be found <a
-          href="/docs/main/guide/#single-curator-page">here</a>
-
+        Each curator registered on APICURON has a personal profile page, further
+        details can be found
+        <a href="/docs/main/guide/#single-curator-page">here</a>
       </p>
-      <h2 class="tw-pt-3 tw-mb-3 tw-mt-5" id="api" #api>Application Programming Interface (API)</h2>
+      <h2 class="tw-pt-3 tw-mb-3 tw-mt-5" id="api" #api>
+        Application Programming Interface (API)
+      </h2>
 
       <p>API Documentation can be found <a [href]="wsname">here</a>.</p>
 
       <h2 class="tw-pt-3 tw-mb-3 tw-mt-5" id="widget" #widget>Widget</h2>
       <p>
-        APICURON offers Widgets to allow resources (curation platforms) to acknowledge their biocurators on their
-        platform directly.<br>
-        Currently APICURON's main widget is the leaderboard, documentation can be found <a
-          href="/docs/dev/widgets.html#web-components-and-widgets">here</a>
-
+        APICURON offers Widgets to allow resources (curation platforms) to
+        acknowledge their biocurators on their platform directly.<br />
+        Currently APICURON's main widget is the leaderboard, documentation can
+        be found
+        <a href="/docs/dev/widgets.html#web-components-and-widgets">here</a>
       </p>
-      <h2 class="tw-pt-3 tw-mb-3 tw-mt-5" id="feedback">Open Collaboration and Feedback</h2>
+      <h2 class="tw-pt-3 tw-mb-3 tw-mt-5" id="feedback">
+        Open Collaboration and Feedback
+      </h2>
 
       <p>
-        APICURON encourages open collaboration and welcomes user feedback to improve its functionality and usability.
-        Users can contribute to the development of the database by <strong>providing suggestions</strong>,
-        <strong>reporting bugs</strong>, or <strong>sharing their experiences</strong>. This collaborative approach
-        ensures that the database meets the evolving needs of the user community and fosters continuous improvement.<br>
+        APICURON encourages open collaboration and welcomes user feedback to
+        improve its functionality and usability. Users can contribute to the
+        development of the database by <strong>providing suggestions</strong>,
+        <strong>reporting bugs</strong>, or
+        <strong>sharing their experiences</strong>. This collaborative approach
+        ensures that the database meets the evolving needs of the user community
+        and fosters continuous improvement.<br />
 
-        You can share share your feedback directly By reporting it on: <a
-          href="https://github.com/BioComputingUP/apicuron-issue-tracker">APICURON's issue tracker</a>
-        <br>
-        By writing to: <a href="mailto:apicuron@ngp-net.bio.unipd.it">apicuron&#64;ngp-net.bio.unipd.it</a>
-        <br>
-        Or Joining the <a href="https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w">APICURON Slack</a>
-
+        You can share share your feedback directly By reporting it on:
+        <a href="https://github.com/BioComputingUP/apicuron-issue-tracker"
+          >APICURON's issue tracker</a
+        >
+        <br />
+        By writing to:
+        <a href="mailto:info@apicuron.org">info&#64;apicuron.org</a>
+        <br />
+        Or Joining the
+        <a
+          href="https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w"
+          >APICURON Slack</a
+        >
       </p>
-
     </div>
-
   </div>
 </div>
