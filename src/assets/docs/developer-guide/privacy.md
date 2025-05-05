@@ -92,24 +92,12 @@ website, so if you click on a link to another website, you should read their pri
 APICURON keeps its privacy policy under regular review and places any updates on this web
 page. This privacy policy was last updated on 19 October 2023.
 
-## How to contact us
+## Who controls your personal data and how to contact us?
 
 If you have any questions about APICURON’s privacy policy, the data we hold on you, or you
 would like to exercise one of your data protection rights, please do not hesitate to contact us
 using the following details:
 
-Data controller:
-Damiano Piovesan
-University of Padua, Department of Biomedical Sciences
-Viale G. Colombo 3
-35131 Padua, Italy
-+39 049 827 6269
-info@apicuron.org
-
-Data protection officer:
-Director of the Department of Biomedical Sciences, University of Padua
-University of Padua, Department of Biomedical Sciences
-Viale G. Colombo 3
-35131 Padua, Italy
-+39 049 827 6047
-direzione.biomed@unipd.it
+| **Data controller**                                                                                                                             | **Data protection officer**                                                                                                                 |
+| ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Damiano Piovesan<br>University of Padua, Department of Biomedical Sciences<br>Viale G. Colombo 3<br>35131 Padova, Italy<br>biocomp@bio.unipd.it | Data Protection Officer at the University of Padua<br>University of Padua<br>Via VIII Febbraio 2<br>35122 Padova, Italy<br>privacy@unipd.it |
