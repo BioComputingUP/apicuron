@@ -1,7 +1,7 @@
-import { Expose, Type } from 'class-transformer';
-import { RegistryCurator } from './registry-curator-dto';
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose, Type } from 'class-transformer';
 import { StorageReference } from 'src/shared/decorators';
+import { RegistryCurator } from './registry-curator-dto';
 
 export class RegistryLeague {
 	@ApiProperty()
@@ -38,6 +38,10 @@ export class RegistryResource {
 	@ApiProperty()
 	@Expose()
 	resource_uri: string;
+
+	@ApiProperty()
+	@Expose()
+	resource_url: string;
 }
 
 export class RegistryContributedTo {
