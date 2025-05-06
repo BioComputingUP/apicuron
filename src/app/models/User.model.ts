@@ -23,7 +23,7 @@ export class User implements Deserializable {
     this.orcid_url = new URL(this.orcid_id, environment.orcid_main_url);
     this.privacy = input.privacy ?? "public";
     this.biography = input.biography ?? "Empty";
-    this.affiliation = input.affiliation ?? "Nothing";
+    this.affiliation = input.affiliation ?? "";
     this.keywords = input.keywords ?? null;
     this.links = input.links ?? null;
     this.newLogin = input.isNewLogin ?? false;
@@ -49,7 +49,6 @@ export class User implements Deserializable {
   links?: Array<{ name: string; url: URL }>;
   newLogin?: boolean;
 
-
   private _generate_avatar(avatar: string, scale = 80, radius = 50): void {
     if (avatar) {
       this.avatar = new URL(avatar).href;
@@ -58,10 +57,10 @@ export class User implements Deserializable {
     const defaultImage = encodeURIComponent(
       `https://api.dicebear.com/5.x/identicon/png/seed=${hash}&scale=${scale}&radius=${radius}`
     );
-    this.avatar = new URL(`https://www.gravatar.com/avatar/${hash}?d=${defaultImage}`).href;
+    this.avatar = new URL(
+      `https://www.gravatar.com/avatar/${hash}?d=${defaultImage}`
+    ).href;
   }
-
-
 }
 
 // upload_avatar(scale = 80, radius = 50): URL {
