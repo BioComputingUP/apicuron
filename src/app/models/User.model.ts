@@ -27,6 +27,7 @@ export class User implements Deserializable {
     this.keywords = input.keywords ?? null;
     this.links = input.links ?? null;
     this.newLogin = input.isNewLogin ?? false;
+    this.emails = input.emails ?? [];
     return this;
   }
 
@@ -43,6 +44,11 @@ export class User implements Deserializable {
   avatar?: string;
   privacy: "private" | "public";
 
+  emails: Array<{
+    email: string;
+    primary: boolean;
+    visibility: EmailVisibilityType;
+  }>;
   biography?: string;
   affiliation?: string;
   keywords?: [string];

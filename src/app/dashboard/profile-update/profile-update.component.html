@@ -10,33 +10,73 @@
     <div class="tw-w-full tw-py-2 sm:tw-py-4 tw-mr-auto form-control-element">
       <label class="tw-mb-2" for="email">Email Address:</label>
 
-      <div formArrayName="emails">
+      <div formArrayName="emails" class="tw-flex tw-gap-2 tw-flex-col">
         <div
           *ngFor="let email of emails.controls; let i = index"
           [formGroupName]="i"
-          class="tw-flex tw-items-center tw-justify-start tw-gap-2"
+          class="tw-flex tw-flex-col tw-gap-1 tw-w-full"
         >
-          <input
-            type="email"
-            formControlName="email"
-            class="tw-bg-white tw-rounded tw-border-gray-500"
-          />
-          <input
-            id="checkbox-primary-{{ i }}"
-            type="checkbox"
-            formControlName="primary"
-            class="tw-bg-white tw-rounded tw-border-gray-500"
-          />
-          <label for="checkbox-primary-{{ i }}">Primary</label>
+          <div class="tw-flex tw-items-center tw-gap-2 tw-w-full tw-flex-wrap">
+            <div class="tw-relative tw-flex-1 tw-min-w-[75%]">
+              <input
+                type="email"
+                formControlName="email"
+                class="tw-bg-white tw-rounded tw-border-gray-500 tw-w-full"
+                [ngClass]="{
+                  'tw-bg-gray-500 tw-border-gray-800 tw-cursor-not-allowed tw-opacity-50':
+                    email.get('email')?.disabled
+                }"
+              />
+              <button
+                (click)="enableFields(i)"
+                class="tw-absolute tw-right-2 tw-top-1/4 tw-z-10"
+              >
+                <img
+                  src="../../../assets/edit.png"
+                  class="tw-aspect-auto tw-max-w-6"
+                />
+              </button>
+            </div>
+            <div
+              class="tw-flex tw-gap-1"
+              [ngClass]="{
+                'tw-cursor-not-allowed tw-opacity-50':
+                  email.get('primary')?.disabled
+              }"
+            >
+              <input
+                id="checkbox-primary-{{ i }}"
+                type="checkbox"
+                formControlName="primary"
+                class="tw-bg-white tw-rounded tw-border-gray-500 tw-aspect-square tw-w-6"
+              />
+              <label for="checkbox-primary-{{ i }}">Primary</label>
+            </div>
+            <div
+              class="tw-flex tw-gap-1"
+              [ngClass]="{
+                'tw-cursor-not-allowed tw-opacity-50':
+                  email.get('visisble')?.disabled
+              }"
+            >
+              <input
+                type="checkbox"
+                formControlName="visible"
+                id="checkbox-visible-{{ i }}"
+                class="tw-bg-white tw-rounded tw-border-gray-500 tw-aspect-square tw-w-6"
+              />
+              <label for="checkbox-visible-{{ i }}">Visible</label>
+            </div>
 
-          <input
-            type="checkbox"
-            formControlName="visible"
-            id="checkbox-visible-{{ i }}"
-            class="tw-bg-white tw-rounded tw-border-gray-500"
-          />
-          <label for="checkbox-visible-{{ i }}">Visible</label>
-
+            <button
+              *ngIf="emails.length > 1"
+              type="button"
+              (click)="removeEmail(i)"
+              class="tw-bg-gray-600 tw-text-white tw-rounded tw-p-2"
+            >
+              X
+            </button>
+          </div>
           <small
             *ngIf="
               email.get('email')?.invalid &&
@@ -46,20 +86,12 @@
           >
             Please enter a valid email.
           </small>
-          <button
-            *ngIf="emails.length > 1"
-            type="button"
-            (click)="removeEmail(i)"
-            class="tw-bg-gray-600 tw-text-white tw-rounded tw-p-2"
-          >
-            X
-          </button>
         </div>
       </div>
       <button
         type="button"
         (click)="addEmail()"
-        class="tw-bg-green-400 tw-shadow-sm tw-opacity-80 tw-rounded-sm tw-p-2 tw-mt-2"
+        class="tw-bg-gray-300 tw-border-solid tw-shadow-sm tw-opacity-80 tw-rounded-sm tw-p-2 tw-mt-2"
       >
         + Add another email
       </button>

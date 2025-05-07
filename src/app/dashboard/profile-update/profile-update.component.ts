@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, OnDestroy } from "@angular/core";
 import {
   FormArray,
   FormBuilder,
@@ -7,8 +7,10 @@ import {
   Validators,
 } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
-import { Observable } from "rxjs";
+import { Observable, Subject, take } from "rxjs";
 import { AuthService } from "src/app/auth/auth.service";
+import { User } from "src/app/models/User.model";
+import { EmailVisibilityType } from "src/app/util/privacy.helper";
 import { UsersService } from "../services/users.service";
 
 @Component({
@@ -16,8 +18,9 @@ import { UsersService } from "../services/users.service";
   templateUrl: "./profile-update.component.html",
   styleUrls: ["./profile-update.component.scss"],
 })
-export class ProfileUpdateComponent {
-  user$: Observable<any>;
+export class ProfileUpdateComponent implements OnDestroy {
+  user$: Observable<User>;
+  destroy$: Subject<boolean> = new Subject();
   form: FormGroup<{
     privacy: FormControl<string>;
     emails: FormArray<
@@ -31,12 +34,19 @@ export class ProfileUpdateComponent {
     privacy: ["", Validators.pattern(new RegExp("private|public"))],
     emails: this.formBuilder.array([
       this.formBuilder.group({
-        email: ["", Validators.email],
-        primary: [true],
+        email: [
+          { value: "example@domain.com", disabled: true },
+          Validators.email,
+        ],
+        primary: [false],
         visibility: [false],
       }),
     ]),
   });
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+    this.destroy$.complete();
+  }
   constructor(
     protected formBuilder: FormBuilder,
     protected auth: AuthService,
@@ -44,11 +54,26 @@ export class ProfileUpdateComponent {
     protected toastr: ToastrService
   ) {
     this.user$ = this.auth.user$;
-    //TODO: populate the form with the user emails
-    // this.user$.pipe(take(1)).subscribe((user: any) => {
-    //   this.form.controls.emails.setValue(user.email ?? "");
-    //   this.form.controls.privacy.setValue(user.privacy ?? "public");
-    // });
+
+    this.user$.pipe(take(1)).subscribe((user: User) => {
+      // this.form.controls.emails.clear();
+      user.emails.map((email) => {
+        this.form.controls.emails.push(
+          this.formBuilder.group({
+            email: [{ value: email.email, disabled: true }, Validators.email],
+            primary: [{ value: email.primary, disabled: true }],
+            visibility: [
+              {
+                value: email.visibility === EmailVisibilityType.public,
+                disabled: true,
+              },
+            ],
+          })
+        );
+      });
+
+      this.form.controls.privacy.setValue(user.privacy ?? "public");
+    });
   }
 
   selectRadio(value: string) {
@@ -104,6 +129,12 @@ export class ProfileUpdateComponent {
     this.emails.removeAt(index);
   }
 
+  enableFields(index: number) {
+    const emails = this.form.get("emails") as FormArray;
+    emails.at(index).get("email").enable();
+    emails.at(index).get("primary").enable();
+    emails.at(index).get("visibility").enable();
+  }
   getEmailError(index: number): boolean {
     const emails = this.form.get("emails") as FormArray;
     return (
