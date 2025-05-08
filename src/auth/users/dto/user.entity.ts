@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
-import { PrivacyType } from 'src/core/enums';
+import { PrivacyType, VisibilityType } from 'src/core/enums';
 import { UserLinks } from 'src/core/schemas/components/user-fields.schema';
 import { StorageReference } from 'src/shared/decorators/storage-reference.decorator';
 import { UserResource } from '../../../core/interfaces/user-resource';
@@ -14,7 +14,7 @@ class EmailEntry {
 	primary: boolean;
 
 	@Expose()
-	verified: boolean;
+	visibility: VisibilityType;
 }
 /**
  * Represents a user entity with various properties related to user information and authentication. But filters sensitive fields.

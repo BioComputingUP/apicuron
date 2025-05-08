@@ -163,7 +163,6 @@ export class UserControllerV2 {
 		if (user.orcid_id !== orcid_id) {
 			throw new UnauthorizedException('Cannot update the data of another User');
 		}
-		this.logger.verbose(JSON.stringify(updateProfile, null, 2));
 		await this.usersService.updateUserProfile(updateProfile);
 		return 'Profile Updated';
 	}

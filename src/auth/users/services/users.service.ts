@@ -253,7 +253,6 @@ export class UsersService {
 
 	async updateUserProfile(updates: UpdateProfileDto): Promise<UserDocument> {
 		const { orcid_id, ...otherUpdates } = updates;
-		console.log(`otherUpdates`, otherUpdates);
 		const updatedUser = await this.userRepository.findOneAndUpdate(
 			{
 				orcid_id,
