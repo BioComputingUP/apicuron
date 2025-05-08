@@ -1,22 +1,22 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { plainToInstance } from 'class-transformer';
 import { FilterQuery, UpdateQuery } from 'mongoose';
+import { v4 as uuid } from 'uuid';
+import { PrivacyType } from '../../../core/enums';
+import { UserRepository } from '../../../core/repositories/user.repository';
+import { ResourceDocument } from '../../../core/schemas/resource/resource.schema';
+import { User, UserDocument } from '../../../core/schemas/user.schema';
 import { achievements_v1_pipeline } from '../aggregation-pipeline/achievements.pipeline';
 import { browse_v1_pipeline } from '../aggregation-pipeline/browse.pipeline';
-import { User, UserDocument } from '../../../core/schemas/user.schema';
-import { ConfigService } from '@nestjs/config';
-import { generateAvatar } from '../generate_avatar';
-import { PrivacyType } from '../../../core/enums';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { UserPrivacyUpdatedEvent } from '../events/update-privacy';
 import { ICreateOrUpdateUser } from '../dto/create-or-update-user.dto';
-import { ResourceDocument } from '../../../core/schemas/resource/resource.schema';
-import { UserCreatedEvent } from '../events/user-created';
-import { UserRepository } from '../../../core/repositories/user.repository';
 import { UpdateProfileDto } from '../dto/update-user.dto';
-import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
-import { v4 as uuid } from 'uuid';
 import { PrivateUserEntity, UserEntity } from '../dto/user.entity';
-import { plainToInstance } from 'class-transformer';
+import { UserPrivacyUpdatedEvent } from '../events/update-privacy';
+import { UserCreatedEvent } from '../events/user-created';
+import { generateAvatar } from '../generate_avatar';
 @Injectable()
 export class UsersService {
 	constructor(
@@ -24,7 +24,7 @@ export class UsersService {
 		protected configService: ConfigService,
 		protected eventEmitter: EventEmitter2,
 		protected storageService: StorageService,
-	) { }
+	) {}
 
 	public async userExists(orcid_id: string): Promise<boolean> {
 		return !!(await this.userRepository.findOne({
@@ -40,7 +40,7 @@ export class UsersService {
 		const userEntity = plainToInstance(PrivateUserEntity, userDoc, {
 			enableCircularCheck: true,
 			excludeExtraneousValues: true,
-		})
+		});
 
 		return userEntity;
 	}
@@ -86,7 +86,10 @@ export class UsersService {
 	 * @param userReq - Optional. The user making the request. If the requesting user is the profile holder, privacy checks are bypassed.
 	 * @returns A promise that resolves to the user profile if found and public, or the full profile if the requesting user is the profile holder.
 	 */
-	async getPublicUser(orcid_id: string, userReq?: User): Promise<UserEntity | PrivateUserEntity> {
+	async getPublicUser(
+		orcid_id: string,
+		userReq?: User,
+	): Promise<UserEntity | PrivateUserEntity> {
 		// if the user requesting is the profile holder. We do not need to check privacy
 		if (userReq?.orcid_id === orcid_id) {
 			return await this.getPrivateUser({ orcid_id });
@@ -119,8 +122,8 @@ export class UsersService {
 		return {
 			...userDoc.toObject(),
 			// employment: userDoc.employment[userDoc.employment.length - 1].name,
-			employment: userDoc.affiliation
-		}
+			employment: userDoc.affiliation,
+		};
 	}
 
 	async get_by_cookie_token(cookie_token: string): Promise<UserDocument> {
@@ -249,39 +252,16 @@ export class UsersService {
 	}
 
 	async updateUserProfile(updates: UpdateProfileDto): Promise<UserDocument> {
-		const { orcid_id, email, ...otherUpdates } = updates;
-		const emailUpdateQuery = {};
-		const emailUpdateOptions = {};
-		if (email) {
-			const emailMatchedUser = await this.userRepository.findOne({
-				emails: { $elemMatch: { email: email.email } },
-			});
-			if (emailMatchedUser && emailMatchedUser.orcid_id != orcid_id) {
-				// email address belongs to another user
-				throw new UnauthorizedException(
-					'The provided email is already used by another user',
-				);
-			} else if (emailMatchedUser && emailMatchedUser.orcid_id == orcid_id) {
-				// User email updated
-				emailUpdateQuery['$set'] = { 'emails.$[elem]': email };
-				emailUpdateOptions['arrayFilters'] = [{ 'elem.email': email.email }];
-			} else if (!emailMatchedUser) {
-				// new email
-				emailUpdateQuery['$push'] = { emails: { ...email, verified: false } };
-			}
-		}
+		const { orcid_id, ...otherUpdates } = updates;
+		console.log(`otherUpdates`, otherUpdates);
 		const updatedUser = await this.userRepository.findOneAndUpdate(
 			{
 				orcid_id,
 			},
 			{
-				...emailUpdateQuery,
-				...otherUpdates,
+				$set: otherUpdates,
 			},
-			{
-				...emailUpdateOptions,
-				new: true,
-			},
+			{ new: true },
 		);
 		if (otherUpdates.privacy) {
 			await this.eventEmitter.emitAsync(

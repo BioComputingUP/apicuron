@@ -4,6 +4,7 @@ import {
 	Get,
 	Headers,
 	HttpStatus,
+	Logger,
 	NotFoundException,
 	Param,
 	Patch,
@@ -13,14 +14,7 @@ import {
 	UnauthorizedException,
 	UseGuards,
 } from '@nestjs/common';
-import { UpdateProfileDto, UpdateUserDto } from './dto/update-user.dto';
-import { UsersService } from './services/users.service';
-import { Logger } from '@nestjs/common';
-import { Response } from 'express';
-import { Roles } from '../decorators/roles.decorator';
-import { json_to_tsv } from './helpers/json-tsv';
-import { LocalAuthGuard } from '../guards/local-auth.guard';
-import { RoleGuard } from '../guards/role.guard';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
 	ApiBody,
 	ApiHeader,
@@ -29,13 +23,19 @@ import {
 	ApiSecurity,
 	ApiTags,
 } from '@nestjs/swagger';
-import { VersionHeader } from '../../plugins/swagger/config';
+import { Response } from 'express';
 import { User } from '../../core/schemas/user.schema';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { VersionHeader } from '../../plugins/swagger/config';
 import { Public } from '../decorators/public.decorator';
+import { Roles } from '../decorators/roles.decorator';
+import { LocalAuthGuard } from '../guards/local-auth.guard';
+import { RoleGuard } from '../guards/role.guard';
+import { UpdateProfileDto, UpdateUserDto } from './dto/update-user.dto';
+import { json_to_tsv } from './helpers/json-tsv';
+import { UsersService } from './services/users.service';
 
-import { UserReq } from '../decorators/applyUser.decorator';
 import { UserRepository } from '../../core/repositories/user.repository';
+import { UserReq } from '../decorators/applyUser.decorator';
 import { AuthProtected } from '../decorators/auth.decorator';
 
 @ApiTags('First Version')
@@ -163,6 +163,7 @@ export class UserControllerV2 {
 		if (user.orcid_id !== orcid_id) {
 			throw new UnauthorizedException('Cannot update the data of another User');
 		}
+		this.logger.verbose(JSON.stringify(updateProfile, null, 2));
 		await this.usersService.updateUserProfile(updateProfile);
 		return 'Profile Updated';
 	}
