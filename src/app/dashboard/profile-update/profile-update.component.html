@@ -23,11 +23,12 @@
                 formControlName="email"
                 class="tw-bg-white tw-rounded tw-border-gray-500 tw-w-full"
                 [ngClass]="{
-                  'tw-bg-gray-500 tw-border-gray-800 tw-cursor-not-allowed tw-opacity-50':
+                  'tw-bg-inherit tw-border-none tw-shadow-none tw-shadow-transparent tw-opacity-50':
                     email.get('email')?.disabled
                 }"
               />
               <button
+                type="button"
                 (click)="enableFields(i)"
                 class="tw-absolute tw-right-2 tw-top-1/4 tw-z-10"
               >
@@ -40,8 +41,7 @@
             <div
               class="tw-flex tw-gap-1"
               [ngClass]="{
-                'tw-cursor-not-allowed tw-opacity-50':
-                  email.get('primary')?.disabled
+                'tw-opacity-50': email.get('primary')?.disabled
               }"
             >
               <input
@@ -55,13 +55,12 @@
             <div
               class="tw-flex tw-gap-1"
               [ngClass]="{
-                'tw-cursor-not-allowed tw-opacity-50':
-                  email.get('visisble')?.disabled
+                'tw-opacity-50': email.get('visibility')?.disabled
               }"
             >
               <input
                 type="checkbox"
-                formControlName="visible"
+                formControlName="visibility"
                 id="checkbox-visible-{{ i }}"
                 class="tw-bg-white tw-rounded tw-border-gray-500 tw-aspect-square tw-w-6"
               />
@@ -69,7 +68,6 @@
             </div>
 
             <button
-              *ngIf="emails.length > 1"
               type="button"
               (click)="removeEmail(i)"
               class="tw-bg-gray-600 tw-text-white tw-rounded tw-p-2"
@@ -200,7 +198,6 @@
       <input
         type="submit"
         value="Submit"
-        [disabled]="form.invalid"
         class="tw-cursor-pointer tw-flex tw-w-1/2 sm:tw-w-1/5 tw-rounded-md tw-bg-apicuron-bright-purple tw-px-3.5 tw-pt-2.5 tw-pb-3.5 tw-text-center tw-text-sm tw-font-semibold tw-text-white tw-shadow-sm tw-hover:bg-indigo-500 tw-focus-visible:outline tw-focus-visible:outline-2 tw-focus-visible:outline-offset-2 tw-focus-visible:outline-indigo-600 tw-capitalize"
         [ngClass]="{ 'tw-opacity-50 tw-cursor-not-allowed': form.invalid }"
       />

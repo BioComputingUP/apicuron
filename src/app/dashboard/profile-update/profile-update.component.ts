@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from "@angular/core";
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from "@angular/core";
 import {
   FormArray,
   FormBuilder,
@@ -7,9 +7,9 @@ import {
   Validators,
 } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
-import { Observable, Subject, take } from "rxjs";
+import { catchError, map, Observable, Subject, switchMap, take } from "rxjs";
 import { AuthService } from "src/app/auth/auth.service";
-import { User } from "src/app/models/User.model";
+import { UpdateUser, User } from "src/app/models/User.model";
 import { EmailVisibilityType } from "src/app/util/privacy.helper";
 import { UsersService } from "../services/users.service";
 
@@ -18,7 +18,7 @@ import { UsersService } from "../services/users.service";
   templateUrl: "./profile-update.component.html",
   styleUrls: ["./profile-update.component.scss"],
 })
-export class ProfileUpdateComponent implements OnDestroy {
+export class ProfileUpdateComponent implements OnInit, OnDestroy {
   user$: Observable<User>;
   destroy$: Subject<boolean> = new Subject();
   form: FormGroup<{
@@ -32,35 +32,30 @@ export class ProfileUpdateComponent implements OnDestroy {
     >;
   }> = this.formBuilder.group({
     privacy: ["", Validators.pattern(new RegExp("private|public"))],
-    emails: this.formBuilder.array([
-      this.formBuilder.group({
-        email: [
-          { value: "example@domain.com", disabled: true },
-          Validators.email,
-        ],
-        primary: [false],
-        visibility: [false],
-      }),
-    ]),
+    emails: this.formBuilder.array<
+      FormGroup<{
+        email: FormControl<string>;
+        primary: FormControl<boolean>;
+        visibility: FormControl<boolean>;
+      }>
+    >([]),
   });
   ngOnDestroy(): void {
     this.destroy$.next(true);
     this.destroy$.complete();
   }
-  constructor(
-    protected formBuilder: FormBuilder,
-    protected auth: AuthService,
-    protected userService: UsersService,
-    protected toastr: ToastrService
-  ) {
+  ngOnInit(): void {
     this.user$ = this.auth.user$;
 
     this.user$.pipe(take(1)).subscribe((user: User) => {
-      // this.form.controls.emails.clear();
       user.emails.map((email) => {
         this.form.controls.emails.push(
           this.formBuilder.group({
-            email: [{ value: email.email, disabled: true }, Validators.email],
+            email: [
+              { value: email.email, disabled: true },
+              [Validators.email, Validators.required],
+              ,
+            ],
             primary: [{ value: email.primary, disabled: true }],
             visibility: [
               {
@@ -75,36 +70,59 @@ export class ProfileUpdateComponent implements OnDestroy {
       this.form.controls.privacy.setValue(user.privacy ?? "public");
     });
   }
+  constructor(
+    protected formBuilder: FormBuilder,
+    protected auth: AuthService,
+    protected userService: UsersService,
+    protected toastr: ToastrService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   selectRadio(value: string) {
     this.form.controls.privacy.setValue(value);
     this.form.controls.privacy.markAsTouched();
   }
   submitForm() {
-    console.log(this.form.value);
-    // this.user$
-    //   .pipe(
-    //     map((user: User) => {
-    //       return new UpdateUser().deserialize({
-    //         orcid_id: user.orcid_id,
-    //         ...this.form.value,
-    //       });
-    //     }),
-    //     switchMap((userUpdate: UpdateUser) => {
-    //       return this.userService.updateUser(userUpdate);
-    //     }),
-    //     catchError((err, caught) => {
-    //       this.toastr.error("Failed to update user data", "User update failed");
-    //       throw err;
-    //     }),
-    //     take(1)
-    //   )
-    //   .subscribe((data) => {
-    //     this.toastr.success(
-    //       "User data successfully updated",
-    //       "User update successfull"
-    //     );
-    //   });
+    this.form.markAllAsTouched();
+    console.log(`validation`, this.form.valid);
+    if (this.form.valid) {
+      this.user$
+        .pipe(
+          map((user: User) => {
+            const formValues = this.form.getRawValue();
+            const serializedEmails = formValues.emails.map((email) => ({
+              email: email.email,
+              primary: email.primary,
+              visibility: email.visibility
+                ? EmailVisibilityType.public
+                : EmailVisibilityType.private,
+            }));
+
+            return new UpdateUser().deserialize({
+              orcid_id: user.orcid_id,
+              privacy: formValues.privacy,
+              emails: serializedEmails,
+            });
+          }),
+          switchMap((userUpdate: UpdateUser) => {
+            return this.userService.updateUser(userUpdate);
+          }),
+          catchError((err, caught) => {
+            this.toastr.error(
+              "Failed to update user data",
+              "User update failed"
+            );
+            throw err;
+          }),
+          take(1)
+        )
+        .subscribe((data) => {
+          this.toastr.success(
+            "User data successfully updated",
+            "User update successful"
+          );
+        });
+    }
   }
 
   get privacy() {
@@ -118,22 +136,39 @@ export class ProfileUpdateComponent implements OnDestroy {
   addEmail() {
     this.emails.push(
       this.formBuilder.group({
-        email: ["", Validators.email],
+        email: [
+          { value: "", disabled: false },
+          [Validators.email, Validators.required],
+        ],
         primary: [false],
-        visibility: [false, Validators.pattern(new RegExp("private|public"))],
+        visibility: [false],
       })
     );
   }
 
   removeEmail(index: number) {
-    this.emails.removeAt(index);
+    const confirmDelete = window.confirm(
+      "Are you sure you want to remove this email?"
+    );
+    if (confirmDelete) {
+      this.emails.removeAt(index);
+    }
   }
 
   enableFields(index: number) {
-    const emails = this.form.get("emails") as FormArray;
-    emails.at(index).get("email").enable();
-    emails.at(index).get("primary").enable();
-    emails.at(index).get("visibility").enable();
+    const emailGroup = this.emails.at(index) as FormGroup;
+
+    emailGroup.get("email").enable();
+    emailGroup.get("primary").enable();
+    emailGroup.get("visibility").enable();
+    console.log("Email control state:", emailGroup.get("email"));
+    console.log("Primary control state:", emailGroup.get("primary"));
+    console.log("Visibility control state:", emailGroup.get("visibility"));
+    emailGroup.markAsTouched();
+
+    // Ensure change detection runs
+    this.emails.updateValueAndValidity();
+    this.cdr.detectChanges();
   }
   getEmailError(index: number): boolean {
     const emails = this.form.get("emails") as FormArray;
