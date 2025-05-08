@@ -68,6 +68,7 @@
             </div>
 
             <button
+              *ngIf="emails.length > 1"
               type="button"
               (click)="removeEmail(i)"
               class="tw-bg-gray-600 tw-text-white tw-rounded tw-p-2"
