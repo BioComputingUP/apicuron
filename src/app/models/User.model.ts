@@ -76,9 +76,7 @@ export class User implements Deserializable {
 export class UpdateUser implements Deserializable, Serializable {
   serialize() {
     const payload: any = { orcid_id: this.orcid_id };
-    if (this.emailEntry && this.emailEntry.email) {
-      payload.email = this.emailEntry;
-    }
+
     if (this.privacy) {
       payload.privacy = this.privacy;
     }
@@ -96,15 +94,16 @@ export class UpdateUser implements Deserializable, Serializable {
   }
   deserialize(input: any): this {
     if (input.email) {
-      this.emailEntry = {
-        email: input.email,
-        // checked box -> public email, unchecked/undefined -> hide email
-        visibility:
-          input.emailVisibility === true
-            ? EmailVisibilityType.public
-            : EmailVisibilityType.private,
-        primary: input.primary ?? null,
-      };
+      this.emails = [
+        {
+          email: input.email,
+          visibility:
+            input.emailVisibility === true
+              ? EmailVisibilityType.public
+              : EmailVisibilityType.private,
+          primary: input.primary ?? null,
+        },
+      ];
     }
     if (input.emails) {
       this.emails = input.emails;
@@ -115,7 +114,6 @@ export class UpdateUser implements Deserializable, Serializable {
     this.acceptsEmails = input.acceptsEmails ?? null;
     return this;
   }
-  emailEntry?: EmailInput;
   emails?: Array<EmailInput>;
   privacy?: PrivacyType;
   orcid_id: string;
