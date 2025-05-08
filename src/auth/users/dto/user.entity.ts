@@ -1,12 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
-import { StorageReference } from 'src/shared/decorators/storage-reference.decorator';
-import { UserResourcePutCode } from '../../../core/interfaces/user-resource-put-code';
-import { UserResource } from '../../../core/interfaces/user-resource';
-import { UserEmailEntry } from '../../../core/schemas/components/user-email.schema';
-import { UserLinks } from 'src/core/schemas/components/user-fields.schema';
 import { PrivacyType } from 'src/core/enums';
+import { UserLinks } from 'src/core/schemas/components/user-fields.schema';
+import { StorageReference } from 'src/shared/decorators/storage-reference.decorator';
+import { UserResource } from '../../../core/interfaces/user-resource';
+import { UserResourcePutCode } from '../../../core/interfaces/user-resource-put-code';
 
+class EmailEntry {
+	@Expose()
+	email: string;
+
+	@Expose()
+	primary: boolean;
+
+	@Expose()
+	verified: boolean;
+}
 /**
  * Represents a user entity with various properties related to user information and authentication. But filters sensitive fields.
  */
@@ -87,6 +96,10 @@ export class UserEntity {
 
 	@Exclude()
 	refresh_token: string;
+
+	@Expose()
+	@Type(() => EmailEntry)
+	emails: EmailEntry[];
 }
 
 /**
@@ -113,7 +126,8 @@ export class PrivateUserEntity {
 	resources: UserResource[];
 
 	@Expose()
-	emails: UserEmailEntry[];
+	@Type(() => EmailEntry)
+	emails: EmailEntry[];
 
 	@Expose()
 	employment?: string | string[];
