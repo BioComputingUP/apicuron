@@ -43,6 +43,7 @@ import {
 	UniqueRule,
 } from './shared/validators';
 import { ConfigService } from '@nestjs/config';
+import { AdminModule } from './admin/admin.module';
 @Module({
 	imports: [
 		// Sentry Setup
@@ -115,6 +116,7 @@ import { ConfigService } from '@nestjs/config';
 		CuratorRegistryModule,
 		OrcidFetcherModule,
 		OrcidSyncModule,
+		AdminModule,
 	],
 	controllers: [AppController, ServeFilesController],
 	providers: [
