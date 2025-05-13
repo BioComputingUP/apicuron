@@ -3,7 +3,7 @@
   class="tw-bg-white tw-pb-2 tw-rounded-md tw-shadow-md tw-mb-4"
 >
   <div class="tw-col-span-2 lg:tw-col-span-4" *ngIf="user$ | async as user">
-    <a [href]="user.bip_url">
+    <a [href]="user.bip_url" target="_blank" rel="noopener noreferrer">
       <div
         class="tw-flex tw-flex-row tw-items-center tw-gap-4 tw-mb-2 tw-bg-slate-200 tw-px-4 tw-py-4"
       >

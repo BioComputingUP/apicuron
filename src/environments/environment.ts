@@ -13,6 +13,7 @@ export const environment = {
   orcid_url: 'https://pub.sandbox.orcid.org/v3.0/',
   orcid_main_url: 'https://sandbox.orcid.org/',
   fairsharing_url: 'https://fairsharing.org',
+  bip_url: 'https://bip.imsi.athenarc.gr/scholar',
   bip_scholar_url: 'https://bip-api.imsi.athenarc.gr/scholar/scores'
 
   // ws: 'https://apicuron.bio.unipd.it/api/'
