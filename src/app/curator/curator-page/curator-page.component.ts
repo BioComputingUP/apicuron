@@ -3,6 +3,7 @@ import { ActivatedRoute, ParamMap } from "@angular/router";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { User } from "src/app/models/User.model";
+import { BipScholarStatsViewModel } from "src/app/models/external/bip-scholar.model";
 import { CuratorStatistics } from "src/app/models/statistics.model";
 import { CuratorPageService } from "./curator-page.service";
 
@@ -16,7 +17,7 @@ export class CuratorPageComponent implements OnInit {
   orcidId$: Observable<string>;
   // statsWithResource$: Observable<StatisticsWithResource[]>;
   statistics$: Observable<CuratorStatistics[]>;
-  bipScores$: Observable<any>;
+  bipScores$: Observable<BipScholarStatsViewModel>;
 
   constructor(
     private route: ActivatedRoute,
@@ -35,5 +36,10 @@ export class CuratorPageComponent implements OnInit {
     this.bipScores$ = this.curatorPageService.getBipScholarScores(
       this.orcidId$
     );
+    // .pipe(
+    //   tap((bipScores) => {
+    //     console.log("BipScholar Scores: ", bipScores.statCardViewModel());
+    //   })
+    // );
   }
 }

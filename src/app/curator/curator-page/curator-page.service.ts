@@ -5,7 +5,10 @@ import { map, shareReplay, switchMap } from "rxjs/operators";
 import { MedalsService } from "src/app/achievements/services/medals.service";
 import { CuratorStatisticsService } from "src/app/curator-statistics/services/curator-statistics.service";
 import { CuratorService } from "src/app/curator/curator.service";
-import { BipScholarStats } from "src/app/models/external/bip-scholar.model";
+import {
+  BipScholarStats,
+  BipScholarStatsViewModel,
+} from "src/app/models/external/bip-scholar.model";
 import { Resource } from "src/app/models/resource.model";
 import { CuratorStatistics } from "src/app/models/statistics.model";
 import { User } from "src/app/models/User.model";
@@ -144,7 +147,9 @@ export class CuratorPageService {
     });
   }
 
-  getBipScholarScores(orcid$: Observable<string>): Observable<BipScholarStats> {
+  getBipScholarScores(
+    orcid$: Observable<string>
+  ): Observable<BipScholarStatsViewModel> {
     return orcid$.pipe(
       switchMap((orcid: string) => {
         let query_orcid = orcid;
@@ -156,7 +161,9 @@ export class CuratorPageService {
         });
       }),
       map((response: any) => {
-        const bipScholarStats = new BipScholarStats().deserialize(response);
+        const bipScholarStats = new BipScholarStats()
+          .deserialize(response)
+          .statCardViewModel();
         return bipScholarStats;
       }),
       shareReplay(1)
