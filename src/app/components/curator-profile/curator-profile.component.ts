@@ -1,22 +1,20 @@
+import { Overlay, OverlayRef, PositionStrategy } from "@angular/cdk/overlay";
+import { TemplatePortal } from "@angular/cdk/portal";
 import { CommonModule } from "@angular/common";
 import {
   ChangeDetectionStrategy,
   Component,
   Input,
   OnInit,
-  ElementRef,
-  ViewContainerRef,
   ViewChild,
-  AfterViewInit
+  ViewContainerRef,
 } from "@angular/core";
-import { User } from "../../models/User.model";
-import { OrcidService } from "src/app/orcid/services/orcid.service";
+import { BehaviorSubject, Observable } from "rxjs";
+import { filter, map, shareReplay } from "rxjs/operators";
 import { OrcidModule } from "src/app/orcid/orcid.module";
-import { BehaviorSubject, Observable, merge } from "rxjs";
+import { OrcidService } from "src/app/orcid/services/orcid.service";
 import { OrcidProfileLink } from "src/app/orcid/types/orcid";
-import { filter, map, shareReplay, switchMap } from "rxjs/operators";
-import { Overlay, OverlayRef, PositionStrategy } from '@angular/cdk/overlay';
-import { TemplatePortal } from '@angular/cdk/portal';
+import { User } from "../../models/User.model";
 
 @Component({
   standalone: true,
@@ -26,22 +24,22 @@ import { TemplatePortal } from '@angular/cdk/portal';
   styleUrls: ["./curator-profile.component.scss"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CuratorProfileComponent implements OnInit, AfterViewInit {
+export class CuratorProfileComponent implements OnInit {
   profileLinks$: Observable<OrcidProfileLink[]>;
   keywords$: Observable<string[]>;
   biography$: Observable<string>;
-  employment$: Observable<string>; // field for the place of work
+  employment$: Observable<string>;
 
   userInfo$: Observable<Boolean>;
 
   overlayRef: OverlayRef;
-  @ViewChild('tooltipTemplate', { static: true }) tooltipTemplate;
+  @ViewChild("tooltipTemplate", { static: true }) tooltipTemplate;
 
   constructor(
     protected orcidService: OrcidService,
     private overlay: Overlay,
     private viewContainerRef: ViewContainerRef
-  ) { }
+  ) {}
 
   curator$ = new BehaviorSubject<User>(null);
   @Input() set curator(value: User) {
@@ -55,37 +53,12 @@ export class CuratorProfileComponent implements OnInit, AfterViewInit {
   );
 
   ngOnInit(): void {
-    // this.biography$ = this.curatorObs$.pipe(
-    //   switchMap((curator: User) =>
-    //     this.orcidService.get_biography(curator.orcid_id)
-    //   )
-    // );
-
-    // this.keywords$ = this.curatorObs$.pipe(
-    //   switchMap((curator: User) =>
-    //     this.orcidService.get_keywords(curator.orcid_id)
-    //   )
-    // );
     this.profileLinks$ = this.curatorObs$.pipe(
       map((curator: User) => {
         return curator.links;
-      }),
+      })
     );
-    // this.employment$ = this.curatorObs$.pipe(
-    //   switchMap((curator: User) =>
-    //     this.orcidService.get_employment(curator.orcid_id)
-    //   )
-    // );
-
-    // this.userInfo$ = merge(
-    //   this.biography$,
-    //   this.keywords$,
-    //   this.profileLinks$,
-    //   this.employment$,
-    // ).pipe(map((k) => true));
   }
-
-  ngAfterViewInit(): void { }
 
   openTooltip(event: MouseEvent, tooltipContent: string) {
     if (this.overlayRef) {
@@ -96,7 +69,12 @@ export class CuratorProfileComponent implements OnInit, AfterViewInit {
       .position()
       .flexibleConnectedTo(event.target as HTMLElement)
       .withPositions([
-        { originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top' }
+        {
+          originX: "center",
+          originY: "bottom",
+          overlayX: "center",
+          overlayY: "top",
+        },
       ]);
 
     this.overlayRef = this.overlay.create({
@@ -105,9 +83,13 @@ export class CuratorProfileComponent implements OnInit, AfterViewInit {
       scrollStrategy: this.overlay.scrollStrategies.reposition(),
     });
 
-    const tooltipPortal = new TemplatePortal(this.tooltipTemplate, this.viewContainerRef, {
-      $implicit: tooltipContent
-    });
+    const tooltipPortal = new TemplatePortal(
+      this.tooltipTemplate,
+      this.viewContainerRef,
+      {
+        $implicit: tooltipContent,
+      }
+    );
 
     this.overlayRef.attach(tooltipPortal);
   }

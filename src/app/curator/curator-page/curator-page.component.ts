@@ -1,16 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, ParamMap } from "@angular/router";
-import { combineLatest, Observable } from "rxjs";
-import { map, pluck, shareReplay, switchMap } from "rxjs/operators";
-import { DatabasesService } from "../../databases/services/databases.service";
-import {
-  CuratorPageService,
-  StatisticsWithResource,
-} from "./curator-page.service";
-import { environment } from "../../../environments/environment";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 import { User } from "src/app/models/User.model";
 import { CuratorStatistics } from "src/app/models/statistics.model";
-import { Resource } from "src/app/models/resource.model";
+import { CuratorPageService } from "./curator-page.service";
 
 @Component({
   selector: "app-curator-page",
@@ -22,6 +16,7 @@ export class CuratorPageComponent implements OnInit {
   orcidId$: Observable<string>;
   // statsWithResource$: Observable<StatisticsWithResource[]>;
   statistics$: Observable<CuratorStatistics[]>;
+  bipScores$: Observable<any>;
 
   constructor(
     private route: ActivatedRoute,
@@ -37,5 +32,8 @@ export class CuratorPageComponent implements OnInit {
     this.curatorPageService.init(this.orcidId$);
     this.curator$ = this.curatorPageService.getCurator();
     this.statistics$ = this.curatorPageService.getStatistics();
+    this.bipScores$ = this.curatorPageService.getBipScholarScores(
+      this.orcidId$
+    );
   }
 }

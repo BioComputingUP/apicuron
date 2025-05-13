@@ -4,9 +4,18 @@
     <div>
       <div class="tw-flex tw-flex-col tw-gap-4 tw-pb-4">
         <div *ngFor="let stats of statistics$ | async">
-          <curator-stat-card [statistics]="stats" [curator]="curator"></curator-stat-card>
+          <curator-stat-card
+            [statistics]="stats"
+            [curator]="curator"
+          ></curator-stat-card>
         </div>
       </div>
+    </div>
+
+    <div *ngIf="bipScores$ | async as bipScores">
+      <p>
+        {{ bipScores | json }}
+      </p>
     </div>
   </ng-container>
 </div>
