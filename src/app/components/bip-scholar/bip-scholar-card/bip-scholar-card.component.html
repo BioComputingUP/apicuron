@@ -1,20 +1,20 @@
 <div
   *ngIf="stats_section_info as section"
-  class="tw-p-4 tw-pt-6 tw-border tw-border-gray-200 tw-rounded-md tw-mb-2 tw-relative tw-bg-white tw-shadow-lg tw-min"
+  class="tw-p-4 tw-pt-6 tw-border tw-border-gray-200 tw-rounded-md tw-mb-2 tw-relative tw-bg-white tw-shadow-md tw-h-full"
 >
   <h3
     class="tw-text-lg tw-mb-4 tw-absolute -tw-top-4 tw-left-2 tw-py-1 tw-px-3 tw-bg-white"
   >
     {{ section.title }}
   </h3>
-  <div class="tw-grid tw-space-y-1 tw-grid-cols-2">
+  <div class="tw-grid tw-space-y-1 tw-grid-cols-2 tw-gap-y-1">
     <div
       *ngFor="let stat of section.stats | keyvalue"
       class="tw-flex tw-flex-col tw-place-items-center"
     >
       <span class="tw-font-bold tw-text-center">{{ stat.value.value }}</span>
-      <p class="tw-text-xs tw-text-center tw-text-gray-500 tw-w-3/4">
-        {{ stat.value.label | lowercase }}
+      <p class="tw-text-xs tw-text-center tw-text-gray-800 tw-w-3/4">
+        {{ stat.value.label | titlecase }}
       </p>
     </div>
   </div>
