@@ -7,6 +7,7 @@ import { BipScholarSection } from "src/app/models/external/bip-scholar.model";
   imports: [CommonModule],
   selector: "bip-scholar-card",
   templateUrl: "./bip-scholar-card.component.html",
+  styleUrl: "./bip-scholar-card.component.scss",
 })
 export class BipScholarCardComponent {
   @Input() stats_section_info: BipScholarSection;
