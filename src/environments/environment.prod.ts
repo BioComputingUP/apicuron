@@ -1,15 +1,15 @@
 export const environment = {
   production: true,
-  env: 'production',
+  env: "production",
   // ws: window.location.protocol + '//' + window.location.hostname + '/api/',
-  host: 'https://apicuron.org',
-  ws: 'https://apicuron.org/api',
-  auth_ws: 'https://apicuron.org/api',
-  public_file_url: 'https://apicuron.org/api/files',
-  resource_logo_path: 'resources',
-  orcid_url: 'https://pub.orcid.org/v3.0/',
-  orcid_main_url: 'https://orcid.org/',
-  fairsharing_url: 'https://fairsharing.org'
-
-
+  host: "https://apicuron.org",
+  ws: "https://apicuron.org/api",
+  auth_ws: "https://apicuron.org/api",
+  public_file_url: "https://apicuron.org/api/files",
+  resource_logo_path: "resources",
+  orcid_url: "https://pub.orcid.org/v3.0/",
+  orcid_main_url: "https://orcid.org/",
+  fairsharing_url: "https://fairsharing.org",
+  bip_url: "https://bip.imsi.athenarc.gr/scholar",
+  bip_scholar_url: "https://bip-api.imsi.athenarc.gr/scholar/scores",
 };

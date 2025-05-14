@@ -24,7 +24,7 @@ export interface StatisticsWithResource {
 export class CuratorPageService {
   private wsUrl = environment.ws;
   private orcid_url = environment.orcid_url;
-  private bip_url = environment.bip_scholar_url;
+  private bip_url = environment.bip_scholar_api_url;
   private stage = environment.env;
   // state observables
   curator$: Observable<User>;
