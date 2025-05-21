@@ -5,7 +5,7 @@ import {
 	Badge,
 	BadgeDocument,
 } from '../../core/schemas/achievements/badges.schema';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import {
 	Statistics,
 	StatisticsDocument,
@@ -75,10 +75,11 @@ export class StatisticsEventHandlerService {
 
 	@OnEvent(UserMedalsCountUpdatedEvent.name, { promisify: true, async: true })
 	async updateUserMedalCount(payload: UserMedalsCountUpdatedEvent) {
-		const filter = {
+		const filter: FilterQuery<MedalDocument> = {
 			resource_id: payload.resource_id,
 			curator_orcid: payload.curator_orcid,
 			league: payload.league,
+			state: AchievementState.achieved,
 		};
 		const medalCount = await this.medalModel.countDocuments(filter);
 
@@ -127,6 +128,7 @@ export class StatisticsEventHandlerService {
 			resource_id: payload.resource_id,
 			curator_orcid: payload.curator_orcid,
 			league: payload.league,
+			state: AchievementState.achieved,
 		};
 		const badgeCount = await this.badgeModel.countDocuments(filter);
 
