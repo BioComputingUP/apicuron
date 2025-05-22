@@ -23,7 +23,7 @@
         class="tw-font-med tw-block tw-text-gray-500 tw-text-sm tw-leading-relaxed"
         *ngIf="medal.score_relative > 1"
       >
-        Requires ranking Among {{ medal.score_relative }} biocurators
+        Requires ranking among the top {{ medal.score_relative }} biocurators
       </span>
       <span
         class="tw-font-med tw-block tw-text-gray-500 tw-text-sm tw-leading-relaxed"
@@ -41,8 +41,26 @@
         cdkOverlayOrigin
         #activities_list
       >
-        Contributions
+        in these Contributions
       </span>
+      <!-- Date -->
+      <div
+        *ngIf="medal.last_day || medal.first_day"
+        class="tw-text-sm tw-text-gray-500"
+      >
+        <ng-container *ngIf="medal.first_day && medal.last_day">
+          Between <b>{{ medal.first_day | date : "dd MMMM y" }}</b> and
+          <b> {{ medal.last_day | date : "dd MMMM y" : "UTC" }} UTC </b>
+        </ng-container>
+        <ng-container *ngIf="medal.first_day && !medal.last_day">
+          After
+          <b> {{ medal.first_day | date : "dd MMMM y" : "UTC" }} UTC </b>
+        </ng-container>
+        <ng-container *ngIf="medal.last_day && !medal.first_day">
+          Before
+          <b> {{ medal.last_day | date : "dd MMMM y" : "UTC" }} UTC </b>
+        </ng-container>
+      </div>
     </div>
   </div>
 </div>
