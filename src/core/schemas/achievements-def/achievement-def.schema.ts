@@ -39,7 +39,9 @@ export class AchievementDef implements IResourceEntity {
 
 	@Prop({
 		type: [String],
-		required: true,
+		required: function () {
+			return !this.assignable;
+		},
 	})
 	list_terms: string[];
 
@@ -75,6 +77,20 @@ export class AchievementDef implements IResourceEntity {
 		required: false,
 	})
 	last_day?: Date;
+
+	@Prop({
+		type: Boolean,
+		required: false,
+		default: false,
+	})
+	assignable?: boolean; // whether the badge can be manually assigned or  not
+
+	@Prop({
+		type: [String],
+		required: false,
+		default: () => [],
+	})
+	assigned_to: string[];
 }
 
 export const AchievementDefSchemaFactory = () => {
