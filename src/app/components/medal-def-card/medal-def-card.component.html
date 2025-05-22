@@ -13,7 +13,7 @@
     <div class="tw-pl-2 tw-flex tw-flex-col tw-grow tw-min-w-0">
       <!-- Final optimized solution -->
       <span
-        class="tw-text-sm sm:tw-text-base tw-text-gray-700 tw-font-bold tw-block tw-text-left tw-line-clamp-3 tw-break-words tw-hyphens-auto tw-whitespace-normal"
+        class="tw-text-xl tw-text-gray-700 tw-font-bold tw-block tw-text-left tw-line-clamp-3 tw-break-words tw-hyphens-auto tw-whitespace-normal"
       >
         {{ medal.name }}
       </span>
@@ -41,24 +41,24 @@
         cdkOverlayOrigin
         #activities_list
       >
-        in these Contributions
+        Required Contributions
       </span>
       <!-- Date -->
       <div
         *ngIf="medal.last_day || medal.first_day"
-        class="tw-text-sm tw-text-gray-500"
+        class="tw-text-sm tw-text-gray-500 tw-bg-slate-100 tw-rounded-xl tw-px-2 tw-py-1 tw-w-fit tw-mt-2"
       >
         <ng-container *ngIf="medal.first_day && medal.last_day">
-          Between <b>{{ medal.first_day | date : "dd MMMM y" }}</b> and
-          <b> {{ medal.last_day | date : "dd MMMM y" : "UTC" }} UTC </b>
+          From <b>{{ medal.first_day | date : "dd MMM yy" : "UTC" }}</b> to
+          <b> {{ medal.last_day | date : "dd MMM yy" : "UTC" }} </b>
         </ng-container>
         <ng-container *ngIf="medal.first_day && !medal.last_day">
           After
-          <b> {{ medal.first_day | date : "dd MMMM y" : "UTC" }} UTC </b>
+          <b> {{ medal.first_day | date : "dd MMM yy" : "UTC" }} </b>
         </ng-container>
         <ng-container *ngIf="medal.last_day && !medal.first_day">
           Before
-          <b> {{ medal.last_day | date : "dd MMMM y" : "UTC" }} UTC </b>
+          <b> {{ medal.last_day | date : "dd MMM yy" : "UTC" }} </b>
         </ng-container>
       </div>
     </div>
