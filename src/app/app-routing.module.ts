@@ -1,13 +1,12 @@
-import { NgModule } from "@angular/core";
-import { Routes, RouterModule } from "@angular/router";
-import { AuthGuard } from "./auth/auth.guard";
-import { IndexComponent } from "./index/index.component";
-import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
-import { MainLayoutComponent } from "./main-layout/main-layout.component";
-import { environment } from "../environments/environment";
-import { RedirectGuard } from "./guards/redirect.guard";
-import { AppComponent } from "./app.component";
 import { APP_BASE_HREF } from "@angular/common";
+import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from "@angular/router";
+import { environment } from "../environments/environment";
+import { AppComponent } from "./app.component";
+import { AuthGuard } from "./auth/auth.guard";
+import { RedirectGuard } from "./guards/redirect.guard";
+import { MainLayoutComponent } from "./main-layout/main-layout.component";
+import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
 
 const routes: Routes = [
   {
@@ -38,16 +37,18 @@ const routes: Routes = [
       import("./databases/databases.module").then((m) => m.DatabasesModule),
   },
   {
-    path: "curators",
+    path: "curators-old",
     component: MainLayoutComponent,
     loadChildren: () =>
       import("./curator/curator.module").then((m) => m.CuratorModule),
   },
   {
-    path: "registry",
+    path: "curators",
     component: MainLayoutComponent,
     loadChildren: () =>
-      import("./curator-registry/curator-registry.module").then((m) => m.CuratorRegistryModule),
+      import("./curator-registry/curator-registry.module").then(
+        (m) => m.CuratorRegistryModule
+      ),
   },
 
   // {
