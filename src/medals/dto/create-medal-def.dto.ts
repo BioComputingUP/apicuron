@@ -71,13 +71,13 @@ export class CreateMedalDefDto {
 	@IsNotEmpty()
 	score_relative: number;
 
-	@MaxDateField(['last_day'])
+	@MaxDateField(['last_day'], true)
 	@IsDate()
 	@IsOptional()
 	@Type(() => Date)
 	first_day?: Date;
 
-	@MinDateField(['first_day'])
+	@MinDateField(['first_day'], true)
 	@IsDate()
 	@IsOptional()
 	@Type(() => Date)
