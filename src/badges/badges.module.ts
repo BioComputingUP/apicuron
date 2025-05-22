@@ -15,6 +15,7 @@ import { EarnedBadgesService } from './services/earned-badges.service';
 import { GroupReportsByUserAggregator } from './aggregation/group-reports-by-user.service';
 import { BadgesController } from './controllers/badges.controller';
 import { BadgesQueryService } from './services/badges-query.service';
+import { AssignableBadgesService } from './services/assignable-badges.service';
 
 @Module({
 	imports: [CoreApicuronModule, AuthModule, ResourcesModule],
@@ -29,6 +30,7 @@ import { BadgesQueryService } from './services/badges-query.service';
 		EarnedBadgesService,
 		BadgeAggregatorService,
 		BadgesQueryService,
+		AssignableBadgesService,
 	],
 	exports: [BadgeAggregatorService, EarnedBadgesService],
 	controllers: [BadgesDefController, BadgesController],
