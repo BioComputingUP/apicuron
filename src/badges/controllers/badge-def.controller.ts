@@ -1,40 +1,39 @@
 import {
-	Controller,
-	Post,
 	Body,
-	Req,
-	Get,
-	Put,
-	Res,
+	Controller,
 	Delete,
+	Get,
 	Param,
+	Post,
+	Put,
 	Query,
-	SerializeOptions,
+	Req,
+	SerializeOptions
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
-	ApiTags,
 	ApiHeader,
-	ApiOperation,
 	ApiOkResponse,
+	ApiOperation,
 	ApiSecurity,
+	ApiTags,
 } from '@nestjs/swagger';
-import { CreateBadgeDefDto } from '../dto/create-badge-def.dto';
-import { DeleteBadgeDefDto } from '../dto/delete-badge-def.dto';
-import { resourceEntityPrivacyFilter } from '../../util/privacy.helper';
+import { plainToInstance } from 'class-transformer';
+import { AuthService } from '../../auth/auth.service';
+import { UserReq } from '../../auth/decorators/applyUser.decorator';
 import { AuthProtected } from '../../auth/decorators/auth.decorator';
 import { Public } from '../../auth/decorators/public.decorator';
 import { User } from '../../core/schemas/user.schema';
-import { UserReq } from '../../auth/decorators/applyUser.decorator';
-import { VersionHeader } from '../../plugins/swagger/config';
-import { AuthService } from '../../auth/auth.service';
 import { paginate, Paginated } from '../../pagination/paginator';
+import { VersionHeader } from '../../plugins/swagger/config';
+import { resourceEntityPrivacyFilter } from '../../util/privacy.helper';
+import { BadgeDefDto } from '../dto/badge.dto';
+import { CreateBadgeDefDto } from '../dto/create-badge-def.dto';
+import { DeleteBadgeDefDto } from '../dto/delete-badge-def.dto';
+import { BadgeDefFilter } from '../dto/filter-badge-def.dto';
 import { UpdateBadgeDefDto } from '../dto/update-badge-def.dto';
 import { BadgeDefCommandsService } from '../services/badge-def-commands.service';
 import { BadgeDefQueriesService } from '../services/badge-def-queries.service';
-import { BadgeDefFilter } from '../dto/filter-badge-def.dto';
-import { BadgeDefDto } from '../dto/badge.dto';
-import { plainToInstance } from 'class-transformer';
 
 @ApiTags('Achievements Definition')
 @ApiHeader(VersionHeader)
@@ -65,9 +64,11 @@ export class BadgesDefController {
 	// nest decorators
 	@Post()
 	@AuthProtected()
+	@SerializeOptions({ type: BadgeDefDto })
 	async create_badge(@Body() badge: CreateBadgeDefDto, @Req() req) {
 		this.can_edit_resource(req.user, badge.resource_id);
-		return await this.badgeDefCommands.createBadgeDef(badge);
+		const res =  await this.badgeDefCommands.createBadgeDef(badge);
+		return res;
 	}
 
 	@ApiOperation({
@@ -79,6 +80,7 @@ export class BadgesDefController {
 	})
 	@AuthProtected()
 	@Public()
+	// eslint-disable-next-line prettier/prettier
 	@SerializeOptions({ type: Paginated<BadgeDefDto> })
 	@Get()
 	async getBadgeDefs(

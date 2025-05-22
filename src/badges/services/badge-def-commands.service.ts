@@ -3,21 +3,21 @@ import {
 	Injectable,
 	InternalServerErrorException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import {
 	BadgeDef,
 	BadgeDefDocument,
 } from '../../core/schemas/achievements-def/badge-def.schema';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Model } from 'mongoose';
-import { UpdateBadgeDefDto } from '../dto/update-badge-def.dto';
-import { BadgeDefUpdatedEvent } from '../events/badge-def-updated.event';
-import { DeleteBadgeDefDto } from '../dto/delete-badge-def.dto';
-import { BadgeDefDeletedEvent } from '../events/badge-def-deleted.event';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { CreateBadgeDefDto } from '../dto/create-badge-def.dto';
 import { assignResourceEntityPrivacy } from '../../util/privacy.helper';
+import { CreateBadgeDefDto } from '../dto/create-badge-def.dto';
+import { DeleteBadgeDefDto } from '../dto/delete-badge-def.dto';
+import { UpdateBadgeDefDto } from '../dto/update-badge-def.dto';
 import { BadgeDefCreatedEvent } from '../events/badge-def-created.event';
+import { BadgeDefDeletedEvent } from '../events/badge-def-deleted.event';
+import { BadgeDefUpdatedEvent } from '../events/badge-def-updated.event';
 
 @Injectable()
 export class BadgeDefCommandsService {
