@@ -105,10 +105,7 @@ async function bootstrap() {
 			]),
 			description: faker.lorem.sentence({ min: 3, max: 6 }),
 			league: exampleResource.defaultLeague,
-			privacy: faker.helpers.arrayElement([
-				PrivacyType.private,
-				PrivacyType.public,
-			]),
+			privacy: PrivacyType.public,
 			score: faker.number.int({ max: 100, min: 5 }),
 		});
 

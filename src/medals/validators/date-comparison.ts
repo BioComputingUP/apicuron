@@ -84,7 +84,7 @@ export class DateFieldComparison implements ValidatorConstraintInterface {
 			if (
 				skipIfNull &&
 				(!args.object[property_name] ||
-					typeof args.object[property_name] == 'string' ||
+					typeof args.object[property_name] != 'string' ||
 					!isDateString(args.object[property_name]))
 			) {
 				return true;
