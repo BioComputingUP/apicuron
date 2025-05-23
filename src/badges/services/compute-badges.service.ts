@@ -1,24 +1,24 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
+import * as _ from 'lodash';
 import { FilterQuery, Model } from 'mongoose';
-import {
-	Badge,
-	BadgeDocument,
-} from '../../core/schemas/achievements/badges.schema';
+import { AchievementState } from '../../core/enums';
 import {
 	BadgeDef,
 	BadgeDefDocument,
 } from '../../core/schemas/achievements-def/badge-def.schema';
-import { AchievementState } from '../../core/enums';
+import {
+	Badge,
+	BadgeDocument,
+} from '../../core/schemas/achievements/badges.schema';
+import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
 	GroupedReportsByUser,
 	GroupReportsByUserAggregator,
 } from '../aggregation/group-reports-by-user.service';
 import { getMatchingReportFilter } from '../helpers/helpers';
-
 @Injectable()
 export class ComputeBadgesService {
 	constructor(
@@ -81,6 +81,7 @@ export class ComputeBadgesService {
 		badgeDefFilter: FilterQuery<BadgeDefDocument> = {},
 	): Promise<{ badgeCount: number; badgeDefsCount: number }> {
 		let badgeDefCount = 0;
+		let assignedBadgesCount = 0;
 
 		const badgeDefs = this.badgeDefModel
 			.find(
@@ -96,26 +97,31 @@ export class ComputeBadgesService {
 
 		for await (const badgeDef of badgeDefs) {
 			badgeDefCount++;
+			if (!badgeDef.assignable) {
+				const badges$ = [];
+				const reportAggregationByUser = this.groupReportsByUser
+					.aggregate(getMatchingReportFilter(badgeDef))
+					.cursor({ batchSize: 50 });
 
-			const reportAggregationByUser = this.groupReportsByUser
-				.aggregate(getMatchingReportFilter(badgeDef))
-				.cursor({ batchSize: 50 });
+				for await (const report of reportAggregationByUser) {
+					const computeBadge$ = this.buildBadgeFromAggregatedReports(
+						badgeDef,
+						report,
+					).then((badge) => badge.save());
 
-			const badges$ = [];
-
-			for await (const report of reportAggregationByUser) {
-				const computeBadge$ = this.buildBadgeFromAggregatedReports(
+					badges$.push(computeBadge$);
+				}
+				userBadgesPromises$.push(Promise.all(badges$));
+				this.logger.log(
+					`Badge ${badgeDef.name} computed for ${badges$.length} users`,
+				);
+			} else {
+				const user_orcids = badgeDef.assigned_to;
+				assignedBadgesCount = await this.createAssignedBadges(
 					badgeDef,
-					report,
-				).then((badge) => badge.save());
-
-				badges$.push(computeBadge$);
+					user_orcids,
+				);
 			}
-			userBadgesPromises$.push(Promise.all(badges$));
-
-			this.logger.log(
-				`Badge ${badgeDef.name} computed for ${badges$.length} users`,
-			);
 		}
 
 		await Promise.all(userBadgesPromises$);
@@ -123,7 +129,7 @@ export class ComputeBadgesService {
 		this.logger.log(`Computed ${userBadgesPromises$.length} badges`);
 
 		return {
-			badgeCount: userBadgesPromises$.length,
+			badgeCount: userBadgesPromises$.length + assignedBadgesCount,
 			badgeDefsCount: badgeDefCount,
 		};
 	}
@@ -133,5 +139,49 @@ export class ComputeBadgesService {
 	): Promise<{ badgeCount: number; badgeDefsCount: number }> {
 		await this.badgeModel.deleteMany(filter);
 		return await this.computeBadges(filter);
+	}
+
+	/// create missing assigned badges for a badgeDef
+	private async createAssignedBadges(
+		badgeDef: BadgeDef,
+		user_orcids: string[],
+	) {
+		// get user orcids that already have the badge
+		const existingBadgeDefs = await this.badgeModel.find(
+			{
+				name: badgeDef.name,
+				resource_id: badgeDef.resource_id,
+				curator_orcid: { $in: user_orcids },
+			},
+			{
+				curator_orcid: 1,
+			},
+		);
+		const filtered_orcids = _.difference(
+			user_orcids,
+			existingBadgeDefs.map((b) => b.curator_orcid),
+		);
+		// TODO: maybe check if the user exists
+		const createBadgePromises$ = filtered_orcids.map((user_orcid) => {
+			const badge = new this.badgeModel({
+				curator_orcid: user_orcid,
+				name: badgeDef.name,
+				displayedName: badgeDef.displayedName,
+				resource_id: badgeDef.resource_id,
+				resource_uri: badgeDef.resource_uri,
+				league: badgeDef.league ?? 'default',
+				color_code: badgeDef.color_code,
+				state: AchievementState.achieved,
+				achieved_at: new Date(),
+				privacy: badgeDef.privacy,
+				assignable: true,
+			});
+			return badge.save();
+		});
+		await Promise.all(createBadgePromises$);
+		this.logger.log(
+			`Created ${createBadgePromises$.length} assigned badges for ${badgeDef.name}`,
+		);
+		return createBadgePromises$.length;
 	}
 }
