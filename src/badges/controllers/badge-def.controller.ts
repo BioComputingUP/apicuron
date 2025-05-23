@@ -152,8 +152,18 @@ export class BadgesDefController {
 		@Req() req
 	) {
 
-		this.can_edit_resource(req.user, assignBadge.resource_id)
+		// this.can_edit_resource(req.user, assignBadge.resource_id)
 		return this.assignableBadgesService.assign_badge_to_users(assignBadge)
 
+	}
+
+	@Delete('withdraw-badge')
+	@SerializeOptions({ type: AssignableBadgeDto })
+	unassignBadgeFromUsers(
+		@Body() assignBadge: AssignBadgeDto,
+		@Req() req
+	) {
+		// this.can_edit_resource(req.user, assignBadge.resource_id)
+		return this.assignableBadgesService.withdraw_badge_from_user(assignBadge)
 	}
 }
