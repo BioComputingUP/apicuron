@@ -27,11 +27,13 @@ import { User } from '../../core/schemas/user.schema';
 import { paginate, Paginated } from '../../pagination/paginator';
 import { VersionHeader } from '../../plugins/swagger/config';
 import { resourceEntityPrivacyFilter } from '../../util/privacy.helper';
-import { BadgeDefDto } from '../dto/badge.dto';
+import { AssignBadgeDto } from '../dto/assign-badge.dto';
+import { AssignableBadgeDto, BadgeDefDto } from '../dto/badge.dto';
 import { CreateBadgeDefDto } from '../dto/create-badge-def.dto';
 import { DeleteBadgeDefDto } from '../dto/delete-badge-def.dto';
 import { BadgeDefFilter } from '../dto/filter-badge-def.dto';
 import { UpdateBadgeDefDto } from '../dto/update-badge-def.dto';
+import { AssignableBadgesService } from '../services/assignable-badges.service';
 import { BadgeDefCommandsService } from '../services/badge-def-commands.service';
 import { BadgeDefQueriesService } from '../services/badge-def-queries.service';
 
@@ -45,11 +47,12 @@ export class BadgesDefController {
 	constructor(
 		protected badgeDefCommands: BadgeDefCommandsService,
 		protected badgeDefQueries: BadgeDefQueriesService,
+		protected assignableBadgesService: AssignableBadgesService,
 		protected authService: AuthService,
 		protected eventEmitter: EventEmitter2,
 	) {}
 
-	private can_edit_resource(user, resource_id) {
+	private can_edit_resource(user: User, resource_id: string) {
 		return this.authService.user_has_resource(user, resource_id);
 	}
 
@@ -140,5 +143,17 @@ export class BadgesDefController {
 		});
 
 		return badgeDefEntity;
+	}
+
+	@Post('assign-badge')
+	@SerializeOptions({ type: AssignableBadgeDto })
+	assignBadgetoUsers(
+		@Body() assignBadge: AssignBadgeDto,
+		@Req() req
+	) {
+
+		this.can_edit_resource(req.user, assignBadge.resource_id)
+		return this.assignableBadgesService.assign_badge_to_users(assignBadge)
+
 	}
 }

@@ -1,8 +1,7 @@
 import { Expose } from 'class-transformer';
 import { AchievementState, PrivacyType } from 'src/core/enums';
-import { BadgeDef } from '../../core/schemas';
 
-export class BadgeDefDto {
+export class BaseBadgeDefDto {
 	@Expose()
 	name: string;
 
@@ -23,13 +22,14 @@ export class BadgeDefDto {
 	color_code: string;
 
 	@Expose()
+	privacy: PrivacyType;
+}
+export class BadgeDefDto extends BaseBadgeDefDto {
+	@Expose()
 	count_threshold: number;
 
 	@Expose()
 	list_terms: string[];
-
-	@Expose()
-	privacy: PrivacyType;
 
 	@Expose()
 	startDate?: Date;
@@ -38,6 +38,13 @@ export class BadgeDefDto {
 	endDate?: Date;
 }
 
+export class AssignableBadgeDto extends BaseBadgeDefDto {
+	@Expose()
+	assignable: boolean;
+
+	@Expose()
+	assigned_to: string[];
+}
 export class BadgeDto extends BadgeDefDto {
 	@Expose()
 	curator_orcid: string;
