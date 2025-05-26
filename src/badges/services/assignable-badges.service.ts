@@ -22,9 +22,11 @@ export class AssignableBadgesService {
 	) {}
 	private async check_if_badge_is_assignable(
 		badge_name: string,
+		resource_id: string,
 	): Promise<BadgeDefDocument> {
 		const existingBadgeDef = await this.badgeDefModel.findOne({
 			name: badge_name,
+			resource_id: resource_id,
 		});
 		if (!existingBadgeDef) {
 			throw new BadRequestException(
@@ -40,7 +42,7 @@ export class AssignableBadgesService {
 	}
 	async assign_badge_to_users(assignBadgeDto: AssignBadgeDto) {
 		const { badge_name, resource_id, user_orcids } = assignBadgeDto;
-		await this.check_if_badge_is_assignable(badge_name);
+		await this.check_if_badge_is_assignable(badge_name, resource_id);
 		const updatedBadgeDef = await this.badgeDefModel.findOneAndUpdate(
 			{
 				name: badge_name,
@@ -68,7 +70,7 @@ export class AssignableBadgesService {
 	}
 	async withdraw_badge_from_user(assignBadgeDto: AssignBadgeDto) {
 		const { badge_name, resource_id, user_orcids } = assignBadgeDto;
-		await this.check_if_badge_is_assignable(badge_name);
+		await this.check_if_badge_is_assignable(badge_name, resource_id);
 		const updatedBadgeDef = await this.badgeDefModel.findOneAndUpdate(
 			{
 				name: badge_name,

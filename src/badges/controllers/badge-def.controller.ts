@@ -145,25 +145,43 @@ export class BadgesDefController {
 		return badgeDefEntity;
 	}
 
+	@ApiOperation({
+		summary: 'Assign a manually assignable badge to a list of users',
+	})
+	@ApiOkResponse({
+		description: 'The badge definition with the assigned users',
+		type: AssignableBadgeDto,
+	})
+	@ApiSecurity('basic')
 	@Post('assign-badge')
 	@SerializeOptions({ type: AssignableBadgeDto })
+	@AuthProtected()
 	assignBadgetoUsers(
 		@Body() assignBadge: AssignBadgeDto,
 		@Req() req
 	) {
 
-		// this.can_edit_resource(req.user, assignBadge.resource_id)
+		this.can_edit_resource(req.user, assignBadge.resource_id)
 		return this.assignableBadgesService.assign_badge_to_users(assignBadge)
 
 	}
 
+	@ApiOperation({
+		summary: 'Unassign a manually assignable badge from a list of users',
+	})
+	@ApiOkResponse({
+		description: 'The badge definition with the unassigned users',
+		type: AssignableBadgeDto,
+	})
+	@ApiSecurity('basic')
 	@Delete('withdraw-badge')
 	@SerializeOptions({ type: AssignableBadgeDto })
+	@AuthProtected()
 	unassignBadgeFromUsers(
 		@Body() assignBadge: AssignBadgeDto,
 		@Req() req
 	) {
-		// this.can_edit_resource(req.user, assignBadge.resource_id)
+		this.can_edit_resource(req.user, assignBadge.resource_id)
 		return this.assignableBadgesService.withdraw_badge_from_user(assignBadge)
 	}
 }

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { AchievementState, PrivacyType } from 'src/core/enums';
 
@@ -22,6 +23,12 @@ export class BaseBadgeDefDto {
 	color_code: string;
 
 	@Expose()
+	@ApiProperty({
+		type: String,
+		enum: PrivacyType,
+		example: PrivacyType.public,
+		description: 'Set to "private" to hide the badge from public view',
+	})
 	privacy: PrivacyType;
 }
 export class BadgeDefDto extends BaseBadgeDefDto {
