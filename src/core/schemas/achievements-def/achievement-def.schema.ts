@@ -40,7 +40,7 @@ export class AchievementDef implements IResourceEntity {
 	@Prop({
 		type: [String],
 		required: function () {
-			return !this.assignable;
+			return this.type === AchievementType.medal || !this.assignable; // if it's a medal always require the list_terms, OR (if it's a badge) only require it if it's not assignable
 		},
 	})
 	list_terms: string[];
@@ -80,14 +80,18 @@ export class AchievementDef implements IResourceEntity {
 
 	@Prop({
 		type: Boolean,
-		required: false,
+		required: function () {
+			return this.type === AchievementType.badge; // if it's a badge, include if it's assignable or not
+		},
 		default: false,
 	})
-	assignable?: boolean; // whether the badge can be manually assigned or  not
+	assignable?: boolean;
 
 	@Prop({
 		type: [String],
-		required: false,
+		required: function () {
+			return this.type === AchievementType.badge && this.assignable; // if it's a badge and assignable, require the assigned_to field
+		},
 		default: () => [],
 	})
 	assigned_to: string[];

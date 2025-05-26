@@ -1,5 +1,6 @@
 import { Expose, Type } from 'class-transformer';
 import {
+	ArrayNotEmpty,
 	IsBoolean,
 	IsDate,
 	IsNotEmpty,
@@ -62,7 +63,8 @@ export class CreateBadgeDefDto {
 
 	@ValidateIf((o) => !o.assignable)
 	@Validate(ActivityTermExists, [{ each: true }])
-	@IsNotEmpty()
+	@IsNotEmpty({ each: true })
+	@ArrayNotEmpty()
 	@Expose()
 	list_terms: string[];
 
@@ -70,7 +72,7 @@ export class CreateBadgeDefDto {
 		PartnerResource.name,
 		({ league, resource_id }): FilterQuery<PartnerResourceDocument> => {
 			return {
-				leagues: league,
+				'leagues.name': league,
 				resource_id,
 			};
 		},
