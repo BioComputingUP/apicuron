@@ -13,7 +13,7 @@ import { UserDocument } from '../../core/schemas/user.schema';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
 import { PartnerResourceUpdatedEvent } from '../../resources/partner-resources/events/resource-updated.event';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, Query, UpdateWriteOpResult } from 'mongoose';
 import { PrivacyType } from '../../core/enums';
 import { UserRepository } from '../../core/repositories/user.repository';
 
@@ -122,12 +122,18 @@ export class ReportAggregatorService implements Aggregator {
 	}
 	async recomputeAllResourceAggregates(resource_id: string) {
 		const resource = await this.resourceModel.findOne({ resource_id });
+		if (!resource) {
+			this.logger.error(
+				`Resource with id ${resource_id} not found while recomputing aggregates`,
+			);
+			throw new Error(`Resource with id ${resource_id} not found`);
+		}
 
 		this.logger.debug(
 			`Assinging resource ${resource.resource_name} to all relevant reports`,
 		);
 		// Update the resource
-		const updates$ = [];
+		const updates$: Query<UpdateWriteOpResult, unknown, unknown>[] = [];
 		const resourceUpdate$ = this.reportModel.updateMany(
 			{ resource_id },
 			{ $set: { resource } },
@@ -153,7 +159,7 @@ export class ReportAggregatorService implements Aggregator {
 		const orcidIds = await this.reportModel.distinct('curator_orcid', {
 			resource_id,
 		});
-		const userUpdates$ = [];
+		const userUpdates$: Query<UpdateWriteOpResult, unknown, unknown>[] = [];
 		for (const curator_orcid of orcidIds) {
 			const user = await this.userRepository.findOne({
 				orcid_id: curator_orcid,
@@ -173,7 +179,7 @@ export class ReportAggregatorService implements Aggregator {
 		// update all terms
 		const terms = await this.termModel.find({ resource_id });
 
-		const termUpdates$ = [];
+		const termUpdates$: Query<UpdateWriteOpResult, unknown, unknown>[] = [];
 		for (const term of terms) {
 			const update$ = this.reportModel.updateMany(
 				{ activity_term: term.activity_term, resource_id },

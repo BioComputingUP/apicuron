@@ -75,7 +75,7 @@ export class SubmitOrcidWork implements OnModuleInit {
 				continue;
 			}
 
-			const submissions$ = [];
+			const submissions$: Promise<unknown>[] = [];
 			for (const stat of stats) {
 				const submission$ = this.submitSingleWork(
 					stat,

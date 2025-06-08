@@ -188,7 +188,7 @@ export class OrcidClientService {
 		return response;
 	}
 
-	async get_user_info(orcid_id: string): Promise<OrcidUserInfo> {
+	async get_user_info(orcid_id: string): Promise<OrcidUserInfo | undefined> {
 		// Gets user biography, keywords, affiliation, and social links from Orcid
 		const requestUrl = `${this.orcidUrl}${orcid_id}/record`;
 		try {

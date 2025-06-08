@@ -158,7 +158,7 @@ export class StatisticsService {
 	async getResourceLeaderboard(
 		filter: FilterQuery<StatisticsDocument> & { resource_id: string },
 		options: QueryOptions<StatisticsDocument>,
-	): Promise<{ data: { stat: LeanDocument<StatisticsDocument>, user: LeanDocument<UserDocument> | null }[]; count: number }> {
+	): Promise<{ data: { stat: LeanDocument<StatisticsDocument>, user?: LeanDocument<UserDocument> | null }[]; count: number }> {
 		const resource = await this.partnerResourceService.get_resource(
 			filter.resource_id,
 		);
@@ -178,7 +178,7 @@ export class StatisticsService {
 			const user = stat.user;
 			const leaderboardEntry = {
 				stat: stat.toObject(),
-				user: user.toObject<LeanDocument<UserDocument>>(),
+				user: user?.toObject<LeanDocument<UserDocument>>() ?? null,
 			};
 
 			return leaderboardEntry

@@ -48,7 +48,7 @@ export class BasePaginationDto {
 	}
 
 	getMongoAggregation(): PaginationAggregation {
-		const agg = [];
+		const agg: PaginationAggregation = [];
 		if (this.skip) {
 			agg.push({ $skip: this.skip });
 		}

@@ -13,7 +13,7 @@ export class OrcidTokenAuthService implements OnModuleInit {
 	) {}
 	private logger = new Logger(OrcidTokenAuthService.name);
 
-	private token: OrcidAuthToken = null;
+	private token: OrcidAuthToken | null = null;
 
 	async onModuleInit() {
 		if (this.options.loadOnStartup) {
@@ -34,12 +34,13 @@ export class OrcidTokenAuthService implements OnModuleInit {
 		);
 
 		if (response.status > 400) {
+			const msg = 'Failed to retrieve ORCID API credentials';
 			this.logger.error(
 				`${response.status}:${response.data.error}${response.data.error_description}`,
 				null,
-				'Failed to retrieve ORCID API credentials',
+				msg,
 			);
-			return;
+			throw new Error(msg);
 		}
 
 		const tokenObj = response.data;

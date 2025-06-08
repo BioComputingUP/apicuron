@@ -74,9 +74,10 @@ export class MonthlyStatisticsAggregator implements Aggregator {
 		let user: UserDocument;
 		if (event instanceof EntityCreatedEvent) {
 			user = event.instance;
-		}
-		if (event instanceof EntityUpdatedEvent) {
+		} else if (event instanceof EntityUpdatedEvent) {
 			user = event.after;
+		} else {
+			throw new Error(`Received unknown event type: ${event}`);
 		}
 		await this.monthlyStatsModel.updateMany(
 			{
