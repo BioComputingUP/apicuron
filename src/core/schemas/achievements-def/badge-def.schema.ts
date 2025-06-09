@@ -29,6 +29,7 @@ export class BadgeDef {
 	@Prop()
 	resource_uri: string;
 
+	@Prop({ required: true, type: String })
 	resource_id: string;
 
 	@Prop({

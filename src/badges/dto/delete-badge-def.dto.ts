@@ -1,17 +1,15 @@
-import { IsNotEmpty, Validate, IsString, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, Validate } from 'class-validator';
 import { FilterQuery } from 'mongoose';
-import { AchievementType } from '../../core/enums';
-import { AchievementDef } from '../../core/schemas/achievements-def/achievement-def.schema';
+import {
+	BadgeDef,
+	BadgeDefDocument,
+} from '../../core/schemas/achievements-def/badge-def.schema';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../../core/schemas/resource/partner-resource.schema';
 import { ResourceIdExists } from '../../resources/partner-resources/validators/resource-id-exists';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
-import {
-	BadgeDef,
-	BadgeDefDocument,
-} from '../../core/schemas/achievements-def/badge-def.schema';
 
 export class DeleteBadgeDefDto {
 	@IsNotEmpty()

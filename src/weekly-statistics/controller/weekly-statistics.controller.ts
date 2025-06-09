@@ -4,26 +4,26 @@ import {
 	NotFoundException,
 	Param,
 	Query,
-	SerializeOptions,
+	SerializeOptions
 } from '@nestjs/common';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { VersionHeader } from '../../plugins/swagger/config';
-import { WeeklyStatisticsFilter } from '../dto/weekly-statistics-filter';
 import { UserReq } from '../../auth/decorators/applyUser.decorator';
 import { AuthProtected } from '../../auth/decorators/auth.decorator';
 import { Public } from '../../auth/decorators/public.decorator';
-import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
-import { WeeklyStatisticsService } from '../services/weekly-statistics.service';
 import { User } from '../../core/schemas/user.schema';
+import { ApiResponsePaginated } from '../../pagination/decorators/paginated-reponse.decorator';
 import { BasePaginationDto } from '../../pagination/dto/paginate.dto';
 import { paginate, Paginated } from '../../pagination/paginator';
+import { VersionHeader } from '../../plugins/swagger/config';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
+import { ApiResponseWrapped } from '../../shared/decorators/wrapped-data-response.decorator';
+import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
+import { WeeklyStatisticsFilter } from '../dto/weekly-statistics-filter';
 import {
 	WeeklyLeaderboardDto,
-	WeeklyStatisticsDto,
+	WeeklyStatisticsDto
 } from '../dto/weekly-statistics.dto';
-import { ApiResponsePaginated } from '../../pagination/decorators/paginated-reponse.decorator';
-import { ApiResponseWrapped } from '../../shared/decorators/wrapped-data-response.decorator';
+import { WeeklyStatisticsService } from '../services/weekly-statistics.service';
 
 @ApiTags('Weekly Statistics')
 @ApiHeader(VersionHeader)
@@ -48,6 +48,7 @@ export class WeeklyStatisticsController {
 	)
 	@AuthProtected()
 	@Public()
+	// eslint-disable-next-line prettier/prettier
 	@SerializeOptions({ type: Paginated<WeeklyLeaderboardDto> })
 	@Get(':resource_id/leaderboard')
 	async getWeeklyLeaderboard(

@@ -1,21 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
-import { Model } from 'mongoose';
-import { ReportDocument } from '../../core/schemas/reports.schema';
-import { ComputeStatisticsService } from '../compute-statistics/compute-statistics.service';
 import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { ReportDocument } from '../../core/schemas/reports.schema';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import {
 	Statistics,
 	StatisticsDocument,
 } from '../../core/schemas/statistics.schema';
-import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
-import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
 import { TermDocument } from '../../core/schemas/terms.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
+import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
+import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { updateUserAggregatePrivacy } from '../../util/privacy.helper';
+import { ComputeStatisticsService } from '../compute-statistics/compute-statistics.service';
 @Injectable()
 @AggregatorClass()
 export class StatisticsAggregator implements Aggregator {

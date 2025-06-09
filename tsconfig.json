@@ -18,10 +18,10 @@
 		"skipLibCheck": true,
 		"lib": ["es2015", "DOM", "DOM.Iterable"],
 		"types": ["node", "jest"],
-		"strictNullChecks": false,
+		"strictNullChecks": true,
 		"noImplicitAny": false,
 		"strictBindCallApply": false,
 		"forceConsistentCasingInFileNames": false,
-		"noFallthroughCasesInSwitch": false,
+		"noFallthroughCasesInSwitch": false
 	}
 }

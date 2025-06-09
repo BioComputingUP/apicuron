@@ -1,28 +1,27 @@
+import { Type } from 'class-transformer';
 import {
+	IsDate,
 	IsOptional,
+	IsString,
 	Matches,
 	Min,
 	Validate,
-	IsString,
-	IsDate,
-	MaxDate,
 } from 'class-validator';
 import { FilterQuery } from 'mongoose';
-import {
-	PartnerResource,
-	PartnerResourceDocument,
-} from '../../core/schemas/resource/partner-resource.schema';
-import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
-import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
 import {
 	BadgeDef,
 	BadgeDefDocument,
 } from '../../core/schemas/achievements-def/badge-def.schema';
-import { Type } from 'class-transformer';
+import {
+	PartnerResource,
+	PartnerResourceDocument,
+} from '../../core/schemas/resource/partner-resource.schema';
 import {
 	MaxDateField,
 	MinDateField,
 } from '../../medals/validators/date-comparison';
+import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
+import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
 
 export class UpdateBadgeDefDto {
 	// mandatory identifier fields

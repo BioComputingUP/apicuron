@@ -1,4 +1,5 @@
 import { FilterQuery, HydratedDocument, LeanDocument, Model } from 'mongoose';
+import { PrivateUserEntity } from 'src/auth/users/dto/user.entity';
 import { PrivacyType } from '../core/enums';
 import {
 	IResourceEntityDocument,
@@ -7,21 +8,20 @@ import {
 	LeanIResourceEntityDocument,
 } from '../core/interfaces/user-resource-entity';
 import {
+	League,
+	PartnerResource,
+	PartnerResourceDocument,
 	Resource,
 	User,
 	UserDocument,
-	PartnerResource,
-	PartnerResourceDocument,
-	League,
 } from '../core/schemas';
-import { PrivateUserEntity, UserEntity } from 'src/auth/users/dto/user.entity';
 
 export type IUserLeagueEntity = {
 	resource_id: string;
 	curator_orcid: string;
 	league: string;
 	privacy: PrivacyType;
-	user?: User;
+	user?: User | null;
 	resource: Resource;
 	league_data: League;
 };
@@ -38,7 +38,12 @@ export type IUserLeagueEntityDocument = HydratedDocument<IUserLeagueEntity>;
  */
 export function computePrivacyField(
 	resource: PartnerResourceDocument | LeanDocument<PartnerResource>,
-	relatedUser: UserDocument | LeanDocument<User> | null | PrivateUserEntity,
+	relatedUser:
+		| UserDocument
+		| LeanDocument<User>
+		| PrivateUserEntity
+		| null
+		| undefined,
 	userResourceEntity:
 		| LeanDocument<IUserResourceEntity>
 		| HydratedDocument<IUserResourceEntity>
@@ -49,6 +54,11 @@ export function computePrivacyField(
 	userResourceEntity.league = league;
 
 	const resourceLeague = resource.leagues.find((l) => l.name === league);
+	if (!resourceLeague) {
+		throw new Error(
+			`League ${league} not found in resource ${resource.resource_id}`,
+		);
+	}
 
 	// we retrieve both the league's privacy and the user's privacy setting
 	const leaguePrivacy = resourceLeague.visibility;
@@ -96,7 +106,15 @@ export function assignResourceEntityPrivacy(
 ): PrivacyType {
 	const league = resourceEntity.league ?? resource.defaultLeague;
 	resourceEntity.league = league;
-	resourceEntity.privacy = resource.getLeague(league).visibility;
+	const leaguePrivacy = resource.getLeague(league)?.visibility;
+	if (!leaguePrivacy) {
+		// If this code is reached, both the entity league and the resource default league were not found
+		// When this happen, it should be investigated
+		throw new Error(
+			`Impossible to assign League ${league}. ${league} was not found in resource ${resource.resource_id}`,
+		);
+	}
+	resourceEntity.privacy = leaguePrivacy;
 	return resourceEntity.privacy;
 }
 

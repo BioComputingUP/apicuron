@@ -1,25 +1,25 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
+import { InjectModel } from '@nestjs/mongoose';
 import { Document, FilterQuery, Model, Types } from 'mongoose';
+import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 import {
-	Report,
 	LeanReportDocument,
+	Report,
 	ReportDocument,
 } from '../../core/schemas/reports.schema';
-import { InjectModel } from '@nestjs/mongoose';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import {
 	WeeklyStatistics,
 	WeeklyStatisticsDocument,
 } from '../../core/schemas/statistics/weekly-statistics.schema';
-import { ComputeWeeklyStatisticsService } from './compute-weekly-statistics.service';
+import { TermDocument } from '../../core/schemas/terms.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
+import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
+import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
+import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { updateUserAggregatePrivacy } from '../../util/privacy.helper';
-import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
-import { TermDocument } from '../../core/schemas/terms.schema';
-import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
-import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { ComputeWeeklyStatisticsService } from './compute-weekly-statistics.service';
 
 @Injectable()
 @AggregatorClass()
@@ -89,8 +89,7 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 		let user: UserDocument;
 		if (event instanceof EntityCreatedEvent) {
 			user = event.instance;
-		}
-		if (event instanceof EntityUpdatedEvent) {
+		} else {
 			user = event.after;
 		}
 		const filter = {

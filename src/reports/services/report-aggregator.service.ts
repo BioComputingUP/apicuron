@@ -13,7 +13,7 @@ import { UserDocument } from '../../core/schemas/user.schema';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
 import { PartnerResourceUpdatedEvent } from '../../resources/partner-resources/events/resource-updated.event';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, UpdateWriteOpResult } from 'mongoose';
 import { PrivacyType } from '../../core/enums';
 import { UserRepository } from '../../core/repositories/user.repository';
 
@@ -120,19 +120,24 @@ export class ReportAggregatorService implements Aggregator {
 			});
 		}
 	}
-	async recomputeAllResourceAggregates(resource_id: string) {
+	async recomputeAllResourceAggregates(resource_id: string): Promise<void> {
 		const resource = await this.resourceModel.findOne({ resource_id });
-
+		if (!resource) {
+			this.logger.warn(
+				`No resource found with id ${resource_id}. Cannot recompute aggregates.`,
+			);
+			return;
+		}
 		this.logger.debug(
 			`Assinging resource ${resource.resource_name} to all relevant reports`,
 		);
 		// Update the resource
-		const updates$ = [];
+		const updates$: Promise<UpdateWriteOpResult>[] = [];
 		const resourceUpdate$ = this.reportModel.updateMany(
 			{ resource_id },
 			{ $set: { resource } },
 		);
-		updates$.push(resourceUpdate$);
+		updates$.push(resourceUpdate$.exec());
 
 		const leagues = resource.leagues;
 		for (const league of leagues) {
@@ -141,9 +146,8 @@ export class ReportAggregatorService implements Aggregator {
 				{ resource_id, league: league.name },
 				{ $set: { league_data: league } },
 			);
-			updates$.push(leagueUpdate$);
+			updates$.push(leagueUpdate$.exec());
 		}
-
 		await Promise.all(updates$);
 
 		this.logger.debug(
@@ -153,7 +157,7 @@ export class ReportAggregatorService implements Aggregator {
 		const orcidIds = await this.reportModel.distinct('curator_orcid', {
 			resource_id,
 		});
-		const userUpdates$ = [];
+		const userUpdates$: Promise<UpdateWriteOpResult>[] = [];
 		for (const curator_orcid of orcidIds) {
 			const user = await this.userRepository.findOne({
 				orcid_id: curator_orcid,
@@ -162,7 +166,7 @@ export class ReportAggregatorService implements Aggregator {
 				{ resource_id, curator_orcid },
 				{ $set: { user } },
 			);
-			userUpdates$.push(update$);
+			userUpdates$.push(update$.exec());
 		}
 		await Promise.all(userUpdates$);
 
@@ -173,13 +177,13 @@ export class ReportAggregatorService implements Aggregator {
 		// update all terms
 		const terms = await this.termModel.find({ resource_id });
 
-		const termUpdates$ = [];
+		const termUpdates$: Promise<UpdateWriteOpResult>[] = [];
 		for (const term of terms) {
 			const update$ = this.reportModel.updateMany(
 				{ activity_term: term.activity_term, resource_id },
 				{ $set: { term } },
 			);
-			termUpdates$.push(update$);
+			termUpdates$.push(update$.exec());
 		}
 
 		await Promise.all(termUpdates$);

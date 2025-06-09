@@ -1,35 +1,34 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import * as moment from 'moment-timezone';
+import { MongoServerError } from 'mongodb';
 import { Document, FilterQuery, Model, Types, UpdateQuery } from 'mongoose';
 import {
 	LeanReportDocument,
 	Report,
 	ReportDocument,
 } from '../../core/schemas/reports.schema';
-import { InjectModel } from '@nestjs/mongoose';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import {
 	WeeklyStatistics,
 	WeeklyStatisticsDocument,
 } from '../../core/schemas/statistics/weekly-statistics.schema';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
+import {
+	fromDate,
+	fromYearWeek,
+	getWeekEnd,
+	getWeekRange,
+	getWeekStart,
+	updateMaxDate,
+	updateMinDate,
+} from '../../util/date.helper';
+import { computePrivacyField } from '../../util/privacy.helper';
 import {
 	AggregatedReportsWeekly,
 	ReportsWeeklyAggregationPipeline,
 } from '../aggregations/reports-weekly.service';
-import { PrivacyType } from '../../core/enums';
-import { MongoServerError } from 'mongodb';
-import {
-	fromDate,
-	fromYearWeek,
-	getWeekStart,
-	getWeekEnd,
-	updateMinDate,
-	updateMaxDate,
-	getWeekRange,
-} from '../../util/date.helper';
-import * as moment from 'moment-timezone';
-import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
-import { computePrivacyField } from '../../util/privacy.helper';
 @Injectable()
 export class ComputeWeeklyStatisticsService {
 	logger = new Logger(ComputeWeeklyStatisticsService.name);
@@ -74,7 +73,7 @@ export class ComputeWeeklyStatisticsService {
 			curator_orcid: report.curator_orcid,
 			resource_id: report.resource_id,
 			league: report.league,
-			privacy: computePrivacyField(report.resource, report.user, {}),
+			privacy: computePrivacyField(report.resource, report?.user, {}),
 			resource: report.resource,
 			user: report.user ?? null,
 			league_data: report.league_data,
@@ -100,7 +99,7 @@ export class ComputeWeeklyStatisticsService {
 			| ReportDocument
 			| (Document<unknown, any, Report> & Report & { _id: Types.ObjectId })
 			| LeanReportDocument,
-		termDoc: TermDocument | null,
+		termDoc: TermDocument,
 		resource: PartnerResourceDocument,
 		user: UserDocument | null = null,
 	) {
@@ -112,13 +111,6 @@ export class ComputeWeeklyStatisticsService {
 				$gt: report.timestamp,
 			},
 		}));
-
-		const term = !termDoc
-			? await this.termModel.findOne({
-					resource_id: report.resource_id,
-					league: report.league,
-			  })
-			: termDoc;
 
 		const [weekStart, weekEnd] = getWeekRange(moment(report.timestamp));
 
@@ -144,10 +136,10 @@ export class ComputeWeeklyStatisticsService {
 				},
 				{
 					$inc: {
-						[`${term.activity_category}_count`]: 1,
-						[`${term.activity_category}_score`]: term.score,
+						[`${termDoc.activity_category}_count`]: 1,
+						[`${termDoc.activity_category}_score`]: termDoc.score,
 						total_count: 1,
-						total_score: term.score,
+						total_score: termDoc.score,
 					},
 					$setOnInsert: {
 						first_contribution: report.timestamp,
@@ -161,7 +153,7 @@ export class ComputeWeeklyStatisticsService {
 			);
 		} catch (err: any) {
 			if (err instanceof MongoServerError && err.code === 11000) {
-				return await this.updateWithReport(report, term, resource, user);
+				return await this.updateWithReport(report, termDoc, resource, user);
 			}
 			throw new Error(err);
 		}
@@ -186,7 +178,7 @@ export class ComputeWeeklyStatisticsService {
 			});
 
 		let currentStat: WeeklyStatisticsDocument | null = null;
-		const saves$ = [];
+		const saves$: Promise<any>[] = [];
 		for await (const reportAgg of aggregation) {
 			const {
 				curator_orcid,

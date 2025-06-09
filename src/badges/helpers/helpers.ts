@@ -1,11 +1,11 @@
 import { FilterQuery, Model } from 'mongoose';
+import { AchievementState, PrivacyType } from '../../core/enums';
+import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
+import { BadgeDocument } from '../../core/schemas/achievements/badges.schema';
 import {
 	LeanReportDocument,
 	ReportDocument,
 } from '../../core/schemas/reports.schema';
-import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
-import { BadgeDocument } from '../../core/schemas/achievements/badges.schema';
-import { AchievementState, PrivacyType } from '../../core/enums';
 
 export function getReportRelatedBadgeDefFilter(
 	report: ReportDocument | LeanReportDocument,

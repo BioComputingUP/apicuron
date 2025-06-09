@@ -9,10 +9,12 @@ import { ResourceStats, ResourceStatsSchema } from './resource-stats.schema';
 type PartnerResourceDocumentOverride = {
 	leagues: Types.DocumentArray<League>;
 	stats: Types.Subdocument<Types.ObjectId> & ResourceStats;
-}
+};
 
-
-export type PartnerResourceDocument = HydratedDocument<PartnerResource, PartnerResourceDocumentOverride>;
+export type PartnerResourceDocument = HydratedDocument<
+	PartnerResource,
+	PartnerResourceDocumentOverride
+>;
 
 // this class defines a partnerResource that has been validated and has the ability to have Models, Badges and so on
 

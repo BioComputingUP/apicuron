@@ -1,19 +1,22 @@
+import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, LeanDocument, Model, Types } from 'mongoose';
-import { PartnerResourceDocument } from '../../../core/schemas/resource/partner-resource.schema';
-import { PartnerResource } from '../../../core/schemas/resource/partner-resource.schema';
+import { assertNotNull } from 'src/util/type-assertion.helper';
+import {
+	League,
+	LeagueDocument,
+} from '../../../core/schemas/league/league.schema';
+import {
+	PartnerResource,
+	PartnerResourceDocument,
+} from '../../../core/schemas/resource/partner-resource.schema';
 import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
-import { League, LeagueDocument } from '../../../core/schemas/league/league.schema';
+import { PartnerResourceUpdatedEvent } from '../events/resource-updated.event';
 import { AddMemberToLeague } from '../leagues/dto/add-member-to-league.dto';
 import { DeleteLeagueDTO } from '../leagues/dto/delete-league.dto';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { LeagueDeletedEvent } from '../leagues/events/league-deleted-event';
-import _ from 'lodash';
-import { PartnerResourceUpdatedEvent } from '../events/resource-updated.event';
-import { PartnerResourceEntity } from '../../dto/partner-resources.entity';
-import { plainToInstance } from 'class-transformer';
-import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
 
 @Injectable()
 export class PartnerResourcesService {
@@ -22,7 +25,7 @@ export class PartnerResourcesService {
 		private partnerResourceModel: Model<PartnerResourceDocument>, // protected transformService: TransformerService
 		protected eventEmitter: EventEmitter2,
 		protected storage: StorageService,
-	) { }
+	) {}
 
 	logger = new Logger(PartnerResourcesService.name);
 	async get_resources(
@@ -74,17 +77,24 @@ export class PartnerResourcesService {
 				new: true,
 			},
 		);
+		assertNotNull(
+			resourceUpdated,
+			`Resource with ID ${removeMemberFromLeague.resource_id} not found.`,
+		);
 		return resourceUpdated;
 	}
 
 	async deleteLeague(
 		deleteLeague: DeleteLeagueDTO,
 	): Promise<PartnerResourceDocument> {
-		// check if this is the last and only league, if it is we return an error
-
 		const resource = await this.partnerResourceModel.findOne({
 			resource_id: deleteLeague.resource_id,
 		});
+		assertNotNull(
+			resource,
+			`Resource with ID ${deleteLeague.resource_id} not found.`,
+		);
+		// check if this is the last and only league, if it is we return an error
 		if (resource.leagues.length == 1) {
 			throw new BadRequestException(
 				`The resource ${resource.resource_name} only has one remaining league ${resource.leagues[0].name}. It cannot be deleted`,
@@ -107,6 +117,10 @@ export class PartnerResourcesService {
 			{
 				new: true,
 			},
+		);
+		assertNotNull(
+			resourceUpdated,
+			`Resource with ID ${deleteLeague.resource_id} not found.`,
 		);
 		await this.eventEmitter.emitAsync(
 			LeagueDeletedEvent.name,
@@ -131,6 +145,7 @@ export class PartnerResourcesService {
 
 	async get_resource(resource_id: string): Promise<PartnerResourceDocument> {
 		const doc = await this.partnerResourceModel.findOne({ resource_id });
+		assertNotNull(doc, `Resource with ID ${resource_id} not found.`);
 		return doc;
 	}
 
@@ -152,7 +167,7 @@ export class PartnerResourcesService {
 			{ $set: resource_update },
 			{ new: true },
 		);
-
+		assertNotNull(newResource, `Resource with ID ${resource_id} not found.`);
 		await this.eventEmitter.emitAsync(
 			PartnerResourceUpdatedEvent.name,
 			new PartnerResourceUpdatedEvent(resource, newResource),
@@ -163,10 +178,20 @@ export class PartnerResourcesService {
 
 	public getResourceLeagues(
 		resource: PartnerResourceDocument | LeanDocument<PartnerResourceDocument>,
-	): [PartnerResourceDocument | LeanDocument<PartnerResourceDocument>, LeanDocument<LeagueDocument>][] {
-		return resource.leagues.map((league: Types.Subdocument<Types.ObjectId> & League): [PartnerResourceDocument | LeanDocument<PartnerResourceDocument>, LeanDocument<LeagueDocument>] => {
-			return [resource, league.toObject()];
-		});
+	): [
+		PartnerResourceDocument | LeanDocument<PartnerResourceDocument>,
+		LeanDocument<LeagueDocument>,
+	][] {
+		return resource.leagues.map(
+			(
+				league: Types.Subdocument<Types.ObjectId> & League,
+			): [
+				PartnerResourceDocument | LeanDocument<PartnerResourceDocument>,
+				LeanDocument<LeagueDocument>,
+			] => {
+				return [resource, league.toObject()];
+			},
+		);
 	}
 
 	public getUserLeague(

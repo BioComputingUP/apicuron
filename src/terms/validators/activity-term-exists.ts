@@ -1,20 +1,21 @@
 import {
+	Injectable,
+	InternalServerErrorException,
+	Logger,
+} from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import {
 	ValidationArguments,
 	ValidatorConstraint,
 	ValidatorConstraintInterface,
 } from 'class-validator';
-import {
-	Injectable,
-	Logger,
-	InternalServerErrorException,
-} from '@nestjs/common';
 import { Model } from 'mongoose';
-import { Term, TermDocument } from '../../core/schemas/terms.schema';
-import { InjectModel } from '@nestjs/mongoose';
+import { assertNotNull } from 'src/util/type-assertion.helper';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../../core/schemas/resource/partner-resource.schema';
+import { Term, TermDocument } from '../../core/schemas/terms.schema';
 
 /**
  * @description This validator checks of the activity term already exists in the database
@@ -71,6 +72,7 @@ export class ActivityTermExists implements ValidatorConstraintInterface {
 						{ resource_id },
 						{ defaultLeague: 1 },
 					);
+					assertNotNull(resource, `Resource with id ${resource_id} not found`);
 					league = resource.defaultLeague;
 				}
 				// value expected is s single term, we check if it exists
@@ -94,9 +96,10 @@ export class ActivityTermExists implements ValidatorConstraintInterface {
 		}
 	}
 
-	defaultMessage(args?: ValidationArguments): string {
+	defaultMessage(args: ValidationArguments): string {
 		// handle the reverse case and edit message accordingly
 		let error_snippet = 'does not exist';
+
 		if (args.constraints && args.constraints.find((x) => x.reverse == true)) {
 			error_snippet = 'Already exists';
 		}

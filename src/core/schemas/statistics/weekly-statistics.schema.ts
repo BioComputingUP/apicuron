@@ -1,19 +1,23 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument, LeanDocument, Types } from 'mongoose';
+import { IUserLeagueEntity } from 'src/util/privacy.helper';
 import { PrivacyType } from '../../enums';
 import { IUserResourceEntity } from '../../interfaces/user-resource-entity';
-import { HydratedDocument, LeanDocument, Types } from 'mongoose';
-import { LeagueSchema, League } from '../league/league.schema';
+import { League, LeagueSchema } from '../league/league.schema';
 import {
-	PartnerResourceSchema,
 	PartnerResource,
+	PartnerResourceSchema,
 } from '../resource/partner-resource.schema';
-import { UserSchema, User } from '../user.schema';
+import { User, UserSchema } from '../user.schema';
 type WeeklyStatisticsDocumentOverride = {
-	user: (Types.Subdocument<Types.ObjectId> & User) | null;
+	user?: (Types.Subdocument<Types.ObjectId> & User) | null;
 	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;
 	league_data: Types.Subdocument<Types.ObjectId> & League;
-}
-export type WeeklyStatisticsDocument = HydratedDocument<WeeklyStatistics, WeeklyStatisticsDocumentOverride>;
+};
+export type WeeklyStatisticsDocument = HydratedDocument<
+	WeeklyStatistics,
+	WeeklyStatisticsDocumentOverride
+>;
 export type LeanWeeklyStatisticsDocument =
 	LeanDocument<WeeklyStatisticsDocument>;
 
@@ -21,12 +25,14 @@ export type LeanWeeklyStatisticsDocument =
 	collection: 'weekly_statistics',
 	timestamps: true,
 })
-export class WeeklyStatistics implements IUserResourceEntity {
+export class WeeklyStatistics
+	implements IUserResourceEntity, IUserLeagueEntity
+{
 	@Prop({ required: true, type: String })
 	resource_id: string;
 
 	@Prop({ required: false, type: UserSchema })
-	user: (Types.Subdocument<Types.ObjectId> & User) | null;
+	user?: (Types.Subdocument<Types.ObjectId> & User) | null;
 
 	@Prop({ required: true, type: PartnerResourceSchema })
 	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;

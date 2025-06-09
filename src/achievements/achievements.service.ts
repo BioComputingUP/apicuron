@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, QueryOptions } from 'mongoose';
-import { PartnerResourcesService } from '../resources/partner-resources/services/partner-resources.service';
+import { plainToInstance } from 'class-transformer';
+import { FilterQuery, Model } from 'mongoose';
+import { AchievementState } from '../core/enums';
+import { AchievementDocument } from '../core/schemas/achievements/achievements.schema';
 import {
-	BadgeDocument,
 	Badge,
+	BadgeDocument,
 } from '../core/schemas/achievements/badges.schema';
 import {
 	Medal,
 	MedalDocument,
 } from '../core/schemas/achievements/medals.schema';
-import { AchievementDocument } from '../core/schemas/achievements/achievements.schema';
-import { AchievementState } from '../core/enums';
-import { plainToInstance } from 'class-transformer';
+import { PartnerResourcesService } from '../resources/partner-resources/services/partner-resources.service';
 import { UserAchievements } from './dto/achievements.dto';
 
 @Injectable()

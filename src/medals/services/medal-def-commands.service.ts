@@ -1,30 +1,25 @@
 import {
 	BadRequestException,
 	Injectable,
-	InternalServerErrorException,
 	NotFoundException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import {
-	BadgeDef,
-	BadgeDefDocument,
-} from '../../core/schemas/achievements-def/badge-def.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { InjectModel } from '@nestjs/mongoose';
+import { plainToInstance } from 'class-transformer';
 import { Model } from 'mongoose';
-import { UpdateMedalDefDto as UpdateMedalDefDto } from '../dto/update-medal-def.dto';
-import { MedalDefUpdatedEvent } from '../events/medal-def-updated.event';
-import { DeleteMedalDefDto } from '../dto/delete-medal-def.dto';
-import { MedalDefDeletedEvent } from '../events/medal-def-deleted.event';
-import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { CreateMedalDefDto } from '../dto/create-medal-def.dto';
-import { assignResourceEntityPrivacy } from '../../util/privacy.helper';
-import { MedalDefCreatedEvent } from '../events/medal-def-created.event';
 import {
 	MedalDef,
 	MedalDefDocument,
 } from '../../core/schemas/achievements-def/medal-def.schema';
-import { plainToInstance } from 'class-transformer';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
+import { assignResourceEntityPrivacy } from '../../util/privacy.helper';
+import { CreateMedalDefDto } from '../dto/create-medal-def.dto';
+import { DeleteMedalDefDto } from '../dto/delete-medal-def.dto';
 import { MedalDefDto } from '../dto/medal.dto';
+import { UpdateMedalDefDto } from '../dto/update-medal-def.dto';
+import { MedalDefCreatedEvent } from '../events/medal-def-created.event';
+import { MedalDefDeletedEvent } from '../events/medal-def-deleted.event';
+import { MedalDefUpdatedEvent } from '../events/medal-def-updated.event';
 
 @Injectable()
 export class MedalDefCommandsService {
@@ -46,25 +41,30 @@ export class MedalDefCommandsService {
 			league: currentLeague,
 		});
 		if (!exists) {
-			throw new Error(
+			throw new NotFoundException(
 				`Medal ${name} for ${resource_id} and league: ${currentLeague} not found`,
 			);
 		}
 
-		const medal: MedalDefDocument = await this.medalDefModel.findOneAndUpdate(
-			{
-				resource_id,
-				name,
-				league: currentLeague,
-			},
-			{
-				$set: updates,
-			},
-			{
-				new: true,
-			},
-		);
-
+		const medal: MedalDefDocument | null =
+			await this.medalDefModel.findOneAndUpdate(
+				{
+					resource_id,
+					name,
+					league: currentLeague,
+				},
+				{
+					$set: updates,
+				},
+				{
+					new: true,
+				},
+			);
+		if (!medal) {
+			throw new NotFoundException(
+				`Medal ${name} for ${resource_id} and league: ${currentLeague} was not found`,
+			);
+		}
 		await this.eventEmitter.emitAsync(
 			MedalDefUpdatedEvent.name,
 			new MedalDefUpdatedEvent(medal),
@@ -73,7 +73,7 @@ export class MedalDefCommandsService {
 		const medalDefEntity = plainToInstance(MedalDefDto, medal, {
 			enableCircularCheck: true,
 			excludeExtraneousValues: true,
-		})
+		});
 
 		return medalDefEntity;
 	}
@@ -96,10 +96,15 @@ export class MedalDefCommandsService {
 			);
 		}
 
-		const medalDef = await this.medalDefModel.findOneAndDelete({
-			...deleteMedalDef,
-		});
-
+		const medalDef: MedalDefDocument | null =
+			await this.medalDefModel.findOneAndDelete({
+				...deleteMedalDef,
+			});
+		if (!medalDef) {
+			throw new BadRequestException(
+				`Medal ${deleteMedalDef.name} from resource ${deleteMedalDef.resource_id}:${deleteMedalDef.league} not found, cannot be deleted`,
+			);
+		}
 		await this.eventEmitter.emitAsync(
 			MedalDefDeletedEvent.name,
 			new MedalDefDeletedEvent(medalDef),
@@ -128,7 +133,6 @@ export class MedalDefCommandsService {
 
 		const newMedalDef = new this.medalDefModel({
 			...medalDef,
-			privacy: resource.getLeague(medalDef.league).visibility,
 			resource_uri: resource.resource_uri,
 		});
 

@@ -4,24 +4,24 @@ import {
 	InternalServerErrorException,
 	Logger,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { InsertManyResult, Model } from 'mongoose';
-import { SubmitReportDto, SubmitReportsDto } from '../dto/submit-report.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { InjectModel } from '@nestjs/mongoose';
 import { DeleteResult } from 'mongodb';
+import { InsertManyResult, Model } from 'mongoose';
+import { Report, ReportDocument } from '../../core/schemas/reports.schema';
+import { SubmitReportDto, SubmitReportsDto } from '../dto/submit-report.dto';
 import {
+	AllResourceReportsDeletedEvent,
 	IAllResourceReportsDeletedEventPayload,
 	IManyReportsSubmittedEventPayload,
 	IReportSubmittedEventPayload,
-	AllResourceReportsDeletedEvent,
 	ManyReportsSubmittedEvent,
 	ReportSubmittedEvent,
 } from '../events/events';
 
 import { MongoServerError } from 'mongodb';
-import { ReportValidatorService } from './report-validator.service';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
+import { ReportValidatorService } from './report-validator.service';
 
 @Injectable()
 export class SubmitReportService {
@@ -40,7 +40,7 @@ export class SubmitReportService {
 		// validate that all resource_ids are valid
 
 		// delete all the reports of all resources in order
-		const deleteResponses = [];
+		const deleteResponses: DeleteResult[] = [];
 		for (const [index, resource_id] of resource_ids.entries()) {
 			try {
 				const deleteResponse = await this.deleteAllResourceReports(resource_id);
@@ -135,11 +135,11 @@ export class SubmitReportService {
 		reportSubmission: SubmitReportsDto,
 		options = { preventEvents: false },
 	): Promise<
-		Omit<InsertManyResult<Report>, 'insertedIds'> & {
-			reports: ReportDocument[];
-			deletedReports: { [keyof: string]: DeleteResult };
-			callback?: () => any | Promise<any>;
-		}
+		| Omit<InsertManyResult<Report>, 'insertedIds'> & {
+				reports: ReportDocument[];
+				deletedReports: { [keyof: string]: DeleteResult };
+				callback?: () => any | Promise<any>;
+		  }
 	> {
 		try {
 			const validatedReports = await this.reportValidator.validateReports(
@@ -190,13 +190,12 @@ export class SubmitReportService {
 			if (err instanceof BadRequestException) {
 				throw err;
 			}
-			if (err instanceof Error) {
-				this.logger.error(err.message, err.stack, err.name);
 
-				throw new InternalServerErrorException(
-					'An internal error occured when submitting the reports',
-				);
-			}
+			this.logger.error(err.message, err.stack, err.name);
+
+			throw new InternalServerErrorException(
+				'An internal error occured when submitting the reports',
+			);
 		}
 	}
 }

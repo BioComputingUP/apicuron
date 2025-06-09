@@ -3,23 +3,19 @@ import {
 	Injectable,
 	InternalServerErrorException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
+import { assertNotNull } from 'src/util/type-assertion.helper';
+import { IResourceEntity } from '../core/interfaces/user-resource-entity';
+import { Report, ReportDocument } from '../core/schemas/reports.schema';
+import { Term, TermDocument } from '../core/schemas/terms.schema';
+import { PartnerResourcesService } from '../resources/partner-resources/services/partner-resources.service';
+import { CreateTermDto } from './dto/createTerm.dto';
 import { DeleteTermDto } from './dto/deleteTerm.dto';
 import { UpdateTermDto } from './dto/updateTerm.dto';
-import { PartnerResourcesService } from '../resources/partner-resources/services/partner-resources.service';
-import { Term, TermDocument } from '../core/schemas/terms.schema';
-import { Report, ReportDocument } from '../core/schemas/reports.schema';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CreateTermDto } from './dto/createTerm.dto';
-import {
-	ITermDeletedEventPayload,
-	TermDeletedEvent,
-	TermUpdatedEvent,
-} from './events/events';
-import { IResourceEntity } from '../core/interfaces/user-resource-entity';
+import { TermDeletedEvent, TermUpdatedEvent } from './events/events';
 import { getRelatedReportFilter } from './helpers/related-report';
-import { TermDto } from './dto/term.dto';
 
 @Injectable()
 export class TermsService {
@@ -94,7 +90,10 @@ export class TermsService {
 			},
 			{ new: true },
 		);
-
+		assertNotNull(
+			updatedTerm,
+			`Failed to update term ${termUpdate.activity_term} from resource ${termUpdate.resource_id} from league ${termUpdate.league}`,
+		);
 		await this.eventEmitter.emitAsync(
 			TermUpdatedEvent.name,
 			new TermUpdatedEvent(oldTerm, updatedTerm),
@@ -124,10 +123,14 @@ export class TermsService {
 				`Term ${createTerm.activity_term} from resource ${createTerm.resource_id} from league ${createTerm.league} already exists`,
 			);
 		}
-
+		const privacy = resource.getLeague(createTerm.league)?.visibility;
+		assertNotNull(
+			privacy,
+			`League ${createTerm.league} does not exist on resource ${createTerm.resource_id}`,
+		);
 		const termDocument = await this.termModel.create({
 			...createTerm,
-			privacy: resource.getLeague(createTerm.league).visibility,
+			privacy, //FIXME: Something weird here
 			resource_uri,
 		});
 		return termDocument.save();
@@ -152,7 +155,7 @@ export class TermsService {
 			return true;
 		} else {
 			throw new InternalServerErrorException(
-				`Failed to delete term ${term.activity_term}:${term.activity_name} from resource ${term.resource_id}`,
+				`Failed to delete term ${deleteTerm.activity_term} from resource ${deleteTerm.resource_id}`,
 			);
 		}
 	}

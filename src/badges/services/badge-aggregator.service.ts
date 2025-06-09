@@ -1,12 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
-import { FilterQuery, Model } from 'mongoose';
-import {
-	Report,
-	LeanReportDocument,
-	ReportDocument,
-} from '../../core/schemas/reports.schema';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
+import { MongoServerError } from 'mongodb';
+import { FilterQuery, Model, UpdateWriteOpResult } from 'mongoose';
+import { AchievementState, PrivacyType } from '../../core/enums';
 import {
 	BadgeDef,
 	BadgeDefDocument,
@@ -15,24 +12,27 @@ import {
 	Badge,
 	BadgeDocument,
 } from '../../core/schemas/achievements/badges.schema';
-import { getReportRelatedBadgeDefFilter } from '../helpers/helpers';
-import { AchievementState, PrivacyType } from '../../core/enums';
-import { MongoServerError } from 'mongodb';
+import {
+	LeanReportDocument,
+	Report,
+	ReportDocument,
+} from '../../core/schemas/reports.schema';
+import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { getReportRelatedBadgeDefFilter } from '../helpers/helpers';
 
-import { ComputeBadgesService } from './compute-badges.service';
+import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { TermDocument } from '../../core/schemas/terms.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
+import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
+import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import {
 	ResourceBadgesUpdatedEvent,
 	UserBadgesUpdatedEvent,
 } from '../events/badge-count-updated.event';
-import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { BadgeEarnedEvent } from '../events/badge-earned.event';
-import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
-import { TermDocument } from '../../core/schemas/terms.schema';
-import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
-import { UserDocument } from '../../core/schemas/user.schema';
+import { ComputeBadgesService } from './compute-badges.service';
 @Injectable()
 @AggregatorClass()
 export class BadgeAggregatorService implements Aggregator {
@@ -53,7 +53,7 @@ export class BadgeAggregatorService implements Aggregator {
 
 	async updatedLeague(leagueUpdated: LeagueUpdatedEvent): Promise<number> {
 		if (!leagueUpdated.privacyChanged()) {
-			return;
+			return 0;
 		}
 
 		const newPrivacy = leagueUpdated.newValue.visibility;
@@ -128,7 +128,7 @@ export class BadgeAggregatorService implements Aggregator {
 		const resources = await this.resourceService.get_resources({
 			resource_id: { $in: resource_ids },
 		});
-		const updates$ = [];
+		const updates$: Promise<UpdateWriteOpResult>[] = [];
 		for (const resource of resources) {
 			for (const league of resource.leagues) {
 				const update$ = this.badgeModel.updateMany(
@@ -146,7 +146,7 @@ export class BadgeAggregatorService implements Aggregator {
 						},
 					},
 				);
-				updates$.push(update$);
+				updates$.push(update$.exec());
 			}
 		}
 
@@ -229,7 +229,7 @@ export class BadgeAggregatorService implements Aggregator {
 		const affectedBadgeDefs = this.badgeDefModel
 			.find(badgeDefsFilter)
 			.cursor({ batchSize: 20 });
-		const badgesUpdated$ = [];
+		const badgesUpdated$: Promise<AchievementState>[] = [];
 		for await (const badgeDef of affectedBadgeDefs) {
 			const badgeUpdate$ = this.createOrUpdateBadge(badgeDef, report);
 

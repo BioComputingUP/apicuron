@@ -1,6 +1,5 @@
 import { Expose } from 'class-transformer';
 import { AchievementState, PrivacyType } from 'src/core/enums';
-import { BadgeDef } from '../../core/schemas';
 
 export class BadgeDefDto {
 	@Expose()
