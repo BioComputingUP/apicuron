@@ -22,7 +22,15 @@ import {
 import { MongoServerError } from 'mongodb';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { ReportValidatorService } from './report-validator.service';
-
+type InsertManyReportsResult = Omit<InsertManyResult<Report>, 'insertedIds'> & {
+	reports: ReportDocument[];
+	deletedReports: { [keyof: string]: DeleteResult };
+	callback: () => any | Promise<any>;
+};
+type InsertReportResult = {
+	report: ReportDocument;
+	callback: () => any | Promise<any>;
+};
 @Injectable()
 export class SubmitReportService {
 	constructor(
@@ -88,8 +96,16 @@ export class SubmitReportService {
 
 	async insertReport(
 		submittedReport: SubmitReportDto,
-		options = { preventEvents: false },
-	): Promise<{ report: ReportDocument; callback?: () => any | Promise<any> }> {
+		options: { preventEvents: true },
+	): Promise<InsertReportResult>;
+	async insertReport(
+		submittedReport: SubmitReportDto,
+		options: { preventEvents: false },
+	): Promise<Omit<InsertReportResult, 'callback'>>;
+	async insertReport(
+		submittedReport: SubmitReportDto,
+		options: { preventEvents: boolean } = { preventEvents: false },
+	): Promise<InsertReportResult> {
 		try {
 			const { resource, user, term, report, league_data } =
 				await this.reportValidator.validateReport(submittedReport);
@@ -133,13 +149,19 @@ export class SubmitReportService {
 
 	async insertReports(
 		reportSubmission: SubmitReportsDto,
-		options = { preventEvents: false },
+		options: { preventEvents: true },
+	): Promise<InsertManyReportsResult>;
+	async insertReports(
+		reportSubmission: SubmitReportsDto,
+		options: { preventEvents: false },
+	): Promise<Omit<InsertManyReportsResult, 'callback'>>;
+	async insertReports(
+		reportSubmission: SubmitReportsDto,
+		options: { preventEvents: boolean } = {
+			preventEvents: false,
+		},
 	): Promise<
-		| Omit<InsertManyResult<Report>, 'insertedIds'> & {
-				reports: ReportDocument[];
-				deletedReports: { [keyof: string]: DeleteResult };
-				callback?: () => any | Promise<any>;
-		  }
+		InsertManyReportsResult | Omit<InsertManyReportsResult, 'callback'>
 	> {
 		try {
 			const validatedReports = await this.reportValidator.validateReports(
@@ -170,17 +192,22 @@ export class SubmitReportService {
 				} as IManyReportsSubmittedEventPayload);
 			};
 
-			if (!options.preventEvents) {
-				await emitEvent();
-			}
-
-			return {
+			const resultBase = {
 				insertedCount,
 				acknowledged,
 				reports: reportDocuments,
 				deletedReports: deleteResponses,
-				callback: options.preventEvents ? emitEvent : undefined,
 			};
+
+			if (!options.preventEvents) {
+				await emitEvent();
+				return resultBase;
+			} else {
+				return {
+					...resultBase,
+					callback: emitEvent,
+				};
+			}
 		} catch (err: any) {
 			if (err instanceof MongoServerError && err.code === 11000) {
 				this.logger.error(`Attempt at duplicate report insertion`);

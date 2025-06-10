@@ -28,7 +28,7 @@ export class StatisticsAggregator implements Aggregator {
 
 	async updatedLeague(leagueUpdated: LeagueUpdatedEvent): Promise<number> {
 		if (!leagueUpdated.privacyChanged()) {
-			return;
+			return 0;
 		}
 
 		const newPrivacy = leagueUpdated.newValue.visibility;
@@ -77,9 +77,13 @@ export class StatisticsAggregator implements Aggregator {
 		let user: UserDocument;
 		if (event instanceof EntityCreatedEvent) {
 			user = event.instance;
-		}
-		if (event instanceof EntityUpdatedEvent) {
+		} else if (event instanceof EntityUpdatedEvent) {
 			user = event.after;
+		} else {
+			this.logger.error(`Unexpected event type: ${event}`);
+			throw new Error(
+				`Unexpected event type: Expected EntityCreatedEvent or EntityUpdatedEvent.`,
+			);
 		}
 		this.logger.log(
 			`Handling Update user stat privacy event in statistics service ${user.orcid_id} ${user.privacy} `,

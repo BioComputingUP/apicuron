@@ -1,46 +1,46 @@
 import {
+	BadRequestException,
 	Body,
 	Controller,
-	Post,
-	Res,
-	UseGuards,
-	Request,
 	ForbiddenException,
-	UseInterceptors,
-	BadRequestException,
 	InternalServerErrorException,
+	Post,
 	Query,
+	Request,
+	Res,
 	UploadedFile,
+	UseGuards,
+	UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
-	ApiOperation,
-	ApiOkResponse,
-	ApiSecurity,
-	ApiHeader,
-	ApiTags,
 	ApiConsumes,
+	ApiHeader,
+	ApiOkResponse,
+	ApiOperation,
 	ApiQuery,
+	ApiSecurity,
+	ApiTags,
 } from '@nestjs/swagger';
+import { Response } from 'express';
+import { isArray } from 'lodash';
+import {
+	SubmitBulkTask,
+	SubmitBulkTaskArgs,
+} from 'src/scheduler/tasks/submit_bulk.task';
+import { AuthProtected } from '../../auth/decorators/auth.decorator';
 import { HasAResourceGuard } from '../../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
+import { VersionHeader } from '../../plugins/swagger/config';
 import { ReportDto } from '../../reports/dto/report.dto';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
+import { SchedulerClientService } from '../../scheduler-client/services/scheduler-client.service';
 import {
 	SubmitBulkDto,
 	SubmitReportDto,
 	SubmitReportsDto,
 } from '../dto/submit-report.dto';
 import { SubmitReportService } from '../services/submit-reports.service';
-import { Response } from 'express';
-import { VersionHeader } from '../../plugins/swagger/config';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { SchedulerClientService } from '../../scheduler-client/services/scheduler-client.service';
-import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { isArray } from 'lodash';
-import { AuthProtected } from '../../auth/decorators/auth.decorator';
-import {
-	SubmitBulkTask,
-	SubmitBulkTaskArgs,
-} from 'src/scheduler/tasks/submit_bulk.task';
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
 @Controller({ path: 'reports', version: '2' })
@@ -97,7 +97,7 @@ export class SubmitReportsController {
 		@Query('delete-all') deleteAll: string[] | string,
 		@Res() res: Response,
 	) {
-		let delete_all = [];
+		let delete_all: string[] = [];
 		const deleteAllInput = deleteAll ?? body.delete_all;
 		if (typeof deleteAllInput == 'string') {
 			delete_all = [deleteAllInput];
@@ -143,7 +143,7 @@ export class SubmitReportsController {
 				'reports submitted successfully. You will receive a notification containing the submission report',
 		});
 		await response;
-		
+
 		return;
 	}
 
@@ -188,14 +188,14 @@ export class SubmitReportsController {
 		@Request() req,
 		@Res() res: Response,
 	) {
-		const response = { deletedReports: null, insertedCount: 0 };
-
-		const { insertedCount, reports, deletedReports, callback } =
+		const { insertedCount, deletedReports, callback } =
 			await this.reportService.insertReports(reportSubmission, {
 				preventEvents: true,
 			});
-		response.insertedCount = insertedCount;
-		response.deletedReports = deletedReports;
+		const response = {
+			deletedReports: deletedReports,
+			insertedCount: insertedCount,
+		};
 
 		// send the insertion response
 		res.send(response);

@@ -1,19 +1,23 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { UsersService } from '../../auth/users/services/users.service';
 import { InjectModel } from '@nestjs/mongoose';
-import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { FilterQuery, LeanDocument, Model } from 'mongoose';
-import { SubmitReportDto } from '../dto/submit-report.dto';
+import { assertNotNull } from 'src/util/type-assertion.helper';
+import { UsersService } from '../../auth/users/services/users.service';
+import {
+	League,
+	LeagueDocument,
+} from '../../core/schemas/league/league.schema';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
-import { computePrivacyField } from '../../util/privacy.helper';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import {
 	hashTermIdentifier,
 	ITermIdentifier,
 } from '../../terms/helpers/term-hash';
-import { League, LeagueDocument } from '../../core/schemas/league/league.schema';
+import { computePrivacyField } from '../../util/privacy.helper';
+import { SubmitReportDto } from '../dto/submit-report.dto';
 
 @Injectable()
 export class ReportValidatorService {
@@ -22,7 +26,7 @@ export class ReportValidatorService {
 		protected usersService: UsersService,
 		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-	) { }
+	) {}
 
 	logger = new Logger(ReportValidatorService.name);
 
@@ -75,7 +79,7 @@ export class ReportValidatorService {
 	 */
 	async validateReportActivityTerm(
 		report: SubmitReportDto,
-		termDoc: TermDocument = null,
+		termDoc: TermDocument | null = null,
 	) {
 		const { resource_id, activity_term } = report;
 		const term =
@@ -101,7 +105,7 @@ export class ReportValidatorService {
 	 */
 	async validateReportResource(
 		report: SubmitReportDto,
-		resourceDoc: PartnerResourceDocument = null,
+		resourceDoc: PartnerResourceDocument | null = null,
 	) {
 		// validate the resource_id
 		const resource =
@@ -128,9 +132,9 @@ export class ReportValidatorService {
 	 */
 	async validateReport(
 		report: SubmitReportDto,
-		userDoc: UserDocument = null,
-		resourceDoc: PartnerResourceDocument = null,
-		termDoc: TermDocument = null,
+		userDoc: UserDocument | null = null,
+		resourceDoc: PartnerResourceDocument | null = null,
+		termDoc: TermDocument | null = null,
 	): Promise<{
 		report: ReportDocument;
 		resource: PartnerResourceDocument;
@@ -191,9 +195,11 @@ export class ReportValidatorService {
 		const activities: Map<string, ITermIdentifier> = reports
 			// populate the league field of the report
 			.map((report) => {
+				const resource_from_report = resourcesMap.get(report.resource_id);
+				assertNotNull(resource_from_report, 'Resource not found');
 				report.league = this.assignDefaultLeague(
 					report,
-					resourcesMap.get(report.resource_id),
+					resource_from_report,
 				).name;
 				return report;
 			})
