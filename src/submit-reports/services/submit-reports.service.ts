@@ -31,6 +31,8 @@ type InsertReportResult = {
 	report: ReportDocument;
 	callback: () => any | Promise<any>;
 };
+
+type InsertOptions<def extends boolean = false> = { preventEvents: def };
 @Injectable()
 export class SubmitReportService {
 	constructor(
@@ -148,16 +150,16 @@ export class SubmitReportService {
 	}
 
 	async insertReports(
-		reportSubmission: SubmitReportsDto,
-		options: { preventEvents: true },
+		submission: SubmitReportsDto,
+		options: InsertOptions<true>,
 	): Promise<InsertManyReportsResult>;
 	async insertReports(
-		reportSubmission: SubmitReportsDto,
-		options: { preventEvents: false },
+		submission: SubmitReportsDto,
+		options: InsertOptions,
 	): Promise<Omit<InsertManyReportsResult, 'callback'>>;
 	async insertReports(
-		reportSubmission: SubmitReportsDto,
-		options: { preventEvents: boolean } = {
+		submission: SubmitReportsDto,
+		options: InsertOptions<boolean> = {
 			preventEvents: false,
 		},
 	): Promise<
@@ -165,13 +167,13 @@ export class SubmitReportService {
 	> {
 		try {
 			const validatedReports = await this.reportValidator.validateReports(
-				reportSubmission.reports,
+				submission.reports,
 			);
 
 			let deleteResponses = {};
-			if (reportSubmission.delete_all) {
+			if (submission.delete_all) {
 				deleteResponses = await this.deleteAllManyResourcesReports(
-					reportSubmission.delete_all,
+					submission.delete_all,
 				);
 			}
 
