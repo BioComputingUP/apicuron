@@ -1,17 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
-import { FilterQuery, Model } from 'mongoose';
-import {
-	Report,
-	LeanReportDocument,
-	ReportDocument,
-} from '../../core/schemas/reports.schema';
-import { InjectModel } from '@nestjs/mongoose';
-import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
-import { GetRelatedMedalDefFilter } from '../helpers/helpers';
-import { AchievementState, PrivacyType } from '../../core/enums';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ComputeMedalsService } from './compute-medals.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { FilterQuery, Model } from 'mongoose';
+import { PrivacyType } from '../../core/enums';
+import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
 import {
 	MedalDef,
 	MedalDefDocument,
@@ -20,18 +13,25 @@ import {
 	Medal,
 	MedalDocument,
 } from '../../core/schemas/achievements/medals.schema';
+import {
+	LeanReportDocument,
+	Report,
+	ReportDocument,
+} from '../../core/schemas/reports.schema';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
+import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
+import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
+import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
 import {
 	ResourceMedalsCountUpdatedEvent,
 	UserMedalsCountUpdatedEvent,
 } from '../events/medal-count-updated.event';
-import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { User, UserDocument } from '../../core/schemas/user.schema';
-import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
-import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { GetRelatedMedalDefFilter } from '../helpers/helpers';
+import { ComputeMedalsService } from './compute-medals.service';
 @Injectable()
 @AggregatorClass()
 export class MedalAggregatorService implements Aggregator {
@@ -161,8 +161,8 @@ export class MedalAggregatorService implements Aggregator {
 	async applyReport(
 		report: ReportDocument | LeanReportDocument,
 		termDoc: TermDocument,
-		resource: PartnerResourceDocument,
-		curator?: UserDocument,
+		_resource: PartnerResourceDocument,
+		_curator?: UserDocument,
 	) {
 		const term =
 			termDoc ??
@@ -217,7 +217,7 @@ export class MedalAggregatorService implements Aggregator {
 	}
 
 	async removeAllResourceAggregates(resource_id: string) {
-		return await this.medalModel.deleteMany({ resource_id });
+		await this.medalModel.deleteMany({ resource_id });
 	}
 
 	async termUpdated(oldTerm: TermDocument, newTerm: TermDocument) {
