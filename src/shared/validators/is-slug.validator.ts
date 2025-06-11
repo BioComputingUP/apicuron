@@ -28,6 +28,6 @@ export class IsSlugValidator implements ValidatorConstraintInterface {
 		return isSlugFunc(value);
 	}
 	defaultMessage?(validationArguments?: ValidationArguments): string {
-		return `The ${validationArguments.property} "${validationArguments.value}" is not a valid slug`;
+		return `The ${validationArguments?.property} "${validationArguments?.value}" is not a valid slug`;
 	}
 }

@@ -3,13 +3,14 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
+import { throwError } from 'src/util/type-assertion.helper';
+import { UserRepository } from '../../core/repositories/user.repository';
 import {
 	Statistics,
 	StatisticsDocument,
 } from '../../core/schemas/statistics.schema';
-import { User, UserDocument } from '../../core/schemas/user.schema';
-import { UserRepository } from '../../core/repositories/user.repository';
+import { UserDocument } from '../../core/schemas/user.schema';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 
 @Injectable()
 export class OrcidSubmissionTask {
@@ -37,7 +38,7 @@ export class OrcidSubmissionTask {
 				if (
 					user &&
 					user.orcid_permission &&
-					user.orcid_scope.includes('/activities/update')
+					user.orcid_scope?.includes('/activities/update')
 				) {
 					this.submitWorks(user, stat);
 				}
@@ -55,8 +56,12 @@ export class OrcidSubmissionTask {
 	// await submitOrcid.submitWorks(user, stat)
 
 	async submitWorks(user: UserDocument, stat: StatisticsDocument) {
-		const fontendHost: string = this.config.get<string>('FRONTEND_HOST');
-		const orcidApiUrl: string = this.config.get('ORCID_API_URL'); // this.config.get<string>('ORCID_API_URL');
+		const fontendHost: string =
+			this.config.get<string>('FRONTEND_HOST') ??
+			throwError(Error, 'FRONTEND_HOST is not defined in the configuration');
+		const orcidApiUrl: string =
+			this.config.get('ORCID_API_URL') ??
+			throwError(Error, 'ORCID_API_URL is not defined in the configuration'); // this.config.get<string>('ORCID_API_URL');
 
 		const resource = await this.partnerResourceService.get_resource(
 			stat.resource_id,
@@ -66,7 +71,9 @@ export class OrcidSubmissionTask {
 
 		if (user.hasResourcePutCode(stat.resource_id)) {
 			// this is an update of a an existing work
-			const resourcePutCode = user.getResourcePutCode(stat.resource_id).putCode;
+			const resourcePutCode =
+				user.getResourcePutCode(stat.resource_id)?.putCode ??
+				throwError(Error, 'Resource put code not found');
 
 			const rawData = `
             <?xml version="1.0" encoding="UTF-8"?>

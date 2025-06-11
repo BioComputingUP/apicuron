@@ -142,7 +142,7 @@ export function resourceEntityPrivacyFilter(
 }
 
 export function userResourceEntityPrivacyFilter(
-	requestUser: User | null,
+	requestUser: User | null | undefined,
 ): FilterQuery<IUserResourceEntityDocument> {
 	if (!requestUser || requestUser == null) {
 		return { privacy: PrivacyType.public };

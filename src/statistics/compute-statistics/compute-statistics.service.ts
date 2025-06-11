@@ -1,26 +1,25 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from '../../core/schemas/user.schema';
+import { MongoServerError } from 'mongodb';
+import { FilterQuery, LeanDocument, Model } from 'mongoose';
+import { Report, ReportDocument } from '../../core/schemas/reports.schema';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import {
 	Statistics,
 	StatisticsDocument,
 } from '../../core/schemas/statistics.schema';
-import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { FilterQuery, LeanDocument, Model } from 'mongoose';
-import { MongoServerError } from 'mongodb';
 import { TermDocument } from '../../core/schemas/terms.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
+import { updateMaxDate, updateMinDate } from '../../util/date.helper';
 import {
 	computeAggregatePrivacyField,
 	computePrivacyField,
 } from '../../util/privacy.helper';
 import {
 	BaseAggregationResult,
-	BaseReportIteratorResult,
 	StatisticsReportAggregator,
 } from '../aggregation/aggregate-reports.service';
-import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-import { updateMaxDate, updateMinDate } from '../../util/date.helper';
 @Injectable()
 export class ComputeStatisticsService {
 	logger = new Logger(ComputeStatisticsService.name);
@@ -30,7 +29,7 @@ export class ComputeStatisticsService {
 		protected statModel: Model<StatisticsDocument>,
 		protected partnerResourceService: PartnerResourcesService,
 		private reportAggregator: StatisticsReportAggregator,
-	) { }
+	) {}
 
 	private getRelatedStatsFilter(
 		report: ReportDocument | Report | LeanDocument<Report>,
@@ -89,7 +88,7 @@ export class ComputeStatisticsService {
 			await this.reportModel.deleteMany({
 				activity_term: report.activity_term,
 			});
-			return null;
+			return;
 		}
 		const scoreIncrement = term.score * reportCount;
 
@@ -194,11 +193,11 @@ export class ComputeStatisticsService {
 		// this.logger.debug(
 		// 	`Deleted ${delResponse.deletedCount} documents, acknowledged ${delResponse.acknowledged} `,
 		// );
-		const statSaves$ = [];
+		const statSaves$: Promise<StatisticsDocument>[] = [];
 
 		const reportsByTerms = this.reportAggregator.iterate(filter);
 
-		let currentStat = null;
+		let currentStat: StatisticsDocument | null = null;
 		for await (const report of reportsByTerms) {
 			if (!currentStat) {
 				// instantiate a new stat object if the current stat is null
@@ -244,16 +243,17 @@ export class ComputeStatisticsService {
 		term: TermDocument,
 		resource: PartnerResourceDocument,
 		user?: UserDocument,
-	) {
-		this.logger.debug(`Incrementing stat for resource ${resource.resource_id} by report from ${report.curator_orcid}`);
+	): Promise<void> {
+		this.logger.debug(
+			`Incrementing stat for resource ${resource.resource_id} by report from ${report.curator_orcid}`,
+		);
 		const statFilter = await this.getRelatedStatsFilter(report);
 
 		const statExists = await this.statModel.findOne(statFilter);
 		if (!!statExists) {
 			return await this.upsertStatByReport(report);
 		}
-
-		delete term._id;
+		const { _id, ...termWithoutId } = term;
 
 		const stat = new this.statModel({
 			...statFilter,
@@ -263,7 +263,7 @@ export class ComputeStatisticsService {
 			[term.activity_category + '_score']: 1 * term.score,
 			[term.activity_category + '_terms']: [
 				{
-					...term,
+					...termWithoutId,
 					count: 1,
 					sum: term.score,
 				},
@@ -277,13 +277,15 @@ export class ComputeStatisticsService {
 		stat.privacy = computePrivacyField(resource, user, stat);
 		try {
 			await stat.save();
+			return;
 		} catch (err) {
 			this.logger.error(
 				`Failed to insert stat for user ${report.curator_orcid} at resource ${report}: \n${err}`,
-			)
+			);
 			if (err instanceof MongoServerError && err.code == 11000) {
 				this.logger.error(
-					`Failed to insert stat for user ${report.curator_orcid} at resource ${report.resource_id}, retrying`,)
+					`Failed to insert stat for user ${report.curator_orcid} at resource ${report.resource_id}, retrying`,
+				);
 				return await this.incrementStatByReport(report, term, resource, user);
 			}
 		}

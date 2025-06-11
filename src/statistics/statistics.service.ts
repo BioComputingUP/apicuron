@@ -1,18 +1,23 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, LeanDocument, Model, QueryOptions } from 'mongoose';
-import { User, UserDocument } from '../core/schemas/user.schema';
+import { plainToInstance } from 'class-transformer';
+import {
+	FilterQuery,
+	LeanDocument,
+	Model,
+	PipelineStage,
+	QueryOptions,
+} from 'mongoose';
+import { UserRepository } from '../core/repositories/user.repository';
 import {
 	Statistics,
 	StatisticsDocument,
 } from '../core/schemas/statistics.schema';
+import { User, UserDocument } from '../core/schemas/user.schema';
 import { PartnerResourcesService } from '../resources/partner-resources/services/partner-resources.service';
-import { GetStatisticsDto } from './dto/get-statistics.dto';
-import { plainToClass, plainToInstance } from 'class-transformer';
-import { StatisticsDto, StatLeaderboardDto } from './dto/statistics.dto';
 import { userResourceEntityPrivacyFilter } from '../util/privacy.helper';
-import { UserRepository } from '../core/repositories/user.repository';
-
+import { GetStatisticsDto } from './dto/get-statistics.dto';
+import { StatisticsDto } from './dto/statistics.dto';
 @Injectable()
 export class StatisticsService {
 	constructor(
@@ -20,7 +25,7 @@ export class StatisticsService {
 		protected statisticsModel: Model<StatisticsDocument>,
 		protected userRepository: UserRepository,
 		protected partnerResourceService: PartnerResourcesService,
-	) { }
+	) {}
 
 	logger = new Logger(StatisticsService.name);
 
@@ -118,7 +123,7 @@ export class StatisticsService {
 		];
 
 		// sort aggregation
-		const sortAggregation = [];
+		const sortAggregation: PipelineStage.Sort[] = [];
 		if (!!getStatDto.sortBy && !!getStatDto.sortOrder) {
 			const obj = { $sort: {} };
 			// if the field belongs  to userFields it is directly used, otherwise it belongs to the
@@ -131,13 +136,14 @@ export class StatisticsService {
 			obj.$sort[sortField] = getStatDto.sortOrder;
 			sortAggregation.push(obj);
 		}
-
-		// get the data aggregated
-		const dataPromise = this.userRepository.aggregate([
+		const paginationAggregation = getStatDto.getMongoAggregation();
+		const aggregation: PipelineStage[] = [
 			...userStatsAggregation,
 			...sortAggregation,
-			...getStatDto.getMongoAggregation(),
-		]);
+			...paginationAggregation,
+		];
+		// get the data aggregated
+		const dataPromise = this.userRepository.aggregate(aggregation);
 
 		const countPromise = this.userRepository.aggregate<{ total_count: number }>(
 			[...userStatsAggregation, { $count: 'total_count' }],
@@ -158,7 +164,13 @@ export class StatisticsService {
 	async getResourceLeaderboard(
 		filter: FilterQuery<StatisticsDocument> & { resource_id: string },
 		options: QueryOptions<StatisticsDocument>,
-	): Promise<{ data: { stat: LeanDocument<StatisticsDocument>, user: LeanDocument<UserDocument> | null }[]; count: number }> {
+	): Promise<{
+		data: {
+			stat: LeanDocument<Statistics>;
+			user: LeanDocument<User> | null;
+		}[];
+		count: number;
+	}> {
 		const resource = await this.partnerResourceService.get_resource(
 			filter.resource_id,
 		);
@@ -175,13 +187,13 @@ export class StatisticsService {
 		);
 
 		const data = leaderboard.map((stat) => {
-			const user = stat.user;
+			const user = stat.user?.toObject<LeanDocument<UserDocument>>() ?? null;
 			const leaderboardEntry = {
 				stat: stat.toObject(),
-				user: user.toObject<LeanDocument<UserDocument>>(),
+				user,
 			};
 
-			return leaderboardEntry
+			return leaderboardEntry;
 		});
 
 		const count = await this.statisticsModel.count(filter);

@@ -1,26 +1,29 @@
+import { faker } from '@faker-js/faker';
+import { HttpService } from '@nestjs/axios';
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { getConnectionToken, getModelToken } from '@nestjs/mongoose';
-import { AppModule } from '../app.module';
-import { Report } from '../core/schemas/reports.schema';
-import { faker } from '@faker-js/faker';
-import { Term } from '../core/schemas/terms.schema';
+import { plainToInstance } from 'class-transformer';
+import { random } from 'lodash';
 import { Connection, Model } from 'mongoose';
-import { User } from '../core/schemas/user.schema';
-import { random, sum } from 'lodash';
+import { SubmittedResourcesService } from 'src/resources/submitted-resources/resources.service';
+import { FileUploadDto } from 'src/util/file-upload.helper';
+import { assertNotNull } from 'src/util/type-assertion.helper';
+import { AppModule } from '../app.module';
+import { UsersService } from '../auth/users/services/users.service';
+import { PrivacyType } from '../core/enums';
+import { Report } from '../core/schemas/reports.schema';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../core/schemas/resource/partner-resource.schema';
-import { PrivacyType } from '../core/enums';
-import { Logger } from '@nestjs/common';
-import { UsersService } from '../auth/users/services/users.service';
+import { Term, TermDocument } from '../core/schemas/terms.schema';
+import { User } from '../core/schemas/user.schema';
+import {
+	SubmitReportDto,
+	SubmitReportsDto,
+} from '../submit-reports/dto/submit-report.dto';
 import { SubmitReportService } from '../submit-reports/services/submit-reports.service';
-import { plainToInstance } from 'class-transformer';
-import { SubmitReportsDto } from '../submit-reports/dto/submit-report.dto';
-import { PartnerResourcesService } from 'src/resources/partner-resources/services/partner-resources.service';
-import { SubmittedResourcesService } from 'src/resources/submitted-resources/resources.service';
-import { FileUploadDto } from 'src/util/file-upload.helper';
-import { HttpService } from '@nestjs/axios';
 
 async function bootstrap() {
 	const app = await NestFactory.createApplicationContext(AppModule);
@@ -35,8 +38,10 @@ async function bootstrap() {
 	const resourceModel: Model<PartnerResource> = app.get(
 		getModelToken(PartnerResource.name),
 	);
-	const resourceService: SubmittedResourcesService = app.get(SubmittedResourcesService);
-	const http: HttpService = app.get(HttpService)
+	const resourceService: SubmittedResourcesService = app.get(
+		SubmittedResourcesService,
+	);
+	const http: HttpService = app.get(HttpService);
 
 	const userService = app.get(UsersService);
 
@@ -53,44 +58,64 @@ async function bootstrap() {
 		privacy: PrivacyType.public,
 	});
 
-	const tempResource = await resourceService.create_resource({
-		resource_description: faker.lorem.sentences(2),
-		resource_name: 'Testing Resource',
-		resource_long_name: 'Testing Resource Long Name',
-		color: '#000000',
-		resource_id: 'example_resource',
-		resource_uri: faker.internet.url(),
-		resource_url: faker.internet.url(),
-	}, testingOrcidId, await FileUploadDto.fromPicsum('https://picsum.photos/300/200.jpg', http))
+	const tempResource = await resourceService.create_resource(
+		{
+			resource_description: faker.lorem.sentences(2),
+			resource_name: 'Testing Resource',
+			resource_long_name: 'Testing Resource Long Name',
+			color: '#000000',
+			resource_id: 'example_resource',
+			resource_uri: faker.internet.url(),
+			resource_url: faker.internet.url(),
+		},
+		testingOrcidId,
+		await FileUploadDto.fromPicsum('https://picsum.photos/300/200.jpg', http),
+	);
 
 	await resourceService.make_partner(tempResource.resource_id);
 
-	const exampleResource = await resourceModel.findOne({ resource_id: tempResource.resource_id });
-
+	const exampleResource = await resourceModel.findOne({
+		resource_id: tempResource.resource_id,
+	});
+	assertNotNull(
+		exampleResource,
+		`Example resource with ID ${tempResource.resource_id} not found`,
+	);
 
 	logger.verbose(`Created testing resource successfully`);
 
-	const secondResourceTemp = await resourceService.create_resource({
-		resource_description: faker.lorem.sentences(2),
-		resource_name: 'Second Resource',
-		resource_long_name: 'Second Resource Long Name',
-		color: '#000000',
-		resource_id: 'second_resource',
-		resource_uri: faker.internet.url(),
-		resource_url: faker.internet.url(),
-	}, testingOrcidId, await FileUploadDto.fromPicsum('https://picsum.photos/300/200.jpg', http));
+	const secondResourceTemp = await resourceService.create_resource(
+		{
+			resource_description: faker.lorem.sentences(2),
+			resource_name: 'Second Resource',
+			resource_long_name: 'Second Resource Long Name',
+			color: '#000000',
+			resource_id: 'second_resource',
+			resource_uri: faker.internet.url(),
+			resource_url: faker.internet.url(),
+		},
+		testingOrcidId,
+		await FileUploadDto.fromPicsum('https://picsum.photos/300/200.jpg', http),
+	);
 
 	await resourceService.make_partner(secondResourceTemp.resource_id);
-	const secondResource = await resourceModel.findOne({ resource_id: secondResourceTemp.resource_id });
-
-	logger.verbose(`Created second resource successfully logo: ${secondResource.logo}`);
+	const secondResource = await resourceModel.findOne({
+		resource_id: secondResourceTemp.resource_id,
+	});
+	assertNotNull(
+		secondResource,
+		`Second resource with ID ${secondResourceTemp.resource_id} not found`,
+	);
+	logger.verbose(
+		`Created second resource successfully logo: ${secondResource.logo}`,
+	);
 
 	logger.verbose(
 		`Assigned testing resources to testing user: ${testingOrcidId}`,
 	);
 
 	//create terms for resource
-	const terms$ = [];
+	const terms$: Promise<TermDocument>[] = [];
 
 	for (let i = 0; i < termCount; i++) {
 		const termName = faker.lorem.words({ min: 1, max: 3 });
@@ -116,10 +141,9 @@ async function bootstrap() {
 	}
 	await Promise.all(terms$);
 
-
 	logger.verbose(`Created ${termCount} Mock terms Successfully`);
 	// create terms for second resource
-	const secondResourceTerms$ = [];
+	const secondResourceTerms$: Promise<TermDocument>[] = [];
 
 	for (let i = 0; i < termCount; i++) {
 		const termName = faker.lorem.words({ min: 1, max: 3 });
@@ -162,7 +186,7 @@ async function bootstrap() {
 
 	const userCount: number = await userModel.count();
 
-	const reports = [];
+	const reports: unknown[] = [];
 
 	for (let index = 0; index < reportCount; index++) {
 		const resource = index % 2 === 0 ? exampleResource : secondResource;
@@ -181,7 +205,9 @@ async function bootstrap() {
 
 	await app
 		.get(SubmitReportService)
-		.insertReports(plainToInstance(SubmitReportsDto, { reports }));
+		.insertReports(plainToInstance(SubmitReportsDto, { reports }), {
+			preventEvents: false,
+		});
 
 	logger.verbose(`Created ${reportCount} Mock reports`);
 
@@ -201,13 +227,15 @@ export async function mockReport(
 	resource: PartnerResourceDocument,
 	userCount = 1,
 	terms: string[],
-) {
+): Promise<SubmitReportDto> {
 	const randomUser = await userModel.findOne(
 		{},
 		{},
 		{ skip: random(0, userCount - 1, false) },
 	);
-
+	if (!randomUser) {
+		throw new Error('No user found');
+	}
 	const report = {
 		activity_term: faker.helpers.arrayElement(terms),
 

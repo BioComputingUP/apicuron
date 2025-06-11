@@ -1,23 +1,28 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../../app.module';
 import { INestApplicationContext, Logger } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { getModelToken } from '@nestjs/mongoose';
-import {
-	PartnerResource,
-	PartnerResourceDocument,
-} from '../../core/schemas/resource/partner-resource.schema';
-import { PrivacyType } from '../../core/enums';
 import { Model } from 'mongoose';
-import { Term } from '../../core/schemas/terms.schema';
-import { AchievementDef } from '../../core/schemas/achievements-def/achievement-def.schema';
-import { Report } from '../../core/schemas/reports.schema';
-import { Achievement } from '../../core/schemas/achievements/achievements.schema';
-import { computePrivacyField } from '../../util/privacy.helper';
-import { User, UserDocument } from '../../core/schemas/user.schema';
+import { ResourceDocument } from 'src/core/schemas/index';
+import { assertNotNull } from 'src/util/type-assertion.helper';
+import { AppModule } from '../../app.module';
+import { PrivacyType } from '../../core/enums';
 import {
 	IResourceEntity,
 	IUserResourceEntity,
 } from '../../core/interfaces/user-resource-entity';
+import { AchievementDef } from '../../core/schemas/achievements-def/achievement-def.schema';
+import {
+	Achievement,
+	AchievementDocument,
+} from '../../core/schemas/achievements/achievements.schema';
+import { Report, ReportDocument } from '../../core/schemas/reports.schema';
+import {
+	PartnerResource,
+	PartnerResourceDocument,
+} from '../../core/schemas/resource/partner-resource.schema';
+import { Term, TermDocument } from '../../core/schemas/terms.schema';
+import { User, UserDocument } from '../../core/schemas/user.schema';
+import { computePrivacyField } from '../../util/privacy.helper';
 
 async function addLeagueToResources(app: INestApplicationContext) {
 	const logger = new Logger(addLeagueToResources.name);
@@ -33,7 +38,7 @@ async function addLeagueToResources(app: INestApplicationContext) {
 		],
 	});
 
-	const savePromises$ = [];
+	const savePromises$: Promise<ResourceDocument>[] = [];
 	for (const resource of resourcesLackingLeague) {
 		logger.debug(`Processing resource ${resource.resource_id}`);
 		// if (!resource.leagues || !(resource.leagues instanceof Map)) {
@@ -73,9 +78,13 @@ async function addLeagueToUserResourceEntities(app: INestApplicationContext) {
 
 	const userModel: Model<UserDocument> = app.get(getModelToken(User.name));
 
-	const reportModel = app.get(getModelToken(Report.name));
+	const reportModel: Model<ReportDocument> = app.get(
+		getModelToken(Report.name),
+	);
 
-	const achievementsModel = app.get(getModelToken(Achievement.name));
+	const achievementsModel: Model<AchievementDocument> = app.get(
+		getModelToken(Achievement.name),
+	);
 
 	const resources = await resourceModel.find();
 
@@ -93,15 +102,20 @@ async function addLeagueToUserResourceEntities(app: INestApplicationContext) {
 
 		const allEntries = model.find({}, {}, { batchSize: 500 }).cursor();
 
-		const entrySaves$ = [];
+		const entrySaves$: Promise<IUserResourceEntity>[] = [];
 
 		for await (const entry of allEntries) {
 			try {
 				if (!entry.league) {
-					entry.league = resourceMap.get(entry.resource_id).defaultLeague;
+					const resource = resourceMap.get(entry.resource_id);
+					assertNotNull(
+						resource,
+						`Resource with resource_id ${entry.resource_id} not found in resourceMap`,
+					);
+					entry.league = resource.defaultLeague;
 				}
-			} catch (err: any) {
-				logger.error(err);
+			} catch (error: unknown) {
+				logger.error(error);
 				throw new Error(
 					`Error processing entry from model ${model.modelName} with resource_id ${entry.resource_id} and orcid_id ${entry.curator_orcid}`,
 				);
@@ -112,14 +126,19 @@ async function addLeagueToUserResourceEntities(app: INestApplicationContext) {
 					const user = await userModel.findOne({
 						orcid_id: entry.curator_orcid,
 					});
+					assertNotNull(
+						user,
+						`User with orcid_id ${entry.curator_orcid} not found in userModel`,
+					);
 					userMap.set(entry.curator_orcid, user);
 				}
 				const user = userMap.get(entry.curator_orcid);
-				entry.privacy = computePrivacyField(
-					resourceMap.get(entry.resource_id),
-					user,
-					entry,
+				const resource = resourceMap.get(entry.resource_id);
+				assertNotNull(
+					resource,
+					`Resource with resource_id ${entry.resource_id} not found in resourceMap`,
 				);
+				entry.privacy = computePrivacyField(resource, user, entry);
 			}
 			const save$ = entry.save();
 			entrySaves$.push(save$);
@@ -138,9 +157,11 @@ async function addLeagueToResourceEntities(app: INestApplicationContext) {
 
 	logger.debug('Loading Models');
 
-	const termModel = app.get(getModelToken(Term.name));
+	const termModel: Model<TermDocument> = app.get(getModelToken(Term.name));
 
-	const achievementDefModel = app.get(getModelToken(AchievementDef.name));
+	const achievementDefModel: Model<AchievementDocument> = app.get(
+		getModelToken(AchievementDef.name),
+	);
 
 	const resources = await resourceModel.find();
 
@@ -155,14 +176,19 @@ async function addLeagueToResourceEntities(app: INestApplicationContext) {
 		logger.debug(`Loading Model ${model.modelName}`);
 		const allEntries = model.find().cursor();
 
-		const entrySaves$ = [];
+		const entrySaves$: Promise<IResourceEntity>[] = [];
 
 		for await (const entry of allEntries) {
+			const resource = resourceMap.get(entry.resource_id);
+			assertNotNull(
+				resource,
+				`Resource with resource_id ${entry.resource_id} not found in resourceMap`,
+			);
 			try {
 				if (!entry.league) {
-					entry.league = resourceMap.get(entry.resource_id).defaultLeague;
+					entry.league = resource.defaultLeague;
 				}
-			} catch (err: any) {
+			} catch (err: unknown) {
 				logger.error(err);
 				throw new Error(
 					`Error processing entry from model${model.modelName} with resource_id ${entry.resource_id}`,
@@ -170,9 +196,12 @@ async function addLeagueToResourceEntities(app: INestApplicationContext) {
 			}
 
 			if (!entry.privacy) {
-				entry.privacy = resourceMap
-					.get(entry.resource_id)
-					.getLeague(entry.league).visibility;
+				const league = resource.getLeague(entry.league);
+				assertNotNull(
+					league,
+					`League ${entry.league} not found in resource ${resource.resource_id}`,
+				);
+				entry.privacy = league.visibility;
 			}
 
 			const save$ = entry.save();

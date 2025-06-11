@@ -1,9 +1,8 @@
+import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams } from 'class-transformer';
 import { IsInt, IsOptional, Max, Min, ValidateIf } from 'class-validator';
-import { QueryOptions } from 'mongoose';
-import { PaginationAggregation } from '../interfaces/pagination-aggregation';
 import { omit } from 'lodash';
-import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
+import { PipelineStage, QueryOptions } from 'mongoose';
 export class BasePaginationDto {
 	@ApiProperty({
 		description: 'The number of records to skip',
@@ -47,8 +46,11 @@ export class BasePaginationDto {
 		}
 	}
 
-	getMongoAggregation(): PaginationAggregation {
-		const agg = [];
+	getMongoAggregation(): [PipelineStage.Skip | PipelineStage.Limit] {
+		const agg: [PipelineStage.Skip | PipelineStage.Limit] = [
+			{ $skip: this.skip || 0 },
+		];
+
 		if (this.skip) {
 			agg.push({ $skip: this.skip });
 		}
@@ -57,7 +59,7 @@ export class BasePaginationDto {
 				$limit: this.limit,
 			});
 		}
-		return agg as PaginationAggregation;
+		return agg;
 	}
 
 	omitPagination(): Omit<this, 'skip' | 'limit'> {

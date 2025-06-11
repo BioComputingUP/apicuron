@@ -1,13 +1,14 @@
-import { NestFactory } from '@nestjs/core';
-import { Logger, INestApplicationContext } from '@nestjs/common';
-import { AppModule } from '../app.module';
-import { getModelToken } from '@nestjs/mongoose';
-import { User, UserDocument } from '../core/schemas/user.schema';
-import { Model } from 'mongoose';
-import { generateAvatar } from '../auth/users/generate_avatar';
+import { INestApplicationContext, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { getModelToken } from '@nestjs/mongoose';
 import { existsSync } from 'fs';
+import { Model } from 'mongoose';
 import { join } from 'path';
+import { throwError } from 'src/util/type-assertion.helper';
+import { AppModule } from '../app.module';
+import { generateAvatar } from '../auth/users/generate_avatar';
+import { User, UserDocument } from '../core/schemas/user.schema';
 
 export async function bootstrap(app: INestApplicationContext) {
 	const userModel: Model<UserDocument> = app.get(getModelToken(User.name));
@@ -23,11 +24,19 @@ export async function bootstrap(app: INestApplicationContext) {
 
 	const userSavePromises: Promise<UserDocument>[] = [];
 
-	async function addAvatarToUser(user: UserDocument) {
+	async function addAvatarToUser(user: UserDocument): Promise<UserDocument> {
 		const avatarSvg = await generateAvatar(user.displayedName);
 
-		if (existsSync(join(config.get('PUBLIC_FILES_PATH'), user.avatar))) {
-			return null;
+		if (
+			existsSync(
+				join(
+					config.get('PUBLIC_FILES_PATH') ??
+						throwError(Error, 'PUBLIC_FILES_PATH is not defined'),
+					user.avatar,
+				),
+			)
+		) {
+			return user;
 		}
 
 		logger.log(

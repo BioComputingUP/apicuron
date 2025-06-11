@@ -1,11 +1,10 @@
-import { NestFactory } from "@nestjs/core";
-import { AppModule } from "src/app.module";
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from 'src/app.module';
 
-import { User, UserDocument } from "src/core/schemas/user.schema";
-import { OrcidClientService } from "src/orcid/orcid-client/orcid-client.service";
-import { getModelToken } from "@nestjs/mongoose";
-import { Model } from "mongoose";
-
+import { getModelToken } from '@nestjs/mongoose';
+import { Model, UpdateWriteOpResult } from 'mongoose';
+import { User, UserDocument } from 'src/core/schemas/user.schema';
+import { OrcidClientService } from 'src/orcid/orcid-client/orcid-client.service';
 
 async function bootstrap() {
 	// get required modules and models
@@ -13,31 +12,34 @@ async function bootstrap() {
 
 	const orcidClientService = app.get(OrcidClientService);
 
-	const userModel: Model<UserDocument> = app.get(
-		getModelToken(User.name),
-	);
+	const userModel: Model<UserDocument> = app.get(getModelToken(User.name));
 
 	// get all user orcids
 	const all_users = await userModel.find().lean().select('orcid_id');
 	// console.log('all_users:>> ', all_users);
-	
-	
-	try{
-		let updates = []
-		console.log("Getting all users information...");
-		for await (const user of all_users){
-			const extra_orcid_info = await orcidClientService.get_user_info(user.orcid_id);
-			updates.push(userModel.updateOne({orcid_id: user.orcid_id}, {$set: extra_orcid_info}));
+
+	try {
+		const updates: Promise<UpdateWriteOpResult>[] = [];
+		console.log('Getting all users information...');
+		for await (const user of all_users) {
+			const extra_orcid_info = await orcidClientService.get_user_info(
+				user.orcid_id,
+			);
+			updates.push(
+				userModel
+					.updateOne({ orcid_id: user.orcid_id }, { $set: extra_orcid_info })
+					.exec(),
+			);
 		}
-		console.log("Updating all users information...");
-		await Promise.all(updates)
-		console.log("Done.");
-	}catch(err){
+		console.log('Updating all users information...');
+		await Promise.all(updates);
+		console.log('Done.');
+	} catch (err: unknown) {
 		console.log(`[ERROR] Error updating user`);
-		console.log("[ERROR]" + err);
+		console.log('[ERROR]' + err);
 	}
-	
-	await app.close()
+
+	await app.close();
 }
 
-bootstrap()
+bootstrap();

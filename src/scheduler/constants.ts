@@ -16,9 +16,8 @@ export interface TaskRunOptions {
 }
 
 export type TaskArguments = {
-	resource_id?: string;
+	resource_id: string;
 	orcid_id?: string;
 	file?: Express.Multer.File;
 	delete_existing?: string[];
-
-}
+};

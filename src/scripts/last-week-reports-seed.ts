@@ -1,25 +1,19 @@
+import { faker } from '@faker-js/faker';
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { getModelToken } from '@nestjs/mongoose';
+import * as moment from 'moment-timezone';
 import { Model } from 'mongoose';
 import { AppModule } from '../app.module';
+import { PrivacyType } from '../core/enums';
+import { LeanReportDocument, Report } from '../core/schemas/reports.schema';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../core/schemas/resource/partner-resource.schema';
 import { Term } from '../core/schemas/terms.schema';
-import { faker } from '@faker-js/faker';
-import { PrivacyType } from '../core/enums';
-import {
-	LeanReportDocument,
-	Report,
-	ReportDocument,
-} from '../core/schemas/reports.schema';
-import { SubmitReportService } from '../submit-reports/services/submit-reports.service';
 import { OrcidClientService } from '../orcid/orcid-client/orcid-client.service';
-import { UsersService } from '../auth/users/services/users.service';
-import { Logger } from '@nestjs/common';
-import * as moment from 'moment-timezone';
-
+import { SubmitReportService } from '../submit-reports/services/submit-reports.service';
 async function mockReport(
 	reportModel: Model<Report>,
 	resource: PartnerResourceDocument,
@@ -101,7 +95,9 @@ async function bootstrap() {
 	const reportCount = parseInt(process.argv?.[2] ?? '150');
 
 	logger.verbose(`Generating ${reportCount} reports`);
-	const resource = await resourceModel.findOne();
+	const resource = await resourceModel
+		.findOne()
+		.orFail(new Error('Resource not found'));
 
 	const terms = await termModel.find({
 		resource_id: resource.resource_id,

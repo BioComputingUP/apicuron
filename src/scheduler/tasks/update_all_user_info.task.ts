@@ -1,8 +1,8 @@
 import { Logger } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, UpdateWriteOpResult } from 'mongoose';
 import { User, UserDocument } from 'src/core/schemas/user.schema';
 import { OrcidClientService } from 'src/orcid/orcid-client/orcid-client.service';
-import { InjectModel } from '@nestjs/mongoose';
 
 export class UpdateAllUsersInfoTask {
 	constructor(
@@ -15,7 +15,7 @@ export class UpdateAllUsersInfoTask {
 		// Get all user Ids from database
 		const all_users = await this.userModel.find().lean().select('orcid_id');
 
-		const updates = [];
+		const updates: Promise<UpdateWriteOpResult>[] = [];
 		this.logger.log('Getting all users information...');
 		for await (const user of all_users) {
 			try {
@@ -23,10 +23,9 @@ export class UpdateAllUsersInfoTask {
 					user.orcid_id,
 				);
 				updates.push(
-					this.userModel.updateOne(
-						{ orcid_id: user.orcid_id },
-						{ $set: extra_orcid_info },
-					),
+					this.userModel
+						.updateOne({ orcid_id: user.orcid_id }, { $set: extra_orcid_info })
+						.exec(),
 				);
 			} catch (error) {
 				this.logger.error(`Error getting infor for user ${user.orcid_id}`);

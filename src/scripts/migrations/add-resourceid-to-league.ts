@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../../app.module';
 import { getModelToken } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { AppModule } from '../../app.module';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../../core/schemas/resource/partner-resource.schema';
-import { Model } from 'mongoose';
 
 async function bootstrap() {
 	const app = await NestFactory.createApplicationContext(AppModule);
@@ -14,7 +14,7 @@ async function bootstrap() {
 		getModelToken(PartnerResource.name),
 	);
 
-	const saves$ = [];
+	const saves$: Promise<void>[] = [];
 	const resources = await resourceModel.find({});
 	for (const resource of resources) {
 		for (let i = 0; i < resource.leagues.length; i++) {

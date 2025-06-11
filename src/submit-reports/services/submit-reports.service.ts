@@ -98,11 +98,11 @@ export class SubmitReportService {
 
 	async insertReport(
 		submittedReport: SubmitReportDto,
-		options: { preventEvents: true },
+		options?: { preventEvents: true },
 	): Promise<InsertReportResult>;
 	async insertReport(
 		submittedReport: SubmitReportDto,
-		options: { preventEvents: false },
+		options?: { preventEvents: false },
 	): Promise<Omit<InsertReportResult, 'callback'>>;
 	async insertReport(
 		submittedReport: SubmitReportDto,
@@ -151,11 +151,11 @@ export class SubmitReportService {
 
 	async insertReports(
 		submission: SubmitReportsDto,
-		options: InsertOptions<true>,
+		options?: InsertOptions<true>,
 	): Promise<InsertManyReportsResult>;
 	async insertReports(
 		submission: SubmitReportsDto,
-		options: InsertOptions,
+		options?: InsertOptions,
 	): Promise<Omit<InsertManyReportsResult, 'callback'>>;
 	async insertReports(
 		submission: SubmitReportsDto,

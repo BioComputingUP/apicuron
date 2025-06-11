@@ -4,6 +4,7 @@ import {
 	AnyAsyncEngineDefinition,
 	StorageModuleConfig,
 } from '@biocomputingup/nest-storage-manager/dist/interfaces';
+import { NotImplementedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 type ObjectValues<T> = T[keyof T];
@@ -52,6 +53,9 @@ const storageDefFactory = (
 				engine: new S3Engine(engineConfig, new S3Client(clientConfig)),
 			};
 		}
+		throw new NotImplementedException(
+			`Unsupported storage engine type: ${configObject.engineType}`,
+		);
 	},
 });
 

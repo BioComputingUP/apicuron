@@ -1,14 +1,14 @@
 import { NestFactory } from '@nestjs/core';
+import { getModelToken } from '@nestjs/mongoose';
+import * as _ from 'lodash';
+import { Model, UpdateWriteOpResult } from 'mongoose';
 import { AppModule } from '../app.module';
-import { Model } from 'mongoose';
+import { BadgeAggregatorService } from '../badges/services/badge-aggregator.service';
 import {
 	BadgeDef,
 	BadgeDefDocument,
 } from '../core/schemas/achievements-def/badge-def.schema';
-import { getModelToken } from '@nestjs/mongoose';
 import { BadgeDocument } from '../core/schemas/achievements/badges.schema';
-import * as _ from 'lodash';
-import { BadgeAggregatorService } from '../badges/services/badge-aggregator.service';
 import { PartnerResourcesService } from '../resources/partner-resources/services/partner-resources.service';
 
 async function bootstrap() {
@@ -30,11 +30,13 @@ async function bootstrap() {
 		.lean()
 		.cursor({ batchSize: 100 });
 
-	let updates$ = [];
+	let updates$: Promise<UpdateWriteOpResult>[] = [];
 	for await (const badgeDef of badgeDefs) {
 		badgeDef.displayedName = badgeDef.name;
 		badgeDef.name = _.kebabCase(badgeDef.name.toLowerCase());
-		updates$.push(badgeDefModel.updateOne({ _id: badgeDef._id }, badgeDef));
+		updates$.push(
+			badgeDefModel.updateOne({ _id: badgeDef._id }, badgeDef).exec(),
+		);
 
 		if (updates$.length >= 100) {
 			await Promise.all(updates$);

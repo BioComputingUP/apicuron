@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
+import { uniq } from 'lodash';
+import { assertNotNull } from 'src/util/type-assertion.helper';
+import { UsersService } from '../../auth/users/services/users.service';
+import { PrivacyType } from '../../core/enums';
+import { ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
-import { PrivacyType } from '../../core/enums';
-import { ReportHandler } from '../interfaces/report.handler';
-import { ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { UsersService } from '../../auth/users/services/users.service';
 import { computePrivacyField } from '../../util/privacy.helper';
-import { uniq } from 'lodash';
+import { ReportHandler } from '../interfaces/report.handler';
 @Injectable()
 export class ReportMetaHandler implements ReportHandler {
 	constructor(
@@ -38,11 +39,18 @@ export class ReportMetaHandler implements ReportHandler {
 		]);
 
 		for (const report of reports) {
-			this.handleIndividualReport(
-				report,
-				resMap.get(report.resource_id),
-				userMap.get(report.curator_orcid),
+			const resource = resMap.get(report.resource_id);
+			assertNotNull(
+				resource,
+				`Resource with ID ${report.resource_id} not found for report ${report._id}`,
 			);
+			const user = userMap.get(report.curator_orcid);
+			assertNotNull(
+				user,
+				`User with ORCID ${report.curator_orcid} not found for report ${report._id}`,
+			);
+
+			this.handleIndividualReport(report, resource, user);
 		}
 
 		return {

@@ -1,29 +1,29 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
+import { FilterQuery, Model } from 'mongoose';
+import {
+	ResourceBadgesUpdatedEvent,
+	UserBadgesUpdatedEvent,
+} from '../../badges/events/badge-count-updated.event';
+import { AchievementState } from '../../core/enums';
 import {
 	Badge,
 	BadgeDocument,
 } from '../../core/schemas/achievements/badges.schema';
-import { FilterQuery, Model } from 'mongoose';
-import {
-	Statistics,
-	StatisticsDocument,
-} from '../../core/schemas/statistics.schema';
 import {
 	Medal,
 	MedalDocument,
 } from '../../core/schemas/achievements/medals.schema';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { AchievementState } from '../../core/enums';
+import {
+	Statistics,
+	StatisticsDocument,
+} from '../../core/schemas/statistics.schema';
 import {
 	ResourceMedalsCountUpdatedEvent,
 	UserMedalsCountUpdatedEvent,
 } from '../../medals/events/medal-count-updated.event';
-import {
-	ResourceBadgesUpdatedEvent,
-	UserBadgesUpdatedEvent,
-} from '../../badges/events/badge-count-updated.event';
 
 @Injectable()
 export class StatisticsEventHandlerService {
@@ -50,7 +50,7 @@ export class StatisticsEventHandlerService {
 			.find({ resource_id: payload.resource_id })
 			.cursor({ batchSize: 50 });
 
-		const statUpdates$ = [];
+		const statUpdates$: Promise<StatisticsDocument>[] = [];
 		for await (const stat of stats) {
 			const update$ = this.medalModel
 				.countDocuments({
@@ -99,7 +99,7 @@ export class StatisticsEventHandlerService {
 			.find({ resource_id: payload.resource_id })
 			.cursor({ batchSize: 50 });
 
-		const statUpdates$ = [];
+		const statUpdates$: Promise<StatisticsDocument>[] = [];
 		for await (const stat of stats) {
 			const update$ = this.badgeModel
 				.countDocuments({

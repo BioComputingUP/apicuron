@@ -1,29 +1,25 @@
-import { Logger } from '@nestjs/common';
+import { faker } from '@faker-js/faker';
 import { NestFactory } from '@nestjs/core';
 import { getModelToken } from '@nestjs/mongoose';
+import { plainToInstance } from 'class-transformer';
 import { Model } from 'mongoose';
 import { AppModule } from '../app.module';
-import { UsersService } from '../auth/users/services/users.service';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
 	Term,
 } from '../core/schemas';
-import { User } from '../core/schemas/user.schema';
-import { mockReport } from './seed';
 import { Report } from '../core/schemas/reports.schema';
-import { faker } from '@faker-js/faker';
-import { plainToInstance } from 'class-transformer';
+import { User } from '../core/schemas/user.schema';
 import {
 	SubmitReportDto,
 	SubmitReportsDto,
 } from '../submit-reports/dto/submit-report.dto';
 import { SubmitReportService } from '../submit-reports/services/submit-reports.service';
+import { mockReport } from './seed';
 
 async function bootstrap() {
 	const app = await NestFactory.createApplicationContext(AppModule);
-
-	const logger = new Logger('SeederLogger');
 
 	// initialize models
 	const reportModel: Model<Report> = app.get(getModelToken(Report.name));
@@ -31,8 +27,6 @@ async function bootstrap() {
 	const resourceModel: Model<PartnerResource> = app.get(
 		getModelToken(PartnerResource.name),
 	);
-
-	const userService = app.get(UsersService);
 
 	const termModel: Model<Term> = app.get(getModelToken(Term.name));
 
@@ -64,9 +58,11 @@ async function bootstrap() {
 
 		await app
 			.get(SubmitReportService)
-			.insertReports(plainToInstance(SubmitReportsDto, { reports }));
+			.insertReports(plainToInstance(SubmitReportsDto, { reports }), {
+				preventEvents: false,
+			});
 	};
-	const computations$ = [];
+	const computations$: Promise<void>[] = [];
 	for (const resource of resources) {
 		const resourceProcess$ = processResource(resource);
 		computations$.push(resourceProcess$);

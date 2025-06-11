@@ -1,42 +1,36 @@
 import {
-	Controller,
+	BadRequestException, Controller,
 	Get,
-	Logger,
-	Query,
-	Param, UseInterceptors,
-	UseGuards,
-	NotFoundException,
-	BadRequestException,
-	SerializeOptions
+	Logger, NotFoundException, Param, Query, SerializeOptions, UseGuards, UseInterceptors
 } from '@nestjs/common';
-import { TransformInterceptor } from '../../shared/transformer/transform.interceptor';
-import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { GetStatisticsDto } from '../dto/get-statistics.dto';
-import { StatisticsService } from '../statistics.service';
 import {
 	ApiHeader,
 	ApiOkResponse,
 	ApiOperation, ApiTags
 } from '@nestjs/swagger';
-import { VersionHeader } from '../../plugins/swagger/config';
+import { plainToInstance } from 'class-transformer';
+import { validate, ValidationError } from 'class-validator';
+import { UserReq } from '../../auth/decorators/applyUser.decorator';
+import { AuthProtected } from '../../auth/decorators/auth.decorator';
+import { Public } from '../../auth/decorators/public.decorator';
+import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
 import { UsersService } from '../../auth/users/services/users.service';
-import { instanceToPlain, plainToInstance } from 'class-transformer';
+import { User } from '../../core/schemas/user.schema';
+import { ApiResponsePaginated } from '../../pagination/decorators/paginated-reponse.decorator';
 import {
 	BasePaginationDto
 } from '../../pagination/dto/paginate.dto';
-import { Public } from '../../auth/decorators/public.decorator';
-import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
-import { UserReq } from '../../auth/decorators/applyUser.decorator';
-import { User } from '../../core/schemas/user.schema';
-import { StatisticsFilter } from '../dto/statistics-filter.dto';
-import { AuthProtected } from '../../auth/decorators/auth.decorator';
-import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
-import { ValidationError, validate } from 'class-validator';
 import { paginate, Paginated } from '../../pagination/paginator';
-import { StatisticsDto, StatLeaderboardDto } from '../dto/statistics.dto';
-import { ApiResponsePaginated } from '../../pagination/decorators/paginated-reponse.decorator';
-import { StatSearchResponseDto } from '../dto/stat-search-response.dto';
+import { VersionHeader } from '../../plugins/swagger/config';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { ApiResponseWrapped } from '../../shared/decorators/wrapped-data-response.decorator';
+import { TransformInterceptor } from '../../shared/transformer/transform.interceptor';
+import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
+import { GetStatisticsDto } from '../dto/get-statistics.dto';
+import { StatSearchResponseDto } from '../dto/stat-search-response.dto';
+import { StatisticsFilter } from '../dto/statistics-filter.dto';
+import { StatisticsDto, StatLeaderboardDto } from '../dto/statistics.dto';
+import { StatisticsService } from '../statistics.service';
 @ApiTags('Statistics')
 @ApiHeader(VersionHeader)
 @Controller({
@@ -120,7 +114,7 @@ export class StatisticsController {
 		if (errors.length > 0) {
 			const errorResponse = errors.map((error: ValidationError) => ({
 				property: error.property,
-				message: error.constraints[Object.keys(error.constraints)[0]],
+				message: error.constraints?.[Object.keys(error.constraints)[0]] ?? 'invalid constraint',
 			}));
 			throw new BadRequestException(errorResponse);
 		}

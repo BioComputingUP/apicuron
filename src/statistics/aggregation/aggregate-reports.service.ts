@@ -1,16 +1,16 @@
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Aggregate, FilterQuery, Model } from 'mongoose';
-import { Term, TermDocument } from '../../core/schemas/terms.schema';
-import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import { User, UserDocument } from '../../core/schemas/user.schema';
+import { PrivacyType } from '../../core/enums';
+import { LeagueDocument } from '../../core/schemas/league/league.schema';
+import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../../core/schemas/resource/partner-resource.schema';
-import { PrivacyType } from '../../core/enums';
-import { LeagueDocument } from '../../core/schemas/league/league.schema';
+import { Term, TermDocument } from '../../core/schemas/terms.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
 
 export interface BaseAggregationResult {
 	_id: {
@@ -135,7 +135,7 @@ export class StatisticsReportAggregator {
 		const terms = await this.termModel.find({ resource_id });
 		let resultTerm: TermDocument | null = null;
 
-		const cacheEvents$ = [];
+		const cacheEvents$: Promise<void>[] = [];
 		for (const term of terms) {
 			if (term.activity_term == activity_term && term.league == league) {
 				resultTerm = term;

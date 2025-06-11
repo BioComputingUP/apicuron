@@ -4,27 +4,27 @@ import {
 	SubmitReportsDto,
 } from '../../submit-reports/dto/submit-report.dto';
 
-import * as StreamObject from 'stream-json/streamers/StreamObject';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { InjectModel } from '@nestjs/mongoose';
+import { plainToInstance } from 'class-transformer';
+import { validate, ValidationError } from 'class-validator';
 import { createReadStream, readFileSync } from 'fs';
-import { filter } from 'stream-json/filters/Filter';
+import { partition } from 'lodash';
+import { MongoBulkWriteError } from 'mongodb';
+import { Model } from 'mongoose';
+import { Command, Option } from 'nest-commander';
+import { chain, Stream } from 'stream-chain';
 import { parser } from 'stream-json';
-import { Stream, chain } from 'stream-chain';
+import { filter } from 'stream-json/filters/Filter';
 import { pick } from 'stream-json/filters/Pick';
 import * as StreamArray from 'stream-json/streamers/StreamArray';
-import { validate, ValidationError } from 'class-validator';
-import { User, UserDocument } from '../../core/schemas/user.schema';
-import { NotificationsService } from '../../notifications/notifications.service';
-import { InjectModel } from '@nestjs/mongoose';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { Model } from 'mongoose';
-import { plainToClass, plainToInstance } from 'class-transformer';
-import { MongoBulkWriteError } from 'mongodb';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { SubmitReportService } from '../../submit-reports/services/submit-reports.service';
-import { BulkSubmissionEvent } from '../../submit-reports/events/events';
-import { partition } from 'lodash';
+import * as StreamObject from 'stream-json/streamers/StreamObject';
 import { UserRepository } from '../../core/repositories/user.repository';
-import { Command, Option } from 'nest-commander';
+import { Report, ReportDocument } from '../../core/schemas/reports.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
+import { NotificationsService } from '../../notifications/notifications.service';
+import { BulkSubmissionEvent } from '../../submit-reports/events/events';
+import { SubmitReportService } from '../../submit-reports/services/submit-reports.service';
 import { Task } from '../interfaces/task.abstract';
 
 export type ValidatedReport = {
@@ -303,7 +303,7 @@ export class SubmitBulkTask extends Task {
 	}
 
 	private async main(file: string, submitter_orcid: string) {
-		let reportStream = null;
+		let reportStream: Stream | null = null;
 		try {
 			const defaultReport = await this.parse_default_report(file);
 			const user = await this.userModel.findOne({
@@ -359,7 +359,7 @@ export class SubmitBulkTask extends Task {
 	private async process_report_stream(
 		reportsStream,
 	): Promise<SubmissionProcessingReport> {
-		let error_report = [];
+		let error_report: ValidationError[] = [];
 		let successful_reports_count = 0;
 		let total_report_count = 0;
 
@@ -381,7 +381,7 @@ export class SubmitBulkTask extends Task {
 							});
 					} catch (e) {
 						if (e) {
-							this.logger.error(e?.message);
+							this.logger.error(e.message);
 							error_report.push({
 								target: report,
 								property: 'all',
@@ -444,7 +444,7 @@ export class SubmitBulkTask extends Task {
 			return text;
 		}
 
-		let submission_report = [];
+		let submission_report: string[] = [];
 		if (success_count > 0) {
 			submission_report = [
 				`Successfully submitted ${success_count}/${total_count}:`,
