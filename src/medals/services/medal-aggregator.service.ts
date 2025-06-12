@@ -155,8 +155,8 @@ export class MedalAggregatorService implements Aggregator {
 	async applyReport(
 		report: ReportDocument | LeanReportDocument,
 		termDoc: TermDocument,
-		resource: PartnerResourceDocument,
-		curator?: UserDocument,
+		_resource: PartnerResourceDocument,
+		_curator?: UserDocument,
 	) {
 		const term =
 			termDoc ??
@@ -211,7 +211,7 @@ export class MedalAggregatorService implements Aggregator {
 	}
 
 	async removeAllResourceAggregates(resource_id: string) {
-		return await this.medalModel.deleteMany({ resource_id });
+		await this.medalModel.deleteMany({ resource_id });
 	}
 
 	async termUpdated(oldTerm: TermDocument, newTerm: TermDocument) {

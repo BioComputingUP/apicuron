@@ -4,26 +4,25 @@ import {
 	OnModuleDestroy,
 	OnModuleInit,
 } from '@nestjs/common';
+import { IEventHandler } from '@nestjs/cqrs';
 import { OnEvent } from '@nestjs/event-emitter';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import {
+	catchError,
+	concatMap,
+	Observable,
+	of,
+	Subject,
+	takeUntil,
+} from 'rxjs';
+import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import {
 	IReportSubmittedEventPayload,
 	ReportSubmittedEvent,
 } from '../../submit-reports/events/events';
-import { InjectModel } from '@nestjs/mongoose';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { Model } from 'mongoose';
-import { IEventHandler } from '@nestjs/cqrs';
-import {
-	EMPTY,
-	Observable,
-	Subject,
-	catchError,
-	concatMap,
-	of,
-	takeUntil,
-} from 'rxjs';
-import { Aggregator } from '../interfaces/aggregator.interface';
 import { SubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
+import { Aggregator } from '../interfaces/aggregator.interface';
 
 @Injectable()
 export class ReportSubmittedEventHandler
@@ -55,7 +54,6 @@ export class ReportSubmittedEventHandler
 							.catch((err) => {
 								this.logger.error(
 									`Error Processing report for resource "${payload.report.resource_id}" from user ${payload.report.curator_orcid}:${payload?.user?.displayedName}`,
-									err,
 								);
 								subscriber.error(err);
 							})

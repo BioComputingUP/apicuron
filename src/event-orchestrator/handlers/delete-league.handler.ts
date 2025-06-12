@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { IEventHandler } from '@nestjs/cqrs';
 import { OnEvent } from '@nestjs/event-emitter';
 import { LeagueDeletedEvent } from '../../resources/partner-resources/leagues/events/league-deleted-event';
-import { Aggregator } from '../interfaces/aggregator.interface';
 import { SubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
+import { Aggregator } from '../interfaces/aggregator.interface';
 
 @Injectable()
 export class DeleteLeagueHandler implements IEventHandler {
@@ -16,7 +16,7 @@ export class DeleteLeagueHandler implements IEventHandler {
 	 */
 	async handle(event: LeagueDeletedEvent) {
 		this.aggregatorRunner.run(async (aggregator: Aggregator) => {
-			return await aggregator.deleteLeague(event.resource_id, event.name);
+			await aggregator.deleteLeague(event.resource_id, event.name);
 		});
 	}
 }

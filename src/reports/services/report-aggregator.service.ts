@@ -1,7 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
-import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
+import { InjectModel } from '@nestjs/mongoose';
+import { FilterQuery, Model, UpdateWriteOpResult } from 'mongoose';
+import { PrivacyType } from '../../core/enums';
 import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { UserRepository } from '../../core/repositories/user.repository';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
@@ -10,12 +12,9 @@ import {
 } from '../../core/schemas';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
-import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
+import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
+import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { PartnerResourceUpdatedEvent } from '../../resources/partner-resources/events/resource-updated.event';
-import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, UpdateWriteOpResult } from 'mongoose';
-import { PrivacyType } from '../../core/enums';
-import { UserRepository } from '../../core/repositories/user.repository';
 
 @Injectable()
 @AggregatorClass()
@@ -79,7 +78,11 @@ export class ReportAggregatorService implements Aggregator {
 				$set: { privacy: PrivacyType.public },
 			},
 		);
-		return await Promise.all([update$, updatePublic$]);
+		const [privateResult, publicResult] = await Promise.all([
+			update$,
+			updatePublic$,
+		]);
+		return privateResult.modifiedCount + publicResult.modifiedCount;
 	}
 	async updatedUser(
 		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
@@ -96,13 +99,15 @@ export class ReportAggregatorService implements Aggregator {
 		return;
 	}
 	async deleteLeague(resource_id: string, league: string) {
-		await this.reportModel.deleteMany({
+		const { deletedCount } = await this.reportModel.deleteMany({
 			resource_id,
 			league,
 		});
+		return deletedCount;
 	}
 	async updatedLeague(leagueUpdated: LeagueUpdatedEvent) {
-		await this.reportModel.updateMany(
+		let count = 0;
+		const { modifiedCount } = await this.reportModel.updateMany(
 			{
 				resource_id: leagueUpdated.resource.resource_id,
 				league: leagueUpdated.newValue.resource_id,
@@ -113,12 +118,14 @@ export class ReportAggregatorService implements Aggregator {
 				},
 			},
 		);
+		count += modifiedCount;
 		if (leagueUpdated.privacyChanged()) {
-			await this.updateReportsPrivacy({
+			count += await this.updateReportsPrivacy({
 				resource_id: leagueUpdated.resource.resource_id,
 				league: leagueUpdated.newValue.name,
 			});
 		}
+		return count;
 	}
 	async recomputeAllResourceAggregates(resource_id: string): Promise<void> {
 		const resource = await this.resourceModel.findOne({ resource_id });

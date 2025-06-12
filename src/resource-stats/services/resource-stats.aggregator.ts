@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
-import { ReportDocument } from '../../core/schemas/reports.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Document, Model, Types } from 'mongoose';
+import { ReportDocument } from '../../core/schemas/reports.schema';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../../core/schemas/resource/partner-resource.schema';
-import { ComputeResourceStatsService } from './compute-resource-stats.service';
-import { TermDocument } from '../../core/schemas/terms.schema';
+import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
+import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
+import { ComputeResourceStatsService } from './compute-resource-stats.service';
 
 @Injectable()
 @AggregatorClass()
@@ -21,18 +21,12 @@ export class ResourceStatsAggregatorService implements Aggregator {
 		protected computeStats: ComputeResourceStatsService,
 	) {}
 
-	async updatedLeague(leagueUpdated: LeagueUpdatedEvent): Promise<number> {
+	async updatedLeague(_leagueUpdated: LeagueUpdatedEvent): Promise<number> {
 		return 0;
-	}
-	termUpdated() {
-		return;
-	}
-	termDeleted() {
-		return;
 	}
 	async applyReport(
 		report: ReportDocument,
-		term: TermDocument,
+		_term: TermDocument,
 		resource: PartnerResourceDocument,
 	) {
 		resource.stats.lastResourceUpdateDate = new Date();
@@ -75,7 +69,21 @@ export class ResourceStatsAggregatorService implements Aggregator {
 	// using this function would not match the name of the function in the aggregator
 	// we do not recomputeAggregates when a bulk submission occurs in this case
 	// we update the lastSubmissionDate and the contributionCount and set the lastSubmissionDate as the currentDate
-	async recomputeAllResourceAggregates(resource_id: string) {
+	async recomputeAllResourceAggregates(_resource_id: string) {
+		return;
+	}
+	termDeleted(
+		_term: Document<unknown, any, Term> &
+			Omit<Term & { _id: Types.ObjectId }, never>,
+	): Promise<void> {
+		return;
+	}
+	termUpdated(
+		_oldTerm: Document<unknown, any, Term> &
+			Omit<Term & { _id: Types.ObjectId }, never>,
+		_term: Document<unknown, any, Term> &
+			Omit<Term & { _id: Types.ObjectId }, never>,
+	): Promise<void> {
 		return;
 	}
 }

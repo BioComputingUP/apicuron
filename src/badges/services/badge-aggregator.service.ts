@@ -266,7 +266,7 @@ export class BadgeAggregatorService implements Aggregator {
 	}
 
 	async removeAllResourceAggregates(resource_id: string) {
-		return await this.badgeModel.deleteMany({ resource_id });
+		await this.badgeModel.deleteMany({ resource_id });
 	}
 
 	/**

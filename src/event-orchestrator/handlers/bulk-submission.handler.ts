@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { IEventHandler } from '@nestjs/cqrs';
 import { OnEvent } from '@nestjs/event-emitter';
-import { Aggregator } from '../interfaces/aggregator.interface';
 import { BulkSubmissionEvent } from '../../submit-reports/events/events';
 import { SubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
+import { Aggregator } from '../interfaces/aggregator.interface';
 
 @Injectable()
 export class BulkReportSubmissionHandler implements IEventHandler {
@@ -22,7 +22,7 @@ export class BulkReportSubmissionHandler implements IEventHandler {
 					await aggregator.recomputeAllResourceAggregates(resource_id),
 			);
 
-			return await Promise.all(reComputeAggregates$);
+			await Promise.all(reComputeAggregates$);
 		});
 	}
 }

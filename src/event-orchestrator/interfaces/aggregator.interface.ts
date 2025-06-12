@@ -1,4 +1,3 @@
-import { PrivacyType } from '../../core/enums';
 import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 import {
 	LeanReportDocument,
@@ -16,24 +15,19 @@ export interface Aggregator {
 		term: TermDocument,
 		resource: PartnerResourceDocument,
 		curator?: UserDocument,
-	): Promise<any> | any;
-	applyAllReports(resource_id: string): Promise<any> | any;
-	removeAllResourceAggregates(resource_id: string): Promise<any> | any;
+	): Promise<void>;
+	applyAllReports(resource_id: string): Promise<void> | void;
+	removeAllResourceAggregates(resource_id: string): Promise<void> | void;
 	updatedUser(
 		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
-	): Promise<any> | any;
-	deleteLeague(
-		resource_id: string,
-		league: string,
-	): Promise<number> | number | any;
-	updatedLeague(
-		leagueUpdated: LeagueUpdatedEvent,
-	): Promise<number> | number | any;
-	recomputeAllResourceAggregates(resource_id: string): Promise<any> | any;
-	termUpdated(oldTerm: TermDocument, term: TermDocument): Promise<any> | any;
-	termDeleted(term: TermDocument): Promise<any> | any;
+	): Promise<void> | void;
+	deleteLeague(resource_id: string, league: string): Promise<number> | number;
+	updatedLeague(leagueUpdated: LeagueUpdatedEvent): Promise<number> | number;
+	recomputeAllResourceAggregates(resource_id: string): Promise<void> | void;
+	termUpdated(oldTerm: TermDocument, term: TermDocument): Promise<void> | void;
+	termDeleted(term: TermDocument): Promise<void> | void;
 
-	updatedResource?(event: PartnerResourceUpdatedEvent): Promise<any> | any;
+	updatedResource?(event: PartnerResourceUpdatedEvent): Promise<void> | void;
 }
 
 export interface AggregatorOptions {
