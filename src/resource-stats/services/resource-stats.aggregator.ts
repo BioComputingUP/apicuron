@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Document, Model, Types } from 'mongoose';
+import { EntityCreatedEvent } from 'src/core/events/entity-created.event';
+import { EntityUpdatedEvent } from 'src/core/events/entity-updated.event';
+import { User, UserDocumentOvrride } from 'src/core/schemas/user.schema';
 import { ReportDocument } from '../../core/schemas/reports.schema';
 import {
 	PartnerResource,
@@ -55,8 +58,20 @@ export class ResourceStatsAggregatorService implements Aggregator {
 	async removeAllResourceAggregates(resource_id: string) {
 		await this.computeStats.computeResourceStats(resource_id);
 	}
-	updatedUser() {
-		return null;
+	updatedUser(
+		_event:
+			| EntityCreatedEvent<
+					Document<unknown, any, User> &
+						Omit<User & { _id: Types.ObjectId }, keyof UserDocumentOvrride> &
+						UserDocumentOvrride
+			  >
+			| EntityUpdatedEvent<
+					Document<unknown, any, User> &
+						Omit<User & { _id: Types.ObjectId }, keyof UserDocumentOvrride> &
+						UserDocumentOvrride
+			  >,
+	): void | Promise<void> {
+		return;
 	}
 
 	async deleteLeague(resource_id: string): Promise<number> {
@@ -75,7 +90,7 @@ export class ResourceStatsAggregatorService implements Aggregator {
 	termDeleted(
 		_term: Document<unknown, any, Term> &
 			Omit<Term & { _id: Types.ObjectId }, never>,
-	): Promise<void> {
+	): Promise<void> | void {
 		return;
 	}
 	termUpdated(
@@ -83,7 +98,7 @@ export class ResourceStatsAggregatorService implements Aggregator {
 			Omit<Term & { _id: Types.ObjectId }, never>,
 		_term: Document<unknown, any, Term> &
 			Omit<Term & { _id: Types.ObjectId }, never>,
-	): Promise<void> {
+	): Promise<void> | void {
 		return;
 	}
 }

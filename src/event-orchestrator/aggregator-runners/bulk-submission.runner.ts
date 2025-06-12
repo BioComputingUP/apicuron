@@ -52,10 +52,15 @@ export class SubmissionRunner implements IRunner, OnModuleInit {
 				!this.relevantAggregatorNames.includes(aggregator.constructor.name),
 		);
 		const relevantAggregators = this.relevantAggregatorNames.map(
-			(name: string) =>
-				aggregators.find(
+			(name: string) => {
+				const agg = aggregators.find(
 					(aggregator: Aggregator) => aggregator.constructor.name == name,
-				),
+				);
+				if (!agg) {
+					throw new Error(`Aggregator ${name} not found`);
+				}
+				return agg;
+			},
 		) as [
 			ReportAggregatorService,
 			StatisticsAggregator,
@@ -63,11 +68,7 @@ export class SubmissionRunner implements IRunner, OnModuleInit {
 			MedalAggregatorService,
 		];
 
-		if (
-			relevantAggregators.includes(undefined) ||
-			relevantAggregators.length < this.relevantAggregatorNames.length ||
-			relevantAggregators.includes(null)
-		) {
+		if (relevantAggregators.length < this.relevantAggregatorNames.length) {
 			throw new Error('Missing aggregators');
 		}
 

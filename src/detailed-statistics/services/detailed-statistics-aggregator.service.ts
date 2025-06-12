@@ -1,28 +1,24 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { PrivacyType } from '../../core/enums';
+import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 import {
 	LeanReportDocument,
 	ReportDocument,
 } from '../../core/schemas/reports.schema';
-import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
-import { InjectModel } from '@nestjs/mongoose';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import {
 	DetailedStatistics,
 	DetailedStatisticsDocument,
 } from '../../core/schemas/statistics/detailed-statistics.schema';
-import { ComputeDetailedStatisticsService } from './compute-detailed-stats.service';
-import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import {
-	computeAggregatePrivacyField,
-	updateUserAggregatePrivacy,
-} from '../../util/privacy.helper';
-import { Injectable, Logger } from '@nestjs/common';
-import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { TermDocument } from '../../core/schemas/terms.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
-import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
+import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
+import { updateUserAggregatePrivacy } from '../../util/privacy.helper';
+import { ComputeDetailedStatisticsService } from './compute-detailed-stats.service';
 
 @Injectable()
 @AggregatorClass()
@@ -48,7 +44,7 @@ export class DetailedStatisticsAggregatorService implements Aggregator {
 		);
 
 		if (!leagueUpdated.privacyChanged()) {
-			return;
+			return 0;
 		}
 
 		const updates = await updateUserAggregatePrivacy(this.detailedStatsModel, {

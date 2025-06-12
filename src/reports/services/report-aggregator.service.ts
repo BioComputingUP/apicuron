@@ -1,17 +1,35 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, UpdateWriteOpResult } from 'mongoose';
+import {
+	Document,
+	FilterQuery,
+	Model,
+	Types,
+	UpdateWriteOpResult,
+} from 'mongoose';
+import { LeagueUpdatedEvent } from 'src/resources/partner-resources/leagues/events/league-updated.event';
 import { PrivacyType } from '../../core/enums';
 import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 import { UserRepository } from '../../core/repositories/user.repository';
 import {
+	League,
 	PartnerResource,
 	PartnerResourceDocument,
+	ResourceStats,
 	Term,
 	TermDocument,
 } from '../../core/schemas';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
+import {
+	LeanReportDocument,
+	Report,
+	ReportDocument,
+	ReportDocumentOverride,
+} from '../../core/schemas/reports.schema';
+import {
+	User,
+	UserDocument,
+	UserDocumentOvrride,
+} from '../../core/schemas/user.schema';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { PartnerResourceUpdatedEvent } from '../../resources/partner-resources/events/resource-updated.event';
@@ -28,18 +46,7 @@ export class ReportAggregatorService implements Aggregator {
 		protected termModel: Model<TermDocument>,
 	) {}
 	logger = new Logger(ReportAggregatorService.name);
-	// Not Implemented
-	applyReport() {
-		return null;
-	}
-	// Not Implemented
-	applyAllReports() {
-		return null;
-	}
-	// Not Implemented
-	removeAllResourceAggregates() {
-		return null;
-	}
+
 	private async updateReportsPrivacy(filter: FilterQuery<ReportDocument> = {}) {
 		const update$ = this.reportModel.updateMany(
 			{
@@ -215,5 +222,39 @@ export class ReportAggregatorService implements Aggregator {
 			{ resource_id: event.newResource.resource_id },
 			{ $set: { resource: event.newResource } },
 		);
+	}
+
+	async applyReport(
+		_report:
+			| (Document<unknown, any, Report> &
+					Omit<Report & { _id: Types.ObjectId }, keyof ReportDocumentOverride> &
+					ReportDocumentOverride)
+			| LeanReportDocument,
+		_term: Document<unknown, any, Term> &
+			Omit<Term & { _id: Types.ObjectId }, never>,
+		_resource: Document<unknown, any, PartnerResource> &
+			Omit<
+				PartnerResource & { _id: Types.ObjectId },
+				keyof {
+					leagues: Types.DocumentArray<League>;
+					stats: Types.Subdocument<Types.ObjectId> & ResourceStats;
+				}
+			> & {
+				leagues: Types.DocumentArray<League>;
+				stats: Types.Subdocument<Types.ObjectId> & ResourceStats;
+			},
+		_curator?:
+			| (Document<unknown, any, User> &
+					Omit<User & { _id: Types.ObjectId }, keyof UserDocumentOvrride> &
+					UserDocumentOvrride)
+			| undefined,
+	): Promise<void> {
+		return;
+	}
+	applyAllReports(_resource_id: string): void | Promise<void> {
+		return;
+	}
+	removeAllResourceAggregates(_resource_id: string): void | Promise<void> {
+		return;
 	}
 }
