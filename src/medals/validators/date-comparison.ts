@@ -1,5 +1,4 @@
 import {
-	getMetadataStorage,
 	isDateString,
 	registerDecorator,
 	ValidationArguments,
@@ -56,7 +55,7 @@ export function MaxDateField(
 
 @ValidatorConstraint({ name: 'DateFieldComparison' })
 export class DateFieldComparison implements ValidatorConstraintInterface {
-	dates_validation: boolean[];
+	dates_validation: Array<boolean | undefined> = [];
 
 	validate(value: string, args: ValidationArguments) {
 		if (!value) {
@@ -106,10 +105,10 @@ export class DateFieldComparison implements ValidatorConstraintInterface {
 	}
 
 	defaultMessage(args?: ValidationArguments): string {
-		const { properties }: { properties: string[] } = args.constraints.find(
+		const { properties }: { properties: string[] } = args?.constraints.find(
 			(x) => x.properties && Array.isArray(x.properties),
 		);
-		const { operator }: { operator: 'min' | 'max' } = args.constraints.find(
+		const { operator }: { operator: 'min' | 'max' } = args?.constraints.find(
 			(x) => x.operator && (x.operator == 'min' || x.operator == 'max'),
 		);
 
@@ -119,6 +118,6 @@ export class DateFieldComparison implements ValidatorConstraintInterface {
 
 		const error_snippet = operator == 'min' ? 'bigger' : 'smaller';
 
-		return `${args.property} Date should be ${error_snippet} than ${invalid_properties} `;
+		return `${args?.property} Date should be ${error_snippet} than ${invalid_properties} `;
 	}
 }

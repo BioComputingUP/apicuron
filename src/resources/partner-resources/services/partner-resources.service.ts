@@ -54,6 +54,11 @@ export class PartnerResourcesService {
 				new: true,
 			},
 		);
+		if (!resourceUpdated) {
+			throw new BadRequestException(
+				`Resource with ID ${addMemberToLeague.resource_id} not found.`,
+			);
+		}
 		return resourceUpdated;
 	}
 

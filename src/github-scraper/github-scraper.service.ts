@@ -1,7 +1,8 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { firstValueFrom } from 'rxjs';
 import * as cheerio from 'cheerio';
+import { firstValueFrom } from 'rxjs';
+import { throwError } from 'src/util/error.utils';
 @Injectable()
 export class GithubScraperService {
 	// Add your methods and properties here
@@ -31,7 +32,8 @@ export class GithubScraperService {
 		const orcidTag =
 			$foundOrcidTags.length == 1 ? $foundOrcidTags : $foundOrcidTags.first();
 
-		const orcidHref = orcidTag.prop('href');
+		const orcidHref =
+			orcidTag.prop('href') ?? throwError(Error, 'ORCID link not found');
 
 		const orcidUrl = new URL(orcidHref);
 

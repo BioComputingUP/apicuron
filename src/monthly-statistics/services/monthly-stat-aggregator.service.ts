@@ -1,24 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
-import { PrivacyType } from '../../core/enums';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { get_user_from_event } from 'src/util/aggregator.helper';
+import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 import {
 	LeanReportDocument,
 	ReportDocument,
 } from '../../core/schemas/reports.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-import { TermDocument } from '../../core/schemas/terms.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
-import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
-import { ComputeMonthlyStatsService } from './compute-monthly-stats.service';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import {
 	MonthlyStatistics,
 	MonthlyStatisticsDocument,
 } from '../../core/schemas/statistics/monthly-statistics.schema';
+import { TermDocument } from '../../core/schemas/terms.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
+import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
+import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 import { updateUserAggregatePrivacy } from '../../util/privacy.helper';
+import { ComputeMonthlyStatsService } from './compute-monthly-stats.service';
 
 @Injectable()
 @AggregatorClass()
@@ -71,13 +71,7 @@ export class MonthlyStatisticsAggregator implements Aggregator {
 	async updatedUser(
 		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
 	) {
-		let user: UserDocument;
-		if (event instanceof EntityCreatedEvent) {
-			user = event.instance;
-		}
-		if (event instanceof EntityUpdatedEvent) {
-			user = event.after;
-		}
+		const user = get_user_from_event(event);
 		await this.monthlyStatsModel.updateMany(
 			{
 				curator_orcid: user.orcid_id,

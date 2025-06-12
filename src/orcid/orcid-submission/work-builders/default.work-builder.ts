@@ -1,19 +1,19 @@
-import { LeanDocument, Types, Document } from 'mongoose';
-import { PartnerResource } from '../../../core/schemas/resource/partner-resource.schema';
-import {
-	Statistics,
-	StatisticsDocument,
-} from '../../../core/schemas/statistics.schema';
-import { User, UserDocument } from '../../../core/schemas/user.schema';
-import { OrcidWork } from '../../../orcid/orcid-client/interfaces/orcid.interface';
-import { OrcidWorkBuilder } from '../interfaces/orcid-submission.interface';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { LeanDocument } from 'mongoose';
+import { ConfigurationError, throwError } from 'src/util/error.utils';
+import { PartnerResource } from '../../../core/schemas/resource/partner-resource.schema';
+import { StatisticsDocument } from '../../../core/schemas/statistics.schema';
+import { UserDocument } from '../../../core/schemas/user.schema';
+import { OrcidWork } from '../../../orcid/orcid-client/interfaces/orcid.interface';
+import { OrcidWorkBuilder } from '../interfaces/orcid-submission.interface';
 
 @Injectable()
 export class DefaultWorkBuilder implements OrcidWorkBuilder {
 	constructor(protected config: ConfigService) {
-		this.frontendHost = this.config.get<string>('FRONTEND_HOST');
+		this.frontendHost =
+			this.config.get<string>('FRONTEND_HOST') ??
+			throwError(ConfigurationError, 'FRONTEND_HOST is not defined');
 	}
 
 	frontendHost: string;
@@ -41,7 +41,7 @@ export class DefaultWorkBuilder implements OrcidWorkBuilder {
 			title: `Contributions to ${resource.resource_name}`,
 			shortDescription: `Completed ${statsitics.total_count} Activities that contribute to ${resource.resource_name}`,
 			type: 'data-set',
-			putCode,
+			putCode: putCode ?? undefined,
 		};
 	}
 }

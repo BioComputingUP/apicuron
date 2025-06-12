@@ -5,7 +5,7 @@ import { getModelToken } from '@nestjs/mongoose';
 import { existsSync } from 'fs';
 import { Model } from 'mongoose';
 import { join } from 'path';
-import { throwError } from 'src/util/type-assertion.helper';
+import { throwError } from 'src/util/error.utils';
 import { AppModule } from '../app.module';
 import { generateAvatar } from '../auth/users/generate_avatar';
 import { User, UserDocument } from '../core/schemas/user.schema';

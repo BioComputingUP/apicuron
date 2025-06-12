@@ -1,5 +1,5 @@
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { INestApplication } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NextFunction, Request, Response } from 'express';
 
 export function setupSwagger(app: INestApplication, docs_prefix = '') {
@@ -43,7 +43,7 @@ export function setupSwagger(app: INestApplication, docs_prefix = '') {
 		.getHttpAdapter()
 		.getInstance()
 		.get('/test-route', (req: Request, res: Response, next: NextFunction) => {
-			res.send(document.components.schemas);
+			res.send(document?.components?.schemas);
 			return;
 		});
 

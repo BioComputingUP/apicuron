@@ -30,7 +30,7 @@ export type OrcidApiJsonWork = {
 		};
 		subtitle?: {
 			value: string;
-		};
+		} | null;
 		'translated-title'?: {
 			value: string;
 			'language-code': string;

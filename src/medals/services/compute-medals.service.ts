@@ -1,27 +1,27 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
+import * as _ from 'lodash';
+import { Cursor, FilterQuery, Model } from 'mongoose';
+import { AchievementState } from '../../core/enums';
+import {
+	MedalDef,
+	MedalDefDocument,
+} from '../../core/schemas/achievements-def/medal-def.schema';
+import {
+	Medal,
+	MedalDocument,
+} from '../../core/schemas/achievements/medals.schema';
 import {
 	LeanReportDocument,
 	Report,
 	ReportDocument,
 } from '../../core/schemas/reports.schema';
-import { Cursor, FilterQuery, Model } from 'mongoose';
-import {
-	MedalDef,
-	MedalDefDocument,
-} from '../../core/schemas/achievements-def/medal-def.schema';
-import { MedalDefReportsUserSummary } from '../interfaces/aggregated-reports';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
-import {
-	Medal,
-	MedalDocument,
-} from '../../core/schemas/achievements/medals.schema';
-import { AchievementState } from '../../core/enums';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import * as _ from 'lodash';
-import { GetrelatedReportFilter } from '../helpers/helpers';
 import { MedalEarnedEvent } from '../events/medal-earned.event';
+import { GetrelatedReportFilter } from '../helpers/helpers';
+import { MedalDefReportsUserSummary } from '../interfaces/aggregated-reports';
 
 @Injectable()
 export class ComputeMedalsService {
@@ -54,8 +54,9 @@ export class ComputeMedalsService {
 		const achievementState = earned
 			? AchievementState.achieved
 			: AchievementState.progress;
+		const medalDefObject = medalDef.toObject();
 		const medal = new this.medalModel({
-			...medalDef.toObject(),
+			medalDefObject,
 			_id: undefined,
 			curator_orcid: aggregatedReports.curator_orcid,
 			last_day: medalDef?.last_day,
@@ -74,11 +75,15 @@ export class ComputeMedalsService {
 				`Saved medal ${medalDef.name} for ${aggregatedReports.curator_orcid}`,
 			);
 			return AchievementState.achieved;
-		} catch (err) {
+		} catch (err: unknown) {
 			if (err instanceof Error) {
 				this.logger.error(err.message, err.stack, err.name);
 				throw new Error(
 					`An error occured while creating medal ${medalDef.name} for curator ${aggregatedReports.curator_orcid} in resource ${medalDef.resource_id}`,
+				);
+			} else {
+				throw new Error(
+					`An unknown error occurred while creating medal ${medalDef.name} for curator ${aggregatedReports.curator_orcid} in resource ${medalDef.resource_id}`,
 				);
 			}
 		}

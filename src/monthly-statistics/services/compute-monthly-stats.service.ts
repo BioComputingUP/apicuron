@@ -1,17 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common';
-import {
-	MonthlyStatistics,
-	MonthlyStatisticsDocument,
-} from '../../core/schemas/statistics/monthly-statistics.schema';
-import { FilterQuery, Model, UpdateQuery } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import * as moment from 'moment-timezone';
+import { MongoServerError } from 'mongodb';
+import { FilterQuery, Model, UpdateQuery } from 'mongoose';
+import { computePrivacyField } from 'src/util/privacy.helper';
 import {
 	LeanReportDocument,
 	Report,
 	ReportDocument,
 } from '../../core/schemas/reports.schema';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import {
+	MonthlyStatistics,
+	MonthlyStatisticsDocument,
+} from '../../core/schemas/statistics/monthly-statistics.schema';
 import { TermDocument } from '../../core/schemas/terms.schema';
-import { getRelatedMonthlyStatFilter } from '../helpers';
+import { UserDocument } from '../../core/schemas/user.schema';
 import {
 	fromYearMonth,
 	getMonthEnd,
@@ -19,14 +23,9 @@ import {
 	updateMaxDate,
 	updateMinDate,
 } from '../../util/date.helper';
-import * as moment from 'moment-timezone';
 import { ReportsMonthlyAggregator } from '../aggregations/reports-monthly-aggregator';
+import { getRelatedMonthlyStatFilter } from '../helpers';
 import { AggregatedReportsMonthly } from '../interfaces';
-import { PrivacyType } from '../../core/enums';
-import { UserDocument } from '../../core/schemas/user.schema';
-import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-import { MongoServerError } from 'mongodb';
-import { computePrivacyField } from 'src/util/privacy.helper';
 @Injectable()
 export class ComputeMonthlyStatsService {
 	constructor(
@@ -140,7 +139,7 @@ export class ComputeMonthlyStatsService {
 			});
 
 		let currentStat: MonthlyStatisticsDocument | null = null;
-		const saves$ = [];
+		const saves$: Promise<MonthlyStatisticsDocument | null>[] = [];
 
 		for await (const reportAgg of aggregation) {
 			const {

@@ -64,7 +64,7 @@ export class MedalDef {
 		type: Number,
 		required: true,
 	})
-	score_relative?: number;
+	score_relative: number;
 
 	/**
 	 * The first day the medal is valid.

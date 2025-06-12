@@ -1,11 +1,11 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
-import { ArgumentParser } from 'argparse';
-import { useContainer } from 'class-validator';
-import { spawnSync } from 'child_process';
-import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { ArgumentParser } from 'argparse';
+import { spawnSync } from 'child_process';
+import { useContainer } from 'class-validator';
+import { join } from 'path';
+import { AppModule } from './app.module';
 
 const parser = new ArgumentParser({
 	description: `Script to perform Database edits and fixes on APICURON,\n this script organizes database operations into tasks that can be executed together or independently
@@ -52,7 +52,7 @@ if (args.t == 'disprot_update') {
 	if (result.error) {
 		console.log(result.error);
 	}
-	process.exit(result.status);
+	process.exit(result.status ?? undefined);
 }
 
 // handle the unique case if the job is to compute_all_metrics, we run update_disprot first

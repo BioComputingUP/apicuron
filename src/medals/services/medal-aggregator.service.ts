@@ -1,17 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
-import { FilterQuery, Model } from 'mongoose';
-import {
-	Report,
-	LeanReportDocument,
-	ReportDocument,
-} from '../../core/schemas/reports.schema';
-import { InjectModel } from '@nestjs/mongoose';
-import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
-import { GetRelatedMedalDefFilter } from '../helpers/helpers';
-import { AchievementState, PrivacyType } from '../../core/enums';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ComputeMedalsService } from './compute-medals.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { FilterQuery, Model, Query, UpdateWriteOpResult } from 'mongoose';
+import { get_user_from_event } from 'src/util/aggregator.helper';
+import { PrivacyType } from '../../core/enums';
+import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
 import {
 	MedalDef,
 	MedalDefDocument,
@@ -20,18 +14,25 @@ import {
 	Medal,
 	MedalDocument,
 } from '../../core/schemas/achievements/medals.schema';
+import {
+	LeanReportDocument,
+	Report,
+	ReportDocument,
+} from '../../core/schemas/reports.schema';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
+import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
+import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
+import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
 import {
 	ResourceMedalsCountUpdatedEvent,
 	UserMedalsCountUpdatedEvent,
 } from '../events/medal-count-updated.event';
-import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { User, UserDocument } from '../../core/schemas/user.schema';
-import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
-import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { GetRelatedMedalDefFilter } from '../helpers/helpers';
+import { ComputeMedalsService } from './compute-medals.service';
 @Injectable()
 @AggregatorClass()
 export class MedalAggregatorService implements Aggregator {
@@ -55,7 +56,7 @@ export class MedalAggregatorService implements Aggregator {
 
 	async updatedLeague(leagueUpdated: LeagueUpdatedEvent): Promise<number> {
 		if (!leagueUpdated.privacyChanged()) {
-			return;
+			return 0;
 		}
 
 		const newPrivacy = leagueUpdated.newValue.visibility;
@@ -103,15 +104,8 @@ export class MedalAggregatorService implements Aggregator {
 	async updatedUser(
 		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
 	) {
-		let curator_orcid, privacy;
-		if (event instanceof EntityCreatedEvent) {
-			curator_orcid = event.instance.orcid_id;
-			privacy = event.instance.privacy;
-		}
-		if (event instanceof EntityUpdatedEvent) {
-			curator_orcid = event.after.orcid_id;
-			privacy = event.after.privacy;
-		}
+		const user = get_user_from_event(event);
+		const { orcid_id: curator_orcid, privacy } = user;
 		// update public medals  to the correct privacy
 		await this.medalModel.updateMany(
 			{
@@ -133,7 +127,7 @@ export class MedalAggregatorService implements Aggregator {
 		const resources = await this.resourceService.get_resources({
 			resource_id: { $in: resourceIds },
 		});
-		const privacyUpdates$ = [];
+		const privacyUpdates$: Query<UpdateWriteOpResult, MedalDocument>[] = [];
 		for (const resource of resources) {
 			for (const league of resource.leagues) {
 				const update$ = this.medalModel.updateMany(
@@ -176,7 +170,7 @@ export class MedalAggregatorService implements Aggregator {
 		const affectedMedalDefs = this.medalDefModel
 			.find(medalDefsFilter)
 			.cursor({ batchSize: 20 });
-		const medalDefsUpdated = [];
+		const medalDefsUpdated: Promise<number>[] = [];
 		for await (const medalDef of affectedMedalDefs) {
 			const update$ = this.computeMedals.createOrUpdateMedal(
 				medalDef,

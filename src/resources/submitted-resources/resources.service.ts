@@ -6,12 +6,15 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
-import { rename } from 'fs/promises';
 import { Model } from 'mongoose';
-import { basename, join } from 'path';
-import { User, UserDocument } from '../../core/schemas/user.schema';
+import { join } from 'path';
 // import { TransformerService } from '../../shared/transformer/transformer.service';
-import { CreateResourceDto } from '../dto/createResource.dto';
+import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
+import { UsersService } from '../../auth/users/services/users.service';
+import {
+	PartnerResource,
+	PartnerResourceDocument,
+} from '../../core/schemas/resource/partner-resource.schema';
 import {
 	Resource,
 	ResourceDocument,
@@ -20,11 +23,9 @@ import {
 	SubmittedResource,
 	SubmittedResourceDocument,
 } from '../../core/schemas/resource/submitted-resource.schema';
-import { PartnerResource, PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-import { UsersService } from '../../auth/users/services/users.service';
-import { FileUploadDto } from '../../util/file-upload.helper';
-import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
 import { StorageType } from '../../storage/storage.config';
+import { FileUploadDto } from '../../util/file-upload.helper';
+import { CreateResourceDto } from '../dto/createResource.dto';
 
 @Injectable()
 export class SubmittedResourcesService {
@@ -38,7 +39,7 @@ export class SubmittedResourcesService {
 		private userService: UsersService,
 		protected configService: ConfigService,
 		protected storageService: StorageService,
-	) { }
+	) {}
 
 	private logger = new Logger(SubmittedResourcesService.name);
 
@@ -93,21 +94,25 @@ export class SubmittedResourcesService {
 			this.storageService.parseCanonicalUrl(resource.logo).path,
 			{ deleteFromSource: true },
 		);
-		const newLogoRef = this.storageService.getEngine(StorageType.public).buildCanonicalUrl(logoRef);
+		const newLogoRef = this.storageService
+			.getEngine(StorageType.public)
+			.buildCanonicalUrl(logoRef);
 		this.logger.debug(`Moved logo from private to public: ${newLogoRef}`);
 
+		const resourceData = resource.toObject();
 		const partnerResource = new this.partnerResourceModel({
-			...resource.toObject(),
+			...resourceData,
 			logo: newLogoRef,
 			joined_date: new Date(),
 		});
-
 
 		await this.submittedResourceModel.deleteOne({ resource_id });
 
 		await this.partnerResourceModel.create(partnerResource.toObject());
 
-		this.logger.debug(`Creating PartnerResource with logo ${partnerResource.logo}`);
+		this.logger.debug(
+			`Creating PartnerResource with logo ${partnerResource.logo}`,
+		);
 
 		// if the submitted resource has a creator, we set it as an owner of the resource
 		const { creator } = resource;

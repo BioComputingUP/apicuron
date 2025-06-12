@@ -1,24 +1,22 @@
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { OrcidClientService } from '../../orcid/orcid-client/orcid-client.service';
 import { InjectModel } from '@nestjs/mongoose';
+import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
+import { CronJob } from 'cron';
+import { FilterQuery, LeanDocument, Model } from 'mongoose';
+import { ReportDocument } from 'src/core/schemas/reports.schema';
+import { PrivacyType } from '../../core/enums';
+import { UserRepository } from '../../core/repositories/user.repository';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import {
 	Statistics,
 	StatisticsDocument,
 } from '../../core/schemas/statistics.schema';
-import { FilterQuery, LeanDocument, Model } from 'mongoose';
 import { UserDocument } from '../../core/schemas/user.schema';
-import {
-	PartnerResource,
-	PartnerResourceDocument,
-} from '../../core/schemas/resource/partner-resource.schema';
+import { responseHasCode } from '../../orcid/orcid-client/helpers/response-with-code';
+import { OrcidWork } from '../../orcid/orcid-client/interfaces/orcid.interface';
+import { OrcidClientService } from '../../orcid/orcid-client/orcid-client.service';
 import { OrcidWorkBuilderToken, RunCronJobs } from './constants';
 import { OrcidWorkBuilder } from './interfaces/orcid-submission.interface';
-import { OrcidWork } from '../../orcid/orcid-client/interfaces/orcid.interface';
-import { responseHasCode } from '../../orcid/orcid-client/helpers/response-with-code';
-import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
-import { PrivacyType } from '../../core/enums';
-import { UserRepository } from '../../core/repositories/user.repository';
-import { CronJob } from 'cron';
 
 @Injectable()
 export class SubmitOrcidWork implements OnModuleInit {
@@ -75,7 +73,7 @@ export class SubmitOrcidWork implements OnModuleInit {
 				continue;
 			}
 
-			const submissions$ = [];
+			const submissions$: Promise<ReportDocument>[] = [];
 			for (const stat of stats) {
 				const submission$ = this.submitSingleWork(
 					stat,

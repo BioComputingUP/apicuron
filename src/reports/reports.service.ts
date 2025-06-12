@@ -1,20 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { mapKeys, pick } from 'lodash';
 import { FilterQuery, Model, PipelineStage, QueryOptions } from 'mongoose';
-import { PartnerResourcesService } from '../resources/partner-resources/services/partner-resources.service';
-import { TermsService } from '../terms/terms.service';
-import {
-	ReportFilterDto,
-	ReportFilterGroupedDto,
-} from './dto/report-filter.dto';
+import { UsersService } from '../auth/users/services/users.service';
 import { Report, ReportDocument } from '../core/schemas/reports.schema';
 import { paginate } from '../pagination/paginator';
-import { PaginationAggregation } from '../pagination/interfaces/pagination-aggregation';
-import { OnEvent } from '@nestjs/event-emitter';
-import { UsersService } from '../auth/users/services/users.service';
-import { TermDeletedEvent } from '../terms/events/events';
-import { pick, mapKeys } from 'lodash';
-import { plainToInstance } from 'class-transformer';
+import { PartnerResourcesService } from '../resources/partner-resources/services/partner-resources.service';
+import { TermsService } from '../terms/terms.service';
+import { ReportFilterDto } from './dto/report-filter.dto';
 import { ReportWithTermDto } from './dto/report.dto';
 @Injectable()
 export class ReportsService {
@@ -24,7 +17,7 @@ export class ReportsService {
 		protected partnerResourcesService: PartnerResourcesService,
 		protected userService: UsersService,
 		protected termsService: TermsService,
-	) { }
+	) {}
 
 	logger = new Logger(ReportsService.name);
 
@@ -157,7 +150,7 @@ export class ReportsService {
 
 		// timestamp filter object
 		// pick the keys from the dto and rename them if they're defined
-		const timestamp: any = mapKeys(pick(dto, ['from', 'to']), (value, key) => {
+		const timestamp = mapKeys(pick(dto, ['from', 'to']), (value, key) => {
 			const rename = { from: '$gte', to: '$lte' };
 			return rename[key];
 		});
@@ -176,7 +169,7 @@ export class ReportsService {
 			'1': 1,
 			'-1': -1,
 		};
-		sort[dto.sortBy] = converter[dto.sortOrder];
+		if (dto.sortBy) sort[dto.sortBy] = converter[dto.sortOrder ?? -1];
 
 		const options: QueryOptions<Report> = {
 			sort,
@@ -207,6 +200,4 @@ export class ReportsService {
 
 		return pipelineArray;
 	}
-
-
 }

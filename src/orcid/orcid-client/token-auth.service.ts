@@ -1,10 +1,10 @@
+import { HttpService } from '@nestjs/axios';
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { MODULE_OPTIONS_TOKEN } from './orcid-client-module-options';
 import {
 	OrcidAuthToken,
 	OrcidClientModuleOptions,
 } from './interfaces/orcid.interface';
-import { HttpService } from '@nestjs/axios';
+import { MODULE_OPTIONS_TOKEN } from './orcid-client-module-options';
 @Injectable()
 export class OrcidTokenAuthService implements OnModuleInit {
 	constructor(
@@ -13,7 +13,7 @@ export class OrcidTokenAuthService implements OnModuleInit {
 	) {}
 	private logger = new Logger(OrcidTokenAuthService.name);
 
-	private token: OrcidAuthToken = null;
+	private token: OrcidAuthToken | null = null;
 
 	async onModuleInit() {
 		if (this.options.loadOnStartup) {
@@ -50,7 +50,7 @@ export class OrcidTokenAuthService implements OnModuleInit {
 		return token;
 	}
 
-	async getToken(): Promise<OrcidAuthToken> {
+	async getToken(): Promise<OrcidAuthToken | undefined> {
 		if (!this.token || Date.now() + 10 * 1000 >= this.token?.expires_at) {
 			return await this.fetchToken();
 		}

@@ -1,29 +1,24 @@
 import {
+	Body,
 	Controller,
 	Get,
-	Param,
-	Req,
-	UploadedFile,
-	Patch,
-	NotFoundException,
-	UseGuards,
-	Body,
-	Put,
-	UseInterceptors,
 	InternalServerErrorException,
 	Logger,
+	NotFoundException,
+	Param,
+	Patch,
+	Put,
+	Req,
 	SerializeOptions,
+	UploadedFile,
+	UseGuards,
+	UseInterceptors,
 } from '@nestjs/common';
 import { SvgSanitationValidationPipe } from '../../../shared/pipes/svg-sanitation.pipe';
 
-import { PartnerResourcesService } from '../services/partner-resources.service';
-import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
-import { LocalAuthGuard } from '../../../auth/guards/local-auth.guard';
-import { HasAResourceGuard } from '../../../auth/guards/belongs-to-resource.guard';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
 import { ConfigService } from '@nestjs/config';
-import { join } from 'path';
-import * as mime from 'mime-types';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
 	ApiBody,
 	ApiConsumes,
@@ -34,18 +29,24 @@ import {
 	ApiSecurity,
 	ApiTags,
 } from '@nestjs/swagger';
+import { plainToInstance } from 'class-transformer';
+import * as mime from 'mime-types';
+import * as mv from 'mv';
+import { join } from 'path';
+import { ConfigurationError, throwError } from 'src/util/error.utils';
+import { AuthService } from '../../../auth/auth.service';
+import { HasAResourceGuard } from '../../../auth/guards/belongs-to-resource.guard';
+import { LocalAuthGuard } from '../../../auth/guards/local-auth.guard';
 import { VersionHeader } from '../../../plugins/swagger/config';
+import { ApiResponseWrapped } from '../../../shared/decorators/wrapped-data-response.decorator';
 import {
 	PartnerResourceEntity,
 	SelectPartnerResourceDto,
 } from '../../dto/partner-resources.entity';
-import { AuthService } from '../../../auth/auth.service';
-import * as mv from 'mv';
-import { ResourceLogoValidationPipe } from '../../validators/logo-validation.pipe';
-import { plainToInstance } from 'class-transformer';
 import { PublicPartnerResourceDto } from '../../dto/public-partner-resource.dto';
-import { ApiResponseWrapped } from '../../../shared/decorators/wrapped-data-response.decorator';
-import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
+import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
+import { ResourceLogoValidationPipe } from '../../validators/logo-validation.pipe';
+import { PartnerResourcesService } from '../services/partner-resources.service';
 
 @ApiTags('Partner Resources')
 @ApiHeader(VersionHeader)
@@ -153,12 +154,14 @@ export class PartnerResourcesController {
 
 		// check if the user has a permission to edit the PartnerResource
 		this.authService.user_has_resource(request.user, resource_id);
-
+		const public_files_path =
+			this.configService.get('PUBLIC_FILES_PATH') ??
+			throwError(ConfigurationError, 'PUBLIC_FILES_PATH not set');
 		// if there's an uploaded file
 		if (logo) {
 			const ext = mime.extension(logo.mimetype);
 			const public_path = join(
-				this.configService.get('PUBLIC_FILES_PATH'),
+				public_files_path,
 				'resources',
 				`${logo.filename}.${ext}`,
 			);
@@ -171,8 +174,9 @@ export class PartnerResourcesController {
 			});
 
 			const logo_link = public_path.replace(
-				this.configService.get('PUBLIC_FILES_PATH'),
-				this.configService.get('PUBLIC_FILES_URL_PATH'),
+				public_files_path,
+				this.configService.get('PUBLIC_FILES_URL_PATH') ??
+					throwError(ConfigurationError, 'PUBLIC_FILES_URL_PATH not set'),
 			);
 
 			await this.partnerResourceService.update_resource({

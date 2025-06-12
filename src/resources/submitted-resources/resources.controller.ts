@@ -1,40 +1,36 @@
 import {
 	Body,
 	Controller,
-	Post,
-	HttpCode,
-	Put,
-	UploadedFile,
-	UseInterceptors,
-	Logger,
-	UseGuards,
-	SetMetadata,
-	Req,
-	InternalServerErrorException,
 	Get,
+	HttpCode,
+	Logger,
+	Post,
+	Put,
+	SetMetadata,
+	UploadedFile,
+	UseGuards,
+	UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { CreateResourceDto } from '../dto/createResource.dto';
-import { SubmittedResourcesService } from './resources.service';
-import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
-import { SvgSanitationValidationPipe } from '../../shared/pipes/svg-sanitation.pipe';
-import * as mime from 'mime-types';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
 	ApiCreatedResponse,
 	ApiExcludeEndpoint,
-	ApiResponse,
 	ApiTags,
 } from '@nestjs/swagger';
+import { join } from 'path';
+import { throwError } from 'src/util/error.utils';
+import { UserReq } from '../../auth/decorators/applyUser.decorator';
+import { AuthProtected } from '../../auth/decorators/auth.decorator';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
 import { RoleGuard } from '../../auth/guards/role.guard';
-import { MakePartner } from '../dto/make-partner.dto';
-import * as mv from 'mv';
-import { ResourceLogoValidationPipe } from '../validators/logo-validation.pipe';
-import { FileUploadDto } from '../../util/file-upload.helper';
-import { AuthProtected } from '../../auth/decorators/auth.decorator';
-import { UserReq } from '../../auth/decorators/applyUser.decorator';
 import { User } from '../../core/schemas';
+import { SvgSanitationValidationPipe } from '../../shared/pipes/svg-sanitation.pipe';
+import { FileUploadDto } from '../../util/file-upload.helper';
+import { CreateResourceDto } from '../dto/createResource.dto';
+import { MakePartner } from '../dto/make-partner.dto';
+import { ResourceLogoValidationPipe } from '../validators/logo-validation.pipe';
+import { SubmittedResourcesService } from './resources.service';
 
 @ApiTags('Resources')
 @Controller({
@@ -49,7 +45,8 @@ export class SubmittedResourcesController {
 
 	private readonly logger = new Logger(SubmittedResourcesController.name);
 	private resources_folder = join(
-		this.configService.get('PRIVATE_FILES_PATH'),
+		this.configService.get('PRIVATE_FILES_PATH') ??
+			throwError(Error, 'PRIVATE_FILES_PATH not set'),
 		'resources',
 	);
 

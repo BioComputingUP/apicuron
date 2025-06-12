@@ -1,12 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
-import * as FormData from 'form-data';
-import { TaskSubmit } from '../types/baseTask';
-import { ConfigService } from '@nestjs/config';
-import { createReadStream } from 'fs';
 import { HttpService } from '@nestjs/axios';
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import * as FormData from 'form-data';
+import { createReadStream } from 'fs';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { buildTaskArgumentString } from '../helpers';
+import { TaskSubmit } from '../types/baseTask';
 // const FormData = require('form-data')
 @Injectable()
 export class SchedulerClientService {
@@ -267,7 +267,8 @@ export class SchedulerClientService {
 			const resources = await this.partnerResourceService.get_resources();
 
 			for (const resource of resources) {
-				const { data } = await this.compute_achievements(resource.resource_id);
+				const result = await this.compute_achievements(resource.resource_id);
+				const data = result?.data || {};
 				if (data.uuid && currentEnv == 'development') {
 					const jobId = data.uuid;
 					this.compute_statistics(resource.resource_id, undefined, jobId);

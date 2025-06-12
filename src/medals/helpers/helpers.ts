@@ -1,11 +1,10 @@
 import { FilterQuery } from 'mongoose';
+import { MedalDefDocument } from '../../core/schemas/achievements-def/medal-def.schema';
+import { MedalDocument } from '../../core/schemas/achievements/medals.schema';
 import {
 	LeanReportDocument,
 	ReportDocument,
 } from '../../core/schemas/reports.schema';
-import { MedalDefDocument } from '../../core/schemas/achievements-def/medal-def.schema';
-import { MedalDocument } from '../../core/schemas/achievements/medals.schema';
-import * as _ from 'lodash';
 
 export function GetRelatedMedalDefFilter(
 	report: ReportDocument | LeanReportDocument,
@@ -46,12 +45,12 @@ export function GetRelatedMedalDefFilter(
 export function GetrelatedReportFilter(
 	medalDef: MedalDefDocument,
 ): FilterQuery<ReportDocument> {
-	let timestampFilter = null;
+	const timestampFilter: { $lte?: Date; $gte?: Date } = {};
 	if (medalDef.last_day) {
-		timestampFilter = { $lte: medalDef.last_day, ...timestampFilter };
+		timestampFilter.$lte = medalDef.last_day;
 	}
 	if (medalDef.first_day) {
-		timestampFilter = { $gte: medalDef.first_day, ...timestampFilter };
+		timestampFilter.$gte = medalDef.first_day;
 	}
 
 	const filter: FilterQuery<ReportDocument> = {
@@ -60,7 +59,7 @@ export function GetrelatedReportFilter(
 		activity_term: { $in: medalDef.list_terms },
 	};
 
-	if (timestampFilter != null) {
+	if (Object.keys(timestampFilter).length > 0) {
 		filter.timestamp = timestampFilter;
 	}
 

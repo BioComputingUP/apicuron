@@ -8,11 +8,3 @@ export function assertNotNull<T>(
 		);
 	}
 }
-
-export function throwError<T extends Error>(
-	ErrorClass: new (...args: unknown[]) => T,
-	message = 'Fatal Error',
-): never {
-	const error = new ErrorClass(message);
-	throw error;
-}

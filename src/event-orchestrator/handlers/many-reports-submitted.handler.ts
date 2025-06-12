@@ -1,15 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { IEventHandler } from '@nestjs/cqrs';
+import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { assertNotNull } from 'src/util/type-assertion.helper';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { Aggregator } from '../interfaces/aggregator.interface';
 import {
 	IManyReportsSubmittedEventPayload,
 	ManyReportsSubmittedEvent,
 } from '../../submit-reports/events/events';
-import { OnEvent } from '@nestjs/event-emitter';
-import { IEventHandler } from '@nestjs/cqrs';
 import { SubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
+import { Aggregator } from '../interfaces/aggregator.interface';
 
 @Injectable()
 export class ManyReportsSubmittedHandler implements IEventHandler {
@@ -17,7 +18,7 @@ export class ManyReportsSubmittedHandler implements IEventHandler {
 	constructor(
 		protected runner: SubmissionRunner,
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-	) { }
+	) {}
 
 	payloadProcessorFactory(payload: IManyReportsSubmittedEventPayload) {
 		const reportDocuments = payload.reports.map(
@@ -45,6 +46,14 @@ export class ManyReportsSubmittedHandler implements IEventHandler {
 						t.activity_term === report.activity_term &&
 						t.resource_id === report.resource_id &&
 						t.league === report.league,
+				);
+				assertNotNull(
+					resource,
+					`Resource not found for report with resource_id: ${report.resource_id}`,
+				);
+				assertNotNull(
+					term,
+					`Term not found for report with activity_term: ${report.activity_term}, resource_id: ${report.resource_id}, league: ${report.league}`,
 				);
 				await aggregator.applyReport(report, term, resource, user);
 			}

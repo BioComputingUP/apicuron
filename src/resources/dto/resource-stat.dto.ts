@@ -23,11 +23,11 @@ export class ResourceStatsDto {
 
 	@IsDate()
 	@Expose()
-	lastContributionDate?: Date; // <- optional
+	lastContributionDate?: Date | null; // <- optional
 
 	@IsDate()
 	@Expose()
-	firstContributionDate?: Date;
+	firstContributionDate?: Date | null;
 
 	@IsDate()
 	@Expose()

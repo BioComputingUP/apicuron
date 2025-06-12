@@ -9,22 +9,22 @@ import {
 	Post,
 	Put,
 } from '@nestjs/common';
-import { AuthProtected } from '../../../auth/decorators/auth.decorator';
-import { UserReq } from '../../../auth/decorators/applyUser.decorator';
-import { User } from '../../../core/schemas/user.schema';
-import { PartnerResourcesService } from '../services/partner-resources.service';
-import { VersionHeader } from '../../../plugins/swagger/config';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateLeagueDto } from './dto/create-league.dto';
+import { plainToClass, plainToInstance } from 'class-transformer';
+import { UserReq } from '../../../auth/decorators/applyUser.decorator';
+import { AuthProtected } from '../../../auth/decorators/auth.decorator';
+import { User } from '../../../core/schemas/user.schema';
+import { VersionHeader } from '../../../plugins/swagger/config';
+import { ApiResponseWrapped } from '../../../shared/decorators/wrapped-data-response.decorator';
+import { PartnerResourceEntity } from '../../dto/partner-resources.entity';
+import { PartnerResourcesService } from '../services/partner-resources.service';
 import { AddMemberToLeague } from './dto/add-member-to-league.dto';
+import { CreateLeagueDto } from './dto/create-league.dto';
 import { DeleteMemberFromLeagueDTO } from './dto/delete-from-league.dto';
 import { DeleteLeagueDTO } from './dto/delete-league.dto';
 import { LeagueEntity } from './dto/league.dto';
-import { PartnerResourceEntity } from '../../dto/partner-resources.entity';
-import { plainToClass, plainToInstance } from 'class-transformer';
-import { ApiResponseWrapped } from '../../../shared/decorators/wrapped-data-response.decorator';
-import { LeagueService } from './services/league.service';
 import { UpdateLeagueDto } from './dto/update-league.dto';
+import { LeagueService } from './services/league.service';
 
 @ApiTags('Leagues')
 @ApiHeader(VersionHeader)
@@ -155,8 +155,9 @@ export class ResourceLeagueController {
 			deleteLeague,
 		);
 
-		delete updatedResource._id;
-
-		return updatedResource.toObject() as PartnerResourceEntity;
+		const res = plainToClass(PartnerResourceEntity, updatedResource, {
+			excludeExtraneousValues: true,
+		});
+		return res;
 	}
 }

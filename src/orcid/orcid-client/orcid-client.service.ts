@@ -1,6 +1,14 @@
 import { HttpService } from '@nestjs/axios';
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import { get } from 'lodash';
+import {
+	UserEmployment,
+	UserLinks,
+} from 'src/core/schemas/components/user-fields.schema';
+import { inspect } from 'util';
 import { OrcidApiUrl } from './constants';
+import { orcidWorkXmlSerializer } from './helpers/orcid-work-serializer';
+import { parseDateObjectIntoString } from './helpers/utils';
 import {
 	OrcidEmailEntry,
 	OrcidUser,
@@ -8,15 +16,7 @@ import {
 	OrcidWork,
 	SubmitWorkResponse,
 } from './interfaces/orcid.interface';
-import { inspect } from 'util';
 import { OrcidTokenAuthService } from './token-auth.service';
-import { orcidWorkXmlSerializer } from './helpers/orcid-work-serializer';
-import {
-	UserEmployment,
-	UserLinks,
-} from 'src/core/schemas/components/user-fields.schema';
-import { get } from 'lodash';
-import { parseDateObjectIntoString } from './helpers/utils';
 
 @Injectable()
 export class OrcidClientService {
@@ -174,7 +174,7 @@ export class OrcidClientService {
 					rows: 20,
 				},
 				headers: {
-					Authorization: `Bearer ${token.access_token}`,
+					Authorization: `Bearer ${token?.access_token}`,
 					Accept: 'application/orcid+json',
 				},
 				validateStatus: () => true,
@@ -193,7 +193,7 @@ export class OrcidClientService {
 					Authorization: `Bearer ${
 						(
 							await this.tokenAuth.getToken()
-						).access_token
+						)?.access_token
 					}`,
 					Accept: 'application/vnd.orcid+json',
 				},
@@ -275,8 +275,13 @@ export class OrcidClientService {
 				user_employment: user_employment,
 			};
 		} catch (error) {
-			this.logger.error(`Error Getting info from Orcid for: ${orcid_id} ! `);
-			this.logger.error(error);
+			this.logger.error(
+				`Error Getting info from Orcid for: ${orcid_id} ! \n ${error} `,
+			);
+
+			throw new Error(
+				`Error Getting info from Orcid for: ${orcid_id} ! \n ${error}`,
+			);
 		}
 	}
 }

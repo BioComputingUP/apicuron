@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
 	ValidationArguments,
@@ -5,7 +6,6 @@ import {
 	ValidatorConstraintInterface,
 } from 'class-validator';
 import { Model } from 'mongoose';
-import { NotFoundException } from '@nestjs/common';
 import {
 	AchievementDef,
 	AchievementDefDocument,
@@ -42,9 +42,9 @@ abstract class AbstractAchievementUnique
 	async validate(value: any, args?: ValidationArguments): Promise<boolean> {
 		const exists = await this.achievement_def_exists(
 			value,
-			args.object['resource_id'],
+			args?.object['resource_id'],
 		);
-		if (args.constraints && args.constraints.find((x) => x.reverse == true)) {
+		if (args?.constraints && args?.constraints.find((x) => x.reverse == true)) {
 			if (!exists) {
 				throw new NotFoundException(`${this.type} named (${value}) Not found`);
 			}
@@ -56,11 +56,11 @@ abstract class AbstractAchievementUnique
 	defaultMessage(args?: ValidationArguments): string {
 		let error_snippet = 'already exists';
 
-		if (args.constraints && args.constraints.find((x) => x.reverse == true)) {
+		if (args?.constraints && args?.constraints.find((x) => x.reverse == true)) {
 			error_snippet = 'does not Exist';
 		}
 
-		return `${this.type} named ${args.value} ${error_snippet} for resource ${args.object['resource_id']}`;
+		return `${this.type} named ${args?.value} ${error_snippet} for resource ${args?.object['resource_id']}`;
 	}
 }
 

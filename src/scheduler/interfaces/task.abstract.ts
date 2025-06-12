@@ -1,5 +1,4 @@
 import { Logger, LogLevel } from '@nestjs/common';
-import { log } from 'console';
 import { CommandRunner, Option } from 'nest-commander';
 // TODO: add file and database and database host to general options
 /*
@@ -27,9 +26,15 @@ export abstract class Task extends CommandRunner {
 		} else {
 			logLevelsAcc.push(val);
 		}
+		if (this.logger.localInstance.setLogLevels) {
+			this.logger.debug(`Setting log levels to ${logLevelsAcc}`);
+			this.logger.localInstance.setLogLevels(logLevelsAcc);
+		} else {
+			this.logger.warn(
+				`Logger instance does not support setLogLevels, using default log levels`,
+			);
+		}
 
-		this.logger.debug(`Setting log levels to ${logLevelsAcc}`);
-		this.logger.localInstance.setLogLevels(logLevelsAcc);
 		return logLevelsAcc;
 	}
 }

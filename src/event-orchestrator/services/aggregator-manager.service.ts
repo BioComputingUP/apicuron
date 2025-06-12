@@ -13,8 +13,13 @@ export class AggregatorManager {
 	private aggregatorEntries: AggregatorEntry[] = [];
 
 	public getAggregator(name: string): Aggregator {
-		return this.aggregatorEntries.find((entry) => entry.name === name)
-			.aggregator;
+		const result = this.aggregatorEntries.find(
+			(entry) => entry.name === name,
+		)?.aggregator;
+		if (!result) {
+			throw new Error(`Aggregator with name ${name} not found`);
+		}
+		return result;
 	}
 
 	public getAggregators(): Aggregator[] {
