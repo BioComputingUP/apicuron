@@ -128,7 +128,7 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 		_league: string,
 	): Promise<number> | number {
 		// Do nothing
-		return;
+		return 0;
 	}
 	termUpdated(_oldTerm: TermDocument, _term: TermDocument) {
 		//shouldn't affect

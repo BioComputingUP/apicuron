@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Query, UpdateWriteOpResult } from 'mongoose';
-import { get_user_from_event } from 'src/util/aggregator.helper';
+import { getEventSubject } from "src/core/helpers/events.helper";
 import { PrivacyType } from '../../core/enums';
 import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
@@ -104,7 +104,7 @@ export class MedalAggregatorService implements Aggregator {
 	async updatedUser(
 		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
 	) {
-		const user = get_user_from_event(event);
+		const user = getEventSubject(event);
 		const { orcid_id: curator_orcid, privacy } = user;
 		// update public medals  to the correct privacy
 		await this.medalModel.updateMany(

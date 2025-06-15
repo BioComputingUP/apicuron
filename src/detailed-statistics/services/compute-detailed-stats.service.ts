@@ -90,7 +90,7 @@ export class ComputeDetailedStatisticsService {
 
 	async upsertDetailedStats(
 		report: ReportDocument | LeanReportDocument,
-		termDoc: TermDocument = null,
+		termDoc: TermDocument,
 	) {
 		const statFilter = {
 			curator_orcid: report.curator_orcid,
@@ -98,26 +98,15 @@ export class ComputeDetailedStatisticsService {
 			league: report.league,
 		};
 
-		// if termDoc is not provided, fetch the term from the database
-		const term$ = !!termDoc
-			? Promise.resolve(termDoc)
-			: this.termModel.findOne({
-					activity_term: report.activity_term,
-					resource_id: report.resource_id,
-					league: report.league,
-			  });
-
-		const stat$ = this.detailedStatsModel.findOne(statFilter);
-
-		const [term, stat] = await Promise.all([term$, stat$]);
+		const stat = await this.detailedStatsModel.findOne(statFilter);
 
 		if (!stat) {
-			const newStat = this.initStat(report, term);
+			const newStat = this.initStat(report, termDoc);
 			try {
 				await newStat.save();
 			} catch (err) {
 				if (err instanceof MongoServerError && err.code == 11000) {
-					return await this.upsertDetailedStats(report);
+					return await this.upsertDetailedStats(report, termDoc);
 				}
 			}
 			return newStat;
@@ -128,7 +117,7 @@ export class ComputeDetailedStatisticsService {
 		stat.set('league_data', report.league_data);
 
 		stat.total_count += 1;
-		stat.total_score += term.score;
+		stat.total_score += termDoc.score;
 
 		const isLastWeek = report.timestamp > getWeekStart() ? 1 : 0;
 		const isLastMonth = report.timestamp > getMonthStart() ? 1 : 0;
@@ -144,21 +133,21 @@ export class ComputeDetailedStatisticsService {
 		if (actIndex == -1) {
 			stat.activities.push({
 				activity_term: report.activity_term,
-				activity_category: term.activity_category,
-				activity_name: term.activity_name,
-				description: term.description,
+				activity_category: termDoc.activity_category,
+				activity_name: termDoc.activity_name,
+				description: termDoc.description,
 				first_contribution: report.timestamp,
 				last_contribution: report.timestamp,
 				count: 1,
-				score: term.score,
-				total_score: term.score,
+				score: termDoc.score,
+				total_score: termDoc.score,
 				last_week_count: isLastWeek,
 				last_month_count: isLastMonth,
 				last_quarter_count: isLastQuarter,
 			});
 		} else {
 			stat.activities[actIndex].count += 1;
-			stat.activities[actIndex].score += term.score;
+			stat.activities[actIndex].score += termDoc.score;
 			stat.activities[actIndex].last_contribution = report.timestamp;
 			stat.activities[actIndex].last_week_count += isLastWeek;
 			stat.activities[actIndex].last_month_count += isLastMonth;
@@ -174,7 +163,7 @@ export class ComputeDetailedStatisticsService {
 			.cursor<DetailedStatAggregationResult>({ batchSize: 50 });
 
 		let currentStat: DetailedStatisticsDocument | null = null;
-		const statSaves$ = [];
+		const statSaves$: Promise<unknown>[] = [];
 		for await (const entry of agg) {
 			// load the relevant term
 			const term =

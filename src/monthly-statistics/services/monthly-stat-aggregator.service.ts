@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { get_user_from_event } from 'src/util/aggregator.helper';
+import { getEventSubject } from 'src/core/helpers/events.helper';
 import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 import {
 	LeanReportDocument,
@@ -71,7 +71,7 @@ export class MonthlyStatisticsAggregator implements Aggregator {
 	async updatedUser(
 		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
 	) {
-		const user = get_user_from_event(event);
+		const user = getEventSubject(event);
 		await this.monthlyStatsModel.updateMany(
 			{
 				curator_orcid: user.orcid_id,

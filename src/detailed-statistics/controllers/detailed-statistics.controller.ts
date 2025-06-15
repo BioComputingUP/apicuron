@@ -40,7 +40,7 @@ export class DetailedStatisticsController {
 	): Promise<{ data: DetailedStatisticsDto }> {
 		const data = await this.detailedStatisticsService.getDetailedStat(
 			identifier,
-			user,
+			user ?? undefined,
 		);
 
 		return { data };
@@ -65,7 +65,7 @@ export class DetailedStatisticsController {
 	) {
 		const data = await this.detailedStatisticsService.getResourceUserStatistics(
 			identifier,
-			user,
+			user ?? undefined,
 		);
 
 		return { data };
