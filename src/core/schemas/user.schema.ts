@@ -9,11 +9,11 @@ import {
 	UserEmailEntrySchema,
 } from './components/user-email.schema';
 import {
+	UserEmployment,
 	UserEmploymentSchema,
 	UserLinks,
 	UserLinksSchema,
 } from './components/user-fields.schema';
-import { UserEmployment } from './components/user-fields.schema';
 
 export type UserDocumentOvrride = {
 	emails: Types.DocumentArray<UserEmailEntry>;
