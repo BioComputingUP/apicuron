@@ -5,7 +5,10 @@ import {
 	ReportDocument,
 } from '../../core/schemas/reports.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-import { TermDocument } from '../../core/schemas/terms.schema';
+import {
+	LeanTermDocument,
+	TermDocument,
+} from '../../core/schemas/terms.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
 import { PartnerResourceUpdatedEvent } from '../../resources/partner-resources/events/resource-updated.event';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
@@ -31,7 +34,11 @@ export interface Aggregator {
 	): Promise<number> | number | any;
 	recomputeAllResourceAggregates(resource_id: string): Promise<any> | any;
 	termUpdated(oldTerm: TermDocument, term: TermDocument): Promise<any> | any;
-	termDeleted(term: TermDocument): Promise<any> | any;
+	termDeleted(
+		term_name: string,
+		resource_id: string,
+		league_name: string,
+	): Promise<void>;
 
 	updatedResource?(event: PartnerResourceUpdatedEvent): Promise<any> | any;
 }

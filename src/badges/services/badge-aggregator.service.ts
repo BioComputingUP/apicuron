@@ -276,13 +276,17 @@ export class BadgeAggregatorService implements Aggregator {
 	async termUpdated() {
 		return;
 	}
-	async termDeleted(term: TermDocument) {
+	async termDeleted(
+		term_name: string,
+		resource_id: string,
+		league_name: string,
+	) {
 		// Retrieve the list of badge definitions that are effected by the term deletion
 		const affectedBadges = await this.badgeDefModel.find(
 			{
-				resource_id: term.resource_id,
-				league: term.league,
-				list_terms: term.activity_term,
+				resource_id: resource_id,
+				league: league_name,
+				list_terms: term_name,
 			},
 			{ _id: 1 },
 		);
@@ -294,12 +298,12 @@ export class BadgeAggregatorService implements Aggregator {
 		// Remove the term from the list of terms in the badge definitions
 		await this.badgeDefModel.updateMany(
 			{
-				resource_id: term.resource_id,
-				league: term.league,
-				list_terms: term.activity_term,
+				resource_id: resource_id,
+				league: league_name,
+				list_terms: term_name,
 			},
 			{
-				$pull: { list_terms: term.activity_term },
+				$pull: { list_terms: term_name },
 			},
 		);
 		// Recompute the badges that are affected by the term deletion

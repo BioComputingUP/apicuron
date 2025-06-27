@@ -1,9 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import {
 	LeanReportDocument,
-	Report,
 	ReportDocument,
 } from 'src/core/schemas/reports.schema';
 import { TermDocument } from 'src/core/schemas/terms.schema';
@@ -22,7 +19,6 @@ import { CuratorRegistryService } from '../curator-registry.service';
 @AggregatorClass()
 export class CuratorRegistryAggregatorService implements Aggregator {
 	constructor(
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		protected registryService: CuratorRegistryService,
 		protected userRep: UserRepository,
 	) {}
@@ -34,10 +30,15 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 		resource: PartnerResourceDocument,
 		curator?: UserDocument,
 	) {
-		this.registryService.applyReportToCuratorRegistry(
-			report,
+		const user = curator || this.userRep.newDocument(report.user);
+
+		await this.registryService.addContribution(
+			report.curator_orcid,
+			report.resource_id,
+			report.league,
+			user,
 			resource || report.resource,
-			curator || (report.user as UserDocument),
+			report.league_data,
 		);
 		this.logger.debug(
 			`Applied report to curator registry for resource ${resource.resource_id} and term ${term.activity_term}`,
@@ -45,53 +46,54 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 		return;
 	}
 
-	applyAllReports(resource_id: string) {
-		this.registryService.recomputeAllEntries();
+	async applyAllReports(resource_id: string) {
+		await this.registryService.recomputeResourceAggregate(resource_id);
 	}
-	updatedUser(
+	async updatedUser(
 		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
 	) {
 		if (event instanceof EntityCreatedEvent) {
-			this.registryService.createUserEntry(
+			await this.registryService.createNewEntry(
 				event.instance.orcid_id,
 				event.instance,
 			);
 		} else if (event instanceof EntityUpdatedEvent) {
-			this.registryService.updateUserData(event.after.orcid_id, event.after);
+			await this.registryService.updateUserData(
+				event.after.orcid_id,
+				event.after,
+			);
 		}
 	}
 	async removeAllResourceAggregates(resource_id: string) {
-		const resultCount = await this.registryService.deleteAllEntriesOfResource(
+		const resultCount = await this.registryService.clearEntriesForResource(
 			resource_id,
 		);
 		this.logger.debug(`Deleted ${resultCount} statistics for ${resource_id}`);
 	}
 
 	async updatedLeague(leagueUpdated: LeagueUpdatedEvent) {
-		// Change privacy for changed leagues.
-		if (!leagueUpdated.privacyChanged()) {
-			return;
-		}
-		this.logger.debug('Updating league privacy');
 		const count = await this.registryService.updateLeague(
 			leagueUpdated.newValue,
 		);
-		this.logger.debug(`Updated League privacy for ${count} curators`);
+		this.logger.debug(`Updated League for ${count} curators`);
 	}
 	async recomputeAllResourceAggregates(resource_id: string) {
 		await this.removeAllResourceAggregates(resource_id);
 		await this.applyAllReports(resource_id);
 	}
 	deleteLeague(resource_id: string, league: string): Promise<number> | number {
-		// Do nothing
-		return 0;
+		return this.registryService.deleteLeague(resource_id, league);
 	}
-	termUpdated(oldTerm: TermDocument, term: TermDocument) {
-		//shouldn't affect
+	termUpdated(_oldTerm: TermDocument, _term: TermDocument) {
+		// Curator registry is independent of terms, all contributions are aggregated equally
 		return;
 	}
-	termDeleted(term: TermDocument) {
-		this.recomputeAllResourceAggregates(term.resource_id);
+	async termDeleted(
+		term_name: string,
+		resource_id: string,
+		league_name: string,
+	) {
+		await this.registryService.recomputeResourceAggregate(resource_id);
 		return;
 	}
 }

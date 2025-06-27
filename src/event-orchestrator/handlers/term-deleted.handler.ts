@@ -15,8 +15,8 @@ export class TermDeletedEventHandler implements IEventHandler {
 	@OnEvent(TermDeletedEvent.name, { promisify: true, async: true })
 	async handle(payload: ITermDeletedEventPayload) {
 		return await this.aggregatorRunner.run(async (aggregator: Aggregator) => {
-			await aggregator.removeAllResourceAggregates(payload.term.resource_id);
-			await aggregator.applyAllReports(payload.term.resource_id);
+			const { activity_term, resource_id, league } = payload.term;
+			await aggregator.termDeleted(activity_term, resource_id, league);
 		});
 	}
 }
