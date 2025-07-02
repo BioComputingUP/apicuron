@@ -1,18 +1,21 @@
-import { BadRequestException, Injectable} from '@nestjs/common';
-import { PartnerResourcesService } from '../../services/partner-resources.service';
-import { UpdateLeagueDto } from '../dto/update-league.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
+import { plainToClass } from 'class-transformer';
+import { Model } from 'mongoose';
+import {
+	League,
+	LeagueDocument,
+} from '../../../../core/schemas/league/league.schema';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../../../../core/schemas/resource/partner-resource.schema';
-import { Model } from 'mongoose';
-import { LeagueDocument } from '../../../../core/schemas/league/league.schema';
-import { plainToClass } from 'class-transformer';
-import { LeagueEntity } from '../dto/league.dto';
-import { LeagueUpdatedEvent } from '../events/league-updated.event';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { PartnerResourcesService } from '../../services/partner-resources.service';
 import { CreateLeagueDto } from '../dto/create-league.dto';
+import { LeagueEntity } from '../dto/league.dto';
+import { UpdateLeagueDto } from '../dto/update-league.dto';
+import { LeagueUpdatedEvent } from '../events/league-updated.event';
 
 @Injectable()
 export class LeagueService {
@@ -22,6 +25,21 @@ export class LeagueService {
 		protected resourceModel: Model<PartnerResourceDocument>,
 		protected eventEmitter: EventEmitter2,
 	) {}
+
+	async getLeague(
+		resource_id: string,
+		league_name: string,
+	): Promise<League | undefined> {
+		const resource: PartnerResource | null = await this.resourceModel.findOne({
+			resource_id: resource_id,
+		});
+		if (!resource) {
+			throw new BadRequestException(`Resource ${resource_id} not found`);
+		}
+
+		const league = resource.getLeague(league_name);
+		return league;
+	}
 
 	async validateLeagueSelector(leagueSelector: {
 		resource_id: string;

@@ -27,9 +27,7 @@ export class ResourceStatsAggregatorService implements Aggregator {
 	termUpdated() {
 		return;
 	}
-	termDeleted() {
-		return;
-	}
+
 	async applyReport(
 		report: ReportDocument,
 		term: TermDocument,
@@ -77,5 +75,12 @@ export class ResourceStatsAggregatorService implements Aggregator {
 	// we update the lastSubmissionDate and the contributionCount and set the lastSubmissionDate as the currentDate
 	async recomputeAllResourceAggregates(resource_id: string) {
 		return;
+	}
+	termDeleted(
+		term_name: string,
+		resource_id: string,
+		league_name: string,
+	): Promise<void> {
+		return this.applyAllReports(resource_id);
 	}
 }
