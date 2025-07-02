@@ -278,17 +278,21 @@ export class ComputeDetailedStatisticsService {
 		this.logger.log(`Computed ${statSaves$.length} detailed statistics`);
 	}
 
-	async reComputeStatsRelatedToTerm(term: TermDocument) {
+	async reComputeStatsRelatedToTerm(
+		term_name: string,
+		resource_id: string,
+		league_name: string,
+	) {
 		await this.detailedStatsModel.deleteMany({
-			resource_id: term.resource_id,
-			league: term.league,
-			'activities.activity_term': term.activity_term,
+			resource_id: resource_id,
+			league: league_name,
+			'activities.activity_term': term_name,
 		});
 
 		await this.computeDetailedStats({
-			resource_id: term.resource_id,
-			league: term.league,
-			activity_term: term.activity_term,
+			resource_id: resource_id,
+			league: league_name,
+			activity_term: term_name,
 		});
 	}
 }

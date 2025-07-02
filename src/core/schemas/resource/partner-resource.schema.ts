@@ -1,18 +1,21 @@
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument, LeanDocument, Types } from 'mongoose';
 import { PrivacyType } from '../../enums';
-import { HydratedDocument, Types } from 'mongoose';
 import { AchievementDef } from '../achievements-def/achievement-def.schema';
-import { Term } from '../terms.schema';
 import { League, LeagueSchema } from '../league/league.schema';
+import { Term } from '../terms.schema';
 import { ResourceStats, ResourceStatsSchema } from './resource-stats.schema';
 
 type PartnerResourceDocumentOverride = {
 	leagues: Types.DocumentArray<League>;
 	stats: Types.Subdocument<Types.ObjectId> & ResourceStats;
-}
+};
 
-
-export type PartnerResourceDocument = HydratedDocument<PartnerResource, PartnerResourceDocumentOverride>;
+export type PartnerResourceDocument = HydratedDocument<
+	PartnerResource,
+	PartnerResourceDocumentOverride
+>;
+export type LeanPartnerResourceDocument = LeanDocument<PartnerResourceDocument>;
 
 // this class defines a partnerResource that has been validated and has the ability to have Models, Badges and so on
 

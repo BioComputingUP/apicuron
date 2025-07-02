@@ -1,15 +1,17 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, LeanDocument, ObjectId, Types } from 'mongoose';
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { User, UserSchema } from '../user.schema';
+import { PrivacyType } from 'src/core/enums';
+import { LeagueDocument, LeagueSchema } from '../league/league.schema';
 import {
 	PartnerResource,
 	PartnerResourceSchema,
 } from '../resource/partner-resource.schema';
-import { League, LeagueDocument, LeagueSchema } from '../league/league.schema';
+import { User, UserSchema } from '../user.schema';
 
 export type CuratorRegistryEntryDocument =
 	HydratedDocument<CuratorRegistryEntry>;
-export type LeanCuratorRegistryEntryDocument = LeanDocument<CuratorRegistryEntryDocument>;
+export type LeanCuratorRegistryEntryDocument =
+	LeanDocument<CuratorRegistryEntryDocument>;
 @Schema({ _id: false })
 export class ContributionEntry {
 	@Prop({ required: true })
@@ -23,7 +25,8 @@ export class ContributionEntry {
 }
 
 export type ContributionEntryDocument = HydratedDocument<ContributionEntry>;
-export type LeanContributionEntryDocument = LeanDocument<ContributionEntryDocument>;
+export type LeanContributionEntryDocument =
+	LeanDocument<ContributionEntryDocument>;
 
 const ContributionEntrySchema =
 	SchemaFactory.createForClass(ContributionEntry).loadClass(ContributionEntry);
@@ -35,6 +38,14 @@ export class CuratorRegistryEntry {
 	curator_orcid: string;
 
 	@Prop({
+		required: true,
+		enum: PrivacyType,
+		type: String,
+		default: PrivacyType.private,
+	})
+	privacy: PrivacyType;
+
+	@Prop({
 		required: false,
 		type: UserSchema,
 	})
@@ -43,7 +54,6 @@ export class CuratorRegistryEntry {
 	@Prop({ required: true, type: [ContributionEntrySchema], default: () => [] })
 	contributed_to: Types.DocumentArray<ContributionEntryDocument>;
 }
-
 
 const CuratorRegistryEntrySchema =
 	SchemaFactory.createForClass(CuratorRegistryEntry).loadClass(
@@ -56,11 +66,18 @@ CuratorRegistryEntrySchema.index({
 	curator_orcid: 'text',
 });
 
+CuratorRegistryEntrySchema.index(
+	{
+		curator_orcid: 1,
+	},
+	{ unique: true, name: 'unique_curator_orcid' },
+);
+
 CuratorRegistryEntrySchema.index({
 	'curator.displayedName': -1,
 	'curator.orcid_id': -1,
 	curator_orcid: -1,
-	'curator.privacy': -1,
+	privacy: -1,
 });
 
 export { CuratorRegistryEntrySchema };

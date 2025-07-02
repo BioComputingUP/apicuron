@@ -1,3 +1,6 @@
+import { Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { DeleteResult, ObjectId, UpdateResult } from 'mongodb';
 import {
 	Aggregate,
 	AggregateOptions,
@@ -15,15 +18,11 @@ import {
 	UpdateQuery,
 	UpdateWithAggregationPipeline,
 } from 'mongoose';
-import { DeleteResult, ObjectId, UpdateResult } from 'mongodb';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
 	EntityDeletedEvent,
-	ManyEntityUpdated,
 	EntityUpdatedEvent,
-	EntityCreatedEvent,
+	ManyEntityUpdated,
 } from '../events';
-import { Logger } from '@nestjs/common';
 
 export abstract class EntityRepository<T extends Document> {
 	constructor(
@@ -276,7 +275,7 @@ export abstract class EntityRepository<T extends Document> {
 		projection?: ProjectionType<T>,
 		options?: QueryOptions<T>,
 	): Query<
-		HydratedDocument<T, any, any>,
+		HydratedDocument<T, any, any> | null,
 		HydratedDocument<T, any, any>,
 		any,
 		T

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument, LeanDocument, Types } from 'mongoose';
 
 import { PrivacyType } from '../enums';
 import { UserResource } from '../interfaces/user-resource';
@@ -22,7 +22,7 @@ export type UserDocumentOvrride = {
 };
 
 export type UserDocument = HydratedDocument<User, UserDocumentOvrride>;
-
+export type LeanUserDocument = LeanDocument<UserDocument>;
 @Schema({
 	collection: 'users',
 	toJSON: {
