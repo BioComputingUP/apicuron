@@ -2,7 +2,9 @@ import { NgcCookieConsentConfig } from "ngx-cookieconsent";
 import { environment } from "src/environments/environment";
 
 export const cookieConfig: NgcCookieConsentConfig = {
-  cookie: {},
+  cookie: {
+    domain: environment.host,
+  },
   position: "top",
   palette: {
     popup: {
@@ -21,7 +23,7 @@ export const cookieConfig: NgcCookieConsentConfig = {
     allow: "Allow cookies",
     deny: "Decline",
     link: "Learn more",
-    policy: "Cookie Policy",
+    policy: " ",
     href: environment.host + "/about#privacy", // Link to your cookie policy
   },
 };

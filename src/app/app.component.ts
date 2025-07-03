@@ -21,7 +21,6 @@ export class AppComponent implements OnInit {
     this.initializingSubscription =
       this.cookieConsentService.initializing$.subscribe(
         (event: NgcInitializingEvent) => {
-          // the cookieconsent is initilializing... Not yet safe to call methods like `NgcCookieConsentService.hasAnswered()`
           console.log(`initializing: ${JSON.stringify(event)}`);
         }
       );
