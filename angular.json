@@ -35,7 +35,10 @@
               "src/assets",
               { "glob": "**/*", "input": "src/assets/", "output": "/assets/" }
             ],
-            "styles": ["src/styles.scss"],
+            "styles": [
+              "src/styles.scss",
+              "node_modules/cookieconsent/build/cookieconsent.min.css"
+            ],
             "scripts": [
               {
                 "input": "node_modules/marked/marked.min.js",
@@ -56,7 +59,8 @@
                 "input": "node_modules/prismjs/components/prism-bash.js",
                 "inject": false,
                 "bundleName": "prism-script-bash"
-              }
+              },
+              "node_modules/cookieconsent/build/cookieconsent.min.js"
             ],
             "vendorChunk": true,
             "extractLicenses": false,

@@ -28,6 +28,8 @@ import { MatomoModule } from "ngx-matomo-client";
 import { MatomoRouterModule } from "ngx-matomo-client";
 import { OrcidToUrl } from "./shared/orcid-to-url.pipe";
 import { SharedUtilsModule } from "./shared/shared-utils.module";
+import { NgcCookieConsentModule } from "ngx-cookieconsent";
+import { cookieConfig } from "../config/cookies.config";
 @NgModule({
   declarations: [
     AppComponent,
@@ -38,6 +40,7 @@ import { SharedUtilsModule } from "./shared/shared-utils.module";
   ],
   imports: [
     SharedUtilsModule,
+    BrowserModule,
     AppRoutingModule,
     AuthModule,
     NotificationsDataModule,
@@ -63,6 +66,7 @@ import { SharedUtilsModule } from "./shared/shared-utils.module";
       scriptUrl: "https://matomo.biocomputingup.it/matomo.js",
     }),
     MatomoRouterModule,
+    NgcCookieConsentModule.forRoot(cookieConfig),
   ],
   providers: [
     // *** Sentry ErrorHandler and Tracer Setup ***
@@ -74,4 +78,4 @@ import { SharedUtilsModule } from "./shared/shared-utils.module";
   bootstrap: [AppComponent],
   exports: [RouterModule],
 })
-export class AppModule { }
+export class AppModule {}
