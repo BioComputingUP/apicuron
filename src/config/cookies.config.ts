@@ -3,7 +3,7 @@ import { environment } from "src/environments/environment";
 
 export const cookieConfig: NgcCookieConsentConfig = {
   cookie: {
-    domain: environment.host,
+    domain: "localhost", // Change this to your domain in production
   },
   position: "top",
   palette: {
