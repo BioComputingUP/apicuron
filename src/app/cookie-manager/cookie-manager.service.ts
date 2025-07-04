@@ -10,6 +10,9 @@ export class CookieManagerService {
 
   constructor(private readonly matomoTracker: MatomoTracker) {}
 
+  /**
+   * Grants consent for tracking to all services that use cookies.
+   */
   grantConsent(): void {
     this.consentStatus.next(true);
     this.enableTracking();
@@ -25,5 +28,7 @@ export class CookieManagerService {
   }
   private disableTracking(): void {
     this.matomoTracker.forgetConsentGiven();
+    this.matomoTracker.deleteCookies();
+    this.consentStatus.next(false);
   }
 }
