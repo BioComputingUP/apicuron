@@ -11,5 +11,5 @@ export const environment = {
   orcid_main_url: "https://orcid.org/",
   fairsharing_url: "https://fairsharing.org",
   bip_url: "https://bip.imsi.athenarc.gr/scholar",
-  bip_scholar_url: "https://bip-api.imsi.athenarc.gr/scholar/scores",
+  bip_scholar_api_url: "https://bip-api.imsi.athenarc.gr/scholar/scores",
 };
