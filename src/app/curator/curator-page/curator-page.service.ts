@@ -149,7 +149,14 @@ export class CuratorPageService {
 
   getBipScholarScores(
     orcid$: Observable<string>
-  ): Observable<BipScholarStatsViewModel> {
+  ): Observable<BipScholarStatsViewModel | null> {
+    if (this.stage === "development") {
+      // Avoid calling the service in dev environment
+      return new Observable((observer) => {
+        observer.next(null);
+        observer.complete();
+      });
+    }
     return orcid$.pipe(
       switchMap((orcid: string) => {
         let query_orcid = orcid;
