@@ -1,46 +1,31 @@
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { ActivatedRoute, ParamMap, Params } from "@angular/router";
-import {
-  BehaviorSubject,
-  combineLatest,
-  forkJoin,
-  Observable,
-  ReplaySubject,
-  Subject,
-  zip,
-} from "rxjs";
-import {
-  filter,
-  map,
-  pluck,
-  share,
-  shareReplay,
-  switchMap,
-  take,
-  tap,
-} from "rxjs/operators";
-import { environment } from "../../../environments/environment";
-import { CuratorStatisticsService } from "src/app/curator-statistics/services/curator-statistics.service";
-import { CuratorStatistics } from "src/app/models/statistics.model";
-import { ResourcesService } from "src/app/resource/service/resources.service";
-import { Resource } from "src/app/models/resource.model";
-import { User } from "src/app/models/User.model";
-import { CuratorService } from "src/app/curator/curator.service";
+import { combineLatest, Observable } from "rxjs";
+import { map, shareReplay, switchMap } from "rxjs/operators";
 import { MedalsService } from "src/app/achievements/services/medals.service";
-import { Medal } from "../../models/medal.model";
-import _ from "lodash";
+import { CuratorStatisticsService } from "src/app/curator-statistics/services/curator-statistics.service";
+import { CuratorService } from "src/app/curator/curator.service";
+import {
+  BipScholarStats,
+  BipScholarStatsViewModel,
+} from "src/app/models/external/bip-scholar.model";
+import { Resource } from "src/app/models/resource.model";
+import { CuratorStatistics } from "src/app/models/statistics.model";
+import { User } from "src/app/models/User.model";
+import { ResourcesService } from "src/app/resource/service/resources.service";
+import { environment } from "../../../environments/environment";
 
 export interface StatisticsWithResource {
-  resource: Resource,
-  curatorStatistics: CuratorStatistics
+  resource: Resource;
+  curatorStatistics: CuratorStatistics;
 }
 
 @Injectable()
 export class CuratorPageService {
   private wsUrl = environment.ws;
   private orcid_url = environment.orcid_url;
-
+  private bip_url = environment.bip_scholar_api_url;
+  private stage = environment.env;
   // state observables
   curator$: Observable<User>;
   resources$: Observable<Resource[]>;
@@ -48,7 +33,7 @@ export class CuratorPageService {
   statisticsWithResource$: Observable<StatisticsWithResource[]>;
   resourceIds$: Observable<string[]>;
   medals$: Observable<any[]>;
-
+  bip_stats$: Observable<any>;
   constructor(
     private http: HttpClient,
     private resources: ResourcesService,
@@ -59,29 +44,25 @@ export class CuratorPageService {
     // load statistics
   }
 
-
-
   public init(orcid_id$: Observable<string>) {
     // setting up the curator behavior subject
-    this.curator$ = this.load_curator(orcid_id$)
+    this.curator$ = this.load_curator(orcid_id$);
 
     // loading the statistics
-    this.statistics$ = this.load_statistics(orcid_id$)
+    this.statistics$ = this.load_statistics(orcid_id$);
 
     this.resourceIds$ = this.statistics$.pipe(
       // extract to list of resource_ids
       map((stats: CuratorStatistics[]) => stats.map((stat) => stat.resource_id))
-    )
+    );
+    this.bip_stats$ = this.getBipScholarScores(orcid_id$);
 
     // load resources using statistics
     // this.resources$ = this.loadResources(this.resourceIds$)
 
-    // load statistics with resources grouped 
+    // load statistics with resources grouped
     // this.statisticsWithResource$ = this.combine_resources_statistics(this.resources$, this.statistics$)
-
-
   }
-
 
   public getCurator() {
     return this.curator$;
@@ -99,7 +80,6 @@ export class CuratorPageService {
     return this.statisticsWithResource$;
   }
 
-
   load_curator(orcid_id$: Observable<string>) {
     return orcid_id$.pipe(
       switchMap((orcid_id: string) => {
@@ -108,18 +88,19 @@ export class CuratorPageService {
       shareReplay(1),
       map((curator: User) => {
         return new User().deserialize(curator);
-      }),
+      })
     );
-
   }
 
-  private load_statistics(orcid_id$: Observable<string>): Observable<CuratorStatistics[]> {
+  private load_statistics(
+    orcid_id$: Observable<string>
+  ): Observable<CuratorStatistics[]> {
     return orcid_id$.pipe(
       switchMap((orcid_id: string) => {
         return this.curatorStatistics.get_curator_statistics(orcid_id);
       }),
       shareReplay(1)
-      )
+    );
   }
 
   private combine_resources_statistics(
@@ -131,16 +112,19 @@ export class CuratorPageService {
       map(([resources, curatorStats]) => {
         return curatorStats.map((stat) => {
           return {
-            resource: resources.find((res) => res.resource_id == stat.resource_id),
-            curatorStatistics: stat
+            resource: resources.find(
+              (res) => res.resource_id == stat.resource_id
+            ),
+            curatorStatistics: stat,
           };
         });
       })
     );
   }
 
-  private loadResources(resourceIds$: Observable<string[]>): Observable<Resource[]> {
-
+  private loadResources(
+    resourceIds$: Observable<string[]>
+  ): Observable<Resource[]> {
     // use resource_id array to load resources
     return resourceIds$.pipe(
       switchMap((resourceIds: string[]) => {
@@ -161,5 +145,28 @@ export class CuratorPageService {
         resource_id,
       },
     });
+  }
+
+  getBipScholarScores(
+    orcid$: Observable<string>
+  ): Observable<BipScholarStatsViewModel> {
+    return orcid$.pipe(
+      switchMap((orcid: string) => {
+        let query_orcid = orcid;
+        if (this.stage == "local") query_orcid = "0000-0002-0341-4888";
+        return this.http.get(this.bip_url + `/${query_orcid}`, {
+          headers: {
+            accept: "application/json",
+          },
+        });
+      }),
+      map((response: any) => {
+        const bipScholarStats = new BipScholarStats()
+          .deserialize(response)
+          .statCardViewModel();
+        return bipScholarStats;
+      }),
+      shareReplay(1)
+    );
   }
 }
