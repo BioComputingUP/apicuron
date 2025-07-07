@@ -1,6 +1,7 @@
 <div
   *ngIf="stats_section_info as section"
   class="tw-p-4 tw-pt-6 tw-border tw-border-gray-200 tw-rounded-md tw-mb-2 tw-relative tw-bg-white tw-shadow-md tw-shadow-gray-400 tw-h-full"
+  (click)="closeTooltip($event)"
 >
   <h3
     class="tw-text-lg tw-mb-4 tw-absolute tw-font-bold -tw-top-4 tw-left-2 tw-py-1 tw-px-3 tw-bg-white"
@@ -9,8 +10,9 @@
   </h3>
   <div class="tw-grid tw-space-y-1 tw-grid-cols-2 tw-gap-y-1">
     <div
-      *ngFor="let stat of section.stats | keyvalue"
-      class="tw-flex tw-flex-col tw-place-items-center"
+      *ngFor="let stat of section.stats | keyvalue; let i = index"
+      class="tw-flex tw-flex-col tw-place-items-center tw-relative tw-cursor-pointer"
+      (click)="toggleDescription(i, $event)"
     >
       <div
         class="counter-animated tw-font-bold tw-text-center tw-text-lg"
@@ -19,6 +21,15 @@
       <p class="tw-text-xs tw-text-center tw-text-gray-800 tw-w-3/4">
         {{ stat.value.label | titlecase }}
       </p>
+      <div
+        *ngIf="isTooltipActive(i)"
+        class="tw-absolute tw-top-full tw-left-1/2 tw-transform -tw-translate-x-1/2 tw-mt-2 tw-bg-[#343438e0] tw-text-white tw-text-xs tw-p-2 tw-rounded tw-shadow-lg tw-z-10 tw-min-w-64 tw-max-w-80 tw-text-center"
+      >
+        {{ stat.value.description }}
+        <div
+          class="tw-absolute tw-bottom-full tw-left-1/2 tw-transform -tw-translate-x-1/2 tw-border-4 tw-border-transparent tw-border-b-gray-900"
+        ></div>
+      </div>
     </div>
   </div>
 </div>

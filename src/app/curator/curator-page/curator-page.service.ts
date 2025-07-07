@@ -159,8 +159,7 @@ export class CuratorPageService {
     }
     return orcid$.pipe(
       switchMap((orcid: string) => {
-        let query_orcid = orcid;
-        if (this.stage == "local") query_orcid = "0000-0002-0341-4888";
+        let query_orcid = this.stage == "local" ? "0000-0002-0341-4888" : orcid;
         return this.http.get(this.bip_url + `/${query_orcid}`, {
           headers: {
             accept: "application/json",

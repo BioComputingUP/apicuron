@@ -1,0 +1,56 @@
+{
+  "Number of Publications": {
+    "intuition": "The total number of a researcher's articles, reflecting their productivity."
+  },
+  "Number of Datasets": {
+    "intuition": "The total number of a researcher's datasets, reflecting their productivity."
+  },
+  "Number of Software": {
+    "intuition": "The total number of a researcher's software, reflecting their productivity."
+  },
+  "Number of Other Works": {
+    "intuition": "The total number of a researcher's other works, reflecting their productivity."
+  },
+  "Citations": {
+    "intuition": "The total number of citations received by all articles of the researcher of interest."
+  },
+  "h-index": {
+    "intuition": "It is an estimation of the importance, significance, and broad impact of a researcher's cumulative research contributions."
+  },
+  "i10-index": {
+    "intuition": "This is a simple measure introduced by Google Scholar that helps gauge the productivity of a researcher."
+  },
+  "Popular Works": {
+    "intuition": "The number of popular works of the researcher of interest."
+  },
+  "Influential Works": {
+    "intuition": "The number of influential works of the researcher of interest."
+  },
+  "Aggregated Popularity": {
+    "intuition": "The sum of the popularity (current impact) scores of all articles of a researcher of interest."
+  },
+  "Aggregated Influence": {
+    "intuition": "The sum of the influence (total/overall impact) scores of all articles of a researcher of interest."
+  },
+  "Aggregated Impulse": {
+    "intuition": "The sum of the impulse scores of all articles of a researcher of interest."
+  },
+  "Open Access Share": {
+    "intuition": "The share (proportion) of articles of the researchers of interest that are open access."
+  },
+  "Open Access Works": {
+    "intuition": "The total count of articles of the researchers of interest that are open access."
+  },
+  "Open Access Influential Works": {
+    "intuition": "The total count of influential articles of the researchers of interest that are open access."
+  },
+  "Open Access Popular Works": {
+    "intuition": "The total count of popular articles of the researchers of interest that are open access."
+  },
+  "Academic Age": {
+    "intuition": "It reflects the time that a scientist has been in the research field and performed active research."
+  },
+  "Fair Academic Age": {
+    "intuition": "A variant of the academic age indicator that takes into consideration a researcher's inactive periods."
+  }
+}
