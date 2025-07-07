@@ -159,7 +159,7 @@ export class CuratorPageService {
     }
     return orcid$.pipe(
       switchMap((orcid: string) => {
-        let query_orcid = this.stage == "local" ? "0000-0002-0341-4888" : orcid;
+        let query_orcid = this.stage == "local" ? "" : orcid;
         return this.http.get(this.bip_url + `/${query_orcid}`, {
           headers: {
             accept: "application/json",
@@ -167,6 +167,9 @@ export class CuratorPageService {
         });
       }),
       map((response: any) => {
+        if (!response || Object.keys(response).length === 0) {
+          return null; // Return null if no data is available
+        }
         const bipScholarStats = new BipScholarStats()
           .deserialize(response)
           .statCardViewModel();

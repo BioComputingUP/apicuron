@@ -17,7 +17,7 @@ export class CuratorPageComponent implements OnInit {
   orcidId$: Observable<string>;
   // statsWithResource$: Observable<StatisticsWithResource[]>;
   statistics$: Observable<CuratorStatistics[]>;
-  bipScores$: Observable<BipScholarStatsViewModel>;
+  bipScores$: Observable<BipScholarStatsViewModel | null>;
 
   constructor(
     private route: ActivatedRoute,

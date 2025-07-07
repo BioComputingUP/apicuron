@@ -2,7 +2,6 @@
   <ng-container *ngIf="curator$ | async as curator">
     <curator-profile [curator]="curator"></curator-profile>
     <app-bip-scores-grid
-      *ngIf="bipScores$ | async as bipScores"
       [bipScores$]="bipScores$"
       [user$]="curator$"
     ></app-bip-scores-grid>
