@@ -13,7 +13,11 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class DefaultWorkBuilder implements OrcidWorkBuilder {
 	constructor(protected config: ConfigService) {
-		this.frontendHost = this.config.get<string>('FRONTEND_HOST');
+		const frontEndHostConfig = this.config.get<string>('FRONTEND_HOST');
+		if (!frontEndHostConfig) {
+			throw new Error('FRONTEND_HOST is not defined in the configuration');
+		}
+		this.frontendHost = frontEndHostConfig;
 	}
 
 	frontendHost: string;
@@ -41,7 +45,7 @@ export class DefaultWorkBuilder implements OrcidWorkBuilder {
 			title: `Contributions to ${resource.resource_name}`,
 			shortDescription: `Completed ${statsitics.total_count} Activities that contribute to ${resource.resource_name}`,
 			type: 'data-set',
-			putCode,
+			putCode: putCode ?? undefined,
 		};
 	}
 }

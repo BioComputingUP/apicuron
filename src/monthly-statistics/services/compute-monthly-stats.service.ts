@@ -140,7 +140,7 @@ export class ComputeMonthlyStatsService {
 			});
 
 		let currentStat: MonthlyStatisticsDocument | null = null;
-		const saves$ = [];
+		const saves$: Promise<unknown>[] = [];
 
 		for await (const reportAgg of aggregation) {
 			const {

@@ -30,6 +30,7 @@ import * as moment from 'moment-timezone';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
 import { computePrivacyField } from '../../util/privacy.helper';
+import { isNil } from 'lodash';
 @Injectable()
 export class ComputeWeeklyStatisticsService {
 	logger = new Logger(ComputeWeeklyStatisticsService.name);
@@ -74,7 +75,7 @@ export class ComputeWeeklyStatisticsService {
 			curator_orcid: report.curator_orcid,
 			resource_id: report.resource_id,
 			league: report.league,
-			privacy: computePrivacyField(report.resource, report.user, {}),
+			privacy: computePrivacyField(report.resource, report.user ?? null, {}),
 			resource: report.resource,
 			user: report.user ?? null,
 			league_data: report.league_data,
@@ -119,6 +120,12 @@ export class ComputeWeeklyStatisticsService {
 					league: report.league,
 			  })
 			: termDoc;
+		
+		if (isNil(term)) {
+			throw new Error(
+				`Term: ${report.activity_term} not found for resource ${report.resource_id} and league ${report.league}`,
+			);
+		}
 
 		const [weekStart, weekEnd] = getWeekRange(moment(report.timestamp));
 
@@ -186,7 +193,7 @@ export class ComputeWeeklyStatisticsService {
 			});
 
 		let currentStat: WeeklyStatisticsDocument | null = null;
-		const saves$ = [];
+		const saves$: Promise<unknown>[] = [];
 		for await (const reportAgg of aggregation) {
 			const {
 				curator_orcid,

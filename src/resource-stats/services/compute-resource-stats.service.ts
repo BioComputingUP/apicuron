@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { LeanDocument, Model } from 'mongoose';
+import { LeanDocument, Model, Types } from 'mongoose';
 import { UpdateResult } from 'mongodb';
 import { ResourceStatsDocument } from '../../core/schemas/resource/resource-stats.schema';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
@@ -79,10 +79,10 @@ export class ComputeResourceStatsService {
 		]);
 
 		const stats: LeanDocument<ResourceStatsDocument> = {
-			_id: undefined,
+			_id: new Types.ObjectId(),
 			resource_id,
-			firstContributionDate: firstSubmissionDate,
-			lastContributionDate: lastSubmissionDate,
+			firstContributionDate: firstSubmissionDate ?? undefined,
+			lastContributionDate: lastSubmissionDate ?? undefined,
 			contributionCount: contributionCount,
 			uniqueContributors: uniqueContributors,
 		};

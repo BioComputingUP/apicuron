@@ -25,6 +25,7 @@ import {
 } from '../../core/schemas/achievements-def/medal-def.schema';
 import { plainToInstance } from 'class-transformer';
 import { MedalDefDto } from '../dto/medal.dto';
+import { th } from '@faker-js/faker';
 
 @Injectable()
 export class MedalDefCommandsService {
@@ -51,7 +52,7 @@ export class MedalDefCommandsService {
 			);
 		}
 
-		const medal: MedalDefDocument = await this.medalDefModel.findOneAndUpdate(
+		const medal: MedalDefDocument | null = await this.medalDefModel.findOneAndUpdate(
 			{
 				resource_id,
 				name,
@@ -64,6 +65,9 @@ export class MedalDefCommandsService {
 				new: true,
 			},
 		);
+		if(!medal) {
+			throw new Error(`Medal Udpate failed after failing Update query`);
+		}
 
 		await this.eventEmitter.emitAsync(
 			MedalDefUpdatedEvent.name,
@@ -99,6 +103,9 @@ export class MedalDefCommandsService {
 		const medalDef = await this.medalDefModel.findOneAndDelete({
 			...deleteMedalDef,
 		});
+		if(!medalDef) {
+			throw new Error(`Medal Delete failed after failing Delete query`);
+		}
 
 		await this.eventEmitter.emitAsync(
 			MedalDefDeletedEvent.name,

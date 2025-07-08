@@ -15,7 +15,7 @@ export interface Aggregator {
 		report: LeanReportDocument | ReportDocument,
 		term: TermDocument,
 		resource: PartnerResourceDocument,
-		curator?: UserDocument,
+		curator?: UserDocument | null,
 	): Promise<any> | any;
 	applyAllReports(resource_id: string): Promise<any> | any;
 	removeAllResourceAggregates(resource_id: string): Promise<any> | any;

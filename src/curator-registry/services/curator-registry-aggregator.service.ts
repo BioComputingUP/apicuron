@@ -25,29 +25,40 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		protected registryService: CuratorRegistryService,
 		protected userRep: UserRepository,
-	) { }
+	) {}
 	private logger = new Logger(CuratorRegistryAggregatorService.name);
 
 	async applyReport(
 		report: LeanReportDocument | ReportDocument,
 		term: TermDocument,
 		resource: PartnerResourceDocument,
-		curator?: UserDocument,
+		curator?: UserDocument | null,
 	) {
 		// check registry for existing curator
 		const curatorEntry = await this.registryService.getCuratorEntry(
-			curator.orcid_id,
+			report.curator_orcid,
 		);
+
+		const leagueData =
+			report.league_data ?? (await resource.getLeague(report.league));
+
+		if (!leagueData) {
+			throw new Error(
+				`${this.constructor.name} League data not found for report with resource_id ${report.resource_id} and league ${report.league}`,
+			);
+		}
 
 		// if curator has no entry, insert them with the resource, and add league to groups
 		if (curatorEntry === null) {
 			await this.registryService.addEntry(
 				report.curator_orcid,
 				report.resource as PartnerResource,
-				report.league_data,
+				leagueData,
 				report.user as User,
 			);
-			this.logger.debug(`New curator entry created for ${curator.orcid_id}`);
+			this.logger.debug(
+				`New curator entry created for ${report.curator_orcid}`,
+			);
 			return;
 		}
 		// if curator has entry
@@ -57,11 +68,10 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 				(entry) => entry.resource_id === resource.resource_id,
 			) === undefined
 		) {
-
 			await this.registryService.addResourceToUser(
 				report.curator_orcid,
 				report.resource as PartnerResource,
-				report.league_data,
+				leagueData,
 			);
 			this.logger.debug(
 				`Resource ${report.resource_id} added to curator entry with orcid ${report.curator_orcid}`,
@@ -72,14 +82,14 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 		const userResource = curatorEntry.contributed_to.find(
 			(entry) => entry.resource_id === resource.resource_id,
 		);
-		const userHasContributedToLeague = userResource.groups.find(
-			(league) => league.name === report.league_data.name,
+		const userHasContributedToLeague = userResource && userResource.groups.find(
+			(league) => league.name === leagueData.name,
 		);
 		if (!userHasContributedToLeague) {
 			this.registryService.addLeagueToUser(
 				report.curator_orcid,
 				resource.resource_id,
-				report.league_data,
+				leagueData,
 			);
 			this.logger.debug(
 				`League ${report.league} under ${report.resource_id} added to curator entry`,
@@ -94,7 +104,8 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 	updatedUser(
 		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
 	) {
-		const user = event instanceof EntityCreatedEvent ? event.instance : event.after;
+		const user =
+			event instanceof EntityCreatedEvent ? event.instance : event.after;
 		// this will update user if they already have an entry, create new entry if not
 		this.registryService.upsertUser(user);
 		return;
@@ -124,7 +135,7 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 	}
 	deleteLeague(resource_id: string, league: string): Promise<number> | number {
 		// Do nothing
-		return;
+		return 0;
 	}
 	termUpdated(oldTerm: TermDocument, term: TermDocument) {
 		//shouldn't affect
