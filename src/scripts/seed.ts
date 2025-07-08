@@ -35,8 +35,10 @@ async function bootstrap() {
 	const resourceModel: Model<PartnerResource> = app.get(
 		getModelToken(PartnerResource.name),
 	);
-	const resourceService: SubmittedResourcesService = app.get(SubmittedResourcesService);
-	const http: HttpService = app.get(HttpService)
+	const resourceService: SubmittedResourcesService = app.get(
+		SubmittedResourcesService,
+	);
+	const http: HttpService = app.get(HttpService);
 
 	const userService = app.get(UsersService);
 
@@ -53,37 +55,50 @@ async function bootstrap() {
 		privacy: PrivacyType.public,
 	});
 
-	const tempResource = await resourceService.create_resource({
-		resource_description: faker.lorem.sentences(2),
-		resource_name: 'Testing Resource',
-		resource_long_name: 'Testing Resource Long Name',
-		color: '#000000',
-		resource_id: 'example_resource',
-		resource_uri: faker.internet.url(),
-		resource_url: faker.internet.url(),
-	}, testingOrcidId, await FileUploadDto.fromPicsum('https://picsum.photos/300/200.jpg', http))
+	const tempResource = await resourceService.create_resource(
+		{
+			resource_description: faker.lorem.sentences(2),
+			resource_name: 'Testing Resource',
+			resource_long_name: 'Testing Resource Long Name',
+			color: '#000000',
+			resource_id: 'example_resource',
+			resource_uri: faker.internet.url(),
+			resource_url: faker.internet.url(),
+		},
+		testingOrcidId,
+		await FileUploadDto.fromPicsum('https://picsum.photos/300/200.jpg', http),
+	);
 
 	await resourceService.make_partner(tempResource.resource_id);
 
-	const exampleResource = await resourceModel.findOne({ resource_id: tempResource.resource_id });
-
+	const exampleResource = await resourceModel.findOne({
+		resource_id: tempResource.resource_id,
+	});
 
 	logger.verbose(`Created testing resource successfully`);
 
-	const secondResourceTemp = await resourceService.create_resource({
-		resource_description: faker.lorem.sentences(2),
-		resource_name: 'Second Resource',
-		resource_long_name: 'Second Resource Long Name',
-		color: '#000000',
-		resource_id: 'second_resource',
-		resource_uri: faker.internet.url(),
-		resource_url: faker.internet.url(),
-	}, testingOrcidId, await FileUploadDto.fromPicsum('https://picsum.photos/300/200.jpg', http));
+	const secondResourceTemp = await resourceService.create_resource(
+		{
+			resource_description: faker.lorem.sentences(2),
+			resource_name: 'Second Resource',
+			resource_long_name: 'Second Resource Long Name',
+			color: '#000000',
+			resource_id: 'second_resource',
+			resource_uri: faker.internet.url(),
+			resource_url: faker.internet.url(),
+		},
+		testingOrcidId,
+		await FileUploadDto.fromPicsum('https://picsum.photos/300/200.jpg', http),
+	);
 
 	await resourceService.make_partner(secondResourceTemp.resource_id);
-	const secondResource = await resourceModel.findOne({ resource_id: secondResourceTemp.resource_id });
+	const secondResource = await resourceModel.findOne({
+		resource_id: secondResourceTemp.resource_id,
+	});
 
-	logger.verbose(`Created second resource successfully logo: ${secondResource.logo}`);
+	logger.verbose(
+		`Created second resource successfully logo: ${secondResource.logo}`,
+	);
 
 	logger.verbose(
 		`Assigned testing resources to testing user: ${testingOrcidId}`,
@@ -105,17 +120,13 @@ async function bootstrap() {
 			]),
 			description: faker.lorem.sentence({ min: 3, max: 6 }),
 			league: exampleResource.defaultLeague,
-			privacy: faker.helpers.arrayElement([
-				PrivacyType.private,
-				PrivacyType.public,
-			]),
+			privacy: PrivacyType.public,
 			score: faker.number.int({ max: 100, min: 5 }),
 		});
 
 		terms$.push(term.save());
 	}
 	await Promise.all(terms$);
-
 
 	logger.verbose(`Created ${termCount} Mock terms Successfully`);
 	// create terms for second resource
@@ -134,10 +145,7 @@ async function bootstrap() {
 			]),
 			description: faker.lorem.sentence({ min: 3, max: 6 }),
 			league: secondResource.defaultLeague,
-			privacy: faker.helpers.arrayElement([
-				PrivacyType.private,
-				PrivacyType.public,
-			]),
+			privacy: PrivacyType.public,
 			score: faker.number.int({ max: 100, min: 5 }),
 		});
 
@@ -220,10 +228,7 @@ export async function mockReport(
 		resource_id: resource.resource_id,
 
 		timestamp: faker.date.recent({ days: 25 }),
-		privacy: faker.helpers.arrayElement([
-			PrivacyType.private,
-			PrivacyType.public,
-		]),
+		privacy: PrivacyType.public,
 		league: faker.helpers.arrayElement(resource.leagues.map((l) => l.name)),
 	};
 
