@@ -1,5 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import Bottleneck from 'bottleneck';
 import { get } from 'lodash';
 import {
 	UserEmployment,
@@ -17,7 +18,6 @@ import {
 	SubmitWorkResponse,
 } from './interfaces/orcid.interface';
 import { OrcidTokenAuthService } from './token-auth.service';
-
 @Injectable()
 export class OrcidClientService {
 	constructor(
@@ -25,7 +25,11 @@ export class OrcidClientService {
 		@Inject(OrcidApiUrl) protected orcidUrl: string,
 		protected tokenAuth: OrcidTokenAuthService,
 	) {}
-
+	private orcid_rate_limit = 20; // ORCID API rate limit is 24, set it to 20 to be safe
+	private limiter = new Bottleneck({
+		maxConcurrent: 1, // ensure 1 reqeust at a time,
+		minTime: 1000 / this.orcid_rate_limit,
+	});
 	logger = new Logger(OrcidClientService.name);
 
 	async loadUserEmail(user: OrcidUser): Promise<OrcidEmailEntry[] | null> {
@@ -188,100 +192,107 @@ export class OrcidClientService {
 		// Gets user biography, keywords, affiliation, and social links from Orcid
 		const requestUrl = `${this.orcidUrl}${orcid_id}/record`;
 		try {
-			const userRecord = await this.httpService.axiosRef.get(requestUrl, {
-				headers: {
-					Authorization: `Bearer ${
-						(
-							await this.tokenAuth.getToken()
-						)?.access_token
-					}`,
-					Accept: 'application/vnd.orcid+json',
-				},
-			});
+			const userRecord = await this.limiter.schedule(
+				{ id: `request-${orcid_id}` },
+				async () =>
+					this.httpService.axiosRef.get(requestUrl, {
+						headers: {
+							Authorization: `Bearer ${
+								(
+									await this.tokenAuth.getToken()
+								).access_token
+							}`,
+							Accept: 'application/vnd.orcid+json',
+						},
+					}),
+			);
+			this.logger.debug(
+				`← Received response with status ${userRecord.status} for ${orcid_id}`,
+			);
+
 			const data = userRecord?.data;
 
-			const user_bio: string = get(data, 'person.biography.content', null);
-
-			const user_keywords: string[] = get(
-				data,
-				'person.keywords.keyword',
-				[],
-			).map((k) => k.content);
-
-			// for now affiliation is the most recent employment.
-			const user_affiliation: string = get(
-				data,
-				'activities-summary.employments.affiliation-group[0].summaries[0].employment-summary.organization.name',
-				null,
-			);
-
-			const user_links: UserLinks[] = get(
-				data,
-				'person.researcher-urls.researcher-url',
-				[],
-			)
-				.map((link) => {
-					const url_name = get(link, 'url-name', null);
-					const url_value = get(link, 'url.value', null) as URL;
-					if (!url_name || !url_value) {
-						return null;
-					}
-					return {
-						name: url_name,
-						url: url_value,
-					};
-				})
-				.filter((link) => !!link && link.url);
-
-			const user_employment: UserEmployment[] = get(
-				data,
-				'activities-summary.employments.affiliation-group',
-				[],
-			)
-				.map((affiliation) => {
-					const summary = get(
-						affiliation,
-						'summaries[0].employment-summary',
-						null,
-					);
-					if (!summary) return null;
-
-					const org_name = get(summary, 'organization.name', undefined);
-					const role_title = get(summary, 'role-title', undefined);
-					const org_url = get(summary, 'url.value', undefined);
-					const start_date = parseDateObjectIntoString(
-						get(summary, 'start-date', undefined),
-					);
-					const end_date = parseDateObjectIntoString(
-						get(summary, 'end-date', undefined),
-					);
-
-					if (!org_name) return null;
-					return {
-						name: org_name,
-						title: role_title,
-						url: org_url,
-						start_date: start_date,
-						end_date: end_date,
-					};
-				})
-				.filter(Boolean);
-			return {
-				orcid_id,
-				biography: user_bio,
-				keywords: user_keywords,
-				affiliation: user_affiliation,
-				links: user_links,
-				user_employment: user_employment,
-			};
+			return this.processOrcidUserInfo(data, orcid_id);
 		} catch (error) {
-			this.logger.error(
-				`Error Getting info from Orcid for: ${orcid_id} ! \n ${error} `,
-			);
-
-			throw new Error(
-				`Error Getting info from Orcid for: ${orcid_id} ! \n ${error}`,
-			);
+			this.logger.error(`Error Getting info from Orcid for: ${orcid_id} ! `);
+			this.logger.error(error);
 		}
+	}
+
+	private processOrcidUserInfo(data: any, orcid_id: string): OrcidUserInfo {
+		const user_bio: string = get(data, 'person.biography.content', null);
+
+		const user_keywords: string[] = get(
+			data,
+			'person.keywords.keyword',
+			[],
+		).map((k) => k.content);
+
+		// for now affiliation is the most recent employment.
+		const user_affiliation: string = get(
+			data,
+			'activities-summary.employments.affiliation-group[0].summaries[0].employment-summary.organization.name',
+			null,
+		);
+
+		const user_links: UserLinks[] = get(
+			data,
+			'person.researcher-urls.researcher-url',
+			[],
+		)
+			.map((link) => {
+				const url_name = get(link, 'url-name', null);
+				const url_value = get(link, 'url.value', null) as URL;
+				if (!url_name || !url_value) {
+					return null;
+				}
+				return {
+					name: url_name,
+					url: url_value,
+				};
+			})
+			.filter((link) => !!link && link.url);
+
+		const user_employment: UserEmployment[] = get(
+			data,
+			'activities-summary.employments.affiliation-group',
+			[],
+		)
+			.map((affiliation) => {
+				const summary = get(
+					affiliation,
+					'summaries[0].employment-summary',
+					null,
+				);
+				if (!summary) return null;
+
+				const org_name = get(summary, 'organization.name', undefined);
+				const role_title = get(summary, 'role-title', undefined);
+				const org_url = get(summary, 'url.value', undefined);
+				const start_date = parseDateObjectIntoString(
+					get(summary, 'start-date', undefined),
+				);
+				const end_date = parseDateObjectIntoString(
+					get(summary, 'end-date', undefined),
+				);
+
+				if (!org_name) return null;
+				return {
+					name: org_name,
+					title: role_title,
+					url: org_url,
+					start_date: start_date,
+					end_date: end_date,
+				};
+			})
+			.filter(Boolean);
+		return {
+			orcid_id,
+			biography: user_bio,
+			keywords: user_keywords,
+			affiliation: user_affiliation,
+			links: user_links,
+			user_employment: user_employment,
+		};
 	}
 }

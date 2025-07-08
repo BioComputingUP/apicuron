@@ -60,6 +60,7 @@
     "@types/passport-jwt": "^3.0.9",
     "@types/stream-json": "^1.7.2",
     "argparse": "^2.0.1",
+    "bottleneck": "^2.19.5",
     "cache-manager": "^5.3.2",
     "cachegoose": "^2.1.7",
     "cheerio": "^1.0.0-rc.12",

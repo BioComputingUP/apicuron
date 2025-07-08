@@ -44,9 +44,9 @@ export class OrcidSyncService {
 			updates.push(this.update_user_info(user));
 		}
 		try {
-			this.logger.log('Updating all users information...');
+			this.logger.log(`Updating info for ${updates.length} users...`);
 			await Promise.all(updates);
-			this.logger.log('Done.');
+			this.logger.log(`Updated ${updates.length} users successfully.`);
 			return;
 		} catch (err) {
 			this.logger.error('Error while updating all users');
