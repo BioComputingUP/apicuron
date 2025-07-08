@@ -28,7 +28,6 @@
     *ngIf="bipScores$ | async as bipScores; else createProfile"
     class="tw-grid tw-grid-cols-2 tw-gap-4 tw-px-4 tw-mt-6 lg:tw-grid-cols-4"
   >
-    <p>{{ bipScores | json }}</p>
     <div *ngFor="let sectionItem of bipScores | keyvalue" class="tw-h-full">
       <bip-scholar-card
         [stats_section_info]="sectionItem.value"

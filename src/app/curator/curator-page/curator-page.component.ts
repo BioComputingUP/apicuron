@@ -18,6 +18,7 @@ export class CuratorPageComponent implements OnInit {
   // statsWithResource$: Observable<StatisticsWithResource[]>;
   statistics$: Observable<CuratorStatistics[]>;
   bipScores$: Observable<BipScholarStatsViewModel | null>;
+  isOwnProfile$: Observable<boolean>;
 
   constructor(
     private route: ActivatedRoute,
@@ -36,6 +37,7 @@ export class CuratorPageComponent implements OnInit {
     this.bipScores$ = this.curatorPageService.getBipScholarScores(
       this.orcidId$
     );
+    this.isOwnProfile$ = this.curatorPageService.isOwnProfile(this.orcidId$);
     // .pipe(
     //   tap((bipScores) => {
     //     console.log("BipScholar Scores: ", bipScores.statCardViewModel());

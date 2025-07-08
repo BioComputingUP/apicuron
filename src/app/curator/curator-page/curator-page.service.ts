@@ -1,8 +1,10 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { combineLatest, Observable } from "rxjs";
+
 import { map, shareReplay, switchMap } from "rxjs/operators";
 import { MedalsService } from "src/app/achievements/services/medals.service";
+import { AuthService } from "src/app/auth/auth.service";
 import { CuratorStatisticsService } from "src/app/curator-statistics/services/curator-statistics.service";
 import { CuratorService } from "src/app/curator/curator.service";
 import {
@@ -39,7 +41,8 @@ export class CuratorPageService {
     private resources: ResourcesService,
     private curatorStatistics: CuratorStatisticsService,
     private curatorService: CuratorService,
-    private medalsService: MedalsService
+    private medalsService: MedalsService,
+    private authService: AuthService
   ) {
     // load statistics
   }
@@ -159,7 +162,7 @@ export class CuratorPageService {
     }
     return orcid$.pipe(
       switchMap((orcid: string) => {
-        let query_orcid = this.stage == "local" ? "" : orcid;
+        let query_orcid = this.stage == "local" ? "0000-0003-0555-4128" : orcid;
         return this.http.get(this.bip_url + `/${query_orcid}`, {
           headers: {
             accept: "application/json",
@@ -174,6 +177,18 @@ export class CuratorPageService {
           .deserialize(response)
           .statCardViewModel();
         return bipScholarStats;
+      }),
+      shareReplay(1)
+    );
+  }
+
+  public isOwnProfile(routeOrcid$: Observable<string>): Observable<boolean> {
+    return combineLatest([routeOrcid$, this.authService.loggedInOrcid$]).pipe(
+      map(([routeOrcid, loggedInOrcid]) => {
+        if (!loggedInOrcid) {
+          return false;
+        }
+        return routeOrcid === loggedInOrcid;
       }),
       shareReplay(1)
     );

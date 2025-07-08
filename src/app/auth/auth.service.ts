@@ -7,6 +7,7 @@ import {
   shareReplay,
   switchMap,
   takeUntil,
+  tap,
 } from "rxjs/operators";
 import { environment } from "../../environments/environment";
 import { BehaviorSubject, combineLatest, Observable, of, Subject } from "rxjs";
@@ -43,7 +44,8 @@ export class AuthService implements OnDestroy {
   private readonly orcidHeader = "orcid-token";
 
   public requestHeaders$: Observable<[string, string][]>;
-
+  private logged_in_orcid = new BehaviorSubject<string | null>(null);
+  loggedInOrcid$ = this.logged_in_orcid.asObservable();
   user$: Observable<User>;
   private loginEvent = new Subject<LoginEventData>();
   loginEvent$ = this.loginEvent.asObservable(); // expose observable to other components
@@ -125,15 +127,18 @@ export class AuthService implements OnDestroy {
         )
       ),
       shareReplay(1),
-      map((user: User) => new User().deserialize(user))
+      map((user: User) => new User().deserialize(user)),
+      tap((user: User) => {
+        // whenever the user changes, update the logged in orcid
+        this.logged_in_orcid.next(user.orcid_id);
+      })
     );
-
+    // Whenever the user changes, update the logged in orcid
     const windowMessageEventListener = (event: MessageEvent) => {
       const allowedOrigins = [
         new URL(environment.host).origin,
         new URL(environment.ws).origin,
       ];
-
       if (allowedOrigins.includes(event.origin)) {
         if (_.isObject(event.data) && event.data["access_token"]) {
           const access_token = event.data["access_token"];
@@ -213,6 +218,7 @@ export class AuthService implements OnDestroy {
     localStorage.removeItem(this.orcidHeader);
     this.orcidToken$.next(null);
     this.jwtToken$.next(null);
+    this.logged_in_orcid.next(null);
   }
 
   redirectAfterAuth() {

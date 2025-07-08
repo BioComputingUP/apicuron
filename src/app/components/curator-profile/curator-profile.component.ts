@@ -43,7 +43,6 @@ export class CuratorProfileComponent implements OnInit {
 
   curator$ = new BehaviorSubject<User>(null);
   @Input() set curator(value: User) {
-    console.log(value);
     this.curator$.next(value);
   }
 
