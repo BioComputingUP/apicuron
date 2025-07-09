@@ -89,8 +89,10 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 		let user: UserDocument;
 		if (event instanceof EntityCreatedEvent) {
 			user = event.instance;
-		} else {
+		} else if (event instanceof EntityUpdatedEvent) {
 			user = event.after;
+		} else {
+			throw new Error('Event type not recognized in updatedUser method');
 		}
 		const filter = {
 			curator_orcid: user.orcid_id,

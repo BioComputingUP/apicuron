@@ -96,7 +96,7 @@ export class ReportFilterDto extends BasePaginationDto {
 		'activity_term',
 	])
 	@IsOptional()
-	sortBy?:
+	sortBy:
 		| 'timestamp'
 		| 'resource_id'
 		| 'entity_uri'
@@ -106,7 +106,7 @@ export class ReportFilterDto extends BasePaginationDto {
 	@IsIn([-1, 1])
 	@IsOptional()
 	@Transform(({ value }) => parseInt(value))
-	sortOrder?: 1 | -1 = -1;
+	sortOrder: 1 | -1 = -1;
 
 	@IsIn(['term', 'resource'], { each: true })
 	@IsOptional()
@@ -119,5 +119,5 @@ export class ReportFilterGroupedDto extends ReportFilterDto {
 	groupBy: ReportGroupBy = 'day';
 
 	@Allow()
-	sortBy?;
+	sortBy;
 }

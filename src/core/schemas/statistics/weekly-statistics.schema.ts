@@ -10,7 +10,7 @@ import {
 } from '../resource/partner-resource.schema';
 import { User, UserSchema } from '../user.schema';
 type WeeklyStatisticsDocumentOverride = {
-	user?: (Types.Subdocument<Types.ObjectId> & User) | null;
+	user: (Types.Subdocument<Types.ObjectId> & User) | null;
 	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;
 	league_data: Types.Subdocument<Types.ObjectId> & League;
 };
@@ -32,7 +32,7 @@ export class WeeklyStatistics
 	resource_id: string;
 
 	@Prop({ required: false, type: UserSchema })
-	user?: (Types.Subdocument<Types.ObjectId> & User) | null;
+	user: (Types.Subdocument<Types.ObjectId> & User) | null;
 
 	@Prop({ required: true, type: PartnerResourceSchema })
 	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;

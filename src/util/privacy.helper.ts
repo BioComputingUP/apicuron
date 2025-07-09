@@ -21,7 +21,7 @@ export type IUserLeagueEntity = {
 	curator_orcid: string;
 	league: string;
 	privacy: PrivacyType;
-	user?: User | null;
+	user: User | null;
 	resource: Resource;
 	league_data: League;
 };
@@ -171,8 +171,8 @@ export function userResourceEntityPrivacyFilter(
  * @param filter - The filter query to select the entities to be updated.
  * @returns A promise that resolves to an array containing the results of the two update operations.
  */
-export async function updateUserAggregatePrivacy(
-	model: Model<IUserLeagueEntityDocument>,
+export async function updateUserAggregatePrivacy<T extends Model<IUserLeagueEntityDocument>>(
+	model: T,
 	filter: FilterQuery<IUserLeagueEntityDocument>,
 ) {
 	const privateUpdate$ = await model.updateMany(

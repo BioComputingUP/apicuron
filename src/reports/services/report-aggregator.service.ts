@@ -4,6 +4,7 @@ import {
 	Document,
 	FilterQuery,
 	Model,
+	Query,
 	Types,
 	UpdateWriteOpResult,
 } from 'mongoose';
@@ -137,11 +138,12 @@ export class ReportAggregatorService implements Aggregator {
 	async recomputeAllResourceAggregates(resource_id: string): Promise<void> {
 		const resource = await this.resourceModel.findOne({ resource_id });
 		if (!resource) {
-			this.logger.warn(
-				`No resource found with id ${resource_id}. Cannot recompute aggregates.`,
+			this.logger.error(
+				`Resource with id ${resource_id} not found while recomputing aggregates`,
 			);
-			return;
+			throw new Error(`Resource with id ${resource_id} not found`);
 		}
+
 		this.logger.debug(
 			`Assinging resource ${resource.resource_name} to all relevant reports`,
 		);

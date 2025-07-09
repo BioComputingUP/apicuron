@@ -11,9 +11,7 @@ import { OrcidWorkBuilder } from '../interfaces/orcid-submission.interface';
 @Injectable()
 export class DefaultWorkBuilder implements OrcidWorkBuilder {
 	constructor(protected config: ConfigService) {
-		this.frontendHost =
-			this.config.get<string>('FRONTEND_HOST') ??
-			throwError(ConfigurationError, 'FRONTEND_HOST is not defined');
+		this.frontendHost = this.config.getOrThrow<string>('FRONTEND_HOST');
 	}
 
 	frontendHost: string;

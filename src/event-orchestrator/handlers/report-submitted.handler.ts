@@ -85,7 +85,16 @@ export class ReportSubmittedEventHandler
 				`Applying report for resource "${payload.report.resource_id}" to aggregator "${aggregator.constructor.name}"`,
 			);
 			const { report, term, resource, user } = payload;
-			return await aggregator.applyReport(report, term, resource, user);
+			try {
+				await aggregator.applyReport(report, term, resource, user);
+			} catch (error) {
+				this.logger.error(
+					`Error processing report in aggregator ${aggregator.constructor.name}: ${error.message}`,
+					error.stack,
+					error.name,
+				);
+				throw error;
+			}
 		});
 	}
 

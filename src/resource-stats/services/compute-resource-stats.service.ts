@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { UpdateResult } from 'mongodb';
-import { LeanDocument, Model } from 'mongoose';
+import { UpdateResult, ObjectId } from 'mongodb';
+import { LeanDocument, Model, Types } from 'mongoose';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import {
 	PartnerResource,
@@ -78,10 +78,11 @@ export class ComputeResourceStatsService {
 			this.getUniqueContributorsCount(resource_id),
 		]);
 
-		const stats: Omit<LeanDocument<ResourceStatsDocument>, '_id'> = {
+		const stats: LeanDocument<ResourceStatsDocument> = {
+			_id: new ObjectId(),
 			resource_id,
-			firstContributionDate: firstSubmissionDate,
-			lastContributionDate: lastSubmissionDate,
+			firstContributionDate: firstSubmissionDate ?? undefined,
+			lastContributionDate: lastSubmissionDate ?? undefined,
 			contributionCount: contributionCount,
 			uniqueContributors: uniqueContributors,
 		}; // Ensure _id is not set, as it is not needed in the stats

@@ -40,6 +40,12 @@ abstract class AbstractAchievementUnique
 	}
 
 	async validate(value: any, args?: ValidationArguments): Promise<boolean> {
+		if (!args || !args.object['resource_id']) {
+			throw new Error(
+				'Resource ID is required in the validated object for ' +
+					this.constructor.name,
+			);
+		}
 		const exists = await this.achievement_def_exists(
 			value,
 			args?.object['resource_id'],
@@ -54,6 +60,12 @@ abstract class AbstractAchievementUnique
 	}
 
 	defaultMessage(args?: ValidationArguments): string {
+		if (!args || !args.object['resource_id']) {
+			throw new Error(
+				'Cannot build error message with missing validationArguments (ResourceId)' +
+					this.constructor.name,
+			);
+		}
 		let error_snippet = 'already exists';
 
 		if (args?.constraints && args?.constraints.find((x) => x.reverse == true)) {

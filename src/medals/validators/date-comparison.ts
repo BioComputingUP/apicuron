@@ -100,12 +100,17 @@ export class DateFieldComparison implements ValidatorConstraintInterface {
 			if (operator == 'max') {
 				return current_field.getTime() < compared_date.getTime();
 			}
+			// if the operator is not recognized, we return false
+			return false;
 		});
 		return this.dates_validation.every(Boolean);
 	}
 
 	defaultMessage(args?: ValidationArguments): string {
-		const { properties }: { properties: string[] } = args?.constraints.find(
+		if (!args) {
+			throw new Error('ValidationArguments is required for defaultMessage');
+		}
+		const { properties }: { properties: string[] } = args.constraints.find(
 			(x) => x.properties && Array.isArray(x.properties),
 		);
 		const { operator }: { operator: 'min' | 'max' } = args?.constraints.find(
