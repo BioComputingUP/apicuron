@@ -8,6 +8,7 @@ import {
 	IsBoolean,
 	ValidateNested,
 	IsEnum,
+	isNotEmpty,
 } from 'class-validator';
 import { User } from '../../../core/schemas/user.schema';
 import { OrcidChecksum } from '../../../submit-reports/validators/orcid-checksum';
@@ -20,12 +21,12 @@ export class EmailDto {
 	@IsNotEmpty()
 	email: string;
 
-	@IsOptional()
+	@IsNotEmpty()
 	@IsString()
 	@IsEnum(VisibilityType)
 	visibility: VisibilityType;
 
-	@IsOptional()
+	@IsNotEmpty()
 	@IsBoolean()
 	primary: boolean;
 }
