@@ -242,4 +242,24 @@ export class AuthService implements OnDestroy {
     this.dropTokens();
     this.router.navigate([""]);
   }
+
+  /**
+   * Determines whether the currently logged-in user is the same as the passed ORCID identifier.
+   *
+   * @param requestedOrcid$ - An observable emitting the ORCID identifier of the profile being requested.
+   * @returns An observable emitting `true` if the requested ORCID matches the logged-in user's ORCID, otherwise `false`.
+   */
+  public isOwnProfile(
+    requestedOrcid$: Observable<string>
+  ): Observable<boolean> {
+    return combineLatest([requestedOrcid$, this.loggedInOrcid$]).pipe(
+      map(([routeOrcid, loggedInOrcid]) => {
+        if (!loggedInOrcid) {
+          return false;
+        }
+        return routeOrcid === loggedInOrcid;
+      }),
+      shareReplay(1)
+    );
+  }
 }

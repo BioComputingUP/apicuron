@@ -34,14 +34,5 @@ export class CuratorPageComponent implements OnInit {
     this.curatorPageService.init(this.orcidId$);
     this.curator$ = this.curatorPageService.getCurator();
     this.statistics$ = this.curatorPageService.getStatistics();
-    this.bipScores$ = this.curatorPageService.getBipScholarScores(
-      this.orcidId$
-    );
-    this.isOwnProfile$ = this.curatorPageService.isOwnProfile(this.orcidId$);
-    // .pipe(
-    //   tap((bipScores) => {
-    //     console.log("BipScholar Scores: ", bipScores.statCardViewModel());
-    //   })
-    // );
   }
 }

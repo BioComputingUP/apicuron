@@ -26,8 +26,7 @@ export interface StatisticsWithResource {
 export class CuratorPageService {
   private wsUrl = environment.ws;
   private orcid_url = environment.orcid_url;
-  private bip_url = environment.bip_scholar_api_url;
-  private stage = environment.env;
+
   // state observables
   curator$: Observable<User>;
   resources$: Observable<Resource[]>;
@@ -35,7 +34,7 @@ export class CuratorPageService {
   statisticsWithResource$: Observable<StatisticsWithResource[]>;
   resourceIds$: Observable<string[]>;
   medals$: Observable<any[]>;
-  bip_stats$: Observable<any>;
+
   constructor(
     private http: HttpClient,
     private resources: ResourcesService,
@@ -58,7 +57,6 @@ export class CuratorPageService {
       // extract to list of resource_ids
       map((stats: CuratorStatistics[]) => stats.map((stat) => stat.resource_id))
     );
-    this.bip_stats$ = this.getBipScholarScores(orcid_id$);
 
     // load resources using statistics
     // this.resources$ = this.loadResources(this.resourceIds$)
@@ -148,49 +146,5 @@ export class CuratorPageService {
         resource_id,
       },
     });
-  }
-
-  getBipScholarScores(
-    orcid$: Observable<string>
-  ): Observable<BipScholarStatsViewModel | null> {
-    if (this.stage === "development") {
-      // Avoid calling the service in dev environment
-      return new Observable((observer) => {
-        observer.next(null);
-        observer.complete();
-      });
-    }
-    return orcid$.pipe(
-      switchMap((orcid: string) => {
-        let query_orcid = this.stage == "local" ? "0000-0003-0555-4128" : orcid;
-        return this.http.get(this.bip_url + `/${query_orcid}`, {
-          headers: {
-            accept: "application/json",
-          },
-        });
-      }),
-      map((response: any) => {
-        if (!response || Object.keys(response).length === 0) {
-          return null; // Return null if no data is available
-        }
-        const bipScholarStats = new BipScholarStats()
-          .deserialize(response)
-          .statCardViewModel();
-        return bipScholarStats;
-      }),
-      shareReplay(1)
-    );
-  }
-
-  public isOwnProfile(routeOrcid$: Observable<string>): Observable<boolean> {
-    return combineLatest([routeOrcid$, this.authService.loggedInOrcid$]).pipe(
-      map(([routeOrcid, loggedInOrcid]) => {
-        if (!loggedInOrcid) {
-          return false;
-        }
-        return routeOrcid === loggedInOrcid;
-      }),
-      shareReplay(1)
-    );
   }
 }

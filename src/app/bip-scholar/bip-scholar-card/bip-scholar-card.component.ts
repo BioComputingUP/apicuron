@@ -4,8 +4,6 @@ import { BipScholarSection } from "src/app/models/external/bip-scholar.model";
 import { BipScoresTooltipManager } from "../bip-scores.component";
 
 @Component({
-  standalone: true,
-  imports: [CommonModule],
   selector: "bip-scholar-card",
   templateUrl: "./bip-scholar-card.component.html",
   styleUrl: "./bip-scholar-card.component.scss",

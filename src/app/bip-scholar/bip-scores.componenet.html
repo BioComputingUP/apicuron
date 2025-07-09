@@ -1,7 +1,8 @@
 <div
+  *ngIf="isOwnProfile$ | async"
   class="tw-bg-white tw-pb-6 tw-rounded-b-md tw-shadow-md tw-mb-4 tw-border-t-4 tw-border-slate-600"
 >
-  <div class="tw-col-span-2 lg:tw-col-span-4" *ngIf="user$ | async as user">
+  <div class="tw-col-span-2 lg:tw-col-span-4" *ngIf="userOrcid$ | async">
     <div
       class="tw-flex tw-flex-row tw-bg-slate-100 tw-justify-between tw-items-center tw-px-4"
     >
@@ -16,7 +17,7 @@
         </h1>
       </div>
       <a
-        [href]="user.bip_url"
+        [href]="userBipUrl$ | async"
         target="_blank"
         rel="noopener noreferrer"
         class="tw-px-2 tw-py-1 tw-border-[#449D44] tw-text-[#449D44] tw-rounded-md tw-border-2 hover:tw-bg-slate-200"
