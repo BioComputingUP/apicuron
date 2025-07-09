@@ -155,10 +155,7 @@ async function bootstrap() {
 			]),
 			description: faker.lorem.sentence({ min: 3, max: 6 }),
 			league: secondResource.defaultLeague,
-			privacy: faker.helpers.arrayElement([
-				PrivacyType.private,
-				PrivacyType.public,
-			]),
+			privacy: PrivacyType.public,
 			score: faker.number.int({ max: 100, min: 5 }),
 		});
 
@@ -245,10 +242,7 @@ export async function mockReport(
 		resource_id: resource.resource_id,
 
 		timestamp: faker.date.recent({ days: 25 }),
-		privacy: faker.helpers.arrayElement([
-			PrivacyType.private,
-			PrivacyType.public,
-		]),
+		privacy: PrivacyType.public,
 		league: faker.helpers.arrayElement(resource.leagues.map((l) => l.name)),
 	};
 
