@@ -29,7 +29,7 @@ export class Statistics implements IUserResourceEntity, IUserLeagueEntity {
 	badges_count: number;
 
 	@Prop({ required: false, type: UserSchema })
-	user?: (Types.Subdocument<Types.ObjectId> & User) | null;
+	user: (Types.Subdocument<Types.ObjectId> & User) | null;
 
 	@Prop({ required: true, type: PartnerResourceSchema })
 	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;
