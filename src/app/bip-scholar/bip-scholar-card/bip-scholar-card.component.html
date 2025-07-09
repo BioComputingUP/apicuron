@@ -12,7 +12,8 @@
     <div
       *ngFor="let stat of section.stats | keyvalue; let i = index"
       class="tw-flex tw-flex-col tw-place-items-center tw-relative tw-cursor-pointer"
-      (click)="toggleDescription(i, $event)"
+      (mouseenter)="toggleDescription(i, $event)"
+      (mouseleave)="closeTooltip($event)"
     >
       <div
         class="counter-animated tw-font-bold tw-text-center tw-text-lg"
