@@ -98,7 +98,7 @@ export class UpdateUser implements Deserializable, Serializable {
           input.emailVisibility === true
             ? EmailVisibilityType.public
             : EmailVisibilityType.private,
-        primary: input.primary ?? null,
+        primary: input.primary ?? false,
       };
     }
     this.privacy = input.privacy ?? null;
