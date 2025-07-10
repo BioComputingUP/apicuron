@@ -6,7 +6,7 @@ ARG GID
 # BUILD FOR LOCAL DEVELOPMENT
 ###################
 
-FROM node:16.14.2-buster-slim As development
+FROM node:16.14.2-buster-slim AS development
 
 ARG APP_DIR
 ARG UID
@@ -46,43 +46,33 @@ CMD ["npm", "run", "start:dev"]
 # BUILD FOR PRODUCTION
 ###################
 
-FROM node:16.14.2-buster-slim As build
-
-ARG APP_DIR
-
-# change node uid and gid to the defined one
-RUN groupmod -g ${GID} node && \
-    usermod -u ${UID} -g ${GID} node
+FROM node:iron-bullseye AS build
 
 USER node
+WORKDIR /home/node/app
 
+COPY --chown=node:node package.json package-lock.json ./
 
-WORKDIR ${APP_DIR}
-
-COPY --chown=node:node package*.json ./
-
-# In order to run `npm run build` we need access to the Nest CLI which is a dev dependency. In the previous development stage we ran `npm ci` which installed all dependencies, so we can copy over the node_modules directory from the development image
-COPY --chown=node:node --from=development ${APP_DIR}/node_modules ./node_modules
+# Keep dev dependencies to build the application
+RUN npm ci 
 
 COPY --chown=node:node . .
 
-# Run the build command which creates the production bundle
 RUN npm run build
 
-# Set NODE_ENV environment variable
-ENV NODE_ENV production
-
-# Running `npm ci` removes the existing node_modules directory and passing in --only=production ensures that only the production dependencies are installed. This ensures that the node_modules directory is as optimized as possible
-RUN npm ci --only=production && npm cache clean --force
-
+# RUN npm prune --omit=dev --omit=peer
 
 ###################
 # PRODUCTION
 ###################
 
-FROM node:16.14.2-buster-slim As production
+FROM node:iron-bullseye-slim AS production
 
-ARG APP_DIR
+ARG APP_DIR=/home/node/app
+ARG UID
+ARG GID
+ENV NODE_ENV=production
+
 
 # change node uid and gid to the defined one
 RUN groupmod -g ${GID} node && \
@@ -90,13 +80,13 @@ RUN groupmod -g ${GID} node && \
 
 USER node
 
-RUN mkdir ${APP_DIR}
+
+
+COPY --chown=node:node --from=build /home/node/app/node_modules ${APP_DIR}/node_modules
+COPY --chown=node:node --from=build /home/node/app/dist ${APP_DIR}/dist
+
 WORKDIR ${APP_DIR}
 
-# Copy the bundled code from the build stage to the production image
-COPY --chown=node:node --from=build ${APP_DIR}/node_modules ${APP_DIR}/node_modules
-COPY --chown=node:node --from=build ${APP_DIR}/dist ${APP_DIR}/dist
 
-
-# Start the server using the production build
+# Start the server using the production buildc
 CMD [ "node", "dist/main.js" ]
