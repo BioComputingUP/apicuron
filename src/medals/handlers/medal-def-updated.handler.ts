@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { MedalAggregatorService } from '../services/medal-aggregator.service';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { MedalDefUpdatedEvent } from '../events/medal-def-updated.event';
 import { ComputeMedalsService } from '../services/compute-medals.service';

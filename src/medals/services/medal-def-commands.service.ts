@@ -1,6 +1,7 @@
 import {
 	BadRequestException,
 	Injectable,
+	Logger,
 	NotFoundException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -23,6 +24,7 @@ import { MedalDefUpdatedEvent } from '../events/medal-def-updated.event';
 
 @Injectable()
 export class MedalDefCommandsService {
+	logger = new Logger(MedalDefCommandsService.name);
 	constructor(
 		@InjectModel(MedalDef.name)
 		protected medalDefModel: Model<MedalDefDocument>,

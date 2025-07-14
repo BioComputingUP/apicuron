@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Query, UpdateWriteOpResult } from 'mongoose';
-import { getEventSubject } from "src/core/helpers/events.helper";
+import { getEventSubject } from 'src/core/helpers/events.helper';
 import { PrivacyType } from '../../core/enums';
 import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';

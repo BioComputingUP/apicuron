@@ -162,6 +162,12 @@ export class Medal implements IUserResourceEntity {
 		type: String,
 	})
 	state: AchievementState;
+
+	@Prop({ required: false, type: Date })
+	last_day?: Date;
+
+	@Prop({ required: false, type: Date })
+	first_day?: Date;
 }
 
 export const MedalSchema = SchemaFactory.createForClass(Medal).loadClass(Medal);

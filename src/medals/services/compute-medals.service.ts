@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import * as _ from 'lodash';
-import { Cursor, FilterQuery, Model } from 'mongoose';
+import { Cursor, FilterQuery, LeanDocument, Model } from 'mongoose';
 import { AchievementState } from '../../core/enums';
 import {
 	MedalDef,
@@ -55,9 +55,23 @@ export class ComputeMedalsService {
 			? AchievementState.achieved
 			: AchievementState.progress;
 		const medalDefObject = medalDef.toObject();
-		const medal = new this.medalModel({
-			medalDefObject,
+
+		const medalDoc: LeanDocument<MedalDocument> = {
+			name: medalDefObject.name,
+			resource_id: medalDefObject.resource_id,
+			league: medalDefObject.league,
+			list_terms: medalDefObject.list_terms,
+			color: medalDefObject.color,
+			score_relative: medalDefObject.score_relative,
+			privacy: computeAggregatePrivacyField(medalDef, aggregatedReports),
+			resource_uri: medalDefObject.resource_uri,
+			createdAt: new Date(),
+			updatedAt: new Date(),
 			_id: undefined,
+			count_relative_index: rankIndex,
+			count_relative_valid: true,
+			count_threshold_valid: true,
+			score_threshold_valid: true,
 			curator_orcid: aggregatedReports.curator_orcid,
 			last_day: medalDef?.last_day,
 			first_day: medalDef?.first_day,
@@ -66,8 +80,9 @@ export class ComputeMedalsService {
 			state: achievementState,
 			score_relative_valid: earned,
 			score_relative_index: rankIndex,
-		});
-		medal.privacy = computeAggregatePrivacyField(medalDef, aggregatedReports);
+		};
+
+		const medal = new this.medalModel(medalDoc);
 
 		try {
 			await medal.save();
@@ -79,7 +94,7 @@ export class ComputeMedalsService {
 			if (err instanceof Error) {
 				this.logger.error(err.message, err.stack, err.name);
 				throw new Error(
-					`An error occured while creating medal ${medalDef.name} for curator ${aggregatedReports.curator_orcid} in resource ${medalDef.resource_id}`,
+					`processAggregatedReportsByMedalDef: An error occured while creating medal ${medalDef.name} for curator ${aggregatedReports.curator_orcid} in resource ${medalDef.resource_id}`,
 				);
 			} else {
 				throw new Error(
@@ -90,6 +105,7 @@ export class ComputeMedalsService {
 	}
 
 	public async computeMedalsForMedalDef(medalDef: MedalDefDocument) {
+		this.logger.debug(`Computing medals for MedalDef: ${medalDef.name}`);
 		const reportsAgg = this.medalReportsAggregationCursor(medalDef);
 
 		const medalAsyncIterator = (async function* () {
@@ -104,6 +120,9 @@ export class ComputeMedalsService {
 		const aggReportsPromises$: Promise<AchievementState>[] = [];
 
 		for await (const [aggregatedReports, idx] of medalAsyncIterator) {
+			this.logger.debug(
+				`Processing aggregated report for ${aggregatedReports.curator_orcid}`,
+			);
 			const aggReportsPromise$ = this.processAggregatedReportsByMedalDef(
 				medalDef,
 				aggregatedReports,
@@ -139,7 +158,9 @@ export class ComputeMedalsService {
 			resource_id: medalDef.resource_id,
 			league: medalDef.league,
 		});
-
+		this.logger.debug(
+			`Deleted ${medalsDeleted.deletedCount} medals for ${medalDef.name}`,
+		);
 		return await this.computeMedalsForMedalDef(medalDef);
 	}
 
@@ -222,7 +243,7 @@ export class ComputeMedalsService {
 		}
 		const medalComputedCounts = await Promise.all(medalDefCountsPromises$);
 
-		const [totalAchieved, totalProgress] = medalComputedCounts.reduce(
+		const [totalAchieved, _] = medalComputedCounts.reduce(
 			(val: [number, number], curr: [number, number]) => [
 				val[0] + curr[0],
 				val[1] + curr[1],
