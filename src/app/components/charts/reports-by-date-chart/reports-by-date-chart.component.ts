@@ -9,7 +9,7 @@ import {
 import { CommonModule } from "@angular/common";
 import { Data } from "plotly.js-dist-min";
 import * as Plotly from "plotly.js-dist-min";
-import * as Moment from "moment";
+import Moment from "moment";
 import { extendMoment } from "moment-range";
 import { ReportFilter } from "src/app/reports/interfaces/report-filter.interface";
 import {
