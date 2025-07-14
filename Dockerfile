@@ -60,8 +60,6 @@ COPY --chown=node:node . .
 
 RUN npm run build
 
-# RUN npm prune --omit=dev --omit=peer
-
 ###################
 # PRODUCTION
 ###################
@@ -87,6 +85,8 @@ COPY --chown=node:node --from=build /home/node/app/dist ${APP_DIR}/dist
 
 WORKDIR ${APP_DIR}
 
+
+EXPOSE 3000
 
 # Start the server using the production buildc
 CMD [ "node", "dist/main.js" ]
