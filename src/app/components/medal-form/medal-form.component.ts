@@ -1,17 +1,14 @@
 import { CommonModule } from "@angular/common";
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import {
-  FormBuilder,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from "@angular/forms";
-import { ToastrModule } from "ngx-toastr";
+import { FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { ToastrModule, ToastrService } from "ngx-toastr";
 import { CalendarModule } from "primeng/calendar";
-import { MultiSelectModule } from "primeng/multiselect";
+import { takeUntil, tap } from "rxjs";
 import { MedalDef } from "src/app/models/medal-def.model";
 import { Term } from "src/app/models/term.model";
+import { SelectionModel } from "@angular/cdk/collections";
+import { createDestroyObservable } from "projects/apicuron-util/src/lib/util/destroy-observable";
+import { SelectActivitiesComponent } from "../select-activities/select-activities.component";
 
 @Component({
   selector: "medal-form",
@@ -23,25 +20,23 @@ import { Term } from "src/app/models/term.model";
     FormsModule,
     ReactiveFormsModule,
     ToastrModule,
-    MultiSelectModule,
+    SelectActivitiesComponent,
     CalendarModule,
   ],
 })
 export class MedalFormComponent implements OnInit {
-  constructor(protected formBuilder: FormBuilder) {}
+  constructor(
+    protected formBuilder: FormBuilder,
+    protected toastr: ToastrService
+  ) {}
+
+  destroy$ = createDestroyObservable();
   ngOnInit(): void {
     if (!this.medal.resource_id) {
       throw new Error("Medal Resource id missing");
     }
     if (this.type == "update") {
-      this.form.setValue({
-        name: this.medal.name ?? null,
-        list_terms: this.medal.list_terms ?? null,
-        color: this.medal.color ?? null,
-        score_relative: this.medal.score_relative ?? null,
-        first_day: this.medal.first_day ?? null,
-        last_day: this.medal.last_day ?? null,
-      });
+      MedalDef.buildUpdateMedalForm(this.form, this.medal);
     }
   }
 
@@ -63,22 +58,7 @@ export class MedalFormComponent implements OnInit {
 
   @Output() closeForm = new EventEmitter<void>();
 
-  form: FormGroup = this.formBuilder.group({
-    color: [
-      "gold",
-      [
-        Validators.required,
-        Validators.pattern(
-          /(^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$)|^bronze$|^gold$|^silver$/
-        ),
-      ],
-    ],
-    score_relative: [1, [Validators.required, Validators.min(1)]],
-    first_day: [null, []],
-    last_day: [null, []],
-    name: ["", [Validators.required]],
-    list_terms: [[], [Validators.required]],
-  });
+  form = MedalDef.buildCreateMedalForm(this.formBuilder);
 
   submit() {
     if (this.form.valid) {
@@ -86,6 +66,8 @@ export class MedalFormComponent implements OnInit {
       const medalDef = new MedalDef().deserialize(medalValue);
 
       this.formResult.emit({ medal: medalDef, operation: this.type });
+    } else {
+      this.toastr.error(`Please fill all required fields`, "Form Error");
     }
   }
   onClose() {

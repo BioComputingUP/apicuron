@@ -23,6 +23,7 @@ import { startWith, takeUntil, tap } from "rxjs/operators";
 import { Term } from "src/app/models/term.model";
 import { slugifyFieldFromAnother } from "../../util/form-reactivity";
 import { BadgeDef } from "../../models/badge-def.model";
+import { SelectActivitiesComponent } from "../select-activities/select-activities.component";
 
 @Component({
   standalone: true,
@@ -33,6 +34,7 @@ import { BadgeDef } from "../../models/badge-def.model";
     MultiSelectModule,
     CalendarModule,
     ToastrModule,
+    SelectActivitiesComponent,
   ],
   templateUrl: "./badge-form.component.html",
   styleUrls: ["./badge-form.component.scss"],

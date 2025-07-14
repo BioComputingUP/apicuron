@@ -1,0 +1,11 @@
+<div
+  *ngFor="let term of (inputActivities$ | async); let i = index"
+  class="tw-block tw-flex-grow tw-w-full tw-mb-1"
+>
+  <activity-list-element
+    [term]="term"
+    [disabled]="disabledState$| async"
+    [isSelected]="termSelector.isSelected(term)"
+    (selectionUpdated)="selectionUpdated($event, term)"
+  ></activity-list-element>
+</div>

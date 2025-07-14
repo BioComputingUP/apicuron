@@ -17,7 +17,7 @@ export class Term implements Deserializable, Serializable {
       activity_category: this.category,
       score: this.score,
       description: this.description,
-    }
+    };
   }
   category: TermCategory;
   activity_term: string;
@@ -26,6 +26,13 @@ export class Term implements Deserializable, Serializable {
   description: string;
   score: number;
   resource_id: string;
+
+  equals(other: Term): boolean {
+    return (
+      this.activity_term === other.activity_term &&
+      this.resource_id === other.resource_id
+    );
+  }
 
   deserialize(input: any): this {
     this.category = input.activity_category;

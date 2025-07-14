@@ -17,6 +17,9 @@ export class TermCardComponent implements OnInit {
   @Input()
   term: Term;
 
+  @Input()
+  compact: boolean = false;
+
   categoryColor(){
     const converter = {
       'tw-text-green-100 tw-bg-generation': 'generation',

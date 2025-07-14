@@ -69,7 +69,7 @@ export class ManageMedalsComponent implements OnInit {
       switchMap(({ resource_id }) =>
         this.termsService.getTerms({ resource_id })
       ),
-      map((terms: Term[]) => this.groupTerms(terms)),
+      // map((terms: Term[]) => this.groupTerms(terms)),
       shareReplay()
     );
 
