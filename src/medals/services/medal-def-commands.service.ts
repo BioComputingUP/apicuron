@@ -1,6 +1,7 @@
 import {
 	BadRequestException,
 	Injectable,
+	Logger,
 	NotFoundException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -23,6 +24,7 @@ import { MedalDefUpdatedEvent } from '../events/medal-def-updated.event';
 
 @Injectable()
 export class MedalDefCommandsService {
+	logger = new Logger(MedalDefCommandsService.name);
 	constructor(
 		@InjectModel(MedalDef.name)
 		protected medalDefModel: Model<MedalDefDocument>,
@@ -45,6 +47,8 @@ export class MedalDefCommandsService {
 				`Medal ${name} for ${resource_id} and league: ${currentLeague} not found`,
 			);
 		}
+
+		this.logger.debug(`Here`);
 
 		const medal: MedalDefDocument | null =
 			await this.medalDefModel.findOneAndUpdate(

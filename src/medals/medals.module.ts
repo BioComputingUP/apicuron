@@ -13,6 +13,7 @@ import { ComputeMedalsService } from './services/compute-medals.service';
 import { EarnedMedalsService } from './services/earned-medals.service';
 import { MedalsController } from './controllers/medals.controller';
 import { MedalsQueryService } from './services/medals-query.service';
+import { FixMedalDefStateCommand } from './commands/fix-medaldef-state.command';
 
 @Module({
 	imports: [CoreApicuronModule, AuthModule, ResourcesModule],
@@ -26,6 +27,7 @@ import { MedalsQueryService } from './services/medals-query.service';
 		EarnedMedalsService,
 		MedalAggregatorService,
 		MedalsQueryService,
+		FixMedalDefStateCommand,
 	],
 	exports: [MedalAggregatorService, EarnedMedalsService],
 	controllers: [MedalsDefController, MedalsController],
