@@ -2,10 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { IEventHandler } from '@nestjs/cqrs';
 import { Aggregator } from '../interfaces/aggregator.interface';
 import { OnEvent } from '@nestjs/event-emitter';
-import {
-	ITermDeletedEventPayload,
-	TermDeletedEvent,
-} from '../../terms/events/events';
+import { TermDeletedEvent } from '../../terms/events/events';
 import { SubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
 
 @Injectable()
