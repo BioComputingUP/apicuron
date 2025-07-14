@@ -53,7 +53,7 @@
                 <div class="tw-flex-none tw-font-bold tw-text-base sm:tw-text-lg sm:tw-w-32">Social Links</div>
                 <div class="tw-ml-2 tw-flex tw-justify-center tw-flex-wrap">
                     <a *ngFor="let link of orcid_links" class="tw-text-blue-500 tw-cursor-pointer tw-underline tw-mr-3"
-                        [href]="link.url.href">
+                        [href]="link.url">
                         <ng-container *ngIf="!link.error">
                             <img [src]="'assets/social-links/' + link.name + '.svg'"
                                 (mouseenter)="openTooltip($event, link.name)" (mouseleave)="closeTooltip()"
