@@ -34,3 +34,27 @@ COPY --chown=node:node ./package*.json ${APP_DIR}/
 
 # run the app in the development server
 CMD ["npm", "run", "start-dev-external"]
+
+FROM node:iron-bullseye-slim AS build
+
+RUN apt-get update && apt-get install -y git && apt-get clean && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+
+COPY package.json yarn.lock ./
+
+RUN yarn install --frozen-lockfile --verbose
+
+COPY . .
+
+RUN yarn build
+
+
+
+FROM nginx:alpine3.21 AS production
+
+
+COPY --chown=nginx:nginx --from=build /app/dist/apicuron-ui /usr/share/nginx/html
+
+EXPOSE 8080
+
+CMD ["nginx", "-g", "daemon off;"]
