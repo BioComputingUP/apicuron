@@ -51,8 +51,7 @@ export class ReportsByDateChartComponent implements OnDestroy, AfterViewInit {
   constructor(
     protected reports: ReportsService,
     protected resourceService: ResourcesService
-  ) {
-  }
+  ) {}
 
   ngAfterViewInit(): void {
     combineLatest([this.plotData$, this.plotLayout$])
@@ -169,12 +168,12 @@ export class ReportsByDateChartComponent implements OnDestroy, AfterViewInit {
     autosize: true,
     barmode: "stack",
     xaxis: {
-      title: "Days",
+      title: { text: "Days" },
     },
     yaxis: {
-      title: "Contributions",
+      title: { text: "Contributions" },
       autorange: true,
-      autotick: true,
+      tickmode: "auto", // https://github.com/plotly/plotly.js/pull/7236/commits/0d02ec4bfd02f940766b4bd206d72ce452eb301f
       // dtick: 1,
       // range: [0, null],
     },
