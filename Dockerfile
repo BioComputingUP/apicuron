@@ -1,4 +1,5 @@
 # Global Arguments for all build stages
+ARG NODE_VERSION=iron-bullseye-slim
 ARG APP_DIR=/home/node/app
 ARG UID
 ARG GID
@@ -6,7 +7,7 @@ ARG GID
 # BUILD FOR LOCAL DEVELOPMENT
 ###################
 
-FROM node:16.14.2-buster-slim AS development
+FROM node:${NODE_VERSION} AS local
 
 ARG APP_DIR
 ARG UID
@@ -61,16 +62,14 @@ COPY --chown=node:node . .
 RUN npm run build
 
 ###################
-# PRODUCTION
+# RUNTIME (PRODUCTION & DEV)
 ###################
 
-FROM node:iron-bullseye-slim AS production
+FROM node:${NODE_VERSION} AS runtime
 
 ARG APP_DIR=/home/node/app
 ARG UID
 ARG GID
-ENV NODE_ENV=production
-
 
 # change node uid and gid to the defined one
 RUN groupmod -g ${GID} node && \
@@ -78,15 +77,23 @@ RUN groupmod -g ${GID} node && \
 
 USER node
 
-
-
 COPY --chown=node:node --from=build /home/node/app/node_modules ${APP_DIR}/node_modules
 COPY --chown=node:node --from=build /home/node/app/dist ${APP_DIR}/dist
 
 WORKDIR ${APP_DIR}
 
-
 EXPOSE 3000
 
-# Start the server using the production buildc
 CMD [ "node", "dist/main.js" ]
+
+###################
+# PRODUCTION
+###################
+FROM runtime AS production
+ENV NODE_ENV=production
+
+###################
+# DEV SERVER
+###################
+FROM runtime AS dev
+ENV NODE_ENV=development
