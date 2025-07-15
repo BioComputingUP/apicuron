@@ -1,11 +1,13 @@
 {
-    "prettier.prettierPath": "",
-    "editor.insertSpaces": false,
-    "editor.detectIndentation": true,
-    "editor.stickyScroll.enabled": false,
-    "javascript.inlayHints.functionLikeReturnTypes.enabled": true,
-    "javascript.inlayHints.propertyDeclarationTypes.enabled": true,
-    "javascript.inlayHints.enumMemberValues.enabled": true,
-    "javascript.inlayHints.parameterNames.enabled": "literals",
-    "javascript.inlayHints.parameterTypes.enabled": true
+  // "prettier.prettierPath": "",
+  // "editor.insertSpaces": false,
+  // "editor.detectIndentation": true,
+  // "editor.stickyScroll.enabled": false,
+  // "javascript.inlayHints.functionLikeReturnTypes.enabled": true,
+  // "javascript.inlayHints.propertyDeclarationTypes.enabled": true,
+  // "javascript.inlayHints.enumMemberValues.enabled": true,
+  // "javascript.inlayHints.parameterNames.enabled": "literals",
+  // "javascript.inlayHints.parameterTypes.enabled": true
+
+  "typescript.tsdk": "apicuron-ws/node_modules/typescript/lib"
 }

@@ -1,0 +1,27 @@
+
+services:
+  apicuron-ws:
+    build:
+      context: "./apicuron-ws"
+      target: production
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+      tags:
+        - registry.biocomputingup.it/apicuron-ws:latest
+        - registry.biocomputingup.it/apicuron-ws:${CURRENT_HASH:-latest}
+    image: registry.biocomputingup.it/apicuron-ws:latest
+    restart: "no"
+  
+  apicuron-ui:
+    build:
+      context: "./apicuron-ui"
+      target: build
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+      tags:
+        - registry.biocomputingup.it/apicuron-ui:latest
+        - registry.biocomputingup.it/apicuron-ui:${CURRENT_HASH:-latest}
+    image: registry.biocomputingup.it/apicuron-ui:latest
+    restart: "no"

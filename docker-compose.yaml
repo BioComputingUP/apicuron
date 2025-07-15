@@ -6,8 +6,8 @@ services:
       context: "./apicuron-ws"
       target: development
       args:
-        - UID=1000
-        - GID=1000
+        - UID=1002
+        - GID=1002
     image: "apicuron-ws:dev" 
     working_dir: "/home/node/app"
     user: $DOCKER_USER
@@ -42,8 +42,8 @@ services:
       context: "./apicuron-ui"
       target: development
       args:
-        - UID=1000
-        - GID=1000
+        - UID=1002
+        - GID=1002
       
       # tags:
       #  - "apicuron-ui:dev"
