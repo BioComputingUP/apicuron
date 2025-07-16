@@ -1,35 +1,18 @@
-version: "3.0"
 services:
   apicuron-webserver:
     container_name: apicuron-webserver
-    # image: registry.biocomputingup.it/apicuron-ws:latest
-    image: apicuron-ws:latest
-    build:
-      context: "./apicuron-ws"
-      target: production
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
-    environment:
+    image: registry.biocomputingup.it/apicuron-ws:prod
+    environment: # !! This one overrides any variables set inside env files listed in attribute `env_file` below
       - NODE_ENV=production
-      - PORT=3000
+    # env_file: # Add this if you want to override configuration
+    #   - prod.env
     restart: "unless-stopped"
       
 
   
-  apicuron-proxy:
-  
-    # image: registry.biocomputingup.it/apicuron-ui:latest
-
-    # This is for the sake of debugging. use above image in production.
-    image: apicuron-proxy:latest
-    container_name: apicuron-proxy
-    build:
-      context: "./apicuron-ui"
-      target: production
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
+  apicuron-proxy-ui:
+    image: registry.biocomputingup.it/apicuron-ui:dev    
+    container_name: apicuron-proxy-ui
     environment:
       - NODE_ENV=production
     volumes:

@@ -4,7 +4,7 @@ services:
     container_name: apicuron-webserver
     build:
       context: "./apicuron-ws"
-      target: development
+      target: local
       args:
         - UID=1002
         - GID=1002
@@ -40,13 +40,13 @@ services:
     container_name: apicuron-ui
     build:
       context: "./apicuron-ui"
-      target: development
+      target: local
       args:
         - UID=1002
         - GID=1002
       
-      # tags:
-      #  - "apicuron-ui:dev"
+    # tags:
+    #  - "apicuron-ui:dev"
     image: "apicuron-ui:dev" 
     working_dir: "/home/node/app"
     # image: "node:16.14"
@@ -62,14 +62,14 @@ services:
     image: "nginx:latest"
     volumes:
       - "./nginx.conf:/etc/nginx/conf.d/default.conf"
-      # - "./proxy/error.log:/var/log/nginx/error.log" TODO: Fix Bind mount issue,
-      # nginx  automatically creates an error.log folder on ./proxy instead of a file and then fails to read it
+    # - "./proxy/error.log:/var/log/nginx/error.log" TODO: Fix Bind mount issue,
+    # nginx  automatically creates an error.log folder on ./proxy instead of a file and then fails to read it
     networks:
       - apicuron-network
     depends_on:
       - apicuron-ui
       - apicuron-ws
-      # - apicuron-docs
+    # - apicuron-docs
     ports:
       - 3000:3000
   
@@ -83,19 +83,19 @@ services:
     ports:
       - 27017:27017
 
-  # apicuron-docs:
-  #   container_name: apicuron-docs
-  #   working_dir: "/home/node/app"
-  #   image: "node:16.14"
-  #   volumes:
-  #     - "./docs:/home/node/app"
-  #   user: $DOCKER_USER
-  #   networks:
-  #     - apicuron-network
-  #   ports:
-  #     - "8080:8080"
-  #   # dns: 10.69.69.1
-  #   command: "npm run dev"
+# apicuron-docs:
+#   container_name: apicuron-docs
+#   working_dir: "/home/node/app"
+#   image: "node:16.14"
+#   volumes:
+#     - "./docs:/home/node/app"
+#   user: $DOCKER_USER
+#   networks:
+#     - apicuron-network
+#   ports:
+#     - "8080:8080"
+#   # dns: 10.69.69.1
+#   command: "npm run dev"
 
 
 networks:
