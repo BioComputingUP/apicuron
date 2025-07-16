@@ -32,7 +32,9 @@ import { UpdateMedalDefDto } from '../dto/update-medal-def.dto';
 import { MedalDefCommandsService } from '../services/medal-def-commands.service';
 import { MedalDefQueriesService } from '../services/medal-def-queries.service';
 import { MedalDefFilter } from '../dto/filter-medal-def.dto';
-import { MedalDefDto } from '../dto/medal.dto';
+import { MedalDefDto, MedalDto } from '../dto/medal.dto';
+import { firstValueFrom } from 'rxjs';
+import { BasePaginationDto } from 'src/pagination/dto/paginate.dto';
 
 @ApiTags('Achievements Definition')
 @ApiHeader(VersionHeader)
@@ -125,5 +127,25 @@ export class MedalsDefController {
 	async delete_medal(@Param() delete_medal: DeleteMedalDefDto, @Req() req) {
 		this.can_edit_resource(req.user, delete_medal.resource_id);
 		return await this.commandsService.deleteMedalDef(delete_medal);
+	}
+
+	@AuthProtected()
+	@Post('test')
+	async loadMedalsForDef(@Body() medalDef: CreateMedalDefDto) {
+		const medals$ = await this.commandsService.makePutativeMedals(
+			medalDef,
+			0,
+			10,
+		);
+		let medals: MedalDefDto[] = [];
+		try {
+			medals = await firstValueFrom(medals$);
+		} catch (err) {}
+
+		const pagination = new BasePaginationDto();
+		pagination.skip = 0;
+		pagination.limit = 10;
+
+		return paginate<MedalDto>(MedalDto, medals, pagination, 35);
 	}
 }

@@ -1,9 +1,19 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import {
+	FilterQuery,
+	HydratedDocument,
+	Model,
+	ProjectionType,
+	QueryOptions,
+} from 'mongoose';
 import { AchievementType, PrivacyType } from '../../enums';
 import { IResourceEntity } from '../../interfaces/user-resource-entity';
 
+export type AchievementDefModel = Model<AchievementDef>;
 export type AchievementDefDocument = HydratedDocument<AchievementDef>;
+export type AchievementDefFilter = FilterQuery<AchievementDef>;
+export type AchievementDefProjection = ProjectionType<AchievementDef>;
+export type AchievementDefQueryOptions = QueryOptions<AchievementDef>;
 
 @Schema({
 	collection: 'achievements_def',

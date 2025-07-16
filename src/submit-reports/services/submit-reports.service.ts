@@ -8,7 +8,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { DeleteResult } from 'mongodb';
 import { InsertManyResult, Model } from 'mongoose';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
+import { ReportModel, ReportDocument, Report } from '../../core/schemas/reports.schema';
 import { SubmitReportDto, SubmitReportsDto } from '../dto/submit-report.dto';
 import {
 	AllResourceReportsDeletedEvent,
@@ -23,20 +23,20 @@ import { MongoServerError } from 'mongodb';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { ReportValidatorService } from './report-validator.service';
 type InsertManyReportsResult = Omit<InsertManyResult<Report>, 'insertedIds'> & {
-	reports: ReportDocument[];
+	reports: Report[];
 	deletedReports: { [keyof: string]: DeleteResult };
-	callback: () => any | Promise<any>;
+	callback: () => void | Promise<void>;
 };
 type InsertReportResult = {
-	report: ReportDocument;
-	callback: () => any | Promise<any>;
+	report: Report;
+	callback: () => void | Promise<void>;
 };
 
 type InsertOptions<def extends boolean = false> = { preventEvents: def };
 @Injectable()
 export class SubmitReportService {
 	constructor(
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
+		@InjectModel(Report.name) protected reportModel: ReportModel,
 		protected eventEmitter: EventEmitter2,
 		protected resourceService: PartnerResourcesService,
 		protected reportValidator: ReportValidatorService,
@@ -111,7 +111,7 @@ export class SubmitReportService {
 		try {
 			const { resource, user, term, report, league_data } =
 				await this.reportValidator.validateReport(submittedReport);
-			await report.save();
+			await this.reportModel.create(report);
 
 			const emitEvent = async () => {
 				const payload: IReportSubmittedEventPayload = {
@@ -127,7 +127,7 @@ export class SubmitReportService {
 				await emitEvent();
 			}
 			return { report, callback: emitEvent };
-		} catch (error: any) {
+		} catch (error) {
 			if (error instanceof MongoServerError && error.code === 11000) {
 				this.logger.error(`Attempt at duplicate report insertion`);
 				// Duplicate key error, return 403
@@ -188,7 +188,7 @@ export class SubmitReportService {
 			const emitEvent = async () => {
 				await this.eventEmitter.emitAsync(ManyReportsSubmittedEvent, {
 					reports: reportDocuments,
-					users: validatedReports.map((r) => r.user),
+					users: validatedReports.map((r) => r?.user),
 					resources: validatedReports.map((r) => r.resource),
 					terms: validatedReports.map((r) => r.term),
 				} as IManyReportsSubmittedEventPayload);
@@ -210,7 +210,14 @@ export class SubmitReportService {
 					callback: emitEvent,
 				};
 			}
-		} catch (err: any) {
+		} catch (err) {
+			if (!err || !(err instanceof Error)) {
+				this.logger.error(
+					`An unknown error occurred during report insertion`,
+					err,
+				);
+				return;
+			}
 			if (err instanceof MongoServerError && err.code === 11000) {
 				this.logger.error(`Attempt at duplicate report insertion`);
 				// Duplicate key error, return 403

@@ -1,23 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { IEventHandler } from '@nestjs/cqrs';
-import { Aggregator } from '../interfaces/aggregator.interface';
 import { OnEvent } from '@nestjs/event-emitter';
-import { UserRepository } from '../../core/repositories/user.repository';
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
-import { UserDocument } from '../../core/schemas/user.schema';
+import {
+	UserCreatedEvent,
+	UserUpdatedEvent,
+} from '../../core/repositories/user.repository';
 import { SubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
+import { Aggregator } from '../interfaces/aggregator.interface';
 
 @Injectable()
 export class UserUpdatedEventHandler implements IEventHandler {
 	constructor(protected aggregatorRunner: SubmissionRunner) {}
 
-	@OnEvent(UserRepository.EntityUpdatedEvent, { promisify: true, async: true })
-	@OnEvent(UserRepository.EntityCreatedEvent, { promisify: true, async: true })
-	async handle(
-		payload:
-			| EntityCreatedEvent<UserDocument>
-			| EntityUpdatedEvent<UserDocument>,
-	) {
+	@OnEvent(UserUpdatedEvent.name, { promisify: true, async: true })
+	@OnEvent(UserCreatedEvent.name, { promisify: true, async: true })
+	async handle(payload: UserCreatedEvent | UserUpdatedEvent) {
 		return await this.aggregatorRunner.run(async (aggregator: Aggregator) => {
 			return await aggregator.updatedUser(payload);
 		});

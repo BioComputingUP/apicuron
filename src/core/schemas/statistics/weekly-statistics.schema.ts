@@ -1,5 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, LeanDocument, Types } from 'mongoose';
+import {
+	FilterQuery,
+	HydratedDocument,
+	LeanDocument,
+	Model,
+	ProjectionType,
+	QueryOptions,
+	Types,
+} from 'mongoose';
 import { IUserLeagueEntity } from 'src/util/privacy.helper';
 import { PrivacyType } from '../../enums';
 import { IUserResourceEntity } from '../../interfaces/user-resource-entity';
@@ -14,12 +22,16 @@ type WeeklyStatisticsDocumentOverride = {
 	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;
 	league_data: Types.Subdocument<Types.ObjectId> & League;
 };
-export type WeeklyStatisticsDocument = HydratedDocument<
+export type WeeklyStatisticsModel = Model<
 	WeeklyStatistics,
+	{},
 	WeeklyStatisticsDocumentOverride
 >;
-export type LeanWeeklyStatisticsDocument =
-	LeanDocument<WeeklyStatisticsDocument>;
+export type LeanWeeklyStatisticsDoc = LeanDocument<WeeklyStatistics>;
+export type WeeklyStatisticsDocument = HydratedDocument<WeeklyStatistics>;
+export type WeeklyStatisticsFilter = FilterQuery<WeeklyStatistics>;
+export type WeeklyStatisticsProjection = ProjectionType<WeeklyStatistics>;
+export type WeeklyStatisticsQueryOptions = QueryOptions<WeeklyStatistics>;
 
 @Schema({
 	collection: 'weekly_statistics',

@@ -9,6 +9,7 @@ import { Model } from 'mongoose';
 import {
 	BadgeDef,
 	BadgeDefDocument,
+	BadgeDefModel,
 } from '../../core/schemas/achievements-def/badge-def.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { assignResourceEntityPrivacy } from '../../util/privacy.helper';
@@ -23,7 +24,7 @@ import { BadgeDefUpdatedEvent } from '../events/badge-def-updated.event';
 export class BadgeDefCommandsService {
 	constructor(
 		@InjectModel(BadgeDef.name)
-		protected badgeDefModel: Model<BadgeDefDocument>,
+		protected badgeDefModel: BadgeDefModel,
 		protected eventEmitter: EventEmitter2,
 		protected resourceService: PartnerResourcesService,
 	) {}

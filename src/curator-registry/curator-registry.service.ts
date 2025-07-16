@@ -10,13 +10,14 @@ import {
 	ContributionEntryDocument,
 	CuratorRegistryEntry,
 	CuratorRegistryEntryDocument,
+	CuratorRegistryEntryModel,
 	LeanContributionEntryDocument,
 	LeanCuratorRegistryEntryDocument,
 } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { PartnerResourcesService } from 'src/resources/partner-resources/services/partner-resources.service';
 import { GetRegistryEntryDto } from './dto/registry-entries.dto';
 import { UserRepository } from 'src/core/repositories/user.repository';
-import { Report, ReportDocument } from 'src/core/schemas/reports.schema';
+import { Report, ReportDocument, ReportModel } from 'src/core/schemas/reports.schema';
 import { User } from 'src/core/schemas/user.schema';
 import { League, LeagueDocument, PartnerResource } from 'src/core/schemas';
 import { PrivacyType } from 'src/core/enums';
@@ -25,8 +26,8 @@ import * as _ from 'lodash';
 export class CuratorRegistryService {
 	constructor(
 		@InjectModel(CuratorRegistryEntry.name)
-		protected registryEntryModel: Model<CuratorRegistryEntryDocument>,
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
+		protected registryEntryModel: CuratorRegistryEntryModel,
+		@InjectModel(Report.name) protected reportModel: ReportModel,
 		protected userRep: UserRepository,
 		protected resourceService: PartnerResourcesService,
 	) {}

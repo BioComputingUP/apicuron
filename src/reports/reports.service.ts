@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { mapKeys, pick } from 'lodash';
 import { FilterQuery, Model, PipelineStage, QueryOptions } from 'mongoose';
 import { UsersService } from '../auth/users/services/users.service';
-import { Report, ReportDocument } from '../core/schemas/reports.schema';
+import { ReportModel, Report, ReportDocument } from '../core/schemas/reports.schema';
 import { paginate } from '../pagination/paginator';
 import { PartnerResourcesService } from '../resources/partner-resources/services/partner-resources.service';
 import { TermsService } from '../terms/terms.service';
@@ -13,7 +13,7 @@ import { ReportWithTermDto } from './dto/report.dto';
 export class ReportsService {
 	constructor(
 		@InjectModel(Report.name)
-		private reportModel: Model<ReportDocument>,
+		private reportModel: ReportModel,
 		protected partnerResourcesService: PartnerResourcesService,
 		protected userService: UsersService,
 		protected termsService: TermsService,

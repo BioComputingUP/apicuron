@@ -1,4 +1,4 @@
-import { FilterQuery } from 'mongoose';
+import { FilterQuery, LeanDocument } from 'mongoose';
 import { MedalDefDocument } from '../../core/schemas/achievements-def/medal-def.schema';
 import { MedalDocument } from '../../core/schemas/achievements/medals.schema';
 import {
@@ -43,7 +43,7 @@ export function GetRelatedMedalDefFilter(
 }
 
 export function GetrelatedReportFilter(
-	medalDef: MedalDefDocument,
+	medalDef: MedalDefDocument | LeanDocument<MedalDefDocument>,
 ): FilterQuery<ReportDocument> {
 	const timestampFilter: { $lte?: Date; $gte?: Date } = {};
 	if (medalDef.last_day) {

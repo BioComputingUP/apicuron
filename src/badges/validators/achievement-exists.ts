@@ -9,6 +9,7 @@ import { NotFoundException } from '@nestjs/common';
 import {
 	AchievementDef,
 	AchievementDefDocument,
+	AchievementDefModel,
 } from '../../core/schemas/achievements-def/achievement-def.schema';
 
 @ValidatorConstraint({ name: 'AchievementExists', async: true })
@@ -17,7 +18,7 @@ abstract class AbstractAchievementUnique
 {
 	constructor(
 		@InjectModel(AchievementDef.name)
-		private achievementDefModel: Model<AchievementDefDocument>,
+		private achievementDefModel: AchievementDefModel,
 	) {}
 
 	type: string;

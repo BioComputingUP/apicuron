@@ -1,19 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
-import { BadgeDefDeletedEvent } from '../events/badge-def-deleted.event';
 import { InjectModel } from '@nestjs/mongoose';
 import {
-	Badge,
-	BadgeDocument,
+	Badge, BadgeModel
 } from '../../core/schemas/achievements/badges.schema';
-import { Model } from 'mongoose';
 import { ResourceBadgesUpdatedEvent } from '../events/badge-count-updated.event';
+import { BadgeDefDeletedEvent } from '../events/badge-def-deleted.event';
 
 @Injectable()
 export class BadgeDefDeletedEventHandler {
 	logger = new Logger(BadgeDefDeletedEventHandler.name);
 	constructor(
-		@InjectModel(Badge.name) protected badgeModel: Model<BadgeDocument>,
+		@InjectModel(Badge.name) protected badgeModel: BadgeModel,
 		protected eventEmitter: EventEmitter2,
 	) {}
 

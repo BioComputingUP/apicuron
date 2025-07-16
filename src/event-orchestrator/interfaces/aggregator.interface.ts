@@ -1,25 +1,26 @@
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { UserCreatedEvent, UserUpdatedEvent } from 'src/core/repositories/user.repository';
 import {
 	LeanReportDocument,
+	Report,
 	ReportDocument,
 } from '../../core/schemas/reports.schema';
-import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-import { TermDocument } from '../../core/schemas/terms.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
+import { PartnerResource, PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { Term, TermDocument } from '../../core/schemas/terms.schema';
+import { User, UserDocument } from '../../core/schemas/user.schema';
 import { PartnerResourceUpdatedEvent } from '../../resources/partner-resources/events/resource-updated.event';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
 
 export interface Aggregator {
 	applyReport(
-		report: LeanReportDocument | ReportDocument,
-		term: TermDocument,
-		resource: PartnerResourceDocument,
-		curator?: UserDocument,
+		report: Report,
+		term: Term,
+		resource: PartnerResource,
+		curator?: User,
 	): Promise<void>;
 	applyAllReports(resource_id: string): Promise<void> | void;
 	removeAllResourceAggregates(resource_id: string): Promise<void> | void;
 	updatedUser(
-		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
+		event: UserCreatedEvent | UserUpdatedEvent,
 	): Promise<void> | void;
 	deleteLeague(resource_id: string, league: string): Promise<number> | number;
 	updatedLeague(leagueUpdated: LeagueUpdatedEvent): Promise<number> | number;

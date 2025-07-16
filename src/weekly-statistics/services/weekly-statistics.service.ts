@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { plainToInstance } from 'class-transformer';
 import * as moment from 'moment-timezone';
-import { FilterQuery, LeanDocument, Model, QueryOptions } from 'mongoose';
-import { UserDocument } from 'src/core/schemas';
+import { FilterQuery, QueryOptions } from 'mongoose';
+import { User } from 'src/core/schemas';
 import { UsersService } from '../../auth/users/services/users.service';
 import {
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	WeeklyStatistics,
 	WeeklyStatisticsDocument,
+	WeeklyStatisticsFilter,
+	WeeklyStatisticsModel,
 } from '../../core/schemas/statistics/weekly-statistics.schema';
 import { getWeekEnd, getWeekStart, TIMEZONE } from '../../util/date.helper';
 import { WeeklyStatisticsDto } from '../dto/weekly-statistics.dto';
@@ -17,7 +18,7 @@ import { WeeklyStatisticsDto } from '../dto/weekly-statistics.dto';
 export class WeeklyStatisticsService {
 	constructor(
 		@InjectModel(WeeklyStatistics.name)
-		protected WeeklyStatistics: Model<WeeklyStatisticsDocument>,
+		protected WeeklyStatistics: WeeklyStatisticsModel,
 		protected userService: UsersService,
 	) {}
 
@@ -30,12 +31,12 @@ export class WeeklyStatisticsService {
 	}
 
 	async getWeeklyLeaderboard(
-		filter: FilterQuery<WeeklyStatisticsDocument> = {},
+		filter: WeeklyStatisticsFilter = {},
 		queryOptions: QueryOptions,
 	): Promise<{
 		data: {
-			stat: LeanDocument<WeeklyStatisticsDocument>;
-			user: LeanDocument<UserDocument>;
+			stat: WeeklyStatistics;
+			user: User;
 		}[];
 		count: number;
 	}> {
@@ -59,12 +60,16 @@ export class WeeklyStatisticsService {
 		const orcid_ids = statistics.map((stat) => stat.curator_orcid);
 		const users = await this.userService.getUsersByOrcid(orcid_ids);
 
-		const statLeaderboard = statistics.map((stat, index) => {
-			const user: UserDocument = users[index];
-			const leaderboardEntry = { stat: stat.toObject(), user: user.toObject() };
+		const statLeaderboard: { stat: WeeklyStatistics; user: User }[] =
+			statistics.map((stat, index) => {
+				const user = users[index];
+				const leaderboardEntry = {
+					stat: stat,
+					user: user,
+				};
 
-			return leaderboardEntry;
-		});
+				return leaderboardEntry;
+			});
 
 		return { data: statLeaderboard, count };
 	}

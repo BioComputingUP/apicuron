@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { TIMEZONE } from '../../util/date.helper';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery, Aggregate } from 'mongoose';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
+import { ReportModel, Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { AggregatedReportsMonthly } from '../interfaces';
 
 @Injectable()
 export class ReportsMonthlyAggregator {
 	constructor(
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
+		@InjectModel(Report.name) protected reportModel: ReportModel,
 		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
 	) {}
 

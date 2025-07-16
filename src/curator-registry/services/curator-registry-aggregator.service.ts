@@ -5,6 +5,7 @@ import {
 	LeanReportDocument,
 	Report,
 	ReportDocument,
+	ReportModel,
 } from 'src/core/schemas/reports.schema';
 import { TermDocument } from 'src/core/schemas/terms.schema';
 import { User, UserDocument } from 'src/core/schemas/user.schema';
@@ -22,7 +23,7 @@ import { CuratorRegistryService } from '../curator-registry.service';
 @AggregatorClass()
 export class CuratorRegistryAggregatorService implements Aggregator {
 	constructor(
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
+		@InjectModel(Report.name) protected reportModel: ReportModel,
 		protected registryService: CuratorRegistryService,
 		protected userRep: UserRepository,
 	) {}

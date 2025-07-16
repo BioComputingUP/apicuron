@@ -1,9 +1,20 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { FilterQuery, HydratedDocument, Model, ObjectId, ProjectionType, QueryOptions, Types } from 'mongoose';
 import { AchievementState, PrivacyType } from '../../enums';
 import { IUserResourceEntity } from '../../interfaces/user-resource-entity';
+import { User, UserSchema } from '../user.schema';
 
-export type MedalDocument = HydratedDocument<Medal>;
+export type MedalDocumentOverride = {
+	user: (Types.Subdocument<Types.ObjectId> & User) | null;
+};
+
+
+export type MedalModel = Model<Medal, {}, MedalDocumentOverride>;
+export type MedalDocument =  HydratedDocument<Medal, MedalDocumentOverride>;
+export type MedalFilter = FilterQuery<Medal>;
+export type MedalProjection = ProjectionType<Medal>;
+export type MedalQueryOptions = QueryOptions<Medal>;
+
 @Schema({ collection: 'achievements', timestamps: true })
 /**
  * Represents a medal in the system.
@@ -18,6 +29,12 @@ export class Medal implements IUserResourceEntity {
 	 * The date and time when the medal was last updated.
 	 */
 	updatedAt: Date;
+
+	@Prop({
+		required: false,
+		type: UserSchema,
+	})
+	user: User | null;
 
 	/**
 	 * The color of the medal.

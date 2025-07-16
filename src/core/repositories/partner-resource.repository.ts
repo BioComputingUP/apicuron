@@ -1,9 +1,8 @@
-import { Model } from 'mongoose';
 import { EntityRepository } from './entity-repository';
 import { InjectModel } from '@nestjs/mongoose';
 import {
 	PartnerResource,
-	PartnerResourceDocument,
+	PartnerResourceModel,
 } from '../schemas/resource/partner-resource.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
@@ -13,25 +12,25 @@ import {
 	ManyEntityUpdated,
 } from '../events';
 
-export class PartnerResourceRepository extends EntityRepository<PartnerResourceDocument> {
+export class PartnerResourceCreatedEvent extends EntityCreatedEvent<PartnerResource> {}
+export class PartnerResourceUpdatedEvent extends EntityUpdatedEvent<PartnerResource> {}
+export class PartnerResourceDeletedEvent extends EntityDeletedEvent<PartnerResource> {}
+export class ManyPartnerResourceUpdatedEvent extends ManyEntityUpdated<PartnerResource> {}
+export class PartnerResourceRepository extends EntityRepository<
+	PartnerResource,
+	PartnerResourceModel
+> {
 	constructor(
 		@InjectModel(PartnerResource.name)
-		resourceModel: Model<PartnerResourceDocument>,
+		resourceModel: PartnerResourceModel,
 		eventEmitter: EventEmitter2,
 	) {
-		super(resourceModel, eventEmitter);
+		super(resourceModel);
+		this.publisher.pushToEventEmitter(eventEmitter, [
+			[EntityCreatedEvent.name, PartnerResourceCreatedEvent.name],
+			[EntityUpdatedEvent.name, PartnerResourceUpdatedEvent.name],
+			[EntityDeletedEvent.name, PartnerResourceDeletedEvent.name],
+			[ManyEntityUpdated.name, ManyPartnerResourceUpdatedEvent.name],
+		]);
 	}
-
-	static EntityCreatedEvent = EntityCreatedEvent.getModelEventName(
-		PartnerResourceRepository,
-	);
-	static EntityUpdatedEvent = EntityUpdatedEvent.getModelEventName(
-		PartnerResourceRepository,
-	);
-	static EntityDeletedEvent = EntityDeletedEvent.getModelEventName(
-		PartnerResourceRepository,
-	);
-	static ManyEntityUpdatedEvent = ManyEntityUpdated.getModelEventName(
-		PartnerResourceRepository,
-	);
 }

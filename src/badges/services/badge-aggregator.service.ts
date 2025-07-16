@@ -7,19 +7,26 @@ import { AchievementState, PrivacyType } from '../../core/enums';
 import {
 	BadgeDef,
 	BadgeDefDocument,
+	BadgeDefModel,
 } from '../../core/schemas/achievements-def/badge-def.schema';
 import {
 	Badge,
 	BadgeDocument,
+	BadgeModel,
 } from '../../core/schemas/achievements/badges.schema';
 import {
 	LeanReportDocument,
 	Report,
 	ReportDocument,
+	ReportModel,
 } from '../../core/schemas/reports.schema';
 import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
-import { getReportRelatedBadgeDefFilter } from '../helpers/helpers';
+import {
+	getRelatedBadges,
+	getReportRelatedBadgeDefFilter,
+	getReportRelatedBadgeFilter,
+} from '../helpers/helpers';
 
 import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 import { TermDocument } from '../../core/schemas/terms.schema';
@@ -38,9 +45,9 @@ import { ComputeBadgesService } from './compute-badges.service';
 export class BadgeAggregatorService implements Aggregator {
 	constructor(
 		@InjectModel(BadgeDef.name)
-		protected badgeDefModel: Model<BadgeDefDocument>,
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-		@InjectModel(Badge.name) protected badgeModel: Model<BadgeDocument>,
+		protected badgeDefModel: BadgeDefModel,
+		@InjectModel(Report.name) protected reportModel: ReportModel,
+		@InjectModel(Badge.name) protected badgeModel: BadgeModel,
 		protected resourceService: PartnerResourcesService,
 
 		protected computeBadges: ComputeBadgesService,
@@ -159,58 +166,40 @@ export class BadgeAggregatorService implements Aggregator {
 		badgeDef: BadgeDefDocument,
 		report: ReportDocument | LeanReportDocument,
 	): Promise<AchievementState> {
-		try {
-			const badge = await this.badgeModel.findOneAndUpdate(
-				{
-					name: badgeDef.name,
-					curator_orcid: report.curator_orcid,
-					league: badgeDef.league,
-					resource_id: badgeDef.resource_id,
-				},
-				{
-					$inc: { count: 1, progress_rate: 1 / badgeDef.count_threshold },
-					$setOnInsert: {
-						displayedName: badgeDef.displayedName,
-						color_code: badgeDef.color_code,
-						count_threshold: badgeDef.count_threshold,
-						list_terms: badgeDef.list_terms,
-						state:
-							1 >= badgeDef.count_threshold
-								? AchievementState.achieved
-								: AchievementState.progress,
-						league: badgeDef.league,
-						privacy: computeAggregatePrivacyField(badgeDef, report),
-					},
-				},
-				{ upsert: true, new: true },
-			);
-
-			this.logger.log(`Badge ${badge.name} updated, count: ${badge.count} `);
-
-			const prevState = badge.state;
-			badge.state =
-				badge.count >= badge.count_threshold
-					? AchievementState.achieved
-					: AchievementState.progress;
-			if (
-				prevState != badge.state &&
-				badge.state == AchievementState.achieved
-			) {
-				// Badge earned by this report
-
-				badge.achieved_at = report.timestamp;
-				await badge.save();
-
-				await this.eventEmitter.emitAsync(
-					BadgeEarnedEvent.name,
-					new BadgeEarnedEvent(badge),
-				);
-
-				return AchievementState.achieved;
+		const badgeFilter: FilterQuery<BadgeDocument> = {
+			$and: [getReportRelatedBadgeFilter(report), getRelatedBadges(badgeDef)],
+		};
+		const badge = await this.badgeModel.findOne(badgeFilter).lean();
+		if (!badge) {
+			const newBadge = this.computeBadges.initBadgeFromReport(badgeDef, report);
+			try {
+				await this.badgeModel.create(newBadge);
+				this.logger.log(`Badge ${newBadge.name} created`);
+				return newBadge.state;
+			} catch (error) {
+				if (error instanceof MongoServerError && error.code == 11000) {
+					// Duplicate key error
+					// retry operation
+					this.logger.log('Duplicate key error..., retrying');
+					this.logger.error(error.message, error.stack, error.name);
+					return await this.createOrUpdateBadge(badgeDef, report);
+				}
+				throw error;
 			}
+		}
 
-			return AchievementState.progress;
-		} catch (error: any) {
+		const newBadge = this.computeBadges.applyReportOnBadge(badge, report);
+
+		try {
+			const result = await this.badgeModel.replaceOne(badge, newBadge);
+			if (result.modifiedCount === 0) {
+				this.logger.warn(
+					`Badge ${badge.name} not updated, no changes detected. The original badge was modified, retrying...`,
+				);
+				return await this.createOrUpdateBadge(badgeDef, report);
+			}
+			return badge.state;
+		} catch (error) {
 			if (error instanceof MongoServerError && error.code == 11000) {
 				// Duplicate key error
 				// retry operation
@@ -253,11 +242,56 @@ export class BadgeAggregatorService implements Aggregator {
 		return;
 	}
 
+	public async createBadges(
+		badgeDefFilter: FilterQuery<BadgeDefDocument> = {},
+	): Promise<{ badgeCount: number; badgeDefsCount: number }> {
+		let badgeDefCount = 0;
+
+		const badgeDefs = this.badgeDefModel
+			.find(
+				badgeDefFilter,
+				{},
+				{
+					sort: { resource_id: -1, league: -1 },
+				},
+			)
+			.cursor({ batchSize: 100 });
+
+		const userBadgesPromises$ = [];
+
+		for await (const badgeDef of badgeDefs) {
+			badgeDefCount++;
+
+			const badges = this.computeBadges.produceBadgesFromDef(badgeDef);
+
+			const badges$ = [];
+			for await (const badge of badges) {
+				const computeBadge$ = this.badgeModel.create(badge);
+				badges$.push(computeBadge$);
+			}
+
+			userBadgesPromises$.push(Promise.all(badges$));
+
+			this.logger.log(
+				`Badge ${badgeDef.name} computed for ${badges$.length} users`,
+			);
+		}
+
+		await Promise.all(userBadgesPromises$);
+
+		this.logger.log(`Computed ${userBadgesPromises$.length} badges`);
+
+		return {
+			badgeCount: userBadgesPromises$.length,
+			badgeDefsCount: badgeDefCount,
+		};
+	}
+
 	async applyAllReports(resource_id: string) {
 		const badgeDefFilter: FilterQuery<BadgeDefDocument> = {
 			resource_id,
 		};
-		await this.computeBadges.computeBadges(badgeDefFilter);
+		await this.createBadges(badgeDefFilter);
 
 		await this.eventEmitter.emitAsync(
 			ResourceBadgesUpdatedEvent.name,
@@ -303,8 +337,15 @@ export class BadgeAggregatorService implements Aggregator {
 			},
 		);
 		// Recompute the badges that are affected by the term deletion
-		await this.computeBadges.reComputeBadges({
+		await this.reComputeBadges({
 			_id: { $in: affectedIds },
 		});
+	}
+
+	public async reComputeBadges(
+		filter: FilterQuery<BadgeDefDocument>,
+	): Promise<{ badgeCount: number; badgeDefsCount: number }> {
+		await this.badgeModel.deleteMany(filter);
+		return await this.createBadges(filter);
 	}
 }

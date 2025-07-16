@@ -4,7 +4,7 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { getConnectionToken, getModelToken } from '@nestjs/mongoose';
 import { plainToInstance } from 'class-transformer';
-import { random } from 'lodash';
+import { map, random } from 'lodash';
 import { Connection, Model } from 'mongoose';
 import { SubmittedResourcesService } from 'src/resources/submitted-resources/resources.service';
 import { FileUploadDto } from 'src/util/file-upload.helper';
@@ -12,13 +12,14 @@ import { assertNotNull } from 'src/util/type-assertion.helper';
 import { AppModule } from '../app.module';
 import { UsersService } from '../auth/users/services/users.service';
 import { PrivacyType } from '../core/enums';
-import { Report } from '../core/schemas/reports.schema';
+import { ReportModel , Report} from '../core/schemas/reports.schema';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
+	PartnerResourceModel,
 } from '../core/schemas/resource/partner-resource.schema';
 import { Term, TermDocument } from '../core/schemas/terms.schema';
-import { User } from '../core/schemas/user.schema';
+import { User, UserModel } from '../core/schemas/user.schema';
 import {
 	SubmitReportDto,
 	SubmitReportsDto,
@@ -33,9 +34,9 @@ async function bootstrap() {
 	const logger = new Logger('SeederLogger');
 
 	// initialize models
-	const reportModel: Model<Report> = app.get(getModelToken(Report.name));
-	const userModel: Model<User> = app.get(getModelToken(User.name));
-	const resourceModel: Model<PartnerResource> = app.get(
+	const reportModel: ReportModel = app.get(getModelToken(Report.name));
+	const userModel: UserModel = app.get(getModelToken(User.name));
+	const resourceModel: PartnerResourceModel = app.get(
 		getModelToken(PartnerResource.name),
 	);
 	const resourceService: SubmittedResourcesService = app.get(
@@ -53,10 +54,11 @@ async function bootstrap() {
 	const testingOrcidId = '0000-0002-2472-5685';
 
 	// create mock user
-	await userService.createUser({
-		orcid_id: testingOrcidId,
-		privacy: PrivacyType.public,
-	});
+	// TODO: Fix !
+	// await userService.createUser({
+	// 	orcid_id: testingOrcidId,
+	// 	privacy: PrivacyType.public,
+	// });
 
 	const tempResource = await resourceService.create_resource(
 		{
@@ -215,6 +217,13 @@ async function bootstrap() {
 	await app.close();
 }
 
+const randomOrcidIds = map(new Array(30), () => {
+	const randomOrcid = map(new Array(4), () =>
+		('000' + Math.random() * 1000).slice(-4),
+	).join('-');
+	return randomOrcid;
+});
+
 export async function mockReport(
 	userModel: Model<User>,
 	reportModel: Model<Report>,
@@ -222,18 +231,20 @@ export async function mockReport(
 	userCount = 1,
 	terms: string[],
 ): Promise<SubmitReportDto> {
-	const randomUser = await userModel.findOne(
-		{},
-		{},
-		{ skip: random(0, userCount - 1, false) },
-	);
-	if (!randomUser) {
-		throw new Error('No user found');
-	}
+	// const randomUser = await userModel.findOne(
+	// 	{},
+	// 	{},
+	// 	{ skip: random(0, userCount - 1, false) },
+	// );
+	const randomOrcid = faker.helpers.arrayElement(randomOrcidIds);
+
+	// if (!randomUser) {
+	// 	throw new Error('No user found');
+	// }
 	const report = {
 		activity_term: faker.helpers.arrayElement(terms),
 
-		curator_orcid: randomUser.orcid_id,
+		curator_orcid: randomOrcid,
 
 		entity_uri: faker.internet.url(),
 

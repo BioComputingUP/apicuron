@@ -1,5 +1,14 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { Prop, Schema as SchemaDec, SchemaFactory } from '@nestjs/mongoose';
+import {
+	FilterQuery,
+	HydratedDocument,
+	LeanDocument,
+	Model,
+	ProjectionType,
+	QueryOptions,
+	Schema,
+	Types,
+} from 'mongoose';
 
 import { PrivacyType } from '../enums';
 import { UserResource } from '../interfaces/user-resource';
@@ -9,32 +18,78 @@ import {
 	UserEmailEntrySchema,
 } from './components/user-email.schema';
 import {
+	UserEmployment,
 	UserEmploymentSchema,
 	UserLinks,
 	UserLinksSchema,
 } from './components/user-fields.schema';
-import { UserEmployment } from './components/user-fields.schema';
 
-export type UserDocumentOvrride = {
+export type UserDocumentOverride = {
 	emails: Types.DocumentArray<UserEmailEntry>;
 	employment: Types.DocumentArray<UserEmployment>;
 	links: Types.DocumentArray<UserLinks>;
+	hasResourcePutCode(resource_id: string): boolean;
+	getResourcePutCode(resource_id: string): {
+		putCode: string;
+		resource_id: string;
+	} | null;
+	setResourcePutCode(resource_id: string, putCode: string): void;
 };
 
-export type UserDocument = HydratedDocument<User, UserDocumentOvrride>;
+export type UserDocument = HydratedDocument<User, UserDocumentOverride>;
+export type UserModel = Model<UserDocument, {}, UserDocumentOverride>;
+export type UserFilter = FilterQuery<User>;
+export type UserProjection = ProjectionType<User>;
+export type UserQueryOptions = QueryOptions<User>;
+export type LeanUserDoc = LeanDocument<User>;
 
-@Schema({
+@SchemaDec({
 	collection: 'users',
 	toJSON: {
 		virtuals: true,
 	},
 	optimisticConcurrency: true,
+	methods: {
+		hasResourcePutCode(this: UserDocument, resource_id: string): boolean {
+			return (
+				this.orcid_work_put_codes.findIndex(
+					(item) => item.resource_id == resource_id,
+				) != -1
+			);
+		},
+		getResourcePutCode(
+			this: UserDocument,
+			resource_id: string,
+		): {
+			putCode: string;
+			resource_id: string;
+		} | null {
+			return this.orcid_work_put_codes.find(
+				(item) => item.resource_id == resource_id,
+			);
+		},
+
+		setResourcePutCode(
+			this: UserDocument,
+			resource_id: string,
+			putCode: string,
+		): void {
+			if (this.hasResourcePutCode(resource_id)) {
+				this.getResourcePutCode(resource_id).putCode = putCode;
+			} else {
+				this.orcid_work_put_codes.push({
+					resource_id,
+					putCode,
+				});
+			}
+		},
+	},
 })
 export class User {
-	@Prop({
-		select: false,
-	})
-	id: Types.ObjectId;
+	// @Prop({
+	// 	select: false,
+	// })
+	// id: Types.ObjectId;
 
 	@Prop()
 	biography?: string;
@@ -56,7 +111,7 @@ export class User {
 		default: [],
 		required: true,
 	})
-	emails: Types.DocumentArray<UserEmailEntry>;
+	emails: UserEmailEntry[];
 
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop({
@@ -64,7 +119,7 @@ export class User {
 		type: [UserEmploymentSchema],
 		default: () => [],
 	})
-	employment: Types.DocumentArray<UserEmployment>;
+	employment: UserEmployment[];
 
 	@Prop()
 	family_name?: string;
@@ -96,7 +151,7 @@ export class User {
 		type: [UserLinksSchema],
 		default: () => [],
 	})
-	links: Types.DocumentArray<UserLinks>;
+	links: UserLinks[];
 	/// Could not determine type the field only had null or empty values in the sample set.
 	@Prop({
 		required: false,
@@ -138,13 +193,13 @@ export class User {
 	@Prop({ required: false, select: true })
 	resources: UserResource[];
 
-	@Prop({
-		required: true,
-		default() {
-			return [];
-		},
-	})
-	contributed_to: string[];
+	// @Prop({
+	// 	required: true,
+	// 	default() {
+	// 		return [];
+	// 	},
+	// })
+	// contributed_to: string[];
 
 	@Prop({ required: false })
 	refresh_token?: string;
@@ -169,35 +224,36 @@ export class User {
 	@Prop({ required: false, default: false })
 	acceptsEmails?: boolean;
 
-	hasResourcePutCode(resource_id: string): boolean {
-		return (
-			this.orcid_work_put_codes.findIndex(
-				(item) => item.resource_id == resource_id,
-			) != -1
-		);
-	}
-	getResourcePutCode(resource_id: string): {
-		putCode: string;
-		resource_id: string;
-	} | null {
-		return this.orcid_work_put_codes.find(
-			(item) => item.resource_id == resource_id,
-		);
-	}
+	// THese methods are commented out because they are added to the schema decorator using the methods property.
+	// hasResourcePutCode(resource_id: string): boolean {
+	// 	return (
+	// 		this.orcid_work_put_codes.findIndex(
+	// 			(item) => item.resource_id == resource_id,
+	// 		) != -1
+	// 	);
+	// }
+	// getResourcePutCode(resource_id: string): {
+	// 	putCode: string;
+	// 	resource_id: string;
+	// } | null {
+	// 	return this.orcid_work_put_codes.find(
+	// 		(item) => item.resource_id == resource_id,
+	// 	);
+	// }
 
-	setResourcePutCode(resource_id: string, putCode: string): void {
-		if (this.hasResourcePutCode(resource_id)) {
-			this.getResourcePutCode(resource_id).putCode = putCode;
-		} else {
-			this.orcid_work_put_codes.push({
-				resource_id,
-				putCode,
-			});
-		}
-	}
+	// setResourcePutCode(resource_id: string, putCode: string): void {
+	// 	if (this.hasResourcePutCode(resource_id)) {
+	// 		this.getResourcePutCode(resource_id).putCode = putCode;
+	// 	} else {
+	// 		this.orcid_work_put_codes.push({
+	// 			resource_id,
+	// 			putCode,
+	// 		});
+	// 	}
+	// }
 }
 
-export const UserSchema = SchemaFactory.createForClass(User).loadClass(User);
+export const UserSchema = SchemaFactory.createForClass(User);
 
 export function userCollectionSchemaFactory() {
 	const UserCollectionSchema =
@@ -207,6 +263,8 @@ export function userCollectionSchemaFactory() {
 		{ orcid_id: 1 },
 		{ unique: true, name: 'unique_users' },
 	);
+
+	UserCollectionSchema.methods.hasResourcePutCode;
 
 	return UserCollectionSchema;
 }

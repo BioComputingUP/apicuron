@@ -1,9 +1,9 @@
 import { LeanDocument } from 'mongoose';
 import { ReportDocument, Report } from '../../core/schemas/reports.schema';
 import { ReportDto } from '../../reports/dto/report.dto';
-import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
-import { TermDocument } from '../../core/schemas/terms.schema';
+import { PartnerResource, PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { User, UserDocument } from '../../core/schemas/user.schema';
+import { Term, TermDocument } from '../../core/schemas/terms.schema';
 import { League } from '../../core/schemas/league/league.schema';
 
 export const ManyReportsSubmittedEvent = 'post.report.insert.many';
@@ -16,10 +16,10 @@ export interface IManyReportsSubmittedEventPayload {
 
 export const ReportSubmittedEvent = 'post.report.insert.single';
 export interface IReportSubmittedEventPayload {
-	report: ReportDocument;
-	term: TermDocument;
-	resource: PartnerResourceDocument;
-	user: UserDocument;
+	report: Report;
+	term: Term;
+	resource: PartnerResource;
+	user: User;
 	league_data: League;
 }
 

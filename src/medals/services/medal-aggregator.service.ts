@@ -38,10 +38,10 @@ import { ComputeMedalsService } from './compute-medals.service';
 export class MedalAggregatorService implements Aggregator {
 	constructor(
 		@InjectModel(MedalDef.name)
-		protected medalDefModel: Model<MedalDefDocument>,
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-		@InjectModel(Medal.name) protected medalModel: Model<MedalDocument>,
-		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
+		protected medalDefModel: Model<MedalDef>,
+		@InjectModel(Report.name) protected reportModel: Model<Report>,
+		@InjectModel(Medal.name) protected medalModel: Model<Medal>,
+		@InjectModel(Term.name) protected termModel: Model<Term>,
 		protected resourceService: PartnerResourcesService,
 		protected computeMedals: ComputeMedalsService,
 		protected eventEmitter: EventEmitter2,
@@ -127,24 +127,26 @@ export class MedalAggregatorService implements Aggregator {
 		const resources = await this.resourceService.get_resources({
 			resource_id: { $in: resourceIds },
 		});
-		const privacyUpdates$: Query<UpdateWriteOpResult, MedalDocument>[] = [];
+		const privacyUpdates$: Promise<UpdateWriteOpResult>[] = [];
 		for (const resource of resources) {
 			for (const league of resource.leagues) {
-				const update$ = this.medalModel.updateMany(
-					{
-						curator_orcid,
-						resource_id: resource.resource_id,
-						privacy: PrivacyType.private,
-					},
-					{
-						$set: {
-							privacy: computeAggregatePrivacyField(
-								{ privacy: league.visibility },
-								{ privacy },
-							),
+				const update$ = this.medalModel
+					.updateMany(
+						{
+							curator_orcid,
+							resource_id: resource.resource_id,
+							privacy: PrivacyType.private,
 						},
-					},
-				);
+						{
+							$set: {
+								privacy: computeAggregatePrivacyField(
+									{ privacy: league.visibility },
+									{ privacy },
+								),
+							},
+						},
+					)
+					.exec();
 				privacyUpdates$.push(update$);
 			}
 		}

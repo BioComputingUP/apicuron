@@ -17,16 +17,14 @@ import { EntryExistsRule } from '../../shared/validators/entry-exists.validator'
 import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
 import { Type } from 'class-transformer';
 import { MaxDateField, MinDateField } from '../validators/date-comparison';
-import { MedalDef } from '../../core/schemas/achievements-def/medal-def.schema';
-import { UniqueRule } from '../../shared/validators/unique.validator';
 
 export class CreateMedalDefDto {
-	@Validate(UniqueRule, [
-		MedalDef.name,
-		({ name, resource_id }) => {
-			return { name, resource_id };
-		},
-	])
+	// @Validate(UniqueRule, [
+	// 	MedalDef.name,
+	// 	({ name, resource_id }) => {
+	// 		return { name, resource_id };
+	// 	},
+	// ])
 	@IsString()
 	@IsNotEmpty()
 	name: string;
@@ -52,7 +50,7 @@ export class CreateMedalDefDto {
 	])
 	@IsString()
 	@IsOptional()
-	league: string;
+	league?: string;
 
 	@Validate(ActivityTermExists, [{ each: true }])
 	@IsNotEmpty()

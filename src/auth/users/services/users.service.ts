@@ -13,10 +13,15 @@ import { generateAvatar } from '../generate_avatar';
 import { PrivacyType } from '../../../core/enums';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserPrivacyUpdatedEvent } from '../events/update-privacy';
-import { ICreateOrUpdateUser } from '../dto/create-or-update-user.dto';
+import {
+	ICreateOrUpdateUser,
+	ICreateUser,
+} from '../dto/create-or-update-user.dto';
 import { ResourceDocument } from '../../../core/schemas/resource/resource.schema';
-import { UserCreatedEvent } from '../events/user-created';
-import { UserRepository } from '../../../core/repositories/user.repository';
+import {
+	UserCreatedEvent,
+	UserRepository,
+} from '../../../core/repositories/user.repository';
 import { EmailDto, UpdateProfileDto } from '../dto/update-user.dto';
 import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
 import { v4 as uuid } from 'uuid';
@@ -51,7 +56,7 @@ export class UsersService {
 		return userEntity;
 	}
 
-	async getByOrcid(orcid_id: string): Promise<UserDocument> {
+	async getByOrcid(orcid_id: string): Promise<UserDocument | null> {
 		const user_promise = await this.userRepository.findOne(
 			{
 				orcid_id,
@@ -72,14 +77,13 @@ export class UsersService {
 	 * @param orcid_ids List of orcid_ids
 	 * @returns list of users from the database
 	 */
-	async getUsersByOrcid(orcid_ids: string[]): Promise<UserDocument[]> {
+	async getUsersByOrcid(orcid_ids: string[]): Promise<User[]> {
 		const users = await this.userRepository.find({
 			orcid_id: { $in: orcid_ids },
 		});
 
 		const sortedUsers = orcid_ids.map(
-			(orcid_id): UserDocument =>
-				users.find((user) => user.orcid_id === orcid_id),
+			(orcid_id): User => users.find((user) => user.orcid_id === orcid_id),
 		);
 
 		return sortedUsers;
@@ -169,15 +173,25 @@ export class UsersService {
 		return result.jwt_token;
 	}
 
-	async createUser(user: ICreateOrUpdateUser): Promise<PrivateUserEntity> {
-		const newUser = this.userRepository.newDocument(user);
-
-		const avatarSvg = await generateAvatar(newUser.displayedName);
+	async createUser(user: ICreateUser): Promise<PrivateUserEntity> {
+		const avatarSvg = await generateAvatar(user.displayedName);
 
 		const avatarLink = await this.storageService.put(
 			`users/${uuid()}.svg`,
 			Buffer.from(avatarSvg),
 		);
+		const newUser = this.userRepository.newDocument({
+			...user,
+			privacy: PrivacyType.private,
+			role: 'user',
+			cookie_token: uuid(),
+			last_update: new Date(),
+			emails: [],
+			jwt_token: undefined,
+			orcid_work_put_codes: [],
+			avatar: avatarLink,
+			resources: [],
+		});
 
 		newUser.avatar = avatarLink;
 
@@ -185,7 +199,7 @@ export class UsersService {
 
 		await this.eventEmitter.emitAsync(
 			UserCreatedEvent.name,
-			new UserCreatedEvent(newUser),
+			new UserCreatedEvent(newUser.orcid_id, newUser, new Date()),
 		);
 
 		const userEntity = plainToInstance(PrivateUserEntity, newUser, {
@@ -205,7 +219,7 @@ export class UsersService {
 		// upsert user
 		const newUser = !!oldUser
 			? await this.updateUser(orcid_id, { $set: data })
-			: await this.createUser({ orcid_id, ...data });
+			: await this.createUser({ orcid_id, ...data } as ICreateUser); // TODO: check if this is correct
 
 		if (oldUser?.privacy !== newUser.privacy) {
 			await this.eventEmitter.emitAsync(
@@ -253,11 +267,11 @@ export class UsersService {
 		return privacy;
 	}
 
-	async getUsers(filter: FilterQuery<UserDocument>): Promise<UserDocument[]> {
+	async getUsers(filter: FilterQuery<User>): Promise<User[]> {
 		return await this.userRepository.find(filter);
 	}
 
-	async updateUserProfile(updates: UpdateProfileDto): Promise<UserDocument> {
+	async updateUserProfile(updates: UpdateProfileDto): Promise<User> {
 		const { orcid_id, email, ...otherUpdates } = updates;
 
 		if (email) {
@@ -287,7 +301,10 @@ export class UsersService {
 		if (otherUpdates.privacy) {
 			await this.eventEmitter.emitAsync(
 				UserPrivacyUpdatedEvent.name,
-				new UserPrivacyUpdatedEvent(updatedUser, otherUpdates.privacy),
+				new UserPrivacyUpdatedEvent(
+					updatedUser.toObject(),
+					otherUpdates.privacy,
+				),
 			);
 		}
 		return updatedUser;

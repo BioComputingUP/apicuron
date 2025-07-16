@@ -2,15 +2,16 @@ import { faker } from '@faker-js/faker';
 import { NestFactory } from '@nestjs/core';
 import { getModelToken } from '@nestjs/mongoose';
 import { plainToInstance } from 'class-transformer';
-import { Model } from 'mongoose';
 import { AppModule } from '../app.module';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
+	PartnerResourceModel,
 	Term,
+	TermModel,
 } from '../core/schemas';
-import { Report } from '../core/schemas/reports.schema';
-import { User } from '../core/schemas/user.schema';
+import { ReportModel, Report } from '../core/schemas/reports.schema';
+import { User, UserModel } from '../core/schemas/user.schema';
 import {
 	SubmitReportDto,
 	SubmitReportsDto,
@@ -22,17 +23,18 @@ async function bootstrap() {
 	const app = await NestFactory.createApplicationContext(AppModule);
 
 	// initialize models
-	const reportModel: Model<Report> = app.get(getModelToken(Report.name));
-	const userModel: Model<User> = app.get(getModelToken(User.name));
-	const resourceModel: Model<PartnerResource> = app.get(
+	const reportModel: ReportModel = app.get(getModelToken(Report.name));
+	const userModel: UserModel = app.get(getModelToken(User.name));
+	const resourceModel: PartnerResourceModel = app.get(
 		getModelToken(PartnerResource.name),
 	);
 
-	const termModel: Model<Term> = app.get(getModelToken(Term.name));
+	const termModel: TermModel = app.get(getModelToken(Term.name));
 
 	const userCount = await userModel.countDocuments();
 
 	const resources = await resourceModel.find();
+	const orcidIds = new Set();
 
 	const processResource = async (resource: PartnerResourceDocument) => {
 		const terms = (
@@ -42,7 +44,6 @@ async function bootstrap() {
 		if (terms.length === 0) {
 			return;
 		}
-
 		const reports: SubmitReportDto[] = [];
 		const reportCount = faker.number.int({ min: 100, max: 150 });
 		for (let index = 0; index < reportCount; index++) {
@@ -53,6 +54,7 @@ async function bootstrap() {
 				userCount,
 				terms,
 			);
+			orcidIds.add(report.curator_orcid);
 			reports.push(report);
 		}
 
@@ -70,6 +72,7 @@ async function bootstrap() {
 
 	await Promise.all(computations$);
 
+	console.log(`Created reports for ${orcidIds.size} unique ORCID IDs`);
 	await app.close();
 }
 

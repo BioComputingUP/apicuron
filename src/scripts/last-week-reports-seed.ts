@@ -6,17 +6,18 @@ import * as moment from 'moment-timezone';
 import { Model } from 'mongoose';
 import { AppModule } from '../app.module';
 import { PrivacyType } from '../core/enums';
-import { LeanReportDocument, Report } from '../core/schemas/reports.schema';
 import {
-	PartnerResource,
-	PartnerResourceDocument,
-} from '../core/schemas/resource/partner-resource.schema';
+	LeanReportDocument,
+	Report,
+	ReportModel,
+} from '../core/schemas/reports.schema';
+import { PartnerResource } from '../core/schemas/resource/partner-resource.schema';
 import { Term } from '../core/schemas/terms.schema';
 import { OrcidClientService } from '../orcid/orcid-client/orcid-client.service';
 import { SubmitReportService } from '../submit-reports/services/submit-reports.service';
 async function mockReport(
 	reportModel: Model<Report>,
-	resource: PartnerResourceDocument,
+	resource: PartnerResource,
 	terms: string[],
 	orcidIds: string[],
 ) {
@@ -65,7 +66,7 @@ async function bootstrap() {
 
 	const testingOrcidId = '0000-0002-2472-5685';
 	// initialize models
-	const reportModel: Model<Report> = app.get(getModelToken(Report.name));
+	const reportModel: ReportModel = app.get(getModelToken(Report.name));
 	const reportService = app.get(SubmitReportService);
 	const resourceModel: Model<PartnerResource> = app.get(
 		getModelToken(PartnerResource.name),

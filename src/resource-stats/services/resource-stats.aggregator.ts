@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Document, Model, Types } from 'mongoose';
 import { EntityCreatedEvent } from 'src/core/events/entity-created.event';
 import { EntityUpdatedEvent } from 'src/core/events/entity-updated.event';
-import { User, UserDocumentOvrride } from 'src/core/schemas/user.schema';
+import { User, UserDocumentOverride } from 'src/core/schemas/user.schema';
 import { ReportDocument } from '../../core/schemas/reports.schema';
 import {
 	PartnerResource,
@@ -62,13 +62,13 @@ export class ResourceStatsAggregatorService implements Aggregator {
 		_event:
 			| EntityCreatedEvent<
 					Document<unknown, any, User> &
-						Omit<User & { _id: Types.ObjectId }, keyof UserDocumentOvrride> &
-						UserDocumentOvrride
+						Omit<User & { _id: Types.ObjectId }, keyof UserDocumentOverride> &
+						UserDocumentOverride
 			  >
 			| EntityUpdatedEvent<
 					Document<unknown, any, User> &
-						Omit<User & { _id: Types.ObjectId }, keyof UserDocumentOvrride> &
-						UserDocumentOvrride
+						Omit<User & { _id: Types.ObjectId }, keyof UserDocumentOverride> &
+						UserDocumentOverride
 			  >,
 	): void | Promise<void> {
 		return;

@@ -11,7 +11,7 @@ import {
 	Statistics,
 	StatisticsDocument,
 } from '../../core/schemas/statistics.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
+import { User, UserDocument } from '../../core/schemas/user.schema';
 import { responseHasCode } from '../../orcid/orcid-client/helpers/response-with-code';
 import { OrcidWork } from '../../orcid/orcid-client/interfaces/orcid.interface';
 import { OrcidClientService } from '../../orcid/orcid-client/orcid-client.service';
@@ -78,7 +78,7 @@ export class SubmitOrcidWork implements OnModuleInit {
 				const submission$ = this.submitSingleWork(
 					stat,
 					stat.resource.toObject(),
-					user,
+					user.toObject(),
 				);
 				submissions$.push(submission$);
 			}
@@ -107,7 +107,7 @@ export class SubmitOrcidWork implements OnModuleInit {
 					`received put code: ${submitResponse.putCode}, saving the user resource put code`,
 				);
 				user.setResourcePutCode(resource.resource_id, submitResponse.putCode);
-				await user.save();
+				await this.userRepository.create(user);
 			}
 		} catch (err) {
 			if (err instanceof Error) {

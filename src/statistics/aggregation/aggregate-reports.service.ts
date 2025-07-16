@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Aggregate, FilterQuery, Model } from 'mongoose';
 import { PrivacyType } from '../../core/enums';
 import { LeagueDocument } from '../../core/schemas/league/league.schema';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
+import { ReportModel, ReportDocument, Report, ReportFilter } from '../../core/schemas/reports.schema';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
@@ -41,7 +41,7 @@ export type BaseReportIteratorResult<T> = {
 @Injectable()
 export class StatisticsReportAggregator {
 	constructor(
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
+		@InjectModel(Report.name) protected reportModel: ReportModel,
 		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
 		@Inject(CACHE_MANAGER) protected cacheManager: Cache,
 		@InjectModel(PartnerResource.name)
@@ -49,7 +49,7 @@ export class StatisticsReportAggregator {
 	) {}
 
 	aggregate(
-		filter: FilterQuery<ReportDocument>,
+		filter: ReportFilter,
 	): Aggregate<BaseAggregationResult[]> {
 		return this.reportModel
 			.aggregate()

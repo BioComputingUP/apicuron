@@ -41,4 +41,8 @@ export class MedalsController {
 
 		return paginate<MedalDto>(MedalDto, data, filter, count);
 	}
+
+
+	
+	
 }

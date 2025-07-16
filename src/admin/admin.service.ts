@@ -6,17 +6,17 @@ import {
 	NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import {
 	BadgeDef,
-	BadgeDefDocument,
+	BadgeDefModel,
 	MedalDef,
-	MedalDefDocument,
+	MedalDefModel,
 	PartnerResource,
-	PartnerResourceDocument,
+	PartnerResourceModel,
 	Term,
+	TermModel,
 	User,
-	UserDocument,
+	UserModel,
 } from 'src/core/schemas';
 
 @Injectable()
@@ -25,16 +25,15 @@ export class AdminService {
 	constructor(
 		protected httpService: HttpService,
 		@InjectModel(MedalDef.name)
-		protected medalDefModel: Model<MedalDefDocument>,
+		protected medalDefModel: MedalDefModel,
 		@InjectModel(BadgeDef.name)
-		protected badgeDefModel: Model<BadgeDefDocument>,
+		protected badgeDefModel: BadgeDefModel,
 		@InjectModel(PartnerResource.name)
-		protected partnerResourceModel: Model<PartnerResourceDocument>,
+		protected partnerResourceModel: PartnerResourceModel,
 		@InjectModel(Term.name)
-		protected termModel: Model<Term>,
-
+		protected termModel: TermModel,
 		@InjectModel(User.name)
-		protected userModel: Model<UserDocument>,
+		protected userModel: UserModel,
 	) {}
 
 	async migrate_resource(
