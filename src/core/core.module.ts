@@ -6,6 +6,7 @@ import { ModelDefinitions, ModelFactories } from './schemas';
 import { UserRepository } from './repositories/user.repository';
 import { ConnectionFactoryProvider } from './database/connection-provider';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { PartnerResourceRepository } from './repositories/partner-resource.repository';
 
 @Module({
 	imports: [
@@ -18,8 +19,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 		MongooseModule.forFeatureAsync(ModelFactories),
 	],
 
-	providers: [UserRepository, SyncIndexesService],
+	providers: [UserRepository, PartnerResourceRepository, SyncIndexesService],
 
-	exports: [UserRepository, MongooseModule],
+	exports: [UserRepository, PartnerResourceRepository, MongooseModule],
 })
 export class CoreApicuronModule {}
