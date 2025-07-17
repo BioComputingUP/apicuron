@@ -62,6 +62,8 @@ export class MedalDefCommandsService {
 			);
 		}
 
+		this.logger.debug(`Here`);
+
 		const medal: MedalDefDocument | null =
 			await this.medalDefModel.findOneAndUpdate(
 				{
