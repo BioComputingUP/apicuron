@@ -1,4 +1,5 @@
 # Global Arguments for all build stages
+ARG BUILD_NODE_VERSION=iron-bullseye
 ARG NODE_VERSION=iron-bullseye-slim
 ARG APP_DIR=/home/node/app
 ARG UID
@@ -47,7 +48,7 @@ CMD ["npm", "run", "start:dev"]
 # BUILD FOR PRODUCTION
 ###################
 
-FROM node:iron-bullseye AS build
+FROM node:${BUILD_NODE_VERSION} AS build
 
 USER node
 WORKDIR /home/node/app
@@ -76,11 +77,11 @@ RUN groupmod -g ${GID} node && \
     usermod -u ${UID} -g ${GID} node
 
 USER node
+WORKDIR ${APP_DIR}
 
 COPY --chown=node:node --from=build /home/node/app/node_modules ${APP_DIR}/node_modules
 COPY --chown=node:node --from=build /home/node/app/dist ${APP_DIR}/dist
 
-WORKDIR ${APP_DIR}
 
 EXPOSE 3000
 
