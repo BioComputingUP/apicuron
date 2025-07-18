@@ -101,4 +101,7 @@ export class ResourceStatsAggregatorService implements Aggregator {
 	): Promise<void> | void {
 		return;
 	}
+	updatedResource(_after: PartnerResource): Promise<void> {
+		return;
+	}
 }

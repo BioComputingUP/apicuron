@@ -127,4 +127,13 @@ export class DetailedStatisticsAggregatorService implements Aggregator {
 			curator_orcid: user.orcid_id,
 		});
 	}
+	async updatedResource(resource: PartnerResourceDocument): Promise<void> {
+		await this.detailedStatsModel.updateOne(
+			{ resource_id: resource.resource_id },
+			{ $set: { resource: resource } },
+		);
+		this.logger.debug(
+			`Updated Detailed Statistics for resource ${resource.resource_name}`,
+		);
+	}
 }

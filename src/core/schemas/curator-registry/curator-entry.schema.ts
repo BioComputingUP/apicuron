@@ -1,3 +1,4 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import {
 	FilterQuery,
 	HydratedDocument,
@@ -8,13 +9,12 @@ import {
 	QueryOptions,
 	Types,
 } from 'mongoose';
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { User, UserSchema } from '../user.schema';
+import { League, LeagueDocument, LeagueSchema } from '../league/league.schema';
 import {
 	PartnerResource,
 	PartnerResourceSchema,
 } from '../resource/partner-resource.schema';
-import { League, LeagueDocument, LeagueSchema } from '../league/league.schema';
+import { User, UserSchema } from '../user.schema';
 
 // Subdocument types for Registry Entry
 
@@ -51,7 +51,7 @@ export type LeanCuratorRegistryEntryDocument =
 	LeanDocument<CuratorRegistryEntry>;
 export type CuratorRegistryEntryModel = Model<
 	CuratorRegistryEntry,
-	{},
+	Record<string, never>,
 	CuratorRegistryOverride
 >;
 export type CuratorRegistryEntryDocument = HydratedDocument<

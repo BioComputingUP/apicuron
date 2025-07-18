@@ -33,7 +33,7 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 		report: LeanReportDocument | ReportDocument,
 		_term: TermDocument,
 		resource: PartnerResourceDocument,
-		curator?: UserDocument | null,
+		_curator?: UserDocument | null,
 	) {
 		// check registry for existing curator
 		const curatorEntry = await this.registryService.getCuratorEntry(
@@ -83,9 +83,9 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 		const userResource = curatorEntry.contributed_to.find(
 			(entry) => entry.resource_id === resource.resource_id,
 		);
-		const userHasContributedToLeague = userResource && userResource.groups.find(
-			(league) => league.name === leagueData.name,
-		);
+		const userHasContributedToLeague =
+			userResource &&
+			userResource.groups.find((league) => league.name === leagueData.name);
 		if (!userHasContributedToLeague) {
 			this.registryService.addLeagueToUser(
 				report.curator_orcid,
@@ -149,5 +149,8 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 	termDeleted(term: TermDocument) {
 		this.recomputeAllResourceAggregates(term.resource_id);
 		return;
+	}
+	async updatedResource(resource: PartnerResourceDocument): Promise<void> {
+		this.registryService.updateResource(resource);
 	}
 }

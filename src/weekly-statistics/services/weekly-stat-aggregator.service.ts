@@ -1,19 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Document, FilterQuery, Model, Types } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
-import {
-	LeanReportDocument,
-	Report,
-	ReportDocument,
-} from '../../core/schemas/reports.schema';
-import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { Report, ReportDocument } from '../../core/schemas/reports.schema';
+import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 import {
 	WeeklyStatistics,
 	WeeklyStatisticsDocument,
 } from '../../core/schemas/statistics/weekly-statistics.schema';
-import { TermDocument } from '../../core/schemas/terms.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
+import { Term, TermDocument } from '../../core/schemas/terms.schema';
+import { User, UserDocument } from '../../core/schemas/user.schema';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
@@ -105,14 +101,12 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 	}
 
 	async applyReport(
-		report:
-			| (Document<unknown, any, Report> & Report & { _id: Types.ObjectId })
-			| LeanReportDocument,
-		term: TermDocument,
-		resource: PartnerResourceDocument,
-		curator?: UserDocument,
-	) {
-		const result = await this.computeWeeklyStat.updateWithReport(
+		report: Report,
+		term: Term,
+		resource: PartnerResource,
+		curator?: User,
+	): Promise<void> {
+		await this.computeWeeklyStat.updateWithReport(
 			report,
 			term,
 			resource,
@@ -121,7 +115,6 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 		this.logger.debug(
 			`Updated Weekly Statistics for user ${report.curator_orcid} at resource ${report.resource_id} and league ${report.league}`,
 		);
-		return result;
 	}
 
 	async applyAllReports(resource_id: string) {
@@ -132,5 +125,14 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 
 	async removeAllResourceAggregates(resource_id: string) {
 		await this.weeklyStatModel.deleteMany({ resource_id });
+	}
+	async updatedResource(resource: PartnerResource): Promise<void> {
+		const res = await this.weeklyStatModel.updateMany(
+			{ resource_id: resource.resource_id },
+			{ $set: { resource } },
+		);
+		this.logger.debug(
+			`Updated ${res.modifiedCount} weekly statistics for resource ${resource.resource_id}`,
+		);
 	}
 }

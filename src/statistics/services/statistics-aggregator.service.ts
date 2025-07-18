@@ -129,4 +129,13 @@ export class StatisticsAggregator implements Aggregator {
 			`Deleted ${result.deletedCount} statistics for ${resource_id}`,
 		);
 	}
+	async updatedResource(resource: PartnerResourceDocument): Promise<void> {
+		await this.statModel.updateMany(
+			{ resource_id: resource.resource_id },
+			{ $set: { resource } },
+		);
+		this.logger.debug(
+			`Updated resource ${resource.resource_name} (${resource.resource_id}) in statistics`,
+		);
+	}
 }

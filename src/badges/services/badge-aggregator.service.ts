@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { MongoServerError } from 'mongodb';
-import { FilterQuery, Model, UpdateWriteOpResult } from 'mongoose';
+import { FilterQuery, UpdateWriteOpResult } from 'mongoose';
 import { AchievementState, PrivacyType } from '../../core/enums';
 import {
 	BadgeDef,
@@ -28,6 +28,7 @@ import {
 	getReportRelatedBadgeFilter,
 } from '../helpers/helpers';
 
+import { PartnerResource } from 'src/core/schemas/index';
 import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 import { TermDocument } from '../../core/schemas/terms.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
@@ -38,7 +39,6 @@ import {
 	ResourceBadgesUpdatedEvent,
 	UserBadgesUpdatedEvent,
 } from '../events/badge-count-updated.event';
-import { BadgeEarnedEvent } from '../events/badge-earned.event';
 import { ComputeBadgesService } from './compute-badges.service';
 @Injectable()
 @AggregatorClass()
@@ -110,7 +110,7 @@ export class BadgeAggregatorService implements Aggregator {
 	async updatedUser(
 		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
 	) {
-		let curator_orcid, privacy;
+		let curator_orcid: string, privacy: PrivacyType;
 		if (event instanceof EntityCreatedEvent) {
 			curator_orcid = event.instance.orcid_id;
 			privacy = event.instance.privacy;
@@ -347,5 +347,8 @@ export class BadgeAggregatorService implements Aggregator {
 	): Promise<{ badgeCount: number; badgeDefsCount: number }> {
 		await this.badgeModel.deleteMany(filter);
 		return await this.createBadges(filter);
+	}
+	updatedResource(_after: PartnerResource): Promise<void> {
+		return; // badges have no reference to the resource
 	}
 }
