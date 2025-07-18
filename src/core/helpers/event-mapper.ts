@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { from, map, of, Subject, Subscription, switchMap } from 'rxjs';
+import { from, of, Subject, Subscription, switchMap } from 'rxjs';
 
 export class RepositoryEventPublisher<
 	Event extends { name: string; value: unknown },

@@ -9,14 +9,17 @@ import { StorageType } from 'src/storage/storage.config';
 
 async function migrateAll() {
 	const app = await NestFactory.createApplicationContext(AppModule);
+	await app.init();
 	const logger = new Logger('StorageMigrationLogger');
-
-	const storageService: StorageService = app.get(StorageService);
-	const userRep = app.get(UserRepository);
-	const resourceRep = app.get(PartnerResourceRepository);
+	const storageService: StorageService = await app.get(StorageService);
+	const userRep = await app.get(UserRepository);
+	const resourceRep = await app.get(PartnerResourceRepository);
 
 	const source = StorageType.public;
 	const target = StorageType.private;
+
+	// const source = StorageType.private;
+	// const target = StorageType.public;
 
 	const migrateUserAndResourceUrls = async (
 		sourceUrl: string,
@@ -24,35 +27,34 @@ async function migrateAll() {
 	) => {
 		try {
 			await Promise.all([
-				userRep.updateMany(
-					{ avatar: sourceUrl },
-					{ $set: { avatar: destUrl } },
-				),
-				resourceRep.updateMany(
-					{ logo: sourceUrl },
-					{ $set: { logo: destUrl } },
-				),
+				userRep.updateOne({ avatar: sourceUrl }, { $set: { avatar: destUrl } }),
+				resourceRep.updateOne({ logo: sourceUrl }, { $set: { logo: destUrl } }),
 			]);
 			logger.verbose(`Updated URLs from ${sourceUrl} to ${destUrl}`);
 		} catch (error: unknown) {
 			if (error instanceof Error) {
-				logger.error(`Error updating URLs: ${error.message}`);
+				logger.error(`lalilulelo: ${error.message}`);
 				throw error;
 			}
 		}
 	};
-	logger.verbose(`Starting migration from ${source} to ${target}`);
+
 	try {
-		await storageService.migrateAll(source, target, migrateUserAndResourceUrls);
-		logger.verbose(`Migration from ${source} to ${target} completed`);
+		await storageService.migrateAll(
+			source,
+			target,
+			migrateUserAndResourceUrls,
+			{ maxConcurrency: 1, deleteFromSource: false },
+		);
+		// await userRep.updateOne({}, { $set: { acceptsEmails: true } });
+		// logger.warn('Updated user acceptsEmails to true');
 	} catch (error: unknown) {
 		if (error instanceof Error) {
 			logger.error(`Migration failed: ${error.message}`);
-
-			return;
 		}
+	} finally {
+		await app.close();
 	}
-	await app.close();
 }
 
 migrateAll();
