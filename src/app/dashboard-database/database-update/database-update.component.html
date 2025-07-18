@@ -1,5 +1,7 @@
 <div class="tw-px-10 tw-pt-6 tw-flex-auto" *ngIf="resource$ | async as resource">
-  <div class="tw-flex tw-items-center tw-justify-between">
+  <form (ngSubmit)="submit()" [formGroup]="form">
+
+    <div class="tw-flex tw-items-center tw-justify-between">
     <span class="tw-text-xl tw-font-bold">Update {{ resource["resource_name"] }}</span>
     <div class="tw-flex">
       <input type="submit" [value]="'Update ' + resource['resource_name']" [disabled]="form.invalid || !form.dirty"
@@ -7,7 +9,7 @@
     </div>
   </div>
 
-  <form class="tw-flex tw-flex-row tw-gap-4" (ngSubmit)="submit()" [formGroup]="form">
+  <div class="tw-flex tw-flex-row tw-gap-4" >
     <!-- left section -->
     <div class="tw-w-full sm:tw-w-1/2">
       <div class="form-control-element">
@@ -99,6 +101,7 @@
 
       </div>
     </div>
+  </div>
   </form>
 </div>
 
