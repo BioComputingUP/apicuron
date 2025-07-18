@@ -1,7 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { getEventSubject } from 'src/core/helpers/events.helper';
+import {
+	UserCreatedEvent,
+	UserUpdatedEvent,
+} from 'src/core/repositories/user.repository';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 import {
@@ -9,7 +13,7 @@ import {
 	WeeklyStatisticsDocument,
 } from '../../core/schemas/statistics/weekly-statistics.schema';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
-import { User, UserDocument } from '../../core/schemas/user.schema';
+import { User } from '../../core/schemas/user.schema';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
@@ -79,17 +83,8 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 		return deleted.deletedCount;
 	}
 
-	async updatedUser(
-		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
-	) {
-		let user: UserDocument;
-		if (event instanceof EntityCreatedEvent) {
-			user = event.instance;
-		} else if (event instanceof EntityUpdatedEvent) {
-			user = event.after;
-		} else {
-			throw new Error('Event type not recognized in updatedUser method');
-		}
+	async updatedUser(event: UserCreatedEvent | UserUpdatedEvent) {
+		const user: User = getEventSubject(event);
 		const filter = {
 			curator_orcid: user.orcid_id,
 		};

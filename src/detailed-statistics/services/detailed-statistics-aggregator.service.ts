@@ -1,7 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { getEventSubject } from 'src/core/helpers/events.helper';
+import {
+	UserCreatedEvent,
+	UserUpdatedEvent,
+} from 'src/core/repositories/user.repository';
 import {
 	LeanReportDocument,
 	ReportDocument,
@@ -101,16 +105,8 @@ export class DetailedStatisticsAggregatorService implements Aggregator {
 	async removeAllResourceAggregates(resource_id: string) {
 		await this.detailedStatsModel.deleteMany({ resource_id });
 	}
-	async updatedUser(
-		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
-	) {
-		let user;
-		if (event instanceof EntityCreatedEvent) {
-			user = event.instance;
-		}
-		if (event instanceof EntityUpdatedEvent) {
-			user = event.after;
-		}
+	async updatedUser(event: UserCreatedEvent | UserUpdatedEvent) {
+		const user = getEventSubject(event);
 
 		await this.detailedStatsModel.updateMany(
 			{
@@ -118,7 +114,7 @@ export class DetailedStatisticsAggregatorService implements Aggregator {
 			},
 			{
 				$set: {
-					user: user.toObject(),
+					user,
 				},
 			},
 		);

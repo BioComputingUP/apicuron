@@ -28,10 +28,14 @@ import {
 	getReportRelatedBadgeFilter,
 } from '../helpers/helpers';
 
+import { getEventSubject } from 'src/core/helpers/events.helper';
+import {
+	UserCreatedEvent,
+	UserUpdatedEvent,
+} from 'src/core/repositories/user.repository';
 import { PartnerResource } from 'src/core/schemas/index';
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 import { TermDocument } from '../../core/schemas/terms.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
+import { User } from '../../core/schemas/user.schema';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
@@ -107,18 +111,10 @@ export class BadgeAggregatorService implements Aggregator {
 
 		return medalDefDeleted.deletedCount + medalDeleted.deletedCount;
 	}
-	async updatedUser(
-		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
-	) {
-		let curator_orcid: string, privacy: PrivacyType;
-		if (event instanceof EntityCreatedEvent) {
-			curator_orcid = event.instance.orcid_id;
-			privacy = event.instance.privacy;
-		}
-		if (event instanceof EntityUpdatedEvent) {
-			curator_orcid = event.after.orcid_id;
-			privacy = event.after.privacy;
-		}
+	async updatedUser(event: UserCreatedEvent | UserUpdatedEvent) {
+		const user: User = getEventSubject(event);
+		const { orcid_id: curator_orcid, privacy } = user;
+
 		await this.badgeModel.updateMany(
 			{
 				curator_orcid,

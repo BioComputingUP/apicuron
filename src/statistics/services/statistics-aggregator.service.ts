@@ -1,7 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { getEventSubject } from 'src/core/helpers/events.helper';
+import {
+	UserCreatedEvent,
+	UserUpdatedEvent,
+} from 'src/core/repositories/user.repository';
 import { ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import {
@@ -9,7 +13,7 @@ import {
 	StatisticsDocument,
 } from '../../core/schemas/statistics.schema';
 import { TermDocument } from '../../core/schemas/terms.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
+import { User, UserDocument } from '../../core/schemas/user.schema';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
@@ -71,20 +75,8 @@ export class StatisticsAggregator implements Aggregator {
 
 	logger = new Logger(StatisticsAggregator.name);
 
-	async updatedUser(
-		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
-	) {
-		let user: UserDocument;
-		if (event instanceof EntityCreatedEvent) {
-			user = event.instance;
-		} else if (event instanceof EntityUpdatedEvent) {
-			user = event.after;
-		} else {
-			this.logger.error(`Unexpected event type: ${event}`);
-			throw new Error(
-				`Unexpected event type: Expected EntityCreatedEvent or EntityUpdatedEvent.`,
-			);
-		}
+	async updatedUser(event: UserCreatedEvent | UserUpdatedEvent) {
+		const user: User = getEventSubject(event);
 		this.logger.log(
 			`Handling Update user stat privacy event in statistics service ${user.orcid_id} ${user.privacy} `,
 		);
@@ -95,7 +87,7 @@ export class StatisticsAggregator implements Aggregator {
 			},
 			{
 				$set: {
-					user: user.toObject(),
+					user,
 				},
 			},
 		);

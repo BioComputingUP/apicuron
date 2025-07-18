@@ -7,6 +7,7 @@ import {
 	Types,
 	UpdateWriteOpResult,
 } from 'mongoose';
+import { getEventSubject } from 'src/core/helpers/events.helper';
 import { LeagueUpdatedEvent } from 'src/resources/partner-resources/leagues/events/league-updated.event';
 import { PrivacyType } from '../../core/enums';
 import {
@@ -91,8 +92,7 @@ export class ReportAggregatorService implements Aggregator {
 		return privateResult.modifiedCount + publicResult.modifiedCount;
 	}
 	async updatedUser(event: UserCreatedEvent | UserUpdatedEvent) {
-		const user =
-			event instanceof UserCreatedEvent ? event.instance : event.after;
+		const user = getEventSubject(event);
 		await this.reportModel.updateMany(
 			{ curator_orcid: user.orcid_id },
 			{ $set: { user } },
