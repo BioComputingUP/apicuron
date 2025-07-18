@@ -1,10 +1,21 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, LeanDocument } from 'mongoose';
+import {
+	FilterQuery,
+	HydratedDocument,
+	LeanDocument,
+	Model,
+	ProjectionType,
+	QueryOptions,
+} from 'mongoose';
 import { AchievementState, PrivacyType } from '../../enums';
 import { IUserResourceEntity } from '../../interfaces/user-resource-entity';
 
-export type BadgeDocument = HydratedDocument<Badge>;
 export type LeanBadgeDocument = LeanDocument<BadgeDocument>;
+export type BadgeModel = Model<Badge>;
+export type BadgeDocument = HydratedDocument<Badge>;
+export type BadgeFilter = FilterQuery<Badge>;
+export type BadgeProjection = ProjectionType<Badge>;
+export type BadgeQueryOptions = QueryOptions<Badge>;
 
 @Schema({
 	collection: 'achievements',

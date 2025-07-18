@@ -3,9 +3,9 @@ import { uniq } from 'lodash';
 import { assertNotNull } from 'src/util/type-assertion.helper';
 import { UsersService } from '../../auth/users/services/users.service';
 import { PrivacyType } from '../../core/enums';
-import { ReportDocument } from '../../core/schemas/reports.schema';
+import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
+import { User, UserDocument } from '../../core/schemas/user.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { computePrivacyField } from '../../util/privacy.helper';
 import { ReportHandler } from '../interfaces/report.handler';
@@ -28,9 +28,9 @@ export class ReportMetaHandler implements ReportHandler {
 		return { report, resource, user };
 	}
 
-	async handleMultiple(reports: ReportDocument[]): Promise<{
-		reports: ReportDocument[];
-		users: UserDocument[];
+	async handleMultiple(reports: Report[]): Promise<{
+		reports: Report[];
+		users: User[];
 		resources: PartnerResourceDocument[];
 	}> {
 		const [resMap, userMap] = await Promise.all([
@@ -42,12 +42,12 @@ export class ReportMetaHandler implements ReportHandler {
 			const resource = resMap.get(report.resource_id);
 			assertNotNull(
 				resource,
-				`Resource with ID ${report.resource_id} not found for report ${report._id}`,
+				`Resource with ID ${report.resource_id} not found for report ${report}`,
 			);
 			const user = userMap.get(report.curator_orcid);
 			assertNotNull(
 				user,
-				`User with ORCID ${report.curator_orcid} not found for report ${report._id}`,
+				`User with ORCID ${report.curator_orcid} not found for report ${report}`,
 			);
 
 			this.handleIndividualReport(report, resource, user);
@@ -61,7 +61,7 @@ export class ReportMetaHandler implements ReportHandler {
 	}
 
 	private async loadResourcesMap(
-		reports: ReportDocument[],
+		reports: Report[],
 	): Promise<Map<string, PartnerResourceDocument>> {
 		const resource_ids = uniq(reports.map((r) => r.resource_id));
 		const resources = await this.resourceService.get_resources({
@@ -74,9 +74,7 @@ export class ReportMetaHandler implements ReportHandler {
 		return resourceMap;
 	}
 
-	private async loadUsersMap(
-		reports: ReportDocument[],
-	): Promise<Map<string, UserDocument>> {
+	private async loadUsersMap(reports: Report[]): Promise<Map<string, User>> {
 		const orcid_ids = uniq(reports.map((r) => r.curator_orcid));
 		const users = await this.usersService.getUsers({
 			orcid_id: { $in: orcid_ids },
@@ -87,9 +85,9 @@ export class ReportMetaHandler implements ReportHandler {
 	}
 
 	private async handleIndividualReport(
-		report: ReportDocument,
+		report: Report,
 		resource: PartnerResourceDocument,
-		user: UserDocument,
+		user: User,
 	) {
 		report.league = this.handleLeague(report, resource);
 		report.privacy = this.handlePrivacyField(resource, user, report);
@@ -97,7 +95,7 @@ export class ReportMetaHandler implements ReportHandler {
 	}
 
 	private handleLeague(
-		report: ReportDocument,
+		report: Report,
 		resource: PartnerResourceDocument,
 	): string {
 		// check if the user belongs to a league
@@ -112,8 +110,8 @@ export class ReportMetaHandler implements ReportHandler {
 
 	private handlePrivacyField(
 		resource: PartnerResourceDocument,
-		user: UserDocument | null,
-		report: ReportDocument,
+		user: User | null,
+		report: Report,
 	): PrivacyType {
 		return computePrivacyField(resource, user, report);
 	}

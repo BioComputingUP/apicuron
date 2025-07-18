@@ -1,18 +1,17 @@
-import { Model } from 'mongoose';
-import { EntityRepository } from './entity-repository';
 import { InjectModel } from '@nestjs/mongoose';
 import {
-	SubmittedResource,
-	SubmittedResourceDocument,
+	SubmittedResource, SubmittedResourceModel
 } from '../schemas/resource/submitted-resource.schema';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EntityRepository } from './entity-repository';
 
-export class SubmittedResourceRepository extends EntityRepository<SubmittedResourceDocument> {
+export class SubmittedResourceRepository extends EntityRepository<
+	SubmittedResource,
+	SubmittedResourceModel
+> {
 	constructor(
 		@InjectModel(SubmittedResource.name)
-		resourceModel: Model<SubmittedResourceDocument>,
-		eventEmitter: EventEmitter2,
+		resourceModel: SubmittedResourceModel,
 	) {
-		super(resourceModel, eventEmitter);
+		super(resourceModel);
 	}
 }

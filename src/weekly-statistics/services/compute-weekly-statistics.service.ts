@@ -1,20 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { isNil } from 'lodash';
 import * as moment from 'moment-timezone';
 import { MongoServerError } from 'mongodb';
 import { Document, FilterQuery, Model, Types, UpdateQuery } from 'mongoose';
+import { User } from 'src/core/schemas/user.schema';
 import {
 	LeanReportDocument,
 	Report,
 	ReportDocument,
 } from '../../core/schemas/reports.schema';
-import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import { PartnerResource } from '../../core/schemas/resource/partner-resource.schema';
 import {
 	WeeklyStatistics,
 	WeeklyStatisticsDocument,
 } from '../../core/schemas/statistics/weekly-statistics.schema';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
 import {
 	fromDate,
 	fromYearWeek,
@@ -29,7 +30,6 @@ import {
 	AggregatedReportsWeekly,
 	ReportsWeeklyAggregationPipeline,
 } from '../aggregations/reports-weekly.service';
-import { isNil } from 'lodash';
 @Injectable()
 export class ComputeWeeklyStatisticsService {
 	logger = new Logger(ComputeWeeklyStatisticsService.name);
@@ -100,10 +100,10 @@ export class ComputeWeeklyStatisticsService {
 			| ReportDocument
 			| (Document<unknown, any, Report> & Report & { _id: Types.ObjectId })
 			| LeanReportDocument,
-		termDoc: TermDocument,
-		resource: PartnerResourceDocument,
-		user: UserDocument | null = null,
-	) {
+		termDoc: Term,
+		resource: PartnerResource,
+		user: User | null = null,
+	): Promise<WeeklyStatisticsDocument> {
 		const reportIsLast = !(await this.reportModel.exists({
 			resource_id: report.resource_id,
 			league: report.league,
@@ -119,7 +119,7 @@ export class ComputeWeeklyStatisticsService {
 					league: report.league,
 			  })
 			: termDoc;
-		
+
 		if (isNil(term)) {
 			throw new Error(
 				`Term: ${report.activity_term} not found for resource ${report.resource_id} and league ${report.league}`,
@@ -165,11 +165,11 @@ export class ComputeWeeklyStatisticsService {
 					new: true,
 				},
 			);
-		} catch (err: any) {
+		} catch (err: unknown) {
 			if (err instanceof MongoServerError && err.code === 11000) {
 				return await this.updateWithReport(report, termDoc, resource, user);
 			}
-			throw new Error(err);
+			throw err;
 		}
 	}
 

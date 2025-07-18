@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
+import { Report, ReportDocument, ReportModel } from '../../core/schemas/reports.schema';
 import { Aggregate, FilterQuery, Model } from 'mongoose';
 import { PrivacyType } from '../../core/enums';
 import {
@@ -39,7 +39,7 @@ export interface DetailedStatAggregationResult {
 @Injectable()
 export class DetailedStatisticsPipeline {
 	constructor(
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
+		@InjectModel(Report.name) protected reportModel: ReportModel,
 	) {}
 
 	/**

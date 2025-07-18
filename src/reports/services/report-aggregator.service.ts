@@ -4,14 +4,17 @@ import {
 	Document,
 	FilterQuery,
 	Model,
-	Query,
 	Types,
 	UpdateWriteOpResult,
 } from 'mongoose';
+import { getEventSubject } from 'src/core/helpers/events.helper';
 import { LeagueUpdatedEvent } from 'src/resources/partner-resources/leagues/events/league-updated.event';
 import { PrivacyType } from '../../core/enums';
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
-import { UserRepository } from '../../core/repositories/user.repository';
+import {
+	UserCreatedEvent,
+	UserRepository,
+	UserUpdatedEvent,
+} from '../../core/repositories/user.repository';
 import {
 	League,
 	PartnerResource,
@@ -25,21 +28,17 @@ import {
 	Report,
 	ReportDocument,
 	ReportDocumentOverride,
+	ReportModel,
 } from '../../core/schemas/reports.schema';
-import {
-	User,
-	UserDocument,
-	UserDocumentOvrride,
-} from '../../core/schemas/user.schema';
+import { User, UserDocumentOverride } from '../../core/schemas/user.schema';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
-import { PartnerResourceUpdatedEvent } from '../../resources/partner-resources/events/resource-updated.event';
 
 @Injectable()
 @AggregatorClass()
 export class ReportAggregatorService implements Aggregator {
 	constructor(
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
+		@InjectModel(Report.name) protected reportModel: ReportModel,
 		protected userRepository: UserRepository,
 		@InjectModel(PartnerResource.name)
 		protected resourceModel: Model<PartnerResourceDocument>,
@@ -92,11 +91,8 @@ export class ReportAggregatorService implements Aggregator {
 		]);
 		return privateResult.modifiedCount + publicResult.modifiedCount;
 	}
-	async updatedUser(
-		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
-	) {
-		const user =
-			event instanceof EntityCreatedEvent ? event.instance : event.after;
+	async updatedUser(event: UserCreatedEvent | UserUpdatedEvent) {
+		const user = getEventSubject(event);
 		await this.reportModel.updateMany(
 			{ curator_orcid: user.orcid_id },
 			{ $set: { user } },
@@ -170,7 +166,7 @@ export class ReportAggregatorService implements Aggregator {
 			`Updating the user attribute for all users in resource ${resource.resource_name} to all relevant reports`,
 		);
 		// Update all users
-		const orcidIds = await this.reportModel.distinct('curator_orcid', {
+		const orcidIds = await this.reportModel.distinct<string>('curator_orcid', {
 			resource_id,
 		});
 		const userUpdates$: Promise<UpdateWriteOpResult>[] = [];
@@ -219,22 +215,23 @@ export class ReportAggregatorService implements Aggregator {
 			resource_id: term.resource_id,
 		});
 	}
-	async updatedResource(event: PartnerResourceUpdatedEvent) {
+	async updatedResource(resource: PartnerResource): Promise<void> {
+		this.logger.debug(`received resource with this logo: ${resource.logo}`);
 		await this.reportModel.updateMany(
-			{ resource_id: event.newResource.resource_id },
-			{ $set: { resource: event.newResource } },
+			{ resource_id: resource.resource_id },
+			{ $set: { resource: resource } },
 		);
 	}
 
 	async applyReport(
 		_report:
-			| (Document<unknown, any, Report> &
+			| (Document<unknown, unknown, Report> &
 					Omit<Report & { _id: Types.ObjectId }, keyof ReportDocumentOverride> &
 					ReportDocumentOverride)
 			| LeanReportDocument,
-		_term: Document<unknown, any, Term> &
+		_term: Document<unknown, unknown, Term> &
 			Omit<Term & { _id: Types.ObjectId }, never>,
-		_resource: Document<unknown, any, PartnerResource> &
+		_resource: Document<unknown, unknown, PartnerResource> &
 			Omit<
 				PartnerResource & { _id: Types.ObjectId },
 				keyof {
@@ -246,9 +243,9 @@ export class ReportAggregatorService implements Aggregator {
 				stats: Types.Subdocument<Types.ObjectId> & ResourceStats;
 			},
 		_curator?:
-			| (Document<unknown, any, User> &
-					Omit<User & { _id: Types.ObjectId }, keyof UserDocumentOvrride> &
-					UserDocumentOvrride)
+			| (Document<unknown, unknown, User> &
+					Omit<User & { _id: Types.ObjectId }, keyof UserDocumentOverride> &
+					UserDocumentOverride)
 			| undefined,
 	): Promise<void> {
 		return;

@@ -1,7 +1,12 @@
-import { HydratedDocument } from 'mongoose';
+import { FilterQuery, HydratedDocument, LeanDocument, Model, ProjectionType, QueryOptions } from 'mongoose';
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 
 export type SubmittedResourceDocument = HydratedDocument<SubmittedResource>; // this class defines a partnerSubmittedResource that has been validated and has the ability to have Models, Badges and so on
+export type SubmittedResourceModel = Model<SubmittedResource>;
+export type LeanSubmittedResourceDoc = LeanDocument<SubmittedResource>;
+export type SubmittedResourceFilter = FilterQuery<SubmittedResource>;
+export type SubmittedResourceProjection = ProjectionType<SubmittedResource>;
+export type SubmittedResourceQueryOptions= QueryOptions<SubmittedResource>;
 
 @Schema()
 export class SubmittedResource {

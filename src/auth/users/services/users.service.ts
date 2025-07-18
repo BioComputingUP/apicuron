@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+	Injectable,
+	InternalServerErrorException,
+	Logger,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { FilterQuery, UpdateQuery } from 'mongoose';
 import { achievements_v1_pipeline } from '../aggregation-pipeline/achievements.pipeline';
 import { browse_v1_pipeline } from '../aggregation-pipeline/browse.pipeline';
@@ -8,23 +13,29 @@ import { generateAvatar } from '../generate_avatar';
 import { PrivacyType } from '../../../core/enums';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserPrivacyUpdatedEvent } from '../events/update-privacy';
-import { ICreateOrUpdateUser } from '../dto/create-or-update-user.dto';
+import {
+	ICreateOrUpdateUser,
+	ICreateUser,
+} from '../dto/create-or-update-user.dto';
 import { ResourceDocument } from '../../../core/schemas/resource/resource.schema';
-import { UserCreatedEvent } from '../events/user-created';
-import { UserRepository } from '../../../core/repositories/user.repository';
-import { UpdateProfileDto } from '../dto/update-user.dto';
+import {
+	UserCreatedEvent,
+	UserRepository,
+} from '../../../core/repositories/user.repository';
+import { EmailDto, UpdateProfileDto } from '../dto/update-user.dto';
 import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
 import { v4 as uuid } from 'uuid';
 import { PrivateUserEntity, UserEntity } from '../dto/user.entity';
 import { plainToInstance } from 'class-transformer';
 @Injectable()
 export class UsersService {
+	logger = new Logger(UsersService.name);
 	constructor(
 		private userRepository: UserRepository,
 		protected configService: ConfigService,
 		protected eventEmitter: EventEmitter2,
 		protected storageService: StorageService,
-	) { }
+	) {}
 
 	public async userExists(orcid_id: string): Promise<boolean> {
 		return !!(await this.userRepository.findOne({
@@ -40,12 +51,12 @@ export class UsersService {
 		const userEntity = plainToInstance(PrivateUserEntity, userDoc, {
 			enableCircularCheck: true,
 			excludeExtraneousValues: true,
-		})
+		});
 
 		return userEntity;
 	}
 
-	async getByOrcid(orcid_id: string): Promise<UserDocument> {
+	async getByOrcid(orcid_id: string): Promise<UserDocument | null> {
 		const user_promise = await this.userRepository.findOne(
 			{
 				orcid_id,
@@ -66,14 +77,13 @@ export class UsersService {
 	 * @param orcid_ids List of orcid_ids
 	 * @returns list of users from the database
 	 */
-	async getUsersByOrcid(orcid_ids: string[]): Promise<UserDocument[]> {
+	async getUsersByOrcid(orcid_ids: string[]): Promise<User[]> {
 		const users = await this.userRepository.find({
 			orcid_id: { $in: orcid_ids },
 		});
 
 		const sortedUsers = orcid_ids.map(
-			(orcid_id): UserDocument =>
-				users.find((user) => user.orcid_id === orcid_id),
+			(orcid_id): User => users.find((user) => user.orcid_id === orcid_id),
 		);
 
 		return sortedUsers;
@@ -86,7 +96,10 @@ export class UsersService {
 	 * @param userReq - Optional. The user making the request. If the requesting user is the profile holder, privacy checks are bypassed.
 	 * @returns A promise that resolves to the user profile if found and public, or the full profile if the requesting user is the profile holder.
 	 */
-	async getPublicUser(orcid_id: string, userReq?: User): Promise<UserEntity | PrivateUserEntity> {
+	async getPublicUser(
+		orcid_id: string,
+		userReq?: User,
+	): Promise<UserEntity | PrivateUserEntity> {
 		// if the user requesting is the profile holder. We do not need to check privacy
 		if (userReq?.orcid_id === orcid_id) {
 			return await this.getPrivateUser({ orcid_id });
@@ -119,8 +132,8 @@ export class UsersService {
 		return {
 			...userDoc.toObject(),
 			// employment: userDoc.employment[userDoc.employment.length - 1].name,
-			employment: userDoc.affiliation
-		}
+			employment: userDoc.affiliation,
+		};
 	}
 
 	async get_by_cookie_token(cookie_token: string): Promise<UserDocument> {
@@ -160,15 +173,25 @@ export class UsersService {
 		return result.jwt_token;
 	}
 
-	async createUser(user: ICreateOrUpdateUser): Promise<PrivateUserEntity> {
-		const newUser = this.userRepository.newDocument(user);
-
-		const avatarSvg = await generateAvatar(newUser.displayedName);
+	async createUser(user: ICreateUser): Promise<PrivateUserEntity> {
+		const avatarSvg = await generateAvatar(user.displayedName);
 
 		const avatarLink = await this.storageService.put(
 			`users/${uuid()}.svg`,
 			Buffer.from(avatarSvg),
 		);
+		const newUser = this.userRepository.newDocument({
+			...user,
+			privacy: PrivacyType.private,
+			role: 'user',
+			cookie_token: uuid(),
+			last_update: new Date(),
+			emails: [],
+			jwt_token: undefined,
+			orcid_work_put_codes: [],
+			avatar: avatarLink,
+			resources: [],
+		});
 
 		newUser.avatar = avatarLink;
 
@@ -176,7 +199,7 @@ export class UsersService {
 
 		await this.eventEmitter.emitAsync(
 			UserCreatedEvent.name,
-			new UserCreatedEvent(newUser),
+			new UserCreatedEvent(newUser.orcid_id, newUser, new Date()),
 		);
 
 		const userEntity = plainToInstance(PrivateUserEntity, newUser, {
@@ -196,7 +219,7 @@ export class UsersService {
 		// upsert user
 		const newUser = !!oldUser
 			? await this.updateUser(orcid_id, { $set: data })
-			: await this.createUser({ orcid_id, ...data });
+			: await this.createUser({ orcid_id, ...data } as ICreateUser); // TODO: check if this is correct
 
 		if (oldUser?.privacy !== newUser.privacy) {
 			await this.eventEmitter.emitAsync(
@@ -244,51 +267,114 @@ export class UsersService {
 		return privacy;
 	}
 
-	async getUsers(filter: FilterQuery<UserDocument>): Promise<UserDocument[]> {
+	async getUsers(filter: FilterQuery<User>): Promise<User[]> {
 		return await this.userRepository.find(filter);
 	}
 
-	async updateUserProfile(updates: UpdateProfileDto): Promise<UserDocument> {
+	async updateUserProfile(updates: UpdateProfileDto): Promise<User> {
 		const { orcid_id, email, ...otherUpdates } = updates;
-		const emailUpdateQuery = {};
-		const emailUpdateOptions = {};
+
 		if (email) {
-			const emailMatchedUser = await this.userRepository.findOne({
-				emails: { $elemMatch: { email: email.email } },
-			});
-			if (emailMatchedUser && emailMatchedUser.orcid_id != orcid_id) {
-				// email address belongs to another user
-				throw new UnauthorizedException(
-					'The provided email is already used by another user',
-				);
-			} else if (emailMatchedUser && emailMatchedUser.orcid_id == orcid_id) {
-				// User email updated
-				emailUpdateQuery['$set'] = { 'emails.$[elem]': email };
-				emailUpdateOptions['arrayFilters'] = [{ 'elem.email': email.email }];
-			} else if (!emailMatchedUser) {
-				// new email
-				emailUpdateQuery['$push'] = { emails: { ...email, verified: false } };
+			try {
+				await this.handleEmailUpdate(orcid_id, email);
+			} catch (error: unknown) {
+				this.logger.error(`Error updating email for user ${orcid_id}:`, error);
+				if (error instanceof UnauthorizedException) {
+					throw error; // Re-throw UnauthorizedException
+				} else {
+					// Handle other errors, e.g., log them or throw a generic error
+
+					throw new InternalServerErrorException(
+						'An error occurred while updating the email',
+					);
+				}
 			}
 		}
 		const updatedUser = await this.userRepository.findOneAndUpdate(
-			{
-				orcid_id,
-			},
-			{
-				...emailUpdateQuery,
-				...otherUpdates,
-			},
-			{
-				...emailUpdateOptions,
-				new: true,
-			},
+			{ orcid_id },
+			{ $set: otherUpdates },
+			{ new: true },
 		);
+		if (!updatedUser) {
+			throw new UnauthorizedException('User not found');
+		}
 		if (otherUpdates.privacy) {
 			await this.eventEmitter.emitAsync(
 				UserPrivacyUpdatedEvent.name,
-				new UserPrivacyUpdatedEvent(updatedUser, otherUpdates.privacy),
+				new UserPrivacyUpdatedEvent(
+					updatedUser.toObject(),
+					otherUpdates.privacy,
+				),
 			);
 		}
 		return updatedUser;
+	}
+
+	private async handleEmailUpdate(
+		orcid_id: string,
+		emailEntry: EmailDto,
+	): Promise<void> {
+		if (!emailEntry?.email) {
+			throw new UnauthorizedException('Email address is required');
+		}
+
+		const emailMatchedUser = await this.userRepository.findOne({
+			emails: { $elemMatch: { email: emailEntry.email } },
+		});
+
+		if (emailMatchedUser) {
+			if (emailMatchedUser.orcid_id !== orcid_id) {
+				// Email belongs to another user
+				throw new UnauthorizedException(
+					'The provided email is already used by another user',
+				);
+			} else {
+				// Update existing email for the same user
+				// Find the current email object to get the original email for the array filter
+				const currentUser = await this.userRepository.findOne({ orcid_id });
+				if (!currentUser) {
+					throw new UnauthorizedException('User not found');
+				}
+
+				// Find the existing email object that matches the new email
+				const existingEmailObj = currentUser.emails?.find(
+					(e) => e.email === emailEntry.email,
+				);
+
+				if (existingEmailObj) {
+					// Update the existing email object
+					await this.userRepository.findOneAndUpdate(
+						{ orcid_id },
+						{
+							$set: {
+								// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+								'emails.$[elem]': {
+									...existingEmailObj.toObject(),
+									...emailEntry,
+								},
+							},
+						},
+						{
+							arrayFilters: [{ 'elem.email': emailEntry.email }],
+							new: true,
+						},
+					);
+				}
+			}
+		} else {
+			// Add new email
+			await this.userRepository.findOneAndUpdate(
+				{ orcid_id },
+				{
+					$push: {
+						emails: {
+							...emailEntry,
+							verified: false,
+						},
+					},
+				},
+				{ new: true },
+			);
+		}
 	}
 }

@@ -1,10 +1,22 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, LeanDocument } from 'mongoose';
+import {
+	FilterQuery,
+	HydratedDocument,
+	LeanDocument,
+	Model,
+	ProjectionType,
+	QueryOptions,
+} from 'mongoose';
 import { PrivacyType } from '../enums';
 import { IResourceEntity } from '../interfaces/user-resource-entity';
 
+
+export type LeanTermDoc = LeanDocument<Term>;
+export type TermModel = Model<Term>;
 export type TermDocument = HydratedDocument<Term>;
-export type LeanTermDocument = LeanDocument<TermDocument>;
+export type TermFilter = FilterQuery<Term>;
+export type TermProjection = ProjectionType<Term>;
+export type TermQueryOptions = QueryOptions<Term>;
 
 @Schema({ collection: 'terms_def' })
 export class Term implements IResourceEntity {

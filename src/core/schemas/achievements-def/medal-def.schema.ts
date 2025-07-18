@@ -1,8 +1,18 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import {
+	FilterQuery,
+	HydratedDocument,
+	Model,
+	ProjectionType,
+	QueryOptions,
+} from 'mongoose';
 import { PrivacyType } from '../../enums';
 
+export type MedalDefModel = Model<MedalDef>;
 export type MedalDefDocument = HydratedDocument<MedalDef>;
+export type MedalDefFilter = FilterQuery<MedalDef>;
+export type MedalDefProjection = ProjectionType<MedalDef>;
+export type MedalDefQueryOptions = QueryOptions<MedalDef>;
 
 @Schema({
 	collection: 'achievements_def',
@@ -12,16 +22,10 @@ export type MedalDefDocument = HydratedDocument<MedalDef>;
  */
 export class MedalDef {
 	/**
-	 * The ID of the medal.
-	 */
-	@Prop()
-	id: string;
-
-	/**
 	 * The category of the medal.
 	 */
 	@Prop()
-	category: string;
+	category?: string;
 
 	/**
 	 * The color of the medal.

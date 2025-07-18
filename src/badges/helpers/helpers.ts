@@ -1,4 +1,4 @@
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, LeanDocument, Model } from 'mongoose';
 import { AchievementState, PrivacyType } from '../../core/enums';
 import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
 import { BadgeDocument } from '../../core/schemas/achievements/badges.schema';
@@ -18,7 +18,7 @@ export function getReportRelatedBadgeDefFilter(
 }
 
 export function getMatchingReportFilter(
-	badgeDef: BadgeDefDocument,
+	badgeDef: LeanDocument<BadgeDefDocument> | BadgeDefDocument,
 ): FilterQuery<ReportDocument> {
 	const filter: FilterQuery<ReportDocument> = {
 		resource_id: badgeDef.resource_id,
@@ -46,33 +46,12 @@ export function getReportRelatedBadgeFilter(
 	};
 }
 
-export function createBadgeFromBadgeDefAndReport(
-	badgeModel: Model<BadgeDocument>,
-	badgeDef: BadgeDefDocument,
-	report: ReportDocument | LeanReportDocument,
-): BadgeDocument {
-	const privacy = [badgeDef.privacy, report.privacy].includes(
-		PrivacyType.private,
-	)
-		? PrivacyType.private
-		: PrivacyType.public;
-
-	return new badgeModel({
-		name: badgeDef.name,
-		resource_uri: badgeDef.resource_uri,
+export function getRelatedBadges(
+	badgeDef: LeanDocument<BadgeDefDocument>,
+): FilterQuery<BadgeDocument> {
+	return {
 		resource_id: badgeDef.resource_id,
 		league: badgeDef.league,
-		curator_orcid: report.curator_orcid,
-		count: 1,
-		color_code: badgeDef.color_code,
-		count_threshold: badgeDef.count_threshold,
-		list_terms: badgeDef.list_terms,
-		state:
-			1 >= badgeDef.count_threshold
-				? AchievementState.achieved
-				: AchievementState.progress,
-		createdAt: new Date(),
-		updatedAt: new Date(),
-		privacy,
-	});
+		name: badgeDef.name,
+	};
 }

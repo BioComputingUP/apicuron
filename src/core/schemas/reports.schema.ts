@@ -1,14 +1,22 @@
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, LeanDocument, Types } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import {
+	FilterQuery,
+	HydratedDocument,
+	LeanDocument,
+	Model,
+	ProjectionType,
+	QueryOptions,
+	Types,
+} from 'mongoose';
 import { PrivacyType } from '../enums';
 import { IUserResourceEntity } from '../interfaces/user-resource-entity';
-import { Term, TermSchema } from './terms.schema';
-import { User, UserSchema } from './user.schema';
+import { League, LeagueSchema } from './league/league.schema';
 import {
 	PartnerResource,
 	PartnerResourceSchema,
 } from './resource/partner-resource.schema';
-import { League, LeagueSchema } from './league/league.schema';
+import { Term, TermSchema } from './terms.schema';
+import { User, UserSchema } from './user.schema';
 
 export type ReportDocumentOverride = {
 	term: Types.Subdocument<Types.ObjectId> & Term;
@@ -19,7 +27,16 @@ export type ReportDocumentOverride = {
 
 export type ReportDocument = HydratedDocument<Report, ReportDocumentOverride>;
 
-export type LeanReportDocument = LeanDocument<ReportDocument>;
+export type LeanReportDocument = LeanDocument<Report>;
+export type ReportModel = Model<
+	Report,
+	Record<string, never>,
+	ReportDocumentOverride
+>;
+export type ReportFilter = FilterQuery<Report>;
+export type ReportProjection = ProjectionType<Report>;
+export type ReportQueryOptions = QueryOptions<Report>;
+
 @Schema({
 	collection: 'reports',
 })
@@ -57,31 +74,25 @@ export class Report implements IUserResourceEntity {
 		required: false,
 		type: TermSchema,
 	})
-	term: Types.Subdocument<Types.ObjectId> & Term;
+	term: Term;
 
 	@Prop({
 		required: false,
 		type: UserSchema,
 	})
-	user?: Types.Subdocument<Types.ObjectId> & User;
+	user?: User;
 
 	@Prop({
 		required: false,
 		type: PartnerResourceSchema,
 	})
-	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;
+	resource: PartnerResource;
 
 	@Prop({
 		required: false,
 		type: LeagueSchema,
 	})
-	league_data?: Types.Subdocument<Types.ObjectId> & League;
-
-	getMetaFields() {
-		return {
-			privacy: this.privacy,
-		};
-	}
+	league_data?: League;
 }
 
 const ReportSchema = SchemaFactory.createForClass(Report).loadClass(Report);

@@ -7,10 +7,17 @@ import {
 	League,
 	LeagueDocument,
 } from '../../core/schemas/league/league.schema';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import {
+	ReportModel,
+	ReportDocument,
+	Report,
+} from '../../core/schemas/reports.schema';
+import {
+	PartnerResource,
+	PartnerResourceDocument,
+} from '../../core/schemas/resource/partner-resource.schema';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
+import { User, UserDocument } from '../../core/schemas/user.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import {
 	hashTermIdentifier,
@@ -25,7 +32,7 @@ export class ReportValidatorService {
 		protected resourceService: PartnerResourcesService,
 		protected usersService: UsersService,
 		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
+		@InjectModel(Report.name) protected reportModel: ReportModel,
 	) {}
 
 	logger = new Logger(ReportValidatorService.name);
@@ -40,7 +47,7 @@ export class ReportValidatorService {
 	private assignDefaultLeague(
 		report: SubmitReportDto,
 		resource: PartnerResourceDocument,
-	): LeanDocument<LeagueDocument> {
+	): League {
 		if (!!report.league) {
 			const selectedLeague = resource.leagues.find(
 				(l) => l.name === report.league,
@@ -79,7 +86,7 @@ export class ReportValidatorService {
 	 */
 	async validateReportActivityTerm(
 		report: SubmitReportDto,
-		termDoc: TermDocument | null = null,
+		termDoc: Term | null = null,
 	) {
 		const { resource_id, activity_term } = report;
 		const term =
@@ -132,14 +139,14 @@ export class ReportValidatorService {
 	 */
 	async validateReport(
 		report: SubmitReportDto,
-		userDoc: UserDocument | null = null,
+		userDoc: User | null = null,
 		resourceDoc: PartnerResourceDocument | null = null,
-		termDoc: TermDocument | null = null,
+		termDoc: Term | null = null,
 	): Promise<{
-		report: ReportDocument;
+		report: Report;
 		resource: PartnerResourceDocument;
-		user: UserDocument;
-		term: TermDocument;
+		user: User;
+		term: Term;
 		league_data: League;
 	}> {
 		// validate the resource_id
@@ -155,15 +162,14 @@ export class ReportValidatorService {
 		const user =
 			userDoc ?? (await this.usersService.getByOrcid(report.curator_orcid));
 
-		const reportDoc = new this.reportModel({
+		const reportDoc = new this.reportModel<Report>({
 			...report,
 			term,
 			resource,
 			league_data: relatedLeague,
 			user: user,
+			privacy: computePrivacyField(resource, user, report),
 		});
-
-		reportDoc.privacy = computePrivacyField(resource, user, report);
 
 		return {
 			report: reportDoc,
@@ -223,7 +229,7 @@ export class ReportValidatorService {
 
 		const [users, terms] = await Promise.all([users$, terms$]);
 
-		const usersMap = new Map<string, UserDocument>(
+		const usersMap = new Map<string, User>(
 			users.map((u) => [u.orcid_id, u]),
 		);
 		const termsMap = new Map<string, TermDocument>(
@@ -231,16 +237,16 @@ export class ReportValidatorService {
 		);
 		const results: {
 			resource: PartnerResourceDocument;
-			user: UserDocument;
-			report: ReportDocument;
-			term: TermDocument;
+			user: User;
+			report: Report;
+			term: Term;
 			league_data: League;
 		}[] = [];
 		for (const [index, report] of reports.entries()) {
 			try {
 				const result = await this.validateReport(
 					report,
-					usersMap.get(report.curator_orcid),
+					usersMap.get(report.curator_orcid) ?? null,
 					resourcesMap.get(report.resource_id),
 					termsMap.get(hashTermIdentifier(report)),
 				);

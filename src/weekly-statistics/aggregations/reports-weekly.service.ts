@@ -1,6 +1,6 @@
-import { Aggregate, FilterQuery, Model } from 'mongoose';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
-import { Term, TermDocument } from '../../core/schemas/terms.schema';
+import { Aggregate, FilterQuery } from 'mongoose';
+import { Report, ReportDocument, ReportModel } from '../../core/schemas/reports.schema';
+import { Term, TermDocument, TermModel } from '../../core/schemas/terms.schema';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { TIMEZONE } from 'src/util/date.helper';
@@ -36,8 +36,8 @@ export interface AggregatedReportsWeekly {
  */
 export class ReportsWeeklyAggregationPipeline {
 	constructor(
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
-		@InjectModel(Term.name) protected termModel: Model<TermDocument>,
+		@InjectModel(Report.name) protected reportModel: ReportModel,
+		@InjectModel(Term.name) protected termModel: TermModel,
 	) {}
 
 	/**

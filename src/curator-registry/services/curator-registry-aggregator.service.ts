@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import {
 	LeanReportDocument,
 	Report,
 	ReportDocument,
+	ReportModel,
 } from 'src/core/schemas/reports.schema';
 import { TermDocument } from 'src/core/schemas/terms.schema';
 import { User, UserDocument } from 'src/core/schemas/user.schema';
@@ -12,9 +12,13 @@ import { AggregatorClass } from 'src/event-orchestrator/decorators/aggregator.de
 import { Aggregator } from 'src/event-orchestrator/interfaces/aggregator.interface';
 import { LeagueUpdatedEvent } from 'src/resources/partner-resources/leagues/events/league-updated.event';
 
-import { EntityCreatedEvent, EntityUpdatedEvent } from 'src/core/events';
-import { UserRepository } from 'src/core/repositories/user.repository';
+import {
+	UserCreatedEvent,
+	UserRepository,
+	UserUpdatedEvent,
+} from 'src/core/repositories/user.repository';
 
+import { getEventSubject } from 'src/core/helpers/events.helper';
 import { PartnerResource, PartnerResourceDocument } from 'src/core/schemas';
 import { CuratorRegistryService } from '../curator-registry.service';
 
@@ -22,7 +26,7 @@ import { CuratorRegistryService } from '../curator-registry.service';
 @AggregatorClass()
 export class CuratorRegistryAggregatorService implements Aggregator {
 	constructor(
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
+		@InjectModel(Report.name) protected reportModel: ReportModel,
 		protected registryService: CuratorRegistryService,
 		protected userRep: UserRepository,
 	) {}
@@ -32,7 +36,7 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 		report: LeanReportDocument | ReportDocument,
 		_term: TermDocument,
 		resource: PartnerResourceDocument,
-		curator?: UserDocument | null,
+		_curator?: UserDocument | null,
 	) {
 		// check registry for existing curator
 		const curatorEntry = await this.registryService.getCuratorEntry(
@@ -82,9 +86,9 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 		const userResource = curatorEntry.contributed_to.find(
 			(entry) => entry.resource_id === resource.resource_id,
 		);
-		const userHasContributedToLeague = userResource && userResource.groups.find(
-			(league) => league.name === leagueData.name,
-		);
+		const userHasContributedToLeague =
+			userResource &&
+			userResource.groups.find((league) => league.name === leagueData.name);
 		if (!userHasContributedToLeague) {
 			this.registryService.addLeagueToUser(
 				report.curator_orcid,
@@ -101,11 +105,8 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 	async applyAllReports(_resource_id: string) {
 		await this.registryService.recomputeAllEntries();
 	}
-	async updatedUser(
-		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
-	) {
-		const user =
-			event instanceof EntityCreatedEvent ? event.instance : event.after;
+	async updatedUser(event: UserCreatedEvent | UserUpdatedEvent) {
+		const user: User = getEventSubject(event);
 		// this will update user if they already have an entry, create new entry if not
 		this.registryService.upsertUser(user);
 		return;
@@ -148,5 +149,8 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 	termDeleted(term: TermDocument) {
 		this.recomputeAllResourceAggregates(term.resource_id);
 		return;
+	}
+	async updatedResource(resource: PartnerResourceDocument): Promise<void> {
+		this.registryService.updateResource(resource);
 	}
 }

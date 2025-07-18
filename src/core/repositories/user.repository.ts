@@ -1,28 +1,30 @@
-import { Model } from 'mongoose';
-import { User, UserDocument } from '../schemas/user.schema';
-import { EntityRepository } from './entity-repository';
-import { InjectModel } from '@nestjs/mongoose';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { InjectModel } from '@nestjs/mongoose';
 import {
 	EntityCreatedEvent,
-	EntityUpdatedEvent,
 	EntityDeletedEvent,
+	EntityUpdatedEvent,
 	ManyEntityUpdated,
-} from '../events';
-export class UserRepository extends EntityRepository<UserDocument> {
-	constructor(
-		@InjectModel(User.name) userModel: Model<UserDocument>,
-		eventEmitter: EventEmitter2,
-	) {
-		super(userModel, eventEmitter);
-	}
+} from '../events/index';
+import { User, UserDocument, UserModel } from '../schemas/user.schema';
+import { EntityRepository } from './entity-repository';
 
-	static EntityCreatedEvent =
-		EntityCreatedEvent.getModelEventName(UserRepository);
-	static EntityUpdatedEvent =
-		EntityUpdatedEvent.getModelEventName(UserRepository);
-	static EntityDeletedEvent =
-		EntityDeletedEvent.getModelEventName(UserRepository);
-	static ManyEntityUpdatedEvent =
-		ManyEntityUpdated.getModelEventName(UserRepository);
+export class UserCreatedEvent extends EntityCreatedEvent<User> {}
+export class UserUpdatedEvent extends EntityUpdatedEvent<User> {}
+export class UserDeletedEvent extends EntityDeletedEvent<User> {}
+export class ManyUserUpdatedEvent extends ManyEntityUpdated<User> {}
+
+export class UserRepository extends EntityRepository<User, UserModel> {
+	constructor(
+		@InjectModel(User.name) userModel: UserModel,
+		protected readonly eventEmitter: EventEmitter2,
+	) {
+		super(userModel);
+		this.publisher.pushToEventEmitter(this.eventEmitter, [
+			[EntityCreatedEvent.name, UserCreatedEvent.name],
+			[EntityUpdatedEvent.name, UserUpdatedEvent.name],
+			[EntityDeletedEvent.name, UserDeletedEvent.name],
+			[ManyEntityUpdated.name, ManyUserUpdatedEvent.name],
+		]);
+	}
 }

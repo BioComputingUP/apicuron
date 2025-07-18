@@ -1,12 +1,12 @@
 import { FilterQuery } from 'mongoose';
 import {
-	LeanTermDocument,
+	LeanTermDoc,
 	TermDocument,
 } from '../../core/schemas/terms.schema';
 import { ReportDocument } from '../../core/schemas/reports.schema';
 
 export function getRelatedReportFilter(
-	term: TermDocument | LeanTermDocument,
+	term: TermDocument | LeanTermDoc,
 ): FilterQuery<ReportDocument> {
 	return {
 		resource_id: term.resource_id,

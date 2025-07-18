@@ -1,8 +1,18 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import {
+	FilterQuery,
+	HydratedDocument,
+	Model,
+	ProjectionType,
+	QueryOptions,
+} from 'mongoose';
 import { PrivacyType } from '../../enums';
 
+export type BadgeDefModel = Model<BadgeDef>;
 export type BadgeDefDocument = HydratedDocument<BadgeDef>;
+export type BadgeDefFilter = FilterQuery<BadgeDef>;
+export type BadgeDefProjection = ProjectionType<BadgeDef>;
+export type BadgeDefQueryOptions = QueryOptions<BadgeDef>;
 
 @Schema({
 	collection: 'achievements_def',

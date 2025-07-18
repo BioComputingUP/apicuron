@@ -1,6 +1,5 @@
 import { EntityCreatedEvent } from 'src/core/events/entity-created.event';
 import { EntityUpdatedEvent } from 'src/core/events/entity-updated.event';
-import { Document } from 'mongoose';
 import { throwError, UnexpectedError } from 'src/util/error.utils';
 
 /**
@@ -11,7 +10,7 @@ import { throwError, UnexpectedError } from 'src/util/error.utils';
  * @throws {Error} If the event is neither an EntityCreatedEvent nor an EntityUpdatedEvent.
  */
 
-export function getEventSubject<T extends Document>(
+export function getEventSubject<T>(
 	event: EntityCreatedEvent<T> | EntityUpdatedEvent<T>,
 ): T {
 	if (event instanceof EntityCreatedEvent) {

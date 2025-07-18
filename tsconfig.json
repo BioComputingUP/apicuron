@@ -20,8 +20,9 @@
 		"types": ["node", "jest"],
 		"strictNullChecks": false,
 		"noImplicitAny": false,
-		"strictBindCallApply": false,
+		"strictBindCallApply": true,
 		"forceConsistentCasingInFileNames": false,
 		"noFallthroughCasesInSwitch": false
-	}
+	},
+	"exclude": ["node_modules", "dist"]
 }

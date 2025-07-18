@@ -1,17 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { plainToInstance } from 'class-transformer';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery } from 'mongoose';
 import { AchievementState } from '../core/enums';
-import { AchievementDocument } from '../core/schemas/achievements/achievements.schema';
 import {
+	Achievement,
+	AchievementFilter,
 	Badge,
-	BadgeDocument,
-} from '../core/schemas/achievements/badges.schema';
-import {
+	BadgeModel,
 	Medal,
-	MedalDocument,
-} from '../core/schemas/achievements/medals.schema';
+	MedalModel,
+} from '../core/schemas';
 import { PartnerResourcesService } from '../resources/partner-resources/services/partner-resources.service';
 import { UserAchievements } from './dto/achievements.dto';
 
@@ -19,8 +18,8 @@ import { UserAchievements } from './dto/achievements.dto';
 export class AchievementsService {
 	constructor(
 		protected partnerResourceService: PartnerResourcesService,
-		@InjectModel(Badge.name) protected badgeModel: Model<BadgeDocument>,
-		@InjectModel(Medal.name) protected medalModel: Model<MedalDocument>,
+		@InjectModel(Badge.name) protected badgeModel: BadgeModel,
+		@InjectModel(Medal.name) protected medalModel: MedalModel,
 	) {}
 
 	async user_achievements({
@@ -30,7 +29,7 @@ export class AchievementsService {
 	}: {
 		curator_orcid: string;
 		resource_id: string;
-	} & FilterQuery<AchievementDocument>) {
+	} & AchievementFilter) {
 		const resource_uri = await this.partnerResourceService.retrieve_uri(
 			resource_id,
 		);

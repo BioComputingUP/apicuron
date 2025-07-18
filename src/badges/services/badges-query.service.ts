@@ -1,29 +1,29 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, FilterQuery, QueryOptions } from 'mongoose';
+import { FilterQuery, QueryOptions } from 'mongoose';
 import { AchievementState } from '../../core/enums';
 import {
 	Badge,
 	BadgeDocument,
+	BadgeModel
 } from '../../core/schemas/achievements/badges.schema';
-import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { plainToClass, plainToInstance } from 'class-transformer';
-import { BadgeDto, PrivateBadgeDto } from '../dto/badge.dto';
-import { UserBadgesFilter } from '../dto/badge-filter.dto';
-import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
 import { User } from '../../core/schemas/user.schema';
+import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
+import { userResourceEntityPrivacyFilter } from '../../util/privacy.helper';
+import { UserBadgesFilter } from '../dto/badge-filter.dto';
+import { BadgeDto } from '../dto/badge.dto';
 
 @Injectable()
 export class BadgesQueryService {
 	constructor(
-		@InjectModel(Badge.name) protected badgeModel: Model<BadgeDocument>,
+		@InjectModel(Badge.name) protected badgeModel: BadgeModel,
 		protected partnerResourceService: PartnerResourcesService,
 	) { }
 	logger = new Logger(BadgesQueryService.name);
 
 	async getBadges(
-		filter: FilterQuery<BadgeDocument>,
-		options: QueryOptions<BadgeDocument>,
+		filter: FilterQuery<Badge>,
+		options: QueryOptions<Badge>,
 	): Promise<{ data: BadgeDto[]; count: number }> {
 		filter.state = AchievementState.achieved;
 		const dataPromise = this.badgeModel.find(filter, {}, options);

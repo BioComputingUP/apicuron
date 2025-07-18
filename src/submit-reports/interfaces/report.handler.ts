@@ -1,22 +1,22 @@
-import { ReportDocument } from '../../core/schemas/reports.schema';
+import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
 
 export interface ReportHandler {
-	handle(report: ReportDocument):
+	handle(report: Report):
 		| {
 				resource: PartnerResourceDocument;
-				report: ReportDocument;
+				report: Report;
 				user: UserDocument;
 		  }
 		| Promise<{
 				resource: PartnerResourceDocument;
-				report: ReportDocument;
+				report: Report;
 				user: UserDocument;
 		  }>;
 	handleMultiple(
-		reports: ReportDocument[],
+		reports: Report[],
 	):
-		| { reports: ReportDocument[]; resources: any[]; users: any[] }
-		| Promise<{ reports: ReportDocument[]; resources: any[]; users: any[] }>;
+		| { reports: Report[]; resources: any[]; users: any[] }
+		| Promise<{ reports: Report[]; resources: any[]; users: any[] }>;
 }

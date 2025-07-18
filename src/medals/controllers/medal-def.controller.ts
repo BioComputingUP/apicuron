@@ -5,7 +5,6 @@ import {
 	Req,
 	Get,
 	Put,
-	Res,
 	Delete,
 	Param,
 	Query,
@@ -28,14 +27,14 @@ import { User } from '../../core/schemas/user.schema';
 import { UserReq } from '../../auth/decorators/applyUser.decorator';
 import { VersionHeader } from '../../plugins/swagger/config';
 import { AuthService } from '../../auth/auth.service';
-import { paginate, Paginated } from '../../pagination/paginator';
+import { paginate } from '../../pagination/paginator';
 import { UpdateMedalDefDto } from '../dto/update-medal-def.dto';
 import { MedalDefCommandsService } from '../services/medal-def-commands.service';
 import { MedalDefQueriesService } from '../services/medal-def-queries.service';
 import { MedalDefFilter } from '../dto/filter-medal-def.dto';
-import { Response } from 'express';
-import { MedalDefDto } from '../dto/medal.dto';
-import { plainToInstance } from 'class-transformer';
+import { MedalDefDto, MedalDto } from '../dto/medal.dto';
+import { firstValueFrom } from 'rxjs';
+import { BasePaginationDto } from 'src/pagination/dto/paginate.dto';
 
 @ApiTags('Achievements Definition')
 @ApiHeader(VersionHeader)
@@ -83,7 +82,7 @@ export class MedalsDefController {
 	@ApiSecurity('basic')
 	@AuthProtected()
 	@Public()
-	@SerializeOptions({ type: Paginated<MedalDefDto> })
+	// @SerializeOptions({ type: Paginated<MedalDefDto> })
 	@Get()
 	async getMedals(
 		@Query() medalFilter: MedalDefFilter,
@@ -108,15 +107,11 @@ export class MedalsDefController {
 	@ApiSecurity('basic')
 	@Put('edit')
 	@AuthProtected()
-	async update_medal(
-		@Body() update_medal: UpdateMedalDefDto,
-		@Req() req,
-		@Res() res: Response,
-	) {
+	async update_medal(@Body() update_medal: UpdateMedalDefDto, @Req() req) {
 		this.can_edit_resource(req.user, update_medal.resource_id);
 		const response = await this.commandsService.updateMedalDef(update_medal);
 
-		return response
+		return response;
 	}
 
 	@ApiOperation({
@@ -133,4 +128,25 @@ export class MedalsDefController {
 		this.can_edit_resource(req.user, delete_medal.resource_id);
 		return await this.commandsService.deleteMedalDef(delete_medal);
 	}
+
+	// Disabled for now, as it is not used in the frontend
+	// @AuthProtected()
+	// @Post('test')
+	// async loadMedalsForDef(@Body() medalDef: CreateMedalDefDto) {
+	// 	const medals$ = await this.commandsService.makePutativeMedals(
+	// 		medalDef,
+	// 		0,
+	// 		10,
+	// 	);
+	// 	let medals: MedalDefDto[] = [];
+	// 	try {
+	// 		medals = await firstValueFrom(medals$);
+	// 	} catch (err) {}
+
+	// 	const pagination = new BasePaginationDto();
+	// 	pagination.skip = 0;
+	// 	pagination.limit = 10;
+
+	// 	return paginate<MedalDto>(MedalDto, medals, pagination, 35);
+	// }
 }

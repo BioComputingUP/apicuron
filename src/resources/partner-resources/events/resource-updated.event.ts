@@ -1,4 +1,3 @@
-import { PartnerResourceDocument } from '../../../core/schemas';
 import { PartnerResourceEntity } from '../../dto/partner-resources.entity';
 
 export class PartnerResourceUpdatedEvent {

@@ -4,8 +4,10 @@ import { UsersService } from './auth/users/services/users.service';
 import { ReportsService } from './reports/reports.service';
 import { PartnerResourcesService } from './resources/partner-resources/services/partner-resources.service';
 import { InjectModel } from '@nestjs/mongoose';
-import { AchievementDef } from './core/schemas/achievements-def/achievement-def.schema';
-import { Model } from 'mongoose';
+import {
+	AchievementDef,
+	AchievementDefModel,
+} from './core/schemas/achievements-def/achievement-def.schema';
 import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
 @Controller()
 export class AppController {
@@ -14,7 +16,7 @@ export class AppController {
 		protected userService: UsersService,
 		protected reportService: ReportsService,
 		@InjectModel(AchievementDef.name)
-		protected achievementDefModel: Model<AchievementDef>,
+		protected achievementDefModel: AchievementDefModel,
 		protected storageService: StorageService,
 	) {}
 

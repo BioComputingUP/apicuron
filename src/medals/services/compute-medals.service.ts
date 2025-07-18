@@ -1,8 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import * as _ from 'lodash';
-import { Cursor, FilterQuery, Model } from 'mongoose';
+import { Cursor, FilterQuery, LeanDocument, Model } from 'mongoose';
+import { from, Observable, switchMap, tap, timer } from 'rxjs';
+import { UsersService } from 'src/auth/users/services/users.service';
+import { User, UserDocument } from 'src/core/schemas/index';
 import { AchievementState } from '../../core/enums';
 import {
 	MedalDef,
@@ -11,6 +14,7 @@ import {
 import {
 	Medal,
 	MedalDocument,
+	MedalModel,
 } from '../../core/schemas/achievements/medals.schema';
 import {
 	LeanReportDocument,
@@ -23,6 +27,9 @@ import { MedalEarnedEvent } from '../events/medal-earned.event';
 import { GetrelatedReportFilter } from '../helpers/helpers';
 import { MedalDefReportsUserSummary } from '../interfaces/aggregated-reports';
 
+export function create<T>(model: Model<T>, data: T) {
+	return new model(data);
+}
 @Injectable()
 export class ComputeMedalsService {
 	constructor(
@@ -31,7 +38,8 @@ export class ComputeMedalsService {
 		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
 		@InjectModel(MedalDef.name)
 		protected medalDefModel: Model<MedalDefDocument>,
-		@InjectModel(Medal.name) protected medalModel: Model<MedalDocument>,
+		@InjectModel(Medal.name) protected medalModel: MedalModel,
+		protected userService: UsersService,
 	) {}
 
 	logger = new Logger(ComputeMedalsService.name);
@@ -45,19 +53,33 @@ export class ComputeMedalsService {
 	 * @param rankIndex - The rank index.
 	 * @returns The state of the medal obtained for the user
 	 */
-	private async processAggregatedReportsByMedalDef(
-		medalDef: MedalDefDocument,
+	private makeMedalFromMedalDefReports(
+		medalDef: MedalDef,
 		aggregatedReports: MedalDefReportsUserSummary,
+		user: User,
 		rankIndex: number,
-	): Promise<AchievementState> {
+	): MedalDocument {
 		const earned = rankIndex + 1 <= medalDef.score_relative;
 		const achievementState = earned
 			? AchievementState.achieved
 			: AchievementState.progress;
-		const medalDefObject = medalDef.toObject();
-		const medal = new this.medalModel({
-			medalDefObject,
-			_id: undefined,
+
+		const medalDoc = new this.medalModel<Medal>({
+			name: medalDef.name,
+			user,
+			resource_id: medalDef.resource_id,
+			league: medalDef.league,
+			list_terms: medalDef.list_terms,
+			color: medalDef.color,
+			score_relative: medalDef.score_relative,
+			privacy: computeAggregatePrivacyField(medalDef, aggregatedReports),
+			resource_uri: medalDef.resource_uri,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			count_relative_index: rankIndex,
+			count_relative_valid: true,
+			count_threshold_valid: true,
+			score_threshold_valid: true,
 			curator_orcid: aggregatedReports.curator_orcid,
 			last_day: medalDef?.last_day,
 			first_day: medalDef?.first_day,
@@ -67,52 +89,69 @@ export class ComputeMedalsService {
 			score_relative_valid: earned,
 			score_relative_index: rankIndex,
 		});
-		medal.privacy = computeAggregatePrivacyField(medalDef, aggregatedReports);
 
+		return medalDoc;
+	}
+	private async saveMedal(medal: MedalDocument): Promise<AchievementState> {
 		try {
-			await medal.save();
-			this.logger.debug(
-				`Saved medal ${medalDef.name} for ${aggregatedReports.curator_orcid}`,
-			);
+			await this.medalModel.create(medal);
+			this.logger.debug(`Saved medal ${medal.name} for ${medal.curator_orcid}`);
 			return AchievementState.achieved;
 		} catch (err: unknown) {
 			if (err instanceof Error) {
 				this.logger.error(err.message, err.stack, err.name);
 				throw new Error(
-					`An error occured while creating medal ${medalDef.name} for curator ${aggregatedReports.curator_orcid} in resource ${medalDef.resource_id}`,
+					`processAggregatedReportsByMedalDef: An error occured while creating medal ${medal.name} for curator ${medal.curator_orcid} in resource ${medal.resource_id}`,
 				);
 			} else {
 				throw new Error(
-					`An unknown error occurred while creating medal ${medalDef.name} for curator ${aggregatedReports.curator_orcid} in resource ${medalDef.resource_id}`,
+					`An unknown error occurred while creating medal ${medal.name} for curator ${medal.curator_orcid} in resource ${medal.resource_id}`,
 				);
 			}
 		}
 	}
 
-	public async computeMedalsForMedalDef(medalDef: MedalDefDocument) {
+	public async *generateMedalsForDef(
+		medalDef: LeanDocument<MedalDefDocument>,
+	): AsyncGenerator<MedalDocument> {
 		const reportsAgg = this.medalReportsAggregationCursor(medalDef);
-
-		const medalAsyncIterator = (async function* () {
-			let i = 0;
-			for await (const reportWithCount of reportsAgg) {
-				yield [reportWithCount, i] as [MedalDefReportsUserSummary, number];
-				i++;
-			}
-			return;
-		})();
-
-		const aggReportsPromises$: Promise<AchievementState>[] = [];
-
-		for await (const [aggregatedReports, idx] of medalAsyncIterator) {
-			const aggReportsPromise$ = this.processAggregatedReportsByMedalDef(
-				medalDef,
-				aggregatedReports,
-				idx,
+		let rankingCounter = 0;
+		for await (const reportWithCount of reportsAgg) {
+			const user = await this.userService.getByOrcid(
+				reportWithCount.curator_orcid,
 			);
-			aggReportsPromises$.push(aggReportsPromise$);
+			const medal = this.makeMedalFromMedalDefReports(
+				medalDef,
+				reportWithCount,
+				user,
+				rankingCounter,
+			);
+			yield medal;
+			rankingCounter++;
 		}
+		return;
+	}
 
-		const medalsStates = await Promise.all(aggReportsPromises$);
+	public streamMedalsForMedalDef(
+		medalDef: LeanDocument<MedalDefDocument>,
+	): Observable<MedalDocument> {
+		const medalAsyncIterator = this.generateMedalsForDef(medalDef);
+		return from(medalAsyncIterator);
+	}
+
+	public async computeMedalsForMedalDef(medalDef: MedalDefDocument) {
+		this.logger.debug(`Computing medals for MedalDef: ${medalDef.name}`);
+
+		const saveMedalsPromises$: Promise<AchievementState>[] = [];
+
+		for await (const medal of this.generateMedalsForDef(medalDef)) {
+			this.logger.debug(
+				`Saving medal ${medal.name} for curator ${medal.curator_orcid}`,
+			);
+			const saveMedalPromise$ = this.saveMedal(medal);
+			saveMedalsPromises$.push(saveMedalPromise$);
+		}
+		const medalsStates = await Promise.all(saveMedalsPromises$);
 
 		// takes the list of medal states computed for a specific MedalDef
 		// splits into lists of achieved and progress
@@ -139,7 +178,9 @@ export class ComputeMedalsService {
 			resource_id: medalDef.resource_id,
 			league: medalDef.league,
 		});
-
+		this.logger.debug(
+			`Deleted ${medalsDeleted.deletedCount} medals for ${medalDef.name}`,
+		);
 		return await this.computeMedalsForMedalDef(medalDef);
 	}
 
@@ -153,7 +194,7 @@ export class ComputeMedalsService {
 	 * @returns A cursor for aggregating reports by user for a specific medalDef.
 	 */
 	private medalReportsAggregationCursor(
-		medal: MedalDefDocument,
+		medal: MedalDefDocument | LeanDocument<MedalDefDocument>,
 		cursorOptions: { batchSize: number } = { batchSize: 50 },
 	): Cursor<MedalDefReportsUserSummary> {
 		const reportFilter = GetrelatedReportFilter(medal);
@@ -162,20 +203,13 @@ export class ComputeMedalsService {
 			this.reportModel
 				.aggregate()
 				.match(reportFilter)
-				// here we lookup and unwind from the terms_def collection to get the term score
-				.lookup({
-					from: this.termModel.collection.name,
-					localField: 'activity_term',
-					foreignField: 'activity_term',
-					as: 'term',
-				})
-				.unwind({ path: '$term' })
 				.project({
 					curator_orcid: 1,
 					activity_term: 1,
 					score: '$term.score',
 					resource_id: 1,
 					privacy: 1,
+					term: 1,
 				})
 				// # here we group by curator while computing the count and score sum
 				.group({
@@ -222,7 +256,7 @@ export class ComputeMedalsService {
 		}
 		const medalComputedCounts = await Promise.all(medalDefCountsPromises$);
 
-		const [totalAchieved, totalProgress] = medalComputedCounts.reduce(
+		const [totalAchieved, _] = medalComputedCounts.reduce(
 			(val: [number, number], curr: [number, number]) => [
 				val[0] + curr[0],
 				val[1] + curr[1],

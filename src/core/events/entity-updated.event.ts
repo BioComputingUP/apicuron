@@ -1,16 +1,10 @@
-import { Document, Model } from 'mongoose';
-import { EntityEvent } from './abstract-entity.event';
-import { EntityRepository } from '../repositories/entity-repository';
+import { HydratedDocument } from 'mongoose';
 
-export class EntityUpdatedEvent<T extends Document> extends EntityEvent<T> {
+export class EntityUpdatedEvent<Entity> {
 	constructor(
-		public readonly model: Model<T>,
-		public readonly Repository: typeof EntityRepository,
 		public readonly identifier: string,
-		public readonly before: T,
-		public readonly after: T,
+		public readonly before: Entity,
+		public readonly after: Entity,
 		public readonly timestamp: Date,
-	) {
-		super(model, Repository, timestamp);
-	}
+	) {}
 }

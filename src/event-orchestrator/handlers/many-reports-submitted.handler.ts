@@ -2,9 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { IEventHandler } from '@nestjs/cqrs';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Report, ReportModel } from '../../core/schemas/reports.schema';
 import { assertNotNull } from 'src/util/type-assertion.helper';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
 import {
 	IManyReportsSubmittedEventPayload,
 	ManyReportsSubmittedEvent,
@@ -17,7 +16,7 @@ export class ManyReportsSubmittedHandler implements IEventHandler {
 	logger = new Logger(ManyReportsSubmittedHandler.name);
 	constructor(
 		protected runner: SubmissionRunner,
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
+		@InjectModel(Report.name) protected reportModel: ReportModel,
 	) {}
 
 	payloadProcessorFactory(payload: IManyReportsSubmittedEventPayload) {
@@ -40,7 +39,9 @@ export class ManyReportsSubmittedHandler implements IEventHandler {
 				const resource = resources.find(
 					(r) => r.resource_id === report.resource_id,
 				);
-				const user = users.find((u) => u.orcid_id === report.curator_orcid);
+				const user = users.find(
+					(userEl) => userEl?.orcid_id === report.curator_orcid,
+				);
 				const term = terms.find(
 					(t) =>
 						t.activity_term === report.activity_term &&

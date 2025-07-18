@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
 	BadgeDef,
 	BadgeDefDocument,
+	BadgeDefModel,
 } from '../../core/schemas/achievements-def/badge-def.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery } from 'mongoose';
@@ -12,11 +13,11 @@ import * as _ from 'lodash';
 export class BadgeDefQueriesService {
 	constructor(
 		@InjectModel(BadgeDef.name)
-		protected badgeDefModel: Model<BadgeDefDocument>,
+		protected badgeDefModel: BadgeDefModel,
 	) {}
 	async getbadgeDefs(
 		badgeFilter: BadgeDefFilter,
-		queryFilter: FilterQuery<BadgeDefDocument> = {},
+		queryFilter: FilterQuery<BadgeDef> = {},
 	) {
 		const { search_query, ...remainingFilters } = badgeFilter.omitPagination();
 

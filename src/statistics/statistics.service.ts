@@ -1,13 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { plainToInstance } from 'class-transformer';
-import {
-	FilterQuery,
-	LeanDocument,
-	Model,
-	PipelineStage,
-	QueryOptions,
-} from 'mongoose';
+import { FilterQuery, Model, PipelineStage, QueryOptions } from 'mongoose';
 import { UserRepository } from '../core/repositories/user.repository';
 import {
 	Statistics,
@@ -166,8 +160,8 @@ export class StatisticsService {
 		options: QueryOptions<StatisticsDocument>,
 	): Promise<{
 		data: {
-			stat: LeanDocument<Statistics>;
-			user: LeanDocument<User> | null;
+			stat: Statistics;
+			user: User | null;
 		}[];
 		count: number;
 	}> {
@@ -187,7 +181,7 @@ export class StatisticsService {
 		);
 
 		const data = leaderboard.map((stat) => {
-			const user = stat.user?.toObject<LeanDocument<UserDocument>>() ?? null;
+			const user = stat.user?.toObject<User>() ?? null;
 			const leaderboardEntry = {
 				stat: stat.toObject(),
 				user,
@@ -196,7 +190,7 @@ export class StatisticsService {
 			return leaderboardEntry;
 		});
 
-		const count = await this.statisticsModel.count(filter);
+		const count = await this.statisticsModel.countDocuments(filter);
 		return {
 			data,
 			count,

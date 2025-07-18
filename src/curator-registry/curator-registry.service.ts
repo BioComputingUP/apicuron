@@ -4,29 +4,33 @@ import {
 	Logger,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, PipelineStage, ProjectionType } from 'mongoose';
+import * as _ from 'lodash';
 import {
-	ContributionEntry,
-	ContributionEntryDocument,
+	FilterQuery,
+	LeanDocument,
+	PipelineStage,
+	ProjectionType,
+} from 'mongoose';
+import { PrivacyType } from 'src/core/enums';
+import { UserRepository } from 'src/core/repositories/user.repository';
+import { League, LeagueDocument, PartnerResource } from 'src/core/schemas';
+import {
 	CuratorRegistryEntry,
 	CuratorRegistryEntryDocument,
+	CuratorRegistryEntryModel,
 	LeanContributionEntryDocument,
 	LeanCuratorRegistryEntryDocument,
 } from 'src/core/schemas/curator-registry/curator-entry.schema';
+import { Report, ReportModel } from 'src/core/schemas/reports.schema';
+import { User } from 'src/core/schemas/user.schema';
 import { PartnerResourcesService } from 'src/resources/partner-resources/services/partner-resources.service';
 import { GetRegistryEntryDto } from './dto/registry-entries.dto';
-import { UserRepository } from 'src/core/repositories/user.repository';
-import { Report, ReportDocument } from 'src/core/schemas/reports.schema';
-import { User } from 'src/core/schemas/user.schema';
-import { League, LeagueDocument, PartnerResource } from 'src/core/schemas';
-import { PrivacyType } from 'src/core/enums';
-import * as _ from 'lodash';
 @Injectable()
 export class CuratorRegistryService {
 	constructor(
 		@InjectModel(CuratorRegistryEntry.name)
-		protected registryEntryModel: Model<CuratorRegistryEntryDocument>,
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
+		protected registryEntryModel: CuratorRegistryEntryModel,
+		@InjectModel(Report.name) protected reportModel: ReportModel,
 		protected userRep: UserRepository,
 		protected resourceService: PartnerResourcesService,
 	) {}
@@ -68,10 +72,12 @@ export class CuratorRegistryService {
 			query.getMongoQueryOptions();
 
 		try {
-			const count = await this.registryEntryModel.count(query_filter);
-			const entries = await this.registryEntryModel
-				.find(query_filter, {}, queryOptions)
-				.lean();
+			const count: number = await this.registryEntryModel.count(query_filter);
+
+			const entries: LeanDocument<CuratorRegistryEntry>[] =
+				await this.registryEntryModel
+					.find(query_filter, {}, queryOptions)
+					.lean();
 
 			if (entries.length == 0) {
 				return {
@@ -103,16 +109,17 @@ export class CuratorRegistryService {
 		}
 	}
 
-	async getCuratorEntry(orcid_identifier: string): Promise<LeanCuratorRegistryEntryDocument | null> {
+	async getCuratorEntry(
+		orcid_identifier: string,
+	): Promise<LeanCuratorRegistryEntryDocument | null> {
 		let entry: LeanCuratorRegistryEntryDocument | null = null;
 		try {
-			entry =  await this.registryEntryModel
+			entry = await this.registryEntryModel
 				.findOne({
 					curator_orcid: orcid_identifier,
 				})
 				.lean();
 			return entry ?? null;
-			
 		} catch (error) {
 			this.logger.error(
 				`Could not retrieve user with orcid: ${orcid_identifier}...`,
@@ -386,5 +393,24 @@ export class CuratorRegistryService {
 			},
 		});
 		return result.deletedCount;
+	}
+
+	async updateResource(resource: PartnerResource): Promise<void> {
+		const result = await this.registryEntryModel.updateMany(
+			{
+				'contributed_to.resource_id': resource.resource_id,
+			},
+			{
+				$set: {
+					'contributed_to.$[elem].resource': resource,
+				},
+			},
+			{
+				arrayFilters: [{ 'elem.resource_id': resource.resource_id }],
+			},
+		);
+		this.logger.debug(
+			`Updated ${result.modifiedCount} entries for resource ${resource.resource_id}`,
+		);
 	}
 }

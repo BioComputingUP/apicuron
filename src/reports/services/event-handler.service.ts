@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Query, UpdateWriteOpResult } from 'mongoose';
+import { Query, UpdateWriteOpResult } from 'mongoose';
 import { UserPrivacyUpdatedEvent } from '../../auth/users/events/update-privacy';
-import { Report, ReportDocument } from '../../core/schemas/reports.schema';
+import { ReportModel, Report, ReportDocument } from '../../core/schemas/reports.schema';
 import { LeagueDeletedEvent } from '../../resources/partner-resources/leagues/events/league-deleted-event';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { computePrivacyField } from '../../util/privacy.helper';
@@ -11,7 +11,7 @@ import { computePrivacyField } from '../../util/privacy.helper';
 @Injectable()
 export class ReportEventsHandlerService {
 	constructor(
-		@InjectModel(Report.name) protected reportModel: Model<ReportDocument>,
+		@InjectModel(Report.name) protected reportModel: ReportModel,
 		protected resourcesService: PartnerResourcesService,
 	) {}
 
@@ -43,7 +43,7 @@ export class ReportEventsHandlerService {
 			.map((resource) => this.resourcesService.getResourceLeagues(resource))
 			.flat();
 
-		const updatePromises$: Query<UpdateWriteOpResult, ReportDocument>[] = [];
+		const updatePromises$: Promise<UpdateWriteOpResult>[] = [];
 		for (const [resource, league] of resourceLeagues) {
 			// Update the privacy field of reports that match the specified criteria
 			const updatePromise$ = this.reportModel.updateMany(
@@ -59,7 +59,7 @@ export class ReportEventsHandlerService {
 						}),
 					},
 				},
-			);
+			).exec();
 			updatePromises$.push(updatePromise$);
 		}
 

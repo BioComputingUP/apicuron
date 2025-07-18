@@ -3,13 +3,13 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { BadgeDefUpdatedEvent } from '../events/badge-def-updated.event';
 import { BadgeDocument } from '../../core/schemas/achievements/badges.schema';
 import { FilterQuery } from 'mongoose';
-import { ComputeBadgesService } from '../services/compute-badges.service';
 import { ResourceBadgesUpdatedEvent } from '../events/badge-count-updated.event';
+import { BadgeAggregatorService } from '../services/badge-aggregator.service';
 
 @Injectable()
 export class BadgeDefUpdatedEventHandler {
 	constructor(
-		protected computeBadges: ComputeBadgesService,
+		protected badgeAggregator: BadgeAggregatorService,
 		protected eventEmitter: EventEmitter2,
 	) {}
 
@@ -20,7 +20,7 @@ export class BadgeDefUpdatedEventHandler {
 			resource_id: badgeDef.resource_id,
 			league: badgeDef.league,
 		};
-		await this.computeBadges.reComputeBadges(filter);
+		await this.badgeAggregator.reComputeBadges(filter);
 		await this.eventEmitter.emitAsync(
 			ResourceBadgesUpdatedEvent.name,
 			new ResourceBadgesUpdatedEvent(badgeDef.resource_id),

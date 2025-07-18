@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LeanDocument } from 'mongoose';
-import { ConfigurationError, throwError } from 'src/util/error.utils';
+import { StatisticsDocument, User, UserDocument } from '../../../core/schemas';
 import { PartnerResource } from '../../../core/schemas/resource/partner-resource.schema';
-import { StatisticsDocument } from '../../../core/schemas/statistics.schema';
-import { UserDocument } from '../../../core/schemas/user.schema';
 import { OrcidWork } from '../../../orcid/orcid-client/interfaces/orcid.interface';
 import { OrcidWorkBuilder } from '../interfaces/orcid-submission.interface';
 
