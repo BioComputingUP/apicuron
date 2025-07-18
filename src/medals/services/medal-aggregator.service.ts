@@ -3,6 +3,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Query, UpdateWriteOpResult } from 'mongoose';
 import { getEventSubject } from 'src/core/helpers/events.helper';
+import { UserCreatedEvent, UserUpdatedEvent } from 'src/core/repositories/user.repository';
 import { PrivacyType } from '../../core/enums';
 import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
@@ -102,7 +103,7 @@ export class MedalAggregatorService implements Aggregator {
 	}
 
 	async updatedUser(
-		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
+		event: UserCreatedEvent | UserUpdatedEvent,
 	) {
 		const user = getEventSubject(event);
 		const { orcid_id: curator_orcid, privacy } = user;

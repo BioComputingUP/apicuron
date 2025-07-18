@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { getEventSubject } from 'src/core/helpers/events.helper';
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { UserCreatedEvent, UserUpdatedEvent } from 'src/core/repositories/user.repository';
 import {
 	LeanReportDocument,
-	ReportDocument,
+	ReportDocument
 } from '../../core/schemas/reports.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import {
 	MonthlyStatistics,
-	MonthlyStatisticsDocument,
+	MonthlyStatisticsDocument
 } from '../../core/schemas/statistics/monthly-statistics.schema';
 import { TermDocument } from '../../core/schemas/terms.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
@@ -69,7 +69,7 @@ export class MonthlyStatisticsAggregator implements Aggregator {
 		await this.computeMonthlyStats.deleteStats({ resource_id });
 	}
 	async updatedUser(
-		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
+		event: UserCreatedEvent | UserUpdatedEvent,
 	) {
 		const user = getEventSubject(event);
 		await this.monthlyStatsModel.updateMany(
