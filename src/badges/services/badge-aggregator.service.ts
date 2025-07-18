@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { MongoServerError } from 'mongodb';
-import { FilterQuery, Model, UpdateWriteOpResult } from 'mongoose';
+import { FilterQuery, UpdateWriteOpResult } from 'mongoose';
 import { AchievementState, PrivacyType } from '../../core/enums';
 import {
 	BadgeDef,
@@ -28,9 +28,14 @@ import {
 	getReportRelatedBadgeFilter,
 } from '../helpers/helpers';
 
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
+import { getEventSubject } from 'src/core/helpers/events.helper';
+import {
+	UserCreatedEvent,
+	UserUpdatedEvent,
+} from 'src/core/repositories/user.repository';
+import { PartnerResource } from 'src/core/schemas/index';
 import { TermDocument } from '../../core/schemas/terms.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
+import { User } from '../../core/schemas/user.schema';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
@@ -38,7 +43,6 @@ import {
 	ResourceBadgesUpdatedEvent,
 	UserBadgesUpdatedEvent,
 } from '../events/badge-count-updated.event';
-import { BadgeEarnedEvent } from '../events/badge-earned.event';
 import { ComputeBadgesService } from './compute-badges.service';
 @Injectable()
 @AggregatorClass()
@@ -107,18 +111,10 @@ export class BadgeAggregatorService implements Aggregator {
 
 		return medalDefDeleted.deletedCount + medalDeleted.deletedCount;
 	}
-	async updatedUser(
-		event: EntityCreatedEvent<UserDocument> | EntityUpdatedEvent<UserDocument>,
-	) {
-		let curator_orcid, privacy;
-		if (event instanceof EntityCreatedEvent) {
-			curator_orcid = event.instance.orcid_id;
-			privacy = event.instance.privacy;
-		}
-		if (event instanceof EntityUpdatedEvent) {
-			curator_orcid = event.after.orcid_id;
-			privacy = event.after.privacy;
-		}
+	async updatedUser(event: UserCreatedEvent | UserUpdatedEvent) {
+		const user: User = getEventSubject(event);
+		const { orcid_id: curator_orcid, privacy } = user;
+
 		await this.badgeModel.updateMany(
 			{
 				curator_orcid,
@@ -347,5 +343,8 @@ export class BadgeAggregatorService implements Aggregator {
 	): Promise<{ badgeCount: number; badgeDefsCount: number }> {
 		await this.badgeModel.deleteMany(filter);
 		return await this.createBadges(filter);
+	}
+	updatedResource(_after: PartnerResource): Promise<void> {
+		return; // badges have no reference to the resource
 	}
 }

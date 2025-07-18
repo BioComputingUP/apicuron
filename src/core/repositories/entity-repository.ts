@@ -1,3 +1,5 @@
+import { Logger, OnModuleDestroy } from '@nestjs/common';
+import { DeleteResult, ObjectId, UpdateResult } from 'mongodb';
 import {
 	Aggregate,
 	AggregateOptions,
@@ -15,15 +17,12 @@ import {
 	UpdateQuery,
 	UpdateWithAggregationPipeline,
 } from 'mongoose';
-import { DeleteResult, ObjectId, UpdateResult } from 'mongodb';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
-	EntityDeletedEvent,
-	ManyEntityUpdated,
-	EntityUpdatedEvent,
 	EntityCreatedEvent,
+	EntityDeletedEvent,
+	EntityUpdatedEvent,
+	ManyEntityUpdated,
 } from '../events';
-import { Logger, OnModuleDestroy } from '@nestjs/common';
 import { RepositoryEventPublisher } from '../helpers/event-mapper';
 
 type EntityEvents<C> =
@@ -276,7 +275,9 @@ export abstract class EntityRepository<
 		TQueryHelpers,
 		EntityClass
 	> {
-		return this.model.find<HydratedDocument<EntityClass, TMethodsAndOverrides, TVirtuals>>(filter, projection, options);
+		return this.model.find<
+			HydratedDocument<EntityClass, TMethodsAndOverrides, TVirtuals>
+		>(filter, projection, options);
 	}
 
 	/**

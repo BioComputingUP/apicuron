@@ -1,16 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { User } from '@sentry/node';
 import { Model } from 'mongoose';
 import { getEventSubject } from 'src/core/helpers/events.helper';
-import { UserCreatedEvent, UserUpdatedEvent } from 'src/core/repositories/user.repository';
+import {
+	UserCreatedEvent,
+	UserUpdatedEvent,
+} from 'src/core/repositories/user.repository';
 import {
 	LeanReportDocument,
-	ReportDocument
+	ReportDocument,
 } from '../../core/schemas/reports.schema';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import {
 	MonthlyStatistics,
-	MonthlyStatisticsDocument
+	MonthlyStatisticsDocument,
 } from '../../core/schemas/statistics/monthly-statistics.schema';
 import { TermDocument } from '../../core/schemas/terms.schema';
 import { UserDocument } from '../../core/schemas/user.schema';
@@ -68,10 +72,8 @@ export class MonthlyStatisticsAggregator implements Aggregator {
 	async removeAllResourceAggregates(resource_id: string) {
 		await this.computeMonthlyStats.deleteStats({ resource_id });
 	}
-	async updatedUser(
-		event: UserCreatedEvent | UserUpdatedEvent,
-	) {
-		const user = getEventSubject(event);
+	async updatedUser(event: UserCreatedEvent | UserUpdatedEvent) {
+		const user: User = getEventSubject(event);
 		await this.monthlyStatsModel.updateMany(
 			{
 				curator_orcid: user.orcid_id,
@@ -106,5 +108,11 @@ export class MonthlyStatisticsAggregator implements Aggregator {
 	}
 	async termDeleted(term: TermDocument) {
 		return await this.recomputeAllResourceAggregates(term.resource_id);
+	}
+	async updatedResource(resource: PartnerResourceDocument): Promise<void> {
+		await this.monthlyStatsModel.updateMany(
+			{ resource_id: resource.resource_id },
+			{ $set: { resource } },
+		);
 	}
 }

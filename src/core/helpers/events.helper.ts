@@ -1,6 +1,5 @@
 import { EntityCreatedEvent } from 'src/core/events/entity-created.event';
 import { EntityUpdatedEvent } from 'src/core/events/entity-updated.event';
-import { Document, Model } from 'mongoose';
 import { throwError, UnexpectedError } from 'src/util/error.utils';
 
 /**

@@ -1,28 +1,27 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, Query, UpdateWriteOpResult } from 'mongoose';
+import { FilterQuery, Model, UpdateWriteOpResult } from 'mongoose';
 import { getEventSubject } from 'src/core/helpers/events.helper';
-import { UserCreatedEvent, UserUpdatedEvent } from 'src/core/repositories/user.repository';
+import {
+	UserCreatedEvent,
+	UserUpdatedEvent,
+} from 'src/core/repositories/user.repository';
 import { PrivacyType } from '../../core/enums';
-import { EntityCreatedEvent, EntityUpdatedEvent } from '../../core/events';
 import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
-import {
-	MedalDef,
-	MedalDefDocument,
-} from '../../core/schemas/achievements-def/medal-def.schema';
-import {
-	Medal,
-	MedalDocument,
-} from '../../core/schemas/achievements/medals.schema';
+import { MedalDef } from '../../core/schemas/achievements-def/medal-def.schema';
+import { Medal } from '../../core/schemas/achievements/medals.schema';
 import {
 	LeanReportDocument,
 	Report,
 	ReportDocument,
 } from '../../core/schemas/reports.schema';
-import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
+import {
+	PartnerResource,
+	PartnerResourceDocument,
+} from '../../core/schemas/resource/partner-resource.schema';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
+import { User, UserDocument } from '../../core/schemas/user.schema';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
@@ -102,10 +101,8 @@ export class MedalAggregatorService implements Aggregator {
 		return medalDefDelete.deletedCount + medalDelete.deletedCount;
 	}
 
-	async updatedUser(
-		event: UserCreatedEvent | UserUpdatedEvent,
-	) {
-		const user = getEventSubject(event);
+	async updatedUser(event: UserCreatedEvent | UserUpdatedEvent) {
+		const user: User = getEventSubject(event);
 		const { orcid_id: curator_orcid, privacy } = user;
 		// update public medals  to the correct privacy
 		await this.medalModel.updateMany(
@@ -270,5 +267,8 @@ export class MedalAggregatorService implements Aggregator {
 
 		// recompute the medals that are affected by the term deletion
 		await this.computeMedals.reComputeMedals({ _id: { $in: affectedIds } });
+	}
+	updatedResource(_after: PartnerResource): Promise<void> {
+		return; // medals have no reference to the resource
 	}
 }

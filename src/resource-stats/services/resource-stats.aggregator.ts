@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Document, Model, Types } from 'mongoose';
-import { EntityCreatedEvent } from 'src/core/events/entity-created.event';
-import { EntityUpdatedEvent } from 'src/core/events/entity-updated.event';
-import { User, UserDocumentOverride } from 'src/core/schemas/user.schema';
+import {
+	UserCreatedEvent,
+	UserUpdatedEvent,
+} from 'src/core/repositories/user.repository';
 import { ReportDocument } from '../../core/schemas/reports.schema';
 import {
 	PartnerResource,
@@ -58,19 +59,7 @@ export class ResourceStatsAggregatorService implements Aggregator {
 	async removeAllResourceAggregates(resource_id: string) {
 		await this.computeStats.computeResourceStats(resource_id);
 	}
-	updatedUser(
-		_event:
-			| EntityCreatedEvent<
-					Document<unknown, any, User> &
-						Omit<User & { _id: Types.ObjectId }, keyof UserDocumentOverride> &
-						UserDocumentOverride
-			  >
-			| EntityUpdatedEvent<
-					Document<unknown, any, User> &
-						Omit<User & { _id: Types.ObjectId }, keyof UserDocumentOverride> &
-						UserDocumentOverride
-			  >,
-	): void | Promise<void> {
+	updatedUser(_event: UserCreatedEvent | UserUpdatedEvent) {
 		return;
 	}
 
@@ -99,6 +88,9 @@ export class ResourceStatsAggregatorService implements Aggregator {
 		_term: Document<unknown, any, Term> &
 			Omit<Term & { _id: Types.ObjectId }, never>,
 	): Promise<void> | void {
+		return;
+	}
+	updatedResource(_after: PartnerResource): Promise<void> {
 		return;
 	}
 }

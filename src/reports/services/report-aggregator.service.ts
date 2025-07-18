@@ -7,6 +7,7 @@ import {
 	Types,
 	UpdateWriteOpResult,
 } from 'mongoose';
+import { getEventSubject } from 'src/core/helpers/events.helper';
 import { LeagueUpdatedEvent } from 'src/resources/partner-resources/leagues/events/league-updated.event';
 import { PrivacyType } from '../../core/enums';
 import {
@@ -29,14 +30,9 @@ import {
 	ReportDocumentOverride,
 	ReportModel,
 } from '../../core/schemas/reports.schema';
-import {
-	User,
-	UserDocument,
-	UserDocumentOverride,
-} from '../../core/schemas/user.schema';
+import { User, UserDocumentOverride } from '../../core/schemas/user.schema';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
-import { PartnerResourceUpdatedEvent } from '../../resources/partner-resources/events/resource-updated.event';
 
 @Injectable()
 @AggregatorClass()
@@ -96,8 +92,7 @@ export class ReportAggregatorService implements Aggregator {
 		return privateResult.modifiedCount + publicResult.modifiedCount;
 	}
 	async updatedUser(event: UserCreatedEvent | UserUpdatedEvent) {
-		const user =
-			event instanceof UserCreatedEvent ? event.instance : event.after;
+		const user = getEventSubject(event);
 		await this.reportModel.updateMany(
 			{ curator_orcid: user.orcid_id },
 			{ $set: { user } },
@@ -220,10 +215,11 @@ export class ReportAggregatorService implements Aggregator {
 			resource_id: term.resource_id,
 		});
 	}
-	async updatedResource(event: PartnerResourceUpdatedEvent) {
+	async updatedResource(resource: PartnerResource): Promise<void> {
+		this.logger.debug(`received resource with this logo: ${resource.logo}`);
 		await this.reportModel.updateMany(
-			{ resource_id: event.newResource.resource_id },
-			{ $set: { resource: event.newResource } },
+			{ resource_id: resource.resource_id },
+			{ $set: { resource: resource } },
 		);
 	}
 
