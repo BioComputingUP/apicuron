@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
-import { MongoServerError } from 'mongodb';
+import { MongoServerError, MongoWriteConcernError } from 'mongodb';
 import { FilterQuery, Model, UpdateWriteOpResult } from 'mongoose';
 import { AchievementState, PrivacyType } from '../../core/enums';
 import {
@@ -189,6 +189,7 @@ export class BadgeAggregatorService implements Aggregator {
 		}
 
 		const newBadge = this.computeBadges.applyReportOnBadge(badge, report);
+		newBadge._id = badge._id; // preserve the _id for the update operation
 
 		try {
 			const result = await this.badgeModel.replaceOne(badge, newBadge);

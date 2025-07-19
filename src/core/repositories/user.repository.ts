@@ -6,7 +6,7 @@ import {
 	EntityUpdatedEvent,
 	ManyEntityUpdated,
 } from '../events/index';
-import { User, UserDocument, UserModel } from '../schemas/user.schema';
+import { User, UserModel } from '../schemas/user.schema';
 import { EntityRepository } from './entity-repository';
 
 export class UserCreatedEvent extends EntityCreatedEvent<User> {}

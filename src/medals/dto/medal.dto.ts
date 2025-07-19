@@ -1,5 +1,7 @@
 import { AchievementState, PrivacyType } from '../../core/enums';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
+import { StorageReference } from 'src/shared/decorators/storage-reference.decorator';
 
 export class MedalDefDto {
 	@Expose()
@@ -30,6 +32,18 @@ export class MedalDefDto {
 	league: string;
 }
 
+export class MedalUser {
+	@Expose()
+	displayedName: string;
+
+	@Expose()
+	orcid_id: string;
+
+	@Expose()
+	@StorageReference()
+	avatar: string;
+}
+
 export class MedalDto extends MedalDefDto {
 	@Expose()
 	curator_orcid: string;
@@ -51,4 +65,8 @@ export class MedalDto extends MedalDefDto {
 
 	@Expose()
 	state: AchievementState;
+
+	@Expose()
+	@Type(() => MedalUser)
+	user: MedalUser;
 }

@@ -25,6 +25,7 @@ import {
 } from '../events';
 import { Logger, OnModuleDestroy } from '@nestjs/common';
 import { RepositoryEventPublisher } from '../helpers/event-mapper';
+import { type } from 'os';
 
 type EntityEvents<C> =
 	| EntityCreatedEvent<C>
@@ -37,6 +38,47 @@ type RepositoryEvent<C> = {
 	value: EntityEvents<C>;
 };
 
+// Utility types
+
+type ExtractEntity<T> = T extends Model<infer U, unknown, unknown, unknown>
+	? U
+	: never;
+type ExtractQueryHelpers<T> = T extends Model<
+	unknown,
+	infer QH,
+	unknown,
+	unknown
+>
+	? QH
+	: never;
+type ExtractMethodsAndOverrides<T> = T extends Model<
+	unknown,
+	unknown,
+	infer M,
+	unknown
+>
+	? M
+	: never;
+
+type ExtractVirtuals<T> = T extends Model<
+	unknown,
+	unknown,
+	unknown,
+	infer V
+>
+	? V
+	: never;
+
+type ExtractSchema<T> = T extends Model<
+	unknown,
+	unknown,
+	unknown,
+	unknown,
+	infer S
+>
+	? S
+	: never;
+
 export abstract class EntityRepository<
 	EntityClass,
 	EntityModel extends Model<
@@ -46,10 +88,10 @@ export abstract class EntityRepository<
 		TVirtuals,
 		TSchema
 	>,
-	TQueryHelpers = {},
-	TMethodsAndOverrides = {},
-	TVirtuals = {},
-	TSchema = {},
+	TQueryHelpers = ExtractQueryHelpers<EntityModel>,
+	TMethodsAndOverrides = ExtractMethodsAndOverrides<EntityModel>,
+	TVirtuals = ExtractVirtuals<EntityModel>,
+	TSchema = ExtractSchema<EntityModel>,
 	EntityDoc = HydratedDocument<EntityClass, TMethodsAndOverrides, TVirtuals>,
 > implements OnModuleDestroy
 {
@@ -276,7 +318,9 @@ export abstract class EntityRepository<
 		TQueryHelpers,
 		EntityClass
 	> {
-		return this.model.find<HydratedDocument<EntityClass, TMethodsAndOverrides, TVirtuals>>(filter, projection, options);
+		return this.model.find<
+			HydratedDocument<EntityClass, TMethodsAndOverrides, TVirtuals>
+		>(filter, projection, options);
 	}
 
 	/**
@@ -315,15 +359,15 @@ export abstract class EntityRepository<
 	 */
 	findOne(
 		filter: FilterQuery<EntityClass>,
-		projection?: ProjectionType<EntityClass>,
-		options?: QueryOptions<EntityClass>,
-	): Query<
-		HydratedDocument<EntityClass, any, any>,
-		HydratedDocument<EntityClass, any, any>,
-		TQueryHelpers,
-		EntityClass
-	> {
-		return this.model.findOne(filter, projection, options);
+		projection?: ProjectionType<EntityClass> | null,
+		options?: QueryOptions<EntityClass> | null,
+	): Promise<HydratedDocument<
+		EntityClass,
+		TMethodsAndOverrides,
+		TVirtuals
+	> | null> {
+		const result = this.model.findOne(filter, projection, options).exec();
+		return result;
 	}
 
 	/**

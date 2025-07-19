@@ -17,7 +17,6 @@ import {
 	GroupReportsByUserAggregator,
 } from '../aggregation/group-reports-by-user.service';
 import { getMatchingReportFilter } from '../helpers/helpers';
-import { ObjectId } from 'mongodb';
 @Injectable()
 export class ComputeBadgesService {
 	constructor(
@@ -111,7 +110,7 @@ export class ComputeBadgesService {
 		const achieved_at =
 			state === AchievementState.achieved ? report.timestamp : undefined;
 		return {
-			_id: new ObjectId(),
+			_id: undefined,
 			name: badgeDef.name,
 			displayedName: badgeDef.displayedName,
 			resource_uri: badgeDef.resource_uri,
@@ -156,7 +155,7 @@ export class ComputeBadgesService {
 			);
 		}
 		const newBadge: LeanDocument<BadgeDocument> = {
-			_id: new ObjectId(),
+			_id: undefined,
 			name: badge.name,
 			displayedName: badge.displayedName,
 			resource_uri: badge.resource_uri,

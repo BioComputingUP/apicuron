@@ -31,6 +31,7 @@ import {
 	skip,
 	switchMap,
 	take,
+	tap,
 } from 'rxjs';
 import { ComputeMedalsService } from './compute-medals.service';
 import { MedalDocument, PartnerResourceDocument } from 'src/core/schemas/index';
@@ -165,7 +166,7 @@ export class MedalDefCommandsService {
 		return newMedalDef;
 	}
 
-	makePutativeMedals(
+	previewMedalsForDef(
 		medalDef: CreateMedalDefDto,
 		skipN: number,
 		limit: number,
@@ -179,7 +180,7 @@ export class MedalDefCommandsService {
 					name: medalDef.name,
 					resource_uri: resource.resource_uri,
 					resource_id: medalDef.resource_id,
-					league: medalDef.league,
+					league: medalDef.league ?? resource.defaultLeague,
 					color: medalDef.color,
 					list_terms: medalDef.list_terms,
 					score_relative: medalDef.score_relative,
@@ -191,9 +192,13 @@ export class MedalDefCommandsService {
 				};
 				return medalDefDoc;
 			}),
+			tap(console.log),
 			switchMap(
-				this.computeMedals.streamMedalsForMedalDef.bind(this.computeMedals),
+				this.computeMedals.streamMedalsForMedalDef.bind<
+					ComputeMedalsService['streamMedalsForMedalDef']
+				>(this.computeMedals),
 			),
+			tap(console.log),
 			skip(skipN),
 			take(limit),
 			bufferCount(limit),

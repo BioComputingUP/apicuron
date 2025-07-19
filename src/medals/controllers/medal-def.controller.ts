@@ -33,8 +33,9 @@ import { MedalDefCommandsService } from '../services/medal-def-commands.service'
 import { MedalDefQueriesService } from '../services/medal-def-queries.service';
 import { MedalDefFilter } from '../dto/filter-medal-def.dto';
 import { MedalDefDto, MedalDto } from '../dto/medal.dto';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, map, tap } from 'rxjs';
 import { BasePaginationDto } from 'src/pagination/dto/paginate.dto';
+import { PreviewMedalsDto as PreviewMedalsDto } from '../dto/compute-medal-def.dto';
 
 @ApiTags('Achievements Definition')
 @ApiHeader(VersionHeader)
@@ -129,24 +130,26 @@ export class MedalsDefController {
 		return await this.commandsService.deleteMedalDef(delete_medal);
 	}
 
-	// Disabled for now, as it is not used in the frontend
-	// @AuthProtected()
-	// @Post('test')
-	// async loadMedalsForDef(@Body() medalDef: CreateMedalDefDto) {
-	// 	const medals$ = await this.commandsService.makePutativeMedals(
-	// 		medalDef,
-	// 		0,
-	// 		10,
-	// 	);
-	// 	let medals: MedalDefDto[] = [];
-	// 	try {
-	// 		medals = await firstValueFrom(medals$);
-	// 	} catch (err) {}
+	@AuthProtected()
+	@Post('preview')
+	async previewMedalsforDef(@Body() previewDto: PreviewMedalsDto) {
+		const medals$ = this.commandsService.previewMedalsForDef(
+			previewDto.medalDef,
+			previewDto.skip,
+			previewDto.limit,
+		).pipe(
+			tap(console.log)
+		)
+		// return medals$;
+		let medals: MedalDto[] = [];
+		try {
+			medals = await firstValueFrom(medals$);
+		} catch (err) {}
 
-	// 	const pagination = new BasePaginationDto();
-	// 	pagination.skip = 0;
-	// 	pagination.limit = 10;
+		const pagination = new BasePaginationDto();
+		pagination.skip = previewDto.skip;
+		pagination.limit = previewDto.limit;
 
-	// 	return paginate<MedalDto>(MedalDto, medals, pagination, 35);
-	// }
+		return paginate<MedalDto>(MedalDto, medals, pagination, 35);
+	}
 }

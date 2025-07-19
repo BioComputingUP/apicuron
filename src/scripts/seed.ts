@@ -236,7 +236,9 @@ export async function mockReport(
 	// 	{},
 	// 	{ skip: random(0, userCount - 1, false) },
 	// );
-	const randomOrcid = faker.helpers.arrayElement(randomOrcidIds);
+	// const randomOrcid = faker.helpers.arrayElement(randomOrcidIds);
+
+	const randomOrcid = '0000-0002-2472-5685'; // for testing purposes, TODO: remove this
 
 	// if (!randomUser) {
 	// 	throw new Error('No user found');
