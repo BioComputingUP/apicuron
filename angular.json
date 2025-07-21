@@ -344,7 +344,7 @@
             },
             "local": {
               "buildOptimizer": false,
-              "outputHashing": false,
+              "outputHashing": "none",
               "optimization": false,
               "vendorChunk": false,
               "extractLicenses": false,
@@ -365,6 +365,9 @@
             },
             "development": {
               "browserTarget": "leaderboard:build:development"
+            },
+            "local": {
+              "browserTarget": "leaderboard:build:local"
             }
           },
           "defaultConfiguration": "production"
