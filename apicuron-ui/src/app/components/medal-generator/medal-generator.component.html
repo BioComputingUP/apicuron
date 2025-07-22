@@ -1,0 +1,21 @@
+<div class="generator-container">
+	<!-- Preview -->
+	<div class="medal-preview" [innerHTML]="generatedSVG"></div>
+
+	<!-- Controls -->
+	<div class="controls">
+		<div class="form-group">
+			<label>Number:</label>
+			<input type="number" [(ngModel)]="number" (input)="updateMedal()" min="1" max="99">
+		</div>
+
+		<div class="form-group">
+			<label>Text Color:</label>
+			<input type="color" [(ngModel)]="color" (input)="updateMedal()">
+		</div>
+
+
+
+		<button (click)="downloadMedal()">Download SVG</button>
+	</div>
+</div>

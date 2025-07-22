@@ -1,0 +1,39 @@
+<div class="tw-flex tw-w-full">
+    <!-- Sidebar -->
+    <dashboard-sidebar
+        class="tw-hidden sm:tw-block tw-w-60 2xl:tw-w-72 tw-flex-none tw-sticky tw-top-0 tw-bottom-0 tw-h-screen"></dashboard-sidebar>
+
+    <!-- Slide-over panel for mobile -->
+    <slide-over-panel [(openPanel)]="openMobileMenu">
+        <dashboard-sidebar></dashboard-sidebar>
+    </slide-over-panel>
+
+    <!-- Main content -->
+    <div class="tw-flex tw-flex-col tw-grow tw-overflow-y-auto">
+        <!-- Navbar -->
+        <div
+            class="tw-flex tw-flex-row tw-justify-between tw-shadow-md tw-px-10 tw-py-4 tw-bg-white tw-sticky tw-top-0 tw-z-20">
+            <div class="sm:tw-hidden">
+                <button aria-controls="mobile-menu" aria-expanded="false"
+                    class="tw-inline-flex tw-items-center tw-justify-center tw-p-2 tw-rounded-md hover:tw-text-gray-700 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-inset focus:tw-ring-gray-500"
+                    type="button" (click)="openMobileMenu = !openMobileMenu">
+                    <span class="tw-sr-only">Open main menu</span>
+                    <svg-icon [ngClass]="{'tw-hidden': openMobileMenu, 'tw-block': !openMobileMenu }"
+                        svgClass="tw-text-gray-700" src="assets/svg/menu_icon.svg"></svg-icon>
+                    <svg-icon [ngClass]="{'tw-hidden': !openMobileMenu, 'tw-block': openMobileMenu }"
+                        src="assets/svg/close.svg" svgClass="tw-w-6 tw-h-6 tw-text-gray-700"></svg-icon>
+                </button>
+            </div>
+            <div>
+                <h2 class="tw-text-2xl tw-font-dm-sans tw-text-gray-700 tw-leading-relaxed tw-tracking-wide">Dashboard
+                </h2>
+            </div>
+            <auth-dropdown class="tw-text-gray-700 tw-ml-auto"></auth-dropdown>
+        </div>
+
+        <!-- Main content area -->
+        <div class="tw-flex-1">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

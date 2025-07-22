@@ -1,0 +1,60 @@
+<style>
+  .custom-tooltip {
+    background-color: white;
+    color: #333;
+    border: 1px solid black;
+    padding: 8px 12px;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    max-width: 300px;
+    white-space: normal;
+    word-wrap: break-word;
+  }
+</style>
+
+<div
+  class="tw-bg-white tw-rounded-md tw-shadow-md tw-shadow-gray-400 tw-p-2 tw-h-full tw-flex tw-flex-col tw-overflow-hidden">
+
+  <h3
+    class="tw-text-gray-800 tw-font-dm-sans tw-text-sm sm:tw-text-base tw-font-semibold sm:tw-mb-2 hover:tw-underline">
+    <a [href]="report.entity_uri">{{ term.name }}
+      <svg-icon src="assets/svg/external-link.svg" svgClass="tw-text-gray-800 tw-h-3 tw-w-3 tw-inline"></svg-icon>
+    </a>
+  </h3>
+
+  <span class="tw-text-xs sm:tw-text-sm tw-text-gray-400 tw-font-bold tw-font-dm-sans">
+    {{ report.formattedDate }}
+  </span>
+
+  <!-- Description with custom tooltip -->
+  <p class="tw-text-gray-500 tw-font-medium sm:tw-mb-2 tw-text-xs sm:tw-text-sm"
+    [ngClass]="{ 'tw-truncate': truncate_description }" (mouseenter)="openTooltip($event)"
+    (mouseleave)="closeTooltip()">
+    {{ term.description }}
+  </p>
+
+  <!-- Tooltip Template -->
+  <ng-template #tooltipTemplate>
+    <div class="custom-tooltip">
+      {{ term.description }}
+    </div>
+  </ng-template>
+
+  <!-- Score and Category -->
+  <div class="tw-flex tw-flex-row tw-items-center tw-justify-between tw-mt-auto">
+    <div class="tw-flex tw-flex-row tw-items-center">
+      <div [title]="'score value for ' + term.name"
+        class="tw-rounded-full tw-h-5 tw-w-5 tw-flex tw-items-center tw-justify-center tw-mr-1"
+        [ngClass]="categoryColor()">
+        <span class="tw-font-bold tw-text-xs tw-cursor-default">{{ term.score }}</span>
+      </div>
+    </div>
+
+    <div>
+      <span class="tw-text-sm tw-font-bold tw-rounded-full tw-px-1 sm:tw-px-2 sm:tw-py-1" [ngClass]="categoryColor()">
+        {{ term.category }}
+      </span>
+    </div>
+  </div>
+</div>

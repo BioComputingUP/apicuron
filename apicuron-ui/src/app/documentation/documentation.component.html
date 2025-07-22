@@ -1,0 +1,26 @@
+<div class="tw-flex tw-justify-start tw-flex-row sm:tw-flex-nowrap tw-items-stretch">
+
+  <aside class="tw-w-83">
+    <div
+      class="tw-sticky tw-top-16 tw-pt-6 tw-px-2 sm:tw-pl-8 tw-bg-white tw-border-r tw-border-slate-300 tw-h-[calc(100vh-4rem)] tw-overflow-y-auto tw-pb-8">
+      <markdown [ngClass]="{'tw-hidden': !display_toc}" src="assets/docs/table_of_contents.md"
+        class="tw-w-full sm:tw-block tw-prose tw-prose-sm tw-prose-slate prose-headings:tw-text-base prose-headings:tw-text-slant-800 prose-headings:tw-font-bold prose-ul:tw-list-none prose-a:tw-pb-2 prose-a:tw-pt-1 prose-a:tw-m-0 prose-a:tw-pl-2 prose-a:tw-no-underline prose-a:tw-border-gray-200 hover:prose-a:tw-border-slant-700 prose-a:tw-text-gray-700 hover:prose-a:tw-text-slant-700">
+      </markdown>
+    </div>
+  </aside>
+
+
+
+
+  <!-- main page -->
+  <main class="tw-block tw-pb-2 tw-flex-grow">
+
+    <!-- page content -->
+    <div class="tw-max-w-screen-lg tw-mx-auto tw-my-0 tw-py-8 tw-px-10" *ngIf="markdownPath$ | async as markdownPath">
+      <markdown [src]="markdownPath" (load)="onLoad($event)" (ready)="onDocumentReady()"
+        class="tw-prose tw-prose-slate prose-headings:tw-text-slate-700 prose-table:tw-border-transparent prose-strong:tw-text-apicuron-purple prose-a:tw-text-apicuron-purple prose-a:tw-font-bold prose-a:tw-underline dark:prose-invert prose-img:sm:tw-block">
+      </markdown>
+    </div>
+
+  </main>
+</div>

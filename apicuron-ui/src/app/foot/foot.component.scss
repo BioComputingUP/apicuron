@@ -1,0 +1,26 @@
+@import "../../styles";
+
+.footer {
+  background-color: theme-color("footer");
+  color: theme-color("light");
+}
+
+.footer-link {
+  color: theme-color("light");
+}
+
+.footer-link:hover {
+  color: #61cce5;
+}
+
+.img-fluid {
+  max-height: 30px;
+}
+
+a {
+  @apply hover:tw-underline;
+}
+
+li {
+  @apply tw-pb-1;
+}

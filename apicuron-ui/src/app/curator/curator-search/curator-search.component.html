@@ -1,0 +1,65 @@
+<form
+    class="tw-flex tw-flex-row tw-flex-wrap lg:tw-flex-nowrap tw-justify-between tw-bg-white tw-rounded-md tw-items-stretch tw-mx-auto
+    tw-rounded-l-lg tw-border tw-border-apicuron-purple sm:tw-border-0">
+    <div
+        class="tw-w-full tw-flex tw-my-1 tw-flex-col tw-pb-2 tw-px-2 tw-pt-1 tw-bg-white tw-overflow-y-visible md:tw-border-r tw-border-gray-200 lg:tw-w-min sm:tw-rounded-l-md">
+        <span class="tw-text-gray-400 tw-uppercase" style="font-size: 0.60rem;">Resources</span>
+        <div *ngIf="selected_resources$ | async as selected_resources" class="tw-flex tw-flex-row tw-items-center">
+
+            <input #resourcesearch
+                (keyup.enter)="add_resource($event.target['value'])"
+                class="tw-outline-none tw-flex-initial" type="text" name=""
+                id="" placeholder="Filter by resource">
+            <div *ngFor="let resource of selected_resources"
+                class="tw-flex tw-flex-row tw-text-sm tw-py-1 tw-px-2 tw-text-gray-100 tw-bg-apicuron-purple tw-rounded-2xl tw-mr-1">
+                <span class="tw-block tw-pr-1 tw-whitespace-pre">{{resource.resource_name}}</span>
+                <button class="focus:tw-outline-none tw-align-middle" (click)="remove_selection(resource)">
+                    <svg class="tw-w-3 tw-h-3" viewBox="0 0 69 69" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M62.604 1.16134L34.468 29.2973L6.33735 1.16134C4.88949 -0.286527 2.54562 -0.286527 1.09255 1.16134C-0.355314 2.60921 -0.355314 4.95307 1.09255 6.40614L29.2232 34.5368L1.09255 62.6515C-0.355314 64.0993 -0.355314 66.4432 1.09255 67.8963C2.54042 69.3441 4.88429 69.3441 6.33735 67.8963L34.468 39.7656L62.5987 67.8963C64.0466 69.3441 66.3904 69.3441 67.8435 67.8963C69.2914 66.4484 69.2914 64.1045 67.8435 62.6515L39.7128 34.5368L67.8435 6.40614C69.2914 4.95827 69.2914 2.61441 67.8435 1.16134C66.3956 -0.286527 64.0518 -0.286527 62.5987 1.16134H62.604Z"
+                            fill="white" />
+                    </svg>
+                </button>
+            </div>
+
+        </div>
+        <!-- <div *ngIf="selected_resources.invalid">
+            Name is required.
+        </div> -->
+        <ng-container *ngIf="display_suggestion$ | async as display_suggestion">
+            <div class="tw-z-10 tw-relative"
+                [ngClass]="{'tw-inline-block': display_suggestion, 'tw-hidden': !display_suggestion}"
+                (mouseleave)="set_suggestion(false)">
+                <div *ngIf="suggested_resources$ | async as  suggested_resources"
+                    class="tw-block tw-absolute tw-top-2 tw-left-0 tw-right-0 tw-rounded-md tw-border tw-border-gray-700 tw-bg-white tw-py-1 tw-shadow-lg">
+                    <div *ngFor="let resource of suggested_resources"
+                        class="tw-p-1 hover:tw-bg-apicuron-purple tw-text-gray-700 hover:tw-text-white tw-text-sm tw-cursor-pointer"
+                        (click)="add_resource(resource)">{{resource.resource_name}}</div>
+                </div>
+            </div>
+
+        </ng-container>
+
+    </div>
+    <div
+        class="tw-bg-white tw-my-1 tw-pb-2 tw-px-2 tw-pt-1 tw-border-0 sm:tw-border-r tw-border-gray-200 tw-items-stretch tw-flex-auto tw-flex tw-flex-col tw-justify-between">
+        <span class="tw-text-gray-400 tw-uppercase" style="font-size: 0.60rem;">Search Field</span>
+        <select [(ngModel)]="search_field" [ngModelOptions]="{standalone: true}"
+            class="tw-bg-white tw-text-apicuron-purple focus:tw-outline-none tw-pr-2 lg:tw-pr-4">
+            <option *ngFor="let item of search_fields" [ngValue]="item.field">
+                {{item.text}}</option>
+        </select>
+    </div>
+
+    <div class="tw-flex-auto tw-flex tw-flex-col tw-items-stretch tw-justify-between tw-pb-2 tw-px-2 tw-pt-1">
+        <span class="tw-text-gray-400 tw-uppercase" style="font-size: 0.60rem;">Search {{ currentField.text }}</span>
+        <input class="tw-outline-none tw-p-2 tw-flex-auto" type="search" name="search" id=""
+        [(ngModel)]="search_text" [ngModelOptions]="{standalone: true}" placeholder="Search ..."
+        (keyup.enter)="onSubmit()">
+
+    </div>
+
+    <button
+        class="tw-w-full sm:tw-w-auto tw-py-2 sm:tw-px-4 tw-bg-apicuron-bright-purple focus:tw-outline-none focus:tw-shadow-inner tw-text-gray-100 tw-rounded-b-md sm:tw-rounded-b-none sm:tw-rounded-r-md tw-px-2"
+        type="submit" (click)="onSubmit()">Submit</button>
+</form>

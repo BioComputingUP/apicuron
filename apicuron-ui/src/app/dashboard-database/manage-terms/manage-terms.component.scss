@@ -1,0 +1,39 @@
+.head-cell {
+    @apply tw-text-sm tw-text-gray-900 tw-px-4 tw-py-2 tw-font-bold
+}
+.cell {
+    @apply tw-text-sm tw-text-gray-900 tw-font-light tw-px-4 tw-py-2
+}
+
+.font-weight-inherit {
+    font-weight: inherit;
+}
+.invalid-field {
+    @apply tw-border-red-800 tw-border-l-2 tw-shadow-red-900 tw-shadow-md #{!important};
+}
+label {
+    @apply tw-font-bold tw-mb-2
+}
+
+input[type="text"],
+input[type="number"],
+textarea,
+.text-input {
+    @apply tw-border-gray-300 tw-text-gray-900 tw-border tw-shadow-md tw-px-4 tw-py-2 tw-rounded focus:tw-outline-none focus:tw-ring-1 focus:tw-ring-apicuron-purple focus:tw-border-apicuron-purple focus:tw-bg-purple-50;
+}
+
+#search_input {
+    @apply tw-border-gray-300 tw-text-gray-900 tw-border tw-shadow-md tw-px-4 tw-py-2 tw-rounded focus:tw-outline-none focus:tw-ring-1 focus:tw-ring-apicuron-purple focus:tw-border-apicuron-purple focus:tw-bg-purple-50;
+    padding-left: 2.5rem;
+}
+
+.form-control-element {
+    @apply tw-flex tw-flex-col tw-my-2 tw-px-2 tw-py-1
+}
+
+#defineActivity {
+    box-shadow: 0 -2px 0 rgba(0, 0, 0, 0.15) inset;
+    -moz-box-shadow: 0 -2px 0 rgba(0, 0, 0, 0.15) inset;
+    -webkit-box-shadow: 0 -2px 0 rgba(0, 0, 0, 0.15) inset;
+}
+

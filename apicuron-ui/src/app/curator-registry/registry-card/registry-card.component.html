@@ -1,0 +1,115 @@
+<div
+  class="tw-p-5 tw-flex tw-flex-col tw-h-full tw-bg-white tw-drop-shadow-sm tw-rounded-md tw-transition-all tw-duration-300 tw-ease-in-out hover:tw-border-violet-400"
+>
+  <!-- First row: Avatar -->
+  <div class="tw-grid tw-grid-cols-1 tw-gap-2 tw-my-2">
+    <img
+      class="tw-aspect-square tw-mx-auto tw-border tw-rounded-full"
+      style="width: 70px; height: auto"
+      [src]="(entry$ | async).curator.avatar"
+      alt="Curator Avatar"
+    />
+  </div>
+
+  <!-- Second row: Curator information -->
+  <div class="tw-grid tw-gap-2 tw-text-center">
+    <div>
+      <a
+        class="tw-font-extrabold tw-text-xl tw-text-slate-800 hover:tw-text-slate-600 hover:tw-underline"
+        [routerLink]="['/curators', (entry$ | async).curator.orcid_id]"
+      >
+        {{ (entry$ | async).curator.displayedName }}
+      </a>
+    </div>
+    <div>
+      <p>
+        {{ (entry$ | async).curator.orcid_id }}
+        <a
+          [href]="(entry$ | async).curator.orcid_url"
+          target="_blank"
+          class="tw-cursor-pointer tw-align-top"
+        >
+          <img
+            class="tw-ml-2 tw-inline tw-h-6 tw-w-6"
+            src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
+            alt=""
+            role="tooltip"
+          />
+        </a>
+      </p>
+      <p
+        class="tw-text-sm tw-text-gray-600"
+        [ngClass]="{
+          'tw-hidden':
+            !(entry$ | async).curator.affiliation ||
+            (entry$ | async).curator.affiliation === 'No affiliation'
+        }"
+      >
+        {{ (entry$ | async).curator.affiliation }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Third row: Contributions and Resources -->
+  <div class="tw-my-2">
+    <div
+      class="tw-flex tw-px-2 tw-py-2 tw-rounded-sm tw-gap-3 tw-justify-center tw-items-center tw-min-h-[80px]"
+    >
+      <!-- Display up to two contributions -->
+      <div
+        *ngFor="let contribution of firstContributions$ | async"
+        class="tw-font-dm-sans tw-max-w-xs tw-flex tw-justify-center tw-items-center"
+      >
+        <a [href]="contribution.resource.resource_url" target="_blank">
+          <img
+            [src]="contribution.resource.logo"
+            class="tw-cursor-pointer"
+            style="width: 70px; height: auto"
+            alt="Resource Logo"
+          />
+        </a>
+      </div>
+
+      <!-- Show remaining contributions count -->
+      <span
+        *ngIf="(contributions$ | async).length > 2"
+        (mouseenter)="showGroups(true)"
+        (mouseleave)="showGroups(false)"
+        #trigger
+      >
+        <span
+          class="tw-font-dm-sans tw-text-sm tw-bg-gray-200 tw-px-3 tw-py-2 tw-rounded-full tw-cursor-pointer tw-align-middle tw-max-w-[32px] tw-max-h-[32px] tw-flex tw-items-center tw-justify-center"
+        >
+          +{{ (contributions$ | async).length - 2 }}
+        </span>
+      </span>
+
+      <!-- Overlay Tooltip -->
+      <ng-template
+        cdkConnectedOverlay
+        [cdkConnectedOverlayOrigin]="trigger"
+        [cdkConnectedOverlayOpen]="(showGroups$ | async) == true"
+        [cdkConnectedOverlayOffsetY]="8"
+        [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
+      >
+        <div
+          class="tw-bg-gray-100 tw-rounded-lg tw-col-1 tw-flex tw-flex-wrap tw-justify-center tw-items-start !tw-min-w-60 !tw-max-w-72 tw-shadow-lg tw-p-4 tw-border tw-border-gray-300"
+        >
+          <div
+            *ngFor="let contribution of remainingContributions$ | async"
+            class="tw-pr-2"
+          >
+            <a [href]="contribution.resource.resource_url" target="_blank">
+              <img
+                [src]="contribution.resource.logo"
+                class="tw-cursor-pointer"
+                style="width: 50px; height: auto"
+                alt="Resource Logo"
+              />
+            </a>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

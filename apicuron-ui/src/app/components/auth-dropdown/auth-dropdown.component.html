@@ -1,0 +1,103 @@
+<div *ngIf="(loggedIn$ | async) && user$ | async as user" class="tw-relative tw-inline-block tw-text-left">
+  <div>
+    <button cdkOverlayOrigin #authbutton="cdkOverlayOrigin" (mouseenter)="updateIsOpen(true)"
+      class="tw-text-gray-700 hover:tw-text-gray-800 dark:tw-text-gray-100 tw-flex tw-flex-row tw-items-center dark:hover:tw-text-white nav-item tw-relative dark:before:tw-bg-white before:tw-bg-gray-700 hover-underline-animation">
+      <img [src]="user.avatar" class="tw-inline tw-w-6 tw-h-6 tw-mr-1 tw-bg-white tw-rounded-full"
+        alt="" />
+      <span class="tw-font-bold">{{ user.displayedName }}</span>
+      <ng-container *ngIf="notifications$ | async as notifications">
+        <span *ngIf="notifications && notifications.length > 0"
+          class="tw-absolute tw-bg-apicuron-purple tw-text-white tw-font-bold tw-px-1.5 tw-py-0.5 tw-text-xs -tw-top-2 -tw-right-1 tw-shadow-md tw-rounded-full">{{
+          notifications.length }}</span>
+      </ng-container>
+    </button>
+  </div>
+  <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="authbutton" [cdkConnectedOverlayOpen]="isOpen$ | async"
+    [cdkConnectedOverlayHasBackdrop]="true" (backdropClick)="updateIsOpen(false)"
+    cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop" #dropdown class=" ">
+    <div (mouseleave)="updateIsOpen(false)"
+      class="tw-w-full tw-min-w-max tw-origin-top-right tw-rounded-md tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none tw-transition-opacity tw-duration-200"
+      role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+      <div class="tw-py-1" role="none">
+        <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
+        <a [routerLink]="['/curators', user.orcid_id]" class="dropdown-element">
+          <svg-icon src="assets/user.svg" svgClass="tw-inline tw-w-4 tw-h-4 tw-text-gray-900"></svg-icon>
+          <!-- <img [src]="generate_avatar()" class="tw-inline tw-w-4 tw-h-4 tw-bg-gray-100 tw-border tw-border-gray-200" alt=""> -->
+          My Biocuration Profile
+        </a>
+        <!-- <ng-container *ngFor="let resource of user.resources"> -->
+        <a routerLink="/dashboard" class="dropdown-element">
+          <svg-icon src="assets/svg/dashboard.svg" svgClass="tw-inline tw-w-4 tw-h-4"></svg-icon>
+          Dashboard
+        </a>
+        <!-- </ng-container> -->
+
+        <button *ngIf="user.resources && user.resources.length > 0" (click)="copy_key()" class="dropdown-element">
+          <svg-icon src="assets/svg/key.svg" svgClass="tw-inline tw-w-4 tw-h-4"></svg-icon>
+          Copy API Key to clipboard
+        </button>
+
+        <a routerLink="/notifications" class="dropdown-element">
+          <svg-icon src="assets/svg/bell.svg" svgClass="tw-inline tw-w-4 tw-h-4"></svg-icon>
+          Notifications
+          <ng-container *ngIf="notifications$ | async as notifications">
+            <span *ngIf="notifications.length > 0"
+              class="tw-bg-apicuron-purple tw-text-white tw-font-bold tw-px-1.5 tw-py-0.5 tw-text-xs tw-shadow-md tw-rounded-full">{{
+              notifications.length }}</span>
+          </ng-container>
+        </a>
+
+        <a routerLink="/databases/create" class="dropdown-element">
+          <svg-icon src="assets/svg/create_icon.svg" svgClass="tw-inline tw-w-4 tw-h-4"></svg-icon>
+          Create Resource
+        </a>
+
+        <button class="dropdown-element" (click)="logout()">
+          <svg-icon src="assets/svg/logout.svg" svgClass="tw-inline tw-w-4 tw-h-4"></svg-icon>
+          Sign out
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</div>
+
+<ng-container *ngIf="!(loggedIn$ | async)">
+  <button class="nav-item tw-relative before:tw-bg-white hover-underline-animation" (click)="show_login = true">
+    Login
+  </button>
+
+  <div [ngClass]="{ 'tw-visible': show_login, 'tw-invisible': !show_login }" class="tw-relative tw-z-10"
+    aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div [ngClass]="{ 'tw-opacity-100': show_login, 'tw-opacity-0': !show_login }"
+      class="tw-fixed tw-inset-0 tw-z-10 tw-overflow-y-auto tw-bg-gray-500 tw-bg-opacity-75 tw-transition-opacity tw-ease-out tw-duration-300">
+      <div
+        class="tw-flex tw-min-h-full tw-items-center tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0">
+        <div [ngClass]="{
+            'tw-opacity-100 tw-translate-y-0': show_login,
+            'tw-opacity-0 -tw-translate-y-4': !show_login
+          }"
+          class="tw-relative tw-transition-all tw-ease-out tw-duration-300 tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-w-3/4 sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg sm:tw-h-1/2 sm:tw-max-h-screen">
+          <div class="tw-bg-white tw-grid tw-grid-flow-row tw-gap-2 tw-px-4 tw-pt-5 tw-pb-4 sm:tw-p-6 sm:tw-pb-4">
+            <img class="tw-justify-self-center" src="../assets/APICURON.svg" />
+            <h2 class="tw-text-xl tw-text-gray-900 tw-font-bold tw-text-center tw-w-full sm:tw-mb-8">
+              Login
+            </h2>
+
+            <a style="background-color: #a6ce39" (click)="login()"
+              class="tw-w-full tw-cursor-pointer hover:tw-text-white tw-text-center tw-py-2 tw-text-white tw-font-bold">Continue
+              with ORCID</a>
+            <button class="tw-w-full tw-py-2 tw-text-gray-700 tw-font-bold tw-bg-gray-300" (click)="show_login = false">
+              Cancel
+            </button>
+
+            <small class="tw-text-xs tw-text-gray-500 tw-font-light">By logging-In, you agree to the Terms of use of
+              APICURON and the
+              <a [routerLink]="['/about']" fragment="privacy" class="tw-underline hover:tw-text-blue-500">Privacy
+                Policy</a>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

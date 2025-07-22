@@ -1,0 +1,28 @@
+// Add this to your SCSS file
+@property --num {
+  syntax: "<integer>";
+  initial-value: 0;
+  inherits: false;
+}
+
+.counter-animated {
+  // Set up the counter
+  counter-reset: num var(--num);
+
+  // Animation setup - trigger on load
+  animation: count-up 2s ease-out forwards;
+
+  // Display the counter value
+  &::after {
+    content: counter(num);
+  }
+}
+
+@keyframes count-up {
+  0% {
+    --num: 0;
+  }
+  100% {
+    --num: var(--target-num);
+  }
+}

@@ -1,0 +1,44 @@
+<div class="tw-border-gray-300 tw-bg-white tw-p-4  tw-border tw-rounded  tw-flex tw-flex-col tw-relative">
+    <h2 class="tw-text-lg tw-font-bold tw-text-gray-800">Submit Reports Bulk</h2>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+        <div class="form-control-element">
+            <label for="reports" class="tw-flex tw-flex-row tw-justify-between tw-items-center tw-mb-2">
+                <span>Reports JSON file</span>
+                <a href="http://apicuron.org/docs#bulk-submission"
+                    class="tw-text-sm tw-text-apicuron-purple-500 tw-underline tw-cursor-pointer">See file
+                    specifications
+                    here</a>
+            </label>
+            <input type="file" (change)="onFileSelected($event)" accept="application/json"
+                class="tw-block tw-w-full tw-text-sm tw-text-apicuron-purple file:tw-mr-4 file:tw-py-2 file:tw-px-4 file:tw-rounded file:tw-border-0 file:tw-text-sm file:tw-font-semibold file:tw-bg-purple-100 file:tw-text-apicuron-purple-500 file:hover:tw-cursor-pointer">
+        </div>
+
+
+        <div class="form-control-element">
+            <label for="delete-all ">Delete all</label>
+            <div class="tw-mt-2">
+                <input type="checkbox" name="delete-all" formControlName="delete-all" id="">
+                <span> Delete all the previous Data</span>
+            </div>
+        </div>
+
+        <div class="tw-flex tw-flex-row tw-justify-center">
+            <input type="submit" value="Submit report" [disabled]="form.invalid"
+                [ngClass]="{'tw-bg-gray-300 tw-text-gray-600':form.invalid, 'tw-bg-apicuron-purple tw-text-white tw-shadow-md': !form.invalid}"
+                class=" tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded disabled:tw-cursor-default enabled:tw-cursor-pointer" />
+        </div>
+    </form>
+    <ng-container *ngIf="blockUI$ | async as blocked">
+        <div class="tw-absolute tw-z-20 tw-bg-gray-700 tw-bg-opacity-70 tw-left-0 tw-right-0 tw-top-0 tw-bottom-0"
+            [ngClass]="{'tw-hidden': !blocked, 'tw-block': blocked }">
+            <spinner class="tw-h-full"></spinner>
+        </div>
+
+    </ng-container>
+</div>
+
+<!-- <p-blockUI [blocked]="blocked"></p-blockUI> -->
+<!-- <p-progressSpinner class="tw-absolute tw-z-40 tw-left-1/2 tw-top-1/2 -tw-translate-y-1/2 -tw-translate-x-1/2"
+    [ngClass]="{'tw-hidden': !blocked}"></p-progressSpinner>
+    <p-toast></p-toast> -->

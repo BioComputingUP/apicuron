@@ -1,0 +1,56 @@
+p, h2, h2, h4, h5, li {
+  @apply tw-text-gray-700 tw-leading-relaxed tw-text-justify;
+}
+
+h1 {
+  @apply tw-text-4xl tw-font-semibold tw-font-dm-sans;
+}
+
+h2 {
+  @apply tw-text-3xl tw-pb-2 tw-pt-3;
+}
+
+h4 {
+  @apply tw-text-2xl tw-mt-1;
+}
+
+h5 {
+  @apply tw-text-xl tw-mt-1;
+}
+ul {
+  @apply tw-list-disc tw-ml-12;
+}
+
+h1, h2, h4 {
+  @apply tw-capitalize
+}
+
+a {
+  @apply tw-cursor-pointer hover:tw-underline tw-text-blue-500;
+}
+
+// a {
+//   color: #0f4c5c;
+// }
+
+a[href^="http"]::after,
+a[href^="https://"]::after,
+a[href^="/docs"]::after
+
+{
+  content: "";
+  width: 1rem;
+  height: 1rem;
+  margin-left: 2px;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" class="icon outbound"><path fill="%23374151" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="%23374151" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>');
+  background-position: bottom;
+  background-repeat: no-repeat;
+  background-size: contain;
+  display: inline-block;
+}
+
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 7rem;
+}

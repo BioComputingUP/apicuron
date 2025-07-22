@@ -1,0 +1,107 @@
+<div
+  class="tw-rounded-md tw-py-1 tw-h-full tw-flex tw-flex-row tw-justify-start tw-overflow-hidden tw-px-2 tw-cursor-pointer tw-border tw-border-gray-200"
+  [ngClass]="{
+    'tw-bg-slate-200 ': selected$ | async,
+    'tw-bg-slate-50': (disabled$ | async),
+    'hover:tw-bg-slate-100': !(disabled$ | async)
+  }"
+  (click)="toggle()"
+>
+  <div class="tw-flex tw-items-center tw-flex-row tw-mr-2">
+    <svg
+      class="tw-text-apicuron-purple tw-w-8 tw-h-auto"
+      [ngClass]="{
+        'tw-block': !(selected$ | async),
+        'tw-hidden': (selected$ | async),
+        'tw-opacity-100': !(disabled$ | async),
+        'tw-opacity-25': (disabled$ | async)
+      }"
+      data-slot="icon"
+      fill="none"
+      stroke-width="1.5"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+      ></path>
+    </svg>
+
+    <svg
+      class="tw-text-apicuron-purple tw-w-8 tw-h-auto"
+      [ngClass]="{
+        'tw-block': (selected$ | async),
+        'tw-hidden': !(selected$ | async),
+        'tw-opacity-100': !(disabled$ | async),
+        'tw-opacity-50': (disabled$ | async)
+      }"
+      data-slot="icon"
+      fill="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        clip-rule="evenodd"
+        fill-rule="evenodd"
+        d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+      ></path>
+    </svg>
+  </div>
+  <div>
+    <span
+      class="tw-font-dm-sans tw-mb-0 tw-text-sm"
+      [ngClass]="{
+        'tw-text-slate-800': !(disabled$ | async),
+        'tw-text-slate-400': (disabled$ | async)
+      }"
+      [title]="term.activity_term"
+    >
+      {{ term.name }}
+    </span>
+    <p
+      class="tw-font-medium sm:tw-text-justify tw-line-clamp-2 sm:tw-line-clamp-1 tw-mb-1 tw-text-xs"
+      [ngClass]="{
+        'tw-text-slate-500': !(disabled$ | async),
+        'tw-text-slate-400': (disabled$ | async)
+      }"
+      [title]="term.description"
+    >
+      {{ term.description }}
+    </p>
+  </div>
+  <div
+    class="tw-ml-auto tw-flex tw-flex-col-reverse sm:tw-flex-row tw-items-center tw-justify-between tw-gap-1"
+  >
+    <!-- Score badge -->
+    <div
+      [title]="'score value for ' + term.name"
+      class="tw-rounded-full tw-h-6 tw-flex tw-items-center tw-justify-center tw-px-2 tw-text-slate-800 tw-bg-gray-300"
+      [ngClass]="{
+        'tw-opacity-100': !(disabled$ | async),
+        'tw-opacity-50': (disabled$ | async)
+      }"
+    >
+      <span class="tw-font-bold tw-text-xs tw-cursor-default tw-whitespace-nowrap"
+        >Score: {{ term.score }}</span
+      >
+    </div>
+    <!-- Category badge -->
+    <div
+      class="tw-text-xs tw-font-bold tw-rounded-full tw-px-2 tw-py-1 tw-text-center tw-w-20 tw-whitespace-nowrap"
+      [class]="categoryClasss"
+      [ngClass]="{
+        'tw-opacity-100': !(disabled$ | async),
+        'tw-opacity-50': (disabled$ | async)
+      }"
+    >
+      {{ term.category | titlecase }}
+    </div>
+    <!-- <div class="">
+    </div> -->
+  </div>
+</div>

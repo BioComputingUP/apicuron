@@ -1,0 +1,71 @@
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+
+import { DashboardRoutingModule } from "./dashboard-routing.module";
+import { DatabasesModule } from "../databases/databases.module";
+import { DashboardSidebarComponent } from "./dashboard-sidebar/dashboard-sidebar.component";
+import { ReactiveFormsModule } from "@angular/forms";
+import { SvgModule } from "../svg/svg.module";
+import { AngularSvgIconModule } from "angular-svg-icon";
+import { UserDashboardComponent } from "./user-dashboard/user-dashboard.component";
+import { NavbarComponent } from "../alt-navbar/alt-navbar.component";
+import { UserOverviewPageService } from "./services/user-overview-page.service";
+import { CalendarModule } from "primeng/calendar";
+import { CategoriesPieChartComponent } from "../components/charts/categories-pie-chart/categories-pie-chart.component";
+import { ProfileUpdateComponent } from "./profile-update/profile-update.component";
+import { RouterModule } from "@angular/router";
+import { SpinnerComponent } from "../components/utils/spinner/spinner.component";
+import { UsersService } from "./services/users.service";
+import { CuratorReportsDetailsComponent } from "../components/curator-reports-details/curator-reports-details.component";
+import { CdkMenuModule } from "@angular/cdk/menu";
+import { NumberCardComponent } from "../components/number-card/number-card.component";
+import { DashboardService } from "./services/dashboard.service";
+import { UserResourceDashboard } from "./user-resource-dashboard/page/user-resource-dashboard.component";
+import { UserResourceDashboardService } from "./user-resource-dashboard/services/user-resource-dashboard.service";
+import { BadgeCardComponent } from "../components/badge-card/badge-card.component";
+import { MyBadgesDetailsComponent } from "../components/my-badges-details/my-badges-details.component";
+import { DoughtnutPieChartComponent } from "../components/charts/doughnut-pie-chart/doughnut-pie-chart.component";
+import { UserOverviewComponent } from "./user-overview/user-overview.component";
+import { SlideOverPanelComponent } from "../components/utils/slide-over-panel/slide-over-panel.component";
+import { AuthDropdownComponent } from "../components/auth-dropdown/auth-dropdown.component";
+import { ReportsByDateChartComponent } from "../components/charts/reports-by-date-chart/reports-by-date-chart.component";
+import { EmptyStateComponent } from "../components/empty-state/empty-state.component";
+@NgModule({
+  declarations: [
+    DashboardSidebarComponent,
+    UserDashboardComponent,
+    UserOverviewComponent,
+    ProfileUpdateComponent,
+    UserResourceDashboard,
+  ],
+  providers: [
+    UserOverviewPageService,
+    UsersService,
+    DashboardService,
+    UserResourceDashboardService,
+  ],
+  imports: [
+    CommonModule,
+    RouterModule,
+    DashboardRoutingModule,
+    SlideOverPanelComponent,
+    AuthDropdownComponent,
+    ReactiveFormsModule,
+    DatabasesModule,
+    CdkMenuModule,
+    AngularSvgIconModule,
+    NavbarComponent,
+    CalendarModule,
+    // SvgModule,
+    MyBadgesDetailsComponent,
+    // BadgeCardComponent,
+    SpinnerComponent,
+    ReportsByDateChartComponent,
+    CategoriesPieChartComponent,
+    CuratorReportsDetailsComponent,
+    NumberCardComponent,
+    DoughtnutPieChartComponent,
+    EmptyStateComponent,
+  ],
+})
+export class DashboardModule {}

@@ -1,0 +1,678 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Application Programming Interface (API)",
+    "version": "1.0"
+  },
+  "host": "dev.apicuron.org",
+  "basePath": "/api",
+  "paths": {
+    "/leaderboards": {
+      "get": {
+        "tags": [
+          "Public API"
+        ],
+        "description": "Retrieve ranking and scores",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "curator_orcid",
+            "in": "query",
+            "type": "string",
+            "description": "Biocurator ORCID"
+          },
+          {
+            "name": "curator_name",
+            "in": "query",
+            "type": "string",
+            "description": "Biocurator name"
+          },
+          {
+            "name": "resource_uri",
+            "in": "query",
+            "type": "string",
+            "description": "Resource unique identifier (URI)"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "description": "Number of items to return"
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "type": "integer",
+            "description": "Number of items to skip (useful for pagination)"
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "The output format. By default it returns a json stream. If explicitly format=json it returns a json file",
+            "type": "string",
+            "enum": [
+              "json",
+              "tsv"
+            ]
+          }
+
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/leaderboard"
+              }
+            }
+          }
+        }
+
+      }
+    },
+    "/achievements":  {
+      "get": {
+        "tags": [
+          "Public API"
+        ],
+        "description": "Retrieve biocurators achievements in terms of badges and medals",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "curator_orcid",
+            "in": "query",
+            "type": "string",
+            "description": "Biocurator ORCID"
+          },
+          {
+            "name": "curator_name",
+            "in": "query",
+            "type": "string",
+            "description": "Biocurator name"
+          },
+          {
+            "name": "resource_uri",
+            "in": "query",
+            "type": "string",
+            "description": "Resource unique identifier (URI)"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "description": "Number of items to return"
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "type": "integer",
+            "description": "Number of items to skip (useful for pagination)"
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "The output format. By default it returns a json stream. If explicitly format=json it returns a json file",
+            "type": "string",
+            "enum": [
+              "json",
+              "tsv"
+            ]
+          }
+
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/achievement"
+              }
+            }
+          }
+        }
+
+      }
+
+    },
+    "/reports": {
+      "get": {
+        "tags": [
+          "Public API"
+        ],
+        "description": "Retrieve biocuration events (or activities)",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "curator_orcid",
+            "in": "query",
+            "type": "string",
+            "description": "Biocurator ORCID"
+          },
+          {
+            "name": "curator_name",
+            "in": "query",
+            "type": "string",
+            "description": "Biocurator name"
+          },
+          {
+            "name": "resource_uri",
+            "in": "query",
+            "type": "string",
+            "description": "Resource unique identifier (URI)"
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "type": "string",
+            "description": "Event date from"
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "type": "string",
+            "description": "Event date to"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "description": "Number of items to return"
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "type": "integer",
+            "description": "Number of items to skip (useful for pagination)"
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "The output format. By default it returns a json stream. If explicitly format=json it returns a json file",
+            "type": "string",
+            "enum": [
+              "json",
+              "tsv"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/report"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/submit_activity": {
+      "post": {
+        "tags": [
+          "Private API"
+        ],
+        "description": "Submit curation activities to APICURON\n",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "pattern": "^Bearer .*$"
+          },
+          {
+            "name": "reports",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resource_uri": {
+                  "type": "string",
+                  "example": "https://registry.identifiers.org/registry/devdisprot"
+                },
+                "reports": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "activity_term": {
+                        "type": "string",
+                        "example": "",
+                        "description": ""
+                      },
+                      "resource_uri": {
+                        "type": "string",
+                        "example": "https://registry.identifiers.org/registry/devdisprot"
+                      },
+                      "timestamp": {
+                        "type": "string",
+                        "example": "",
+                        "description": ""
+                      },
+                      "curator_orcid": {
+                        "type": "string",
+                        "example": "0000-0001-6859-3648",
+                        "description": "The ORCID iD of the biocurator"
+                      },
+                      "entity_uri": {
+                        "type": "string",
+                        "example": "",
+                        "description": ""
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/resubmit_activity": {
+      "post": {
+        "tags": [
+          "Private API"
+        ],
+        "description": "Remove previously reported activities within the indicated time interval and submit curation activities to APICURON.",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "pattern": "^Bearer .*$"
+          },
+          {
+            "name": "reports",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resource_uri": {
+                  "type": "string",
+                  "example": "https://registry.identifiers.org/registry/devdisprot"
+                },
+                "time_start": {
+                  "type": "string",
+                  "example": "2015-01-02T11:15:43Z"
+                },
+                "time_end": {
+                  "type": "string",
+                  "example": "2999-02-15T20:10:10Z"
+                },
+                "reports": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "activity_term": {
+                        "type": "string",
+                        "example": "",
+                        "description": ""
+                      },
+                      "resource_uri": {
+                        "type": "string",
+                        "example": "https://registry.identifiers.org/registry/devdisprot"
+                      },
+                      "timestamp": {
+                        "type": "string",
+                        "example": "",
+                        "description": ""
+                      },
+                      "curator_orcid": {
+                        "type": "string",
+                        "example": "0000-0001-6859-3648",
+                        "description": "The ORCID iD of the biocurator"
+                      },
+                      "entity_uri": {
+                        "type": "string",
+                        "example": "",
+                        "description": ""
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/submit_description": {
+      "post": {
+        "tags": [
+          "Private API"
+        ],
+        "description": "Submit resource setting and definition to APICURON. It takes the list and definition of activity terms and the corresponding scores. Badges and medals definitions and rules and a short text describing the resource.",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "pattern": "^Bearer .*$"
+          },
+          {
+            "name": "reports",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resource_uri": {
+                  "type": "string",
+                  "description": "This is the identifier used to identify the resource and activity terms (see submit activity)"
+                },
+                "resource_url": {
+                  "type": "string",
+                  "description": "Resource homepage URL"
+                },
+                "resource_name": {
+                  "type": "string",
+                  "description": "Resource name"
+                },
+                "resource_long_name": {
+                  "type": "string",
+                  "description": "Resource full name"
+                },
+                "resource_description": {
+                  "type": "string",
+                  "description": "Text describing the resource shown in the APICURON database pages"
+                },
+                "terms_def": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "activity_term": {
+                        "type": "string",
+                        "description": "Activity term identifier"
+                      },
+                      "activity_name": {
+                        "type": "string",
+                        "description": "Activity term name"
+                      },
+                      "activity_category": {
+                        "type": "string",
+                        "description": "Activity term category. Either \"generation\", \"revision\" or \"invalidation\"",
+                        "enum": [
+                          "Generation",
+                          "Revision",
+                          "Invalidation"
+                        ]
+                      },
+                      "score": {
+                        "type": "string",
+                        "description": "An interger number representing the effort or importance of the curation activity"
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "A human readable description of the activity term"
+                      }
+                    }}},
+                "achievements_def": {
+                  "type": "array",
+                  "description": "The definition of achievements and parameters for their calculation. See tables below\n",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Either \"badge\" or \"medal\""
+                      },
+                      "category": {
+                        "type": "string",
+                        "description": "A number to identify a group of related badges/medals"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Human readable name of the badge/medal"
+                      },
+                      "list_terms": {
+                        "type": "string",
+                        "description": "The list of activity terms to be considered to assign the badge/medal"
+                      },
+                      "color": {
+                        "type": "string",
+                        "description": "The hexadecimal color code or color name used ot visualize the badge/medal. You can se gold/silver/bronze for a metal effect"
+                      },
+                      "count_threshold": {
+                        "type": "string",
+                        "description": "Only badges. The count threshold to assign the badge"
+                      },
+                      "score_relative": {
+                        "type": "string",
+                        "description": "Only medals. The ranking over other database curators to assign the medal. The ranking is calculated by multiplying the activities listed in \"list_terms\" with the corresponding score"
+                      },
+                      "first_day": {
+                        "type": "string",
+                        "description": "Only medals. Consider activity terms from this date"
+                      },
+                      "last_day": {
+                        "type": "string",
+                        "description": "Only medals. Consider activity terms to this date"
+                      }
+
+                    }}}
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+          }
+    }
+  },
+  "schemes": [
+    "https"
+  ],
+  "definitions": {
+    "report": {
+      "type": "object",
+      "description": "Retrieve biocuration events (or activities)",
+      "properties": {
+        "resource_uri": {
+          "type": "string",
+          "description": "The database identifier",
+          "example": "https://registry.identifiers.org/registry/devdisprot"
+        },
+        "activity_category": {
+          "type": "string",
+          "example": "",
+          "description": "Activity term category. Either \"generation\", \"revision\" or \"invalidation\"",
+          "enum": [
+            "Generation",
+            "Revision",
+            "Invalidation"
+          ]
+        },
+        "activity_name": {
+          "type": "string",
+          "example": "",
+          "description": "Activity term name"
+        },
+        "activity_term": {
+          "type": "string",
+          "example": "",
+          "description": "The curation activity term identifier"
+        },
+        "description": {
+          "type": "string",
+          "example": "",
+          "description": "A human readable description of the activity term"
+        },
+        "score": {
+          "type": "string",
+          "example": "",
+          "description": "An interger number representing the effort or importance of the curation activity"
+        },
+        "curator_orcid": {
+          "type": "string",
+          "example": "0000-0001-6859-3648",
+          "description": "The ORCID iD of the biocurator"
+        },
+        "entity_uri": {
+          "type": "string",
+          "example": "",
+          "description": "The identifier of the curated object in the source database\n"
+        },
+        "timestamp": {
+          "type": "string",
+          "example": "",
+          "description": "The date and time of the curation activity"
+        }
+      }
+    },
+    "leaderboard": {
+      "type": "object",
+      "description": "Ranking and scores of biocurators",
+      "properties": {
+        "resource_uri": {
+          "type": "string",
+          "description": "The database identifier",
+          "example": "https://registry.identifiers.org/registry/devdisprot"
+        },
+        "curator_orcid": {
+          "type": "string",
+          "example": "0000-0001-6859-3648",
+          "description": "The ORCID iD of the biocurator"
+        },
+        "given_name": {
+          "type": "string",
+          "description": ""
+        },
+        "family_name": {
+          "type": "string",
+          "description": ""
+        },
+        "ranking": {
+          "type": "integer",
+          "description": ""
+        },
+        "total_score": {
+          "type": "integer",
+          "description": ""
+        },
+        "generation_count": {
+          "type": "integer",
+          "description": ""
+        },
+        "generation_score": {
+          "type": "integer",
+          "description": ""
+        },
+        "revision_count": {
+          "type": "integer",
+          "description": ""
+        },
+        "revision_score": {
+          "type": "integer",
+          "description": ""
+        },
+        "invalidation_count": {
+          "type": "integer",
+          "description": ""
+        },
+        "invalidation_score": {
+          "type": "integer",
+          "description": ""
+        },
+        "badges_count": {
+          "type": "integer",
+          "description": ""
+        },
+        "medals_count": {
+          "type": "integer",
+          "description": ""
+        }
+
+      }
+    },
+    "achievement": {
+      "type": "object",
+      "description": "Biocurators achievements in terms of badges and medals",
+      "properties": {
+        "curator_orcid": {
+          "type": "string",
+          "example": "0000-0001-6859-3648",
+          "description": "The ORCID iD of the biocurator"
+        },
+        "given_name": {
+          "type": "string",
+          "description": ""
+        },
+        "family_name": {
+          "type": "string",
+          "description": ""
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of the achievement",
+          "enum": ["badge", "medal"]
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the achievement"
+        },
+       "colore_code": {
+          "type": "string",
+          "description": ""
+        },
+        "count": {
+          "type": "integer",
+          "description": ""
+        },
+       "count_threshold": {
+          "type": "integer",
+          "description": ""
+        }
+
+
+
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Public API"
+    },
+    {
+      "name": "Private API",
+      "description": " All private endpoints are only available to registered organizations and intended to be used only for submitting curation data. To become an APICURON member database and open an account to submit data please"
+    }
+  ]
+}

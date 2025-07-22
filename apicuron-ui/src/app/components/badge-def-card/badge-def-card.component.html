@@ -1,0 +1,81 @@
+<div
+  class="tw-flex tw-p-3 tw-py-5 tw-flex-col tw-bg-white tw-rounded tw-h-full"
+  [ngClass]="{ 'tw-shadow-sm': enableShadow }"
+>
+  <div class="tw-flex tw-flex-row tw-grow">
+    <div class="tw-shrink-0">
+      <svg-icon
+        src="assets/svg/badge_check.svg"
+        svgClass="tw-w-8 sm:tw-w-10 lg:tw-w-12 tw-mx-auto"
+      >
+      </svg-icon>
+    </div>
+    <div class="tw-pl-2 tw-flex tw-flex-col tw-grow tw-min-w-0">
+      <span
+        class="tw-text-sm sm:tw-text-base tw-text-gray-700 tw-font-bold tw-block tw-text-left tw-line-clamp-3 tw-break-words tw-hyphens-auto tw-whitespace-normal"
+      >
+        {{ badge.displayedName }}
+      </span>
+
+      <span
+        class="tw-font-med tw-block tw-text-gray-500 tw-text-sm tw-leading-relaxed"
+      >
+        Requires completing
+        <span class="tw-font-bold">{{ badge.count_threshold }}</span>
+        {{ badge.count_threshold > 1 ? "activities" : "activity" }}
+        <!-- Date conditions remain unchanged -->
+        <span *ngIf="!!badge.startDate && !badge.endDate">
+          starting from
+          <span class="tw-font-bold"
+            >{{ badge.startDate | date : "dd-MM-yyyy" }} UTC</span
+          >
+        </span>
+        <span *ngIf="!!badge.endDate && !badge.startDate">
+          before
+          <span class="tw-font-bold"
+            >{{ badge.endDate | date : "dd-MM-yyyy" }} UTC</span
+          >
+        </span>
+        <span *ngIf="!!badge.startDate && !!badge.endDate">
+          between
+          <span class="tw-font-bold">{{
+            badge.startDate | date : "dd-MM-yyyy"
+          }}</span>
+          and
+          <span class="tw-font-bold"
+            >{{ badge.endDate | date : "dd-MM-yyyy" }} UTC</span
+          >
+        </span>
+      </span>
+
+      <span
+        class="tw-font-normal tw-text-sm tw-underline tw-cursor-pointer"
+        cdkOverlayOrigin
+        #activities_list
+        (mouseenter)="setOverlayState(true)"
+        (mouseleave)="setOverlayState(false, 300)"
+      >
+        Activities
+      </span>
+    </div>
+  </div>
+</div>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="activities_list"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
+  [cdkConnectedOverlayOpen]="!!(overlayOpen$ | async)"
+>
+  <div
+    class="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-py-2 tw-rounded tw-shadow-md tw-shadow-gray-400"
+  >
+    <span
+      class="tw-block tw-text-sm tw-font-dm-sans tw-text-gray-600 tw-leading-normal tw-py-1 tw-px-2"
+      *ngFor="let term of termNames$ | async"
+    >
+      {{ term }}
+    </span>
+  </div>
+</ng-template>

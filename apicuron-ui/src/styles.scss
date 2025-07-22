@@ -1,0 +1,85 @@
+button:focus {
+  outline: none;
+}
+
+.main-content {
+  @apply tw-mx-auto tw-container tw-max-w-7xl tw-px-2 sm:tw-px-4 2xl:tw-px-0 tw-py-2 xl:tw-py-4;
+}
+
+@import '@angular/cdk/overlay-prebuilt.css';
+
+$apicuron_purple: #4d194d;
+
+
+
+:root {
+  --bronze: #967444;
+  --gold: #d1b000;
+  --silver: #a9a9a9;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+:focus-visible {
+  outline: none;
+}
+
+::ng-deep .mat-tooltip {
+  background-color: white !important;
+  color: black !important;
+}
+
+// Navbar Styles Section
+// ------------------------------------
+.nav-item {
+  @apply dark:tw-text-gray-100 hover:dark:tw-text-white tw-text-gray-700 hover:tw-text-gray-800 tw-px-2 tw-mx-1 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium;
+}
+
+.hover-underline-animation {
+  @apply before:tw-absolute before:tw-h-[4px] before:tw-left-1/2 before:tw-right-1/2 before:tw-content-[""] before:tw-bottom-0 before:tw-transition-all before:tw-duration-200 before:tw-ease-in;
+}
+
+.hover-underline-animation {
+  @apply hover:before:tw-right-0 hover:before:tw-left-0;
+}
+
+.active-underline-animation {
+  @apply before:tw-right-0 before:tw-left-0 tw-delay-500;
+}
+
+// ------------------------------------
+
+@import "ngx-toastr/toastr";
+@import "prismjs/themes/prism-okaidia.css";
+@import '@angular/cdk/overlay-prebuilt.css';
+
+
+@tailwind base;
+
+
+// $primaryColor: #4d194d;
+// $secondaryColor: #742574;
+// @import "primeng/resources/primeng.min.css";
+// @import "primeicons/primeicons.css";
+// @import "primeng-sass-theme/themes/tailwind/tailwind-light/theme.scss";
+
+
+
+@tailwind components;
+@tailwind utilities;
+
+
+.custom-tooltip {
+  background-color: white;
+  color: #333;
+  border: 1px solid black;
+  padding: 8px 12px;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  max-width: 300px;
+  white-space: normal;
+  word-wrap: break-word;
+}

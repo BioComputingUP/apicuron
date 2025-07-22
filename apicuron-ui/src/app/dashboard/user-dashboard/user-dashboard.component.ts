@@ -1,0 +1,30 @@
+import {
+  Component,
+  OnInit, ViewEncapsulation
+} from "@angular/core";
+import { AuthService } from "src/app/auth/auth.service";
+import { environment } from "src/environments/environment";
+import { Observable } from "rxjs";
+@Component({
+  selector: "app-user-dashboard",
+  templateUrl: "./user-dashboard.component.html",
+  encapsulation: ViewEncapsulation.None,
+  styleUrls: [
+    "./user-dashboard.component.scss",
+    // "../styles/primeicons.css",
+    // "../styles/primeng.min.css",
+    // "../styles/theme.scss",
+  ],
+})
+export class UserDashboardComponent implements OnInit {
+  development = ["development", "local"].includes(environment.env);
+  user$: Observable<any>;
+
+  openSidePanel: Boolean = false;
+  openMobileMenu: Boolean = false;
+
+  constructor(protected auth: AuthService) {
+    this.user$ = this.auth.user$;
+  }
+  ngOnInit(): void {}
+}

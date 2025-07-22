@@ -1,0 +1,15 @@
+@config "../tailwind.config.js";
+
+/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+th {
+    @apply tw-px-2
+}
+
+td {
+    @apply tw-py-2
+}

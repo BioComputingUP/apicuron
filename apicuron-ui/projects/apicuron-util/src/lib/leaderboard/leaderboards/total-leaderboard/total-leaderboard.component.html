@@ -1,0 +1,136 @@
+<!-- Total Leaderboard -->
+<div [loadable]="totalLeaderboard$" class="tw-font-dm-sans">
+  <ng-container *ngIf="totalLeaderboard$ | async as totalLeaderboard">
+    <ng-container *ngIf="resource$ | async as resource">
+      <span class="tw-text-xs tw-text-gray-500 tw-font-light">
+        This Leaderboard comprises all contributions recorded by APICURON. From
+        the begining of the resource. This may inlclude very old contributions
+      </span>
+      <table *ngIf="totalLeaderboard.data.length > 0" class="tw-table-auto tw-border-collapse tw-w-full">
+        <thead>
+          <tr class="tw-divide-x tw-divide-gray-200">
+            <!-- {{ tableColumnsTotal | json }} -->
+            <ng-container *ngFor="let column of columns$ | async">
+              <ng-container [ngSwitch]="column.columnName">
+                <th
+                  *ngSwitchCase="'Medals'"
+                  [title]="column.description"
+                  class="tw-px-2 tw-py-1 tw-text-center tw-text-gray-700"
+                >
+                  {{ column.columnName }}
+                  <!-- <svg-icon
+                    src="assets/medal_icon.svg"
+                    svgClass="tw-inline tw-w-4 tw-h-4 tw-text-inherit"
+                  ></svg-icon> -->
+                  <img src="assets/medal_icon.svg" class="tw-inline tw-w-4 tw-h-4 tw-text-inherit" >
+
+                </th>
+
+                <th
+                  *ngSwitchCase="'Badges'"
+                  [title]="column.description"
+                  class="tw-px-2 tw-py-1 tw-text-center tw-text-gray-700"
+                >
+                  {{ column.columnName }}
+                  <!-- <svg-icon
+                    src="assets/badge_icon.svg"
+                    svgClass="tw-inline tw-w-4 tw-h-4 tw-text-inherit"
+                  ></svg-icon> -->
+                  <img src="assets/badge_icon.svg" class="tw-inline tw-w-4 tw-h-4 tw-text-inherit" >
+                  
+                </th>
+
+                <th
+                  *ngSwitchDefault
+                  [title]="column.description"
+                  class="tw-px-2 tw-py-1 tw-text-center tw-text-gray-700"
+                >
+                  {{ column.columnName }}
+                </th>
+              </ng-container>
+            </ng-container>
+          </tr>
+        </thead>
+        <tbody class="tw-divide-y tw-divide-gray-200">
+          <tr
+            *ngFor="
+              let entry of totalLeaderboard.data;
+              let indexOfelement = index
+            "
+            class="odd:tw-bg-gray-50"
+          >
+            <ng-container *ngFor="let column of columns$ | async">
+              <ng-container [ngSwitch]="column.columnName">
+                <td
+                  *ngSwitchCase="'Contributor'"
+                  profile-renderer
+                  [profile-renderer-user]="entry.user"
+                ></td>
+                <td
+                  *ngSwitchCase="'last Contribution Date'"
+                  class="tw-text-center tw-font-bold tw-text-gray-700"
+                >
+                  {{
+                    entry.stat.last_contribution | date : "dd-MM-yyyy" : "UTC"
+                  }}
+                </td>
+                <td
+                  *ngSwitchDefault
+                  class="tw-text-center tw-font-bold tw-text-gray-700"
+                >
+                  {{
+                    column.fieldAccessor(
+                      entry,
+                      indexOfelement,
+                      totalLeaderboard
+                    )
+                  }}
+                </td>
+              </ng-container>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+
+      <div
+        class="tw-p-1 md:tw-p-2 tw-text-gray-700"
+        style="font-family: system-ui"
+      >
+        <ng-container
+          *ngIf="totalLeaderboard.meta.pagination.total > 0; else emptyList"
+        >
+          <div
+            class="tw-flex tw-flex-row tw-items-center tw-justify-between tw-pt-2 md:tw-pt-4"
+          >
+            <div>
+              <span
+                >Total Contributors:
+                <span
+                  class="tw-bg-apicuron-bright-purple tw-text-white tw-font-bold tw-rounded-md tw-px-1"
+                  >{{ totalLeaderboard.meta.pagination.total }}</span
+                >
+              </span>
+            </div>
+            <pagination
+              [paginated]="totalLeaderboard"
+              (pageChanged)="updatePage($event)"
+            ></pagination>
+            <a class="tw-block" [href]="apicuronURL">
+              <img
+                class="tw-w-48 tw-transition-transform hover:tw-scale-110"
+                src="assets/APICURON.svg"
+                alt=""
+              />
+            </a>
+          </div>
+        </ng-container>
+
+        <ng-template #emptyList>
+          <div class="tw-text-center">
+            {{ resource.resource_name }} Has no available Leaderboard yet
+          </div>
+        </ng-template>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>
