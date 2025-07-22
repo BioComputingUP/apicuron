@@ -1,0 +1,18 @@
+version: '3'
+services:
+  apicuron-ws:
+    container_name: apicuron_webserver
+    build:
+      context: "."
+      target: development
+      tags:
+       - "apicuron-ws:dev"
+    image: "apicuron-ws" 
+    logging:
+      driver: "json-file"
+      options:
+        - max-size: "5mb"
+        - max-file: "5"
+    ports:
+      - "3000:3000"
+    

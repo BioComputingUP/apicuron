@@ -1,0 +1,110 @@
+import {
+	Controller,
+	Get,
+	Logger,
+	Req,
+	UseGuards,
+	Render,
+	SerializeOptions,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import {
+	ApiExcludeEndpoint,
+	ApiOkResponse,
+	ApiSecurity,
+	ApiTags,
+} from '@nestjs/swagger';
+import { OrcidGuard } from './guards/orcid.guard';
+import { AuthService } from './auth.service';
+import { Roles } from './decorators/roles.decorator';
+import { LocalAuthGuard } from './guards/local-auth.guard';
+import { RoleGuard } from './guards/role.guard';
+import { UsersService } from './users/services/users.service';
+import { UserReq } from './decorators/applyUser.decorator';
+import { User } from '../core/schemas/user.schema';
+import { plainToInstance } from 'class-transformer';
+import { PrivateUserEntity } from './users/dto/user.entity';
+import { AuthProtected } from './decorators/auth.decorator';
+
+@Controller({
+	path: 'auth',
+})
+export class AuthController {
+	constructor(
+		private authService: AuthService,
+		private configService: ConfigService,
+		private userService: UsersService,
+	) {}
+
+	private authControllerLogger = new Logger(AuthController.name);
+
+	// redirect to orcid
+	@ApiExcludeEndpoint()
+	@Get('orcid')
+	@UseGuards(OrcidGuard)
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	authenticate_orcid() {}
+
+	@ApiExcludeEndpoint()
+	@Get('orcid_permission')
+	@UseGuards(OrcidGuard)
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	orcid_permission() {}
+
+	@ApiExcludeEndpoint()
+	@Get('orcid/redirect')
+	// @Redirect('/orcid/', 301)
+	@Render('auth')
+	@UseGuards(OrcidGuard)
+	orcid_redirect(@UserReq() user: User) {
+		console.log(user);
+		return {
+			displayedName: user.displayedName,
+			access_token: user.orcid_permission,
+			refresh_token: user.refresh_token,
+		};
+	}
+
+	@ApiExcludeEndpoint()
+	@Get('token')
+	@UseGuards(LocalAuthGuard)
+	async get_jwt_token(@Req() req) {
+		if (req.headers['authorization'] && !req.headers['orcid-token']) {
+			return {
+				token: req.headers['authorization'],
+			};
+		}
+		const { header, token } = await this.authService.generate_jwt_token(
+			req.user,
+		);
+		return { token };
+	}
+
+	@ApiExcludeEndpoint()
+	@Get('/orcid/:orcid_id')
+	@Roles('user', 'admin')
+	@UseGuards(LocalAuthGuard, RoleGuard)
+	protected_page(@Req() request) {
+		return 'Can be accessed';
+	}
+
+	// swagger documentation decorators
+	@ApiTags('Users')
+	@ApiSecurity('basic')
+	// TODO: finish implementation of the docs
+	@ApiOkResponse({
+		description: 'An Object describing the current User and his information',
+	})
+	// nestjs logic decorators
+	@Get('profile')
+	@AuthProtected()
+	@SerializeOptions({
+		type: PrivateUserEntity,
+	})
+	async get_user_profile(@UserReq() userReq: User) {
+		const user = await this.userService.getPrivateUser({
+			orcid_id: userReq.orcid_id,
+		});
+		return user;
+	}
+}

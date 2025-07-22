@@ -1,0 +1,28 @@
+{
+	"compilerOptions": {
+		"module": "CommonJS",
+		"moduleResolution": "Node16",
+		"declaration": true,
+		"paths": {
+			"src/*": ["./src/*"]
+		},
+		"removeComments": true,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"allowSyntheticDefaultImports": true,
+		"target": "es2017",
+		"sourceMap": true,
+		"outDir": "./dist",
+		"baseUrl": "./",
+		"incremental": true,
+		"skipLibCheck": true,
+		"lib": ["es2015", "DOM", "DOM.Iterable"],
+		"types": ["node", "jest"],
+		"strictNullChecks": false,
+		"noImplicitAny": false,
+		"strictBindCallApply": true,
+		"forceConsistentCasingInFileNames": false,
+		"noFallthroughCasesInSwitch": false
+	},
+	"exclude": ["node_modules", "dist"]
+}
