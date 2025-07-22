@@ -1,6 +1,0 @@
-[submodule "apicuron-ui"]
-	path = apicuron-ui
-	url = git@github.com:BioComputingUP/apicuron-ui.git
-[submodule "apicuron-ws"]
-	path = apicuron-ws
-	url = git@github.com:BioComputingUP/apicuron-ws.git

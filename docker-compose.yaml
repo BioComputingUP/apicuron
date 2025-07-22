@@ -1,4 +1,3 @@
-version: '3.0'
 services:
   apicuron-ws:
     container_name: apicuron-webserver
@@ -6,8 +5,8 @@ services:
       context: "./apicuron-ws"
       target: local
       args:
-        - UID=1002
-        - GID=1002
+        - UID=${UID}
+        - GID=${GID}
     image: "apicuron-ws:dev" 
     working_dir: "/home/node/app"
     user: $DOCKER_USER
@@ -42,8 +41,8 @@ services:
       context: "./apicuron-ui"
       target: local
       args:
-        - UID=1002
-        - GID=1002
+        - UID=${UID}
+        - GID=${GID}
       
     # tags:
     #  - "apicuron-ui:dev"
@@ -82,7 +81,30 @@ services:
       - apicuron-network
     ports:
       - 27017:27017
-
+  
+  # broker:
+  #   image: apache/kafka:latest
+  #   ports:
+  #     - 9092:9092
+  #   container_name: broker
+  #   networks:
+  #     - apicuron-network
+  #   environment:
+  #     KAFKA_LISTENERS: PLAINTEXT://broker:9092,CONTROLLER://localhost:9093
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092
+  #     # KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+  #     # KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092
+  #     KAFKA_NODE_ID: 1
+  #     KAFKA_PROCESS_ROLES: broker,controller
+  #     KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+  #     KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  #     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+  #     KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+  #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  #     KAFKA_NUM_PARTITIONS: 3
+    
 # apicuron-docs:
 #   container_name: apicuron-docs
 #   working_dir: "/home/node/app"
