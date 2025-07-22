@@ -34,6 +34,7 @@ export class MedalDef
     return this;
   }
 
+  
   first_day: Date | null = null;
   last_day: Date | null = null;
   name: string = "";
@@ -42,8 +43,8 @@ export class MedalDef
   static colorsPattern =
     /(^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$)|^bronze$|^gold$|^silver$/;
 
-  static buildCreateMedalForm(fb: FormBuilder, resource_id: string = '') {
-    const fg =  fb.group({
+  static buildCreateMedalForm(fb: FormBuilder, resource_id: string = "") {
+    const fg = fb.group({
       color: new FormControl<string>("gold", {
         validators: [
           Validators.required,
@@ -64,7 +65,6 @@ export class MedalDef
       resource_id: new FormControl<string>(resource_id),
       resource_uri: new FormControl<string>(""),
     });
-    fg.controls.resource_id.disable();
     return fg;
   }
 
@@ -90,8 +90,6 @@ export class MedalDef
       resource_uri: medal.resource_uri,
     });
 
-    form.controls.resource_id.disable();
-    form.controls.resource_uri.disable();
     return form;
   }
 }
