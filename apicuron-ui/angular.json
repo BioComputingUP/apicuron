@@ -1,0 +1,431 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "apicuron-ui": {
+      "root": "",
+      "sourceRoot": "src",
+      "projectType": "application",
+      "prefix": "app",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser-esbuild",
+          "options": {
+            "allowedCommonJsDependencies": [
+              "plotly.js-dist-min",
+              "moment",
+              "moment-range",
+              "lodash",
+              "anchor-js",
+              "ordinal"
+            ],
+            "outputPath": "dist/apicuron-ui",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.app.json",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              { "glob": "**/*", "input": "src/assets/", "output": "/assets/" }
+            ],
+            "styles": ["src/styles.scss"],
+            "scripts": [
+              {
+                "input": "node_modules/marked/marked.min.js",
+                "inject": false,
+                "bundleName": "marked-script"
+              },
+              {
+                "input": "node_modules/prismjs/prism.js",
+                "inject": false,
+                "bundleName": "prism-script"
+              },
+              {
+                "input": "node_modules/prismjs/components/prism-json.js",
+                "inject": false,
+                "bundleName": "prism-script-json"
+              },
+              {
+                "input": "node_modules/prismjs/components/prism-bash.js",
+                "inject": false,
+                "bundleName": "prism-script-bash"
+              }
+            ],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": {
+                "scripts": true
+              },
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "10mb",
+                  "maximumError": "10mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "600kb"
+                }
+              ]
+            },
+            "development": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.dev.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "10mb",
+                  "maximumError": "10mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "600kb"
+                }
+              ]
+            }
+          },
+          "defaultConfiguration": ""
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "buildTarget": "apicuron-ui:build"
+          },
+          "configurations": {
+            "defaultConfiguration": {
+              "buildTarget": "apicuron-ui:build:development"
+            },
+            "production": {
+              "buildTarget": "apicuron-ui:build:production"
+            },
+            "development": {
+              "buildTarget": "apicuron-ui:build:development"
+            },
+            "build-auth-response": {
+              "host": "0.0.0.0",
+              "disableHostCheck": true,
+              "port": 1050,
+              "buildTarget": "apicuron-ui:build:build-auth-response"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "buildTarget": "apicuron-ui:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/test.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.spec.json",
+            "karmaConfig": "src/karma.conf.js",
+            "styles": ["src/styles.scss"],
+            "scripts": [],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              { "glob": "**/*", "input": "src/assets/", "output": "/assets/" }
+            ]
+          }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist/apicuron-ui/server",
+            "main": "server.ts",
+            "tsConfig": "src/tsconfig.server.json",
+            "optimization": false,
+            "sourceMap": true,
+            "extractLicenses": false,
+            "vendorChunk": true,
+            "buildOptimizer": false
+          },
+          "configurations": {
+            "production": {
+              "outputHashing": "media",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "sourceMap": {
+                "scripts": true
+              },
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            },
+            "development": {
+              "outputHashing": "media",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.dev.ts"
+                }
+              ],
+              "optimization": true,
+              "sourceMap": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            },
+            "build-auth-response": {
+              "optimization": false,
+              "extractLicenses": false,
+              "vendorChunk": true,
+              "buildOptimizer": false
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve-ssr": {
+          "builder": "@angular-devkit/build-angular:ssr-dev-server",
+          "configurations": {
+            "development": {
+              "browserTarget": "apicuron-ui:build:development",
+              "serverTarget": "apicuron-ui:server:development"
+            },
+            "production": {
+              "browserTarget": "apicuron-ui:build:production",
+              "serverTarget": "apicuron-ui:server:production"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "prerender": {
+          "builder": "@angular-devkit/build-angular:prerender",
+          "options": {
+            "routes": [
+              "/docs",
+              "/docs",
+              "/docs/developer-guide/index",
+              "/docs/developer-guide/integration",
+              "/docs/developer-guide/privacy"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "apicuron-ui:build:production",
+              "serverTarget": "apicuron-ui:server:production"
+            },
+            "development": {
+              "browserTarget": "apicuron-ui:build:development",
+              "serverTarget": "apicuron-ui:server:development"
+            }
+          },
+          "defaultConfiguration": "production"
+        }
+      }
+    },
+    "apicuron-ui-e2e": {
+      "root": "e2e/",
+      "projectType": "application",
+      "prefix": "",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "e2e/protractor.conf.js",
+            "devServerTarget": "apicuron-ui:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "apicuron-ui:serve:production"
+            }
+          }
+        }
+      }
+    },
+    "leaderboard": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/leaderboard",
+      "sourceRoot": "projects/leaderboard/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-builders/custom-webpack:browser",
+          "options": {
+            "outputPath": "dist/leaderboard",
+            "index": "projects/leaderboard/src/index.html",
+            "main": "projects/leaderboard/src/main.ts",
+            "polyfills": ["zone.js"],
+            "outputHashing": false,
+            "tsConfig": "projects/leaderboard/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/leaderboard/src/favicon.ico",
+              "projects/leaderboard/src/assets"
+            ],
+            "customWebpackConfig": {
+              "path": "projects/leaderboard/src/webpack.config.js"
+            },
+            "styles": [],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
+            },
+            "development": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.dev.ts"
+                }
+              ]
+            },
+            "local": {
+              "buildOptimizer": false,
+              "outputHashing": "none",
+              "optimization": false,
+              "vendorChunk": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-builders/custom-webpack:dev-server",
+          "options": {
+            "browserTarget": "leaderboard:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "leaderboard:build:production"
+            },
+            "development": {
+              "browserTarget": "leaderboard:build:development"
+            },
+            "local": {
+              "browserTarget": "leaderboard:build:local"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "buildTarget": "leaderboard:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "polyfills": ["zone.js", "zone.js/testing"],
+            "tsConfig": "projects/leaderboard/tsconfig.spec.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/leaderboard/src/favicon.ico",
+              "projects/leaderboard/src/assets"
+            ],
+            "styles": ["projects/leaderboard/src/styles.scss"],
+            "scripts": []
+          }
+        }
+      }
+    },
+    "apicuron-util": {
+      "projectType": "library",
+      "root": "projects/apicuron-util",
+      "sourceRoot": "projects/apicuron-util/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/apicuron-util/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/apicuron-util/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/apicuron-util/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/apicuron-util/tsconfig.spec.json",
+            "polyfills": ["zone.js", "zone.js/testing"]
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "analytics": false
+  }
+}
