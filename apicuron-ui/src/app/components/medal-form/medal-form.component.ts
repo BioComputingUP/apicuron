@@ -1,13 +1,17 @@
 import { CommonModule } from "@angular/common";
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { AngularSvgIconModule } from "angular-svg-icon";
 import { ToastrModule, ToastrService } from "ngx-toastr";
 import { CalendarModule } from "primeng/calendar";
-import { takeUntil, tap } from "rxjs";
+import { createDestroy$ } from "projects/apicuron-util/src/lib/util/destroy-observable";
+import { map, Observable, startWith, switchMap } from "rxjs";
+import { MedalDefService } from "src/app/achievements-def/services/medal-def.service";
+import { Paginated } from "src/app/interfaces/paginated";
 import { MedalDef } from "src/app/models/medal-def.model";
+import { Medal } from "src/app/models/medal.model";
 import { Term } from "src/app/models/term.model";
-import { SelectionModel } from "@angular/cdk/collections";
-import { createDestroyObservable } from "projects/apicuron-util/src/lib/util/destroy-observable";
+import { environment } from "src/environments/environment.dev";
 import { SelectActivitiesComponent } from "../select-activities/select-activities.component";
 
 @Component({
@@ -22,15 +26,18 @@ import { SelectActivitiesComponent } from "../select-activities/select-activitie
     ToastrModule,
     SelectActivitiesComponent,
     CalendarModule,
+    AngularSvgIconModule
   ],
 })
 export class MedalFormComponent implements OnInit {
+  medalPreview$: Observable<Paginated<Medal>>;
   constructor(
     protected formBuilder: FormBuilder,
-    protected toastr: ToastrService
+    protected toastr: ToastrService,
+    protected medalDefService: MedalDefService,
   ) {}
 
-  destroy$ = createDestroyObservable();
+  destroy$ = createDestroy$();
   ngOnInit(): void {
     if (!this.medal.resource_id) {
       throw new Error("Medal Resource id missing");
@@ -38,7 +45,25 @@ export class MedalFormComponent implements OnInit {
     if (this.type == "update") {
       MedalDef.buildUpdateMedalForm(this.form, this.medal);
     }
+
+    this.medalPreview$ = this.form.valueChanges.pipe(
+      startWith(this.form.value),
+      map(() => this.form.value),
+      map((formValue) => {
+        const medalDef = new MedalDef().deserialize(formValue);
+        return {
+          medalDef,
+          skip: 0,
+          limit: 10,
+        };
+      }),
+      switchMap(({ medalDef, skip, limit }) => {
+        return this.medalDefService.loadMedalDefPreview(medalDef, skip, limit);
+      })
+    );
   }
+
+  orcid_main_url = environment.orcid_main_url;
 
   @Input()
   type: "create" | "update" = "create";

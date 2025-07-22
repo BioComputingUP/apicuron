@@ -20,14 +20,14 @@ import {
   Subject,
   takeUntil,
 } from "rxjs";
-import { createDestroyObservable } from "../util/destroy-observable";
+import { createDestroy$ } from "../util/destroy-observable";
 
 @Component({
   template: "",
 })
 export abstract class Selectable {
   private _defaultInitialValue = false;
-  destroy$ = createDestroyObservable();
+  destroy$ = createDestroy$();
   disabled$ = new BehaviorSubject<boolean>(false);
 
   constructor() {
