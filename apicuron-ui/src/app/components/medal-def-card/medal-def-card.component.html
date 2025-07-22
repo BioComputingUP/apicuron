@@ -1,0 +1,98 @@
+<div
+  class="tw-flex tw-p-3 tw-py-5 tw-flex-col tw-bg-white tw-rounded tw-h-full"
+  [ngClass]="{ 'tw-shadow-sm': enableShadow }"
+>
+  <div class="tw-flex tw-flex-row tw-grow">
+    <div class="tw-shrink-0">
+      <img
+        src="assets/svg/gold_medal.svg"
+        class="tw-w-8 sm:tw-w-10 lg:tw-w-12"
+        alt=""
+      />
+    </div>
+    <div class="tw-pl-2 tw-flex tw-flex-col tw-grow tw-min-w-0">
+      <!-- Final optimized solution -->
+      <span
+        class="tw-text-xl tw-text-gray-700 tw-font-bold tw-block tw-text-left tw-line-clamp-3 tw-break-words tw-hyphens-auto tw-whitespace-normal"
+      >
+        {{ medal.name }}
+      </span>
+
+      <!-- Rest of the content remains unchanged -->
+      <span
+        class="tw-font-med tw-block tw-text-gray-500 tw-text-sm tw-leading-relaxed"
+        *ngIf="medal.score_relative > 1"
+      >
+        Requires ranking among the top {{ medal.score_relative }} biocurators
+      </span>
+      <span
+        class="tw-font-med tw-block tw-text-gray-500 tw-text-sm tw-leading-relaxed"
+        *ngIf="medal.score_relative == 1"
+      >
+        Requires ranking
+        <span class="tw-not-sr-only">1st</span>
+        <span class="tw-sr-only">First</span>
+      </span>
+
+      <span
+        class="tw-font-normal tw-text-sm tw-underline tw-cursor-pointer"
+        (mouseenter)="setOverlayState(true)"
+        (mouseleave)="setOverlayState(false, 300)"
+        cdkOverlayOrigin
+        #activities_list
+      >
+        Required Contributions
+      </span>
+      <!-- Date -->
+      <div
+        *ngIf="medal.last_day || medal.first_day"
+        class="tw-text-sm tw-text-gray-500 tw-bg-slate-100 tw-rounded-xl tw-px-2 tw-py-1 tw-w-fit tw-mt-2"
+      >
+        <ng-container *ngIf="medal.first_day && medal.last_day">
+          From <b>{{ medal.first_day | date : "dd MMM yy" : "UTC" }}</b> to
+          <b> {{ medal.last_day | date : "dd MMM yy" : "UTC" }} </b>
+        </ng-container>
+        <ng-container *ngIf="medal.first_day && !medal.last_day">
+          After
+          <b> {{ medal.first_day | date : "dd MMM yy" : "UTC" }} </b>
+        </ng-container>
+        <ng-container *ngIf="medal.last_day && !medal.first_day">
+          Before
+          <b> {{ medal.last_day | date : "dd MMM yy" : "UTC" }} </b>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="activities_list"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
+  [cdkConnectedOverlayOpen]="!!(overlayOpen$ | async)"
+>
+  <div
+    class="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-py-2 tw-rounded tw-shadow-md tw-shadow-gray-400"
+  >
+    <span
+      class="tw-block tw-text-sm tw-font-dm-sans tw-text-gray-600 tw-leading-normal tw-py-1 tw-px-2 tw-text-center"
+      *ngFor="let term of termNames$ | async"
+    >
+      {{ term }}
+    </span>
+  </div>
+</ng-template>
+
+<style>
+  .tw-line-clamp-3 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+  }
+
+  .tw-hyphens-auto {
+    hyphens: auto;
+  }
+</style>
