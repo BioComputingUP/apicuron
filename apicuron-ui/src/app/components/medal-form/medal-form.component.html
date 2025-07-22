@@ -32,136 +32,208 @@
       </span>
     </h2>
   </div>
-  <div
-    class="tw-px-3 sm:tw-px-6 tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-1 sm:tw-gap-3 tw-overflow-auto sm:tw-overflow-hidden"
-  >
-    <!-- Medal Name -->
-    <div class="tw-col-span-2">
-      <label class="tw-block tw-font-bold tw-text-gray-700" for="medal_name"
-        >Medal Name<span style="color: red">*</span></label
-      >
-      <input
-        type="text"
-        formControlName="name"
-        id="medal_name"
-        class="tw-w-full tw-p-2 !tw-px-4 tw-border tw-border-gray-300 tw-rounded-md"
-      />
-    </div>
-
-    <!-- List of Terms -->
-    <div class="tw-mt-1 tw-col-span-2">
-      <div class="tw-flex tw-flex-row tw-justify-between tw-items-center">
-        <label
-          class="tw-block tw-font-bold tw-text-gray-700 tw-text-sm sm:tw-text-md"
-          for="list_terms"
-          >List of Activities<span style="color: red">*</span>
-        </label>
-        <span
-          class="tw-block tw-text-right tw-ml-auto tw-text-xs sm:tw-text-sm tw-text-gray-500"
-          >Select the list of activities included
-        </span>
-      </div>
-      <div
-        class="tw-flex tw-flex-row tw-flex-wrap tw-max-h-80 tw-overflow-y-auto"
-        id="list_terms"
-        select-activities
-        [activities]="terms"
-        formControlName="list_terms"
-      ></div>
-    </div>
-
-    <!-- Color Code and Medal Recipients in One Row -->
-    <div class="tw-mt-1 sm:tw-mt-2 tw-col-span-2">
-      <!-- Medal Recipients -->
-      <div class="tw-mt-2 sm:tw-mt-0">
-        <label class="tw-block tw-font-bold tw-text-gray-700" for="score"
-          >Medal Recipients</label
+  <!-- Form Section -->
+  <div class="tw-grid tw-grid-cols-2 tw-items-start tw-overflow-y-hidden">
+    <!-- Form Fields -->
+    <div
+      class="tw-px-3 sm:tw-px-6 tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-1 sm:tw-gap-3 tw-overflow-auto sm:tw-overflow-hidden"
+    >
+      <!-- Medal Name -->
+      <div class="tw-col-span-2">
+        <label class="tw-block tw-font-bold tw-text-gray-700" for="medal_name"
+          >Medal Name<span style="color: red">*</span></label
         >
         <input
-          type="number"
-          min="1"
-          formControlName="score_relative"
-          id="score"
-          class="tw-w-full !tw-px-4 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md"
+          type="text"
+          formControlName="name"
+          id="medal_name"
+          class="tw-w-full tw-p-2 !tw-px-4 tw-border tw-border-gray-300 tw-rounded-md"
         />
-        <small
-          class="tw-pt-2 tw-block tw-leading-tight tw-text-xs tw-text-gray-500"
-        >
-          This field determines the number of recipients who will be awarded the
-          medal.
-        </small>
-        <small
-          class="tw-pt-2 tw-block tw-leading-tight tw-text-sm tw-text-red-500"
-          *ngIf="
-            form.get('score_relative').hasError('min') &&
-            form.get('score_relative').touched
-          "
-        >
-          Minimum value of a count threshold is 1
-        </small>
-      </div>
-    </div>
-
-    <!-- Start Date and End Date in One Row -->
-    <div class="tw-mt-2 tw-col-span-2 sm:tw-grid sm:tw-grid-cols-2 sm:tw-gap-4">
-      <!-- Start Date -->
-      <div class="tw-mt-2 sm:tw-mt-0">
-        <label class="tw-block tw-font-bold tw-text-gray-700" for="first_day"
-          >Start Date</label
-        >
-        <p-calendar
-          styleClass="tw-w-full tw-p-2 !tw-px-4  tw-border tw-border-gray-400 tw-rounded-md tw-hover:tw-shadow-none"
-          formControlName="first_day"
-          [showIcon]="true"
-          [maxDate]="form.get('last_day').value"
-          [showClear]="true"
-          [readonlyInput]="true"
-          class="tw-w-full"
-        ></p-calendar>
-        <small
-          class="tw-pt-2 tw-block tw-leading-tight tw-text-xs tw-text-gray-500"
-          >This field indicates when the medal period begins.</small
-        >
       </div>
 
-      <!-- End Date -->
-      <div class="tw-mt-2 sm:tw-mt-0">
-        <label class="tw-block tw-font-bold tw-text-gray-700" for="last_day"
-          >End Date</label
-        >
-        <p-calendar
-          styleClass="tw-w-full tw-p-2 !tw-px-4  tw-border tw-border-gray-400 tw-rounded-md"
-          formControlName="last_day"
-          [showIcon]="true"
-          [minDate]="form.get('first_day').value"
-          [showClear]="true"
-          [readonlyInput]="true"
-          class="tw-w-full"
-        ></p-calendar>
-        <small
-          class="tw-pt-2 tw-leading-tight tw-block tw-text-xs tw-text-gray-500"
-          >This field indicates when the medal period ends.</small
-        >
+      <!-- List of Terms -->
+      <div class="tw-mt-1 tw-col-span-2">
+        <div class="tw-flex tw-flex-row tw-justify-between tw-items-center">
+          <label
+            class="tw-block tw-font-bold tw-text-gray-700 tw-text-sm sm:tw-text-md"
+            for="list_terms"
+            >List of Activities<span style="color: red">*</span>
+          </label>
+          <span
+            class="tw-block tw-text-right tw-ml-auto tw-text-xs sm:tw-text-sm tw-text-gray-500"
+            >Select the list of activities included
+          </span>
+        </div>
+        <div
+          class="tw-flex tw-flex-row tw-flex-wrap tw-max-h-80 tw-overflow-y-auto"
+          id="list_terms"
+          select-activities
+          [activities]="terms"
+          formControlName="list_terms"
+        ></div>
       </div>
-    </div>
 
-    <!-- Submit Button -->
-    <div class="tw-mt-2 tw-col-span-2 tw-flex tw-items-center tw-gap-2">
-      <!-- Close Button -->
-      <button
-        type="button"
-        (click)="onClose()"
-        class="tw-w-24 tw-p-2 tw-border tw-border-gray-400 tw-text-gray-400 tw-font-bold tw-rounded-md"
+      <!-- Color Code and Medal Recipients in One Row -->
+      <div class="tw-mt-1 sm:tw-mt-2 tw-col-span-2">
+        <!-- Medal Recipients -->
+        <div class="tw-mt-2 sm:tw-mt-0">
+          <label class="tw-block tw-font-bold tw-text-gray-700" for="score"
+            >Medal Recipients</label
+          >
+          <input
+            type="number"
+            min="1"
+            formControlName="score_relative"
+            id="score"
+            class="tw-w-full !tw-px-4 tw-p-2 tw-border tw-border-gray-300 tw-rounded-md"
+          />
+          <small
+            class="tw-pt-2 tw-block tw-leading-tight tw-text-xs tw-text-gray-500"
+          >
+            This field determines the number of recipients who will be awarded
+            the medal.
+          </small>
+          <small
+            class="tw-pt-2 tw-block tw-leading-tight tw-text-sm tw-text-red-500"
+            *ngIf="
+              form.get('score_relative').hasError('min') &&
+              form.get('score_relative').touched
+            "
+          >
+            Minimum value of a count threshold is 1
+          </small>
+        </div>
+      </div>
+
+      <!-- Start Date and End Date in One Row -->
+      <div
+        class="tw-mt-2 tw-col-span-2 sm:tw-grid sm:tw-grid-cols-2 sm:tw-gap-4"
       >
-        Close
-      </button>
+        <!-- Start Date -->
+        <div class="tw-mt-2 sm:tw-mt-0">
+          <label class="tw-block tw-font-bold tw-text-gray-700" for="first_day"
+            >Start Date</label
+          >
+          <p-calendar
+            styleClass="tw-w-full tw-p-2 !tw-px-4  tw-border tw-border-gray-400 tw-rounded-md tw-hover:tw-shadow-none"
+            formControlName="first_day"
+            [showIcon]="true"
+            [maxDate]="form.get('last_day').value"
+            [showClear]="true"
+            [readonlyInput]="true"
+            class="tw-w-full"
+          ></p-calendar>
+          <small
+            class="tw-pt-2 tw-block tw-leading-tight tw-text-xs tw-text-gray-500"
+            >This field indicates when the medal period begins.</small
+          >
+        </div>
+
+        <!-- End Date -->
+        <div class="tw-mt-2 sm:tw-mt-0">
+          <label class="tw-block tw-font-bold tw-text-gray-700" for="last_day"
+            >End Date</label
+          >
+          <p-calendar
+            styleClass="tw-w-full tw-p-2 !tw-px-4  tw-border tw-border-gray-400 tw-rounded-md"
+            formControlName="last_day"
+            [showIcon]="true"
+            [minDate]="form.get('first_day').value"
+            [showClear]="true"
+            [readonlyInput]="true"
+            class="tw-w-full"
+          ></p-calendar>
+          <small
+            class="tw-pt-2 tw-leading-tight tw-block tw-text-xs tw-text-gray-500"
+            >This field indicates when the medal period ends.</small
+          >
+        </div>
+      </div>
 
       <!-- Submit Button -->
-      <input
-        type="submit"
-        class="tw-flex-1 tw-rounded-md tw-bg-apicuron-bright-purple tw-px-3.5 tw-pt-2.5 tw-pb-3.5 tw-text-center tw-text-sm tw-cursor-pointer tw-font-semibold tw-text-white tw-shadow-sm tw-hover:bg-indigo-500 tw-focus-visible:outline tw-focus-visible:outline-2 tw-focus-visible:outline-offset-2 tw-focus-visible:outline-indigo-600"
-        value="Submit"
-      />
+      <div class="tw-mt-2 tw-col-span-2 tw-flex tw-items-center tw-gap-2">
+        <!-- Close Button -->
+        <button
+          type="button"
+          (click)="onClose()"
+          class="tw-w-24 tw-p-2 tw-border tw-border-gray-400 tw-text-gray-400 tw-font-bold tw-rounded-md"
+        >
+          Close
+        </button>
+
+        <!-- Submit Button -->
+        <input
+          type="submit"
+          class="tw-flex-1 tw-rounded-md tw-bg-apicuron-bright-purple tw-px-3.5 tw-pt-2.5 tw-pb-3.5 tw-text-center tw-text-sm tw-cursor-pointer tw-font-semibold tw-text-white tw-shadow-sm tw-hover:bg-indigo-500 tw-focus-visible:outline tw-focus-visible:outline-2 tw-focus-visible:outline-offset-2 tw-focus-visible:outline-indigo-600"
+          value="Submit"
+        />
+      </div>
+    </div>
+    <!-- Feedback Section -->
+    <div class="tw-overflow-y-scroll">
+      <p>Feedback</p>
+      <ng-container *ngIf="medalPreview$ | async as medalsPreview">
+        <div *ngFor="let medal of medalsPreview.data">
+          <div
+            class="tw-flex tw-items-center tw-space-x-4 tw-bg-white tw-shadow tw-rounded-lg tw-p-4 tw-mb-2"
+          >
+            <!-- Profile Image -->
+            <div
+              class="tw-w-16 tw-h-16 tw-rounded-full tw-p-2 tw-bg-gray-200 tw-flex tw-items-center tw-justify-center tw-text-gray-400 tw-text-2xl"
+            >
+              <img
+                [src]="medal?.user?.avatar?.href ?? '/assets/user.svg'"
+                class="tw-w-full tw-h-full"
+                alt=""
+                srcset=""
+              />
+            </div>
+            <!-- Profile Info -->
+            <div class="tw-flex-1">
+              <div class="tw-font-bold tw-text-lg tw-text-gray-800">
+                <!-- [Person's Name] -->
+                {{ medal?.user?.displayedName || "Unknown User" }}
+              </div>
+              <div class="tw-text-sm tw-text-gray-500">
+                <!-- [Badge Name] -->
+                Earned The Medal: {{ medal?.name || "Unnamed Medal" }}
+              </div>
+              <div class="tw-flex tw-items-center tw-space-x-2 tw-mt-1">
+                <span
+                  class="tw-bg-yellow-300 tw-text-yellow-900 tw-px-2 tw-py-1 tw-rounded tw-text-xs tw-font-semibold"
+                >
+                  <!-- [Ranking/Position] -->
+                  {{ medal.score_relative_index + 1 }}
+                </span>
+                <span class="tw-text-xs tw-text-gray-400">
+                  <!-- [Additional Info] -->
+
+                  <a
+                    [href]="orcid_main_url + medal.curator_orcid"
+                    target="_blank"
+                    title="Visit ORCID Profile"
+                    class="hover:tw-underline tw-text-blue-500"
+                  >
+                    {{ medal.curator_orcid }}
+                    <svg-icon svgClass="tw-w-4 tw-h-4 tw-inline" src="assets/svg/external-link.svg"></svg-icon>
+                  </a>
+                </span>
+              </div>
+            </div>
+            <!-- Badge Icon -->
+            <div
+              class="tw-w-10 tw-h-10 tw-rounded-fulltw-flex tw-items-center tw-justify-center tw-text-xl"
+            >
+              <!-- [Badge Icon] -->
+              <img
+                src="/assets/svg/gold_medal.svg"
+                alt="Medal icon"
+                srcset=""
+              />
+            </div>
+          </div>
+        </div>
+      </ng-container>
     </div>
   </div>
 </form>
