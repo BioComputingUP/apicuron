@@ -1,8 +1,9 @@
+import { User } from 'src/core/schemas/user.schema';
 import { PrivacyType } from '../../core/enums';
 
 /**
  * This is the output of an aggregation pipeline
- * it groups all reports related to a medal definition for a specific user
+ * it represents a groupped value of all reports related to a medal definition for a specific user
  */
 export type MedalDefReportsUserSummary = {
 	score_total: number;
@@ -12,4 +13,5 @@ export type MedalDefReportsUserSummary = {
 	league: string;
 	privacy: PrivacyType;
 	curator_orcid: string;
+	user: User;
 };

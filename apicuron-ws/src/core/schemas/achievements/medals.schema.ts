@@ -34,7 +34,7 @@ export class Medal implements IUserResourceEntity {
 		required: false,
 		type: UserSchema,
 	})
-	user: User | null;
+	user: User;
 
 	/**
 	 * The color of the medal.

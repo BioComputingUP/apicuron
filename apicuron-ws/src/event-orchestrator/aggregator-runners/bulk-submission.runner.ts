@@ -114,8 +114,8 @@ export class SubmissionRunner implements IRunner, OnModuleInit {
 						.map((agg) => agg.constructor.name);
 					failed_aggregators.push(...didntComplete);
 					throw new Error(
-						`${aggregator.constructor.name} failed during sequential execution ${error.message}` +
-							(error.stack ? `\nStack: ${error.stack}` : ''),
+						`${aggregator.constructor.name} failed during sequential execution with Error [${error?.name}:${error?.code}]: ${error?.message}` +
+							(error?.stack ? `\nStack: ${error?.stack}` : ''),
 					);
 				}
 			}

@@ -3,6 +3,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import * as _ from 'lodash';
 import { Cursor, FilterQuery, LeanDocument, Model } from 'mongoose';
+import { Transform } from 'node:stream';
 import { from, Observable, switchMap, tap, timer } from 'rxjs';
 import { UsersService } from 'src/auth/users/services/users.service';
 import { User, UserDocument } from 'src/core/schemas/index';
@@ -117,13 +118,10 @@ export class ComputeMedalsService {
 		const reportsAgg = this.medalReportsAggregationCursor(medalDef);
 		let rankingCounter = 0;
 		for await (const reportWithCount of reportsAgg) {
-			const user = await this.userService.getByOrcid(
-				reportWithCount.curator_orcid,
-			);
 			const medal = this.makeMedalFromMedalDefReports(
 				medalDef,
 				reportWithCount,
-				user,
+				reportWithCount.user,
 				rankingCounter,
 			);
 			yield medal;
@@ -189,56 +187,60 @@ export class ComputeMedalsService {
 	 * This function groups reports by user while counting all sorts of stats regarding the tasks
 	 * Specifically the total score
 	 *
-	 * @param medal - The medal definition document.
+	 * @param medalDef - The medal definition document.
 	 * @param cursorOptions - The options for the cursor (default: { batchSize: 50 }).
 	 * @returns A cursor for aggregating reports by user for a specific medalDef.
 	 */
 	private medalReportsAggregationCursor(
-		medal: MedalDefDocument | LeanDocument<MedalDefDocument>,
+		medalDef: MedalDefDocument | LeanDocument<MedalDefDocument>,
 		cursorOptions: { batchSize: number } = { batchSize: 50 },
 	): Cursor<MedalDefReportsUserSummary> {
-		const reportFilter = GetrelatedReportFilter(medal);
+		const reportFilter = GetrelatedReportFilter(medalDef);
 
-		return (
-			this.reportModel
-				.aggregate()
-				.match(reportFilter)
-				.project({
-					curator_orcid: 1,
-					activity_term: 1,
-					score: '$term.score',
-					resource_id: 1,
-					privacy: 1,
-					term: 1,
-				})
-				// # here we group by curator while computing the count and score sum
-				.group({
-					_id: '$curator_orcid',
-					curator_orcid: {
-						$first: '$curator_orcid',
-					},
-					activity_terms: {
-						$addToSet: '$activity_term',
-					},
-					resource_id: {
-						$first: '$resource_id',
-					},
-					count: {
-						$sum: 1,
-					},
-					score_total: {
-						$sum: '$score',
-					},
-					privacy: {
-						$first: '$privacy',
-					},
-				})
-				// and we sort the output in decreasing order based on the score_total
-				.sort({
-					score_total: -1,
-				})
-				.cursor(cursorOptions)
-		);
+		const response = this.reportModel
+			.aggregate()
+			.match(reportFilter)
+			.project({
+				curator_orcid: 1,
+				activity_term: 1,
+				score: '$term.score',
+				resource_id: 1,
+				privacy: 1,
+				term: 1,
+				user: 1,
+			})
+			// # here we group by curator while computing the count and score sum
+			.group({
+				_id: '$curator_orcid',
+				curator_orcid: {
+					$first: '$curator_orcid',
+				},
+				activity_terms: {
+					$addToSet: '$activity_term',
+				},
+				user: {
+					$first: '$user',
+				},
+				resource_id: {
+					$first: '$resource_id',
+				},
+				count: {
+					$sum: 1,
+				},
+				score_total: {
+					$sum: '$score',
+				},
+				privacy: {
+					$first: '$privacy',
+				},
+			})
+			// and we sort the output in decreasing order based on the score_total
+			.sort({
+				score_total: -1,
+			})
+			.cursor(cursorOptions);
+
+		return response;
 	}
 
 	public async computeMedals(

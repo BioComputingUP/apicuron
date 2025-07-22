@@ -229,9 +229,7 @@ export class ReportValidatorService {
 
 		const [users, terms] = await Promise.all([users$, terms$]);
 
-		const usersMap = new Map<string, User>(
-			users.map((u) => [u.orcid_id, u]),
-		);
+		const usersMap = new Map<string, User>(users.map((u) => [u.orcid_id, u]));
 		const termsMap = new Map<string, TermDocument>(
 			terms.map((t) => [hashTermIdentifier(t), t]),
 		);

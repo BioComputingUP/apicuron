@@ -6,7 +6,6 @@ import {
 	Model,
 	ProjectionType,
 	QueryOptions,
-	Schema,
 	Types,
 } from 'mongoose';
 
@@ -37,7 +36,7 @@ export type UserDocumentOverride = {
 };
 
 export type UserDocument = HydratedDocument<User, UserDocumentOverride>;
-export type UserModel = Model<UserDocument, {}, UserDocumentOverride>;
+export type UserModel = Model<User, unknown, UserDocumentOverride>;
 export type UserFilter = FilterQuery<User>;
 export type UserProjection = ProjectionType<User>;
 export type UserQueryOptions = QueryOptions<User>;

@@ -69,7 +69,7 @@ export class UsersService {
 			},
 		);
 
-		return await user_promise;
+		return user_promise;
 	}
 
 	/**

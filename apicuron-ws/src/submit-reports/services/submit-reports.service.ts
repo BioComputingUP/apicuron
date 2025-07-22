@@ -8,7 +8,11 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { DeleteResult } from 'mongodb';
 import { InsertManyResult, Model } from 'mongoose';
-import { ReportModel, ReportDocument, Report } from '../../core/schemas/reports.schema';
+import {
+	ReportModel,
+	ReportDocument,
+	Report,
+} from '../../core/schemas/reports.schema';
 import { SubmitReportDto, SubmitReportsDto } from '../dto/submit-report.dto';
 import {
 	AllResourceReportsDeletedEvent,
