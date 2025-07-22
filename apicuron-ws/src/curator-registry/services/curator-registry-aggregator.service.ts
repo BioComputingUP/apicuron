@@ -1,0 +1,156 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import {
+	LeanReportDocument,
+	Report,
+	ReportDocument,
+	ReportModel,
+} from 'src/core/schemas/reports.schema';
+import { TermDocument } from 'src/core/schemas/terms.schema';
+import { User, UserDocument } from 'src/core/schemas/user.schema';
+import { AggregatorClass } from 'src/event-orchestrator/decorators/aggregator.decorator';
+import { Aggregator } from 'src/event-orchestrator/interfaces/aggregator.interface';
+import { LeagueUpdatedEvent } from 'src/resources/partner-resources/leagues/events/league-updated.event';
+
+import {
+	UserCreatedEvent,
+	UserRepository,
+	UserUpdatedEvent,
+} from 'src/core/repositories/user.repository';
+
+import { getEventSubject } from 'src/core/helpers/events.helper';
+import { PartnerResource, PartnerResourceDocument } from 'src/core/schemas';
+import { CuratorRegistryService } from '../curator-registry.service';
+
+@Injectable()
+@AggregatorClass()
+export class CuratorRegistryAggregatorService implements Aggregator {
+	constructor(
+		@InjectModel(Report.name) protected reportModel: ReportModel,
+		protected registryService: CuratorRegistryService,
+		protected userRep: UserRepository,
+	) {}
+	private logger = new Logger(CuratorRegistryAggregatorService.name);
+
+	async applyReport(
+		report: LeanReportDocument | ReportDocument,
+		_term: TermDocument,
+		resource: PartnerResourceDocument,
+		_curator?: UserDocument | null,
+	) {
+		// check registry for existing curator
+		const curatorEntry = await this.registryService.getCuratorEntry(
+			report.curator_orcid,
+		);
+
+		const leagueData =
+			report.league_data ?? (await resource.getLeague(report.league));
+
+		if (!leagueData) {
+			throw new Error(
+				`${this.constructor.name} League data not found for report with resource_id ${report.resource_id} and league ${report.league}`,
+			);
+		}
+
+		// if curator has no entry, insert them with the resource, and add league to groups
+		if (curatorEntry === null) {
+			await this.registryService.addEntry(
+				report.curator_orcid,
+				report.resource as PartnerResource,
+				leagueData,
+				report.user as User,
+			);
+			this.logger.debug(
+				`New curator entry created for ${report.curator_orcid}`,
+			);
+			return;
+		}
+		// if curator has entry
+		// if resource not in their entry, add it
+		if (
+			curatorEntry.contributed_to.find(
+				(entry) => entry.resource_id === resource.resource_id,
+			) === undefined
+		) {
+			await this.registryService.addResourceToUser(
+				report.curator_orcid,
+				report.resource as PartnerResource,
+				leagueData,
+			);
+			this.logger.debug(
+				`Resource ${report.resource_id} added to curator entry with orcid ${report.curator_orcid}`,
+			);
+			return;
+		}
+		// if league not inside the resource entry add it
+		const userResource = curatorEntry.contributed_to.find(
+			(entry) => entry.resource_id === resource.resource_id,
+		);
+		const userHasContributedToLeague =
+			userResource &&
+			userResource.groups.find((league) => league.name === leagueData.name);
+		if (!userHasContributedToLeague) {
+			this.registryService.addLeagueToUser(
+				report.curator_orcid,
+				resource.resource_id,
+				leagueData,
+			);
+			this.logger.debug(
+				`League ${report.league} under ${report.resource_id} added to curator entry`,
+			);
+		}
+		return;
+	}
+
+	async applyAllReports(_resource_id: string) {
+		await this.registryService.recomputeAllEntries();
+	}
+	async updatedUser(event: UserCreatedEvent | UserUpdatedEvent) {
+		const user: User = getEventSubject(event);
+		// this will update user if they already have an entry, create new entry if not
+		this.registryService.upsertUser(user);
+		return;
+	}
+
+	async removeAllResourceAggregates(resource_id: string) {
+		const resultCount = await this.registryService.removeAllEntries(
+			resource_id,
+		);
+		this.logger.debug(`Deleted ${resultCount} statistics for ${resource_id}`);
+	}
+
+	async updatedLeague(leagueUpdated: LeagueUpdatedEvent) {
+		// Change privacy for changed leagues.
+		if (!leagueUpdated.privacyChanged()) {
+			return 0;
+		}
+		this.logger.debug('Updating league privacy');
+		const count = await this.registryService.updateLeague(
+			leagueUpdated.newValue,
+		);
+		this.logger.debug(`Updated League privacy for ${count} curators`);
+		return count;
+	}
+	async recomputeAllResourceAggregates(resource_id: string) {
+		await this.removeAllResourceAggregates(resource_id);
+		await this.applyAllReports(resource_id);
+	}
+	deleteLeague(
+		_resource_id: string,
+		_league: string,
+	): Promise<number> | number {
+		// Do nothing
+		return 0;
+	}
+	termUpdated(_oldTerm: TermDocument, _term: TermDocument) {
+		//shouldn't affect
+		return;
+	}
+	termDeleted(term: TermDocument) {
+		this.recomputeAllResourceAggregates(term.resource_id);
+		return;
+	}
+	async updatedResource(resource: PartnerResourceDocument): Promise<void> {
+		this.registryService.updateResource(resource);
+	}
+}
