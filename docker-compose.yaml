@@ -9,7 +9,7 @@ services:
         - GID=${GID}
     image: "apicuron-ws:dev" 
     working_dir: "/home/node/app"
-    user: $DOCKER_USER
+    # user: $DOCKER_USER
     volumes:
       - "./apicuron-ws:/home/node/app"
     networks:
