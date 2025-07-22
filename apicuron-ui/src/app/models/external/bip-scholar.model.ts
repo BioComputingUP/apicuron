@@ -1,11 +1,11 @@
 import * as _ from "lodash";
 import { Deserializable } from "src/app/interfaces/deserializable.model";
-
+import { indicators } from "./indicators";
 const sections = {
-  PRODUCTIVITY_INDICATORS: "Productivity Indicators",
   IMPACT_INDICATORS: "Impact Indicators",
-  OPEN_SCIENCE_INDICATORS: "Open Science Indicators",
   CAREER_STAGE_INDICATORS: "Career Stage Indicators",
+  OPEN_SCIENCE_INDICATORS: "Open Science Indicators",
+  PRODUCTIVITY_INDICATORS: "Productivity Indicators",
 } as const;
 type SectionType = (typeof sections)[keyof typeof sections];
 
@@ -13,71 +13,86 @@ type SectionMap = {
   [key: string]: {
     label: string;
     section: SectionType;
+    description: string;
   };
 };
 
 const sections_map: SectionMap = {
-  "work_types_num.papers": {
-    label: "Papers",
-    section: sections.PRODUCTIVITY_INDICATORS,
-  },
   "work_types_num.datasets": {
     label: "Datasets",
     section: sections.PRODUCTIVITY_INDICATORS,
+    description: indicators.Datasets,
+  },
+  "work_types_num.papers": {
+    label: "Papers",
+    section: sections.PRODUCTIVITY_INDICATORS,
+    description: indicators.Publications,
   },
   "work_types_num.software": {
     label: "Software",
     section: sections.PRODUCTIVITY_INDICATORS,
+    description: indicators.Software,
   },
   "work_types_num.other": {
     label: "Other Works",
     section: sections.PRODUCTIVITY_INDICATORS,
+    description: indicators.Other,
   },
   citations_num: {
     label: "Citations",
     section: sections.IMPACT_INDICATORS,
+    description: indicators.Citations,
   },
   h_index: {
     label: "H-index",
     section: sections.IMPACT_INDICATORS,
+    description: indicators["h-index"],
   },
   popular_works_count: {
     label: "Popular Works",
     section: sections.IMPACT_INDICATORS,
+    description: indicators.Popular,
   },
   influential_works_count: {
     label: "Influential Works",
     section: sections.IMPACT_INDICATORS,
+    description: indicators.Influential,
   },
   "openness.open_percentage": {
     label: "Open Access Share",
     section: sections.OPEN_SCIENCE_INDICATORS,
+    description: indicators.OAShare,
   },
   "openness.open_papers": {
     label: "Open Access Works",
     section: sections.OPEN_SCIENCE_INDICATORS,
+    description: indicators.OAWorks,
   },
   "openness.influential_open_papers": {
     label: "Open Influential Works",
     section: sections.OPEN_SCIENCE_INDICATORS,
+    description: indicators.OAInfluential,
   },
   "openness.popular_open_papers": {
     label: "Open Popular Works",
     section: sections.OPEN_SCIENCE_INDICATORS,
+    description: indicators.OAPopular,
   },
   academic_age: {
     label: "Academic Age",
     section: sections.CAREER_STAGE_INDICATORS,
+    description: indicators.Academic_Age,
   },
   responsible_academic_age: {
     label: "Fair Academic Age",
     section: sections.CAREER_STAGE_INDICATORS,
+    description: indicators.Fair_Academic_Age,
   },
 };
 
 interface WorkTypes {
-  papers: number;
   datasets: number;
+  papers: number;
   software: number;
   other: number;
 }
@@ -105,6 +120,7 @@ export type BipScholarSection = {
     [statKey: string]: {
       label: string;
       value: number;
+      description: string;
     };
   };
 };
@@ -152,6 +168,9 @@ export class BipScholarStats implements Deserializable {
   }
 
   public statCardViewModel(): BipScholarStatsViewModel {
+    // Groups stats into sections based on the sections_map
+
+    // Build the sections object with the section titles
     const stats: BipScholarStatsViewModel = Object.values(sections).reduce(
       (acc, section) => {
         acc[section] = {
@@ -163,14 +182,17 @@ export class BipScholarStats implements Deserializable {
       {} as BipScholarStatsViewModel
     );
 
+    // Iterate over the sections_map to populate the stats for each section
     Object.keys(sections_map).forEach((key) => {
       const section_title: string = sections_map[key].section;
       const label: string = sections_map[key].label;
+      const description: string = sections_map[key].description || "";
       const value = _.get(this, key);
 
       const stat = {
         label: label,
         value: value,
+        description: description,
       };
 
       if (value !== undefined) {

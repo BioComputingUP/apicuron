@@ -43,10 +43,9 @@ import { NumberCardComponent } from "../components/number-card/number-card.compo
     AchievementsDefModule,
     LeaderboardModule,
     FairSharingComponent,
-    NumberCardComponent
-
-],
-  providers:[DatabasesService, FairSharingService],
+    NumberCardComponent,
+  ],
+  providers: [DatabasesService, FairSharingService],
   exports: [DatabasesPageComponent],
 })
 export class DatabasesModule {}

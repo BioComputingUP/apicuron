@@ -17,7 +17,8 @@ export class CuratorPageComponent implements OnInit {
   orcidId$: Observable<string>;
   // statsWithResource$: Observable<StatisticsWithResource[]>;
   statistics$: Observable<CuratorStatistics[]>;
-  bipScores$: Observable<BipScholarStatsViewModel>;
+  bipScores$: Observable<BipScholarStatsViewModel | null>;
+  isOwnProfile$: Observable<boolean>;
 
   constructor(
     private route: ActivatedRoute,
@@ -33,13 +34,5 @@ export class CuratorPageComponent implements OnInit {
     this.curatorPageService.init(this.orcidId$);
     this.curator$ = this.curatorPageService.getCurator();
     this.statistics$ = this.curatorPageService.getStatistics();
-    this.bipScores$ = this.curatorPageService.getBipScholarScores(
-      this.orcidId$
-    );
-    // .pipe(
-    //   tap((bipScores) => {
-    //     console.log("BipScholar Scores: ", bipScores.statCardViewModel());
-    //   })
-    // );
   }
 }

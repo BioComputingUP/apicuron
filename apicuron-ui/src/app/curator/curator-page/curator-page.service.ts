@@ -1,8 +1,10 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { combineLatest, Observable } from "rxjs";
+
 import { map, shareReplay, switchMap } from "rxjs/operators";
 import { MedalsService } from "src/app/achievements/services/medals.service";
+import { AuthService } from "src/app/auth/auth.service";
 import { CuratorStatisticsService } from "src/app/curator-statistics/services/curator-statistics.service";
 import { CuratorService } from "src/app/curator/curator.service";
 import {
@@ -24,8 +26,7 @@ export interface StatisticsWithResource {
 export class CuratorPageService {
   private wsUrl = environment.ws;
   private orcid_url = environment.orcid_url;
-  private bip_url = environment.bip_scholar_api_url;
-  private stage = environment.env;
+
   // state observables
   curator$: Observable<User>;
   resources$: Observable<Resource[]>;
@@ -33,13 +34,14 @@ export class CuratorPageService {
   statisticsWithResource$: Observable<StatisticsWithResource[]>;
   resourceIds$: Observable<string[]>;
   medals$: Observable<any[]>;
-  bip_stats$: Observable<any>;
+
   constructor(
     private http: HttpClient,
     private resources: ResourcesService,
     private curatorStatistics: CuratorStatisticsService,
     private curatorService: CuratorService,
-    private medalsService: MedalsService
+    private medalsService: MedalsService,
+    private authService: AuthService
   ) {
     // load statistics
   }
@@ -55,7 +57,6 @@ export class CuratorPageService {
       // extract to list of resource_ids
       map((stats: CuratorStatistics[]) => stats.map((stat) => stat.resource_id))
     );
-    this.bip_stats$ = this.getBipScholarScores(orcid_id$);
 
     // load resources using statistics
     // this.resources$ = this.loadResources(this.resourceIds$)
@@ -145,35 +146,5 @@ export class CuratorPageService {
         resource_id,
       },
     });
-  }
-
-  getBipScholarScores(
-    orcid$: Observable<string>
-  ): Observable<BipScholarStatsViewModel | null> {
-    if (this.stage === "development") {
-      // Avoid calling the service in dev environment
-      return new Observable((observer) => {
-        observer.next(null);
-        observer.complete();
-      });
-    }
-    return orcid$.pipe(
-      switchMap((orcid: string) => {
-        let query_orcid = orcid;
-        if (this.stage == "local") query_orcid = "0000-0002-0341-4888";
-        return this.http.get(this.bip_url + `/${query_orcid}`, {
-          headers: {
-            accept: "application/json",
-          },
-        });
-      }),
-      map((response: any) => {
-        const bipScholarStats = new BipScholarStats()
-          .deserialize(response)
-          .statCardViewModel();
-        return bipScholarStats;
-      }),
-      shareReplay(1)
-    );
   }
 }

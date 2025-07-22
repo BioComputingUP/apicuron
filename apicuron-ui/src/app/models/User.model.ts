@@ -27,10 +27,7 @@ export class User implements Deserializable {
     this.keywords = input.keywords ?? null;
     this.links = input.links ?? null;
     this.newLogin = input.isNewLogin ?? false;
-    this.bip_url = new URL(
-      `/scholar/profile/${this.orcid_id}`,
-      environment.bip_url
-    );
+
     return this;
   }
   bip_url: URL;

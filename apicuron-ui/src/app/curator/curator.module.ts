@@ -15,11 +15,12 @@ import { CuratorsPageComponent } from "./curators-page.component";
 
 import { HttpClientModule } from "@angular/common/http";
 import { AchievementsModule } from "../achievements/achievements.module";
-import { BipScholarCardComponent } from "../components/bip-scholar/bip-scholar-card/bip-scholar-card.component";
-import { BipScoresComponenet } from "../components/bip-scholar/bip-scores.component";
+import { BipScholarCardComponent } from "../bip-scholar/bip-scholar-card/bip-scholar-card.component";
+import { BipScoresComponenet } from "../bip-scholar/bip-scores.component";
 import { CuratorStatCardComponent } from "../components/curator-stat-card/curator-stat-card.component";
 import { CuratorStatisticsModule } from "../curator-statistics/curator-statistics.module";
 import { SharedUtilsModule } from "../shared/shared-utils.module";
+import { BipScholarModule } from "../bip-scholar/bip-scholar.module";
 @NgModule({
   declarations: [
     CuratorCardComponent,
@@ -41,8 +42,7 @@ import { SharedUtilsModule } from "../shared/shared-utils.module";
     AngularSvgIconModule,
     ReactiveFormsModule,
     CuratorRoutingModule,
-    BipScholarCardComponent,
-    BipScoresComponenet,
+    BipScholarModule,
   ],
   providers: [CuratorService, CuratorPageService],
   exports: [CuratorCardComponent, CuratorSearchComponent],
