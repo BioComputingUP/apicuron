@@ -9,5 +9,5 @@
   // "javascript.inlayHints.parameterNames.enabled": "literals",
   // "javascript.inlayHints.parameterTypes.enabled": true
 
-  "typescript.tsdk": "apicuron-ws/node_modules/typescript/lib"
+  "typescript.tsdk": "apicuron-ui/node_modules/typescript/lib"
 }

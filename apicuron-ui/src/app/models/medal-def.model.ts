@@ -34,7 +34,6 @@ export class MedalDef
     return this;
   }
 
-  
   first_day: Date | null = null;
   last_day: Date | null = null;
   name: string = "";
@@ -43,7 +42,7 @@ export class MedalDef
   static colorsPattern =
     /(^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$)|^bronze$|^gold$|^silver$/;
 
-  static buildCreateMedalForm(fb: FormBuilder, resource_id: string = "") {
+  static buildCreateMedalForm(fb: FormBuilder, resource_id: string) {
     const fg = fb.group({
       color: new FormControl<string>("gold", {
         validators: [
@@ -56,13 +55,17 @@ export class MedalDef
         nonNullable: true,
       }),
 
-      name: new FormControl<string>("", { validators: [Validators.required] }),
+      name: new FormControl<string>("", {
+        validators: [Validators.required, Validators.minLength(1)],
+      }),
       score_relative: new FormControl<number>(1, {
         validators: [Validators.required, Validators.min(1)],
       }),
       first_day: new FormControl<Date | null>(null),
       last_day: new FormControl<Date | null>(null),
-      resource_id: new FormControl<string>(resource_id),
+      resource_id: new FormControl<string>(resource_id, {
+        validators: [Validators.minLength(1)],
+      }),
       resource_uri: new FormControl<string>(""),
     });
     return fg;
@@ -76,7 +79,7 @@ export class MedalDef
     if (fbOrForm instanceof FormGroup) {
       form = fbOrForm;
     } else {
-      form = this.buildCreateMedalForm(fbOrForm);
+      form = this.buildCreateMedalForm(fbOrForm, medal.resource_id);
     }
 
     form.patchValue({

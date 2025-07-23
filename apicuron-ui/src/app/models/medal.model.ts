@@ -15,6 +15,8 @@ class MedalUser implements Deserializable {
   }
 }
 
+type AchievementState = 'achieved' | 'progress';
+
 export class Medal extends MedalDef implements Deserializable {
   deserialize(input: any): this {
     super.deserialize(input);
@@ -26,6 +28,9 @@ export class Medal extends MedalDef implements Deserializable {
     this.score_relative_index = input.score_relative_index;
     this.score_threshold_valid = input.score_threshold_valid;
     this.score_total = input.score_total;
+    this.state = input.state;
+    this.privacy = input.privacy;
+    this.hasUser = !!this.user;
 
     return this;
   }
@@ -35,6 +40,10 @@ export class Medal extends MedalDef implements Deserializable {
   score_relative_index: number;
   score_threshold_valid: Boolean;
   score_total: number;
+  state: AchievementState;
+  privacy: string;
+  hasUser: boolean;
+  
   // list_terms: string[];
 
   getRanking(): String {

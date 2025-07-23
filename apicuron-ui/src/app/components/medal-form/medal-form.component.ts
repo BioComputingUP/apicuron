@@ -1,11 +1,23 @@
 import { CommonModule } from "@angular/common";
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from "@angular/forms";
 import { AngularSvgIconModule } from "angular-svg-icon";
 import { ToastrModule, ToastrService } from "ngx-toastr";
 import { CalendarModule } from "primeng/calendar";
 import { createDestroy$ } from "projects/apicuron-util/src/lib/util/destroy-observable";
-import { map, Observable, startWith, switchMap } from "rxjs";
+import {
+  BehaviorSubject,
+  filter,
+  map,
+  Observable,
+  startWith,
+  switchMap,
+} from "rxjs";
 import { MedalDefService } from "src/app/achievements-def/services/medal-def.service";
 import { Paginated } from "src/app/interfaces/paginated";
 import { MedalDef } from "src/app/models/medal-def.model";
@@ -13,6 +25,7 @@ import { Medal } from "src/app/models/medal.model";
 import { Term } from "src/app/models/term.model";
 import { environment } from "src/environments/environment.dev";
 import { SelectActivitiesComponent } from "../select-activities/select-activities.component";
+import { UserMedalCardComponent } from "../user-medal-card/user-medal-card.component";
 
 @Component({
   selector: "medal-form",
@@ -26,7 +39,7 @@ import { SelectActivitiesComponent } from "../select-activities/select-activitie
     ToastrModule,
     SelectActivitiesComponent,
     CalendarModule,
-    AngularSvgIconModule
+    UserMedalCardComponent,
   ],
 })
 export class MedalFormComponent implements OnInit {
@@ -34,7 +47,7 @@ export class MedalFormComponent implements OnInit {
   constructor(
     protected formBuilder: FormBuilder,
     protected toastr: ToastrService,
-    protected medalDefService: MedalDefService,
+    protected medalDefService: MedalDefService
   ) {}
 
   destroy$ = createDestroy$();
@@ -43,13 +56,24 @@ export class MedalFormComponent implements OnInit {
       throw new Error("Medal Resource id missing");
     }
     if (this.type == "update") {
-      MedalDef.buildUpdateMedalForm(this.form, this.medal);
+      this.form = MedalDef.buildUpdateMedalForm(this.formBuilder, this.medal);
+    }
+    if (this.type == "create") {
+      this.form = MedalDef.buildCreateMedalForm(
+        this.formBuilder,
+        this.medal.resource_id
+      );
     }
 
-    this.medalPreview$ = this.form.valueChanges.pipe(
+    const formUpdated$ = this.form.valueChanges.pipe(
       startWith(this.form.value),
       map(() => this.form.value),
+      filter(() => this.form.valid)
+    );
+
+    this.medalPreview$ = formUpdated$.pipe(
       map((formValue) => {
+        console.log({ formValue });
         const medalDef = new MedalDef().deserialize(formValue);
         return {
           medalDef,
@@ -83,7 +107,7 @@ export class MedalFormComponent implements OnInit {
 
   @Output() closeForm = new EventEmitter<void>();
 
-  form = MedalDef.buildCreateMedalForm(this.formBuilder);
+  form: FormGroup;
 
   submit() {
     if (this.form.valid) {

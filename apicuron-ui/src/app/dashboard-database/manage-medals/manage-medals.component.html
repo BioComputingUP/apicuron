@@ -185,10 +185,10 @@
       >
         <div
           [ngClass]="{
-            'tw-block': manageForm.show,
+            'tw-flex tw-items-stretch ': manageForm.show,
             'tw-hidden': !manageForm.show
           }"
-          class="tw-relative tw-overflow-auto tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-full sm:tw-my-8 sm:tw-w-3/4 sm:tw-max-w-screen-sm xl:tw-max-w-screen-lg tw-max-w-screen sm:tw-h-1/2 tw-max-h-[95vh]"
+          class="tw-relative tw-overflow-auto tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all tw-w-full sm:tw-my-8 sm:tw-w-3/4 sm:tw-max-w-screen-sm xl:tw-max-w-screen-lg tw-max-w-screen tw-max-h-screen tw-max-h sm:tw-max-h-[90vh]"
         >
           <medal-form
             [medal]="manageForm.medal"

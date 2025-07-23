@@ -1,15 +1,15 @@
 <form
   [formGroup]="form"
   (submit)="submit()"
-  class="tw-py-2 sm:tw-py-4 tw-w-full"
+  class="tw-py-1 sm:tw-py-2 2xl:tw-py-4 tw-w-full tw-flex tw-flex-col tw-h-full"
 >
   <!-- Header -->
   <div
-    class="tw-border-b-4 tw-flex tw-items-center tw-pb-2 tw-w-full tw-col-span-2 tw-mb-2"
+    class="tw-border-b-4 tw-flex tw-items-center tw-pb-2 tw-w-full tw-col-span-2 tw-mb-2 tw-sticky"
   >
     <h2
       *ngIf="type == 'create'"
-      class="tw-px-6 tw-text-xl tw-font-bold tw-flex tw-items-center"
+      class="tw-px-3 2xl:tw-px-6 tw-text-xl tw-font-bold tw-flex tw-items-center"
     >
       Create Medal
       <span
@@ -21,7 +21,7 @@
     </h2>
     <h2
       *ngIf="type == 'update'"
-      class="tw-px-6 tw-text-xl tw-font-bold tw-text-center tw-flex tw-items-center"
+      class="tw-px-3 2xl:tw-px-6 tw-text-xl tw-font-bold tw-text-center tw-flex tw-items-center"
     >
       Updating Medal
       <span
@@ -33,10 +33,32 @@
     </h2>
   </div>
   <!-- Form Section -->
-  <div class="tw-grid tw-grid-cols-2 tw-items-start tw-overflow-y-hidden">
+  <div
+    class="tw-grid tw-grid-cols-2 tw-items-start tw-overflow-hidden tw-h-full tw-max-h-full"
+  >
+    <!-- Feedback Section -->
+    <div
+      class="tw-overflow-y-scroll tw-h-full tw-max-h-full tw-px-3 tw-py-2 tw-bg-gray-50 tw-rounded-sm tw-order-last"
+    >
+      <div class="tw-mb-1">
+        <label>Feedback</label>
+      </div>
+      <ng-container *ngIf="medalPreview$ | async as medalsPreview">
+        <ng-container *ngFor="let medal of medalsPreview.data">
+          <user-medal-card [medal]="medal"></user-medal-card>
+        </ng-container>
+
+        <!-- <button
+          class="tw-text-gray-500 tw-border tw-border-gray-500 tw-bg-transparent tw-py-2 tw-w-full tw-rounded"
+          (click)="loadMore(medalsPreview.meta.pagination)"
+        >
+          See more
+        </button> -->
+      </ng-container>
+    </div>
     <!-- Form Fields -->
     <div
-      class="tw-px-3 sm:tw-px-6 tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-1 sm:tw-gap-3 tw-overflow-auto sm:tw-overflow-hidden"
+      class="tw-px-3 2xl:tw-px-6 tw-grid tw-my-2 tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-1 sm:tw-gap-3 tw-overflow-y-scroll 2xl:tw-overflow-visible tw-h-full tw-order-first"
     >
       <!-- Medal Name -->
       <div class="tw-col-span-2">
@@ -65,7 +87,7 @@
           </span>
         </div>
         <div
-          class="tw-flex tw-flex-row tw-flex-wrap tw-max-h-80 tw-overflow-y-auto"
+          class="tw-flex tw-flex-row tw-flex-wrap tw-max-h-60 2xl:tw-max-h-80 tw-overflow-y-auto"
           id="list_terms"
           select-activities
           [activities]="terms"
@@ -106,21 +128,20 @@
       </div>
 
       <!-- Start Date and End Date in One Row -->
-      <div
-        class="tw-mt-2 tw-col-span-2 sm:tw-grid sm:tw-grid-cols-2 sm:tw-gap-4"
-      >
+      <div class="tw-col-span-2 sm:tw-grid sm:tw-grid-cols-2 sm:tw-gap-4">
         <!-- Start Date -->
         <div class="tw-mt-2 sm:tw-mt-0">
           <label class="tw-block tw-font-bold tw-text-gray-700" for="first_day"
             >Start Date</label
           >
           <p-calendar
-            styleClass="tw-w-full tw-p-2 !tw-px-4  tw-border tw-border-gray-400 tw-rounded-md tw-hover:tw-shadow-none"
+            styleClass="tw-w-full tw-p-2 !tw-px-4  tw-border tw-border-gray-400 tw-rounded-md tw-hover:tw-shadow-none tw-z-50"
             formControlName="first_day"
             [showIcon]="true"
             [maxDate]="form.get('last_day').value"
             [showClear]="true"
             [readonlyInput]="true"
+            [touchUI]="true"
             class="tw-w-full"
           ></p-calendar>
           <small
@@ -135,12 +156,13 @@
             >End Date</label
           >
           <p-calendar
-            styleClass="tw-w-full tw-p-2 !tw-px-4  tw-border tw-border-gray-400 tw-rounded-md"
+            styleClass="tw-w-full tw-p-2 !tw-px-4  tw-border tw-border-gray-400 tw-rounded-md tw-z-50"
             formControlName="last_day"
             [showIcon]="true"
             [minDate]="form.get('first_day').value"
             [showClear]="true"
             [readonlyInput]="true"
+            [touchUI]="true"
             class="tw-w-full"
           ></p-calendar>
           <small
@@ -149,91 +171,26 @@
           >
         </div>
       </div>
-
-      <!-- Submit Button -->
-      <div class="tw-mt-2 tw-col-span-2 tw-flex tw-items-center tw-gap-2">
-        <!-- Close Button -->
-        <button
-          type="button"
-          (click)="onClose()"
-          class="tw-w-24 tw-p-2 tw-border tw-border-gray-400 tw-text-gray-400 tw-font-bold tw-rounded-md"
-        >
-          Close
-        </button>
-
-        <!-- Submit Button -->
-        <input
-          type="submit"
-          class="tw-flex-1 tw-rounded-md tw-bg-apicuron-bright-purple tw-px-3.5 tw-pt-2.5 tw-pb-3.5 tw-text-center tw-text-sm tw-cursor-pointer tw-font-semibold tw-text-white tw-shadow-sm tw-hover:bg-indigo-500 tw-focus-visible:outline tw-focus-visible:outline-2 tw-focus-visible:outline-offset-2 tw-focus-visible:outline-indigo-600"
-          value="Submit"
-        />
-      </div>
     </div>
-    <!-- Feedback Section -->
-    <div class="tw-overflow-y-scroll">
-      <p>Feedback</p>
-      <ng-container *ngIf="medalPreview$ | async as medalsPreview">
-        <div *ngFor="let medal of medalsPreview.data">
-          <div
-            class="tw-flex tw-items-center tw-space-x-4 tw-bg-white tw-shadow tw-rounded-lg tw-p-4 tw-mb-2"
-          >
-            <!-- Profile Image -->
-            <div
-              class="tw-w-16 tw-h-16 tw-rounded-full tw-p-2 tw-bg-gray-200 tw-flex tw-items-center tw-justify-center tw-text-gray-400 tw-text-2xl"
-            >
-              <img
-                [src]="medal?.user?.avatar?.href ?? '/assets/user.svg'"
-                class="tw-w-full tw-h-full"
-                alt=""
-                srcset=""
-              />
-            </div>
-            <!-- Profile Info -->
-            <div class="tw-flex-1">
-              <div class="tw-font-bold tw-text-lg tw-text-gray-800">
-                <!-- [Person's Name] -->
-                {{ medal?.user?.displayedName || "Unknown User" }}
-              </div>
-              <div class="tw-text-sm tw-text-gray-500">
-                <!-- [Badge Name] -->
-                Earned The Medal: {{ medal?.name || "Unnamed Medal" }}
-              </div>
-              <div class="tw-flex tw-items-center tw-space-x-2 tw-mt-1">
-                <span
-                  class="tw-bg-yellow-300 tw-text-yellow-900 tw-px-2 tw-py-1 tw-rounded tw-text-xs tw-font-semibold"
-                >
-                  <!-- [Ranking/Position] -->
-                  {{ medal.score_relative_index + 1 }}
-                </span>
-                <span class="tw-text-xs tw-text-gray-400">
-                  <!-- [Additional Info] -->
+  </div>
+  <!-- Submit Button -->
+  <div
+    class="tw-pt-2 sm:tw-pt-3 tw-col-span-2 tw-flex tw-items-center tw-gap-2 tw-px-4 2xl:tw-px-6 tw-w-full tw-justify-between"
+  >
+    <!-- Close Button -->
+    <button
+      type="button"
+      (click)="onClose()"
+      class="tw-w-24 tw-p-2 tw-border tw-border-gray-400 tw-text-gray-400 tw-font-bold tw-rounded-md"
+    >
+      Close
+    </button>
 
-                  <a
-                    [href]="orcid_main_url + medal.curator_orcid"
-                    target="_blank"
-                    title="Visit ORCID Profile"
-                    class="hover:tw-underline tw-text-blue-500"
-                  >
-                    {{ medal.curator_orcid }}
-                    <svg-icon svgClass="tw-w-4 tw-h-4 tw-inline" src="assets/svg/external-link.svg"></svg-icon>
-                  </a>
-                </span>
-              </div>
-            </div>
-            <!-- Badge Icon -->
-            <div
-              class="tw-w-10 tw-h-10 tw-rounded-fulltw-flex tw-items-center tw-justify-center tw-text-xl"
-            >
-              <!-- [Badge Icon] -->
-              <img
-                src="/assets/svg/gold_medal.svg"
-                alt="Medal icon"
-                srcset=""
-              />
-            </div>
-          </div>
-        </div>
-      </ng-container>
-    </div>
+    <!-- Submit Button -->
+    <input
+      type="submit"
+      class="tw-flex-1 tw-rounded-md tw-bg-apicuron-bright-purple tw-px-3.5 tw-pt-2.5 tw-pb-3.5 tw-text-center tw-text-sm tw-cursor-pointer tw-font-semibold tw-text-white tw-shadow-sm tw-hover:bg-indigo-500 tw-focus-visible:outline tw-focus-visible:outline-2 tw-focus-visible:outline-offset-2 tw-focus-visible:outline-indigo-600 tw-w-40 tw-max-w-[14rem]"
+      value="Submit"
+    />
   </div>
 </form>
