@@ -1,15 +1,15 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 
-import { BipScoresComponenet } from "./bip-scores.component";
-import { BipScholarCardComponent } from "./bip-scholar-card/bip-scholar-card.component";
 import { BipScholarService } from "./services/bip-scholar.service";
 import { AuthModule } from "../auth/auth.module";
+import { BipScoresComponent } from "./bip-scores.component";
+import { BipScholarCardComponent } from "./bip-scholar-card/bip-scholar-card.component";
 
 @NgModule({
-  declarations: [BipScoresComponenet, BipScholarCardComponent],
+  declarations: [BipScoresComponent, BipScholarCardComponent],
   imports: [CommonModule, AuthModule],
   providers: [BipScholarService],
-  exports: [BipScoresComponenet],
+  exports: [BipScoresComponent],
 })
 export class BipScholarModule {}

@@ -16,7 +16,7 @@ import { CuratorsPageComponent } from "./curators-page.component";
 import { HttpClientModule } from "@angular/common/http";
 import { AchievementsModule } from "../achievements/achievements.module";
 import { BipScholarCardComponent } from "../bip-scholar/bip-scholar-card/bip-scholar-card.component";
-import { BipScoresComponenet } from "../bip-scholar/bip-scores.component";
+import { BipScoresComponent } from "../bip-scholar/bip-scores.component";
 import { CuratorStatCardComponent } from "../components/curator-stat-card/curator-stat-card.component";
 import { CuratorStatisticsModule } from "../curator-statistics/curator-statistics.module";
 import { SharedUtilsModule } from "../shared/shared-utils.module";

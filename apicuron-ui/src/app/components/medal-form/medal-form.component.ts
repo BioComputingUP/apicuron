@@ -78,7 +78,7 @@ export class MedalFormComponent implements OnInit {
         return {
           medalDef,
           skip: 0,
-          limit: 10,
+          limit: 20,
         };
       }),
       switchMap(({ medalDef, skip, limit }) => {

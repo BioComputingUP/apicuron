@@ -30,9 +30,9 @@ export class BipScoresTooltipManager {
 }
 @Component({
   selector: "app-bip-scores-grid",
-  templateUrl: "bip-scores.componenet.html",
+  templateUrl: "bip-scores.component.html",
 })
-export class BipScoresComponenet implements OnDestroy, OnInit {
+export class BipScoresComponent implements OnDestroy, OnInit {
   private destroy$ = new Subject<void>();
   protected bipScores$: Observable<BipScholarStatsViewModel>;
   protected userBipUrl$: Observable<URL>;

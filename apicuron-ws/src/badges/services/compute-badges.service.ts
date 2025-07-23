@@ -1,17 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
-import { LeanDocument, Model } from 'mongoose';
+import { LeanDocument } from 'mongoose';
+import { AchievementState } from '../../core/enums';
 import {
-	Report,
-	ReportDocument,
 	BadgeDefDocument,
 	BadgeDocument,
 	LeanReportDocument,
+	Report,
+	ReportDocument,
 	ReportModel,
 } from '../../core/schemas';
-import { AchievementState } from '../../core/enums';
 import { computeAggregatePrivacyField } from '../../util/privacy.helper';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
 	BadgeAggregatedReports,
 	GroupReportsByUserAggregator,
@@ -57,7 +57,7 @@ export class ComputeBadgesService {
 			reportAgg.count >= badgeDef.count_threshold
 				? AchievementState.achieved
 				: AchievementState.progress;
-		let achieved_at;
+		let achieved_at: Date | undefined = undefined;
 		if (state == AchievementState.achieved) {
 			achieved_at = reportAgg.earningReport.timestamp;
 		}
