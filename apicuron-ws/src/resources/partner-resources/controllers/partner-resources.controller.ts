@@ -33,7 +33,6 @@ import { plainToInstance } from 'class-transformer';
 import * as mime from 'mime-types';
 import * as mv from 'mv';
 import { join } from 'path';
-import { ConfigurationError, throwError } from 'src/util/error.utils';
 import { AuthService } from '../../../auth/auth.service';
 import { HasAResourceGuard } from '../../../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../../../auth/guards/local-auth.guard';
@@ -155,10 +154,10 @@ export class PartnerResourcesController {
 		// check if the user has a permission to edit the PartnerResource
 		this.authService.user_has_resource(request.user, resource_id);
 		const public_files_path =
-			this.configService.get('PUBLIC_FILES_PATH') ??
-			throwError(ConfigurationError, 'PUBLIC_FILES_PATH not set');
+			this.configService.getOrThrow<string>('PUBLIC_FILES_PATH');
 		// if there's an uploaded file
 		if (logo) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const ext = mime.extension(logo.mimetype);
 			const public_path = join(
 				public_files_path,
@@ -175,8 +174,7 @@ export class PartnerResourcesController {
 
 			const logo_link = public_path.replace(
 				public_files_path,
-				this.configService.get('PUBLIC_FILES_URL_PATH') ??
-					throwError(ConfigurationError, 'PUBLIC_FILES_URL_PATH not set'),
+				this.configService.getOrThrow('PUBLIC_FILES_URL_PATH'),
 			);
 
 			await this.partnerResourceService.update_resource({
