@@ -1,8 +1,12 @@
 import { Paginated } from "../../../../../../../src/app/interfaces/paginated";
+import { WeeklyLeaderboardColumns } from "../../interfaces/leaderboard-columns.types";
 import { LeaderboardDef } from "../../interfaces/leaderboard-def.interface";
 import { WeeklyLeaderboardEntry } from "./weekly-leaderboard.entry";
 
-export const leaderboardDef: LeaderboardDef<WeeklyLeaderboardEntry> = {
+export const leaderboardDef: LeaderboardDef<
+  WeeklyLeaderboardEntry,
+  WeeklyLeaderboardColumns
+> = {
   name: "weekly-leaderboard",
   label: "Weekly Leaderboard",
   description: "The total leaderboard of the current week",

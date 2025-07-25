@@ -1,5 +1,10 @@
 import _ from "lodash";
 import {
+  MonthlyLeaderboardColumns,
+  TotalLeaderboardColumns,
+  WeeklyLeaderboardColumns,
+} from "projects/apicuron-util/src/lib/leaderboard/interfaces/leaderboard-columns.types";
+import {
   Deserializable,
   Serializable,
 } from "src/app/interfaces/deserializable.model";
@@ -30,7 +35,7 @@ export class ResourceStats implements Deserializable {
 }
 
 export class Resource implements Deserializable, Serializable {
-  serialize(): any {
+  serialize() {
     return {
       resource_id: this.resource_id,
       resource_long_name: this.resource_long_name,
@@ -39,6 +44,7 @@ export class Resource implements Deserializable, Serializable {
       resource_uri: this.resource_uri,
       resource_url: this.resource_url,
       color: this.color,
+      leaderboard_preferences: this.leaderboard_preferences,
     };
   }
   deserialize(input: any): this {
@@ -57,18 +63,15 @@ export class Resource implements Deserializable, Serializable {
       this.lastSubmissionDate = _.max([
         this.stats.lastContributionDate,
         this.stats.lastResourceUpdateDate,
-        this.joined_date
-      ])
+        this.joined_date,
+      ]);
     }
 
     if (input.logo && typeof input.logo == "string") {
       if (input.logo.startsWith("assets")) {
         this.logo = new URL(input.logo, environment.host + "/");
       } else {
-        this.logo = new URL(
-          input.logo,
-          environment.ws
-        );
+        this.logo = new URL(input.logo, environment.ws);
       }
     }
 
@@ -98,4 +101,11 @@ export class Resource implements Deserializable, Serializable {
   color: string;
   joined_date: Date;
   lastSubmissionDate?: Date;
+  leaderboard_preferences: LeaderboardPreferences;
+}
+
+interface LeaderboardPreferences {
+  monthly?: MonthlyLeaderboardColumns[];
+  weekly?: WeeklyLeaderboardColumns[];
+  total?: TotalLeaderboardColumns[];
 }
