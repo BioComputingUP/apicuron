@@ -331,4 +331,8 @@ export abstract class EntityRepository<
 	): Aggregate<R[]> {
 		return this.model.aggregate<R>(pipeline, options);
 	}
+
+	async exists(filter: FilterQuery<EntityClass>): Promise<boolean> {
+		return await !!this.model.exists(filter);
+	}
 }

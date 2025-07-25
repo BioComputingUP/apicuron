@@ -33,6 +33,7 @@ import { plainToInstance } from 'class-transformer';
 import * as mime from 'mime-types';
 import * as mv from 'mv';
 import { join } from 'path';
+import { PartnerResourceDocument } from 'src/core/schemas/resource/partner-resource.schema';
 import { AuthService } from '../../../auth/auth.service';
 import { HasAResourceGuard } from '../../../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../../../auth/guards/local-auth.guard';
@@ -143,6 +144,7 @@ export class PartnerResourcesController {
 			dest: '/tmp/apicuron/resources',
 		}),
 	)
+	@SerializeOptions({ type: PartnerResourceEntity })
 	async update_resource_values(
 		@Body() update_resource: UpdatePartnerResourceDto,
 		@Req() request,
@@ -150,7 +152,7 @@ export class PartnerResourcesController {
 		logo: Express.Multer.File,
 	) {
 		const { resource_id } = update_resource;
-
+		let res: PartnerResourceDocument;
 		// check if the user has a permission to edit the PartnerResource
 		this.authService.user_has_resource(request.user, resource_id);
 		const public_files_path =
@@ -177,14 +179,16 @@ export class PartnerResourcesController {
 				this.configService.getOrThrow('PUBLIC_FILES_URL_PATH'),
 			);
 
-			await this.partnerResourceService.update_resource({
+			res = await this.partnerResourceService.update_resource({
 				...update_resource,
 				logo: logo_link,
 			});
 		} else {
-			await this.partnerResourceService.update_resource(update_resource);
+			res = await this.partnerResourceService.update_resource(update_resource);
 		}
-
-		return await this.partnerResourceService.get_resource(resource_id);
+		return plainToInstance(PartnerResourceEntity, res, {
+			excludeExtraneousValues: true,
+			enableCircularCheck: true,
+		});
 	}
 }
