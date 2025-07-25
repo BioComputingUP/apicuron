@@ -53,7 +53,8 @@ export class ComputeMonthlyStatsService {
 			league: report.league,
 			curator_orcid: report.curator_orcid,
 			timestamp: {
-				$gte: report.timestamp,
+				$gt: report.timestamp,
+				$lt: getMonthEnd(moment(report.timestamp)),
 			},
 		}));
 
@@ -62,6 +63,7 @@ export class ComputeMonthlyStatsService {
 			user: report.user ?? curator ?? null,
 			league_data: report.league_data,
 		};
+		this.logger.error(`reportIsLast: ${reportIsLast}, report`);
 		if (reportIsLast) {
 			setObj.last_contribution = report.timestamp;
 		}

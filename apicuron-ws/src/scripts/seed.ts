@@ -4,7 +4,7 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { getConnectionToken, getModelToken } from '@nestjs/mongoose';
 import { plainToInstance } from 'class-transformer';
-import { map, random } from 'lodash';
+import { map } from 'lodash';
 import { Connection, Model } from 'mongoose';
 import { SubmittedResourcesService } from 'src/resources/submitted-resources/resources.service';
 import { FileUploadDto } from 'src/util/file-upload.helper';
@@ -12,7 +12,7 @@ import { assertNotNull } from 'src/util/type-assertion.helper';
 import { AppModule } from '../app.module';
 import { UsersService } from '../auth/users/services/users.service';
 import { PrivacyType } from '../core/enums';
-import { ReportModel , Report} from '../core/schemas/reports.schema';
+import { Report, ReportModel } from '../core/schemas/reports.schema';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
@@ -115,6 +115,23 @@ async function bootstrap() {
 	logger.verbose(
 		`Assigned testing resources to testing user: ${testingOrcidId}`,
 	);
+
+	// // Assign resources to test user
+	// userModel.updateOne(
+	// 	{ orcid_id: testingOrcidId },
+	// 	{
+	// 		$set: {
+	// 			resources: [
+	// 				{
+	// 					resource_id: exampleResource.resource_id,
+	// 				},
+	// 				{
+	// 					resource_id: secondResource.resource_id,
+	// 				},
+	// 			],
+	// 		},
+	// 	},
+	// );
 
 	//create terms for resource
 	const terms$: Promise<TermDocument>[] = [];
