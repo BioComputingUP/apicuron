@@ -52,6 +52,9 @@ export class ComputeMonthlyStatsService {
 			resource_id: report.resource_id,
 			league: report.league,
 			curator_orcid: report.curator_orcid,
+			// To check if there's a more recent report within the month:
+			// check if there's a report that has a higher date than the current report, but also within the same month
+			// no need to check for month start since we are searching for latest report within the month
 			timestamp: {
 				$gt: report.timestamp,
 				$lt: getMonthEnd(moment(report.timestamp)),
@@ -148,7 +151,6 @@ export class ComputeMonthlyStatsService {
 				curator_orcid,
 				resource_id,
 				league,
-				privacy,
 				activity_category,
 				score,
 				year,
