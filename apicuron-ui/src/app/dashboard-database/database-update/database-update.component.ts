@@ -1,24 +1,11 @@
-import { HttpErrorResponse } from "@angular/common/http";
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  OnDestroy,
-  ViewChild,
-} from "@angular/core";
+import { Component, OnDestroy } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, ParamMap } from "@angular/router";
-import {
-  BehaviorSubject,
-  Observable,
-  Subject,
-  Subscription,
-  combineLatest,
-} from "rxjs";
+import { MessageService } from "primeng/api";
+import { BehaviorSubject, combineLatest, Observable, Subject } from "rxjs";
 import {
   catchError,
-  finalize,
   map,
   shareReplay,
   startWith,
@@ -26,10 +13,8 @@ import {
   takeUntil,
   tap,
 } from "rxjs/operators";
-import { ResourcesService } from "../../resource/service/resources.service";
 import { Resource } from "../../models/resource.model";
-import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
-import { MessageService } from "primeng/api";
+import { ResourcesService } from "../../resource/service/resources.service";
 
 @Component({
   selector: "database-update",
@@ -53,6 +38,7 @@ export class DatabaseUpdateComponent implements OnDestroy {
   blocked$ = new BehaviorSubject<Boolean>(false);
   destroy$ = new Subject<Boolean>();
 
+  allTotalLeaderBoardPreferences = ["option1", "option2", "option3"];
   // @ViewChild("fileUploadElement", { static: false })
   // fileInputElement: ElementRef<HTMLInputElement>;
 
@@ -66,19 +52,6 @@ export class DatabaseUpdateComponent implements OnDestroy {
     this.resource_id$ = this.route.paramMap.pipe(
       map((params: ParamMap) => {
         return params.get("resource_id");
-      })
-    );
-
-    this.resource$ = this.resource_id$.pipe(
-      switchMap((resource_id: string) => {
-        return this.resourceService.get_resource(resource_id);
-      }),
-      shareReplay(),
-      tap(async (resource: Resource) => {
-        this.form.setValue({
-          ...resource.serialize(),
-          logo: null,
-        });
       })
     );
 
@@ -118,8 +91,24 @@ export class DatabaseUpdateComponent implements OnDestroy {
             ),
           ],
         ],
+        totalLeaderBoardPreferences: [
+          ["option1", "option2"],
+          [Validators.required],
+        ],
       },
       { validators: Validators.required, updateOn: "change" }
+    );
+    this.resource$ = this.resource_id$.pipe(
+      switchMap((resource_id: string) => {
+        return this.resourceService.get_resource(resource_id);
+      }),
+      shareReplay(),
+      tap(async (resource: Resource) => {
+        this.form.setValue({
+          ...resource.serialize(),
+          logo: null,
+        });
+      })
     );
 
     this.logoLink$ = combineLatest([

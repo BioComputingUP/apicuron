@@ -1,0 +1,13 @@
+<div>
+  <ul
+    cdkListbox
+    cdkListboxMultiple
+    [cdkListboxValue]="selectedPreferences"
+    (cdkListboxValueChange)="onSelectionChange($event.value)"
+  >
+    @for (preference of preferences; track preference){
+    <li [cdkOption]="preference" class="option">{{ preference }}</li>
+    }
+  </ul>
+  <p>Selected Preferences: {{ selectedPreferences.join(", ") }}</p>
+</div>
