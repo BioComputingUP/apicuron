@@ -1,50 +1,29 @@
-export const LeaderboardColumns = {
-	Ranking: 'ranking',
-	Contributor: 'contributor',
-	'Generation Contributions': 'generation_score',
-	'Invalidation Contributions': 'invalidation_score',
-	'Revision Contributions': 'revision_score',
-	'Total Score': 'total_score',
-	'Last Contribution Date': 'last_contribution_date',
-	Medals: 'medals_count',
-	Badges: 'badges_count',
+type ObjectValues<T> = T[keyof T];
+const LeaderboardColumns = {
+	ranking: 'Ranking',
+	contributor: 'Contributor',
+	generation_score: 'Generation Contributions',
+	invalidation_score: 'Invalidation Contributions',
+	revision_score: 'Revision Contributions',
+	total_score: 'Total Score',
+	last_contribution_date: 'last Contribution Date',
 } as const;
 
-export type LeaderboardColumns = keyof typeof LeaderboardColumns;
-// type BaseLeaderBoardSettings<
-// 	LType extends LeaderboardType,
-// 	AllowedColumns extends LeaderBoardColumns = LeaderBoardColumns,
-// > = Record<LType, AllowedColumns[]>;
+export type LeaderboardColumns = ObjectValues<typeof LeaderboardColumns>;
 
-type MonthlyLeaderboardColumns = Exclude<
-	LeaderboardColumns,
-	'Medals' | 'Badges'
->;
-type WeeklyLeaderboardColumns = Exclude<
-	LeaderboardColumns,
-	'Medals' | 'Badges'
->;
-type TotalLeaderboardColumns = LeaderboardColumns;
+export const MonthlyLeaderboardColumns = LeaderboardColumns;
+export type MonthlyLeaderboardColumns = LeaderboardColumns;
 
-// export type MonthlyLeaderBoardSettings = BaseLeaderBoardSettings<
-// 	'monthly',
-// 	MonthlyLeaderBoardColumns
-// >;
-// export type WeeklyLeaderBoardSettings = BaseLeaderBoardSettings<
-// 	'weekly',
-// 	WeeklyLeaderBoardColumns
-// >;
-// export type TotalLeaderBoardSettings = BaseLeaderBoardSettings<
-// 	'total',
-// 	TotalLeaderBoardColumns
-// >;
+export const WeeklyLeaderboardColumns = LeaderboardColumns;
+export type WeeklyLeaderboardColumns = LeaderboardColumns;
 
-// Combined type allowing an object with any/all of the three settings
-// export type LeaderBoardSettings = Partial<
-// 	MonthlyLeaderBoardSettings &
-// 		WeeklyLeaderBoardSettings &
-// 		TotalLeaderBoardSettings
-// >;
+export const TotalLeaderboardColumns = {
+	...LeaderboardColumns,
+	medals_count: 'Medals',
+	badges_count: 'Badges',
+} as const;
+
+export type TotalLeaderboardColumns = keyof typeof TotalLeaderboardColumns;
 export const LeaderboardTypes = {
 	monthly: 'monthly',
 	weekly: 'weekly',

@@ -1,15 +1,8 @@
+import { Expose, Type } from 'class-transformer';
 import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
-import { LeagueEntity } from '../partner-resources/leagues/dto/league.dto';
-import {
-	Expose,
-	plainToClassFromExist,
-	plainToInstance,
-	Type,
-} from 'class-transformer';
-import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
-import { PartnerResourceDocument } from '../../core/schemas';
-import { StorageType } from '../../storage/storage.config';
 import { StorageReference } from 'src/shared/decorators/storage-reference.decorator';
+import { LeagueEntity } from '../partner-resources/leagues/dto/league.dto';
+import { LeaderboardSettingsDto } from './leaderboard-settings.dto';
 import { ResourceStatsDto } from './resource-stat.dto';
 export class SelectPartnerResourceDto {
 	@IsString()
@@ -73,4 +66,8 @@ export class PartnerResourceEntity extends SelectPartnerResourceDto {
 	@Expose()
 	@Type(() => ResourceStatsDto)
 	stats: ResourceStatsDto;
+
+	@Expose()
+	@Type(() => LeaderboardSettingsDto)
+	leaderboardPreferences: LeaderboardSettingsDto;
 }

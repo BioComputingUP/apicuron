@@ -10,7 +10,6 @@ import {
 import { PrivacyType } from '../../enums';
 import { AchievementDef } from '../achievements-def/achievement-def.schema';
 import {
-	LeaderboardColumns,
 	LeaderboardSettings,
 	LeaderboardType,
 } from '../components/leaderboard-preferences.schema';
@@ -110,9 +109,9 @@ export class PartnerResource {
 	@Prop({ required: false, type: LeaderboardSettings })
 	leaderboardPreferences: LeaderboardSettings;
 
-	getLeaderBoardSettings(
-		leaderboardType: LeaderboardType,
-	): LeaderboardColumns[] | undefined {
+	getLeaderBoardSettings<T extends LeaderboardType>(
+		leaderboardType: T,
+	): LeaderboardSettings[T] {
 		return this.leaderboardPreferences[leaderboardType];
 	}
 
