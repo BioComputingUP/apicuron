@@ -33,9 +33,15 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              { "glob": "**/*", "input": "src/assets/", "output": "/assets/" }
+              {
+                "glob": "**/*",
+                "input": "src/assets/",
+                "output": "/assets/"
+              }
             ],
-            "styles": ["src/styles.scss"],
+            "styles": [
+              "src/styles.scss"
+            ],
             "scripts": [
               {
                 "input": "node_modules/marked/marked.min.js",
@@ -159,12 +165,18 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
-            "styles": ["src/styles.scss"],
+            "styles": [
+              "src/styles.scss"
+            ],
             "scripts": [],
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              { "glob": "**/*", "input": "src/assets/", "output": "/assets/" }
+              {
+                "glob": "**/*",
+                "input": "src/assets/",
+                "output": "/assets/"
+              }
             ]
           }
         },
@@ -295,7 +307,9 @@
             "outputPath": "dist/leaderboard",
             "index": "projects/leaderboard/src/index.html",
             "main": "projects/leaderboard/src/main.ts",
-            "polyfills": ["zone.js"],
+            "polyfills": [
+              "zone.js"
+            ],
             "outputHashing": false,
             "tsConfig": "projects/leaderboard/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -381,14 +395,19 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "polyfills": ["zone.js", "zone.js/testing"],
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
             "tsConfig": "projects/leaderboard/tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               "projects/leaderboard/src/favicon.ico",
               "projects/leaderboard/src/assets"
             ],
-            "styles": ["projects/leaderboard/src/styles.scss"],
+            "styles": [
+              "projects/leaderboard/src/styles.scss"
+            ],
             "scripts": []
           }
         }
@@ -419,7 +438,10 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "tsConfig": "projects/apicuron-util/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
           }
         }
       }

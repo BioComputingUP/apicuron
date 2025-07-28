@@ -8,7 +8,6 @@
       <div class="tw-p-1 sm:tw-p-2">
         <img src="assets/APICURON_white.svg" alt="APICURON LOGO" />
       </div>
-
       <div class="tw-p-1 sm:tw-p-2">
         <span
           class="tw-text-apicuron-purple-100 tw-opacity-75 tw-font-bold tw-text-lg sm:tw-mb-2"
@@ -22,7 +21,7 @@
           <li>
             <svg-icon
               src="assets/svg/member.svg"
-              svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"
+              svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1"
             ></svg-icon>
             <a [routerLink]="['/about']" fragment="becomemember"
               >Become a member Resource</a
@@ -31,28 +30,28 @@
           <li>
             <svg-icon
               src="assets/svg/tags.svg"
-              svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"
+              svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1"
             ></svg-icon>
             <a [routerLink]="['/about']" fragment="license">License</a>
           </li>
           <li>
             <svg-icon
               src="assets/svg/sitemap.svg"
-              svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"
+              svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1"
             ></svg-icon>
             <a [routerLink]="['/about']" fragment="governance">Governance</a>
           </li>
           <li>
             <svg-icon
               src="assets/svg/euro.svg"
-              svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"
+              svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1"
             ></svg-icon>
             <a [routerLink]="['/about']" fragment="funding">Funding</a>
           </li>
           <li>
             <svg-icon
               src="assets/svg/box.svg"
-              svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"
+              svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1"
             ></svg-icon>
 
             <a [routerLink]="['/about']" fragment="qa-life-cycle-plan"
@@ -62,9 +61,36 @@
           <li>
             <svg-icon
               src="assets/svg/badge-solid.svg"
-              svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"
+              svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1"
             ></svg-icon>
             <a [routerLink]="['/about']" fragment="sab">SAB</a>
+          </li>
+        </ul>
+      </div>
+      <div class="tw-p-1 sm:tw-p-2">
+        <span
+          class="tw-text-apicuron-purple-100 tw-opacity-75 tw-font-bold tw-text-lg sm:tw-mb-2"
+        >
+          Information
+        </span>
+        <ul class="tw-text-sm tw-font-normal">
+          <li>
+            <svg-icon
+              src="assets/svg/quotes.svg"
+              svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1"
+            ></svg-icon>
+
+            <a [routerLink]="'/about'" fragment="how-to-cite">Cite APICURON</a>
+          </li>
+
+          <li>
+            <svg-icon
+              src="assets/svg/document-text.svg"
+              svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1"
+            ></svg-icon>
+            <a [routerLink]="'/about'" fragment="related-articles"
+              >Related articles</a
+            >
           </li>
         </ul>
       </div>
@@ -82,7 +108,7 @@
             <a [href]="host + '/docs/'">
               <svg-icon
                 src="assets/svg/document-text.svg"
-                svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"
+                svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1"
               ></svg-icon>
               Documentation
             </a>
@@ -90,21 +116,23 @@
           <li>
             <svg-icon
               src="assets/svg/wrench.svg"
-              svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"
+              svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1"
             ></svg-icon>
             <a [href]="ws">API Documentation</a>
           </li>
           <li>
             <svg-icon
               src="assets/svg/widget.svg"
-              svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"
+              svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1"
             ></svg-icon>
-            <a [href]="host + '/docs/dev/widgets.html'">APICURON Widgets</a>
+            <a [href]="host + '/docs/developer-guide/widgets'"
+              >APICURON Widgets</a
+            >
           </li>
           <li>
             <svg-icon
               src="assets/svg/message-bubble.svg"
-              svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"
+              svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1"
             ></svg-icon>
             <a [routerLink]="['/help']" fragment="feedback"
               >Open Collaboration and Feedback</a
@@ -122,7 +150,7 @@
           <li>
             <svg-icon
               src="assets/svg/slack-icon.svg"
-              svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1 tw-text-apicuron-purple-100 tw-opacity-75"
+              svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1 tw-text-apicuron-purple-100 tw-opacity-75"
             ></svg-icon>
             <a
               href="https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w"
@@ -132,14 +160,14 @@
           <li>
             <svg-icon
               src="assets/svg/envelope.svg"
-              svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"
+              svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1"
             ></svg-icon>
             <a href="mailto:info@apicuron.org">E-mail</a>
           </li>
           <li>
             <svg-icon
               src="assets/svg/bug.svg"
-              svgClass="tw-h-5 tw-w-5 tw-inline tw-pr-1"
+              svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1"
             ></svg-icon>
             <a href="https://github.com/BioComputingUP/apicuron-issue-tracker"
               >Issue Tracker</a
