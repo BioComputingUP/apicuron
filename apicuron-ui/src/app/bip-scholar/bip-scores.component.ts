@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Component, Input, OnDestroy, OnInit } from "@angular/core";
-import { Observable, Subject, takeUntil } from "rxjs";
+import { Observable, ReplaySubject, Subject, takeUntil } from "rxjs";
 import { BipScholarStatsViewModel } from "src/app/models/external/bip-scholar.model";
 import { User } from "src/app/models/User.model";
 import { BipScholarCardComponent } from "./bip-scholar-card/bip-scholar-card.component";
@@ -38,7 +38,11 @@ export class BipScoresComponent implements OnDestroy, OnInit {
   protected userBipUrl$: Observable<URL>;
   protected isOwnProfile$: Observable<boolean>;
 
-  @Input() userOrcid$: Observable<string>;
+  userOrcid$ = new ReplaySubject<string>(1);
+
+  @Input() set orcidId(value: string) {
+    this.userOrcid$.next(value);
+  }
 
   constructor(
     private bipScholarService: BipScholarService,

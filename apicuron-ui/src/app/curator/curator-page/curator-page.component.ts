@@ -28,7 +28,11 @@ export class CuratorPageComponent implements OnInit {
   ngOnInit() {
     this.orcidId$ = this.route.paramMap.pipe(
       map((params: ParamMap) => {
-        return params.get("orcid_id");
+        const orcidId = params.get("orcid_id");
+        if (!orcidId) {
+          throw new Error("ORCID ID is required");
+        }
+        return orcidId;
       })
     );
     this.curatorPageService.init(this.orcidId$);
