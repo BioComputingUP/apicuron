@@ -1,24 +1,26 @@
 <div
-  class="tw-container tw-mx-auto sm:tw-px-4 tw-max-w-full tw-container-wide sm:tw-pb-4"
+  class="tw-container tw-mx-auto sm:tw-px-2 2xl:tw-px-4 tw-max-w-full tw-container-wide sm:tw-pb-4"
 >
   <div class="tw-flex tw-flex-wrap tw-pt-3">
-    <div class="tw-w-full lg:tw-w-1/4 tw-pr-4 tw-pl-4 lg:tw-block xl:tw-block">
+    <div
+      class="tw-w-full sm:tw-w-1/4 tw-px-2 2xl:tw-px-4 lg:tw-block xl:tw-block"
+    >
       <div class="sm:tw-sticky sm:tw-top-28 tw-sidebar">
         <div class="tw-flex tw-flex-wrap">
           <div
-            class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1 sm:tw-px-4"
+            class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1 2xl:tw-px-4"
           >
-            <div
+            <details open
               class="tw-relative tw-flex tw-flex-col tw-min-w-0 tw-rounded tw-break-words tw-border tw-bg-white tw-border-1 tw-border-gray-300"
             >
-              <div
-                class="tw-py-3 tw-px-6 tw-mb-0 tw-bg-gray-200 tw-border-b-1 tw-border-gray-300 tw-text-gray-900"
+              <summary
+                class="tw-py-3 tw-px-6 tw-mb-0 tw-bg-gray-200 tw-border-b-1 tw-border-gray-300 tw-text-gray-900 tw-text-xl tw-block tw-cursor-pointer"
               >
-                <h5>Navigate</h5>
-              </div>
+                Table of contents
+              </summary>
               <div class="tw-flex-auto tw-p-6">
                 <h6><a routerLink="." fragment="top">About</a></h6>
-                <ul>
+                <ul class="disc-list">
                   <li>
                     <a routerLink="." fragment="how-to-cite">How to Cite</a>
                   </li>
@@ -50,20 +52,20 @@
                   <li>
                     <a routerLink="." fragment="privacy">Privacy notice</a>
                   </li>
-                  <!-- <ul>
+                  <!-- <ul class="disc-list">
                   </ul>
                   
-                  <ul>
+                  <ul class="disc-list">
 
                   </ul> -->
                 </ul>
               </div>
-            </div>
+            </details>
           </div>
         </div>
       </div>
     </div>
-    <div class="lg:tw-w-3/4 tw-pr-4 tw-pl-2 sm:tw-pl-0 sm:tw-pr-8">
+    <div class="tw-w-full sm:tw-w-3/4 tw-pr-4 tw-pl-2 sm:tw-pl-0 sm:tw-pr-8">
       <h1 id="top">About APICURON</h1>
       <div class="tw-flex tw-flex-wrap">
         <div class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1">
@@ -85,6 +87,26 @@
               >10.1093/database/baab019</a
             >
           </p>
+
+          <h2 class="tw-pt-3 tw-pb-2" id="related-articles">
+            Related articles
+          </h2>
+
+          <ul class="tw-list-none">
+            <li>
+              <em
+                >Quaglia, F., Bouhraoua, K. E. A., Farrell, G., & Tosatto, S.
+                (2025).</em
+              >
+              <br />ELIXIR Commissioned Service Report: M3.3 Use Cases for
+              APICURON Evaluated. Zenodo. <br />
+              <a target="_blank" href="https://doi.org/10.5281/zenodo.15789620"
+                >doi:10.5281/zenodo.15789620</a
+              >
+            </li>
+          </ul>
+          <!-- <p class="tw-text-justify">
+        </p> -->
 
           <div class="tw-flex tw-flex-wrap" id="license">
             <div class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1">
@@ -155,7 +177,7 @@
             entity, activity, agent and timestamp. These key elements fulfill the recommendations of
             <a href="https://datascience.codata.org/articles/10.5334/dsj-2019-054/">Thessen et al.</a>
           </p>
-          <ul>
+          <ul class="disc-list">
             <li>
               <strong>Entity</strong>
               it corresponds to the curated data object, which is identified by using the identifiers.org
@@ -259,7 +281,7 @@
           <span class="tw-font-bold">Team members</span>
         </p>
 
-        <ul>
+        <ul class="disc-list">
           <li>Silvio CE Tosatto - Team leader (Full Professor)</li>
           <li>
             Damiano Piovesan - Team leader & software developer (Associate
@@ -270,7 +292,7 @@
         </ul>
 
         <span class="tw-font-bold tw-text-gray-700">Previous contributors</span>
-        <ul>
+        <ul class="disc-list">
           <li>András Hatos - Web Developer (PhD Student)</li>
         </ul>
       </div>
@@ -365,7 +387,7 @@
         </p>
 
         <h5>ELSI Policy</h5>
-        <ul>
+        <ul class="disc-list">
           <li>
             <strong>Data Privacy and Consent: </strong>APICURON adheres to
             strict data privacy guidelines and respects user consent. Any
@@ -394,7 +416,7 @@
         </ul>
 
         <h5>Equal Opportunity Research Support</h5>
-        <ul>
+        <ul class="disc-list">
           <li>
             <strong>Accessibility: </strong>APICURON strives to provide an
             accessible platform for users with disabilities. Efforts are made to
@@ -418,7 +440,7 @@
         </ul>
 
         <h5>Diversity and Inclusion</h5>
-        <ul>
+        <ul class="disc-list">
           <li>
             <strong>Accessibility: </strong>APICURON values diversity and
             inclusion and strives to ensure representation across various

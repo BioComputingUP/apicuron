@@ -17,8 +17,8 @@ h4 {
 h5 {
   @apply tw-text-xl tw-mt-1;
 }
-ul {
-  @apply tw-list-disc tw-ml-12;
+ul.disc-list {
+  @apply tw-list-disc tw-ml-6 xl:tw-ml-12;
 }
 
 h1, h2, h4 {

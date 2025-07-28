@@ -50,10 +50,25 @@ export class DocumentationComponent implements OnInit, OnDestroy {
 
   constructor(
     protected route: ActivatedRoute,
+    protected router: Router,
     protected markdownService: MarkdownService,
     protected viewport: ViewportScroller,
     protected http: HttpClient
   ) {
+    window["markedClick"] = (url: string) => {
+      this.router.navigateByUrl(url);
+    };
+    this.markdownService.renderer.link = (
+      href: string,
+      title: string,
+      text: string
+    ): string => {
+      if (href.startsWith("/")) {
+        return `<a title="${title}" onclick="markedClick('${href}')">${text}</a>`;
+      }
+      return `<a title="${title}" href="${href}">${text}</a>`;
+    };
+
     this.anchors = new AnchorJS({
       icon: "#",
       placement: "left",
@@ -83,7 +98,7 @@ export class DocumentationComponent implements OnInit, OnDestroy {
     //     }),
     //     tap(console.log)
     //   )
-      // .subscribe(() => {});
+    // .subscribe(() => {});
   }
   ngOnDestroy(): void {
     this.destroy$.next(true);
