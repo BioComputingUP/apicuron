@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable, OnInit } from "@angular/core";
-import { Observable, switchMap, map, shareReplay } from "rxjs";
+import { Injectable } from "@angular/core";
+import { Observable, map, shareReplay, switchMap } from "rxjs";
 import {
-  BipScholarStatsViewModel,
   BipScholarStats,
+  BipScholarStatsViewModel,
 } from "src/app/models/external/bip-scholar.model";
 import { environment } from "src/environments/environment";
 

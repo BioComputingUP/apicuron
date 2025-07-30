@@ -1,16 +1,12 @@
-import { CommonModule } from "@angular/common";
 import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { Observable, ReplaySubject, Subject, takeUntil } from "rxjs";
 import { BipScholarStatsViewModel } from "src/app/models/external/bip-scholar.model";
-import { User } from "src/app/models/User.model";
-import { BipScholarCardComponent } from "./bip-scholar-card/bip-scholar-card.component";
 
 import { Injectable } from "@angular/core";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, map } from "rxjs";
 import { environment } from "src/environments/environment";
-import { map } from "rxjs";
-import { BipScholarService } from "./services/bip-scholar.service";
 import { AuthService } from "../auth/auth.service";
+import { BipScholarService } from "./services/bip-scholar.service";
 
 @Injectable({
   providedIn: "root",
