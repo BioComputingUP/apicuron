@@ -41,7 +41,7 @@ export class CuratorRegistryService {
 	// Create
 	async createNewEntry(
 		curator_orcid: string,
-		curator?: UserDocument | null,
+		curator?: User,
 		contributed_to?: {
 			resource: PartnerResource;
 			league: League;
