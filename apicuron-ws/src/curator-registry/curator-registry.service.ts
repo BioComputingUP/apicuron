@@ -2,6 +2,7 @@ import {
 	Injectable,
 	InternalServerErrorException,
 	Logger,
+	NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as _ from 'lodash';
@@ -22,9 +23,10 @@ import {
 	LeanCuratorRegistryEntryDocument,
 } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { Report, ReportModel } from 'src/core/schemas/reports.schema';
-import { User } from 'src/core/schemas/user.schema';
+import { User, UserDocument } from 'src/core/schemas/user.schema';
 import { PartnerResourcesService } from 'src/resources/partner-resources/services/partner-resources.service';
 import { GetRegistryEntryDto } from './dto/registry-entries.dto';
+
 @Injectable()
 export class CuratorRegistryService {
 	constructor(
@@ -36,10 +38,158 @@ export class CuratorRegistryService {
 	) {}
 	logger = new Logger(CuratorRegistryService.name);
 
-	/**
-	 * Get all curators from registry that match the user filter query
-	 * @param query : user query
-	 */
+	// Create
+	async createNewEntry(
+		curator_orcid: string,
+		curator?: UserDocument | null,
+		contributed_to?: {
+			resource: PartnerResource;
+			league: League;
+		},
+	): Promise<CuratorRegistryEntryDocument> {
+		try {
+			const curator_data: User | UserDocument | null =
+				curator || (await this.userRep.findOne({ orcid_id: curator_orcid }));
+
+			if (contributed_to?.resource && contributed_to?.league) {
+				return this.registryEntryModel.create({
+					curator_orcid: curator_orcid,
+					curator: curator_data,
+					privacy: curator_data?.privacy || PrivacyType.private,
+					contributed_to: [
+						{
+							resource_id: contributed_to.resource.resource_id,
+							resource: contributed_to.resource,
+							groups: [contributed_to.league],
+						},
+					],
+				});
+			} else {
+				// If no resource or league is provided, create an empty entry
+				return this.registryEntryModel.create({
+					curator_orcid: curator_orcid,
+					curator: curator_data,
+					privacy: curator_data?.privacy || PrivacyType.private,
+					contributed_to: [],
+				});
+			}
+		} catch (error) {
+			this.logger.error(
+				`Error while adding curator ${curator_orcid} to registry`,
+			);
+			this.logger.error(error);
+
+			throw new InternalServerErrorException(
+				`Error while adding curator ${curator_orcid} to registry`,
+			);
+		}
+	}
+
+	async recomputeAllEntries() {
+		// don't use this unless needed
+		await this.removeAllEntries();
+
+		const aggregation_pipeline: PipelineStage[] = [
+			{
+				$group: {
+					// Build a list of leagues in each resource that was contributed to, and group by user
+					_id: {
+						curator_orcid: '$curator_orcid',
+						resource_id: '$resource_id',
+					},
+					leagueNames: { $addToSet: '$league' },
+				},
+			},
+			{
+				// Get the resource details
+				$lookup: {
+					from: 'resources_def',
+					localField: '_id.resource_id',
+					foreignField: 'resource_id',
+					as: 'resources',
+				},
+			},
+			{ $unwind: { path: '$resources' } },
+			{
+				// populate league field
+				$addFields: {
+					leagues: {
+						$filter: {
+							input: '$resources.leagues',
+							as: 'league',
+							cond: {
+								$in: ['$$league.name', '$leagueNames'],
+							},
+						},
+					},
+				},
+			},
+			{
+				// Build the final output structure
+				$group: {
+					_id: '$_id.curator_orcid',
+					resources: {
+						$push: {
+							resource_id: '$_id.resource_id',
+							resource: '$resources',
+							groups: '$leagues',
+						},
+					},
+				},
+			},
+			{
+				// Lookup the user details
+				$lookup: {
+					from: 'users',
+					localField: '_id',
+					foreignField: 'orcid_id',
+					as: 'curator',
+				},
+			},
+			{
+				$unwind: {
+					path: '$curator',
+					preserveNullAndEmptyArrays: false,
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					curator_orcid: '$_id',
+					curator: 1,
+					resources: 1,
+				},
+			},
+		];
+
+		this.logger.debug('Updating all curator registry entries...');
+		try {
+			const aggregationResults = await this.reportModel.aggregate(
+				aggregation_pipeline,
+			);
+
+			const updates: Promise<CuratorRegistryEntryDocument>[] = [];
+			for (const result of aggregationResults) {
+				updates.push(
+					this.registryEntryModel.create({
+						curator_orcid: result.curator_orcid,
+						contributed_to: result.resources,
+						curator: result.curator,
+						privacy: result.curator.privacy || PrivacyType.private,
+					}),
+				);
+			}
+			await Promise.all(updates);
+			this.logger.debug('Recreated All Entries');
+		} catch (error) {
+			this.logger.error(
+				'Error while updating registry collection with aggregation results',
+			);
+			this.logger.error(error);
+		}
+	}
+
+	// Read
 	async getAllEntries(query: GetRegistryEntryDto) {
 		//extract user query details
 		const {
@@ -108,11 +258,24 @@ export class CuratorRegistryService {
 			throw new InternalServerErrorException(`Error while processing request`);
 		}
 	}
-
+	async curatorContributedToResource(
+		curator_orcid: string,
+		resource_id: string,
+	): Promise<boolean> {
+		const result = await this.registryEntryModel.findOne({
+			curator_orcid: curator_orcid,
+			contributed_to: {
+				$elemMatch: {
+					resource_id: resource_id,
+				},
+			},
+		});
+		return !!result;
+	}
 	async getCuratorEntry(
 		orcid_identifier: string,
 	): Promise<LeanCuratorRegistryEntryDocument | null> {
-		let entry: LeanCuratorRegistryEntryDocument | null = null;
+		let entry: LeanCuratorRegistryEntryDocument;
 		try {
 			entry = await this.registryEntryModel
 				.findOne({
@@ -126,136 +289,104 @@ export class CuratorRegistryService {
 			);
 			this.logger.error(error);
 		}
-		return entry;
 	}
 
-	async upsertUser(curator: User) {
+	//Update
+	async updateUserData(
+		orcid: string,
+		newUserData: User | UserDocument,
+	): Promise<boolean> {
 		try {
 			const result = await this.registryEntryModel.updateOne(
-				{
-					curator_orcid: curator.orcid_id,
-				},
-				{
-					$set: {
-						curator: curator,
-					},
-				},
-				{ upsert: true },
+				{ curator_orcid: orcid },
+				{ curator: newUserData },
 			);
-
-			return result;
+			return result.modifiedCount > 0;
 		} catch (error) {
 			this.logger.error(
-				`Error while upserting user with orcid: ${curator.orcid_id}...`,
+				`Error while updating user data for curator with ORCID ${orcid}`,
+				error,
 			);
-			this.logger.error(error);
-			throw new InternalServerErrorException(`Error while processing request`);
+			throw new Error(
+				`Error while updating user data for curator with ORCID ${orcid}`,
+			);
 		}
 	}
-
-	async recomputeAllEntries() {
-		// don't use this unless needed
-
-		const aggregation_pipeline: PipelineStage[] = [
-			{
-				$group: {
-					_id: {
-						curator_orcid: '$curator_orcid',
-						resource_id: '$resource_id',
-					},
-					leagueNames: { $addToSet: '$league' },
-				},
-			},
-			{
-				$lookup: {
-					from: 'resources_def',
-					localField: '_id.resource_id',
-					foreignField: 'resource_id',
-					as: 'resources',
-				},
-			},
-			{ $unwind: { path: '$resources' } },
-			{
-				$addFields: {
-					leagues: {
-						$filter: {
-							input: '$resources.leagues',
-							as: 'league',
-							cond: {
-								$in: ['$$league.name', '$leagueNames'],
-							},
-						},
-					},
-				},
-			},
-			{
-				$group: {
-					_id: '$_id.curator_orcid',
-					resources: {
-						$push: {
-							resource_id: '$_id.resource_id',
-							resource: '$resources',
-							groups: '$leagues',
-						},
-					},
-				},
-			},
-			{
-				$lookup: {
-					from: 'users',
-					localField: '_id',
-					foreignField: 'orcid_id',
-					as: 'curator',
-				},
-			},
-			{
-				$unwind: {
-					path: '$curator',
-					preserveNullAndEmptyArrays: false,
-				},
-			},
-			{
-				$project: {
-					_id: 0,
-					curator_orcid: '$_id',
-					curator: 1,
-					resources: 1,
-				},
-			},
-		];
-
-		this.logger.debug('Updating all curator registry entries...');
-		try {
-			const aggregationResults = await this.reportModel.aggregate(
-				aggregation_pipeline,
-			);
-
-			const updates = [];
-			for (const result of aggregationResults) {
-				updates.push(
-					this.registryEntryModel.findOneAndUpdate(
-						{ curator_orcid: result.curator_orcid },
-						{
-							$set: {
-								contributed_to: result.resources,
-								curator: result.curator,
-							},
-						},
-						{ upsert: true },
-					),
-				);
-			}
-
-			await Promise.all(updates);
-			this.logger.debug('Updated registry collection with aggregation results');
-			return updates;
-		} catch (error) {
+	async addContribution(
+		orcid: string,
+		resource_id: string,
+		leagueName: string,
+		user_data?: UserDocument,
+		resource_data?: PartnerResource,
+		league_data?: League,
+	) {
+		const [resource, user] = await Promise.all([
+			resource_data || this.resourceService.get_resource(resource_id),
+			user_data || this.userRep.findOne({ orcid_id: orcid }),
+		]);
+		if (!resource) {
+			this.logger.error(`Resource ${resource_id} not found`);
+			throw new NotFoundException(`Resource ${resource_id} not found`);
+		}
+		if (!user) {
+			this.logger.error(`User with ORCID ${orcid} not found`);
+			throw new NotFoundException(`User with ORCID ${orcid} not found`);
+		}
+		const league: League | undefined =
+			league_data || resource.getLeague(leagueName);
+		if (!league) {
 			this.logger.error(
-				'Error while updating registry collection with aggregation results',
+				`League data for ${leagueName} could not be found in ${resource.resource_id}`,
 			);
-			this.logger.error(error);
+			throw new InternalServerErrorException(
+				`League data for ${leagueName} could not be found in ${resource.resource_id}`,
+			);
 		}
+		const existingEntry = await this.registryEntryModel
+			.findOne({ curator_orcid: orcid })
+			.lean();
+		// const existingEntry = await a.registryEntryModel.findOne({curator_orcid: orcid,}).lean();
+		if (!existingEntry) {
+			this.logger.verbose(
+				'No existing entry found, creating a new one Entry:',
+				existingEntry,
+				orcid,
+			);
+			return this.createNewEntry(orcid, user, {
+				resource,
+				league,
+			});
+		}
+
+		const existingResourceContribution = existingEntry?.contributed_to.find(
+			(entry) => entry.resource_id === resource.resource_id,
+		);
+		// Entry exists but has no resources or the contributed resource is not in the entry
+
+		if (
+			existingEntry.contributed_to.length === 0 ||
+			!existingResourceContribution
+		) {
+			this.logger.verbose(
+				`No existing resource contribution found for resource ${resource.resource_id}, adding it`,
+			);
+			return this.addResourceToUser(orcid, resource, league);
+		}
+
+		// resource exists, check if league is already in the contribution list and add it if not
+		const existingLeague = existingResourceContribution.groups.find(
+			(group) => group.name === league.name,
+		);
+		if (!existingLeague) {
+			this.logger.verbose(
+				`League ${league.name} not found in resource ${resource.resource_id}, adding it`,
+			);
+			return this.addLeagueToUser(orcid, resource_id, league);
+		}
+		// League already exists, no action needed
+		return existingEntry;
 	}
+
 	async updateLeague(league: LeagueDocument): Promise<number> {
 		const resource_id = league.resource_id;
 		const results = await this.registryEntryModel.updateMany(
@@ -282,117 +413,202 @@ export class CuratorRegistryService {
 		return results.modifiedCount;
 	}
 
-	/**
-	 * Creates a new entry in the registry for a curator even if they don't exist
-	 * @param curator_orcid the orcid id of the curator
-	 * @param resource the contributed to resource object
-	 * @param league the league (object) the curator contributed to
-	 * @param curator curator (object, optional) if it exists
-	 * @returns a promise resolving to the newly created entry
-	 */
-	async addEntry(
+	private async addResourceToUser(
 		curator_orcid: string,
 		resource: PartnerResource,
 		league: League,
-		curator?: User,
 	): Promise<CuratorRegistryEntryDocument> {
 		try {
-			const newEntry = await this.registryEntryModel.create({
-				curator_orcid: curator_orcid,
-				curator: curator,
-				contributed_to: [
-					{
-						resource_id: resource.resource_id,
-						resource: resource,
-						groups: [league],
+			const result = await this.registryEntryModel.findOneAndUpdate(
+				{
+					curator_orcid: curator_orcid,
+				},
+				{
+					$push: {
+						contributed_to: {
+							resource_id: resource.resource_id,
+							resource: resource,
+							groups: [league],
+						},
 					},
-				],
-			});
-			return newEntry;
+				},
+			);
+			if (!result) {
+				this.logger.error(
+					`No registry entry found for curator ${curator_orcid}`,
+				);
+				throw new InternalServerErrorException(
+					`No registry entry found for curator ${curator_orcid}`,
+				);
+			}
+			return result;
 		} catch (error) {
 			this.logger.error(
-				`Error while adding curator ${curator_orcid} to registry`,
+				`Error while adding resource ${resource.resource_id} to curator ${curator_orcid}`,
+				error,
 			);
 			this.logger.error(error);
-
 			throw new InternalServerErrorException(
-				`Error while adding curator ${curator_orcid} to registry`,
+				`Error while adding resource ${resource.resource_id} to curator ${curator_orcid}`,
 			);
 		}
 	}
 
-	async addResourceToUser(
+	private async addLeagueToUser(
 		curator_orcid: string,
-		resource: PartnerResource,
+		resource_id: string,
 		league: League,
-	) {
-		const result = await this.registryEntryModel.updateOne(
+	): Promise<CuratorRegistryEntryDocument> {
+		try {
+			const result = await this.registryEntryModel.findOneAndUpdate(
+				{
+					curator_orcid: curator_orcid,
+				},
+				{
+					$push: {
+						'contributed_to.$[elem].groups': league,
+					},
+				},
+				{
+					arrayFilters: [{ 'elem.resource_id': resource_id }],
+				},
+			);
+			if (!result) {
+				this.logger.error(
+					`No registry entry found for curator ${curator_orcid}`,
+				);
+				throw new InternalServerErrorException(
+					`No registry entry found for curator ${curator_orcid}`,
+				);
+			}
+			return result;
+		} catch (error) {
+			this.logger.error(
+				`Error while adding league ${league.name} to resource ${resource_id} for curator ${curator_orcid}`,
+				error,
+			);
+			throw new InternalServerErrorException(
+				`Error while adding league ${league.name} to resource ${resource_id} for curator ${curator_orcid}`,
+			);
+		}
+	}
+
+	async recomputeResourceAggregate(resource_id: string): Promise<void> {
+		const resource = await this.resourceService.get_resource(resource_id);
+		if (!resource) {
+			this.logger.error(`Resource ${resource_id} not found`);
+			throw new NotFoundException(`Resource ${resource_id} not found`);
+		}
+		await this.clearEntriesForResource(resource_id);
+		const aggregation_pipeline: PipelineStage[] = [
 			{
-				curator_orcid: curator_orcid,
+				$match: {
+					resource_id: resource_id,
+				},
 			},
 			{
-				$push: {
+				$group: {
+					_id: '$curator_orcid',
+					leagues: {
+						$addToSet: '$league_data',
+					},
+				},
+			},
+		];
+		const aggregationResults = await this.reportModel.aggregate<{
+			_id: string;
+			leagues: League[];
+		}>(aggregation_pipeline);
+		// this needs to be disabled because if you try to use its true type (AnyBulkWriteOperation<CuratorRegistryEntry>[])
+		// it causes a deep type inferences that loads infinetly and crashes tsserver
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const bulkOps: any[] = aggregationResults.map((aggResult) => ({
+			updateOne: {
+				filter: { curator_orcid: aggResult._id },
+				update: {
+					$push: {
+						contributed_to: {
+							resource_id: resource_id,
+							resource: resource,
+							groups: aggResult.leagues,
+						},
+					},
+				},
+			},
+		}));
+
+		if (aggregationResults.length === 0) return;
+
+		try {
+			const result = await this.registryEntryModel.bulkWrite(bulkOps);
+			this.logger.debug(
+				`Recomputed ${result.modifiedCount} aggregates for resource ${resource_id}`,
+			);
+		} catch (error) {
+			this.logger.error(
+				`Error while recomputing resource aggregate for resource ${resource_id}`,
+				error,
+			);
+			throw new InternalServerErrorException(
+				`Error while recomputing resource aggregate for resource ${resource_id}`,
+			);
+		}
+	}
+
+	// Delete
+	private async removeAllEntries() {
+		try {
+			this.logger.warn('Deleting all curator registry entries...');
+			await this.registryEntryModel.deleteMany({});
+			this.logger.debug('All curator registry entries deleted');
+		} catch (error) {
+			this.logger.error(
+				'Error while deleting all curator registry entries',
+				error,
+			);
+			throw new Error('Error while deleting all curator registry entries');
+		}
+	}
+
+	async clearEntriesForResource(resource_id: string) {
+		this.logger.warn(`Clearing entries for resource ${resource_id}...`);
+		const result = await this.registryEntryModel.updateMany(
+			{
+				'contributed_to.resource_id': resource_id,
+			},
+			{
+				$pull: {
 					contributed_to: {
-						resource_id: resource.resource_id,
-						resource: resource,
-						groups: [league],
+						resource_id: resource_id,
 					},
 				},
 			},
 		);
-		return result;
+		this.logger.verbose(
+			`Cleared ${result.modifiedCount} entries for resource ${resource_id}`,
+		);
+
+		return result.modifiedCount;
 	}
-	async addLeagueToUser(
-		curator_orcid: string,
-		resource_id: string,
-		league: League,
-	) {
-		const result = await this.registryEntryModel.updateOne(
+
+	async deleteLeague(resource_id: string, league: string): Promise<number> {
+		this.logger.warn(
+			`Deleting league ${league} for all contributors of resource ${resource_id}...`,
+		);
+		const result = await this.registryEntryModel.updateMany(
 			{
-				curator_orcid: curator_orcid,
+				'contributed_to.resource_id': resource_id,
 			},
 			{
-				$push: {
-					'contributed_to.$[elem].groups': league,
+				$pull: {
+					'contributed_to.$[].groups': { name: league },
 				},
-			},
-			{
-				arrayFilters: [{ 'elem.resource_id': resource_id }],
 			},
 		);
-		return result;
-	}
-
-	/**
-	 * Checks if a curator has contributed to a given resource
-	 * @param curator_orcid the orcid id of the curator
-	 * @param resource_id the id of the resource
-	 * @returns a promise that resolves to true if the curator has contributed to the resource, false otherwise
-	 */
-	async curatorContributedToResource(
-		curator_orcid: string,
-		resource_id: string,
-	): Promise<boolean> {
-		const result = await this.registryEntryModel.findOne({
-			curator_orcid: curator_orcid,
-			contributed_to: {
-				$elemMatch: {
-					resource_id: resource_id,
-				},
-			},
-		});
-		return !!result;
-	}
-
-	async removeAllEntries(resource_id: string) {
-		const result = await this.registryEntryModel.deleteMany({
-			contributed_to: {
-				$elemMatch: {
-					resource_id: resource_id,
-				},
-			},
-		});
-		return result.deletedCount;
+		this.logger.verbose(
+			`Deleted league ${league} for ${result.modifiedCount} contributors of resource ${resource_id}`,
+		);
+		return result.modifiedCount;
 	}
 
 	async updateResource(resource: PartnerResource): Promise<void> {

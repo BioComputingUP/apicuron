@@ -9,6 +9,7 @@ import {
 	QueryOptions,
 	Types,
 } from 'mongoose';
+import { PrivacyType } from 'src/core/enums';
 import { League, LeagueDocument, LeagueSchema } from '../league/league.schema';
 import {
 	PartnerResource,
@@ -74,6 +75,14 @@ export class CuratorRegistryEntry {
 	curator_orcid: string;
 
 	@Prop({
+		required: true,
+		enum: PrivacyType,
+		type: String,
+		default: PrivacyType.private,
+	})
+	privacy: PrivacyType;
+
+	@Prop({
 		required: false,
 		type: UserSchema,
 	})
@@ -94,11 +103,18 @@ CuratorRegistryEntrySchema.index({
 	curator_orcid: 'text',
 });
 
+CuratorRegistryEntrySchema.index(
+	{
+		curator_orcid: 1,
+	},
+	{ unique: true, name: 'unique_curator_orcid' },
+);
+
 CuratorRegistryEntrySchema.index({
 	'curator.displayedName': -1,
 	'curator.orcid_id': -1,
 	curator_orcid: -1,
-	'curator.privacy': -1,
+	privacy: -1,
 });
 
 export { CuratorRegistryEntrySchema };

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Document, Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import {
 	UserCreatedEvent,
 	UserUpdatedEvent,
@@ -10,7 +10,7 @@ import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../../core/schemas/resource/partner-resource.schema';
-import { Term, TermDocument } from '../../core/schemas/terms.schema';
+import { TermDocument } from '../../core/schemas/terms.schema';
 import { AggregatorClass } from '../../event-orchestrator/decorators/aggregator.decorator';
 import { Aggregator } from '../../event-orchestrator/interfaces/aggregator.interface';
 import { LeagueUpdatedEvent } from '../../resources/partner-resources/leagues/events/league-updated.event';
@@ -76,17 +76,12 @@ export class ResourceStatsAggregatorService implements Aggregator {
 	async recomputeAllResourceAggregates(_resource_id: string) {
 		return;
 	}
-	termDeleted(
-		_term: Document<unknown, any, Term> &
-			Omit<Term & { _id: Types.ObjectId }, never>,
-	): Promise<void> | void {
-		return;
+	termDeleted(term: TermDocument): Promise<void> | void {
+		return this.applyAllReports(term.resource_id);
 	}
 	termUpdated(
-		_oldTerm: Document<unknown, any, Term> &
-			Omit<Term & { _id: Types.ObjectId }, never>,
-		_term: Document<unknown, any, Term> &
-			Omit<Term & { _id: Types.ObjectId }, never>,
+		_oldTerm: TermDocument,
+		_term: TermDocument,
 	): Promise<void> | void {
 		return;
 	}

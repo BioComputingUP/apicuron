@@ -24,7 +24,6 @@ import {
 	ManyEntityUpdated,
 } from '../events';
 import { RepositoryEventPublisher } from '../helpers/event-mapper';
-import { type } from 'os';
 
 type EntityEvents<C> =
 	| EntityCreatedEvent<C>
@@ -59,12 +58,7 @@ type ExtractMethodsAndOverrides<T> = T extends Model<
 	? M
 	: never;
 
-type ExtractVirtuals<T> = T extends Model<
-	unknown,
-	unknown,
-	unknown,
-	infer V
->
+type ExtractVirtuals<T> = T extends Model<unknown, unknown, unknown, infer V>
 	? V
 	: never;
 

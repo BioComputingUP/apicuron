@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { IEventHandler } from '@nestjs/cqrs';
-import { Aggregator } from '../interfaces/aggregator.interface';
 import { OnEvent } from '@nestjs/event-emitter';
 import { TermDeletedEvent } from '../../terms/events/events';
 import { SubmissionRunner } from '../aggregator-runners/bulk-submission.runner';
+import { Aggregator } from '../interfaces/aggregator.interface';
 
 @Injectable()
 export class TermDeletedEventHandler implements IEventHandler {

@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
-import { Connection, Model, MongooseError } from 'mongoose';
+import { Connection, Model } from 'mongoose';
 
 @Injectable()
 export class SyncIndexesService implements OnModuleInit {
@@ -23,6 +23,7 @@ export class SyncIndexesService implements OnModuleInit {
 			await Promise.all(indexesSyncPromises$);
 		} catch (err) {
 			this.logger.error(`Error Occured when syncing indexes: ${err?.message}`);
+			this.logger.log(err);
 		}
 	}
 

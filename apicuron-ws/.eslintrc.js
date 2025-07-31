@@ -25,6 +25,7 @@ module.exports = {
       'error',
       { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
     ],
-    "@typescript-eslint/no-unsafe-assignment": "error"
+    "@typescript-eslint/no-unsafe-assignment": "error",
+    "@typescript-eslint/no-floating-promises": ["error"]
   },
 };

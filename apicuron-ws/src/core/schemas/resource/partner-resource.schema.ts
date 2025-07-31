@@ -1,5 +1,4 @@
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { PrivacyType } from '../../enums';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import {
 	FilterQuery,
 	HydratedDocument,
@@ -8,9 +7,10 @@ import {
 	QueryOptions,
 	Types,
 } from 'mongoose';
+import { PrivacyType } from '../../enums';
 import { AchievementDef } from '../achievements-def/achievement-def.schema';
-import { Term } from '../terms.schema';
 import { League, LeagueSchema } from '../league/league.schema';
+import { Term } from '../terms.schema';
 import { ResourceStats, ResourceStatsSchema } from './resource-stats.schema';
 
 type PartnerResourceDocumentOverride = {
