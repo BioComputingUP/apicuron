@@ -24,10 +24,13 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { FirstPopupComponent } from "./first-login/first-popup/first-popup.component";
 import { DashboardModule } from "./dashboard/dashboard.module";
 import { ErrorMessagePipe } from "./components/utils/error-messages/error-messages.pipe";
-import { MatomoModule } from "ngx-matomo-client";
+import { MatomoConsentRequirement, MatomoModule } from "ngx-matomo-client";
 import { MatomoRouterModule } from "ngx-matomo-client";
 import { OrcidToUrl } from "./shared/orcid-to-url.pipe";
 import { SharedUtilsModule } from "./shared/shared-utils.module";
+import { NgcCookieConsentModule } from "ngx-cookieconsent";
+import { cookieConfig } from "../config/cookies.config";
+import { CookieManagerService } from "./cookie-manager/cookie-manager.service";
 @NgModule({
   declarations: [
     AppComponent,
@@ -38,6 +41,7 @@ import { SharedUtilsModule } from "./shared/shared-utils.module";
   ],
   imports: [
     SharedUtilsModule,
+    BrowserModule,
     AppRoutingModule,
     AuthModule,
     NotificationsDataModule,
@@ -61,8 +65,10 @@ import { SharedUtilsModule } from "./shared/shared-utils.module";
       trackerUrl: "https://matomo.biocomputingup.it/matomo.php",
       siteId: "10",
       scriptUrl: "https://matomo.biocomputingup.it/matomo.js",
+      requireConsent: "cookie",
     }),
     MatomoRouterModule,
+    NgcCookieConsentModule.forRoot(cookieConfig),
   ],
   providers: [
     // *** Sentry ErrorHandler and Tracer Setup ***
@@ -70,8 +76,9 @@ import { SharedUtilsModule } from "./shared/shared-utils.module";
     // *** end of sentry setup ***
     { provide: APP_ID, useValue: "serverApp" },
     OrcidToUrl,
+    CookieManagerService,
   ],
   bootstrap: [AppComponent],
   exports: [RouterModule],
 })
-export class AppModule { }
+export class AppModule {}
