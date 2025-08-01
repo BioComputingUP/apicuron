@@ -1,84 +1,207 @@
 <div class="tw-flex tw-flex-col tw-px-10 tw-py-6">
-    <h2 class="tw-text-lg lg:tw-text-xl tw-font-bold tw-font-dm-sans">Edit Profile</h2>
-    <form class="tw-flex tw-w-full tw-flex-row tw-flex-wrap" [formGroup]="form" (submit)="submitForm()">
-        <div class="tw-w-full tw-py-2 sm:tw-py-4 tw-mr-auto form-control-element">
-            <label class="tw-mb-2" for="email">Email Address:</label>
-            <input type="email" name="" id="" class="tw-bg-white tw-rounded tw-border-gray-500" formControlName="email">
-            <small class="tw-text-sm tw-text-red-500 tw-font-normal tw-py-2"
-                *ngIf="email.errors?.['email'] && (email.dirty || email.touched)">Please enter a valid email
-                address.</small>
-        </div>
-        <div class="tw-w-full tw-mt-2 tw-pb-2 sm:tw-pb-4 tw-mr-auto">
-            <label for="privacy">Privacy Setting:</label>
+  <h2 class="tw-text-lg lg:tw-text-xl tw-font-bold tw-font-dm-sans">
+    Edit Profile
+  </h2>
+  <form
+    class="tw-flex tw-w-full tw-flex-row tw-flex-wrap"
+    [formGroup]="form"
+    (submit)="submitForm()"
+  >
+    <div class="tw-w-full tw-py-2 sm:tw-py-4 tw-mr-auto form-control-element">
+      <label class="tw-mb-2" for="email">Email Address:</label>
 
-            <fieldset class="tw-grid tw-grid-cols-2 tw-gap-3 tw-my-4 tw-w-full">
-                <!-- Public Button -->
-                <div class="tw-w-full">
-                    <label for="public" (click)="selectRadio('public')"
-                        class="tw-block tw-cursor-pointer tw-w-full tw-h-full tw-rounded-lg tw-border-2 tw-bg-white tw-p-2 tw-text-sm tw-font-medium tw-shadow-md"
-                        [ngClass]="{
-                                    'tw-border-2 tw-bg-purple-50 tw-border-apicuron-bright-purple': privacy === 'public',
-                                    'tw-border-gray-100': privacy !== 'public',
-                                    'tw-opacity-50': privacy !== 'public'
-                                }">
-                        <div class="tw-flex tw-p-1 tw-gap-2  tw-items-start">
-                            <div class="tw-col-span-2">
-                                <img class="tw-h-6 tw-max-w-full tw-max-h-full" src="../../assets/public.svg"
-                                    alt="Public Icon" />
-                            </div>
-                            <div class="tw-col-span-10">
-                                <div class="tw-flex tw-items-center tw-gap-2 tw-pb-1">
-                                    <span class="tw-font-bold">Public</span>
-                                    <span *ngIf="privacy === 'public'"
-                                        class="tw-text-xs tw-bg-purple-100 tw-text-purple-800 tw-border tw-border-apicuron-bright-purple tw-rounded-full tw-px-2 tw-py-0.5">
-                                        Current
-                                    </span>
-                                </div>
-                                <span class="tw-text-sm tw-font-normal tw-text-gray-600">Your profile is visible to
-                                    everyone</span>
-                            </div>
-                        </div>
-                        <input type="radio" name="privacy" value="public" id="public" class="peer/public tw-hidden"
-                            formControlName="privacy" />
-                    </label>
+      <div formArrayName="emails" class="tw-flex tw-gap-2 tw-flex-col">
+        <div
+          *ngFor="let email of emails.controls; let i = index"
+          [formGroupName]="i"
+          class="tw-flex tw-flex-col tw-gap-1 tw-w-full"
+        >
+          <div class="tw-flex tw-items-center tw-gap-2 tw-w-full tw-flex-wrap">
+            <div class="tw-relative tw-flex-1 tw-min-w-[75%]">
+              <input
+                type="email"
+                formControlName="email"
+                class="tw-bg-white tw-rounded tw-border-gray-500 tw-w-full"
+                [ngClass]="{
+                  'tw-bg-inherit tw-border-none tw-shadow-none tw-shadow-transparent tw-opacity-50':
+                    email.get('email')?.disabled
+                }"
+              />
+              <button
+                type="button"
+                (click)="enableFields(i)"
+                class="tw-absolute tw-right-2 tw-top-1/4 tw-z-10"
+              >
+                <img
+                  src="../../../assets/edit.png"
+                  class="tw-aspect-auto tw-max-w-6"
+                />
+              </button>
+            </div>
+            <div
+              class="tw-flex tw-gap-1"
+              [ngClass]="{
+                'tw-opacity-50': email.get('primary')?.disabled
+              }"
+            >
+              <input
+                id="checkbox-primary-{{ i }}"
+                type="checkbox"
+                formControlName="primary"
+                class="tw-bg-white tw-rounded tw-border-gray-500 tw-aspect-square tw-w-6"
+              />
+              <label for="checkbox-primary-{{ i }}">Primary</label>
+            </div>
+            <div
+              class="tw-flex tw-gap-1"
+              [ngClass]="{
+                'tw-opacity-50': email.get('visibility')?.disabled
+              }"
+            >
+              <input
+                type="checkbox"
+                formControlName="visibility"
+                id="checkbox-visible-{{ i }}"
+                class="tw-bg-white tw-rounded tw-border-gray-500 tw-aspect-square tw-w-6"
+              />
+              <label for="checkbox-visible-{{ i }}">Visible</label>
+            </div>
+
+            <button
+              *ngIf="emails.length > 1"
+              type="button"
+              (click)="removeEmail(i)"
+              class="tw-bg-gray-600 tw-text-white tw-rounded tw-p-2"
+            >
+              X
+            </button>
+          </div>
+          <small
+            *ngIf="
+              email.get('email')?.invalid &&
+              (email.get('email')?.dirty || email.get('email')?.touched)
+            "
+            class="tw-text-red-500 tw-text-sm tw-font-normal"
+          >
+            Please enter a valid email.
+          </small>
+        </div>
+      </div>
+      <button
+        type="button"
+        (click)="addEmail()"
+        class="tw-bg-gray-300 tw-border-solid tw-shadow-sm tw-opacity-80 tw-rounded-sm tw-p-2 tw-mt-2"
+      >
+        + Add another email
+      </button>
+    </div>
+    <div class="tw-w-full tw-mt-2 tw-pb-2 sm:tw-pb-4 tw-mr-auto">
+      <label for="privacy">Privacy Setting:</label>
+
+      <fieldset class="tw-grid tw-grid-cols-2 tw-gap-3 tw-my-4 tw-w-full">
+        <!-- Public Button -->
+        <div class="tw-w-full">
+          <label
+            for="public"
+            (click)="selectRadio('public')"
+            class="tw-block tw-cursor-pointer tw-w-full tw-h-full tw-rounded-lg tw-border-2 tw-bg-white tw-p-2 tw-text-sm tw-font-medium tw-shadow-md"
+            [ngClass]="{
+              'tw-border-2 tw-bg-purple-50 tw-border-apicuron-bright-purple':
+                privacy === 'public',
+              'tw-border-gray-100': privacy !== 'public',
+              'tw-opacity-50': privacy !== 'public'
+            }"
+          >
+            <div class="tw-flex tw-p-1 tw-gap-2 tw-items-start">
+              <div class="tw-col-span-2">
+                <img
+                  class="tw-h-6 tw-max-w-full tw-max-h-full"
+                  src="../../assets/public.svg"
+                  alt="Public Icon"
+                />
+              </div>
+              <div class="tw-col-span-10">
+                <div class="tw-flex tw-items-center tw-gap-2 tw-pb-1">
+                  <span class="tw-font-bold">Public</span>
+                  <span
+                    *ngIf="privacy === 'public'"
+                    class="tw-text-xs tw-bg-purple-100 tw-text-purple-800 tw-border tw-border-apicuron-bright-purple tw-rounded-full tw-px-2 tw-py-0.5"
+                  >
+                    Current
+                  </span>
                 </div>
+                <span class="tw-text-sm tw-font-normal tw-text-gray-600"
+                  >Your profile is visible to everyone</span
+                >
+              </div>
+            </div>
+            <input
+              type="radio"
+              name="privacy"
+              value="public"
+              id="public"
+              class="peer/public tw-hidden"
+              formControlName="privacy"
+            />
+          </label>
+        </div>
 
-                <!-- Private Button -->
-                <div class="tw-w-full">
-                    <label for="private" (click)="selectRadio('private')"
-                        class="tw-block tw-cursor-pointer tw-w-full tw-h-full tw-rounded-lg tw-border-2 tw-bg-white tw-p-2 tw-text-sm tw-font-medium tw-shadow-md"
-                        [ngClass]="{
-                                    'tw-border-2 tw-bg-purple-50 tw-border-apicuron-bright-purple': privacy === 'private',
-                                    'tw-border-gray-100': privacy !== 'private',
-                                    'tw-opacity-50': privacy !== 'private'
-                                }">
-                        <div class="tw-flex tw-p-1 tw-gap-2  tw-items-start">
-                            <div class="tw-col-span-2">
-                                <img class="tw-h-6 tw-max-w-full tw-max-h-full" src="../../assets/private.svg"
-                                    alt="Private Icon" />
-                            </div>
-                            <div class="tw-col-span-10">
-                                <div class="tw-flex tw-items-center tw-gap-2 tw-pb-1">
-                                    <span class="tw-font-bold">Private</span>
-                                    <span *ngIf="privacy === 'private'"
-                                        class="tw-text-xs tw-bg-purple-100 tw-text-purple-800 tw-border tw-border-apicuron-bright-purple tw-rounded-full tw-px-2 tw-py-0.5">
-                                        Current
-                                    </span>
-                                </div>
-                                <span class="tw-text-sm tw-font-normal tw-text-gray-600">Your profile is only visible to
-                                    you</span>
-                            </div>
-                        </div>
-                        <input type="radio" name="privacy" value="private" id="private" class="peer/private tw-hidden"
-                            formControlName="privacy" />
-                    </label>
+        <!-- Private Button -->
+        <div class="tw-w-full">
+          <label
+            for="private"
+            (click)="selectRadio('private')"
+            class="tw-block tw-cursor-pointer tw-w-full tw-h-full tw-rounded-lg tw-border-2 tw-bg-white tw-p-2 tw-text-sm tw-font-medium tw-shadow-md"
+            [ngClass]="{
+              'tw-border-2 tw-bg-purple-50 tw-border-apicuron-bright-purple':
+                privacy === 'private',
+              'tw-border-gray-100': privacy !== 'private',
+              'tw-opacity-50': privacy !== 'private'
+            }"
+          >
+            <div class="tw-flex tw-p-1 tw-gap-2 tw-items-start">
+              <div class="tw-col-span-2">
+                <img
+                  class="tw-h-6 tw-max-w-full tw-max-h-full"
+                  src="../../assets/private.svg"
+                  alt="Private Icon"
+                />
+              </div>
+              <div class="tw-col-span-10">
+                <div class="tw-flex tw-items-center tw-gap-2 tw-pb-1">
+                  <span class="tw-font-bold">Private</span>
+                  <span
+                    *ngIf="privacy === 'private'"
+                    class="tw-text-xs tw-bg-purple-100 tw-text-purple-800 tw-border tw-border-apicuron-bright-purple tw-rounded-full tw-px-2 tw-py-0.5"
+                  >
+                    Current
+                  </span>
                 </div>
-            </fieldset>
+                <span class="tw-text-sm tw-font-normal tw-text-gray-600"
+                  >Your profile is only visible to you</span
+                >
+              </div>
+            </div>
+            <input
+              type="radio"
+              name="privacy"
+              value="private"
+              id="private"
+              class="peer/private tw-hidden"
+              formControlName="privacy"
+            />
+          </label>
         </div>
+      </fieldset>
+    </div>
 
-        <div class="tw-flex tw-w-full tw-flex-row tw-justify-center tw-py-2">
-            <input type="submit" value="submit"
-                class="tw-cursor-pointer tw-flex tw-w-1/2 sm:tw-w-1/5 tw-rounded-md tw-bg-apicuron-bright-purple tw-px-3.5 tw-pt-2.5 tw-pb-3.5 tw-text-center tw-text-sm tw-font-semibold tw-text-white tw-shadow-sm tw-hover:bg-indigo-500 tw-focus-visible:outline tw-focus-visible:outline-2 tw-focus-visible:outline-offset-2 tw-focus-visible:outline-indigo-600 tw-capitalize">
-        </div>
-    </form>
+    <div class="tw-flex tw-w-full tw-flex-row tw-justify-center tw-py-2">
+      <input
+        type="submit"
+        value="Submit"
+        class="tw-cursor-pointer tw-flex tw-w-1/2 sm:tw-w-1/5 tw-rounded-md tw-bg-apicuron-bright-purple tw-px-3.5 tw-pt-2.5 tw-pb-3.5 tw-text-center tw-text-sm tw-font-semibold tw-text-white tw-shadow-sm tw-hover:bg-indigo-500 tw-focus-visible:outline tw-focus-visible:outline-2 tw-focus-visible:outline-offset-2 tw-focus-visible:outline-indigo-600 tw-capitalize"
+        [ngClass]="{ 'tw-opacity-50 tw-cursor-not-allowed': form.invalid }"
+      />
+    </div>
+  </form>
 </div>
