@@ -10,7 +10,7 @@ import {
 import { AchievementState, PrivacyType } from '../../enums';
 import { IUserResourceEntity } from '../../interfaces/user-resource-entity';
 
-export type LeanBadgeDocument = LeanDocument<BadgeDocument>;
+export type LeanBadgeDocument = LeanDocument<Badge>;
 export type BadgeModel = Model<Badge>;
 export type BadgeDocument = HydratedDocument<Badge>;
 export type BadgeFilter = FilterQuery<Badge>;
@@ -48,7 +48,9 @@ export class Badge implements IUserResourceEntity {
 	resource_id: string;
 
 	@Prop({
-		required: true,
+		required: function () {
+			return !this.assignable;
+		},
 	})
 	count: number;
 	@Prop({
@@ -56,12 +58,16 @@ export class Badge implements IUserResourceEntity {
 	})
 	color_code: string;
 	@Prop({
-		required: true,
+		required: function () {
+			return !this.assignable;
+		},
 	})
 	count_threshold: number;
 
 	@Prop({
-		required: true,
+		required: function () {
+			return !this.assignable;
+		},
 	})
 	list_terms: string[];
 
@@ -77,7 +83,9 @@ export class Badge implements IUserResourceEntity {
 	achieved_at?: Date;
 
 	@Prop({
-		required: true,
+		required: function () {
+			return !this.assignable;
+		},
 		default: 0,
 	})
 	progress_rate: number;
@@ -102,6 +110,12 @@ export class Badge implements IUserResourceEntity {
 		required: false,
 	})
 	endDate?: Date;
+
+	@Prop({
+		required: false,
+		default: false,
+	})
+	assignable?: boolean;
 }
 
 export const BadgeSchema = SchemaFactory.createForClass(Badge).loadClass(Badge);

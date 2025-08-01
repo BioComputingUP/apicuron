@@ -1,26 +1,29 @@
+import { Expose, Type } from 'class-transformer';
 import {
-	IsOptional,
-	Matches,
+	ArrayNotEmpty,
+	IsBoolean,
+	IsDate,
 	IsNotEmpty,
+	IsOptional,
+	IsString,
+	Matches,
 	Min,
 	Validate,
-	IsString,
-	IsDate,
+	ValidateIf,
 } from 'class-validator';
 import { FilterQuery } from 'mongoose';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../../core/schemas/resource/partner-resource.schema';
-import { ResourceIdExists } from '../../resources/partner-resources/validators/resource-id-exists';
-import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
-import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
-import { Expose, Type } from 'class-transformer';
 import {
 	MaxDateField,
 	MinDateField,
 } from '../../medals/validators/date-comparison';
+import { ResourceIdExists } from '../../resources/partner-resources/validators/resource-id-exists';
+import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 import { isSlug } from '../../shared/validators/is-slug.validator';
+import { ActivityTermExists } from '../../terms/validators/activity-term-exists';
 
 export class CreateBadgeDefDto {
 	@IsOptional()
@@ -37,6 +40,7 @@ export class CreateBadgeDefDto {
 	@Expose()
 	color_code: string;
 
+	@ValidateIf((o) => !o.assignable)
 	@Min(1)
 	@IsNotEmpty()
 	@Expose()
@@ -57,9 +61,10 @@ export class CreateBadgeDefDto {
 	@Expose()
 	resource_id: string;
 
-	@Expose()
+	@ValidateIf((o) => !o.assignable)
 	@Validate(ActivityTermExists, [{ each: true }])
-	@IsNotEmpty()
+	@IsNotEmpty({ each: true })
+	@ArrayNotEmpty()
 	@Expose()
 	list_terms: string[];
 
@@ -67,7 +72,7 @@ export class CreateBadgeDefDto {
 		PartnerResource.name,
 		({ league, resource_id }): FilterQuery<PartnerResourceDocument> => {
 			return {
-				leagues: league,
+				'leagues.name': league,
 				resource_id,
 			};
 		},
@@ -77,6 +82,7 @@ export class CreateBadgeDefDto {
 	@Expose()
 	league: string;
 
+	@ValidateIf((o) => !o.assignable)
 	@MaxDateField(['endDate'], true)
 	@IsDate()
 	@IsOptional()
@@ -84,10 +90,16 @@ export class CreateBadgeDefDto {
 	@Expose()
 	startDate: Date;
 
+	@ValidateIf((o) => !o.assignable)
 	@MinDateField(['startDate'], true)
 	@IsDate()
 	@IsOptional()
 	@Type(() => Date)
 	@Expose()
 	endDate: Date;
+
+	@IsBoolean()
+	@IsOptional()
+	@Expose()
+	assignable: boolean;
 }
