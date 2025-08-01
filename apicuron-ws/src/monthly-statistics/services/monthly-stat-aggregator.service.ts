@@ -106,8 +106,8 @@ export class MonthlyStatisticsAggregator implements Aggregator {
 		}
 		await this.recomputeAllResourceAggregates(term.resource_id);
 	}
-	async termDeleted(term_name: string, resource_id: string) {
-		return await this.recomputeAllResourceAggregates(resource_id);
+	async termDeleted(term: TermDocument) {
+		return await this.recomputeAllResourceAggregates(term.resource_id);
 	}
 	async updatedResource(resource: PartnerResourceDocument): Promise<void> {
 		await this.monthlyStatsModel.updateMany(

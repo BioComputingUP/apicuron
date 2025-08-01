@@ -1,32 +1,27 @@
-import {
-	Injectable,
-	InternalServerErrorException,
-	Logger,
-	UnauthorizedException,
-} from '@nestjs/common';
-import { FilterQuery, UpdateQuery } from 'mongoose';
-import { achievements_v1_pipeline } from '../aggregation-pipeline/achievements.pipeline';
-import { browse_v1_pipeline } from '../aggregation-pipeline/browse.pipeline';
-import { User, UserDocument } from '../../../core/schemas/user.schema';
+import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { generateAvatar } from '../generate_avatar';
-import { PrivacyType } from '../../../core/enums';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { UserPrivacyUpdatedEvent } from '../events/update-privacy';
-import {
-	ICreateOrUpdateUser,
-	ICreateUser,
-} from '../dto/create-or-update-user.dto';
-import { ResourceDocument } from '../../../core/schemas/resource/resource.schema';
+import { plainToInstance } from 'class-transformer';
+import { FilterQuery, UpdateQuery } from 'mongoose';
+import { v4 as uuid } from 'uuid';
+import { PrivacyType } from '../../../core/enums';
 import {
 	UserCreatedEvent,
 	UserRepository,
 } from '../../../core/repositories/user.repository';
-import { EmailDto, UpdateProfileDto } from '../dto/update-user.dto';
-import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
-import { v4 as uuid } from 'uuid';
+import { ResourceDocument } from '../../../core/schemas/resource/resource.schema';
+import { User, UserDocument } from '../../../core/schemas/user.schema';
+import { achievements_v1_pipeline } from '../aggregation-pipeline/achievements.pipeline';
+import { browse_v1_pipeline } from '../aggregation-pipeline/browse.pipeline';
+import {
+	ICreateOrUpdateUser,
+	ICreateUser,
+} from '../dto/create-or-update-user.dto';
+import { UpdateProfileDto } from '../dto/update-user.dto';
 import { PrivateUserEntity, UserEntity } from '../dto/user.entity';
-import { plainToInstance } from 'class-transformer';
+import { UserPrivacyUpdatedEvent } from '../events/update-privacy';
+import { generateAvatar } from '../generate_avatar';
 @Injectable()
 export class UsersService {
 	logger = new Logger(UsersService.name);
@@ -151,7 +146,9 @@ export class UsersService {
 		const orcid = receivedOrcid ? orcidOrUser : orcidOrUser.orcid_id;
 
 		const filter = { orcid_id: orcid };
-		const user = await this.userRepository.updateOne(filter, updates);
+		const user = await this.userRepository.updateOne(filter, updates, {
+			new: true,
+		});
 
 		const userEntity = plainToInstance(PrivateUserEntity, user, {
 			excludeExtraneousValues: true,
@@ -219,7 +216,7 @@ export class UsersService {
 		// upsert user
 		const newUser = !!oldUser
 			? await this.updateUser(orcid_id, { $set: data })
-			: await this.createUser({ orcid_id, ...data } as ICreateUser); // TODO: check if this is correct
+			: await this.createUser({ orcid_id, ...data } as ICreateUser);
 
 		if (oldUser?.privacy !== newUser.privacy) {
 			await this.eventEmitter.emitAsync(
@@ -272,24 +269,8 @@ export class UsersService {
 	}
 
 	async updateUserProfile(updates: UpdateProfileDto): Promise<User> {
-		const { orcid_id, email, ...otherUpdates } = updates;
+		const { orcid_id, ...otherUpdates } = updates;
 
-		if (email) {
-			try {
-				await this.handleEmailUpdate(orcid_id, email);
-			} catch (error: unknown) {
-				this.logger.error(`Error updating email for user ${orcid_id}:`, error);
-				if (error instanceof UnauthorizedException) {
-					throw error; // Re-throw UnauthorizedException
-				} else {
-					// Handle other errors, e.g., log them or throw a generic error
-
-					throw new InternalServerErrorException(
-						'An error occurred while updating the email',
-					);
-				}
-			}
-		}
 		const updatedUser = await this.userRepository.findOneAndUpdate(
 			{ orcid_id },
 			{ $set: otherUpdates },
@@ -308,73 +289,5 @@ export class UsersService {
 			);
 		}
 		return updatedUser;
-	}
-
-	private async handleEmailUpdate(
-		orcid_id: string,
-		emailEntry: EmailDto,
-	): Promise<void> {
-		if (!emailEntry?.email) {
-			throw new UnauthorizedException('Email address is required');
-		}
-
-		const emailMatchedUser = await this.userRepository.findOne({
-			emails: { $elemMatch: { email: emailEntry.email } },
-		});
-
-		if (emailMatchedUser) {
-			if (emailMatchedUser.orcid_id !== orcid_id) {
-				// Email belongs to another user
-				throw new UnauthorizedException(
-					'The provided email is already used by another user',
-				);
-			} else {
-				// Update existing email for the same user
-				// Find the current email object to get the original email for the array filter
-				const currentUser = await this.userRepository.findOne({ orcid_id });
-				if (!currentUser) {
-					throw new UnauthorizedException('User not found');
-				}
-
-				// Find the existing email object that matches the new email
-				const existingEmailObj = currentUser.emails?.find(
-					(e) => e.email === emailEntry.email,
-				);
-
-				if (existingEmailObj) {
-					// Update the existing email object
-					await this.userRepository.findOneAndUpdate(
-						{ orcid_id },
-						{
-							$set: {
-								// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-								'emails.$[elem]': {
-									...existingEmailObj.toObject(),
-									...emailEntry,
-								},
-							},
-						},
-						{
-							arrayFilters: [{ 'elem.email': emailEntry.email }],
-							new: true,
-						},
-					);
-				}
-			}
-		} else {
-			// Add new email
-			await this.userRepository.findOneAndUpdate(
-				{ orcid_id },
-				{
-					$push: {
-						emails: {
-							...emailEntry,
-							verified: false,
-						},
-					},
-				},
-				{ new: true },
-			);
-		}
 	}
 }

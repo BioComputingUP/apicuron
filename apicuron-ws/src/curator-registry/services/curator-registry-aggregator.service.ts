@@ -99,6 +99,6 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 		return;
 	}
 	async updatedResource(resource: PartnerResourceDocument): Promise<void> {
-		await his.registryService.updateResource(resource);
+		await this.registryService.updateResource(resource);
 	}
 }

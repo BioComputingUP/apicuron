@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
-import { MongoServerError, MongoWriteConcernError } from 'mongodb';
-import { FilterQuery, Model, UpdateWriteOpResult } from 'mongoose';
+import { MongoServerError } from 'mongodb';
+import { FilterQuery, UpdateWriteOpResult } from 'mongoose';
 import { AchievementState, PrivacyType } from '../../core/enums';
 import {
 	BadgeDef,
@@ -307,17 +307,13 @@ export class BadgeAggregatorService implements Aggregator {
 	async termUpdated() {
 		return;
 	}
-	async termDeleted(
-		term_name: string,
-		resource_id: string,
-		league_name: string,
-	) {
+	async termDeleted(term: TermDocument) {
 		// Retrieve the list of badge definitions that are effected by the term deletion
 		const affectedBadges = await this.badgeDefModel.find(
 			{
-				resource_id: resource_id,
-				league: league_name,
-				list_terms: term_name,
+				resource_id: term.resource_id,
+				league: term.league,
+				list_terms: term.activity_term,
 			},
 			{ _id: 1 },
 		);
@@ -329,12 +325,12 @@ export class BadgeAggregatorService implements Aggregator {
 		// Remove the term from the list of terms in the badge definitions
 		await this.badgeDefModel.updateMany(
 			{
-				resource_id: resource_id,
-				league: league_name,
-				list_terms: term_name,
+				resource_id: term.resource_id,
+				league: term.league,
+				list_terms: term.activity_term,
 			},
 			{
-				$pull: { list_terms: term_name },
+				$pull: { list_terms: term.activity_term },
 			},
 		);
 		// Recompute the badges that are affected by the term deletion

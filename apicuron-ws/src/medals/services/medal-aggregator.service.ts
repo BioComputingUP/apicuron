@@ -235,17 +235,13 @@ export class MedalAggregatorService implements Aggregator {
 		);
 	}
 
-	async termDeleted(
-		term_name: string,
-		resource_id: string,
-		league_name: string,
-	) {
+	async termDeleted(term: TermDocument) {
 		// retrieve the list of medal definitions that are affected by the term deletion
 		const affectedMedalDefs = await this.medalDefModel.find(
 			{
-				resource_id: resource_id,
-				league: league_name,
-				list_terms: term_name,
+				resource_id: term.resource_id,
+				league: term.league,
+				list_terms: term.activity_term,
 			},
 			{ _id: 1 },
 		);
@@ -260,12 +256,12 @@ export class MedalAggregatorService implements Aggregator {
 		// remove the term from the list of terms in the medal definitions
 		await this.medalDefModel.updateMany(
 			{
-				resource_id: resource_id,
-				league: league_name,
-				list_terms: term_name,
+				resource_id: term.resource_id,
+				league: term.league,
+				list_terms: term.activity_term,
 			},
 			{
-				$pull: { list_terms: term_name },
+				$pull: { list_terms: term.activity_term },
 			},
 		);
 

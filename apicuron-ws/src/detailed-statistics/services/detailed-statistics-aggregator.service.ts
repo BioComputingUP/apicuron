@@ -59,15 +59,11 @@ export class DetailedStatisticsAggregatorService implements Aggregator {
 		return updates.reduce((acc, cur) => acc + cur.modifiedCount, 0);
 	}
 
-	async termDeleted(
-		term_name: string,
-		resource_id: string,
-		league_name: string,
-	) {
+	async termDeleted(term: TermDocument) {
 		return await this.computeDetailedStats.reComputeStatsRelatedToTerm(
-			term_name,
-			resource_id,
-			league_name,
+			term.activity_term,
+			term.resource_id,
+			term.league,
 		);
 	}
 	async termUpdated(oldTerm: TermDocument, term: TermDocument) {

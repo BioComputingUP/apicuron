@@ -209,10 +209,10 @@ export class ReportAggregatorService implements Aggregator {
 			{ $set: { term: term } },
 		);
 	}
-	async termDeleted(term_name: string, resource_id: string) {
+	async termDeleted(term: TermDocument) {
 		await this.reportModel.deleteMany({
-			activity_term: term_name,
-			resource_id: resource_id,
+			activity_term: term.activity_term,
+			resource_id: term.resource_id,
 		});
 	}
 	async updatedResource(resource: PartnerResource): Promise<void> {

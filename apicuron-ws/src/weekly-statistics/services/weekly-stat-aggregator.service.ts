@@ -57,8 +57,8 @@ export class WeeklyStatisticsAggregatorService implements Aggregator {
 		);
 	}
 
-	async termDeleted(term_name: string, resource_id: string) {
-		return await this.recomputeAllResourceAggregates(resource_id);
+	async termDeleted(term: TermDocument) {
+		return await this.recomputeAllResourceAggregates(term.resource_id);
 	}
 	async termUpdated(oldTerm: TermDocument, term: TermDocument) {
 		if (oldTerm.score == term.score) {

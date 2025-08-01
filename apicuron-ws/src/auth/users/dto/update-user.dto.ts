@@ -1,19 +1,19 @@
+import { Type } from 'class-transformer';
 import {
+	IsBoolean,
 	IsEmail,
+	IsEnum,
 	IsIn,
 	IsNotEmpty,
 	IsOptional,
 	IsString,
 	Validate,
-	IsBoolean,
 	ValidateNested,
-	IsEnum,
-	isNotEmpty,
 } from 'class-validator';
-import { User } from '../../../core/schemas/user.schema';
-import { OrcidChecksum } from '../../../submit-reports/validators/orcid-checksum';
-import { EntryExistsRule } from '../../../shared/validators/entry-exists.validator';
 import { VisibilityType } from 'src/core/enums';
+import { User } from '../../../core/schemas/user.schema';
+import { EntryExistsRule } from '../../../shared/validators/entry-exists.validator';
+import { OrcidChecksum } from '../../../submit-reports/validators/orcid-checksum';
 
 export class EmailDto {
 	@IsEmail()
@@ -75,9 +75,10 @@ export class UpdateProfileDto {
 	@IsNotEmpty()
 	orcid_id: string;
 
-	@ValidateNested()
+	@ValidateNested({ each: true })
+	@Type(() => EmailDto)
 	@IsOptional()
-	email: EmailDto;
+	emails: EmailDto[];
 
 	@IsIn(['private', 'public'])
 	@IsString()
