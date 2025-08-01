@@ -1,36 +1,34 @@
-import { BrowserModule } from "@angular/platform-browser";
-import { NgModule, APP_ID } from "@angular/core";
-import { RouterModule } from "@angular/router";
 import { HttpClientModule } from "@angular/common/http";
+import { APP_ID, NgModule } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { RouterModule } from "@angular/router";
+import { AngularSvgIconModule } from "angular-svg-icon";
+import { ToastrModule } from "ngx-toastr";
+import { SentryModuleConfig } from "../config/sentry.config";
+import { NavbarComponent } from "./alt-navbar/alt-navbar.component";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
-import { FootComponent } from "./foot/foot.component";
-import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
-import { NavbarComponent } from "./alt-navbar/alt-navbar.component";
-import { IndexModule } from "./index/index.module";
 import { AuthModule } from "./auth/auth.module";
-import { ToastrModule } from "ngx-toastr";
-import { AngularSvgIconModule } from "angular-svg-icon";
-import { MainLayoutComponent } from "./main-layout/main-layout.component";
 import { AuthDropdownComponent } from "./components/auth-dropdown/auth-dropdown.component";
+import { FootComponent } from "./foot/foot.component";
+import { IndexModule } from "./index/index.module";
+import { MainLayoutComponent } from "./main-layout/main-layout.component";
 import { NotificationsDataModule } from "./notifications-data/notifications-data.module";
-import { SentryModuleConfig } from "../config/sentry.config";
-import { FormsModule } from "@angular/forms";
+import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
 
-import { FirstLoginDialog } from "./first-login/first-login.component";
 import { DialogModule } from "@angular/cdk/dialog";
 import { ReactiveFormsModule } from "@angular/forms";
-import { FirstPopupComponent } from "./first-login/first-popup/first-popup.component";
-import { DashboardModule } from "./dashboard/dashboard.module";
-import { ErrorMessagePipe } from "./components/utils/error-messages/error-messages.pipe";
-import { MatomoConsentRequirement, MatomoModule } from "ngx-matomo-client";
-import { MatomoRouterModule } from "ngx-matomo-client";
-import { OrcidToUrl } from "./shared/orcid-to-url.pipe";
-import { SharedUtilsModule } from "./shared/shared-utils.module";
 import { NgcCookieConsentModule } from "ngx-cookieconsent";
+import { MatomoModule, MatomoRouterModule } from "ngx-matomo-client";
 import { cookieConfig } from "../config/cookies.config";
 import { CookieManagerService } from "./cookie-manager/cookie-manager.service";
+import { DashboardModule } from "./dashboard/dashboard.module";
+import { FirstLoginDialog } from "./first-login/first-login.component";
+import { FirstPopupComponent } from "./first-login/first-popup/first-popup.component";
+import { OrcidToUrl } from "./shared/orcid-to-url.pipe";
+import { SharedUtilsModule } from "./shared/shared-utils.module";
 @NgModule({
   declarations: [
     AppComponent,
