@@ -1,9 +1,22 @@
 import {
-	Body, Controller, Delete, Get, Param, Post, Put, Query, Req, SerializeOptions
+	Body,
+	Controller,
+	Delete,
+	Get,
+	Param,
+	Post,
+	Put,
+	Query,
+	Req,
+	SerializeOptions
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
-	ApiHeader, ApiOkResponse, ApiOperation, ApiSecurity, ApiTags
+	ApiHeader,
+	ApiOkResponse,
+	ApiOperation,
+	ApiSecurity,
+	ApiTags,
 } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 import { AuthService } from '../../auth/auth.service';
@@ -14,11 +27,13 @@ import { User } from '../../core/schemas/user.schema';
 import { paginate, Paginated } from '../../pagination/paginator';
 import { VersionHeader } from '../../plugins/swagger/config';
 import { resourceEntityPrivacyFilter } from '../../util/privacy.helper';
-import { BadgeDefDto } from '../dto/badge.dto';
+import { AssignBadgeDto } from '../dto/assign-badge.dto';
+import { AssignableBadgeDto, BadgeDefDto } from '../dto/badge.dto';
 import { CreateBadgeDefDto } from '../dto/create-badge-def.dto';
 import { DeleteBadgeDefDto } from '../dto/delete-badge-def.dto';
 import { BadgeDefFilter } from '../dto/filter-badge-def.dto';
 import { UpdateBadgeDefDto } from '../dto/update-badge-def.dto';
+import { AssignableBadgesService } from '../services/assignable-badges.service';
 import { BadgeDefCommandsService } from '../services/badge-def-commands.service';
 import { BadgeDefQueriesService } from '../services/badge-def-queries.service';
 
@@ -32,11 +47,12 @@ export class BadgesDefController {
 	constructor(
 		protected badgeDefCommands: BadgeDefCommandsService,
 		protected badgeDefQueries: BadgeDefQueriesService,
+		protected assignableBadgesService: AssignableBadgesService,
 		protected authService: AuthService,
 		protected eventEmitter: EventEmitter2,
 	) {}
 
-	private can_edit_resource(user, resource_id) {
+	private can_edit_resource(user: User, resource_id: string) {
 		return this.authService.user_has_resource(user, resource_id);
 	}
 
@@ -51,9 +67,11 @@ export class BadgesDefController {
 	// nest decorators
 	@Post()
 	@AuthProtected()
+	@SerializeOptions({ type: BadgeDefDto })
 	async create_badge(@Body() badge: CreateBadgeDefDto, @Req() req) {
 		this.can_edit_resource(req.user, badge.resource_id);
-		return await this.badgeDefCommands.createBadgeDef(badge);
+		const res =  await this.badgeDefCommands.createBadgeDef(badge);
+		return res;
 	}
 
 	@ApiOperation({
@@ -125,5 +143,45 @@ export class BadgesDefController {
 		});
 
 		return badgeDefEntity;
+	}
+
+	@ApiOperation({
+		summary: 'Assign a manually assignable badge to a list of users',
+	})
+	@ApiOkResponse({
+		description: 'The badge definition with the assigned users',
+		type: AssignableBadgeDto,
+	})
+	@ApiSecurity('basic')
+	@Post('assign-badge')
+	@SerializeOptions({ type: AssignableBadgeDto })
+	@AuthProtected()
+	assignBadgetoUsers(
+		@Body() assignBadge: AssignBadgeDto,
+		@Req() req
+	) {
+
+		this.can_edit_resource(req.user, assignBadge.resource_id)
+		return this.assignableBadgesService.assign_badge_to_users(assignBadge)
+
+	}
+
+	@ApiOperation({
+		summary: 'Unassign a manually assignable badge from a list of users',
+	})
+	@ApiOkResponse({
+		description: 'The badge definition with the unassigned users',
+		type: AssignableBadgeDto,
+	})
+	@ApiSecurity('basic')
+	@Delete('withdraw-badge')
+	@SerializeOptions({ type: AssignableBadgeDto })
+	@AuthProtected()
+	unassignBadgeFromUsers(
+		@Body() assignBadge: AssignBadgeDto,
+		@Req() req
+	) {
+		this.can_edit_resource(req.user, assignBadge.resource_id)
+		return this.assignableBadgesService.withdraw_badge_from_user(assignBadge)
 	}
 }

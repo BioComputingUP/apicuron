@@ -243,7 +243,7 @@ export class BadgeAggregatorService implements Aggregator {
 		badgeDefFilter: FilterQuery<BadgeDefDocument> = {},
 	): Promise<{ badgeCount: number; badgeDefsCount: number }> {
 		let badgeDefCount = 0;
-
+		let assignedBadgesCount = 0;
 		const badgeDefs = this.badgeDefModel
 			.find(
 				badgeDefFilter,
@@ -254,24 +254,34 @@ export class BadgeAggregatorService implements Aggregator {
 			)
 			.cursor({ batchSize: 100 });
 
-		const userBadgesPromises$ = [];
+		const userBadgesPromises$: Promise<BadgeDocument[]>[] = [];
 
 		for await (const badgeDef of badgeDefs) {
 			badgeDefCount++;
+			if (!badgeDef.assignable) {
+				const badges = this.computeBadges.produceBadgesFromDef(badgeDef);
 
-			const badges = this.computeBadges.produceBadgesFromDef(badgeDef);
+				const badges$: Promise<BadgeDocument>[] = [];
+				for await (const badge of badges) {
+					const computeBadge$ = this.badgeModel.create(badge);
+					badges$.push(computeBadge$);
+				}
 
-			const badges$ = [];
-			for await (const badge of badges) {
-				const computeBadge$ = this.badgeModel.create(badge);
-				badges$.push(computeBadge$);
+				userBadgesPromises$.push(Promise.all(badges$));
+
+				this.logger.log(
+					`Badge ${badgeDef.name} computed for ${badges$.length} users`,
+				);
+			} else {
+				const user_orcids = badgeDef.assigned_to;
+				assignedBadgesCount = await this.computeBadges.createAssignedBadges(
+					badgeDef,
+					user_orcids,
+				);
+				this.logger.log(
+					`Assigned ${assignedBadgesCount} badges for ${badgeDef.name}`,
+				);
 			}
-
-			userBadgesPromises$.push(Promise.all(badges$));
-
-			this.logger.log(
-				`Badge ${badgeDef.name} computed for ${badges$.length} users`,
-			);
 		}
 
 		await Promise.all(userBadgesPromises$);
@@ -279,7 +289,7 @@ export class BadgeAggregatorService implements Aggregator {
 		this.logger.log(`Computed ${userBadgesPromises$.length} badges`);
 
 		return {
-			badgeCount: userBadgesPromises$.length,
+			badgeCount: userBadgesPromises$.length + assignedBadgesCount,
 			badgeDefsCount: badgeDefCount,
 		};
 	}

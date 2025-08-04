@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { uuid } from 'uuidv4';
@@ -41,7 +41,8 @@ export class AuthService {
 
 	public user_has_resource(user, resource_id) {
 		// get the resources list that belong to the current user
-		const user_resources: Array<{ resource_id: string }> = user.resources;
+		const user_resources: Array<{ resource_id: string }> =
+			user?.resources ?? [];
 		// check if the resource belongs to the user
 		const resource_found = user_resources.find(
 			(resource) => resource.resource_id == resource_id,
