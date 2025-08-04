@@ -12,7 +12,7 @@ import {
 } from 'class-validator';
 import { FilterQuery } from 'mongoose';
 
-import { Type } from 'class-transformer';
+import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
@@ -73,6 +73,26 @@ export class UpdatePartnerResourceDto {
 
 	@IsOptional()
 	@ValidateNested()
+	@Transform(({ value }) => {
+		// multipart/form-data sends nested objects as stringified JSON.
+		// `plainToInstance` is then required to convert the parsed object
+		// into a class instance, enabling nested validation to work correctly.
+		if (typeof value === 'string') {
+			try {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+				const parsed = JSON.parse(value);
+				const instance = plainToInstance(LeaderboardSettingsDto, parsed, {
+					excludeExtraneousValues: true,
+					enableCircularCheck: true,
+				});
+				return instance;
+			} catch (e) {
+				return value;
+			}
+		}
+		return value;
+	})
 	@Type(() => LeaderboardSettingsDto)
-	leaderboardPreferences?: LeaderboardSettingsDto;
+	@Expose()
+	leaderboard_preferences?: LeaderboardSettingsDto;
 }

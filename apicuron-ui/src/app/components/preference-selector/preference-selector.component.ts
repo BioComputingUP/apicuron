@@ -20,10 +20,10 @@ import {
     },
   ],
 })
-export class PreferenceSelectorComponent<T extends string>
+export class PreferenceSelectorComponent<T extends string = string>
   implements ControlValueAccessor
 {
-  @Input() preferences: T[];
+  @Input() preferences: readonly T[];
 
   selectedPreferences: readonly T[] = [];
 

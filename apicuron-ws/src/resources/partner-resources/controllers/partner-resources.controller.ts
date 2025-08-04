@@ -151,6 +151,12 @@ export class PartnerResourcesController {
 		@UploadedFile(ResourceLogoValidationPipe(), SvgSanitationValidationPipe)
 		logo: Express.Multer.File,
 	) {
+		this.logger.debug(
+			`received leaderboard prefs: ${JSON.stringify(
+				update_resource.leaderboard_preferences,
+			)}`,
+		);
+
 		const { resource_id } = update_resource;
 		let res: PartnerResourceDocument;
 		// check if the user has a permission to edit the PartnerResource

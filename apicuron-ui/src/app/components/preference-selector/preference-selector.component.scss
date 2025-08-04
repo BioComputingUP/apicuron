@@ -1,9 +1,10 @@
 .option[aria-selected='true'] {
-  background-color: #e0f7fa;
-  color: #006064;
+  background-color: #d6bfec;
+  color: #4a154b;
   position: relative;
   padding-left: 25px;
-transition: color 1s, background-color 1s;
+  
+transition: color 0.01s, background-color 0.01s;
 }
 .option[aria-selected='true']::before {
   content: '';

@@ -160,14 +160,41 @@
       </div>
     </div>
     <hr />
-    <label for="totalLeaderBoardPreferences"
-      >Total Leader Board Preferences</label
+    <label for="leaderboard_preferences">Leaderboard Preferences</label>
+    <div
+      formGroupName="leaderboard_preferences"
+      class="tw-flex tw-flex-row tw-gap-4 tw-w-full tw-flex-1"
     >
-    <preference-selector
-      [preferences]="allTotalLeaderBoardPreferences"
-      formControlName="totalLeaderBoardPreferences"
-    >
-    </preference-selector>
+      <!-- Monthly preferences -->
+      <div class="tw-flex-1">
+        <label>Monthly Preferences</label>
+        <preference-selector
+          formControlName="monthly"
+          [preferences]="all_lb_preferences.monthly"
+        >
+        </preference-selector>
+      </div>
+
+      <!-- Weekly preferences -->
+      <div class="tw-flex-1">
+        <label>Weekly Preferences</label>
+        <preference-selector
+          formControlName="weekly"
+          [preferences]="all_lb_preferences.weekly"
+        >
+        </preference-selector>
+      </div>
+
+      <!-- Total preferences -->
+      <div class="tw-flex-1">
+        <label>Total Preferences</label>
+        <preference-selector
+          formControlName="total"
+          [preferences]="all_lb_preferences.total"
+        >
+        </preference-selector>
+      </div>
+    </div>
   </form>
 </div>
 

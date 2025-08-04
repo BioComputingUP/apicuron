@@ -107,12 +107,12 @@ export class PartnerResource {
 	allowedUrlsPrefix: string[];
 
 	@Prop({ required: false, type: LeaderboardSettings })
-	leaderboardPreferences: LeaderboardSettings;
+	leaderboard_preferences: LeaderboardSettings;
 
 	getLeaderBoardSettings<T extends LeaderboardType>(
 		leaderboardType: T,
 	): LeaderboardSettings[T] {
-		return this.leaderboardPreferences[leaderboardType];
+		return this.leaderboard_preferences[leaderboardType];
 	}
 
 	getLeague(leagueName: string): League {

@@ -6,7 +6,12 @@
     (cdkListboxValueChange)="onSelectionChange($event.value)"
   >
     @for (preference of preferences; track preference){
-    <li [cdkOption]="preference" class="option">{{ preference }}</li>
+    <li
+      [cdkOption]="preference"
+      class="option tw-cursor-pointer hover:tw-bg-purple-100"
+    >
+      {{ preference }}
+    </li>
     }
   </ul>
   <p>Selected Preferences: {{ selectedPreferences.join(", ") }}</p>

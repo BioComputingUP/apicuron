@@ -3,6 +3,11 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { MessageService } from "primeng/api";
+import {
+  MonthlyLeaderboardColumns,
+  TotalLeaderboardColumns,
+  WeeklyLeaderboardColumns,
+} from "projects/apicuron-util/src/lib/leaderboard/interfaces/leaderboard-columns.types";
 import { BehaviorSubject, combineLatest, Observable, Subject } from "rxjs";
 import {
   catchError,
@@ -38,7 +43,11 @@ export class DatabaseUpdateComponent implements OnDestroy {
   blocked$ = new BehaviorSubject<Boolean>(false);
   destroy$ = new Subject<Boolean>();
 
-  allTotalLeaderBoardPreferences = ["option1", "option2", "option3"];
+  all_lb_preferences = {
+    monthly: MonthlyLeaderboardColumns,
+    weekly: WeeklyLeaderboardColumns,
+    total: TotalLeaderboardColumns,
+  };
   // @ViewChild("fileUploadElement", { static: false })
   // fileInputElement: ElementRef<HTMLInputElement>;
 
@@ -91,10 +100,11 @@ export class DatabaseUpdateComponent implements OnDestroy {
             ),
           ],
         ],
-        totalLeaderBoardPreferences: [
-          ["option1", "option2"],
-          [Validators.required],
-        ],
+        leaderboard_preferences: this.formBuilder.group({
+          monthly: [[], [Validators.required]],
+          weekly: [[], [Validators.required]],
+          total: [[], [Validators.required]],
+        }),
       },
       { validators: Validators.required, updateOn: "change" }
     );
@@ -104,6 +114,9 @@ export class DatabaseUpdateComponent implements OnDestroy {
       }),
       shareReplay(),
       tap(async (resource: Resource) => {
+        // const leaderBoardPrefs = this.parseLeaderBoardPreferences(
+        //   resource.leaderboard_preferences
+        // );
         this.form.setValue({
           ...resource.serialize(),
           logo: null,
@@ -119,7 +132,7 @@ export class DatabaseUpdateComponent implements OnDestroy {
         if (changes && changes instanceof File) {
           const url = URL.createObjectURL(changes);
           const safeUrl = this.sanitizer.bypassSecurityTrustUrl(url);
-          console.log({ url, safeUrl });
+
           return safeUrl;
         } else {
           return resource.logo.href;
@@ -137,11 +150,16 @@ export class DatabaseUpdateComponent implements OnDestroy {
   }
 
   submit() {
-    const formValue: FormData = this.form.value;
+    const formValue = this.form.value;
+
     this.blocked$.next(true);
+    const resourceData = {
+      ...formValue,
+      logo: undefined,
+    };
     this.resourceService
       .updateResource(
-        new Resource().deserialize(formValue),
+        new Resource().deserialize(resourceData),
         this.form.get("logo").value
       )
       .pipe(

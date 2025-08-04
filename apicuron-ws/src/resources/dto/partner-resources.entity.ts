@@ -69,5 +69,5 @@ export class PartnerResourceEntity extends SelectPartnerResourceDto {
 
 	@Expose()
 	@Type(() => LeaderboardSettingsDto)
-	leaderboardPreferences: LeaderboardSettingsDto;
+	leaderboard_preferences: LeaderboardSettingsDto;
 }
