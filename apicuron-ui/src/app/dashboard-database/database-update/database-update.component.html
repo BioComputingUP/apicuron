@@ -160,14 +160,19 @@
       </div>
     </div>
     <hr />
-    <label for="leaderboard_preferences">Leaderboard Preferences</label>
-    <div
-      formGroupName="leaderboard_preferences"
-      class="tw-flex tw-flex-row tw-gap-4 tw-w-full tw-flex-1"
+    <label for="leaderboard_preferences" class="tw-font-bold tw-text-lg tw-mb-2"
+      >Leaderboard Preferences</label
     >
+    <div formGroupName="leaderboard_preferences" class="leaderboard-main">
       <!-- Monthly preferences -->
-      <div class="tw-flex-1">
-        <label>Monthly Preferences</label>
+      <div class="leaderboard-section">
+        <div class="leaderboard-section-title">
+          <svg-icon
+            src="assets/svg/month.svg"
+            svgClass="tw-w-8 tw-h-8 tw-fill-apicuron-bright-purple tw-mr-2"
+          />
+          <label>Monthly Leaderboard Columns</label>
+        </div>
         <preference-selector
           formControlName="monthly"
           [preferences]="all_lb_preferences.monthly"
@@ -176,8 +181,14 @@
       </div>
 
       <!-- Weekly preferences -->
-      <div class="tw-flex-1">
-        <label>Weekly Preferences</label>
+      <div class="leaderboard-section">
+        <div class="leaderboard-section-title">
+          <svg-icon
+            src="assets/svg/week.svg"
+            svgClass="tw-w-8 tw-h-8 tw-fill-apicuron-bright-purple tw-mr-2"
+          />
+          <label>Weekly Leaderboard Columns</label>
+        </div>
         <preference-selector
           formControlName="weekly"
           [preferences]="all_lb_preferences.weekly"
@@ -186,8 +197,14 @@
       </div>
 
       <!-- Total preferences -->
-      <div class="tw-flex-1">
-        <label>Total Preferences</label>
+      <div class="leaderboard-section">
+        <div class="leaderboard-section-title">
+          <svg-icon
+            src="assets/svg/total.svg"
+            svgClass="tw-w-8 tw-h-8 tw-fill-apicuron-bright-purple tw-mr-2"
+          />
+          <label>Total Leaderboard Columns</label>
+        </div>
         <preference-selector
           formControlName="total"
           [preferences]="all_lb_preferences.total"

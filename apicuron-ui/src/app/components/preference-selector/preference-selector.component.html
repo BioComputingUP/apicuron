@@ -1,4 +1,4 @@
-<div>
+<div class="tw-mt-4">
   <ul
     cdkListbox
     cdkListboxMultiple
@@ -8,11 +8,14 @@
     @for (preference of preferences; track preference){
     <li
       [cdkOption]="preference"
-      class="option tw-cursor-pointer hover:tw-bg-purple-100"
+      class="option tw-cursor-pointer hover:tw-bg-purple-100 tw-p-2 tw-m-1 tw-rounded-md tw-text-gray-700 tw-font-medium"
     >
       {{ preference }}
     </li>
     }
   </ul>
-  <p>Selected Preferences: {{ selectedPreferences.join(", ") }}</p>
+  <hr class="tw-my-4" />
+  <p class="tw-mt-2 tw-text-gray-400">
+    Selected Preferences: {{ selectedPreferences.join(", ") }}
+  </p>
 </div>
