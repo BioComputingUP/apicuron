@@ -26,17 +26,20 @@ export class PreferenceSelectorComponent<T extends string = string>
   @Input() preferences: readonly T[];
 
   selectedPreferences: readonly T[] = [];
+  allSelected = false;
 
   private onChange = (value: readonly T[]) => {};
   private onTouched = () => {};
 
   onSelectionChange(value: readonly T[]) {
+    this.allSelected = value && value.length === this.preferences.length;
     this.selectedPreferences = value;
     this.onChange(value);
     this.onTouched();
   }
 
   writeValue(value: readonly T[]): void {
+    this.allSelected = value && value.length === this.preferences.length;
     this.selectedPreferences = value || [];
   }
   registerOnChange(fn: (value: readonly T[]) => void): void {
@@ -47,9 +50,10 @@ export class PreferenceSelectorComponent<T extends string = string>
     this.onTouched = fn;
   }
 
-  selectAll() {
-    this.selectedPreferences = this.preferences;
-    this.onChange(this.selectedPreferences);
-    this.onTouched();
+  toggleSelection() {
+    this.selectedPreferences = this.allSelected ? [] : this.preferences;
+    this.allSelected =
+      this.selectedPreferences.length === this.preferences.length;
+    this.onSelectionChange(this.selectedPreferences);
   }
 }
