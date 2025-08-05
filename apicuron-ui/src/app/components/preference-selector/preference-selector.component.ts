@@ -46,4 +46,10 @@ export class PreferenceSelectorComponent<T extends string = string>
   registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
+
+  selectAll() {
+    this.selectedPreferences = this.preferences;
+    this.onChange(this.selectedPreferences);
+    this.onTouched();
+  }
 }
