@@ -126,15 +126,15 @@ export class LeaderboardPreferences {
   parseIntoOptions(): LeaderboardOptions {
     const options: LeaderboardOptions = [];
 
-    if (this.monthly) {
+    if (this.monthly && this.monthly.length > 0) {
       options.push(["monthly-leaderboard", this.monthly]);
     }
 
-    if (this.weekly) {
+    if (this.weekly && this.weekly.length > 0) {
       options.push(["weekly-leaderboard", this.weekly]);
     }
 
-    if (this.total) {
+    if (this.total && this.total.length > 0) {
       options.push(["total-leaderboard", this.total]);
     }
     return options;

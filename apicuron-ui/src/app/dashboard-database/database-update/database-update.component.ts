@@ -101,9 +101,9 @@ export class DatabaseUpdateComponent implements OnDestroy {
           ],
         ],
         leaderboard_preferences: this.formBuilder.group({
-          monthly: [[], [Validators.required]],
-          weekly: [[], [Validators.required]],
-          total: [[], [Validators.required]],
+          monthly: [[], []],
+          weekly: [[], []],
+          total: [[], []],
         }),
       },
       { validators: Validators.required, updateOn: "change" }
