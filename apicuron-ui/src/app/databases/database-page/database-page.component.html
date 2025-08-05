@@ -78,21 +78,10 @@
           </div>
         </div>
 
-        <div>
+        <div *ngIf="leaderboardOptions$ | async as leaderboardOptions">
           <resource-leaderboard
             [resource]="resource"
-            [options]="[
-              [
-                'monthly-leaderboard',
-                [
-                  'Contributor',
-                  'Total Score',
-                  'Ranking',
-                  'last Contribution Date'
-                ]
-              ],
-              ['total-leaderboard', ['Contributor', 'Medals', 'Badges']]
-            ]"
+            [options]="leaderboardOptions"
           ></resource-leaderboard>
         </div>
 

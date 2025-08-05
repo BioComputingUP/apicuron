@@ -4,6 +4,7 @@ import {
   TotalLeaderboardColumns,
   WeeklyLeaderboardColumns,
 } from "projects/apicuron-util/src/lib/leaderboard/interfaces/leaderboard-columns.types";
+import { LeaderboardOptions } from "projects/apicuron-util/src/lib/leaderboard/interfaces/leaderboard-options";
 import {
   Deserializable,
   Serializable,
@@ -44,7 +45,11 @@ export class Resource implements Deserializable, Serializable {
       resource_uri: this.resource_uri.href,
       resource_url: this.resource_url.href,
       color: this.color,
-      leaderboard_preferences: this.leaderboard_preferences,
+      leaderboard_preferences: {
+        monthly: this.leaderboard_preferences.monthly,
+        weekly: this.leaderboard_preferences.weekly,
+        total: this.leaderboard_preferences.total,
+      },
     };
   }
   deserialize(input: any): this {
@@ -57,7 +62,9 @@ export class Resource implements Deserializable, Serializable {
     this.resource_url = new URL(input.resource_url);
     this.color = input.color;
     this.joined_date = new Date(input.joined_date);
-    this.leaderboard_preferences = input.leaderboard_preferences;
+    this.leaderboard_preferences = new LeaderboardPreferences().deserialize(
+      input.leaderboard_preferences || {}
+    );
     if (input.stats) {
       this.stats = new ResourceStats().deserialize(input.stats);
       this.lastSubmissionDate = _.max([
@@ -104,8 +111,32 @@ export class Resource implements Deserializable, Serializable {
   leaderboard_preferences: LeaderboardPreferences;
 }
 
-export interface LeaderboardPreferences {
+export class LeaderboardPreferences {
   monthly?: MonthlyLeaderboardColumns[];
   weekly?: WeeklyLeaderboardColumns[];
   total?: TotalLeaderboardColumns[];
+
+  deserialize(input: any): this {
+    this.monthly = input.monthly;
+    this.weekly = input.weekly;
+    this.total = input.total;
+    return this;
+  }
+
+  parseIntoOptions(): LeaderboardOptions {
+    const options: LeaderboardOptions = [];
+
+    if (this.monthly) {
+      options.push(["monthly-leaderboard", this.monthly]);
+    }
+
+    if (this.weekly) {
+      options.push(["weekly-leaderboard", this.weekly]);
+    }
+
+    if (this.total) {
+      options.push(["total-leaderboard", this.total]);
+    }
+    return options;
+  }
 }
