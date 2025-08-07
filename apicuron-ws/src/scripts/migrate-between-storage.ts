@@ -57,4 +57,7 @@ async function migrateAll() {
 	}
 }
 
-migrateAll();
+if (require.main === module) {
+	// If this script is run directly, execute the migration
+	migrateAll();
+}
