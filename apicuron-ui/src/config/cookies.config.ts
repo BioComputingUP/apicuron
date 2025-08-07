@@ -3,7 +3,7 @@ import { environment } from "src/environments/environment";
 
 export const cookieConfig: NgcCookieConsentConfig = {
   cookie: {
-    domain: environment.host,
+    domain: environment.domain,
   },
   position: "top-left",
   palette: {
@@ -23,7 +23,7 @@ export const cookieConfig: NgcCookieConsentConfig = {
     allow: "Allow cookies",
     deny: "Decline",
     link: "Learn more",
-    policy: " ",
+    policy: "Privacy Policy",
     href: environment.host + "/about#privacy", // Link to your cookie policy
   },
 };
