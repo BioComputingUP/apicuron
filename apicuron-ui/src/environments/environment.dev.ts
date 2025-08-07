@@ -3,6 +3,7 @@ export const environment = {
   env: "development",
 
   // ws: window.location.protocol + '//' + window.location.hostname + '/api/',
+  domain: "dev.apicuron.org",
   host: "https://dev.apicuron.org",
   ws: "https://dev.apicuron.org/api",
   auth_ws: "https://dev.apicuron.org/api",

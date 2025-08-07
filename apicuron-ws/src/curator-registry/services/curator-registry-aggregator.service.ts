@@ -37,7 +37,7 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 		resource: PartnerResourceDocument,
 		curator?: UserDocument | null,
 	) {
-		const user = curator || this.userRep.newDocument(report.user);
+		const user = curator ?? report.user;
 
 		await this.registryService.addContribution(
 			report.curator_orcid,

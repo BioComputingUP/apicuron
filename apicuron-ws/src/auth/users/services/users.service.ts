@@ -177,7 +177,7 @@ export class UsersService {
 			`users/${uuid()}.svg`,
 			Buffer.from(avatarSvg),
 		);
-		const newUser = this.userRepository.newDocument({
+		const newUser: User = {
 			...user,
 			privacy: PrivacyType.private,
 			role: 'user',
@@ -188,11 +188,11 @@ export class UsersService {
 			orcid_work_put_codes: [],
 			avatar: avatarLink,
 			resources: [],
-		});
+		};
 
 		newUser.avatar = avatarLink;
 
-		await newUser.save();
+		await this.userRepository.create(newUser);
 
 		await this.eventEmitter.emitAsync(
 			UserCreatedEvent.name,

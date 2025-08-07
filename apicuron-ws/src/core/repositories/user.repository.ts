@@ -21,10 +21,10 @@ export class UserRepository extends EntityRepository<User, UserModel> {
 	) {
 		super(userModel);
 		this.publisher.pushToEventEmitter(this.eventEmitter, [
-			[EntityCreatedEvent.name, UserCreatedEvent.name],
-			[EntityUpdatedEvent.name, UserUpdatedEvent.name],
-			[EntityDeletedEvent.name, UserDeletedEvent.name],
-			[ManyEntityUpdated.name, ManyUserUpdatedEvent.name],
+			[EntityCreatedEvent, UserCreatedEvent],
+			[EntityUpdatedEvent, UserUpdatedEvent],
+			[EntityDeletedEvent, UserDeletedEvent],
+			[ManyEntityUpdated, ManyUserUpdatedEvent],
 		]);
 	}
 }

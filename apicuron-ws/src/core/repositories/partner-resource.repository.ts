@@ -27,10 +27,10 @@ export class PartnerResourceRepository extends EntityRepository<
 	) {
 		super(resourceModel);
 		this.publisher.pushToEventEmitter(eventEmitter, [
-			[EntityCreatedEvent.name, PartnerResourceCreatedEvent.name],
-			[EntityUpdatedEvent.name, PartnerResourceUpdatedEvent.name],
-			[EntityDeletedEvent.name, PartnerResourceDeletedEvent.name],
-			[ManyEntityUpdated.name, ManyPartnerResourceUpdatedEvent.name],
+			[EntityCreatedEvent, PartnerResourceCreatedEvent],
+			[EntityUpdatedEvent, PartnerResourceUpdatedEvent],
+			[EntityDeletedEvent, PartnerResourceDeletedEvent],
+			[ManyEntityUpdated, ManyPartnerResourceUpdatedEvent],
 		]);
 	}
 }

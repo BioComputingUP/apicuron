@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   env: "local",
+  domain: 'localhost',
   host: "http://localhost:3000",
   ws: "http://localhost:3000/api",
   auth_ws: "http://localhost:3000/api",

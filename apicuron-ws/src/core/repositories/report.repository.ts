@@ -20,10 +20,10 @@ export class ReportRepository extends EntityRepository<Report, ReportModel> {
 	) {
 		super(reportModel);
 		this.publisher.pushToEventEmitter(eventEmitter, [
-			[EntityCreatedEvent.name, ReportCreatedEvent.name],
-			[EntityUpdatedEvent.name, ReportUpdatedEvent.name],
-			[EntityDeletedEvent.name, ReportDeletedEvent.name],
-			[ManyEntityUpdated.name, ManyReportUpdatedEvent.name],
+			[EntityCreatedEvent, ReportCreatedEvent],
+			[EntityUpdatedEvent, ReportUpdatedEvent],
+			[EntityDeletedEvent, ReportDeletedEvent],
+			[ManyEntityUpdated, ManyReportUpdatedEvent],
 		]);
 	}
 }
