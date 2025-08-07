@@ -173,7 +173,7 @@ export abstract class EntityRepository<
 		TVirtuals
 	> | null> {
 		const before = await this.model.findOne(filter, null, options);
-		if (!before || !('__v' in before)) {
+		if (!before || !before.__v) {
 			return null;
 		}
 

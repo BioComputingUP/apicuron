@@ -35,7 +35,7 @@ import { getGlobalInterceptorChain } from './shared/interceptors';
 import {
 	EntriesExistRule,
 	EntryExistsRule,
-	UniqueRule,
+	UniqueRule
 } from './shared/validators';
 import { StatisticsModule } from './statistics/statistics.module';
 import { ServeFilesController } from './storage/serve-files.controller';
@@ -73,6 +73,7 @@ import { WeeklyStatisticsModule } from './weekly-statistics/weekly-statistics.mo
 		ConfigModule.forRoot({
 			isGlobal: true,
 			// ignoreEnvFile: true,
+			skipProcessEnv: true,
 			load: [loadConfig()],
 		}),
 
