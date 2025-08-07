@@ -61,6 +61,7 @@ export class ComputeBadgesService {
 	public async buildBadgeFromAggregatedReports(
 		badgeDef: BadgeDefDocument | LeanDocument<BadgeDefDocument>,
 		reportAgg: BadgeAggregatedReports,
+		earningReport?: Report,
 	): Promise<LeanBadgeDocument> {
 		const state =
 			reportAgg.count >= badgeDef.count_threshold
@@ -68,7 +69,7 @@ export class ComputeBadgesService {
 				: AchievementState.progress;
 		let achieved_at: Date | undefined;
 		if (state == AchievementState.achieved) {
-			achieved_at = reportAgg.earningReport.timestamp;
+			achieved_at = earningReport?.timestamp;
 		}
 		const badgeDoc: LeanBadgeDocument = {
 			name: badgeDef.name,
@@ -98,9 +99,14 @@ export class ComputeBadgesService {
 			.groupReportsByBadgeDef(badgeDef)
 			.cursor({ batchSize: 50 });
 		for await (const aggregatedReports of reportAggregationByUser) {
+			const earningReport = await this.getBadgeEarnedReport(
+				badgeDef,
+				aggregatedReports.curator_orcid,
+			);
 			const badge = this.buildBadgeFromAggregatedReports(
 				badgeDef,
 				aggregatedReports,
+				earningReport,
 			);
 			yield badge;
 		}

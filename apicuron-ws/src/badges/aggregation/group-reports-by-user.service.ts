@@ -28,7 +28,6 @@ export interface BadgeAggregatedReports {
 	privacy: PrivacyType;
 	league: string;
 	curator_orcid: string;
-	earningReport: ReportDocument;
 }
 
 @Injectable()
@@ -38,23 +37,24 @@ export class GroupReportsByUserAggregator {
 	aggregate(
 		filter: FilterQuery<ReportDocument>,
 	): Aggregate<GroupedReportsByUser[]> {
+		const group: Record<keyof GroupedReportsByUser, unknown> = {
+			_id: '$curator_orcid',
+			count: { $sum: 1 },
+			resource_id: { $first: '$resource_id' },
+			activity_terms: { $addToSet: '$activity_term' },
+			privacy: { $first: '$privacy' },
+			league: { $first: '$league' },
+			curator_orcid: { $first: '$curator_orcid' },
+		};
 		const agg = this.reportModel
-			.aggregate()
+			.aggregate<GroupedReportsByUser>()
 			.match(filter)
-			.group({
-				_id: '$curator_orcid',
-				count: { $sum: 1 },
-				resource_id: { $first: '$resource_id' },
-				activity_terms: { $addToSet: '$activity_term' },
-				privacy: { $first: '$privacy' },
-				league: { $first: '$league' },
-				curator_orcid: { $first: '$curator_orcid' },
-			})
+			.group(group)
 			.sort({
 				resource_id: -1,
 				league: -1,
 				curator_orcid: -1,
-			}) as unknown as Aggregate<GroupedReportsByUser[]>;
+			});
 
 		return agg;
 	}
@@ -73,21 +73,6 @@ export class GroupReportsByUserAggregator {
 				privacy: { $first: '$privacy' },
 				league: { $first: '$league' },
 				curator_orcid: { $first: '$curator_orcid' },
-				firstNReports: {
-					$topN: {
-						output: '$$ROOT',
-						sortBy: { timestamp: 1 },
-						n: badgeDef.count_threshold,
-					},
-				},
-			})
-			.addFields({
-				earningReport: {
-					$arrayElemAt: ['$firstNReports', -1],
-				},
-			})
-			.project({
-				firstNReports: 0,
 			})
 			.sort({
 				count: -1,
