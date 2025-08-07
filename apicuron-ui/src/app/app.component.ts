@@ -3,7 +3,7 @@ import {
   NgcCookieConsentService,
   NgcStatusChangeEvent,
 } from "ngx-cookieconsent";
-import { Subscription } from "rxjs";
+import { Subject, Subscription, takeUntil } from "rxjs";
 import { CookieManagerService } from "./cookie-manager/cookie-manager.service";
 
 @Component({
@@ -13,32 +13,29 @@ import { CookieManagerService } from "./cookie-manager/cookie-manager.service";
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = "apicuron-ui";
-  private subscriptions: Subscription[] = [];
+  private destroy$ = new Subject<void>();
 
   constructor(
     private cookieConsentService: NgcCookieConsentService,
     private cookieManager: CookieManagerService
   ) {}
   ngOnInit(): void {
-    this.subscriptions.push(
-      this.cookieConsentService.statusChange$.subscribe(
-        (event: NgcStatusChangeEvent) => {
-          if (event.status === "allow") {
-            this.cookieManager.grantConsent();
-          } else {
-            this.cookieManager.revokeConsent();
-          }
+    this.cookieConsentService.statusChange$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((event: NgcStatusChangeEvent) => {
+        if (event.status === "allow") {
+          this.cookieManager.grantConsent();
+        } else {
+          this.cookieManager.revokeConsent();
         }
-      )
-    );
-    this.subscriptions.push(
-      this.cookieConsentService.revokeChoice$.subscribe(() => {
+      });
+    this.cookieConsentService.revokeChoice$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
         this.cookieManager.revokeConsent();
-      })
-    );
+      });
   }
   ngOnDestroy(): void {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
-    this.subscriptions = [];
+    this.destroy$.next();
   }
 }

@@ -4819,6 +4819,11 @@ cookie@~0.7.2:
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.7.2.tgz#556369c472a2ba910f2979891b526b3436237ed7"
   integrity sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==
 
+cookieconsent@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/cookieconsent/-/cookieconsent-3.1.1.tgz#f90bfadcaeef7d2bdcdd8278257f7264cb5d6819"
+  integrity sha512-v8JWLJcI7Zs9NWrs8hiVldVtm3EBF70TJI231vxn6YToBGj0c9dvdnYwltydkAnrbBMOM/qX1xLFrnTfm5wTag==
+
 copy-anything@^2.0.1:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/copy-anything/-/copy-anything-2.0.6.tgz#092454ea9584a7b7ad5573062b2a87f5900fc480"
@@ -8431,6 +8436,13 @@ ng-packagr@^17.3.0:
   optionalDependencies:
     esbuild "^0.20.0"
     rollup "^4.5.0"
+
+ngx-cookieconsent@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/ngx-cookieconsent/-/ngx-cookieconsent-6.0.0.tgz#c22c3dd79c83c40498ed23282f8befc90586d0c9"
+  integrity sha512-HBgRXODXN6Fqo3rKUrmuTlpPHA5Lb14F6hE+2rIw9iZ1yZ7nhYlZ58lb1b/JnozmH7gFxHinxuWz3OCkG+7kUw==
+  dependencies:
+    tslib "^2.3.0"
 
 ngx-markdown@^17.2.1:
   version "17.2.1"

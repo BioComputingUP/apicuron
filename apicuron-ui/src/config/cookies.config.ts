@@ -3,9 +3,9 @@ import { environment } from "src/environments/environment";
 
 export const cookieConfig: NgcCookieConsentConfig = {
   cookie: {
-    domain: "localhost", // Change this to your domain in production
+    domain: environment.host,
   },
-  position: "top",
+  position: "top-left",
   palette: {
     popup: {
       background: "#000",
