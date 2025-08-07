@@ -8,6 +8,9 @@ const BaseColumns = [
   "Total Score",
   "last Contribution Date",
 ] as const;
+
+export type LeaderboardEnumType = 'monthly' | 'weekly' | 'total';
+
 export const MonthlyLeaderboardColumns = [...BaseColumns] as const;
 export const WeeklyLeaderboardColumns = [...BaseColumns] as const;
 export const TotalLeaderboardColumns = [

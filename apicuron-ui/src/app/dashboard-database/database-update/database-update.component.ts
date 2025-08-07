@@ -1,9 +1,16 @@
 import { Component, OnDestroy } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import {
+  AbstractControl,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from "@angular/forms";
 import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { MessageService } from "primeng/api";
 import {
+  LeaderboardEnumType,
   MonthlyLeaderboardColumns,
   TotalLeaderboardColumns,
   WeeklyLeaderboardColumns,
@@ -64,6 +71,12 @@ export class DatabaseUpdateComponent implements OnDestroy {
       })
     );
 
+    const leaderboardForm = this.formBuilder.group({
+      monthly: [[], []],
+      weekly: [[], []],
+      total: [[], []],
+    });
+
     this.form = this.formBuilder.group(
       {
         resource_uri: [
@@ -100,11 +113,7 @@ export class DatabaseUpdateComponent implements OnDestroy {
             ),
           ],
         ],
-        leaderboard_preferences: this.formBuilder.group({
-          monthly: [[], []],
-          weekly: [[], []],
-          total: [[], []],
-        }),
+        leaderboard_preferences: leaderboardForm,
       },
       { validators: Validators.required, updateOn: "change" }
     );
@@ -147,6 +156,20 @@ export class DatabaseUpdateComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.destroy$.next(true);
+  }
+  
+  
+  toggleSelectAll(leaderboardType: LeaderboardEnumType) {
+    const formControl: AbstractControl<string[]> = this.form
+      .get("leaderboard_preferences")
+      .get(leaderboardType);
+    const allColumns = this.all_lb_preferences[leaderboardType];
+    const currentColums: string[] = formControl.value;
+    if (currentColums.length === allColumns.length) {
+      formControl.setValue([]);
+      return;
+    }
+    formControl.setValue([...allColumns]);
   }
 
   submit() {

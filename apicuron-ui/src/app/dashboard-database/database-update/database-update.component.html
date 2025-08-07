@@ -159,11 +159,13 @@
         </div>
       </div>
     </div>
-    <hr />
-    <label for="leaderboard_preferences" class="tw-font-bold tw-text-lg tw-mb-2"
+    <label for="leaderboard_preferences" class="tw-font-bold tw-mb-2"
       >Leaderboard Preferences</label
     >
-    <div formGroupName="leaderboard_preferences" class="leaderboard-main">
+    <div
+      formGroupName="leaderboard_preferences"
+      class="leaderboard-main tw-w-full"
+    >
       <!-- Monthly preferences -->
       <div class="leaderboard-section">
         <div class="leaderboard-section-title">
@@ -172,6 +174,14 @@
             svgClass="tw-w-8 tw-h-8 tw-fill-apicuron-bright-purple tw-mr-2"
           />
           <label>Monthly Leaderboard Columns</label>
+
+          <button
+            class="tw-ml-auto tw-text-sm tw-font-medium tw-text-gray-500 tw-p-1"
+            type="button"
+            (click)="toggleSelectAll('monthly')"
+          >
+            Select all
+          </button>
         </div>
         <preference-selector
           formControlName="monthly"

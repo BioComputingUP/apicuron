@@ -1,17 +1,18 @@
-.option[aria-selected='true'] {
-  background-color: #d6bfec;
-  color: #4a154b;
-  position: relative;
-  padding-left: 25px;
-
-transition: color 500ms, background-color 500ms;
+.option[aria-selected="true"] {
+  @apply tw-bg-apicuron-purple-100 tw-text-apicuron-purple tw-relative
+  
 }
-.option[aria-selected='true']::before {
-  content: '';
+// transition: color 500ms, background-color 500ms;
+// background-color: #d6bfec;
+// color: #441324;
+// position: relative;
+// padding-left: 25px;
+.option[aria-selected="true"]::before {
+  content: "";
   display: block;
   width: 20px;
   height: 20px;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24"><path d="m9.55 18-5.7-5.7 1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4Z"/></svg>');
+  background-image: url('/assets/svg/check.svg');
   background-size: cover;
   position: absolute;
   right: 25px;

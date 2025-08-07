@@ -1,5 +1,9 @@
 <div class="tw-mt-4 tw-flex tw-flex-col">
-  <button type="button" (click)="toggleSelection()" class="tw-self-end tw-mr-4">
+  <button
+    type="button"
+    (click)="toggleSelection()"
+    class="tw-self-end tw-block tw-text-right tw-py-1 tw-px-2 tw-rounded tw-bg-gray-100 tw-my-1 hover:tw-bg-purple-100"
+  >
     {{ allSelected ? "Deselect All" : "Select All" }}
   </button>
   <ul
@@ -11,14 +15,14 @@
     @for (preference of preferences; track preference){
     <li
       [cdkOption]="preference"
-      class="option tw-cursor-pointer hover:tw-bg-purple-100 tw-p-2 tw-m-1 tw-rounded-md tw-text-gray-700 tw-font-medium"
+      class="option tw-cursor-pointer hover:tw-bg-purple-100 tw-p-2 tw-my-1 tw-rounded-md tw-text-gray-700 tw-font-medium tw-bg-gray-100"
     >
       {{ preference }}
     </li>
     }
   </ul>
-  <hr class="tw-my-4" />
-  <p class="tw-mt-2 tw-text-gray-400">
+  <!-- <hr class="tw-my-4" /> -->
+  <!-- <p class="tw-mt-2 tw-text-gray-400">
     Selected Preferences: {{ selectedPreferences.join(", ") }}
-  </p>
+  </p> -->
 </div>
