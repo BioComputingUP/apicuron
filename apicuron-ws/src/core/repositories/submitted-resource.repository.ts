@@ -1,6 +1,7 @@
 import { InjectModel } from '@nestjs/mongoose';
 import {
-	SubmittedResource, SubmittedResourceModel
+	SubmittedResource,
+	SubmittedResourceModel,
 } from '../schemas/resource/submitted-resource.schema';
 import { EntityRepository } from './entity-repository';
 

@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
-import { Query, UpdateWriteOpResult } from 'mongoose';
+import { UpdateWriteOpResult } from 'mongoose';
 import { UserPrivacyUpdatedEvent } from '../../auth/users/events/update-privacy';
-import { ReportModel, Report, ReportDocument } from '../../core/schemas/reports.schema';
+import { Report, ReportModel } from '../../core/schemas/reports.schema';
 import { LeagueDeletedEvent } from '../../resources/partner-resources/leagues/events/league-deleted-event';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { computePrivacyField } from '../../util/privacy.helper';
@@ -46,20 +46,22 @@ export class ReportEventsHandlerService {
 		const updatePromises$: Promise<UpdateWriteOpResult>[] = [];
 		for (const [resource, league] of resourceLeagues) {
 			// Update the privacy field of reports that match the specified criteria
-			const updatePromise$ = this.reportModel.updateMany(
-				{
-					curator_orcid: user.orcid_id,
-					resource_id: resource.resource_id,
-					league: league.name,
-				},
-				{
-					$set: {
-						privacy: computePrivacyField(resource, user, {
-							league: league.name,
-						}),
+			const updatePromise$ = this.reportModel
+				.updateMany(
+					{
+						curator_orcid: user.orcid_id,
+						resource_id: resource.resource_id,
+						league: league.name,
 					},
-				},
-			).exec();
+					{
+						$set: {
+							privacy: computePrivacyField(resource, user, {
+								league: league.name,
+							}),
+						},
+					},
+				)
+				.exec();
 			updatePromises$.push(updatePromise$);
 		}
 

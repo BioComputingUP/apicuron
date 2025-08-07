@@ -316,13 +316,13 @@ export class CuratorRegistryService {
 		orcid: string,
 		resource_id: string,
 		leagueName: string,
-		user_data?: UserDocument,
+		user_data?: User,
 		resource_data?: PartnerResource,
 		league_data?: League,
 	) {
-		const [resource, user] = await Promise.all([
+		const [resource, user]: [PartnerResource, User] = await Promise.all([
 			resource_data || this.resourceService.get_resource(resource_id),
-			user_data || this.userRep.findOne({ orcid_id: orcid }),
+			user_data ?? (await this.userRep.findOne({ orcid_id: orcid })).toObject(),
 		]);
 		if (!resource) {
 			this.logger.error(`Resource ${resource_id} not found`);

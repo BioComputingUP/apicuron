@@ -22,10 +22,10 @@ export class TermRepository extends EntityRepository<Term, TermModel> {
 		super(TermModel);
 
 		this.publisher.pushToEventEmitter(eventEmitter, [
-			[EntityCreatedEvent.name, TermCreatedEvent.name],
-			[EntityUpdatedEvent.name, TermUpdatedEvent.name],
-			[EntityDeletedEvent.name, TermDeletedEvent.name],
-			[ManyEntityUpdated.name, ManyTermUpdatedEvent.name],
+			[EntityCreatedEvent, TermCreatedEvent],
+			[EntityUpdatedEvent, TermUpdatedEvent],
+			[EntityDeletedEvent, TermDeletedEvent],
+			[ManyEntityUpdated, ManyTermUpdatedEvent],
 		]);
 	}
 }

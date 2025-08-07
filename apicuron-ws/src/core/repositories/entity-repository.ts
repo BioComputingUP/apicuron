@@ -5,72 +5,28 @@ import {
 	AggregateOptions,
 	FilterQuery,
 	HydratedDocument,
-	IfEquals,
 	Model,
 	ObjectId as ObjectIdType,
-	ObtainSchemaGeneric,
 	PipelineStage,
 	ProjectionType,
 	Query,
 	QueryOptions,
-	SaveOptions,
 	UpdateQuery,
 	UpdateWithAggregationPipeline,
 } from 'mongoose';
 import {
-	EntityCreatedEvent,
 	EntityDeletedEvent,
 	EntityUpdatedEvent,
 	ManyEntityUpdated,
 } from '../events';
 import { RepositoryEventPublisher } from '../helpers/event-mapper';
-
-type EntityEvents<C> =
-	| EntityCreatedEvent<C>
-	| EntityUpdatedEvent<C>
-	| EntityDeletedEvent<C>
-	| ManyEntityUpdated<C>;
-
-type RepositoryEvent<C> = {
-	name: string;
-	value: EntityEvents<C>;
-};
-
-// Utility types
-
-type ExtractEntity<T> = T extends Model<infer U, unknown, unknown, unknown>
-	? U
-	: never;
-type ExtractQueryHelpers<T> = T extends Model<
-	unknown,
-	infer QH,
-	unknown,
-	unknown
->
-	? QH
-	: never;
-type ExtractMethodsAndOverrides<T> = T extends Model<
-	unknown,
-	unknown,
-	infer M,
-	unknown
->
-	? M
-	: never;
-
-type ExtractVirtuals<T> = T extends Model<unknown, unknown, unknown, infer V>
-	? V
-	: never;
-
-type ExtractSchema<T> = T extends Model<
-	unknown,
-	unknown,
-	unknown,
-	unknown,
-	infer S
->
-	? S
-	: never;
+import {
+	ExtractMethodsAndOverrides,
+	ExtractQueryHelpers,
+	ExtractSchema,
+	ExtractVirtuals,
+	RepositoryEvent,
+} from '../interfaces/entity-repository';
 
 export abstract class EntityRepository<
 	EntityClass,
@@ -85,7 +41,7 @@ export abstract class EntityRepository<
 	TMethodsAndOverrides = ExtractMethodsAndOverrides<EntityModel>,
 	TVirtuals = ExtractVirtuals<EntityModel>,
 	TSchema = ExtractSchema<EntityModel>,
-	EntityDoc = HydratedDocument<EntityClass, TMethodsAndOverrides, TVirtuals>,
+	// EntityDoc = HydratedDocument<EntityClass, TMethodsAndOverrides, TVirtuals>,
 > implements OnModuleDestroy
 {
 	constructor(protected readonly model: EntityModel) {}
@@ -98,34 +54,6 @@ export abstract class EntityRepository<
 	private logger = new Logger(EntityRepository.name);
 
 	/**
-	 * Creates a new document instance of the model.
-	 *
-	 * @param doc - An optional partial document to initialize the new document with.
-	 * @param fields - Optional fields to include in the new document.
-	 * @param options - Optional settings for the document creation. Can be a boolean or an object.
-	 * @returns A new instance of the model.
-	 */
-	public newDocument(
-		doc?: EntityClass,
-		fields?: any | null,
-		options?: SaveOptions,
-	): HydratedDocument<
-		EntityClass,
-		TMethodsAndOverrides,
-		IfEquals<
-			TVirtuals,
-			{},
-			ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
-			TVirtuals
-		>
-	> &
-		ObtainSchemaGeneric<TSchema, 'TStaticMethods'> {
-		const instance = new this.model<EntityClass>(doc, fields, options);
-
-		return instance;
-	}
-
-	/**
 	 * Deletes a document from the database by its ID.
 	 *
 	 * @param id - The ID of the document to delete.
@@ -134,7 +62,7 @@ export abstract class EntityRepository<
 	async deleteById(
 		id: string,
 	): Promise<HydratedDocument<EntityClass, TMethodsAndOverrides, TVirtuals>> {
-		const doc = await this.model.findByIdAndDelete(id);
+		const doc = await this.model.findByIdAndDelete(id).exec();
 
 		const event = new EntityDeletedEvent<EntityClass>(
 			id,
@@ -163,7 +91,7 @@ export abstract class EntityRepository<
 		TMethodsAndOverrides,
 		TVirtuals
 	> | null> {
-		const doc = await this.model.findOneAndDelete(filter, options);
+		const doc = await this.model.findOneAndDelete(filter, options).exec();
 		const event = new EntityDeletedEvent<EntityClass>(
 			doc._id.toString(),
 			doc.toObject(),
@@ -238,17 +166,21 @@ export abstract class EntityRepository<
 		TVirtuals
 	> | null> {
 		const before = await this.model.findOne(filter, null, options);
-		if (!before) {
+		if (!before || !('__v' in before)) {
 			return null;
 		}
-		const updateQuery$ = this.model.findOneAndUpdate(
-			{ ...filter, __v: before.__v },
-			update,
-			{
-				...options,
-				new: true,
-			},
-		);
+
+		const updateQuery$ = this.model
+			.findOneAndUpdate(
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+				{ ...filter, __v: before.__v },
+				update,
+				{
+					...options,
+					new: true,
+				},
+			)
+			.exec();
 
 		const result = await updateQuery$;
 		const event = new EntityUpdatedEvent<EntityClass>(
@@ -257,7 +189,6 @@ export abstract class EntityRepository<
 			result.toObject(),
 			new Date(),
 		);
-		this.logger.debug(`Emitting ${event}`);
 		await this.publisher.publish({
 			name: EntityUpdatedEvent.name,
 			value: event,
@@ -289,8 +220,10 @@ export abstract class EntityRepository<
 	 * @param id - The ID of the document to find.
 	 * @returns A Promise that resolves to the found document.
 	 */
-	async findById(id: string): Promise<EntityClass> {
-		return this.model.findById(id);
+	async findById(
+		id: string,
+	): Promise<HydratedDocument<EntityClass, TMethodsAndOverrides, TVirtuals>> {
+		return await this.model.findById(id).exec();
 	}
 
 	/**
@@ -333,8 +266,8 @@ export abstract class EntityRepository<
 		options?: QueryOptions<EntityClass>,
 	): AsyncGenerator<
 		HydratedDocument<EntityClass, TMethodsAndOverrides, TVirtuals>,
-		any,
-		any
+		void,
+		unknown
 	> {
 		const cursor = this.model.find(filter, projection, options).cursor(options);
 		for await (const entry of cursor) {
