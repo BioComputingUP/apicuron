@@ -1,5 +1,11 @@
 import { Component, Input, OnDestroy, OnInit } from "@angular/core";
-import { Observable, ReplaySubject, Subject, takeUntil } from "rxjs";
+import {
+  combineLatest,
+  Observable,
+  ReplaySubject,
+  Subject,
+  takeUntil,
+} from "rxjs";
 import { BipScholarStatsViewModel } from "src/app/models/external/bip-scholar.model";
 
 import { Injectable } from "@angular/core";
@@ -35,6 +41,12 @@ export class BipScoresComponent implements OnDestroy, OnInit {
   protected isOwnProfile$: Observable<boolean>;
 
   userOrcid$ = new ReplaySubject<string>(1);
+  vm$: Observable<{
+    bipScores: BipScholarStatsViewModel;
+    userBipUrl: URL;
+    isOwnProfile: boolean;
+    userOrcid: string;
+  }>;
 
   @Input() set orcidId(value: string) {
     this.userOrcid$.next(value);
@@ -52,6 +64,19 @@ export class BipScoresComponent implements OnDestroy, OnInit {
     );
     this.userBipUrl$ = this.getUserBipUrl();
     this.isOwnProfile$ = this.authService.isOwnProfile(this.userOrcid$);
+    this.vm$ = combineLatest([
+      this.bipScores$,
+      this.userBipUrl$,
+      this.isOwnProfile$,
+      this.userOrcid$,
+    ]).pipe(
+      map(([bipScores, userBipUrl, isOwnProfile, userOrcid]) => ({
+        bipScores,
+        userBipUrl,
+        isOwnProfile,
+        userOrcid,
+      }))
+    );
   }
 
   getUserBipUrl(): Observable<URL> {
