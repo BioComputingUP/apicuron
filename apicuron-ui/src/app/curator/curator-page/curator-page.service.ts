@@ -3,14 +3,8 @@ import { Injectable } from "@angular/core";
 import { combineLatest, Observable } from "rxjs";
 
 import { map, shareReplay, switchMap } from "rxjs/operators";
-import { MedalsService } from "src/app/achievements/services/medals.service";
-import { AuthService } from "src/app/auth/auth.service";
 import { CuratorStatisticsService } from "src/app/curator-statistics/services/curator-statistics.service";
 import { CuratorService } from "src/app/curator/curator.service";
-import {
-  BipScholarStats,
-  BipScholarStatsViewModel,
-} from "src/app/models/external/bip-scholar.model";
 import { Resource } from "src/app/models/resource.model";
 import { CuratorStatistics } from "src/app/models/statistics.model";
 import { User } from "src/app/models/User.model";
@@ -25,7 +19,6 @@ export interface StatisticsWithResource {
 @Injectable()
 export class CuratorPageService {
   private wsUrl = environment.ws;
-  private orcid_url = environment.orcid_url;
 
   // state observables
   curator$: Observable<User>;
@@ -39,9 +32,7 @@ export class CuratorPageService {
     private http: HttpClient,
     private resources: ResourcesService,
     private curatorStatistics: CuratorStatisticsService,
-    private curatorService: CuratorService,
-    private medalsService: MedalsService,
-    private authService: AuthService
+    private curatorService: CuratorService
   ) {
     // load statistics
   }
@@ -101,39 +92,6 @@ export class CuratorPageService {
         return this.curatorStatistics.get_curator_statistics(orcid_id);
       }),
       shareReplay(1)
-    );
-  }
-
-  private combine_resources_statistics(
-    resources$: Observable<Resource[]>,
-    curatorStatistics$: Observable<CuratorStatistics[]>
-  ): Observable<StatisticsWithResource[]> {
-    // Done: Finish implementation
-    return combineLatest([resources$, curatorStatistics$]).pipe(
-      map(([resources, curatorStats]) => {
-        return curatorStats.map((stat) => {
-          return {
-            resource: resources.find(
-              (res) => res.resource_id == stat.resource_id
-            ),
-            curatorStatistics: stat,
-          };
-        });
-      })
-    );
-  }
-
-  private loadResources(
-    resourceIds$: Observable<string[]>
-  ): Observable<Resource[]> {
-    // use resource_id array to load resources
-    return resourceIds$.pipe(
-      switchMap((resourceIds: string[]) => {
-        const resourcesArray$ = resourceIds.map((resource_id: string) =>
-          this.resources.get_resource(resource_id)
-        );
-        return combineLatest(resourcesArray$);
-      })
     );
   }
 

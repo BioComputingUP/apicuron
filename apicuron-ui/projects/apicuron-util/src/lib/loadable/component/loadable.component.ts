@@ -1,10 +1,10 @@
 import { CommonModule } from "@angular/common";
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, Output } from "@angular/core";
 import { AngularSvgIconModule } from "angular-svg-icon";
-import { Observable } from "rxjs";
-import { createLoadingState } from "../loading-state";
-import { LoadingState } from "../interfaces";
+import { filter, map, Observable } from "rxjs";
 import { ImageSrcOverrideDirective } from "../../util";
+import { LoadingState } from "../interfaces";
+import { createLoadingState } from "../loading-state";
 
 @Component({
   standalone: true,
@@ -36,7 +36,13 @@ export class LoadableComponent implements OnInit {
   @Input("loadable") data: Observable<any>;
 
   loadingData$: Observable<LoadingState<any>>;
+  @Output("loadedContent") loadedContent: Observable<any>;
+
   ngOnInit(): void {
     this.loadingData$ = this.data.pipe(createLoadingState());
+    this.loadingData$.pipe(
+      filter((state) => state.loading === false && state.error === undefined),
+      map((state) => state.data)
+    );
   }
 }

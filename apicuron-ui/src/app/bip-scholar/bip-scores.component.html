@@ -1,70 +1,65 @@
-<div
-  *ngIf="{
-    bipScores: bipScores$ | async,
-    isOwnProfile: isOwnProfile$ | async,
-    userOrcid: userOrcid$ | async,
-    userBipUrl: userBipUrl$ | async
-  } as vm"
->
-  <div
-    *ngIf="vm.bipScores || vm.isOwnProfile"
-    class="tw-bg-white tw-pb-6 tw-rounded-b-md tw-shadow-md tw-mb-4 tw-border-t-4 tw-border-slate-600"
-  >
-    <!-- Top banner -->
-    <div class="tw-col-span-2 lg:tw-col-span-4" *ngIf="vm.userOrcid">
+<div [loadable]="vm$">
+  <ng-container *ngIf="vm$ | async as vm">
+    <div
+      *ngIf="vm.bipScores || vm.isOwnProfile"
+      class="tw-bg-white tw-pb-6 tw-rounded-b-md tw-shadow-md tw-mb-4 tw-border-t-4 tw-border-slate-600"
+    >
+      <!-- Top banner -->
+      <div class="tw-col-span-2 lg:tw-col-span-4" *ngIf="vm.userOrcid">
+        <div
+          class="tw-flex tw-flex-row tw-bg-slate-100 tw-justify-between tw-items-center tw-px-4"
+        >
+          <div
+            class="tw-flex tw-flex-row tw-items-center tw-gap-4 tw-mb-2 tw-py-4"
+          >
+            <img
+              src="assets/logos/bip-scholar.png"
+              alt="Bip! Scholar"
+              class="tw-w-10"
+            />
+            <h1 class="tw-text-[1.3rem] tw-font-semibold">
+              Bip! Scholar Statistics
+            </h1>
+          </div>
+          <a
+            *ngIf="vm.bipScores"
+            [href]="vm.userBipUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="tw-px-2 tw-py-1 tw-border-[#449D44] tw-text-[#449D44] tw-rounded-md tw-border-2 hover:tw-bg-slate-200"
+            >Visit Profile
+          </a>
+        </div>
+      </div>
+
+      <!-- Scores section -->
       <div
-        class="tw-flex tw-flex-row tw-bg-slate-100 tw-justify-between tw-items-center tw-px-4"
+        *ngIf="vm.bipScores"
+        class="tw-grid tw-grid-cols-2 tw-gap-4 tw-px-4 tw-mt-6 lg:tw-grid-cols-4"
       >
         <div
-          class="tw-flex tw-flex-row tw-items-center tw-gap-4 tw-mb-2 tw-py-4"
+          *ngFor="let sectionItem of vm.bipScores | keyvalue"
+          class="tw-h-full"
         >
-          <img
-            src="assets/logos/bip-scholar.png"
-            alt="Bip! Scholar"
-            class="tw-w-10"
-          />
-          <h1 class="tw-text-[1.3rem] tw-font-semibold">
-            Bip! Scholar Statistics
-          </h1>
+          <bip-scholar-card
+            [stats_section_info]="sectionItem.value"
+            class="tw-h-full"
+          ></bip-scholar-card>
         </div>
+      </div>
+
+      <!-- Create profile section -->
+      <div *ngIf="!vm.bipScores && vm.isOwnProfile" class="tw-px-4 tw-mt-6">
+        It looks like you haven't created a profile on Bip! Scholar yet. Please
+        visit
         <a
-          *ngIf="vm.bipScores"
-          [href]="vm.userBipUrl"
+          href="https://bip.imsi.athenarc.gr/scholar"
           target="_blank"
           rel="noopener noreferrer"
-          class="tw-px-2 tw-py-1 tw-border-[#449D44] tw-text-[#449D44] tw-rounded-md tw-border-2 hover:tw-bg-slate-200"
-          >Visit Profile
-        </a>
+          class="tw-text-blue-500 hover:tw-underline"
+          >Bip! Scholar Page </a
+        >. to create your profile and display your statistics to others here.
       </div>
     </div>
-
-    <!-- Scores section -->
-    <div
-      *ngIf="vm.bipScores"
-      class="tw-grid tw-grid-cols-2 tw-gap-4 tw-px-4 tw-mt-6 lg:tw-grid-cols-4"
-    >
-      <div
-        *ngFor="let sectionItem of vm.bipScores | keyvalue"
-        class="tw-h-full"
-      >
-        <bip-scholar-card
-          [stats_section_info]="sectionItem.value"
-          class="tw-h-full"
-        ></bip-scholar-card>
-      </div>
-    </div>
-
-    <!-- Create profile section -->
-    <div *ngIf="!vm.bipScores && vm.isOwnProfile" class="tw-px-4 tw-mt-6">
-      It looks like you haven't created a profile on Bip! Scholar yet. Please
-      visit
-      <a
-        href="https://bip.imsi.athenarc.gr/scholar"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="tw-text-blue-500 hover:tw-underline"
-        >Bip! Scholar Page </a
-      >. to create your profile and display your statistics to others here.
-    </div>
-  </div>
+  </ng-container>
 </div>
