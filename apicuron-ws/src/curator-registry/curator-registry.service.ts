@@ -85,6 +85,10 @@ export class CuratorRegistryService {
 		}
 	}
 
+	/**
+	 * @deprecated
+	 * Use `recomputeAllEntries` instead to rebuild the registry from reports.
+	 */
 	async recomputeAllEntries() {
 		// don't use this unless needed
 		await this.removeAllEntries();
@@ -320,10 +324,11 @@ export class CuratorRegistryService {
 		resource_data?: PartnerResource,
 		league_data?: League,
 	) {
-		const [resource, user]: [PartnerResource, User] = await Promise.all([
-			resource_data || this.resourceService.get_resource(resource_id),
-			user_data ?? (await this.userRep.findOne({ orcid_id: orcid })).toObject(),
-		]);
+		const [resource, user]: [PartnerResource, User | undefined] =
+			await Promise.all([
+				resource_data || this.resourceService.get_resource(resource_id),
+				user_data ?? (await this.userRep.findOne({ orcid_id: orcid })),
+			]);
 		if (!resource) {
 			this.logger.error(`Resource ${resource_id} not found`);
 			throw new NotFoundException(`Resource ${resource_id} not found`);
