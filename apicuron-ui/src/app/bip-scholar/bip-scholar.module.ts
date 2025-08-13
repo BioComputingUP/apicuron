@@ -1,11 +1,11 @@
-import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { NgModule } from "@angular/core";
 
-import { BipScholarService } from "./services/bip-scholar.service";
+import { LoadableComponent } from "../../../projects/apicuron-util/src/lib/loadable";
 import { AuthModule } from "../auth/auth.module";
-import { BipScoresComponent } from "./bip-scores.component";
 import { BipScholarCardComponent } from "./bip-scholar-card/bip-scholar-card.component";
-import { LoadableComponent } from "projects/apicuron-util/src/lib/loadable";
+import { BipScoresComponent } from "./bip-scores.component";
+import { BipScholarService } from "./services/bip-scholar.service";
 
 @NgModule({
   declarations: [BipScoresComponent, BipScholarCardComponent],

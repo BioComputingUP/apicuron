@@ -17,6 +17,13 @@ type SectionMap = {
   };
 };
 
+const SECTION_ORDER = [
+  sections.IMPACT_INDICATORS,
+  sections.PRODUCTIVITY_INDICATORS,
+  sections.OPEN_SCIENCE_INDICATORS,
+  sections.CAREER_STAGE_INDICATORS,
+] as const;
+
 const sections_map: SectionMap = {
   "work_types_num.datasets": {
     label: "Datasets",
@@ -167,7 +174,7 @@ export class BipScholarStats implements Deserializable {
     return this;
   }
 
-  public statCardViewModel(): BipScholarStatsViewModel {
+  public statCardViewModel(): Array<{ key: string; value: BipScholarSection }> {
     // Groups stats into sections based on the sections_map
 
     // Build the sections object with the section titles
@@ -199,6 +206,9 @@ export class BipScholarStats implements Deserializable {
         stats[section_title].stats[key] = stat;
       }
     });
-    return stats;
+    return SECTION_ORDER.map((sectionKey) => ({
+      key: sectionKey,
+      value: stats[sectionKey],
+    }));
   }
 }

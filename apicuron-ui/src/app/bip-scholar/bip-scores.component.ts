@@ -6,7 +6,7 @@ import {
   Subject,
   takeUntil,
 } from "rxjs";
-import { BipScholarStatsViewModel } from "src/app/models/external/bip-scholar.model";
+import { BipScholarSection } from "src/app/models/external/bip-scholar.model";
 
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, map } from "rxjs";
@@ -36,13 +36,15 @@ export class BipScoresTooltipManager {
 })
 export class BipScoresComponent implements OnDestroy, OnInit {
   private destroy$ = new Subject<void>();
-  protected bipScores$: Observable<BipScholarStatsViewModel>;
+  protected bipScores$: Observable<
+    Array<{ key: string; value: BipScholarSection }>
+  >;
   protected userBipUrl$: Observable<URL>;
   protected isOwnProfile$: Observable<boolean>;
 
   userOrcid$ = new ReplaySubject<string>(1);
   vm$: Observable<{
-    bipScores: BipScholarStatsViewModel;
+    bipScores: Array<{ key: string; value: BipScholarSection }>;
     userBipUrl: URL;
     isOwnProfile: boolean;
     userOrcid: string;

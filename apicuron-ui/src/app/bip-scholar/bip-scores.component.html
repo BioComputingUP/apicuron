@@ -37,10 +37,7 @@
         *ngIf="vm.bipScores"
         class="tw-grid tw-grid-cols-2 tw-gap-4 tw-px-4 tw-mt-6 lg:tw-grid-cols-4"
       >
-        <div
-          *ngFor="let sectionItem of vm.bipScores | keyvalue"
-          class="tw-h-full"
-        >
+        <div *ngFor="let sectionItem of vm.bipScores" class="tw-h-full">
           <bip-scholar-card
             [stats_section_info]="sectionItem.value"
             class="tw-h-full"
