@@ -26,22 +26,3 @@ input[type="file"],
     display: inline-block;
     float: left;
 }
-
-// Leaderboard options related styles
-
-.leaderboard-main{
-    @apply tw-flex tw-flex-row tw-gap-2 tw-mb-4;
-}
-.leaderboard-section {
-    @apply tw-flex-1 tw-rounded-md tw-bg-white tw-shadow-md tw-p-4 tw-border tw-border-gray-200;
-}
-.leaderboard-section-title {
-    @apply tw-flex tw-gap-1 tw-items-center tw-text-lg tw-font-semibold ;
-}
-.leaderboard-section-title label {
-    @apply tw-text-gray-800 tw-m-0;
-}
-
-.leaderboard-icon {
-    @apply tw-w-10 tw-h-10 tw-fill-apicuron-bright-purple tw-mr-2;
-}

@@ -9,7 +9,6 @@ import {
 @Component({
   selector: "leaderboard-preferences",
   templateUrl: "./leaderboard-preferences.component.html",
-  styleUrls: ["./leaderboard-preferences.component.scss"],
 })
 export class LeaderboardPreferencesComponent {
   @Input() leaderboard_preferences_group: FormGroup;
@@ -19,4 +18,21 @@ export class LeaderboardPreferencesComponent {
     weekly: WeeklyLeaderboardColumns,
     total: TotalLeaderboardColumns,
   };
+  leaderboardSections = [
+    {
+      key: "monthly",
+      label: "Monthly Leaderboard Columns",
+      icon: "assets/svg/month.svg",
+    },
+    {
+      key: "weekly",
+      label: "Weekly Leaderboard Columns",
+      icon: "assets/svg/week.svg",
+    },
+    {
+      key: "total",
+      label: "Total Leaderboard Columns",
+      icon: "assets/svg/total.svg",
+    },
+  ];
 }

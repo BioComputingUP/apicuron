@@ -17,9 +17,11 @@
       </div>
     </div>
 
-    <div class="tw-flex tw-flex-row tw-gap-4">
+    <div
+      class="tw-flex tw-flex-col lg:tw-gap-4 tw-w-full lg:tw-flex-row lg:tw-w-auto"
+    >
       <!-- left section -->
-      <div class="tw-w-full sm:tw-w-1/2">
+      <div class="tw-w-full lg:tw-w-1/2">
         <div class="form-control-element">
           <label for="resource_name">Resource Name</label>
           <input type="text" formControlName="resource_name" />
@@ -79,7 +81,7 @@
       </div>
 
       <!-- right section -->
-      <div class="tw-w-full sm:tw-w-1/2">
+      <div class="tw-w-full lg:tw-w-1/2">
         <div class="form-control-element">
           <label for="resource_url">Resource URL</label>
           <input type="text" formControlName="resource_url" />
@@ -108,14 +110,14 @@
           <div
             class="tw-bg-white tw-border-gray-300 tw-rounded tw-border tw-p-4 tw-flex tw-flex-col tw-gap-2"
           >
-            <div class="tw-w-1/2">
+            <div class="tw-w-full lg:tw-w-1/2">
               <span
                 class="tw-text-base tw-font-bold tw-text-gray-700 tw-my-1 sm:tw-my-2"
               >
                 Logo Preview:
               </span>
               <div
-                class="tw-flex tw-justify-center tw-items-center tw-m-1"
+                class="tw-flex tw-w-full tw-justify-center tw-items-center tw-m-1"
                 *ngIf="logoLink$ | async as logoLink"
               >
                 <img
@@ -159,9 +161,18 @@
         </div>
       </div>
     </div>
-    <label for="leaderboard_preferences" class="tw-font-bold tw-mb-2"
-      >Leaderboard Preferences</label
-    >
+    <div class="tw-mb-2">
+      <label for="leaderboard_preferences" class="tw-font-bold"
+        >Leaderboard Preferences</label
+      >
+      <svg-icon
+        mat-raised-button
+        matTooltip="Select columns to show in each leaderboard. Uncheck all to hide the leaderboard."
+        matTooltipClass="tw-bg-[#ececec] tw-font-semibold tw-text-gray-700 tw-rounded-md tw-p-2 tw-text-sm tw-bg-opacity-50 tw-backdrop-blur-md"
+        src="assets/svg/info.svg"
+        svgClass="tw-w-6 tw-h-6 tw-fill-apicuron-purple tw-inline-block tw-ml-2"
+      />
+    </div>
     <leaderboard-preferences
       [leaderboard_preferences_group]="leaderboardForm"
     ></leaderboard-preferences>

@@ -2,6 +2,7 @@ import { DialogModule } from "@angular/cdk/dialog";
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatTooltipModule } from "@angular/material/tooltip";
 import { AngularSvgIconModule } from "angular-svg-icon";
 import { MessageService } from "primeng/api";
 import { CalendarModule } from "primeng/calendar";
@@ -86,6 +87,7 @@ import { SubmitSingleComponent } from "./submit-report/submit-single/submit-sing
     ConfirmationModule,
     EmptyStateComponent,
     PreferenceSelectorComponent,
+    MatTooltipModule,
   ],
 })
 export class DashboardDatabaseModule {}

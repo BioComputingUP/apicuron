@@ -1,35 +1,16 @@
 <div
   [formGroup]="leaderboard_preferences_group"
-  class="leaderboard-main tw-w-full tw-gap-8"
+  class="tw-flex tw-flex-col tw-gap-2 lg:tw-flex-row"
 >
-  <!-- Monthly preferences -->
-  <div class="leaderboard-section">
+  <div
+    class="tw-flex-1 tw-rounded-md tw-bg-white tw-shadow-md tw-p-4 tw-border tw-border-gray-300 tw-mb-4;"
+    *ngFor="let section of leaderboardSections"
+  >
     <preference-selector
-      formControlName="monthly"
-      [preferences]="all_lb_preferences.monthly"
-      sectionLabel="Monthly Leaderboard Columns"
-      sectionIcon="assets/svg/month.svg"
-    >
-    </preference-selector>
-  </div>
-  <!-- Weekly preferences -->
-  <div class="leaderboard-section">
-    <preference-selector
-      formControlName="weekly"
-      [preferences]="all_lb_preferences.weekly"
-      sectionLabel="Weekly Leaderboard Columns"
-      sectionIcon="assets/svg/week.svg"
-    >
-    </preference-selector>
-  </div>
-
-  <!-- Total preferences -->
-  <div class="leaderboard-section">
-    <preference-selector
-      formControlName="total"
-      [preferences]="all_lb_preferences.total"
-      sectionLabel="Total Leaderboard Columns"
-      sectionIcon="assets/svg/total.svg"
+      [formControlName]="section.key"
+      [preferences]="all_lb_preferences[section.key]"
+      [sectionLabel]="section.label"
+      [sectionIcon]="section.icon"
     >
     </preference-selector>
   </div>
