@@ -162,66 +162,9 @@
     <label for="leaderboard_preferences" class="tw-font-bold tw-mb-2"
       >Leaderboard Preferences</label
     >
-    <div
-      formGroupName="leaderboard_preferences"
-      class="leaderboard-main tw-w-full"
-    >
-      <!-- Monthly preferences -->
-      <div class="leaderboard-section">
-        <div class="leaderboard-section-title">
-          <svg-icon
-            src="assets/svg/month.svg"
-            svgClass="tw-w-8 tw-h-8 tw-fill-apicuron-bright-purple tw-mr-2"
-          />
-          <label>Monthly Leaderboard Columns</label>
-
-          <button
-            class="tw-ml-auto tw-text-sm tw-font-medium tw-text-gray-500 tw-p-1"
-            type="button"
-            (click)="toggleSelectAll('monthly')"
-          >
-            Select all
-          </button>
-        </div>
-        <preference-selector
-          formControlName="monthly"
-          [preferences]="all_lb_preferences.monthly"
-        >
-        </preference-selector>
-      </div>
-
-      <!-- Weekly preferences -->
-      <div class="leaderboard-section">
-        <div class="leaderboard-section-title">
-          <svg-icon
-            src="assets/svg/week.svg"
-            svgClass="tw-w-8 tw-h-8 tw-fill-apicuron-bright-purple tw-mr-2"
-          />
-          <label>Weekly Leaderboard Columns</label>
-        </div>
-        <preference-selector
-          formControlName="weekly"
-          [preferences]="all_lb_preferences.weekly"
-        >
-        </preference-selector>
-      </div>
-
-      <!-- Total preferences -->
-      <div class="leaderboard-section">
-        <div class="leaderboard-section-title">
-          <svg-icon
-            src="assets/svg/total.svg"
-            svgClass="tw-w-8 tw-h-8 tw-fill-apicuron-bright-purple tw-mr-2"
-          />
-          <label>Total Leaderboard Columns</label>
-        </div>
-        <preference-selector
-          formControlName="total"
-          [preferences]="all_lb_preferences.total"
-        >
-        </preference-selector>
-      </div>
-    </div>
+    <leaderboard-preferences
+      [leaderboard_preferences_group]="leaderboardForm"
+    ></leaderboard-preferences>
   </form>
 </div>
 

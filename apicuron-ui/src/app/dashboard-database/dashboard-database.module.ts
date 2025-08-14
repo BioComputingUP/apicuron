@@ -32,6 +32,7 @@ import { GroupsService } from "./curator-groups/services/groups.service";
 import { DashboardDatabaseRoutingModule } from "./dashboard-database-routing.module";
 import { DatabaseOverviewComponent } from "./database-overview/database-overview.component";
 import { DatabaseUpdateComponent } from "./database-update/database-update.component";
+import { LeaderboardPreferencesComponent } from "./database-update/leaderboard-preferences/leaderboard-preferences.component";
 import { ManageBadgesComponent } from "./manage-badges/manage-badges.component";
 import { ManageMedalsComponent } from "./manage-medals/manage-medals.component";
 import { ManageTermsComponent } from "./manage-terms/manage-terms.component";
@@ -45,6 +46,7 @@ import { SubmitSingleComponent } from "./submit-report/submit-single/submit-sing
   declarations: [
     ErrorMessagePipe,
     DatabaseUpdateComponent,
+    LeaderboardPreferencesComponent,
     SubmitReportComponent,
     SubmitSingleComponent,
     SubmitBulkComponent,

@@ -5,13 +5,14 @@ import {
   FormsModule,
   NG_VALUE_ACCESSOR,
 } from "@angular/forms";
+import { AngularSvgIconModule } from "angular-svg-icon";
 
 @Component({
   standalone: true,
   selector: "preference-selector",
   templateUrl: "./preference-selector.component.html",
   styleUrls: ["./preference-selector.component.scss"],
-  imports: [CdkListbox, CdkOption, FormsModule],
+  imports: [CdkListbox, CdkOption, FormsModule, AngularSvgIconModule],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -24,6 +25,8 @@ export class PreferenceSelectorComponent<T extends string = string>
   implements ControlValueAccessor
 {
   @Input() preferences: readonly T[];
+  @Input() sectionLabel: string;
+  @Input() sectionIcon: string;
 
   selectedPreferences: readonly T[] = [];
   allSelected = false;

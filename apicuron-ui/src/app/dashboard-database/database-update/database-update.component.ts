@@ -1,20 +1,8 @@
 import { Component, OnDestroy } from "@angular/core";
-import {
-  AbstractControl,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from "@angular/forms";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { MessageService } from "primeng/api";
-import {
-  LeaderboardEnumType,
-  MonthlyLeaderboardColumns,
-  TotalLeaderboardColumns,
-  WeeklyLeaderboardColumns,
-} from "projects/apicuron-util/src/lib/leaderboard/interfaces/leaderboard-columns.types";
 import { BehaviorSubject, combineLatest, Observable, Subject } from "rxjs";
 import {
   catchError,
@@ -23,7 +11,7 @@ import {
   startWith,
   switchMap,
   takeUntil,
-  tap,
+  tap
 } from "rxjs/operators";
 import { Resource } from "../../models/resource.model";
 import { ResourcesService } from "../../resource/service/resources.service";
@@ -49,12 +37,11 @@ export class DatabaseUpdateComponent implements OnDestroy {
 
   blocked$ = new BehaviorSubject<Boolean>(false);
   destroy$ = new Subject<Boolean>();
-
-  all_lb_preferences = {
-    monthly: MonthlyLeaderboardColumns,
-    weekly: WeeklyLeaderboardColumns,
-    total: TotalLeaderboardColumns,
-  };
+  leaderboardForm = this.formBuilder.group({
+    monthly: [[], []],
+    weekly: [[], []],
+    total: [[], []],
+  });
   // @ViewChild("fileUploadElement", { static: false })
   // fileInputElement: ElementRef<HTMLInputElement>;
 
@@ -70,12 +57,6 @@ export class DatabaseUpdateComponent implements OnDestroy {
         return params.get("resource_id");
       })
     );
-
-    const leaderboardForm = this.formBuilder.group({
-      monthly: [[], []],
-      weekly: [[], []],
-      total: [[], []],
-    });
 
     this.form = this.formBuilder.group(
       {
@@ -113,7 +94,7 @@ export class DatabaseUpdateComponent implements OnDestroy {
             ),
           ],
         ],
-        leaderboard_preferences: leaderboardForm,
+        leaderboard_preferences: this.leaderboardForm,
       },
       { validators: Validators.required, updateOn: "change" }
     );
@@ -156,20 +137,6 @@ export class DatabaseUpdateComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.destroy$.next(true);
-  }
-  
-  
-  toggleSelectAll(leaderboardType: LeaderboardEnumType) {
-    const formControl: AbstractControl<string[]> = this.form
-      .get("leaderboard_preferences")
-      .get(leaderboardType);
-    const allColumns = this.all_lb_preferences[leaderboardType];
-    const currentColums: string[] = formControl.value;
-    if (currentColums.length === allColumns.length) {
-      formControl.setValue([]);
-      return;
-    }
-    formControl.setValue([...allColumns]);
   }
 
   submit() {

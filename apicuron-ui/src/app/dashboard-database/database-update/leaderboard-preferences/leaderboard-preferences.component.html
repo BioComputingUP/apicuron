@@ -1,0 +1,36 @@
+<div
+  [formGroup]="leaderboard_preferences_group"
+  class="leaderboard-main tw-w-full tw-gap-8"
+>
+  <!-- Monthly preferences -->
+  <div class="leaderboard-section">
+    <preference-selector
+      formControlName="monthly"
+      [preferences]="all_lb_preferences.monthly"
+      sectionLabel="Monthly Leaderboard Columns"
+      sectionIcon="assets/svg/month.svg"
+    >
+    </preference-selector>
+  </div>
+  <!-- Weekly preferences -->
+  <div class="leaderboard-section">
+    <preference-selector
+      formControlName="weekly"
+      [preferences]="all_lb_preferences.weekly"
+      sectionLabel="Weekly Leaderboard Columns"
+      sectionIcon="assets/svg/week.svg"
+    >
+    </preference-selector>
+  </div>
+
+  <!-- Total preferences -->
+  <div class="leaderboard-section">
+    <preference-selector
+      formControlName="total"
+      [preferences]="all_lb_preferences.total"
+      sectionLabel="Total Leaderboard Columns"
+      sectionIcon="assets/svg/total.svg"
+    >
+    </preference-selector>
+  </div>
+</div>

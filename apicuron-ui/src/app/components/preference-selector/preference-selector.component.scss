@@ -1,5 +1,5 @@
 .option[aria-selected="true"] {
-  @apply tw-bg-apicuron-purple-100 tw-text-apicuron-purple tw-relative
+  @apply tw-bg-purple-100 tw-text-apicuron-purple tw-relative
   
 }
 // transition: color 500ms, background-color 500ms;
@@ -7,13 +7,13 @@
 // color: #441324;
 // position: relative;
 // padding-left: 25px;
-.option[aria-selected="true"]::before {
-  content: "";
-  display: block;
-  width: 20px;
-  height: 20px;
-  background-image: url('/assets/svg/check.svg');
-  background-size: cover;
-  position: absolute;
-  right: 25px;
-}
+// .option[aria-selected="true"]::before {
+//   content: "";
+//   display: block;
+//   width: 20px;
+//   height: 20px;
+//   background-image: url('/assets/svg/check.svg');
+//   background-size: cover;
+//   position: absolute;
+//   right: 25px;
+// }

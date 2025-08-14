@@ -1,16 +1,26 @@
-<div class="tw-mt-4 tw-flex tw-flex-col">
-  <button
-    type="button"
-    (click)="toggleSelection()"
-    class="tw-self-end tw-block tw-text-right tw-py-1 tw-px-2 tw-rounded tw-bg-gray-100 tw-my-1 hover:tw-bg-purple-100"
-  >
-    {{ allSelected ? "Deselect All" : "Select All" }}
-  </button>
+<div class="tw-flex tw-flex-col">
+  <div class="tw-flex tw-align-top tw-text-lg tw-font-semibold tw-pb-2">
+    <div>
+      <svg-icon
+        [src]="sectionIcon"
+        svgClass="tw-w-8 tw-h-8 tw-fill-apicuron-bright-purple tw-mr-2 tw-inline-block"
+      />
+      <span class="tw-text-gray-700 tw-font-bold">{{ sectionLabel }}</span>
+    </div>
+    <button
+      type="button"
+      (click)="toggleSelection()"
+      class="tw-text-sm tw-ml-2 tw-font-medium tw-text-gray-500 tw-p-1 hover:tw-bg-gray-100 tw-rounded-md"
+    >
+      {{ allSelected ? "Deselect All" : "Select All" }}
+    </button>
+  </div>
   <ul
     cdkListbox
     cdkListboxMultiple
     [cdkListboxValue]="selectedPreferences"
     (cdkListboxValueChange)="onSelectionChange($event.value)"
+    class="tw-flex tw-flex-row tw-flex-wrap tw-gap-2"
   >
     @for (preference of preferences; track preference){
     <li
