@@ -1,12 +1,9 @@
-
+# This is used to build and push the Docker images
 services:
   apicuron-ws-prod:
     build:
       context: "./apicuron-ws"
       target: production
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
       tags:
         - registry.biocomputingup.it/apicuron-ws:latest
         - registry.biocomputingup.it/apicuron-ws:prod
@@ -18,9 +15,6 @@ services:
     build:
       context: "./apicuron-ui"
       target: production
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
       tags:
         - registry.biocomputingup.it/apicuron-ui:latest
         - registry.biocomputingup.it/apicuron-ui:${CURRENT_HASH:-latest}
@@ -30,9 +24,6 @@ services:
     build:
       context: "./apicuron-ws"
       target: dev
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
       tags:
         - registry.biocomputingup.it/apicuron-ws:dev
         - registry.biocomputingup.it/apicuron-ws:dev-${CURRENT_HASH:-latest}
@@ -43,9 +34,6 @@ services:
     build:
       context: "./apicuron-ui"
       target: dev
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
       tags:
         - registry.biocomputingup.it/apicuron-ui:dev
         - registry.biocomputingup.it/apicuron-ui:dev-${CURRENT_HASH:-latest}
