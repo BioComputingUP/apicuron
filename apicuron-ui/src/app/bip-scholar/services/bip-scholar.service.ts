@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable, map, shareReplay, switchMap } from "rxjs";
+import { map, Observable, shareReplay, switchMap } from "rxjs";
 import {
+  BipScholarSection,
   BipScholarStats,
-  BipScholarStatsViewModel,
 } from "src/app/models/external/bip-scholar.model";
 import { environment } from "src/environments/environment";
 
@@ -19,7 +19,7 @@ export class BipScholarService {
 
   getBipScholarScores(
     orcid$: Observable<string>
-  ): Observable<BipScholarStatsViewModel | null> {
+  ): Observable<Array<{ key: string; value: BipScholarSection }>> {
     if (this.stage === "development") {
       // Avoid calling the service in dev environment
       return new Observable((observer) => {
