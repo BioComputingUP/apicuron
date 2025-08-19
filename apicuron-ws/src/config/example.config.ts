@@ -4,7 +4,7 @@ export default () => ({
 	db_host: process.env.DATABASE_HOST || 'moros', // the hostname of the mongodb instance to use
 
 	database: process.env.DATABASE || 'apicuron_test', // the name of the database on mongodb
-	db_port: parseInt(process.env.DB_PORT) || 27017, // the port that the database uses
+	db_port: parseInt(process.env.DB_PORT ?? '27017') || 27017, // the port that the database uses
 	ORCID_REDIRECT: 'http://localhost:3000/auth/orcid/redirect', // The assigned Redirect URL for ORCID
 	ORCID_CLIENT_ID: 'APP-TTBI2EX11P70SRD6', // the client ID registered on
 	ORCID_CLIENT_SECRET: 'YOUR-ORCID-CLIENT-SECRET', // the secret used when communicating with ORCID

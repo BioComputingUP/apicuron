@@ -355,7 +355,7 @@ export class BadgeAggregatorService implements Aggregator {
 		await this.badgeModel.deleteMany(filter);
 		return await this.createBadges(filter);
 	}
-	updatedResource(_after: PartnerResource): Promise<void> {
+	updatedResource(_after: PartnerResource): Promise<void> | void {
 		return; // badges have no reference to the resource
 	}
 }

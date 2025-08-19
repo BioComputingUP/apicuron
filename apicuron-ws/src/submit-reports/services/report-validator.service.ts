@@ -1,23 +1,13 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, LeanDocument, Model } from 'mongoose';
-import { assertNotNull } from 'src/util/type-assertion.helper';
+import { FilterQuery, Model } from 'mongoose';
+import { assertIsDefined } from 'src/util/type-assertion.helper';
 import { UsersService } from '../../auth/users/services/users.service';
-import {
-	League,
-	LeagueDocument,
-} from '../../core/schemas/league/league.schema';
-import {
-	ReportModel,
-	ReportDocument,
-	Report,
-} from '../../core/schemas/reports.schema';
-import {
-	PartnerResource,
-	PartnerResourceDocument,
-} from '../../core/schemas/resource/partner-resource.schema';
+import { League } from '../../core/schemas/league/league.schema';
+import { Report, ReportModel } from '../../core/schemas/reports.schema';
+import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
 import { Term, TermDocument } from '../../core/schemas/terms.schema';
-import { User, UserDocument } from '../../core/schemas/user.schema';
+import { User } from '../../core/schemas/user.schema';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import {
 	hashTermIdentifier,
@@ -145,7 +135,7 @@ export class ReportValidatorService {
 	): Promise<{
 		report: Report;
 		resource: PartnerResourceDocument;
-		user: User;
+		user?: User | null;
 		term: Term;
 		league_data: League;
 	}> {
@@ -202,7 +192,7 @@ export class ReportValidatorService {
 			// populate the league field of the report
 			.map((report) => {
 				const resource_from_report = resourcesMap.get(report.resource_id);
-				assertNotNull(resource_from_report, 'Resource not found');
+				assertIsDefined(resource_from_report, 'Resource not found');
 				report.league = this.assignDefaultLeague(
 					report,
 					resource_from_report,
@@ -235,7 +225,7 @@ export class ReportValidatorService {
 		);
 		const results: {
 			resource: PartnerResourceDocument;
-			user: User;
+			user?: User | null;
 			report: Report;
 			term: Term;
 			league_data: League;

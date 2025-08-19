@@ -10,7 +10,7 @@ import {
 	ValidatorConstraintInterface,
 } from 'class-validator';
 import { Model } from 'mongoose';
-import { assertNotNull } from 'src/util/type-assertion.helper';
+import { assertIsDefined } from 'src/util/type-assertion.helper';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
@@ -72,7 +72,10 @@ export class ActivityTermExists implements ValidatorConstraintInterface {
 						{ resource_id },
 						{ defaultLeague: 1 },
 					);
-					assertNotNull(resource, `Resource with id ${resource_id} not found`);
+					assertIsDefined(
+						resource,
+						`Resource with id ${resource_id} not found`,
+					);
 					league = resource.defaultLeague;
 				}
 				// value expected is s single term, we check if it exists

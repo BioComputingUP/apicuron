@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { IEventHandler } from '@nestjs/cqrs';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
+import { assertIsDefined } from 'src/util/type-assertion.helper';
 import { Report, ReportModel } from '../../core/schemas/reports.schema';
-import { assertNotNull } from 'src/util/type-assertion.helper';
 import {
 	IManyReportsSubmittedEventPayload,
 	ManyReportsSubmittedEvent,
@@ -48,11 +48,11 @@ export class ManyReportsSubmittedHandler implements IEventHandler {
 						t.resource_id === report.resource_id &&
 						t.league === report.league,
 				);
-				assertNotNull(
+				assertIsDefined(
 					resource,
 					`Resource not found for report with resource_id: ${report.resource_id}`,
 				);
-				assertNotNull(
+				assertIsDefined(
 					term,
 					`Term not found for report with activity_term: ${report.activity_term}, resource_id: ${report.resource_id}, league: ${report.league}`,
 				);

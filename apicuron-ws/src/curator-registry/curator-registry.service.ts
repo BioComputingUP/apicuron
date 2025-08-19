@@ -194,7 +194,10 @@ export class CuratorRegistryService {
 	}
 
 	// Read
-	async getAllEntries(query: GetRegistryEntryDto) {
+	async getAllEntries(query: GetRegistryEntryDto): Promise<{
+		total: number;
+		data: LeanCuratorRegistryEntryDocument[];
+	}> {
 		//extract user query details
 		const {
 			filter_field: filtered_field, //orcid or displayed name
@@ -235,7 +238,7 @@ export class CuratorRegistryService {
 
 			if (entries.length == 0) {
 				return {
-					length: 0,
+					total: 0,
 					data: [],
 				};
 			}
@@ -278,7 +281,7 @@ export class CuratorRegistryService {
 	}
 	async getCuratorEntry(
 		orcid_identifier: string,
-	): Promise<LeanCuratorRegistryEntryDocument | null> {
+	): Promise<LeanCuratorRegistryEntryDocument | undefined> {
 		let entry: LeanCuratorRegistryEntryDocument;
 		try {
 			entry = await this.registryEntryModel
@@ -286,7 +289,7 @@ export class CuratorRegistryService {
 					curator_orcid: orcid_identifier,
 				})
 				.lean();
-			return entry ?? null;
+			return entry ?? undefined;
 		} catch (error) {
 			this.logger.error(
 				`Could not retrieve user with orcid: ${orcid_identifier}...`,
@@ -327,7 +330,9 @@ export class CuratorRegistryService {
 		const [resource, user]: [PartnerResource, User | undefined] =
 			await Promise.all([
 				resource_data || this.resourceService.get_resource(resource_id),
-				user_data ?? (await this.userRep.findOne({ orcid_id: orcid })),
+				user_data ??
+					(await this.userRep.findOne({ orcid_id: orcid })) ??
+					undefined,
 			]);
 		if (!resource) {
 			this.logger.error(`Resource ${resource_id} not found`);

@@ -6,7 +6,7 @@ import {
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
-import { assertNotNull } from 'src/util/type-assertion.helper';
+import { assertIsDefined } from 'src/util/type-assertion.helper';
 import { IResourceEntity } from '../core/interfaces/user-resource-entity';
 import { Report, ReportDocument } from '../core/schemas/reports.schema';
 import { Term, TermDocument } from '../core/schemas/terms.schema';
@@ -90,7 +90,7 @@ export class TermsService {
 			},
 			{ new: true },
 		);
-		assertNotNull(
+		assertIsDefined(
 			updatedTerm,
 			`Failed to update term ${termUpdate.activity_term} from resource ${termUpdate.resource_id} from league ${termUpdate.league}`,
 		);
@@ -124,7 +124,7 @@ export class TermsService {
 			);
 		}
 		const privacy = resource.getLeague(createTerm.league)?.visibility;
-		assertNotNull(
+		assertIsDefined(
 			privacy,
 			`League ${createTerm.league} does not exist on resource ${createTerm.resource_id}`,
 		);

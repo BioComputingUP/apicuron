@@ -59,9 +59,9 @@ export class ComputeBadgesService {
 	}
 
 	public async buildBadgeFromAggregatedReports(
-		badgeDef: BadgeDefDocument | LeanDocument<BadgeDefDocument>,
+		badgeDef: BadgeDefDocument | LeanDocument<BadgeDef>,
 		reportAgg: BadgeAggregatedReports,
-		earningReport?: Report,
+		earningReport?: Report | null,
 	): Promise<LeanBadgeDocument> {
 		const state =
 			reportAgg.count >= badgeDef.count_threshold
@@ -115,7 +115,7 @@ export class ComputeBadgesService {
 	public initBadgeFromReport(
 		badgeDef: LeanDocument<BadgeDefDocument>,
 		report: ReportDocument | LeanReportDocument,
-	): LeanDocument<BadgeDocument> {
+	): LeanDocument<Badge> {
 		const privacy = computeAggregatePrivacyField(badgeDef, report);
 		const state =
 			1 >= badgeDef.count_threshold
@@ -124,7 +124,6 @@ export class ComputeBadgesService {
 		const achieved_at =
 			state === AchievementState.achieved ? report.timestamp : undefined;
 		return {
-			_id: undefined,
 			name: badgeDef.name,
 			displayedName: badgeDef.displayedName,
 			resource_uri: badgeDef.resource_uri,
@@ -160,16 +159,15 @@ export class ComputeBadgesService {
 	 * @throws {Error} If the report's activity term is not included in the badge's list of terms.
 	 */
 	public applyReportOnBadge(
-		badge: LeanDocument<BadgeDocument>,
+		badge: LeanDocument<Badge>,
 		report: LeanReportDocument,
-	): LeanDocument<BadgeDocument> {
+	): BadgeDocument {
 		if (!badge.list_terms.includes(report.activity_term)) {
 			throw new Error(
 				`Report activity term ${report.activity_term} not in badge list terms ${badge.list_terms}, this function should not have been called`,
 			);
 		}
-		const newBadge: LeanDocument<BadgeDocument> = {
-			_id: undefined,
+		const newBadge: BadgeDocument = new this.badgeModel({
 			name: badge.name,
 			displayedName: badge.displayedName,
 			resource_uri: badge.resource_uri,
@@ -188,7 +186,7 @@ export class ComputeBadgesService {
 			state: badge.state,
 			count: badge.count + 1,
 			progress_rate: badge.count / badge.count_threshold,
-		};
+		});
 		if (
 			badge.state != AchievementState.achieved &&
 			newBadge.count >= newBadge.count_threshold

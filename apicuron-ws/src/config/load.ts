@@ -18,10 +18,11 @@ export function loadConfig() {
 		production: 'prod',
 	};
 
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	const configName =
-		(process.env.NODE_ENV == 'test'
+		process.env.NODE_ENV == 'test'
 			? undefined
-			: configNames[process.env.NODE_ENV]) || 'local';
+			: configNames[process.env.NODE_ENV || 'local'];
 
 	// eslint-disable-next-line @typescript-eslint/no-var-requires
 	const config = require(`./config.${configName}`);

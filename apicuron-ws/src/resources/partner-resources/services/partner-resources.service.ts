@@ -3,7 +3,7 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, LeanDocument, Model, Types } from 'mongoose';
-import { assertNotNull } from 'src/util/type-assertion.helper';
+import { assertIsDefined } from 'src/util/type-assertion.helper';
 import {
 	League,
 	LeagueDocument,
@@ -82,7 +82,7 @@ export class PartnerResourcesService {
 				new: true,
 			},
 		);
-		assertNotNull(
+		assertIsDefined(
 			resourceUpdated,
 			`Resource with ID ${removeMemberFromLeague.resource_id} not found.`,
 		);
@@ -95,7 +95,7 @@ export class PartnerResourcesService {
 		const resource = await this.partnerResourceModel.findOne({
 			resource_id: deleteLeague.resource_id,
 		});
-		assertNotNull(
+		assertIsDefined(
 			resource,
 			`Resource with ID ${deleteLeague.resource_id} not found.`,
 		);
@@ -123,7 +123,7 @@ export class PartnerResourcesService {
 				new: true,
 			},
 		);
-		assertNotNull(
+		assertIsDefined(
 			resourceUpdated,
 			`Resource with ID ${deleteLeague.resource_id} not found.`,
 		);
@@ -150,7 +150,7 @@ export class PartnerResourcesService {
 
 	async get_resource(resource_id: string): Promise<PartnerResourceDocument> {
 		const doc = await this.partnerResourceModel.findOne({ resource_id });
-		assertNotNull(doc, `Resource with ID ${resource_id} not found.`);
+		assertIsDefined(doc, `Resource with ID ${resource_id} not found.`);
 		return doc;
 	}
 
@@ -172,7 +172,7 @@ export class PartnerResourcesService {
 			{ $set: resource_update },
 			{ new: true },
 		);
-		assertNotNull(newResource, `Resource with ID ${resource_id} not found.`);
+		assertIsDefined(newResource, `Resource with ID ${resource_id} not found.`);
 		await this.eventEmitter.emitAsync(
 			PartnerResourceUpdatedEvent.name,
 			new PartnerResourceUpdatedEvent(resource, newResource),

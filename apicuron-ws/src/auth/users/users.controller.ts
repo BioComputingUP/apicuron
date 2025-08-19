@@ -2,14 +2,12 @@ import {
 	Body,
 	Controller,
 	Get,
-	Headers,
 	HttpStatus,
 	Logger,
 	NotFoundException,
 	Param,
 	Patch,
 	Post,
-	Req,
 	Res,
 	UnauthorizedException,
 	UseGuards,
@@ -23,7 +21,6 @@ import {
 	ApiSecurity,
 	ApiTags,
 } from '@nestjs/swagger';
-import { Response } from 'express';
 import { User } from '../../core/schemas/user.schema';
 import { VersionHeader } from '../../plugins/swagger/config';
 import { Public } from '../decorators/public.decorator';
@@ -31,7 +28,7 @@ import { Roles } from '../decorators/roles.decorator';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { RoleGuard } from '../guards/role.guard';
 import { UpdateProfileDto, UpdateUserDto } from './dto/update-user.dto';
-import { json_to_tsv } from './helpers/json-tsv';
+
 import { UsersService } from './services/users.service';
 
 import { UserRepository } from '../../core/repositories/user.repository';
@@ -67,46 +64,46 @@ export class UsersController {
 			});
 	}
 
-	@Get('/browse')
-	// @Roles('user')
-	@UseGuards(LocalAuthGuard)
-	async get_user_stats(@Param() params, @Res() res: Response) {
-		// params['orcid_filter'] =
+	// @Get('/browse')
+	// // @Roles('user')
+	// @UseGuards(LocalAuthGuard)
+	// async get_user_stats(@Param() params, @Res() res: Response) {
+	// 	// params['orcid_filter'] =
 
-		const result = await this.usersService.get_users_with_stats(params);
+	// 	const result = await this.usersService.get_users_with_stats(params);
 
-		res.header('count', result[0]['biocurators_count']);
-		res.send(result[0]['biocurators']);
-	}
+	// 	res.header('count', result[0]['biocurators_count']);
+	// 	res.send(result[0]['biocurators']);
+	// }
 
-	@Get('/achievements')
-	async get_user_achievements(
-		@Param() params,
-		@Req() req,
-		@Headers('format') format,
-		@Res() res,
-	) {
-		const result = await this.usersService.get_achievements({
-			...params,
-			user: !!req.user ? req.user.orcid_id : null,
-		});
-		if (!!format && format == 'tsv') {
-			res.set({
-				'Content-Type': 'text/tab-separated-values',
-				'Content-Disposition':
-					'attachment; filename="apicuron_achievements.tsv"',
-			});
-			res.send(json_to_tsv(result));
-		} else if (!format || (!!format && format == 'json')) {
-			res.set({
-				'Content-Type': 'application/json',
-				'Content-Disposition':
-					'attachment; filename="apicuron_achievements.json"',
-			});
+	// @Get('/achievements')
+	// async get_user_achievements(
+	// 	@Param() params,
+	// 	@Req() req,
+	// 	@Headers('format') format,
+	// 	@Res() res,
+	// ) {
+	// 	const result = await this.usersService.get_achievements({
+	// 		...params,
+	// 		user: !!req.user ? req.user.orcid_id : null,
+	// 	});
+	// 	if (!!format && format == 'tsv') {
+	// 		res.set({
+	// 			'Content-Type': 'text/tab-separated-values',
+	// 			'Content-Disposition':
+	// 				'attachment; filename="apicuron_achievements.tsv"',
+	// 		});
+	// 		res.send(json_to_tsv(result));
+	// 	} else if (!format || (!!format && format == 'json')) {
+	// 		res.set({
+	// 			'Content-Type': 'application/json',
+	// 			'Content-Disposition':
+	// 				'attachment; filename="apicuron_achievements.json"',
+	// 		});
 
-			res.send(result);
-		}
-	}
+	// 		res.send(result);
+	// 	}
+	// }
 }
 
 @ApiTags('Users')

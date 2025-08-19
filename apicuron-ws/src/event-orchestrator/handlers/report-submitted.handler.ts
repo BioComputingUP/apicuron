@@ -86,7 +86,7 @@ export class ReportSubmittedEventHandler
 			);
 			const { report, term, resource, user } = payload;
 			try {
-				await aggregator.applyReport(report, term, resource, user);
+				await aggregator.applyReport(report, term, resource, user ?? undefined);
 			} catch (error) {
 				this.logger.error(
 					`Error processing report in aggregator ${aggregator.constructor.name}: ${error.message}`,

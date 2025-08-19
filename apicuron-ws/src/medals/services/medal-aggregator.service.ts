@@ -268,7 +268,7 @@ export class MedalAggregatorService implements Aggregator {
 		// recompute the medals that are affected by the term deletion
 		await this.computeMedals.reComputeMedals({ _id: { $in: affectedIds } });
 	}
-	updatedResource(_after: PartnerResource): Promise<void> {
+	updatedResource(_after: PartnerResource): Promise<void> | void {
 		return; // medals have no reference to the resource
 	}
 }

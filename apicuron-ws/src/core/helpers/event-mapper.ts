@@ -25,13 +25,12 @@ export class RepositoryEventPublisher<
 		this.subscription = this._publisher
 			.pipe(
 				switchMap((event: Event) => {
-					const mapFound =
-						eventMap.find(
-							([sourceEvent, _destEvent]: [
-								SourceEvent,
-								new (...args: unknown[]) => unknown,
-							]) => sourceEvent.name === event.name,
-						) || [];
+					const mapFound = eventMap.find(
+						([sourceEvent, _destEvent]: [
+							SourceEvent,
+							new (...args: unknown[]) => unknown,
+						]) => sourceEvent.name === event.name,
+					);
 					if (!mapFound) {
 						this.logger.warn(`No mapping found for event: ${event.name}`);
 						return of(null);

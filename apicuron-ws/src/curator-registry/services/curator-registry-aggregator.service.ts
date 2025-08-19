@@ -1,13 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-	LeanReportDocument,
-	Report,
-	ReportDocument,
-	ReportModel,
-} from 'src/core/schemas/reports.schema';
-import { TermDocument } from 'src/core/schemas/terms.schema';
-import { UserDocument } from 'src/core/schemas/user.schema';
+import { Report, ReportModel } from 'src/core/schemas/reports.schema';
+import { Term, TermDocument } from 'src/core/schemas/terms.schema';
+import { User } from 'src/core/schemas/user.schema';
 import { AggregatorClass } from 'src/event-orchestrator/decorators/aggregator.decorator';
 import { Aggregator } from 'src/event-orchestrator/interfaces/aggregator.interface';
 import { LeagueUpdatedEvent } from 'src/resources/partner-resources/leagues/events/league-updated.event';
@@ -18,7 +13,7 @@ import {
 	UserUpdatedEvent,
 } from 'src/core/repositories/user.repository';
 
-import { PartnerResourceDocument } from 'src/core/schemas';
+import { PartnerResource, PartnerResourceDocument } from 'src/core/schemas';
 import { CuratorRegistryService } from '../curator-registry.service';
 
 @Injectable()
@@ -32,12 +27,12 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 	private logger = new Logger(CuratorRegistryAggregatorService.name);
 
 	async applyReport(
-		report: LeanReportDocument | ReportDocument,
-		_term: TermDocument,
-		resource: PartnerResourceDocument,
-		curator?: UserDocument | null,
+		report: Report,
+		_term: Term,
+		resource: PartnerResource,
+		curator?: User,
 	) {
-		const user = curator ?? report.user;
+		const user = curator ?? report.user ?? undefined;
 
 		await this.registryService.addContribution(
 			report.curator_orcid,
