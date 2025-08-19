@@ -27,7 +27,7 @@ export class LeaderboardPreferencesComponent {
     {
       key: "weekly",
       label: "Weekly Leaderboard Columns",
-      icon: "assets/svg/week.svg",
+      icon: "assets/svg/weekly.svg",
     },
     {
       key: "total",

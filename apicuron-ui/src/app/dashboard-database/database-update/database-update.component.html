@@ -7,14 +7,6 @@
       <span class="tw-text-xl tw-font-bold"
         >Update {{ resource["resource_name"] }}</span
       >
-      <div class="tw-flex">
-        <input
-          type="submit"
-          [value]="'Update ' + resource['resource_name']"
-          [disabled]="form.invalid || !form.dirty"
-          class="tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded-md disabled:tw-bg-gray-300 disabled:tw-text-gray-600 enabled:tw-bg-apicuron-purple enabled:tw-text-white enabled:tw-shadow-md enabled:tw-cursor-pointer"
-        />
-      </div>
     </div>
 
     <div
@@ -61,7 +53,7 @@
         <div class="form-control-element">
           <label for="resource_description">Resource Description</label>
           <textarea
-            class="text-input"
+            class="text-input tw-h-40"
             name="resource_description"
             formControlName="resource_description"
             id="resource_description_textarea"
@@ -110,7 +102,7 @@
           <div
             class="tw-bg-white tw-border-gray-300 tw-rounded tw-border tw-p-4 tw-flex tw-flex-col tw-gap-2"
           >
-            <div class="tw-w-full lg:tw-w-1/2">
+            <div class="tw-w-full">
               <span
                 class="tw-text-base tw-font-bold tw-text-gray-700 tw-my-1 sm:tw-my-2"
               >
@@ -121,7 +113,7 @@
                 *ngIf="logoLink$ | async as logoLink"
               >
                 <img
-                  class="tw-max-w-full tw-w-32 sm:tw-w-48 xl:tw-w-64"
+                  class="tw-max-w-48 sm:tw-max-w-44 xl:tw-max-w-40"
                   [src]="logoLink"
                   alt=""
                 />
@@ -162,20 +154,25 @@
       </div>
     </div>
     <div class="tw-mb-2">
-      <label for="leaderboard_preferences" class="tw-font-bold"
+      <label for="leaderboard_preferences" class="tw-font-bold tw-pl-1"
         >Leaderboard Preferences</label
       >
-      <svg-icon
-        mat-raised-button
-        matTooltip="Select columns to show in each leaderboard. Uncheck all to hide the leaderboard."
-        matTooltipClass="tw-bg-[#ececec] tw-font-semibold tw-text-gray-700 tw-rounded-md tw-p-2 tw-text-sm tw-bg-opacity-50 tw-backdrop-blur-md"
-        src="assets/svg/info.svg"
-        svgClass="tw-w-6 tw-h-6 tw-fill-apicuron-purple tw-inline-block tw-ml-2"
-      />
+      <p class="tw-text-gray-600 tw-text-sm tw-pl-1 tw-font-medium">
+        Choose which columns to display in each leaderboard. If all columns are
+        unchecked, the leaderboard will be hidden.
+      </p>
     </div>
     <leaderboard-preferences
       [leaderboard_preferences_group]="leaderboardForm"
     ></leaderboard-preferences>
+    <div class="tw-flex tw-mb-4 tw-justify-end">
+      <input
+        type="submit"
+        [value]="'Update ' + resource['resource_name']"
+        [disabled]="form.invalid || !form.dirty"
+        class="tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded-md disabled:tw-bg-gray-300 disabled:tw-text-gray-600 enabled:tw-bg-apicuron-purple enabled:tw-text-white enabled:tw-shadow-md enabled:tw-cursor-pointer"
+      />
+    </div>
   </form>
 </div>
 
