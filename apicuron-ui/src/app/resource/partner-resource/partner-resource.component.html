@@ -3,23 +3,18 @@
 >
   <div class="tw-flex tw-flex-row tw-justify-between">
     <a
-      class="tw-text-xl tw-font-bold hover:tw-underline hover:tw-text-apicuron-purple tw-text-gray-800 tw-cursor-pointer"
+      class="tw-text-xl tw-font-bold hover:tw-underline hover:tw-text-apicuron-bright-purple tw-text-gray-800 tw-cursor-pointer tw-inline tw-align-middle"
       [routerLink]="['/databases', resource.resource_id]"
       >{{ resource.resource_name }}
-    </a>
-    <a
-      target="_blank"
-      class="tw-text-md tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer hover:tw-underline"
-      [href]="resource.resource_url"
-      >Visit Resource
       <svg-icon
-        src="assets/svg/external-link.svg"
-        svgClass="tw-h-3 tw-w-3 tw-inline"
+        src="assets/svg/right-arrow.svg"
+        svgClass="tw-h-6 tw-w-6 tw-pt-2"
+        class="tw-inline-flex tw-h-full tw-items-center"
       >
-      </svg-icon
-    ></a>
+      </svg-icon>
+    </a>
   </div>
-  <span class="tw-text-gray-400 tw-font-semibold tw-text-left tw-font-dm-sans">
+  <span class="tw-text-gray-500 tw-font-normal tw-text-left tw-font-dm-sans">
     {{ resource.resource_long_name }}
   </span>
   <p
@@ -69,5 +64,18 @@
         />
       </a>
     </div>
+  </div>
+  <div class="tw-self-end tw-grow tw-flex tw-items-end">
+    <a
+      target="_blank"
+      class="tw-text-md tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer hover:tw-underline"
+      [href]="resource.resource_url"
+      >Visit Website
+      <svg-icon
+        src="assets/svg/external-link.svg"
+        svgClass="tw-h-3 tw-w-3 tw-inline"
+      >
+      </svg-icon
+    ></a>
   </div>
 </div>
