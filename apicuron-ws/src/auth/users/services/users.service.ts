@@ -68,26 +68,6 @@ export class UsersService {
 	}
 
 	/**
-	 * Get users by orcid_ids, maintains order and returns a list of UserEntity matching the orcid_ids order
-	 * @param orcid_ids List of orcid_ids
-	 * @returns list of users from the database
-	 */
-	async getUsersByOrcid(orcid_ids: string[]): Promise<User[]> {
-		const users = await this.userRepository.find({
-			orcid_id: { $in: orcid_ids },
-		});
-		if (!users) return [];
-
-		const sortedUsers = orcid_ids
-			.map((orcid_id): User | undefined =>
-				users.find((user) => user.orcid_id === orcid_id),
-			)
-			.filter((user): user is User => !!user);
-
-		return sortedUsers;
-	}
-
-	/**
 	 * Retrieves a public user profile based on the provided ORCID ID.
 	 *
 	 * @param orcid_id - The ORCID ID of the user to retrieve.

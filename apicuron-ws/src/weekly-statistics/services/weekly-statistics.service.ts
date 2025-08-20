@@ -36,7 +36,7 @@ export class WeeklyStatisticsService {
 	): Promise<{
 		data: {
 			stat: WeeklyStatistics;
-			user: User;
+			user: User | null;
 		}[];
 		count: number;
 	}> {
@@ -57,15 +57,11 @@ export class WeeklyStatisticsService {
 			this.WeeklyStatistics.count(statFilter),
 		]);
 
-		const orcid_ids = statistics.map((stat) => stat.curator_orcid);
-		const users = await this.userService.getUsersByOrcid(orcid_ids);
-
-		const statLeaderboard: { stat: WeeklyStatistics; user: User }[] =
-			statistics.map((stat, index) => {
-				const user = users[index];
+		const statLeaderboard: { stat: WeeklyStatistics; user: User | null }[] =
+			statistics.map((stat) => {
 				const leaderboardEntry = {
-					stat: stat,
-					user: user,
+					stat: stat.toObject(),
+					user: stat.user?.toObject<User>() ?? null,
 				};
 
 				return leaderboardEntry;

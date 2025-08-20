@@ -46,6 +46,7 @@ export class ContributionEntry {
 
 type CuratorRegistryOverride = {
 	contributed_to: Types.DocumentArray<ContributionEntry>;
+	curator: (Types.Subdocument<ObjectId> & User) | null;
 };
 
 export type LeanCuratorRegistryEntryDocument =
@@ -86,7 +87,7 @@ export class CuratorRegistryEntry {
 		required: false,
 		type: UserSchema,
 	})
-	curator: User;
+	curator: User | null;
 
 	@Prop({ required: true, type: [ContributionEntrySchema], default: () => [] })
 	contributed_to: ContributionEntry[];
