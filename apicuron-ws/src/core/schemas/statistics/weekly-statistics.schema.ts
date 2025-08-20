@@ -44,13 +44,13 @@ export class WeeklyStatistics
 	resource_id: string;
 
 	@Prop({ required: false, type: UserSchema })
-	user: (Types.Subdocument<Types.ObjectId> & User) | null;
+	user: User | null;
 
 	@Prop({ required: true, type: PartnerResourceSchema })
-	resource: Types.Subdocument<Types.ObjectId> & PartnerResource;
+	resource: PartnerResource;
 
 	@Prop({ required: true, type: LeagueSchema })
-	league_data: Types.Subdocument<Types.ObjectId> & League;
+	league_data: League;
 
 	@Prop({ required: true, type: String, enum: PrivacyType })
 	privacy: PrivacyType;

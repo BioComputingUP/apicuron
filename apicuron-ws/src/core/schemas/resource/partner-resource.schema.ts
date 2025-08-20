@@ -102,7 +102,7 @@ export class PartnerResource {
 	})
 	allowedUrlsPrefix: string[];
 
-	getLeague(leagueName: string): League {
+	getLeague(leagueName: string): League | undefined {
 		return this.leagues.find((league: League) => league.name == leagueName);
 	}
 

@@ -59,10 +59,13 @@ export type LeanUserDoc = LeanDocument<User>;
 		getResourcePutCode(
 			this: UserDocument,
 			resource_id: string,
-		): {
-			putCode: string;
-			resource_id: string;
-		} | null {
+		):
+			| {
+					putCode: string;
+					resource_id: string;
+			  }
+			| null
+			| undefined {
 			return this.orcid_work_put_codes.find(
 				(item) => item.resource_id == resource_id,
 			);
@@ -74,7 +77,8 @@ export type LeanUserDoc = LeanDocument<User>;
 			putCode: string,
 		): void {
 			if (this.hasResourcePutCode(resource_id)) {
-				this.getResourcePutCode(resource_id).putCode = putCode;
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				this.getResourcePutCode(resource_id)!.putCode = putCode;
 			} else {
 				this.orcid_work_put_codes.push({
 					resource_id,
@@ -138,7 +142,7 @@ export class User {
 	institution?: string;
 
 	@Prop({ select: false })
-	jwt_token: string;
+	jwt_token?: string;
 
 	@Prop({
 		required: false,

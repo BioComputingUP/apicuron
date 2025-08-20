@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ResourceDocument } from 'src/core/schemas/index';
-import { assertNotNull } from 'src/util/type-assertion.helper';
+import { assertIsDefined } from 'src/util/type-assertion.helper';
 import { AppModule } from '../../app.module';
 import { PrivacyType } from '../../core/enums';
 import {
@@ -108,7 +108,7 @@ async function addLeagueToUserResourceEntities(app: INestApplicationContext) {
 			try {
 				if (!entry.league) {
 					const resource = resourceMap.get(entry.resource_id);
-					assertNotNull(
+					assertIsDefined(
 						resource,
 						`Resource with resource_id ${entry.resource_id} not found in resourceMap`,
 					);
@@ -126,7 +126,7 @@ async function addLeagueToUserResourceEntities(app: INestApplicationContext) {
 					const user = await userModel.findOne({
 						orcid_id: entry.curator_orcid,
 					});
-					assertNotNull(
+					assertIsDefined(
 						user,
 						`User with orcid_id ${entry.curator_orcid} not found in userModel`,
 					);
@@ -134,7 +134,7 @@ async function addLeagueToUserResourceEntities(app: INestApplicationContext) {
 				}
 				const user = userMap.get(entry.curator_orcid);
 				const resource = resourceMap.get(entry.resource_id);
-				assertNotNull(
+				assertIsDefined(
 					resource,
 					`Resource with resource_id ${entry.resource_id} not found in resourceMap`,
 				);
@@ -180,7 +180,7 @@ async function addLeagueToResourceEntities(app: INestApplicationContext) {
 
 		for await (const entry of allEntries) {
 			const resource = resourceMap.get(entry.resource_id);
-			assertNotNull(
+			assertIsDefined(
 				resource,
 				`Resource with resource_id ${entry.resource_id} not found in resourceMap`,
 			);
@@ -197,7 +197,7 @@ async function addLeagueToResourceEntities(app: INestApplicationContext) {
 
 			if (!entry.privacy) {
 				const league = resource.getLeague(entry.league);
-				assertNotNull(
+				assertIsDefined(
 					league,
 					`League ${entry.league} not found in resource ${resource.resource_id}`,
 				);

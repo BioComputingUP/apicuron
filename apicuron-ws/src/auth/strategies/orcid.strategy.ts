@@ -1,11 +1,11 @@
+import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { AuthService } from '../auth.service';
 import { Strategy } from 'passport-oauth2';
-import { UsersService } from '../users/services/users.service';
-import { HttpService } from '@nestjs/axios';
 import { OrcidClientService } from 'src/orcid/orcid-client/orcid-client.service';
+import { AuthService } from '../auth.service';
+import { UsersService } from '../users/services/users.service';
 
 const orcid_scopes = '/read-limited /activities/update';
 
@@ -31,8 +31,8 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 
 			async function (accessToken, refreshToken, params, profile, done) {
 				const orcid_id: string = params.orcid;
-				const user_info = await orcid_client.get_user_info(orcid_id);
 				try {
+					const user_info = await orcid_client.get_user_info(orcid_id);
 					const user = await usersService.createOrUpdateUser({
 						displayedName: params.name,
 						username: params.name,
@@ -42,9 +42,9 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 						orcid_scope: params.scope,
 						refresh_token: refreshToken,
 						// fetched user info
-						biography: user_info.biography,
+						biography: user_info.biography ?? undefined,
 						keywords: user_info.keywords,
-						affiliation: user_info.affiliation,
+						affiliation: user_info.affiliation ?? undefined,
 						employment: user_info.user_employment,
 						links: user_info.links,
 					});

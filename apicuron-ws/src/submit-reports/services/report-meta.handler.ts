@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { uniq } from 'lodash';
-import { assertNotNull } from 'src/util/type-assertion.helper';
+import { assertIsDefined } from 'src/util/type-assertion.helper';
 import { UsersService } from '../../auth/users/services/users.service';
 import { PrivacyType } from '../../core/enums';
 import { Report, ReportDocument } from '../../core/schemas/reports.schema';
@@ -18,13 +18,13 @@ export class ReportMetaHandler implements ReportHandler {
 	async handle(report: ReportDocument): Promise<{
 		resource: PartnerResourceDocument;
 		report: ReportDocument;
-		user: UserDocument;
+		user?: UserDocument | null;
 	}> {
 		const resource = await this.resourceService.get_resource(
 			report.resource_id,
 		);
 		const user = await this.usersService.getByOrcid(report.curator_orcid);
-		this.handleIndividualReport(report, resource, user);
+		await this.handleIndividualReport(report, resource, user);
 		return { report, resource, user };
 	}
 
@@ -40,17 +40,17 @@ export class ReportMetaHandler implements ReportHandler {
 
 		for (const report of reports) {
 			const resource = resMap.get(report.resource_id);
-			assertNotNull(
+			assertIsDefined(
 				resource,
 				`Resource with ID ${report.resource_id} not found for report ${report}`,
 			);
 			const user = userMap.get(report.curator_orcid);
-			assertNotNull(
+			assertIsDefined(
 				user,
 				`User with ORCID ${report.curator_orcid} not found for report ${report}`,
 			);
 
-			this.handleIndividualReport(report, resource, user);
+			await this.handleIndividualReport(report, resource, user);
 		}
 
 		return {
@@ -87,10 +87,10 @@ export class ReportMetaHandler implements ReportHandler {
 	private async handleIndividualReport(
 		report: Report,
 		resource: PartnerResourceDocument,
-		user: User,
+		user?: User | null,
 	) {
 		report.league = this.handleLeague(report, resource);
-		report.privacy = this.handlePrivacyField(resource, user, report);
+		report.privacy = this.handlePrivacyField(resource, report, user);
 		return;
 	}
 
@@ -110,8 +110,8 @@ export class ReportMetaHandler implements ReportHandler {
 
 	private handlePrivacyField(
 		resource: PartnerResourceDocument,
-		user: User | null,
 		report: Report,
+		user?: User | null,
 	): PrivacyType {
 		return computePrivacyField(resource, user, report);
 	}

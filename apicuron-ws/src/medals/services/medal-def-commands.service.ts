@@ -9,6 +9,18 @@ import { InjectModel } from '@nestjs/mongoose';
 import { plainToInstance } from 'class-transformer';
 import { LeanDocument, Model } from 'mongoose';
 import {
+	bufferCount,
+	from,
+	map,
+	Observable,
+	skip,
+	switchMap,
+	take,
+	tap,
+} from 'rxjs';
+import { PartnerResourceDocument } from 'src/core/schemas/index';
+import { assertIsDefined } from 'src/util/type-assertion.helper';
+import {
 	MedalDef,
 	MedalDefDocument,
 } from '../../core/schemas/achievements-def/medal-def.schema';
@@ -21,20 +33,7 @@ import { UpdateMedalDefDto } from '../dto/update-medal-def.dto';
 import { MedalDefCreatedEvent } from '../events/medal-def-created.event';
 import { MedalDefDeletedEvent } from '../events/medal-def-deleted.event';
 import { MedalDefUpdatedEvent } from '../events/medal-def-updated.event';
-import {
-	buffer,
-	bufferCount,
-	from,
-	map,
-	Observable,
-	of,
-	skip,
-	switchMap,
-	take,
-	tap,
-} from 'rxjs';
 import { ComputeMedalsService } from './compute-medals.service';
-import { MedalDocument, PartnerResourceDocument } from 'src/core/schemas/index';
 
 @Injectable()
 export class MedalDefCommandsService {
@@ -175,8 +174,12 @@ export class MedalDefCommandsService {
 			this.resourceService.get_resource(medalDef.resource_id),
 		).pipe(
 			map((resource: PartnerResourceDocument) => {
-				const medalDefDoc: LeanDocument<MedalDefDocument> = {
-					_id: undefined,
+				const privacy =
+					resource.getLeague(medalDef.league ?? resource.defaultLeague)
+						?.visibility ??
+					resource.getLeague(resource.defaultLeague)?.visibility;
+				assertIsDefined(privacy);
+				const medalDefDoc: LeanDocument<MedalDef> = {
 					name: medalDef.name,
 					resource_uri: resource.resource_uri,
 					resource_id: medalDef.resource_id,
@@ -186,9 +189,7 @@ export class MedalDefCommandsService {
 					score_relative: medalDef.score_relative,
 					first_day: medalDef.first_day,
 					last_day: medalDef.last_day,
-					privacy:
-						resource.getLeague(medalDef.league)?.visibility ??
-						resource.getLeague(resource.defaultLeague).visibility,
+					privacy,
 				};
 				return medalDefDoc;
 			}),

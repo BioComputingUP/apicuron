@@ -1,20 +1,18 @@
-import { Controller, Get, Logger, Param, Query, SerializeOptions } from '@nestjs/common';
+import { Controller, Get, Logger, NotFoundException, Param, Query, SerializeOptions } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 import { CuratorRegistryService } from './curator-registry.service';
 import { GetRegistryEntryDto } from './dto/registry-entries.dto';
-import { plainToInstance } from 'class-transformer';
 
-import { paginate, Paginated } from 'src/pagination/paginator';
-import { RegistrySearchResultDto } from './dto/registry-search-dto';
 import {
-	ApiOkResponse,
+	ApiExtraModels, ApiHeader, ApiOkResponse,
 	ApiOperation,
-	ApiTags,
-	ApiHeader,
-	ApiExtraModels,
+	ApiTags
 } from '@nestjs/swagger';
 import { ApiResponsePaginated } from 'src/pagination/decorators/paginated-reponse.decorator';
-import { RegistryCurator } from './dto/registry-curator-dto';
+import { paginate, Paginated } from 'src/pagination/paginator';
 import { VersionHeader } from 'src/plugins/swagger/config';
+import { RegistryCurator } from './dto/registry-curator-dto';
+import { RegistrySearchResultDto } from './dto/registry-search-dto';
 
 @ApiTags('Curator Registry')
 @ApiHeader(VersionHeader)
@@ -39,19 +37,19 @@ export class CuratorRegistryController {
 	async getCuratorEntry(
 		@Param('id') user_orcid: string,
 	): Promise<RegistrySearchResultDto> {
-		try {
+		
 			const result = await this.registryService.getCuratorEntry(user_orcid);
-			const desrialized_result = plainToInstance(
+			if (!result){
+				throw new NotFoundException(`Contributor with ORCID ${user_orcid} not found`);
+			}
+			const deserialized_result = plainToInstance(
 				RegistrySearchResultDto,
 				result,
 				{
 					excludeExtraneousValues: true,
 				},
 			);
-			return desrialized_result;
-		} catch (error) {
-			this.logger.error(error);
-		}
+			return deserialized_result;
 	}
 
 	@ApiOperation({
@@ -66,7 +64,7 @@ export class CuratorRegistryController {
 	@Get()
 	async getAllEntries(
 		@Query() query: GetRegistryEntryDto,
-	): Promise<Paginated<RegistrySearchResultDto>> | null {
+	): Promise<Paginated<RegistrySearchResultDto>>  {
 		// const getStatDtoInstance = plainToInstance(GetRegistryEntryDto, query);
 		const getStatDtoInstance = query;
 		const { data, total } = await this.registryService.getAllEntries(

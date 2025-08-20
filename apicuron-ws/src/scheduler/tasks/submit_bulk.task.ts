@@ -570,13 +570,13 @@ export class SubmitBulkTask extends Task {
 	}
 
 	private check_submission_priviledge(
-		user: UserDocument,
+		user: UserDocument | null,
 		report: SubmitReportDto,
 	): ValidationError | null {
-		const allowedResources = user.resources.map(
+		const allowedResources = user?.resources.map(
 			({ resource_id }) => resource_id,
 		);
-		if (allowedResources.includes(report.resource_id)) {
+		if (allowedResources?.includes(report.resource_id)) {
 			return null;
 		}
 		return {

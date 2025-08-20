@@ -1,10 +1,10 @@
-import { Connection, Schema } from 'mongoose';
+import { Schema } from 'mongoose';
 
 // function obtained from https://mongoosejs.com/docs/guide.html#versionKey
-export function versionKeyUpdatePlugin(schema: Schema, options: any) {
+export function versionKeyUpdatePlugin(schema: Schema) {
 	schema.pre('findOneAndUpdate', function () {
 		const update = this.getUpdate();
-		if (update instanceof Array) {
+		if (update instanceof Array || update == null) {
 			return;
 		}
 		if (update.__v != null) {

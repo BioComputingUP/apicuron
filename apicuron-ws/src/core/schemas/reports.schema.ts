@@ -80,7 +80,7 @@ export class Report implements IUserResourceEntity {
 		required: false,
 		type: UserSchema,
 	})
-	user?: User;
+	user?: User | null;
 
 	@Prop({
 		required: false,

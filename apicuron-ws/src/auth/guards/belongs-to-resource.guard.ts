@@ -1,5 +1,4 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
 import { UsersService } from '../users/services/users.service';
 
 @Injectable()
@@ -12,6 +11,7 @@ export class HasAResourceGuard implements CanActivate {
 		if (req.user.orcid_id) {
 			const user = await this.userService.getByOrcid(req.user.orcid_id);
 			if (
+				!!user &&
 				!!user.resources &&
 				Array.isArray(user.resources) &&
 				user.resources.length > 0

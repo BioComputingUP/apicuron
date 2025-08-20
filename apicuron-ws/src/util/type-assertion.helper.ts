@@ -1,4 +1,4 @@
-export function assertNotNull<T>(
+export function assertIsDefined<T>(
 	value: T | null | undefined,
 	message?: string,
 ): asserts value is NonNullable<T> {

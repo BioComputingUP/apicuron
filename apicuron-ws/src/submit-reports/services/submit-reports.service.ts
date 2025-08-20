@@ -7,12 +7,8 @@ import {
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { DeleteResult } from 'mongodb';
-import { InsertManyResult, Model } from 'mongoose';
-import {
-	ReportModel,
-	ReportDocument,
-	Report,
-} from '../../core/schemas/reports.schema';
+import { InsertManyResult } from 'mongoose';
+import { Report, ReportModel } from '../../core/schemas/reports.schema';
 import { SubmitReportDto, SubmitReportsDto } from '../dto/submit-report.dto';
 import {
 	AllResourceReportsDeletedEvent,
@@ -220,7 +216,6 @@ export class SubmitReportService {
 					`An unknown error occurred during report insertion`,
 					err,
 				);
-				return;
 			}
 			if (err instanceof MongoServerError && err.code === 11000) {
 				this.logger.error(`Attempt at duplicate report insertion`);
