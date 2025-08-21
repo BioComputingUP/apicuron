@@ -1,3 +1,4 @@
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
 	IsArray,
 	IsEnum,
@@ -5,9 +6,10 @@ import {
 	IsString,
 	ValidateIf,
 } from 'class-validator';
+import * as _ from 'lodash';
+import { FilterQuery } from 'mongoose';
+import { CuratorRegistryEntryDocument } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { BasePaginationDto } from 'src/pagination/dto/paginate.dto';
-import { ApiPropertyOptional } from '@nestjs/swagger';
-
 export enum SearchFieldFilter {
 	displayedName = 'displayedName',
 	orcid_id = 'orcid_id',
@@ -30,5 +32,26 @@ export class GetRegistryEntryDto extends BasePaginationDto {
 	@ApiPropertyOptional()
 	@IsArray()
 	@IsOptional()
-	resources: string[];
+	resources?: string[];
+
+	// Build the query filter
+	buildQueryFilter(): FilterQuery<CuratorRegistryEntryDocument> {
+		const query_filter: FilterQuery<CuratorRegistryEntryDocument> = {};
+		const field =
+			this.filter_field === 'orcid_id'
+				? 'curator.orcid_id'
+				: 'curator.displayedName';
+		if (!!this.query) {
+			// clean the userquery
+			const cleanQuery = _.escapeRegExp(this.query);
+			query_filter[field] = { $regex: `.*${cleanQuery}.*`, $options: 'i' };
+		}
+
+		if (!!this.resources) {
+			query_filter['contributed_to'] = {
+				$elemMatch: { resource_id: { $in: this.resources } },
+			};
+		}
+		return query_filter;
+	}
 }

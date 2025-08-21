@@ -1,6 +1,5 @@
 import { Controller, Get, Logger, NotFoundException, Param, Query, SerializeOptions } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { CuratorRegistryService } from './curator-registry.service';
 import { GetRegistryEntryDto } from './dto/registry-entries.dto';
 
 import {
@@ -13,6 +12,7 @@ import { paginate, Paginated } from 'src/pagination/paginator';
 import { VersionHeader } from 'src/plugins/swagger/config';
 import { RegistryCurator } from './dto/registry-curator-dto';
 import { RegistrySearchResultDto } from './dto/registry-search-dto';
+import { RegistryQueryService } from './services/registry-query.service';
 
 @ApiTags('Curator Registry')
 @ApiHeader(VersionHeader)
@@ -22,7 +22,7 @@ import { RegistrySearchResultDto } from './dto/registry-search-dto';
 })
 @ApiExtraModels(RegistrySearchResultDto, RegistryCurator)
 export class CuratorRegistryController {
-	constructor(protected registryService: CuratorRegistryService) { }
+	constructor(protected registryQueryService: RegistryQueryService) { }
 
 	private logger = new Logger(CuratorRegistryController.name);
 	@ApiOkResponse({
@@ -37,8 +37,8 @@ export class CuratorRegistryController {
 	async getCuratorEntry(
 		@Param('id') user_orcid: string,
 	): Promise<RegistrySearchResultDto> {
-		
-			const result = await this.registryService.getCuratorEntry(user_orcid);
+
+			const result = await this.registryQueryService.findCuratorEntryByOrcid(user_orcid);
 			if (!result){
 				throw new NotFoundException(`Contributor with ORCID ${user_orcid} not found`);
 			}
@@ -67,7 +67,7 @@ export class CuratorRegistryController {
 	): Promise<Paginated<RegistrySearchResultDto>>  {
 		// const getStatDtoInstance = plainToInstance(GetRegistryEntryDto, query);
 		const getStatDtoInstance = query;
-		const { data, total } = await this.registryService.getAllEntries(
+		const { data, total } = await this.registryQueryService.getAllEntries(
 			getStatDtoInstance,
 		);
 
