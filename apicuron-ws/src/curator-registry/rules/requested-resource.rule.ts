@@ -1,5 +1,5 @@
 import { CuratorRegistryEntry } from 'src/core/schemas/curator-registry/curator-entry.schema';
-import { FilterStrategyContext, FilterStrategyRule } from './filters.interface';
+import { FilterStrategyRule, RegistryFilterContext } from './filters.interface';
 /**
  * Rule to filter out entries that don't include any requested resource
  */
@@ -8,7 +8,7 @@ export class RequestedResourceRule
 {
 	name = 'Public Requested Resource';
 
-	shouldApply(context: FilterStrategyContext): boolean {
+	shouldApply(context: RegistryFilterContext): boolean {
 		return (
 			!context.showAll &&
 			!!context.requestedResources &&
@@ -17,7 +17,7 @@ export class RequestedResourceRule
 	}
 
 	applyFilter(
-		context: FilterStrategyContext,
+		context: RegistryFilterContext,
 		items: CuratorRegistryEntry[],
 	): CuratorRegistryEntry[] {
 		console.debug('applyFilter', this.name);

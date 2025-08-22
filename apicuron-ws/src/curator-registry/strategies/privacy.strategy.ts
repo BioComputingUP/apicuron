@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CuratorRegistryEntry } from 'src/core/schemas/curator-registry/curator-entry.schema';
-import { FilterStrategyContext } from '../rules/filters.interface';
+import { RegistryFilterContext } from '../rules/filters.interface';
 import { PublicContributionRule } from '../rules/public-contribution.rules';
 import { PublicUsersOnlyRule } from '../rules/public-users-only.rule';
 import { RequestedResourceRule } from '../rules/requested-resource.rule';
@@ -15,7 +15,7 @@ export class PrivacyFilterStrategy {
 	logger = new Logger(PrivacyFilterStrategy.name);
 
 	filter(
-		context: FilterStrategyContext,
+		context: RegistryFilterContext,
 		unfilteredEntries: CuratorRegistryEntry[],
 	): CuratorRegistryEntry[] {
 		// Filter entries first to avoid processing unnecessary contributions

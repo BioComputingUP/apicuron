@@ -1,18 +1,18 @@
 import { PrivacyType } from 'src/core/enums';
 import { CuratorRegistryEntry } from 'src/core/schemas/curator-registry/curator-entry.schema';
-import { FilterStrategyContext, FilterStrategyRule } from './filters.interface';
+import { FilterStrategyRule, RegistryFilterContext } from './filters.interface';
 /**
  * Rule to only show public users.
  */
 export class PublicUsersOnlyRule implements FilterStrategyRule {
 	name = 'Public Users Only';
 
-	shouldApply(context: FilterStrategyContext): boolean {
+	shouldApply(context: RegistryFilterContext): boolean {
 		return !context.showAll;
 	}
 
 	applyFilter(
-		context: FilterStrategyContext,
+		context: RegistryFilterContext,
 		items: CuratorRegistryEntry[],
 	): CuratorRegistryEntry[] {
 		return items.filter(

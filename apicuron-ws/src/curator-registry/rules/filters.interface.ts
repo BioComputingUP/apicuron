@@ -3,9 +3,12 @@ import {
 	CuratorRegistryEntry,
 } from 'src/core/schemas/curator-registry/curator-entry.schema';
 
-export interface FilterStrategyContext {
+export interface RegistryFilterContext {
+	// Resources that were queried
 	requestedResources?: string[];
+	// Resources that the requesting user administers
 	userAdministeredResourceIds: string[];
+	// Override visibility - Use for debugging
 	showAll: boolean;
 }
 
@@ -13,6 +16,16 @@ export interface FilterStrategyRule<
 	T extends CuratorRegistryEntry | ContributionEntry = CuratorRegistryEntry,
 > {
 	name: string;
-	shouldApply(context: FilterStrategyContext): boolean;
-	applyFilter(context: FilterStrategyContext, items: T[]): T[];
+	/**
+	 * Determines if the filter should be applied based on the context.
+	 * @param context The context in which the filter is being applied.
+	 */
+	shouldApply(context: RegistryFilterContext): boolean;
+
+	/**
+	 * Applies the filter to the given items based on the context.
+	 * @param context The context in which the filter is being applied.
+	 * @param items The items to filter.
+	 */
+	applyFilter(context: RegistryFilterContext, items: T[]): T[];
 }

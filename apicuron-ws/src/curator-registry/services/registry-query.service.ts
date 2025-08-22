@@ -12,7 +12,7 @@ import {
 	LeanCuratorRegistryEntryDocument,
 } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { GetRegistryEntryDto } from '../dto/registry-entries.dto';
-import { FilterStrategyContext } from '../rules/filters.interface';
+import { RegistryFilterContext } from '../rules/filters.interface';
 import { PrivacyFilterStrategy } from '../strategies/privacy.strategy';
 
 @Injectable()
@@ -50,7 +50,7 @@ export class RegistryQueryService {
 				};
 			}
 			// apply privacy filtering strategy
-			const strategyContext: FilterStrategyContext = {
+			const strategyContext: RegistryFilterContext = {
 				requestedResources: query.resources,
 				userAdministeredResourceIds,
 				showAll: showAll,

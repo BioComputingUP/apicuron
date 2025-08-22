@@ -4,7 +4,7 @@ import {
 	CuratorRegistryEntry,
 } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { League } from 'src/core/schemas/index';
-import { FilterStrategyContext, FilterStrategyRule } from './filters.interface';
+import { FilterStrategyRule, RegistryFilterContext } from './filters.interface';
 /**
  * Rule to only show public contributions and private contributions the user administers.
  */
@@ -13,12 +13,12 @@ export class PublicContributionRule
 {
 	name = 'Public Contribution';
 
-	shouldApply(context: FilterStrategyContext): boolean {
+	shouldApply(context: RegistryFilterContext): boolean {
 		return !context.showAll;
 	}
 
 	applyFilter(
-		context: FilterStrategyContext,
+		context: RegistryFilterContext,
 		items: CuratorRegistryEntry[],
 	): CuratorRegistryEntry[] {
 		// Filter out contributions to private groups unless the user administers their resources
@@ -30,7 +30,7 @@ export class PublicContributionRule
 
 	filterEntryContributions(
 		entry: CuratorRegistryEntry,
-		context: FilterStrategyContext,
+		context: RegistryFilterContext,
 	): CuratorRegistryEntry {
 		return {
 			...entry,
@@ -44,7 +44,7 @@ export class PublicContributionRule
 
 	private filterContributionGroups(
 		contribution: ContributionEntry,
-		context: FilterStrategyContext,
+		context: RegistryFilterContext,
 	): ContributionEntry {
 		const visibleGroups = contribution.groups.filter((group) =>
 			this.filterGroup(group, context.userAdministeredResourceIds),
