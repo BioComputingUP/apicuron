@@ -13,13 +13,13 @@ class Maybe<T> {
 	}
 }
 
-interface User {
+interface Test {
 	name: string;
 }
-const a = new Maybe<User>({
+const a = new Maybe<Test>({
 	name: 'John Doe',
 });
-const b = new Maybe<User>(null);
+const b = new Maybe<Test>(null);
 const c = [a, b].map((maybeUser) =>
 	maybeUser.bind((user) => new Maybe(user.name)),
 );
