@@ -1,3 +1,7 @@
 {
-    "svg.preview.background": "dark-transparent"
+
+    "files.exclude": {
+       ".angular":true
+    }
+        
 }

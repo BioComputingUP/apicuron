@@ -7,6 +7,10 @@ import {
 	ApiOperation,
 	ApiTags
 } from '@nestjs/swagger';
+import { UserReq } from 'src/auth/decorators/applyUser.decorator';
+import { AuthProtected } from 'src/auth/decorators/auth.decorator';
+import { Public } from 'src/auth/decorators/public.decorator';
+import { User } from 'src/core/schemas/user.schema';
 import { ApiResponsePaginated } from 'src/pagination/decorators/paginated-reponse.decorator';
 import { paginate, Paginated } from 'src/pagination/paginator';
 import { VersionHeader } from 'src/plugins/swagger/config';
@@ -60,20 +64,24 @@ export class CuratorRegistryController {
 		200,
 		'List of curators and their resources and groups they contribute to ',
 	)
+	// eslint-disable-next-line prettier/prettier
 	@SerializeOptions({ type: Paginated<RegistrySearchResultDto> })
+	@AuthProtected()
+	@Public()
 	@Get()
 	async getAllEntries(
 		@Query() query: GetRegistryEntryDto,
+		@UserReq() user: User | null,
 	): Promise<Paginated<RegistrySearchResultDto>>  {
-		// const getStatDtoInstance = plainToInstance(GetRegistryEntryDto, query);
-		const getStatDtoInstance = query;
+		const userAdministeredResourceIds: string[] = user ? user.resources.map(resource => resource.resource_id) : [];
 		const { data, total } = await this.registryQueryService.getAllEntries(
-			getStatDtoInstance,
+			query,
+			userAdministeredResourceIds
 		);
 
 		return paginate<RegistrySearchResultDto>(RegistrySearchResultDto,
 			data,
-			getStatDtoInstance,
+			query,
 			total,
 		);
 	}

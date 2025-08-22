@@ -5,15 +5,15 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { LeanDocument, ProjectionType } from 'mongoose';
-import { PrivacyType } from 'src/core/enums';
 import {
-	ContributionEntry,
 	CuratorRegistryEntry,
 	CuratorRegistryEntryDocument,
 	CuratorRegistryEntryModel,
 	LeanCuratorRegistryEntryDocument,
 } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { GetRegistryEntryDto } from '../dto/registry-entries.dto';
+import { FilterStrategyContext } from '../rules/filters.interface';
+import { PrivacyFilterStrategy } from '../strategies/privacy.strategy';
 
 @Injectable()
 export class RegistryQueryService {
@@ -22,9 +22,14 @@ export class RegistryQueryService {
 	constructor(
 		@InjectModel(CuratorRegistryEntry.name)
 		protected registryEntryModel: CuratorRegistryEntryModel,
+		protected privacyStrategy: PrivacyFilterStrategy,
 	) {}
 
-	async getAllEntries(query: GetRegistryEntryDto): Promise<{
+	async getAllEntries(
+		query: GetRegistryEntryDto,
+		userAdministeredResourceIds: string[],
+		showAll = false,
+	): Promise<{
 		total: number;
 		data: LeanCuratorRegistryEntryDocument[];
 	}> {
@@ -44,17 +49,19 @@ export class RegistryQueryService {
 					data: [],
 				};
 			}
-			let filteredEntries = RegistryQueryService.filterPrivateEntries(entries);
-			if (query.resources) {
-				filteredEntries = RegistryQueryService.filterNonQueriedResources(
-					filteredEntries,
-					query.resources,
-				);
-			}
-
+			// apply privacy filtering strategy
+			const strategyContext: FilterStrategyContext = {
+				requestedResources: query.resources,
+				userAdministeredResourceIds,
+				showAll: showAll,
+			};
+			const filteredResults = this.privacyStrategy.filter(
+				strategyContext,
+				entries,
+			);
 			return {
-				total: filteredEntries.length,
-				data: filteredEntries,
+				total: filteredResults.length,
+				data: filteredResults,
 			};
 		} catch (error) {
 			this.logger.error(
@@ -86,51 +93,5 @@ export class RegistryQueryService {
 				`Error while retrieving user with orcid: ${orcid_identifier}`,
 			);
 		}
-	}
-
-	private static filterPrivateUsers(
-		unfilteredEntries: CuratorRegistryEntry[],
-	): CuratorRegistryEntry[] {
-		return unfilteredEntries.filter(
-			(entry) => entry.privacy === PrivacyType.public,
-		);
-	}
-
-	private static filterNonQueriedResources(
-		entries: CuratorRegistryEntry[],
-		queried_resources: string[],
-	): CuratorRegistryEntry[] {
-		return entries.filter((entry) =>
-			entry.contributed_to.some((contribution) =>
-				queried_resources.includes(contribution.resource_id),
-			),
-		);
-	}
-
-	private static filterPrivateContributions(
-		allContributions: ContributionEntry[],
-	): ContributionEntry[] {
-		const res = allContributions
-			.map((contribution) => {
-				const filteredGroups = contribution.groups.filter(
-					(group) => group.visibility === PrivacyType.public,
-				);
-				return {
-					...contribution,
-					groups: filteredGroups,
-				};
-			})
-			.filter((contribution) => contribution.groups.length > 0); // Remove contributions with empty groups
-
-		return res;
-	}
-
-	private static filterPrivateEntries(allEntries: CuratorRegistryEntry[]) {
-		return RegistryQueryService.filterPrivateUsers(allEntries).map((entry) => ({
-			...entry,
-			contributed_to: RegistryQueryService.filterPrivateContributions(
-				entry.contributed_to,
-			),
-		}));
 	}
 }

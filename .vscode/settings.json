@@ -9,5 +9,14 @@
   // "javascript.inlayHints.parameterNames.enabled": "literals",
   // "javascript.inlayHints.parameterTypes.enabled": true
 
-  "typescript.tsdk": "apicuron-ui/node_modules/typescript/lib"
+  "typescript.tsdk": "apicuron-ui/node_modules/typescript/lib",
+  "files.exclude": {
+    "apicuron-ui": true,
+    "apicuron-ws": true,
+    "db": true,
+  },
+  "workbench.colorCustomizations": {
+    "window.activeBorder": "#007acc",
+    "window.inactiveBorder": "#cccccc"
+  }
 }
