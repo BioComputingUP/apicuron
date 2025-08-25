@@ -47,6 +47,7 @@ export class SyncIndexesService implements OnModuleInit {
 				}
 				this.logger.error(
 					`Error syncing indexes for model: ${model.modelName}, not handled`,
+					err,
 				);
 				synced = true;
 			}

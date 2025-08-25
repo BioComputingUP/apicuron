@@ -263,6 +263,13 @@ export async function mockReport(
 }
 
 if (require.main === module) {
+	const env = process.env.NODE_ENV;
+	if (env === 'production' || env === 'development') {
+		console.log(
+			'Seeding is disabled in production or development environments.',
+		);
+		process.exit(1);
+	}
 	console.log('called directly');
 	bootstrap();
 }
