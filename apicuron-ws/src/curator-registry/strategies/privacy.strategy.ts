@@ -22,7 +22,6 @@ export class PrivacyFilterStrategy {
 		let filteredEntries: CuratorRegistryEntry[] = unfilteredEntries;
 		for (const rule of this.filerPipeline) {
 			if (rule.shouldApply(context)) {
-				this.logger.debug(`Applying rule: ${rule.constructor.name}`);
 				filteredEntries = rule.applyFilter(context, filteredEntries);
 			}
 		}

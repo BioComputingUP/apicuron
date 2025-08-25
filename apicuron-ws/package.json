@@ -18,7 +18,7 @@
 		"start:prod": "NODE_ENV=production node dist/main",
 		"start:prod_temp": "NODE_ENV=prod_temp node dist/main",
 		"lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-		"test": "jest --silent=false",
+		"test": "jest --silent=false --maxWorkers=50%",
 		"test:watch": "jest --watch",
 		"test:cov": "jest --coverage",
 		"rimraf": "./node_modules/rimraf/bin.js",
@@ -139,16 +139,12 @@
 		"collectCoverageFrom": [
 			"**/*.(t|j)s"
 		],
-		"coverageDirectory": "../coverage",
 		"testEnvironment": "node",
 		"moduleNameMapper": {
 			"^src/(.*)$": "<rootDir>/$1"
 		},
 		"transform": {
 			"^.+\\.(t|j)s$": "ts-jest"
-		},
-		"setupFiles": [
-			"tsconfig-paths/register"
-		]
+		}
 	}
 }

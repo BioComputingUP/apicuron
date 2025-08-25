@@ -20,7 +20,6 @@ export class RequestedResourceRule
 		context: RegistryFilterContext,
 		items: CuratorRegistryEntry[],
 	): CuratorRegistryEntry[] {
-		console.debug('applyFilter', this.name);
 		const requestedResource = context.requestedResources;
 		if (requestedResource) {
 			return items.filter((entry) =>

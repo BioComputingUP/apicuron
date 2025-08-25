@@ -58,11 +58,6 @@ export class PublicContributionRule
 		group: League,
 		userAdministeredResourceIds: string[],
 	): boolean {
-		console.log('------\nfilterGroup', group, userAdministeredResourceIds);
-		console.log(
-			group.visibility === PrivacyType.public ||
-				group.resource_id in userAdministeredResourceIds,
-		);
 		return (
 			group.visibility === PrivacyType.public ||
 			userAdministeredResourceIds.includes(group.resource_id)
