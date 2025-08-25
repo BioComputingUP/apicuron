@@ -6,7 +6,7 @@ import { PublicUsersOnlyRule } from '../rules/public-users-only.rule';
 import { RequestedResourceRule } from '../rules/requested-resource.rule';
 @Injectable()
 export class PrivacyFilterStrategy {
-	entriesRules = [
+	filerPipeline = [
 		new PublicUsersOnlyRule(),
 		new PublicContributionRule(),
 		new RequestedResourceRule(),
@@ -20,7 +20,7 @@ export class PrivacyFilterStrategy {
 	): CuratorRegistryEntry[] {
 		// Filter entries first to avoid processing unnecessary contributions
 		let filteredEntries: CuratorRegistryEntry[] = unfilteredEntries;
-		for (const rule of this.entriesRules) {
+		for (const rule of this.filerPipeline) {
 			if (rule.shouldApply(context)) {
 				this.logger.debug(`Applying rule: ${rule.constructor.name}`);
 				filteredEntries = rule.applyFilter(context, filteredEntries);
