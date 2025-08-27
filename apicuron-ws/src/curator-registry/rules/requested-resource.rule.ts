@@ -3,7 +3,7 @@ import { FilterStrategyRule, RegistryFilterContext } from './filters.interface';
 /**
  * Rule to filter out entries that don't include any requested resource
  */
-export class RequestedResourceRule
+export class RequestedResourceFilterRule
 	implements FilterStrategyRule<CuratorRegistryEntry>
 {
 	name = 'Public Requested Resource';

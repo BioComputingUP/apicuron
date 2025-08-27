@@ -4,7 +4,7 @@ import { FilterStrategyRule, RegistryFilterContext } from './filters.interface';
 /**
  * Rule to only show public users.
  */
-export class PublicUsersOnlyRule implements FilterStrategyRule {
+export class UserPrivacyFilterRule implements FilterStrategyRule {
 	name = 'Public Users Only';
 
 	shouldApply(context: RegistryFilterContext): boolean {

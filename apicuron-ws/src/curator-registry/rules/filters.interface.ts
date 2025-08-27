@@ -1,7 +1,4 @@
-import {
-	ContributionEntry,
-	CuratorRegistryEntry,
-} from 'src/core/schemas/curator-registry/curator-entry.schema';
+import { CuratorRegistryEntry } from 'src/core/schemas/curator-registry/curator-entry.schema';
 
 export interface RegistryFilterContext {
 	// Resources that were queried
@@ -13,7 +10,7 @@ export interface RegistryFilterContext {
 }
 
 export interface FilterStrategyRule<
-	T extends CuratorRegistryEntry | ContributionEntry = CuratorRegistryEntry,
+	T extends CuratorRegistryEntry = CuratorRegistryEntry,
 > {
 	name: string;
 	/**

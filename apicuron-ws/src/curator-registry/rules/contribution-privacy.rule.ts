@@ -8,7 +8,7 @@ import { FilterStrategyRule, RegistryFilterContext } from './filters.interface';
 /**
  * Rule to only show public contributions and private contributions the user administers.
  */
-export class PublicContributionRule
+export class ContributionPrivacyFilterRule
 	implements FilterStrategyRule<CuratorRegistryEntry>
 {
 	name = 'Public Contribution';

@@ -6,14 +6,14 @@ import { CuratorRegistryController } from './curator-registry.controller';
 import { CuratorRegistryService } from './curator-registry.service';
 import { CuratorRegistryAggregatorService } from './services/curator-registry-aggregator.service';
 import { RegistryQueryService } from './services/registry-query.service';
-import { PrivacyFilterStrategy } from './strategies/privacy.strategy';
+import { RegistryFilterStrategy } from './strategies/registry-filter.strategy';
 @Module({
 	imports: [CoreApicuronModule, AuthModule, ResourcesModule],
 	providers: [
 		CuratorRegistryAggregatorService,
 		CuratorRegistryService,
 		RegistryQueryService,
-		PrivacyFilterStrategy,
+		RegistryFilterStrategy,
 	],
 	controllers: [CuratorRegistryController],
 })

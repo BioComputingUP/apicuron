@@ -1,18 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CuratorRegistryEntry } from 'src/core/schemas/curator-registry/curator-entry.schema';
+import { ContributionPrivacyFilterRule } from '../rules/contribution-privacy.rule';
 import { RegistryFilterContext } from '../rules/filters.interface';
-import { PublicContributionRule } from '../rules/public-contribution.rules';
-import { PublicUsersOnlyRule } from '../rules/public-users-only.rule';
-import { RequestedResourceRule } from '../rules/requested-resource.rule';
+import { RequestedResourceFilterRule } from '../rules/requested-resource.rule';
+import { UserPrivacyFilterRule } from '../rules/user-privacy.rule';
 @Injectable()
-export class PrivacyFilterStrategy {
+export class RegistryFilterStrategy {
 	filerPipeline = [
-		new PublicUsersOnlyRule(),
-		new PublicContributionRule(),
-		new RequestedResourceRule(),
+		new UserPrivacyFilterRule(),
+		new ContributionPrivacyFilterRule(),
+		new RequestedResourceFilterRule(),
 	]; // !! order matters
 
-	logger = new Logger(PrivacyFilterStrategy.name);
+	logger = new Logger(RegistryFilterStrategy.name);
 
 	filter(
 		context: RegistryFilterContext,

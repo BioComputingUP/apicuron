@@ -13,7 +13,7 @@ import {
 } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { GetRegistryEntryDto } from '../dto/registry-entries.dto';
 import { RegistryFilterContext } from '../rules/filters.interface';
-import { PrivacyFilterStrategy } from '../strategies/privacy.strategy';
+import { RegistryFilterStrategy } from '../strategies/registry-filter.strategy';
 
 @Injectable()
 export class RegistryQueryService {
@@ -22,7 +22,7 @@ export class RegistryQueryService {
 	constructor(
 		@InjectModel(CuratorRegistryEntry.name)
 		protected registryEntryModel: CuratorRegistryEntryModel,
-		protected privacyStrategy: PrivacyFilterStrategy,
+		protected privacyStrategy: RegistryFilterStrategy,
 	) {}
 
 	async getAllEntries(
