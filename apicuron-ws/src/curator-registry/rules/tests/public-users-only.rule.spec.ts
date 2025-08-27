@@ -6,13 +6,13 @@ import {
 	CuratorRegistryEntry,
 } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { RegistryFilterContext } from '../filters.interface';
-import { PublicUsersOnlyRule } from '../public-users-only.rule';
+import { UserPrivacyFilterRule } from '../user-privacy.rule';
 
 describe('PublicUsersOnlyRule', () => {
-	let rule: PublicUsersOnlyRule;
+	let rule: UserPrivacyFilterRule;
 
 	beforeEach(() => {
-		rule = new PublicUsersOnlyRule();
+		rule = new UserPrivacyFilterRule();
 	});
 
 	describe('shouldApply', () => {
@@ -27,7 +27,7 @@ describe('PublicUsersOnlyRule', () => {
 			expect(result).toBe(true);
 		});
 
-		it('should not run when user has no administered resources and showAll is false', () => {
+		it('should return true when showAll is false', () => {
 			const context: RegistryFilterContext = {
 				showAll: false,
 				userAdministeredResourceIds: [],
@@ -35,10 +35,10 @@ describe('PublicUsersOnlyRule', () => {
 
 			const result = rule.shouldApply(context);
 
-			expect(result).toBe(false);
+			expect(result).toBe(true);
 		});
 
-		it('should return run when showAll is true', () => {
+		it('should return false when showAll is true', () => {
 			const context: RegistryFilterContext = {
 				showAll: true,
 				userAdministeredResourceIds: [],
@@ -46,7 +46,7 @@ describe('PublicUsersOnlyRule', () => {
 
 			const result = rule.shouldApply(context);
 
-			expect(result).toBe(true);
+			expect(result).toBe(false);
 		});
 	});
 	describe('applyFilter', () => {

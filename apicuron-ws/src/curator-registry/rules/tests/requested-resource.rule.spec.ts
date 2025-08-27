@@ -3,13 +3,13 @@ import {
 	CuratorRegistryEntry,
 } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { RegistryFilterContext } from '../filters.interface';
-import { RequestedResourceRule } from '../requested-resource.rule';
+import { RequestedResourceFilterRule } from '../requested-resource.rule';
 
 describe('RequestedResourceRule', () => {
-	let rule: RequestedResourceRule;
+	let rule: RequestedResourceFilterRule;
 
 	beforeEach(() => {
-		rule = new RequestedResourceRule();
+		rule = new RequestedResourceFilterRule();
 	});
 
 	describe('shouldApply', () => {
@@ -38,13 +38,13 @@ describe('RequestedResourceRule', () => {
 			expect(rule.shouldApply(context)).toBe(true);
 		});
 
-		it('should return true when showAll is true', () => {
+		it('should return false when showAll is true', () => {
 			const context: RegistryFilterContext = {
 				showAll: true,
 				userAdministeredResourceIds: [],
 				requestedResources: [],
 			};
-			expect(rule.shouldApply(context)).toBe(true);
+			expect(rule.shouldApply(context)).toBe(false);
 		});
 	});
 

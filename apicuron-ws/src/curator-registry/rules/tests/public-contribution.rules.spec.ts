@@ -5,14 +5,14 @@ import {
 	CuratorRegistryEntry,
 } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { League } from 'src/core/schemas/index';
+import { ContributionPrivacyFilterRule } from '../contribution-privacy.rule';
 import { RegistryFilterContext } from '../filters.interface';
-import { PublicContributionRule } from '../public-contribution.rules';
 
 describe('PublicContributionRule', () => {
-	let rule: PublicContributionRule;
+	let rule: ContributionPrivacyFilterRule;
 
 	beforeEach(() => {
-		rule = new PublicContributionRule();
+		rule = new ContributionPrivacyFilterRule();
 	});
 
 	describe('filterGroup', () => {
@@ -70,7 +70,7 @@ describe('PublicContributionRule', () => {
 	});
 
 	describe('shouldApply', () => {
-		it('should run true when showAll is true', () => {
+		it('should return false when showAll is true', () => {
 			const context: RegistryFilterContext = {
 				showAll: true,
 				userAdministeredResourceIds: [],
@@ -78,7 +78,7 @@ describe('PublicContributionRule', () => {
 
 			const result = rule.shouldApply(context);
 
-			expect(result).toBe(true);
+			expect(result).toBe(false);
 		});
 
 		it('should run when user has administered resources', () => {
@@ -92,7 +92,7 @@ describe('PublicContributionRule', () => {
 			expect(result).toBe(true);
 		});
 
-		it('should not run when showAll is false and user has no administered resources', () => {
+		it('should return true when showAll is false', () => {
 			const context: RegistryFilterContext = {
 				showAll: false,
 				userAdministeredResourceIds: [],
@@ -100,7 +100,7 @@ describe('PublicContributionRule', () => {
 
 			const result = rule.shouldApply(context);
 
-			expect(result).toBe(false);
+			expect(result).toBe(true);
 		});
 	});
 

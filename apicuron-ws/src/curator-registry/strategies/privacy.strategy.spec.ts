@@ -3,10 +3,10 @@ import { CuratorRegistryEntry } from 'src/core/schemas/curator-registry/curator-
 import { PartnerResource } from 'src/core/schemas/index';
 import { League } from 'src/core/schemas/league/league.schema';
 import { RegistryFilterContext } from '../rules/filters.interface';
-import { PrivacyFilterStrategy } from './privacy.strategy';
+import { RegistryFilterStrategy } from './registry-filter.strategy';
 
 describe('PrivacyFilterStrategy', () => {
-	let strategy: PrivacyFilterStrategy;
+	let strategy: RegistryFilterStrategy;
 
 	const publicLeagueRes1: League = {
 		resource_id: 'res1',
@@ -57,7 +57,7 @@ describe('PrivacyFilterStrategy', () => {
 	};
 
 	beforeEach(() => {
-		strategy = new PrivacyFilterStrategy();
+		strategy = new RegistryFilterStrategy();
 	});
 
 	it('should return only public users when no admin rights and showAll=false', () => {
