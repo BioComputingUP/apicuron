@@ -61,18 +61,23 @@ export abstract class EntityRepository<
 	 */
 	async deleteById(
 		id: string,
-	): Promise<HydratedDocument<EntityClass, TMethodsAndOverrides, TVirtuals>> {
+	): Promise<HydratedDocument<
+		EntityClass,
+		TMethodsAndOverrides,
+		TVirtuals
+	> | null> {
 		const doc = await this.model.findByIdAndDelete(id).exec();
-
-		const event = new EntityDeletedEvent<EntityClass>(
-			id,
-			doc.toObject(),
-			new Date(),
-		);
-		await this.publisher.publish({
-			name: EntityDeletedEvent.name,
-			value: event,
-		});
+		if (!!doc) {
+			const event = new EntityDeletedEvent<EntityClass>(
+				id,
+				doc.toObject(),
+				new Date(),
+			);
+			await this.publisher.publish({
+				name: EntityDeletedEvent.name,
+				value: event,
+			});
+		}
 		return doc;
 	}
 
@@ -92,15 +97,17 @@ export abstract class EntityRepository<
 		TVirtuals
 	> | null> {
 		const doc = await this.model.findOneAndDelete(filter, options).exec();
-		const event = new EntityDeletedEvent<EntityClass>(
-			doc._id.toString(),
-			doc.toObject(),
-			new Date(),
-		);
-		await this.publisher.publish({
-			name: EntityDeletedEvent.name,
-			value: event,
-		});
+		if (!!doc) {
+			const event = new EntityDeletedEvent<EntityClass>(
+				doc._id.toString(),
+				doc.toObject(),
+				new Date(),
+			);
+			await this.publisher.publish({
+				name: EntityDeletedEvent.name,
+				value: event,
+			});
+		}
 		return doc;
 	}
 
@@ -183,6 +190,9 @@ export abstract class EntityRepository<
 			.exec();
 
 		const result = await updateQuery$;
+		if (!result) {
+			return null;
+		}
 		const event = new EntityUpdatedEvent<EntityClass>(
 			before._id.toString(),
 			before.toObject(),
@@ -222,7 +232,11 @@ export abstract class EntityRepository<
 	 */
 	async findById(
 		id: string,
-	): Promise<HydratedDocument<EntityClass, TMethodsAndOverrides, TVirtuals>> {
+	): Promise<HydratedDocument<
+		EntityClass,
+		TMethodsAndOverrides,
+		TVirtuals
+	> | null> {
 		return await this.model.findById(id).exec();
 	}
 

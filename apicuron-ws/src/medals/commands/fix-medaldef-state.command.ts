@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Command, CommandRunner } from 'nest-commander';
@@ -24,7 +24,8 @@ export class FixMedalDefStateCommand extends CommandRunner {
 
 	async getActivitiesForResource(resourceId: string): Promise<TermDocument[]> {
 		if (this.cachedActivities.has(resourceId)) {
-			return this.cachedActivities.get(resourceId);
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			return this.cachedActivities.get(resourceId)!;
 		}
 		const activities = await this.termModel.find({ resource_id: resourceId });
 		this.cachedActivities.set(resourceId, activities);
@@ -34,12 +35,10 @@ export class FixMedalDefStateCommand extends CommandRunner {
 	logger = new Logger(FixMedalDefStateCommand.name);
 
 	async run(
-		passedParams: string[],
-		options?: Record<string, any>,
+		_passedParams: string[],
+		_options?: Record<string, any>,
 	): Promise<void> {
 		const medalDefs = this.medalDefModel.find().batchSize(100).cursor();
-
-		const activities: Record<string, Term[]> = {};
 
 		const operations: Promise<unknown>[] = [];
 

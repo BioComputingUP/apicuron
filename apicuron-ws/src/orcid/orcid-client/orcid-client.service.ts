@@ -188,7 +188,7 @@ export class OrcidClientService {
 		return response;
 	}
 
-	async get_user_info(orcid_id: string): Promise<OrcidUserInfo | undefined> {
+	async get_user_info(orcid_id: string): Promise<OrcidUserInfo> {
 		// Gets user biography, keywords, affiliation, and social links from Orcid
 		const requestUrl = `${this.orcidUrl}${orcid_id}/record`;
 		try {
@@ -200,58 +200,73 @@ export class OrcidClientService {
 							Authorization: `Bearer ${
 								(
 									await this.tokenAuth.getToken()
-								).access_token
+								)?.access_token
 							}`,
 							Accept: 'application/vnd.orcid+json',
 						},
 					}),
 			);
 			this.logger.debug(
-				`← Received response with status ${userRecord.status} for ${orcid_id}`,
+				`Received response with status ${userRecord.status} for ${orcid_id}`,
 			);
-
+			// Disabled since we don't have the response schema
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const data = userRecord?.data;
 
 			return this.processOrcidUserInfo(data, orcid_id);
 		} catch (error) {
 			this.logger.error(`Error Getting info from Orcid for: ${orcid_id} ! `);
 			this.logger.error(error);
+			throw new Error(`Failed to get user info from Orcid for: ${orcid_id}`);
 		}
 	}
 
 	private processOrcidUserInfo(data: any, orcid_id: string): OrcidUserInfo {
-		const user_bio: string = get(data, 'person.biography.content', null);
+		const user_bio: string | null = get<string | null>(
+			data,
+			'person.biography.content',
+			null,
+		);
 
-		const user_keywords: string[] = get(
+		const user_keywords: string[] = get<Array<{ content: string }>>(
 			data,
 			'person.keywords.keyword',
 			[],
-		).map((k) => k.content);
+		).map((k) => k?.content);
 
 		// for now affiliation is the most recent employment.
-		const user_affiliation: string = get(
+		const user_affiliation: string | null = get<string | null>(
 			data,
 			'activities-summary.employments.affiliation-group[0].summaries[0].employment-summary.organization.name',
 			null,
 		);
 
-		const user_links: UserLinks[] = get(
+		type OrcidApiLink = { 'url-name': string; url: { value: URL } };
+		const user_links: UserLinks[] = get<Array<OrcidApiLink>>(
 			data,
 			'person.researcher-urls.researcher-url',
 			[],
 		)
 			.map((link) => {
-				const url_name = get(link, 'url-name', null);
-				const url_value = get(link, 'url.value', null) as URL;
+				const url_name: string | null = get<OrcidApiLink, 'url-name', null>(
+					link,
+					'url-name',
+					null,
+				);
+				const url_value: URL | null = get<OrcidApiLink, 'url.value', null>(
+					link,
+					'url.value',
+					null,
+				);
 				if (!url_name || !url_value) {
-					return null;
+					return;
 				}
 				return {
 					name: url_name,
 					url: url_value,
 				};
 			})
-			.filter((link) => !!link && link.url);
+			.filter((link): link is UserLinks => link !== undefined && !!link.url);
 
 		const user_employment: UserEmployment[] = get(
 			data,
@@ -267,7 +282,9 @@ export class OrcidClientService {
 				if (!summary) return null;
 
 				const org_name = get(summary, 'organization.name', undefined);
+
 				const role_title = get(summary, 'role-title', undefined);
+
 				const org_url = get(summary, 'url.value', undefined);
 				const start_date = parseDateObjectIntoString(
 					get(summary, 'start-date', undefined),
@@ -279,7 +296,9 @@ export class OrcidClientService {
 				if (!org_name) return null;
 				return {
 					name: org_name,
+
 					title: role_title,
+
 					url: org_url,
 					start_date: start_date,
 					end_date: end_date,

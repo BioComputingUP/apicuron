@@ -1,49 +1,48 @@
+import { StorageManagerModule } from '@biocomputingup/nest-storage-manager';
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { MulterModule } from '@nestjs/platform-express';
+import { ScheduleModule } from '@nestjs/schedule';
+import { AchievementsModule } from './achievements/achievements.module';
+import { AdminModule } from './admin/admin.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
-import { loadConfig } from './config/load';
-import { ReportsModule } from './reports/reports.module';
-import { ResourcesModule } from './resources/resources.module';
-import { StatisticsModule } from './statistics/statistics.module';
-import { ScheduleModule } from '@nestjs/schedule';
-import { MulterModule } from '@nestjs/platform-express';
-import { NotificationsModule } from './notifications/notifications.module';
-import { TermsModule } from './terms/terms.module';
-import { SchedulerModule } from './scheduler/scheduler.module';
-import { SchedulerClientModule } from './scheduler-client/scheduler-client.module';
-import { EmailModule } from './email/email.module';
-import { CoreApicuronModule } from './core/core.module';
-import { EventEmitterModule } from '@nestjs/event-emitter';
-import { SubmitReportModule } from './submit-reports/submit-reports.module';
-import { OrcidSubmissionModule } from './orcid/orcid-submission/orcid-submission.module';
-import { ResourceManagerModule } from './resource-manager/resource-manager.module';
-import { DetailedStatisticsModule } from './detailed-statistics/detailed-statistics.module';
-import { WeeklyStatisticsModule } from './weekly-statistics/weekly-statistics.module';
 import { BadgesModule } from './badges/badges.module';
-import { MedalsModule } from './medals/medals.module';
-import { AchievementsModule } from './achievements/achievements.module';
-import { loadSentryModule } from './plugins/sentry';
+import { loadConfig } from './config/load';
+import { CoreApicuronModule } from './core/core.module';
+import { CuratorRegistryModule } from './curator-registry/curator-registry.module';
+import { DetailedStatisticsModule } from './detailed-statistics/detailed-statistics.module';
+import { EmailModule } from './email/email.module';
 import { EventOrchestratorModule } from './event-orchestrator/event-orchestrator.module';
-import { ResourceStatsModule } from './resource-stats/resource-stats.module';
+import { OrcidFetcherModule } from './github-scraper/github-scraper.module';
+import { MedalsModule } from './medals/medals.module';
 import { MonthlyStatisticsModule } from './monthly-statistics/monthly-statistics.module';
-import { OrcidSyncModule } from './orcid/orcid-sync/orcid-sync.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { OrcidClientModuleOptions } from './orcid/orcid-client/interfaces/orcid.interface';
 import { OrcidClientModule } from './orcid/orcid-client/orcid-client.module';
-import { CuratorRegistryModule } from './curator-registry/curator-registry.module';
-import { OrcidFetcherModule } from './github-scraper/github-scraper.module';
-import { StorageManagerModule } from '@biocomputingup/nest-storage-manager';
-import { StorageModuleOptions } from './storage/storage.config';
-import { ServeFilesController } from './storage/serve-files.controller';
+import { OrcidSubmissionModule } from './orcid/orcid-submission/orcid-submission.module';
+import { OrcidSyncModule } from './orcid/orcid-sync/orcid-sync.module';
+import { loadSentryModule } from './plugins/sentry';
+import { ReportsModule } from './reports/reports.module';
+import { ResourceManagerModule } from './resource-manager/resource-manager.module';
+import { ResourceStatsModule } from './resource-stats/resource-stats.module';
+import { ResourcesModule } from './resources/resources.module';
+import { SchedulerClientModule } from './scheduler-client/scheduler-client.module';
+import { SchedulerModule } from './scheduler/scheduler.module';
 import { getGlobalInterceptorChain } from './shared/interceptors';
 import {
 	EntriesExistRule,
 	EntryExistsRule,
 	UniqueRule,
 } from './shared/validators';
-import { ConfigService } from '@nestjs/config';
-import { AdminModule } from './admin/admin.module';
+import { StatisticsModule } from './statistics/statistics.module';
+import { ServeFilesController } from './storage/serve-files.controller';
+import { StorageModuleOptions } from './storage/storage.config';
+import { SubmitReportModule } from './submit-reports/submit-reports.module';
+import { TermsModule } from './terms/terms.module';
+import { WeeklyStatisticsModule } from './weekly-statistics/weekly-statistics.module';
 @Module({
 	imports: [
 		// Sentry Setup
@@ -58,9 +57,9 @@ import { AdminModule } from './admin/admin.module';
 			inject: [ConfigService],
 			useFactory: (config: ConfigService): OrcidClientModuleOptions => {
 				return {
-					apiUrl: config.get<string>('ORCID_API_URL'),
-					client_id: config.get<string>('ORCID_CLIENT_ID'),
-					client_secret: config.get<string>('ORCID_CLIENT_SECRET'),
+					apiUrl: config.getOrThrow<string>('ORCID_API_URL'),
+					client_id: config.getOrThrow<string>('ORCID_CLIENT_ID'),
+					client_secret: config.getOrThrow<string>('ORCID_CLIENT_SECRET'),
 					scopes: ['/read-limited', '/activities/update'],
 					loadOnStartup: config.get<string>('environment') != 'local',
 				};

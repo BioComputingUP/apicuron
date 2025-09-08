@@ -61,9 +61,9 @@ export interface OrcidAuthToken {
 
 export interface OrcidUserInfo {
 	orcid_id: string;
-	biography: string;
+	biography: string | null;
 	keywords: string[];
-	affiliation: string;
+	affiliation: string | null;
 	links: UserLinks[];
 	user_employment: UserEmployment[];
 }

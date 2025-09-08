@@ -4,7 +4,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, LeanDocument, Types } from 'mongoose';
 import { PartnerResourceRepository } from 'src/core/repositories/partner-resource.repository';
-import { assertNotNull } from 'src/util/type-assertion.helper';
+import { assertIsDefined } from 'src/util/type-assertion.helper';
 import {
 	League,
 	LeagueDocument,
@@ -82,7 +82,7 @@ export class PartnerResourcesService {
 				new: true,
 			},
 		);
-		assertNotNull(
+		assertIsDefined(
 			resourceUpdated,
 			`Resource with ID ${removeMemberFromLeague.resource_id} not found.`,
 		);
@@ -95,7 +95,7 @@ export class PartnerResourcesService {
 		const resource = await this.partnerResourceRepo.findOne({
 			resource_id: deleteLeague.resource_id,
 		});
-		assertNotNull(
+		assertIsDefined(
 			resource,
 			`Resource with ID ${deleteLeague.resource_id} not found.`,
 		);
@@ -123,7 +123,7 @@ export class PartnerResourcesService {
 				new: true,
 			},
 		);
-		assertNotNull(
+		assertIsDefined(
 			resourceUpdated,
 			`Resource with ID ${deleteLeague.resource_id} not found.`,
 		);
@@ -150,7 +150,7 @@ export class PartnerResourcesService {
 
 	async get_resource(resource_id: string): Promise<PartnerResourceDocument> {
 		const doc = await this.partnerResourceRepo.findOne({ resource_id });
-		assertNotNull(doc, `Resource with ID ${resource_id} not found.`);
+		assertIsDefined(doc, `Resource with ID ${resource_id} not found.`);
 		return doc;
 	}
 
@@ -162,11 +162,13 @@ export class PartnerResourcesService {
 		resource_update: UpdatePartnerResourceDto & { logo?: string },
 	): Promise<PartnerResourceDocument> {
 		const { resource_id } = resource_update;
-		return await this.partnerResourceRepo.findOneAndUpdate(
+		const newResource = await this.partnerResourceRepo.findOneAndUpdate(
 			{ resource_id },
 			{ $set: resource_update },
 			{ new: true },
 		);
+		assertIsDefined(newResource, `Resource with ID ${resource_id} not found.`);
+		return newResource;
 	}
 
 	public getResourceLeagues(

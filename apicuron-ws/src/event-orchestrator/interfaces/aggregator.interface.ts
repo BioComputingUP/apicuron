@@ -24,7 +24,7 @@ export interface Aggregator {
 	termUpdated(oldTerm: TermDocument, term: TermDocument): Promise<void> | void;
 	termDeleted(term: TermDocument): Promise<void> | void;
 
-	updatedResource(after: PartnerResource): Promise<void>;
+	updatedResource(after: PartnerResource): Promise<void> | void;
 }
 
 export interface AggregatorOptions {

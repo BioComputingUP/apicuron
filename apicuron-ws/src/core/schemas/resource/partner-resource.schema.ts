@@ -115,7 +115,7 @@ export class PartnerResource {
 		return this.leaderboard_preferences[leaderboardType];
 	}
 
-	getLeague(leagueName: string): League {
+	getLeague(leagueName: string): League | undefined {
 		return this.leagues.find((league: League) => league.name == leagueName);
 	}
 

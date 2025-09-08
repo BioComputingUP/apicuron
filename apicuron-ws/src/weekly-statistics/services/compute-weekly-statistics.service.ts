@@ -140,7 +140,7 @@ export class ComputeWeeklyStatisticsService {
 			setObj.last_contribution = report.timestamp;
 		}
 		try {
-			await this.weeklyStatModel.findOneAndUpdate(
+			const result = await this.weeklyStatModel.findOneAndUpdate(
 				{
 					resource_id: report.resource_id,
 					league: report.league,
@@ -165,6 +165,7 @@ export class ComputeWeeklyStatisticsService {
 					new: true,
 				},
 			);
+			return result;
 		} catch (err: unknown) {
 			if (err instanceof MongoServerError && err.code === 11000) {
 				return await this.updateWithReport(report, termDoc, resource, user);

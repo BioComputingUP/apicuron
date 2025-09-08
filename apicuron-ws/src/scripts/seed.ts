@@ -8,7 +8,7 @@ import { map } from 'lodash';
 import { Connection, Model } from 'mongoose';
 import { SubmittedResourcesService } from 'src/resources/submitted-resources/resources.service';
 import { FileUploadDto } from 'src/util/file-upload.helper';
-import { assertNotNull } from 'src/util/type-assertion.helper';
+import { assertIsDefined } from 'src/util/type-assertion.helper';
 import { AppModule } from '../app.module';
 import { UsersService } from '../auth/users/services/users.service';
 import { PrivacyType } from '../core/enums';
@@ -79,7 +79,7 @@ async function bootstrap() {
 	const exampleResource = await resourceModel.findOne({
 		resource_id: tempResource.resource_id,
 	});
-	assertNotNull(
+	assertIsDefined(
 		exampleResource,
 		`Example resource with ID ${tempResource.resource_id} not found`,
 	);
@@ -104,7 +104,7 @@ async function bootstrap() {
 	const secondResource = await resourceModel.findOne({
 		resource_id: secondResourceTemp.resource_id,
 	});
-	assertNotNull(
+	assertIsDefined(
 		secondResource,
 		`Second resource with ID ${secondResourceTemp.resource_id} not found`,
 	);

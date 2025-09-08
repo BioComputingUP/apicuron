@@ -4,9 +4,9 @@ import {
 	NestMiddleware,
 	UnauthorizedException,
 } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { NextFunction, Request, Response } from 'express';
 import { UsersService } from '../users/services/users.service';
 
 export interface JwtPayload {
@@ -60,6 +60,7 @@ export class AuthMiddleware implements NestMiddleware {
 			if (!!token && token != '' && token != undefined) {
 				return token;
 			}
+			throw new UnauthorizedException();
 		} catch (e) {
 			this.authMiddlewareLogger.error('Wrong header formatting Error ', e);
 			this.unauthorized_exception(
@@ -68,20 +69,20 @@ export class AuthMiddleware implements NestMiddleware {
 		}
 	}
 
-	check_auth_header(req: Request): string {
-		const tokenKey = this.configService.get<string>('JWT_HEADER');
+	check_auth_header(req: Request): string | undefined {
+		const tokenKey = this.configService.getOrThrow<string>('JWT_HEADER');
 		if (req.header(tokenKey)) {
 			// this.authMiddlewareLogger.log('user has header');
 			return req.header(tokenKey);
 		} else if (req.cookies[tokenKey]) {
 			return req.cookies[tokenKey];
 		} else {
-			return null;
+			return undefined;
 			// this.unauthorized_exception('authorization header non-existent');
 		}
 	}
 
-	unauthorized_exception(reason: string) {
+	unauthorized_exception(reason: string): never {
 		throw new UnauthorizedException({
 			statusCode: 403,
 			message: 'Forbidden resource: ' + reason,
