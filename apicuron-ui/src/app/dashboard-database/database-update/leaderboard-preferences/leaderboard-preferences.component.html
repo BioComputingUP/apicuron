@@ -1,0 +1,17 @@
+<div
+  [formGroup]="leaderboard_preferences_group"
+  class="tw-flex tw-flex-col tw-gap-2 lg:tw-flex-row tw-mb-4"
+>
+  <div
+    class="tw-flex-1 tw-rounded-md tw-bg-white tw-shadow-md tw-p-4 tw-border tw-border-gray-300 tw-mb-4;"
+    *ngFor="let section of leaderboardSections"
+  >
+    <preference-selector
+      [formControlName]="section.key"
+      [preferences]="all_lb_preferences[section.key]"
+      [sectionLabel]="section.label"
+      [sectionIcon]="section.icon"
+    >
+    </preference-selector>
+  </div>
+</div>

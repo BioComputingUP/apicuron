@@ -1,18 +1,25 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from "@angular/core";
-import { DatabasesService } from "../services/databases.service";
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+} from "@angular/core";
 import { ActivatedRoute, ParamMap } from "@angular/router";
+import { LeaderboardOptions } from "projects/apicuron-util/src/lib/leaderboard/interfaces/leaderboard-options";
+import { combineLatest, interval, Observable, of } from "rxjs";
 import { delay, map, pluck, shareReplay, switchMap, tap } from "rxjs/operators";
-import { combineLatest, interval, Observable } from "rxjs";
-import { Resource } from "../../models/resource.model";
-import { BadgeDefService } from "../../achievements-def/services/badge-def.service";
 import { BadgeDefFilter } from "../../achievements-def/interfaces/badge-def.filter";
+import { MedalDefFilter } from "../../achievements-def/interfaces/medal-def.filter";
+import { BadgeDefService } from "../../achievements-def/services/badge-def.service";
+import { MedalDefService } from "../../achievements-def/services/medal-def.service";
 import { Paginated } from "../../interfaces/paginated";
 import { BadgeDef } from "../../models/badge-def.model";
-import { TermsService } from "../../terms/services/terms.service";
-import { Term } from "../../models/term.model";
-import { MedalDefService } from "../../achievements-def/services/medal-def.service";
-import { MedalDefFilter } from "../../achievements-def/interfaces/medal-def.filter";
 import { MedalDef } from "../../models/medal-def.model";
+import { Resource } from "../../models/resource.model";
+import { Term } from "../../models/term.model";
+import { TermsService } from "../../terms/services/terms.service";
+import { DatabasesService } from "../services/databases.service";
 @Component({
   selector: "app-database-page",
   templateUrl: "./database-page.component.html",
@@ -30,6 +37,7 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
   terms$: Observable<Term[]>;
   firstMedals$: Observable<Paginated<MedalDef>>;
   lastMedals$: Observable<Paginated<MedalDef>>;
+  leaderboardOptions$: Observable<LeaderboardOptions>;
 
   constructor(
     private databaseService: DatabasesService,
@@ -75,7 +83,7 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
       }),
       shareReplay()
     );
-    
+
     this.resource$ = this.resourceId$.pipe(
       switchMap((resource_id: string) => {
         return this.databaseService.get_resource(resource_id);
@@ -83,13 +91,19 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
       pluck<{ data: Resource }, "data">("data"),
       shareReplay(1)
     );
-    
+    this.leaderboardOptions$ = this.resource$.pipe(
+      switchMap((resource: Resource) => {
+        return of(resource.leaderboard_preferences.parseIntoOptions());
+        // return resource.leaderboard_preferences.parseIntoOptions();
+      }),
+      shareReplay(1)
+    );
     this.terms$ = this.resource$.pipe(
       switchMap(({ resource_id }: Resource) => {
         return this.termService.getTerms({ resource_id });
       })
     );
-    
+
     this.firstBadges$ = this.resource$.pipe(
       switchMap(({ resource_id }: Resource) => {
         return this.badgeDefService.getBadgeDefs(
@@ -127,6 +141,5 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
       }),
       shareReplay()
     );
-
   }
 }

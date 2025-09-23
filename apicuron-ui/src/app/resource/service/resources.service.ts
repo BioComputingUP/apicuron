@@ -1,11 +1,11 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable, combineLatest, of } from "rxjs";
-import { map, pluck, startWith, switchMap } from "rxjs/operators";
+
+import { combineLatest, Observable, of, tap } from "rxjs";
+import { map, pluck, switchMap } from "rxjs/operators";
 import { Resource } from "src/app/models/resource.model";
 import { environment } from "src/environments/environment";
 import {
-  createLoadingState,
   LoadingState,
   switchMapWithLoading,
 } from "../../interfaces/loading-state";
@@ -48,6 +48,9 @@ export class ResourcesService {
       pluck("data"),
       map((resource: Resource) => {
         return new Resource().deserialize(resource);
+      }),
+      tap((resource) => {
+        console.log("Resource fetched");
       })
     );
   }
@@ -83,7 +86,24 @@ export class ResourcesService {
 
     for (const key of Object.keys(resource.serialize())) {
       const value = resource[key];
-      formData.set(key, value);
+
+      // This was seperated because leaderboard preferences is a nested object, and it needs to be stringified for a multipart request
+      if (
+        key === "leaderboard_preferences" &&
+        typeof value === "object" &&
+        value !== null
+      ) {
+        formData.set(key, JSON.stringify(value));
+        const jsonString = JSON.stringify(value);
+        console.log(
+          "Sending leaderboard_preferences:",
+          value,
+          "as JSON:",
+          jsonString
+        );
+      } else {
+        formData.set(key, value);
+      }
     }
     if (logo) {
       formData.set("logo", logo);

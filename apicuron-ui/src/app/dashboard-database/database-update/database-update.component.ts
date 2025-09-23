@@ -1,35 +1,20 @@
-import { HttpErrorResponse } from "@angular/common/http";
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  OnDestroy,
-  ViewChild,
-} from "@angular/core";
+import { Component, OnDestroy } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, ParamMap } from "@angular/router";
-import {
-  BehaviorSubject,
-  Observable,
-  Subject,
-  Subscription,
-  combineLatest,
-} from "rxjs";
+import { MessageService } from "primeng/api";
+import { BehaviorSubject, combineLatest, Observable, Subject } from "rxjs";
 import {
   catchError,
-  finalize,
   map,
   shareReplay,
   startWith,
   switchMap,
   takeUntil,
-  tap,
+  tap
 } from "rxjs/operators";
-import { ResourcesService } from "../../resource/service/resources.service";
 import { Resource } from "../../models/resource.model";
-import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
-import { MessageService } from "primeng/api";
+import { ResourcesService } from "../../resource/service/resources.service";
 
 @Component({
   selector: "database-update",
@@ -52,7 +37,11 @@ export class DatabaseUpdateComponent implements OnDestroy {
 
   blocked$ = new BehaviorSubject<Boolean>(false);
   destroy$ = new Subject<Boolean>();
-
+  leaderboardForm = this.formBuilder.group({
+    monthly: [[], []],
+    weekly: [[], []],
+    total: [[], []],
+  });
   // @ViewChild("fileUploadElement", { static: false })
   // fileInputElement: ElementRef<HTMLInputElement>;
 
@@ -66,19 +55,6 @@ export class DatabaseUpdateComponent implements OnDestroy {
     this.resource_id$ = this.route.paramMap.pipe(
       map((params: ParamMap) => {
         return params.get("resource_id");
-      })
-    );
-
-    this.resource$ = this.resource_id$.pipe(
-      switchMap((resource_id: string) => {
-        return this.resourceService.get_resource(resource_id);
-      }),
-      shareReplay(),
-      tap(async (resource: Resource) => {
-        this.form.setValue({
-          ...resource.serialize(),
-          logo: null,
-        });
       })
     );
 
@@ -118,8 +94,24 @@ export class DatabaseUpdateComponent implements OnDestroy {
             ),
           ],
         ],
+        leaderboard_preferences: this.leaderboardForm,
       },
       { validators: Validators.required, updateOn: "change" }
+    );
+    this.resource$ = this.resource_id$.pipe(
+      switchMap((resource_id: string) => {
+        return this.resourceService.get_resource(resource_id);
+      }),
+      shareReplay(),
+      tap(async (resource: Resource) => {
+        // const leaderBoardPrefs = this.parseLeaderBoardPreferences(
+        //   resource.leaderboard_preferences
+        // );
+        this.form.setValue({
+          ...resource.serialize(),
+          logo: null,
+        });
+      })
     );
 
     this.logoLink$ = combineLatest([
@@ -130,7 +122,7 @@ export class DatabaseUpdateComponent implements OnDestroy {
         if (changes && changes instanceof File) {
           const url = URL.createObjectURL(changes);
           const safeUrl = this.sanitizer.bypassSecurityTrustUrl(url);
-          console.log({ url, safeUrl });
+
           return safeUrl;
         } else {
           return resource.logo.href;
@@ -148,11 +140,16 @@ export class DatabaseUpdateComponent implements OnDestroy {
   }
 
   submit() {
-    const formValue: FormData = this.form.value;
+    const formValue = this.form.value;
+
     this.blocked$.next(true);
+    const resourceData = {
+      ...formValue,
+      logo: undefined,
+    };
     this.resourceService
       .updateResource(
-        new Resource().deserialize(formValue),
+        new Resource().deserialize(resourceData),
         this.form.get("logo").value
       )
       .pipe(

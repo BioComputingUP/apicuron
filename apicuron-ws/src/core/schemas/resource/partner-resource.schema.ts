@@ -9,6 +9,10 @@ import {
 } from 'mongoose';
 import { PrivacyType } from '../../enums';
 import { AchievementDef } from '../achievements-def/achievement-def.schema';
+import {
+	LeaderboardSettings,
+	LeaderboardType,
+} from '../components/leaderboard-preferences.schema';
 import { League, LeagueSchema } from '../league/league.schema';
 import { Term } from '../terms.schema';
 import { ResourceStats, ResourceStatsSchema } from './resource-stats.schema';
@@ -101,6 +105,15 @@ export class PartnerResource {
 		required: true,
 	})
 	allowedUrlsPrefix: string[];
+
+	@Prop({ required: false, type: LeaderboardSettings })
+	leaderboard_preferences: LeaderboardSettings;
+
+	getLeaderBoardSettings<T extends LeaderboardType>(
+		leaderboardType: T,
+	): LeaderboardSettings[T] {
+		return this.leaderboard_preferences[leaderboardType];
+	}
 
 	getLeague(leagueName: string): League | undefined {
 		return this.leagues.find((league: League) => league.name == leagueName);

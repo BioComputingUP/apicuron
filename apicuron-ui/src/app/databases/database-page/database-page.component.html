@@ -78,8 +78,11 @@
           </div>
         </div>
 
-        <div>
-          <resource-leaderboard [resource]="resource"></resource-leaderboard>
+        <div *ngIf="leaderboardOptions$ | async as leaderboardOptions">
+          <resource-leaderboard
+            [resource]="resource"
+            [options]="leaderboardOptions"
+          ></resource-leaderboard>
         </div>
 
         <div class="tw-my-2 sm:tw-my-4" *ngIf="terms.length > 0">

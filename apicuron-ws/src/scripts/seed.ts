@@ -116,6 +116,23 @@ async function bootstrap() {
 		`Assigned testing resources to testing user: ${testingOrcidId}`,
 	);
 
+	// // Assign resources to test user
+	// userModel.updateOne(
+	// 	{ orcid_id: testingOrcidId },
+	// 	{
+	// 		$set: {
+	// 			resources: [
+	// 				{
+	// 					resource_id: exampleResource.resource_id,
+	// 				},
+	// 				{
+	// 					resource_id: secondResource.resource_id,
+	// 				},
+	// 			],
+	// 		},
+	// 	},
+	// );
+
 	//create terms for resource
 	const terms$: Promise<TermDocument>[] = [];
 
