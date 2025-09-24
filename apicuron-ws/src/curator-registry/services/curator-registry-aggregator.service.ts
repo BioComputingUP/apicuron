@@ -10,7 +10,7 @@ import { LeagueUpdatedEvent } from 'src/resources/partner-resources/leagues/even
 import {
 	UserCreatedEvent,
 	UserRepository,
-	UserUpdatedEvent,
+	UserUpdatedEvent
 } from 'src/core/repositories/user.repository';
 
 import { PartnerResource, PartnerResourceDocument } from 'src/core/schemas';
@@ -79,8 +79,7 @@ export class CuratorRegistryAggregatorService implements Aggregator {
 		return count;
 	}
 	async recomputeAllResourceAggregates(resource_id: string) {
-		await this.removeAllResourceAggregates(resource_id);
-		await this.applyAllReports(resource_id);
+		await this.registryService.recomputeResourceAggregate(resource_id);
 	}
 	deleteLeague(resource_id: string, league: string): Promise<number> | number {
 		return this.registryService.deleteLeague(resource_id, league);
