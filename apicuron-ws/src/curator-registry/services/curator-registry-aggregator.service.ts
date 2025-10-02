@@ -10,7 +10,7 @@ import { LeagueUpdatedEvent } from 'src/resources/partner-resources/leagues/even
 import {
 	UserCreatedEvent,
 	UserRepository,
-	UserUpdatedEvent
+	UserUpdatedEvent,
 } from 'src/core/repositories/user.repository';
 
 import { PartnerResource, PartnerResourceDocument } from 'src/core/schemas';

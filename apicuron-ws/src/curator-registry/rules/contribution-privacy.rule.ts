@@ -1,16 +1,14 @@
 import { PrivacyType } from 'src/core/enums';
-import {
-	ContributionEntry,
-	CuratorRegistryEntry,
-} from 'src/core/schemas/curator-registry/curator-entry.schema';
+import { ContributionEntry } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { League } from 'src/core/schemas/index';
-import { FilterStrategyRule, RegistryFilterContext } from './filters.interface';
+import {
+	ContributionFilterRule,
+	RegistryFilterContext,
+} from './filters.interface';
 /**
  * Rule to only show public contributions and private contributions the user administers.
  */
-export class ContributionPrivacyFilterRule
-	implements FilterStrategyRule<CuratorRegistryEntry>
-{
+export class ContributionPrivacyFilterRule implements ContributionFilterRule {
 	name = 'Public Contribution';
 
 	shouldApply(context: RegistryFilterContext): boolean {
@@ -19,27 +17,26 @@ export class ContributionPrivacyFilterRule
 
 	applyFilter(
 		context: RegistryFilterContext,
-		items: CuratorRegistryEntry[],
-	): CuratorRegistryEntry[] {
+		contributions: ContributionEntry[],
+	): ContributionEntry[] {
 		// Filter out contributions to private groups unless the user administers their resources
 
-		return items.map((entry) => {
-			return this.filterEntryContributions(entry, context);
-		});
+		const contributionsWithFilteredGroups = contributions.map(
+			(contribution) => {
+				return this.filterContributionGroups(contribution, context);
+			},
+		);
+		return this.filterContributionsWithNoGroups(
+			contributionsWithFilteredGroups,
+		);
 	}
 
-	filterEntryContributions(
-		entry: CuratorRegistryEntry,
-		context: RegistryFilterContext,
-	): CuratorRegistryEntry {
-		return {
-			...entry,
-			contributed_to: entry.contributed_to
-				.map((contribution) =>
-					this.filterContributionGroups(contribution, context),
-				)
-				.filter((contribution) => contribution.groups.length > 0),
-		};
+	private filterContributionsWithNoGroups(
+		contributions: ContributionEntry[],
+	): ContributionEntry[] {
+		return contributions.filter((contribution) => {
+			return contribution.groups.length > 0;
+		});
 	}
 
 	private filterContributionGroups(

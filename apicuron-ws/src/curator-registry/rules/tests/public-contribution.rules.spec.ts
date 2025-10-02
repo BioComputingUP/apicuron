@@ -1,9 +1,6 @@
 import { PrivacyType } from 'src/core/enums';
 
-import {
-	ContributionEntry,
-	CuratorRegistryEntry,
-} from 'src/core/schemas/curator-registry/curator-entry.schema';
+import { ContributionEntry } from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { League } from 'src/core/schemas/index';
 import { ContributionPrivacyFilterRule } from '../contribution-privacy.rule';
 import { RegistryFilterContext } from '../filters.interface';
@@ -136,94 +133,87 @@ describe('PublicContributionRule', () => {
 		});
 	});
 
-	describe('filterEntryContributions', () => {
-		it('should filter contributions and remove empty ones', () => {
-			const entry: CuratorRegistryEntry = {
-				contributed_to: [
-					{
-						groups: [
-							{
-								visibility: PrivacyType.public,
-								resource_id: 'resource-1',
-							} as League,
-						],
-					} as ContributionEntry,
-					{
-						groups: [
-							{
-								visibility: PrivacyType.private,
-								resource_id: 'resource-2',
-							} as League,
-						],
-					} as ContributionEntry,
-					{
-						groups: [
-							{
-								visibility: PrivacyType.private,
-								resource_id: 'resource-3',
-							} as League,
-						],
-					} as ContributionEntry,
-				],
-			} as CuratorRegistryEntry;
-
-			const context: RegistryFilterContext = {
-				showAll: false,
-				userAdministeredResourceIds: ['resource-3'],
-			};
-
-			const result = rule.filterEntryContributions(entry, context);
-
-			expect(result.contributed_to).toHaveLength(2);
-			expect(result.contributed_to[0].groups[0].resource_id).toBe('resource-1');
-			expect(result.contributed_to[1].groups[0].resource_id).toBe('resource-3');
-		});
-	});
-
 	describe('applyFilter', () => {
-		it('should apply filtering to all entries', () => {
-			const entries: CuratorRegistryEntry[] = [
-				{
-					contributed_to: [
-						{
-							groups: [
-								{
-									visibility: PrivacyType.public,
-									resource_id: 'resource-1',
-								} as League,
-								{
-									visibility: PrivacyType.private,
-									resource_id: 'resource-2',
-								} as League,
-							],
-						} as ContributionEntry,
-					],
-				} as CuratorRegistryEntry,
-				{
-					contributed_to: [
-						{
-							groups: [
-								{
-									visibility: PrivacyType.private,
-									resource_id: 'resource-3',
-								} as League,
-							],
-						} as ContributionEntry,
-					],
-				} as CuratorRegistryEntry,
-			];
+		const publicGroupRes1: League = {
+			visibility: PrivacyType.public,
+			resource_id: 'resource-1',
+		} as League;
+		const privateGroupRes1: League = {
+			visibility: PrivacyType.private,
+			resource_id: 'resource-1',
+		} as League;
 
+		const publicGroupRes2: League = {
+			visibility: PrivacyType.public,
+			resource_id: 'resource-2',
+		} as League;
+
+		const privateGroupRes2: League = {
+			visibility: PrivacyType.private,
+			resource_id: 'resource-2',
+		} as League;
+
+		it('should hide private contributions when user is not resource admin', () => {
 			const context: RegistryFilterContext = {
 				showAll: false,
 				userAdministeredResourceIds: ['resource-2'],
 			};
 
-			const result = rule.applyFilter(context, entries);
+			const contributions: ContributionEntry[] = [
+				{
+					resource_id: 'resource-1',
+					groups: [publicGroupRes1, privateGroupRes1],
+				} as ContributionEntry,
+			];
+			const result = rule['applyFilter'](context, contributions);
+			expect(result).toHaveLength(1);
+			expect(result[0].groups).toHaveLength(1);
+			expect(result[0].groups[0].visibility).toBe(PrivacyType.public);
+		});
 
+		it('should show private contributions when user is resource admin and hide other resources', () => {
+			const context: RegistryFilterContext = {
+				showAll: false,
+				userAdministeredResourceIds: ['resource-1'],
+			};
+			const contributions: ContributionEntry[] = [
+				{
+					resource_id: 'resource-1',
+					groups: [publicGroupRes1, privateGroupRes1],
+				} as ContributionEntry,
+				{
+					resource_id: 'resource-2',
+					groups: [publicGroupRes2],
+				} as ContributionEntry,
+			];
+			const result = rule['applyFilter'](context, contributions);
 			expect(result).toHaveLength(2);
-			expect(result[0].contributed_to).toHaveLength(1);
-			expect(result[0].contributed_to[0].groups).toHaveLength(2);
-			expect(result[1].contributed_to).toHaveLength(0);
+
+			expect(result[0].groups).toHaveLength(2);
+			expect(result[1].groups).toHaveLength(1);
+			expect(result[1].groups[0].visibility).toBe(PrivacyType.public);
+		});
+
+		it('should not show the resource if all groups are private to the user', () => {
+			const context: RegistryFilterContext = {
+				showAll: false,
+				userAdministeredResourceIds: [],
+			};
+			const contributions: ContributionEntry[] = [
+				{
+					resource_id: 'resource-1',
+					groups: [privateGroupRes1],
+				} as ContributionEntry,
+				{
+					resource_id: 'resource-2',
+					groups: [publicGroupRes2],
+				} as ContributionEntry,
+			];
+			const result = rule['applyFilter'](context, contributions);
+			expect(result).toHaveLength(1);
+			expect(result[0].groups).toHaveLength(1);
+			expect(result[0].resource_id).toBe('resource-2');
+			expect(result[0].groups[0].visibility).toBe(PrivacyType.public);
 		});
 	});
 });
