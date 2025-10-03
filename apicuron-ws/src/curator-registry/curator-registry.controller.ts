@@ -76,7 +76,7 @@ export class CuratorRegistryController {
 		const userAdministeredResourceIds: string[] = user ? user.resources.map(resource => resource.resource_id) : [];
 		const { data, total } = await this.registryQueryService.getAllEntries(
 			query,
-			userAdministeredResourceIds
+			userAdministeredResourceIds,
 		);
 
 		return paginate<RegistrySearchResultDto>(RegistrySearchResultDto,

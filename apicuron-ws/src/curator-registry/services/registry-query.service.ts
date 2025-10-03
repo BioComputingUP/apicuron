@@ -14,7 +14,6 @@ import {
 import { GetRegistryEntryDto } from '../dto/registry-entries.dto';
 import { RegistryFilterContext } from '../rules/filters.interface';
 import { RegistryFilterStrategy } from '../strategies/registry-filter.strategy';
-
 @Injectable()
 export class RegistryQueryService {
 	logger = new Logger(RegistryQueryService.name);
@@ -55,12 +54,16 @@ export class RegistryQueryService {
 				userAdministeredResourceIds,
 				showAll: showAll,
 			};
+			this.logger.log('Count before filtering: ' + entries.length);
 			const filteredResults = this.privacyStrategy.filter(
 				strategyContext,
 				entries,
 			);
+			this.logger.log('Count after filtering: ' + filteredResults.length);
+			const count: number = await this.registryEntryModel.count(query_filter);
+
 			return {
-				total: filteredResults.length,
+				total: count,
 				data: filteredResults,
 			};
 		} catch (error) {
