@@ -1,15 +1,20 @@
+import { Logger } from '@nestjs/common';
 import { PrivacyType } from 'src/core/enums';
 
-import { ContributionEntry } from 'src/core/schemas/curator-registry/curator-entry.schema';
+import {
+	ContributionEntry,
+	CuratorRegistryEntry,
+} from 'src/core/schemas/curator-registry/curator-entry.schema';
 import { League } from 'src/core/schemas/index';
 import { ContributionPrivacyFilterRule } from '../contribution-privacy.rule';
 import { RegistryFilterContext } from '../filters.interface';
 
 describe('PublicContributionRule', () => {
 	let rule: ContributionPrivacyFilterRule;
-
+	let logger: Logger;
 	beforeEach(() => {
 		rule = new ContributionPrivacyFilterRule();
+		logger = new Logger(ContributionPrivacyFilterRule.name);
 	});
 
 	describe('filterGroup', () => {
@@ -147,12 +152,27 @@ describe('PublicContributionRule', () => {
 			visibility: PrivacyType.public,
 			resource_id: 'resource-2',
 		} as League;
-
 		const privateGroupRes2: League = {
 			visibility: PrivacyType.private,
 			resource_id: 'resource-2',
 		} as League;
+		const contributorEntry = {
+			curator_orcid: '0000-0001',
+			privacy: PrivacyType.public,
+			curator: null,
+		} as CuratorRegistryEntry;
 
+		function buildEntryWithContributions(
+			contributions: ContributionEntry[],
+		): CuratorRegistryEntry[] {
+			console.log(contributorEntry);
+			return [
+				{
+					...contributorEntry,
+					contributed_to: contributions,
+				},
+			];
+		}
 		it('should hide private contributions when user is not resource admin', () => {
 			const context: RegistryFilterContext = {
 				showAll: false,
@@ -165,10 +185,17 @@ describe('PublicContributionRule', () => {
 					groups: [publicGroupRes1, privateGroupRes1],
 				} as ContributionEntry,
 			];
-			const result = rule['applyFilter'](context, contributions);
+
+			const result = rule.applyFilter(
+				context,
+				buildEntryWithContributions(contributions),
+			);
 			expect(result).toHaveLength(1);
-			expect(result[0].groups).toHaveLength(1);
-			expect(result[0].groups[0].visibility).toBe(PrivacyType.public);
+			expect(result[0].contributed_to).toHaveLength(1);
+			expect(result[0].contributed_to[0].groups).toHaveLength(1);
+			expect(result[0].contributed_to[0].groups[0].visibility).toBe(
+				PrivacyType.public,
+			);
 		});
 
 		it('should show private contributions when user is resource admin and hide other resources', () => {
@@ -183,15 +210,17 @@ describe('PublicContributionRule', () => {
 				} as ContributionEntry,
 				{
 					resource_id: 'resource-2',
-					groups: [publicGroupRes2],
+					groups: [publicGroupRes2, privateGroupRes2],
 				} as ContributionEntry,
 			];
-			const result = rule['applyFilter'](context, contributions);
-			expect(result).toHaveLength(2);
-
-			expect(result[0].groups).toHaveLength(2);
-			expect(result[1].groups).toHaveLength(1);
-			expect(result[1].groups[0].visibility).toBe(PrivacyType.public);
+			const result = rule['applyFilter'](
+				context,
+				buildEntryWithContributions(contributions),
+			);
+			expect(result).toHaveLength(1);
+			expect(result[0].contributed_to).toHaveLength(2);
+			expect(result[0].contributed_to[0].groups).toHaveLength(2);
+			expect(result[0].contributed_to[1].groups).toHaveLength(1);
 		});
 
 		it('should not show the resource if all groups are private to the user', () => {
@@ -204,16 +233,35 @@ describe('PublicContributionRule', () => {
 					resource_id: 'resource-1',
 					groups: [privateGroupRes1],
 				} as ContributionEntry,
+			];
+			const result = rule['applyFilter'](
+				context,
+				buildEntryWithContributions(contributions),
+			);
+			expect(result).toHaveLength(1);
+			expect(result[0].contributed_to).toHaveLength(0);
+		});
+
+		it('should anonymize the entry if the requested resources match with contributions that are private to the user', () => {
+			const context: RegistryFilterContext = {
+				showAll: false,
+				userAdministeredResourceIds: [],
+				requestedResources: ['resource-1'],
+			};
+			const contributions: ContributionEntry[] = [
 				{
-					resource_id: 'resource-2',
-					groups: [publicGroupRes2],
+					resource_id: 'resource-1',
+					groups: [privateGroupRes1],
 				} as ContributionEntry,
 			];
-			const result = rule['applyFilter'](context, contributions);
+			const result = rule.applyFilter(
+				context,
+				buildEntryWithContributions(contributions),
+			);
 			expect(result).toHaveLength(1);
-			expect(result[0].groups).toHaveLength(1);
-			expect(result[0].resource_id).toBe('resource-2');
-			expect(result[0].groups[0].visibility).toBe(PrivacyType.public);
+			expect(result[0].curator_orcid).toBe(''); // anonymized
+			expect(result[0].curator?.displayedName).toBe('Private User');
+			expect(result[0].contributed_to).toHaveLength(0);
 		});
 	});
 });
