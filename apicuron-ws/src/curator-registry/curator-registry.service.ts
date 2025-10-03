@@ -365,7 +365,6 @@ export class CuratorRegistryService {
 			);
 		}
 	}
-
 	async recomputeResourceAggregate(resource_id: string): Promise<void> {
 		const resource = await this.resourceService.get_resource(resource_id);
 		if (!resource) {
@@ -385,12 +384,14 @@ export class CuratorRegistryService {
 					leagues: {
 						$addToSet: '$league_data',
 					},
+					curator: { $first: '$user' },
 				},
 			},
 		];
 		const aggregationResults = await this.reportModel.aggregate<{
 			_id: string;
 			leagues: League[];
+			curator: User;
 		}>(aggregation_pipeline);
 		// this needs to be disabled because if you try to use its true type (AnyBulkWriteOperation<CuratorRegistryEntry>[])
 		// it causes a deep type inferences that loads infinetly and crashes tsserver
@@ -406,16 +407,25 @@ export class CuratorRegistryService {
 							groups: aggResult.leagues,
 						},
 					},
+					$set: {
+						curator: aggResult.curator,
+						privacy: aggResult.curator?.privacy || PrivacyType.private,
+					},
 				},
+				upsert: true,
 			},
 		}));
 
 		if (aggregationResults.length === 0) return;
 
 		try {
-			const result = await this.registryEntryModel.bulkWrite(bulkOps);
+			const result = await this.registryEntryModel.bulkWrite(bulkOps, {
+				ordered: false,
+			});
 			this.logger.debug(
-				`Recomputed ${result.modifiedCount} aggregates for resource ${resource_id}`,
+				`Recomputed ${
+					result.modifiedCount + result.upsertedCount
+				} aggregates for resource ${resource_id}`,
 			);
 		} catch (error) {
 			this.logger.error(
