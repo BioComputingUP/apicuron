@@ -1,5 +1,8 @@
-import { ContributionEntry } from 'src/core/schemas/curator-registry/curator-entry.schema';
-import { League, PartnerResource } from 'src/core/schemas/index';
+import {
+	ContributionEntry,
+	CuratorRegistryEntry,
+} from 'src/core/schemas/curator-registry/curator-entry.schema';
+import { League, PartnerResource, User } from 'src/core/schemas/index';
 export function createContributionQuery(
 	resource: PartnerResource | undefined,
 	league: League | undefined,
@@ -14,4 +17,15 @@ export function createContributionQuery(
 			groups: [league],
 		},
 	];
+}
+
+export function createUnknownCuratorEntry(): CuratorRegistryEntry {
+	return {
+		curator_orcid: '',
+		curator: {
+			displayedName: 'Private User',
+		} as User,
+		privacy: 'private',
+		contributed_to: [],
+	};
 }
