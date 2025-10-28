@@ -1,5 +1,10 @@
 import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	Logger,
+	NotFoundException,
+} from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, LeanDocument, Types } from 'mongoose';
@@ -150,7 +155,11 @@ export class PartnerResourcesService {
 
 	async get_resource(resource_id: string): Promise<PartnerResourceDocument> {
 		const doc = await this.partnerResourceRepo.findOne({ resource_id });
-		assertIsDefined(doc, `Resource with ID ${resource_id} not found.`);
+		assertIsDefined(
+			doc,
+			`Resource with ID ${resource_id} not found.`,
+			NotFoundException,
+		);
 		return doc;
 	}
 
