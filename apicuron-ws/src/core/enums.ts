@@ -1,6 +1,6 @@
 // Generics
-type ObjectValues<T> = T[keyof T];
-type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType[number];
+export type ObjectValues<T> = T[keyof T];
+export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType[number];
 
 // Types
 export const PrivacyType = {
@@ -62,3 +62,14 @@ export const months = [
 	'december',
 ] as const;
 export type Month = ArrayElement<typeof months>;
+
+// Resource Categories
+
+export const ResourceCategory = {
+    DocRepositoryResource: 'DocRepositoryResource',
+    DatabaseResource: 'DatabaseResource'
+} as const;
+
+export const ResourceCategories = Object.values(ResourceCategory);
+
+export type ResourceCategory = ObjectValues<typeof ResourceCategory>;
