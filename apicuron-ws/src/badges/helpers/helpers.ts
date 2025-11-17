@@ -1,5 +1,4 @@
-import { FilterQuery, LeanDocument, Model } from 'mongoose';
-import { AchievementState, PrivacyType } from '../../core/enums';
+import { FilterQuery, LeanDocument } from 'mongoose';
 import { BadgeDefDocument } from '../../core/schemas/achievements-def/badge-def.schema';
 import { BadgeDocument } from '../../core/schemas/achievements/badges.schema';
 import {
@@ -14,6 +13,22 @@ export function getReportRelatedBadgeDefFilter(
 		resource_id: report.resource_id,
 		league: report.league,
 		list_terms: report.activity_term,
+		$and: [
+			{
+				$or: [
+					{ startDate: null },
+					{ startDate: { $exists: false } },
+					{ startDate: { $lte: report.timestamp } },
+				],
+			},
+			{
+				$or: [
+					{ endDate: null },
+					{ endDate: { $exists: false } },
+					{ endDate: { $gte: report.timestamp } },
+				],
+			},
+		],
 	};
 }
 
