@@ -4,6 +4,7 @@ import { BadgeDocument } from '../../core/schemas/achievements/badges.schema';
 import {
 	LeanReportDocument,
 	ReportDocument,
+	ReportFilter,
 } from '../../core/schemas/reports.schema';
 
 export function getReportRelatedBadgeDefFilter(
@@ -34,18 +35,19 @@ export function getReportRelatedBadgeDefFilter(
 
 export function getMatchingReportFilter(
 	badgeDef: LeanDocument<BadgeDefDocument> | BadgeDefDocument,
-): FilterQuery<ReportDocument> {
-	const filter: FilterQuery<ReportDocument> = {
+): ReportFilter {
+	const filter: ReportFilter = {
 		resource_id: badgeDef.resource_id,
 		league: badgeDef.league,
 		activity_term: { $in: badgeDef.list_terms },
 	};
 
 	if (!!badgeDef.startDate) {
-		filter.timestamp = { $gte: badgeDef.startDate, ...filter.timestamp };
+		filter.timestamp = { $gte: badgeDef.startDate };
 	}
 	if (!!badgeDef.endDate) {
-		filter.timestamp = { $lte: badgeDef.endDate, ...filter.timestamp };
+		const prev: ReportFilter = (filter.timestamp as ReportFilter) ?? {};
+		filter.timestamp = { $lte: badgeDef.endDate, ...prev };
 	}
 	return filter;
 }
