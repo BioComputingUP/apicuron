@@ -1,0 +1,19 @@
+{
+  "folders": [
+    {
+      "name": "Frontend",
+      "path": "apicuron-ui"
+    },
+    {
+      "name": "Backend",
+      "path": "apicuron-ws"
+    },
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "typescript.tsdk": "apicuron/apicuron-ws/node_modules/typescript/lib",
+    "vsicons.presets.nestjs": true,
+  }
+}
