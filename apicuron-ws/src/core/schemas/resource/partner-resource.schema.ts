@@ -16,7 +16,7 @@ import {
 import { GitRepository } from '../components/git-repository.schema';
 import { League, LeagueSchema } from '../league/league.schema';
 import { Term } from '../terms.schema';
-import { isCategory, requiresGithubRepo } from './resource-category.schema';
+import { isCategory, requiresGithubRepo } from './resource-category.helpers';
 import { ResourceStats, ResourceStatsSchema } from './resource-stats.schema';
 
 type PartnerResourceDocumentOverride = {

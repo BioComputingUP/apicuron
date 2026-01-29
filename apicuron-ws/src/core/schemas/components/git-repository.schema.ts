@@ -13,4 +13,8 @@ export class GitRepository {
 		required: true,
 	})
 	name: string;
+	
+	get repoUrl(): string {
+		return `https://github.com/${this.owner}/${this.name}`;
+	}
 }

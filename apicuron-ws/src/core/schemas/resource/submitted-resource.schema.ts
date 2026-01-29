@@ -9,7 +9,7 @@ import {
 } from 'mongoose';
 import { ResourceCategories, ResourceCategory } from '../../enums';
 import { GitRepository } from '../components/git-repository.schema';
-import { isCategory, requiresGithubRepo } from './resource-category.schema';
+import { isCategory, requiresGithubRepo } from './resource-category.helpers';
 
 export type SubmittedResourceDocument = HydratedDocument<SubmittedResource>; // this class defines a partnerSubmittedResource that has been validated and has the ability to have Models, Badges and so on
 export type SubmittedResourceModel = Model<SubmittedResource>;
