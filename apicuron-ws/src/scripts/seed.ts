@@ -11,7 +11,7 @@ import { FileUploadDto } from 'src/util/file-upload.helper';
 import { assertIsDefined } from 'src/util/type-assertion.helper';
 import { AppModule } from '../app.module';
 import { UsersService } from '../auth/users/services/users.service';
-import { PrivacyType } from '../core/enums';
+import { PrivacyType, ResourceCategory } from '../core/enums';
 import { Report, ReportModel } from '../core/schemas/reports.schema';
 import {
 	PartnerResource,
@@ -69,6 +69,7 @@ async function bootstrap() {
 			resource_id: 'example_resource',
 			resource_uri: faker.internet.url(),
 			resource_url: faker.internet.url(),
+			category: ResourceCategory.Database,
 		},
 		testingOrcidId,
 		await FileUploadDto.fromPicsum('https://picsum.photos/300/200.jpg', http),
@@ -95,6 +96,7 @@ async function bootstrap() {
 			resource_id: 'second_resource',
 			resource_uri: faker.internet.url(),
 			resource_url: faker.internet.url(),
+			category: ResourceCategory.Database,
 		},
 		testingOrcidId,
 		await FileUploadDto.fromPicsum('https://picsum.photos/300/200.jpg', http),
