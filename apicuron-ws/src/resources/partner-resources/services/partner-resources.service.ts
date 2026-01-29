@@ -7,8 +7,12 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
+import { readFile } from 'fs/promises';
 import { FilterQuery, LeanDocument, Types } from 'mongoose';
+import { join } from 'path';
 import { PartnerResourceRepository } from 'src/core/repositories/partner-resource.repository';
+import { StorageType } from 'src/storage/storage.config';
+import { FileUploadDto } from 'src/util/file-upload.helper';
 import { assertIsDefined } from 'src/util/type-assertion.helper';
 import {
 	League,
@@ -29,7 +33,7 @@ export class PartnerResourcesService {
 		@InjectModel(PartnerResource.name)
 		private partnerResourceRepo: PartnerResourceRepository,
 		protected eventEmitter: EventEmitter2,
-		protected storage: StorageService,
+		private storageService: StorageService,
 	) {}
 
 	logger = new Logger(PartnerResourcesService.name);
@@ -168,14 +172,31 @@ export class PartnerResourcesService {
 	}
 
 	async update_resource(
-		resource_update: UpdatePartnerResourceDto & { logo?: string },
+		resource_update: UpdatePartnerResourceDto,
+		logo?: Express.Multer.File
 	): Promise<PartnerResourceDocument> {
-		const { resource_id } = resource_update;
+		const { resource_id, ...updates } = resource_update;
+
+		if (logo) {
+			const logoFile = FileUploadDto.fromMulter(logo);
+			logoFile.buffer = logo.buffer || await readFile(logo.path);
+			const publicEngine = this.storageService.getEngine(StorageType.public);
+			const logoReference = await publicEngine.put(
+					join('resources', logoFile.filename),
+					logoFile.buffer,
+				);
+			updates.logo = logoReference;
+			this.logger.debug(`Updating logo for resource ${resource_id} to ${logoReference}`);
+		}
+
 		const newResource = await this.partnerResourceRepo.findOneAndUpdate(
 			{ resource_id },
-			{ $set: resource_update },
+			{ $set: updates },
 			{ new: true },
 		);
+
+
+
 		assertIsDefined(newResource, `Resource with ID ${resource_id} not found.`);
 		return newResource;
 	}
