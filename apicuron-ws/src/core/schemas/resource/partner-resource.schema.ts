@@ -16,7 +16,7 @@ import {
 import { GitRepository } from '../components/git-repository.schema';
 import { League, LeagueSchema } from '../league/league.schema';
 import { Term } from '../terms.schema';
-import { isCategory } from './resource-category.schema';
+import { isCategory, requiresGithubRepo } from './resource-category.schema';
 import { ResourceStats, ResourceStatsSchema } from './resource-stats.schema';
 
 type PartnerResourceDocumentOverride = {
@@ -131,7 +131,7 @@ export class PartnerResource {
 
 	@Prop({
 		type: GitRepository,
-		required: isCategory(ResourceCategory.KnowledgeBase),
+		required: requiresGithubRepo(),
 	})
 	repository: GitRepository;
 
