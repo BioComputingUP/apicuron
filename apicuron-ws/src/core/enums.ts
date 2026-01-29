@@ -66,8 +66,8 @@ export type Month = ArrayElement<typeof months>;
 // Resource Categories
 
 export const ResourceCategory = {
+	Database: 'Database',
     KnowledgeBase: 'KnowledgeBase',
-    DatabaseResource: 'DatabaseResource',
 	Software: 'Software',
 	Training: 'Training',
 } as const;

@@ -124,7 +124,7 @@ export class PartnerResource {
 	@Prop({
 		type: String,
 		required: true,
-		default: ResourceCategory.DatabaseResource,
+		default: ResourceCategory.Database,
 		enum: ResourceCategories,
 	})
 	category: ResourceCategory;
