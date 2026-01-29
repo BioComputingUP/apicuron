@@ -62,7 +62,7 @@ export class SubmittedResource {
 
 	@Prop({
 		type: GitRepository,
-		required: isCategory(ResourceCategory.DocRepositoryResource),
+		required: isCategory(ResourceCategory.KnowledgeBase),
 	})
 	repository: GitRepository;
 

@@ -66,8 +66,10 @@ export type Month = ArrayElement<typeof months>;
 // Resource Categories
 
 export const ResourceCategory = {
-    DocRepositoryResource: 'DocRepositoryResource',
-    DatabaseResource: 'DatabaseResource'
+    KnowledgeBase: 'KnowledgeBase',
+    DatabaseResource: 'DatabaseResource',
+	Software: 'Software',
+	Training: 'Training',
 } as const;
 
 export const ResourceCategories = Object.values(ResourceCategory);
