@@ -158,40 +158,10 @@ export class PartnerResourcesController {
 		);
 
 		const { resource_id } = update_resource;
-		let res: PartnerResourceDocument;
 		// check if the user has a permission to edit the PartnerResource
 		this.authService.user_has_resource(request.user, resource_id);
-		const public_files_path =
-			this.configService.getOrThrow<string>('PUBLIC_FILES_PATH');
-		// if there's an uploaded file
-		if (logo) {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			const ext = mime.extension(logo.mimetype);
-			const public_path = join(
-				public_files_path,
-				'resources',
-				`${logo.filename}.${ext}`,
-			);
-
-			mv(logo.path, public_path, { mkdirp: true }, (err: Error) => {
-				if (err) {
-					this.logger.error(err.message, err.stack, err.name);
-					throw new InternalServerErrorException();
-				}
-			});
-
-			const logo_link = public_path.replace(
-				public_files_path,
-				this.configService.getOrThrow('PUBLIC_FILES_URL_PATH'),
-			);
-
-			res = await this.partnerResourceService.update_resource({
-				...update_resource,
-				logo: logo_link,
-			});
-		} else {
-			res = await this.partnerResourceService.update_resource(update_resource);
-		}
+		
+		const res: PartnerResourceDocument = await this.partnerResourceService.update_resource(update_resource, logo);
 		return plainToInstance(PartnerResourceEntity, res, {
 			excludeExtraneousValues: true,
 			enableCircularCheck: true,
