@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
 	MonthlyStatistics,
@@ -22,7 +22,7 @@ export class MonthlyStatisticsService {
 		protected monthlyStatModel: Model<MonthlyStatisticsDocument>,
 		protected userService: UsersService,
 	) { }
-
+	protected logger = new Logger(MonthlyStatisticsService.name);
 	async getLeaderboard(
 		resource_id: string,
 		paginationDto: BasePaginationDto,
