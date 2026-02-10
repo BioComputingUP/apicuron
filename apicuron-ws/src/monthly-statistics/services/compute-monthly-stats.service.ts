@@ -65,8 +65,8 @@ export class ComputeMonthlyStatsService {
 			resource: report.resource ?? resource,
 			user: report.user ?? curator ?? null,
 			league_data: report.league_data,
+			privacy: computePrivacyField(report.resource, report.user, {league: report.league}),
 		};
-		this.logger.error(`reportIsLast: ${reportIsLast}, report`);
 		if (reportIsLast) {
 			setObj.last_contribution = report.timestamp;
 		}
