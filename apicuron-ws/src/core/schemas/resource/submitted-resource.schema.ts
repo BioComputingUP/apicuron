@@ -60,12 +60,6 @@ export class SubmittedResource {
 	})
 	category: ResourceCategory;
 
-	@Prop({
-		type: GitRepository,
-		required: requiresGithubRepo()
-	})
-	repository: GitRepository;
-
 	state: string;
 
 	updated_at: Date;
