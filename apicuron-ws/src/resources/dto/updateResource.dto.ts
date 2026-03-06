@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
 	IsEmpty,
+	IsEnum,
 	IsNotEmpty,
 	IsOptional,
 	IsString,
@@ -19,6 +20,7 @@ import {
 } from '../../core/schemas/resource/partner-resource.schema';
 import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
 import { LeaderboardSettingsDto } from './leaderboard-settings.dto';
+import { ResourceCategory } from 'src/core/enums';
 
 export class UpdatePartnerResourceDto {
 	@Validate(EntryExistsRule, [
@@ -95,4 +97,11 @@ export class UpdatePartnerResourceDto {
 	@Type(() => LeaderboardSettingsDto)
 	@Expose()
 	leaderboard_preferences?: LeaderboardSettingsDto;
+
+	@ApiProperty({ enum: ResourceCategory })
+	@IsEnum(ResourceCategory)
+	@IsString()
+	@IsNotEmpty()
+	category: ResourceCategory;
+
 }
