@@ -10,6 +10,7 @@ import {
   Serializable,
 } from "src/app/interfaces/deserializable.model";
 import { environment } from "src/environments/environment";
+import { ResourceCategory } from "./types/enums";
 export class ResourceStats implements Deserializable {
   contributionCount: any;
   uniqueContributors: any;
@@ -109,6 +110,7 @@ export class Resource implements Deserializable, Serializable {
   joined_date: Date;
   lastSubmissionDate?: Date;
   leaderboard_preferences: LeaderboardPreferences;
+  category: ResourceCategory;
 }
 
 export class LeaderboardPreferences {
