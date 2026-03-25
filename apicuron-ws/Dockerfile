@@ -56,11 +56,12 @@ WORKDIR /home/node/app
 COPY --chown=node:node package.json package-lock.json ./
 
 # Keep dev dependencies to build the application
-RUN npm ci 
+RUN yarn install --frozen-lockfile
+
 
 COPY --chown=node:node . .
 
-RUN npm run build
+RUN yarn build
 
 ###################
 # RUNTIME (PRODUCTION & DEV)
