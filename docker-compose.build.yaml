@@ -24,6 +24,9 @@ services:
     build:
       context: "./apicuron-ws"
       target: dev
+      args:
+        - UID=${UID}
+        - GID=${GID}
       tags:
         - registry.biocomputingup.it/apicuron-ws:dev
         - registry.biocomputingup.it/apicuron-ws:dev-${CURRENT_HASH:-latest}

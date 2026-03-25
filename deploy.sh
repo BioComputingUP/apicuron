@@ -1,3 +1,11 @@
+#!/bin/bash
+
+# Configuration
+REGISTRY="registry.biocomputingup.it"
+COMPOSE_FILE="docker-compose.build.yml"
+HOST_TARGET="ermes2"
+
+
 if [[ -z "$1" ]]; then
   echo "Usage: $0 <CURRENT_HASH> [ENVIRONMENT]"
   echo "Error: Current hash argument is required"
@@ -69,3 +77,9 @@ build_images "$1" "$ENVIRONMENT"
 push_images "$1" "$ENVIRONMENT"
 
 echo "Published $ENVIRONMENT images to docker registry"
+
+# Deploying to the host target
+
+echo "Deploying to $HOST_TARGET"
+
+ssh biocomp@$HOST_TARGET 'bash -s' < ./run-prod.sh
