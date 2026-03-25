@@ -70,7 +70,7 @@ import { SharedUtilsModule } from "./shared/shared-utils.module";
   ],
   providers: [
     // *** Sentry ErrorHandler and Tracer Setup ***
-    SentryModuleConfig,
+    ...SentryModuleConfig,
     // *** end of sentry setup ***
     { provide: APP_ID, useValue: "serverApp" },
     OrcidToUrl,

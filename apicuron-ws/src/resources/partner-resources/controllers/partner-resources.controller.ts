@@ -52,9 +52,7 @@ import { Request } from 'express';
 export class PartnerResourcesController {
 	constructor(
 		private partnerResourceService: PartnerResourcesService,
-		private configService: ConfigService,
 		private authService: AuthService,
-		private storage: StorageService,
 	) {}
 
 	logger = new Logger(PartnerResourcesController.name);
@@ -80,8 +78,6 @@ export class PartnerResourcesController {
 				enableCircularCheck: true,
 			},
 		);
-
-		this.logger.debug(`Partner Resources retrieved`);
 
 		return resourceEntities;
 	}
