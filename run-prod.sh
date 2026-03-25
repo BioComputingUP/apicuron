@@ -1,6 +1,6 @@
 #!/bin/bash
 REGISTRY="registry.biocomputingup.it"
-COMPOSE_FILE="docker-compose.prod.yml"
+COMPOSE_FILE="docker-compose.prod.yaml"
 DIRECTORY="/home/biocomp/apicuron"
 
 update_repo() {
