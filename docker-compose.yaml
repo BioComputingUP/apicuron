@@ -45,6 +45,8 @@ services:
         - GID=${GID}
     image: "apicuron-ui:local" 
     working_dir: "/home/node/app"
+    ports:
+      - 4200:4200
     # image: "node:16.14"
     volumes:
       - "./apicuron-ui:/home/node/app"

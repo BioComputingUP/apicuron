@@ -17,6 +17,7 @@ services:
       target: production
       tags:
         - registry.biocomputingup.it/apicuron-ui:latest
+        - registry.biocomputingup.it/apicuron-ui:prod
         - registry.biocomputingup.it/apicuron-ui:${CURRENT_HASH:-latest}
     image: registry.biocomputingup.it/apicuron-ui:latest
     restart: "no"

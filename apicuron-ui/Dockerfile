@@ -51,6 +51,7 @@ FROM nginx:${NGINX_VERSION} AS production
 
 COPY --chown=nginx:nginx --from=build-prod /app/dist/apicuron-ui /usr/share/nginx/html
 
+
 EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]

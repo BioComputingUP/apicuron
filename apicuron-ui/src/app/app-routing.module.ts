@@ -20,7 +20,7 @@ const routes: Routes = [
     component: MainLayoutComponent,
     loadChildren: () =>
       import("./notifications/notifications.module").then(
-        (m) => m.NotificationsModule
+        (m) => m.NotificationsModule,
       ),
     // component: NotificationsComponent,
     canActivate: [AuthGuard],
@@ -47,7 +47,7 @@ const routes: Routes = [
     component: MainLayoutComponent,
     loadChildren: () =>
       import("./curator-registry/curator-registry.module").then(
-        (m) => m.CuratorRegistryModule
+        (m) => m.CuratorRegistryModule,
       ),
   },
 
@@ -72,7 +72,7 @@ const routes: Routes = [
     component: MainLayoutComponent,
     loadChildren: () =>
       import("./documentation/documentation.module").then(
-        (m) => m.DocumentationModule
+        (m) => m.DocumentationModule,
       ),
     data: {
       disableGrowingNav: true,
@@ -111,10 +111,13 @@ const routes: Routes = [
     }),
   ],
   providers: [
-    {
-      provide: APP_BASE_HREF,
-      useValue: environment.host,
-    },
+    // Removed to avoid routing errors when serving app with production config from a different Origin
+    // Triggers following error:
+    // SecurityError: Failed to execute 'replaceState' on 'History': A history state object with URL 'https://apicuron.org/' cannot be created in a document with origin 'http://localhost:8089' and URL 'http://localhost:8089/'.
+    // {
+    //   provide: APP_BASE_HREF,
+    //   useValue: environment.host,
+    // },
   ],
   exports: [RouterModule],
 })
