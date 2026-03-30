@@ -78,7 +78,7 @@ export class SubmitOrcidWork implements OnModuleInit {
 				const submission$ = this.submitSingleWork(
 					stat,
 					stat.resource.toObject(),
-					user.toObject(),
+					user,
 				);
 				submissions$.push(submission$);
 			}

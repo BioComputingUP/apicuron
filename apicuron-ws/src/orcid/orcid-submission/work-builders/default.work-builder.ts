@@ -24,7 +24,7 @@ export class DefaultWorkBuilder implements OrcidWorkBuilder {
 
 		const putCodeEntry = user.getResourcePutCode(resource.resource_id);
 
-		const { putCode } = putCodeEntry ?? { putCode: null };
+		const { putCode } = putCodeEntry ?? { putCode: undefined };
 		return {
 			externalIds: [
 				{
@@ -37,7 +37,7 @@ export class DefaultWorkBuilder implements OrcidWorkBuilder {
 			title: `Contributions to ${resource.resource_name}`,
 			shortDescription: `Completed ${statsitics.total_count} Activities that contribute to ${resource.resource_name}`,
 			type: 'data-set',
-			putCode: putCode ?? undefined,
+			putCode: putCode,
 		};
 	}
 }
