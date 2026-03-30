@@ -63,26 +63,34 @@ export class SubmitOrcidWork implements OnModuleInit {
 			.cursor({ batchSize: this.defaultBatchSize });
 
 		for await (const user of users) {
-			const stats = await this.statModel.find({
-				curator_orcid: user.orcid_id,
-				privacy: PrivacyType.public,
-			});
+			try{
+				const stats = await this.statModel.find({
+					curator_orcid: user.orcid_id,
+					privacy: PrivacyType.public,
+				});
+	
+				if (stats.length === 0) {
+					this.logger.debug(`No stats found for user ${user.displayedName}`);
+					continue;
+				}
+	
+				const submissions$: Promise<ReportDocument>[] = [];
+				for (const stat of stats) {
+					const submission$ = this.submitSingleWork(
+						stat,
+						stat.resource.toObject(),
+						user,
+					);
+					submissions$.push(submission$);
+				}
+				await Promise.all(submissions$);
 
-			if (stats.length === 0) {
-				this.logger.debug(`No stats found for user ${user.displayedName}`);
-				continue;
+			}catch(err: unknown){
+				if (err instanceof Error) {
+					this.logger.error(`Error processing user ${user.displayedName} (${user.orcid_id})`);
+					this.logger.error(err.message, err.stack, err.name);
+				}
 			}
-
-			const submissions$: Promise<ReportDocument>[] = [];
-			for (const stat of stats) {
-				const submission$ = this.submitSingleWork(
-					stat,
-					stat.resource.toObject(),
-					user,
-				);
-				submissions$.push(submission$);
-			}
-			await Promise.all(submissions$);
 		}
 	}
 
