@@ -68,5 +68,5 @@ if (require.main === module) {
 		await app.close();
 	}
 
-	main();
+	void main();
 }

@@ -224,4 +224,6 @@ async function bootstrap() {
 	await app.close();
 }
 
-bootstrap();
+if (require.main === module) {
+	void bootstrap();
+}
