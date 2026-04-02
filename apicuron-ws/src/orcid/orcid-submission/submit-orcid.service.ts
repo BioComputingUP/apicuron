@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { FilterQuery, LeanDocument, Model } from 'mongoose';
-import { ReportDocument } from 'src/core/schemas/reports.schema';
 import { PrivacyType } from '../../core/enums';
 import { UserRepository } from '../../core/repositories/user.repository';
 import { PartnerResourceDocument } from '../../core/schemas/resource/partner-resource.schema';
@@ -11,7 +10,7 @@ import {
 	Statistics,
 	StatisticsDocument,
 } from '../../core/schemas/statistics.schema';
-import { User, UserDocument } from '../../core/schemas/user.schema';
+import { UserDocument } from '../../core/schemas/user.schema';
 import { responseHasCode } from '../../orcid/orcid-client/helpers/response-with-code';
 import { OrcidWork } from '../../orcid/orcid-client/interfaces/orcid.interface';
 import { OrcidClientService } from '../../orcid/orcid-client/orcid-client.service';
@@ -48,7 +47,7 @@ export class SubmitOrcidWork implements OnModuleInit {
 	defaultBatchSize = 100;
 	logger = new Logger(SubmitOrcidWork.name);
 
-	async submitAllWorks(filter: FilterQuery<UserDocument> = {}): Promise<any> {
+	async submitAllWorks(filter: FilterQuery<UserDocument> = {}): Promise<void> {
 		const users = this.userRepository
 			.find({
 				$and: [
@@ -63,26 +62,35 @@ export class SubmitOrcidWork implements OnModuleInit {
 			.cursor({ batchSize: this.defaultBatchSize });
 
 		for await (const user of users) {
-			const stats = await this.statModel.find({
-				curator_orcid: user.orcid_id,
-				privacy: PrivacyType.public,
-			});
+			try {
+				const stats = await this.statModel.find({
+					curator_orcid: user.orcid_id,
+					privacy: PrivacyType.public,
+				});
 
-			if (stats.length === 0) {
-				this.logger.debug(`No stats found for user ${user.displayedName}`);
-				continue;
-			}
+				if (stats.length === 0) {
+					this.logger.debug(`No stats found for user ${user.displayedName}`);
+					continue;
+				}
 
-			const submissions$: Promise<ReportDocument>[] = [];
-			for (const stat of stats) {
-				const submission$ = this.submitSingleWork(
-					stat,
-					stat.resource.toObject(),
-					user,
-				);
-				submissions$.push(submission$);
+				const submissions$: Promise<void>[] = [];
+				for (const stat of stats) {
+					const submission$ = this.submitSingleWork(
+						stat,
+						stat.resource.toObject(),
+						user,
+					);
+					submissions$.push(submission$);
+				}
+				await Promise.all(submissions$);
+			} catch (err: unknown) {
+				if (err instanceof Error) {
+					this.logger.error(
+						`Error processing user ${user.displayedName} (${user.orcid_id})`,
+					);
+					this.logger.error(err.message, err.stack, err.name);
+				}
 			}
-			await Promise.all(submissions$);
 		}
 	}
 
@@ -90,7 +98,7 @@ export class SubmitOrcidWork implements OnModuleInit {
 		statsitics: LeanDocument<StatisticsDocument>,
 		resource: LeanDocument<PartnerResourceDocument>,
 		user: UserDocument,
-	): Promise<any> {
+	): Promise<void> {
 		const work: OrcidWork = this.orcidWorkBuilder.buildWork(
 			statsitics,
 			resource,
@@ -102,12 +110,12 @@ export class SubmitOrcidWork implements OnModuleInit {
 				work,
 			);
 
-			if (responseHasCode(submitResponse)) {
+			if (responseHasCode(submitResponse, 201)) {
 				this.logger.debug(
 					`received put code: ${submitResponse.putCode}, saving the user resource put code`,
 				);
 				user.setResourcePutCode(resource.resource_id, submitResponse.putCode);
-				await this.userRepository.create(user);
+				await user.save();
 			}
 		} catch (err) {
 			if (err instanceof Error) {

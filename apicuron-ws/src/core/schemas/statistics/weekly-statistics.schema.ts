@@ -24,7 +24,7 @@ type WeeklyStatisticsDocumentOverride = {
 };
 export type WeeklyStatisticsModel = Model<
 	WeeklyStatistics,
-	{},
+	Record<string, never>,
 	WeeklyStatisticsDocumentOverride
 >;
 export type LeanWeeklyStatisticsDoc = LeanDocument<WeeklyStatistics>;
