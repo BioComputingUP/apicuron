@@ -5,6 +5,7 @@ import {
 
 export function responseHasCode(
 	response: SubmitWorkResponse,
+	code = 201,
 ): response is SubmitWorkReponseWithCode {
-	return response.status === 201;
+	return response.status === code;
 }
