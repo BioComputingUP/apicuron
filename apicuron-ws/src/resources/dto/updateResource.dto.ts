@@ -101,7 +101,7 @@ export class UpdatePartnerResourceDto {
 	@ApiProperty({ enum: ResourceCategory })
 	@IsEnum(ResourceCategory)
 	@IsString()
-	@IsNotEmpty()
+	@IsOptional()
 	category: ResourceCategory;
 
 }
