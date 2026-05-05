@@ -2,7 +2,7 @@
   <ng-container *ngIf="vm$ | async as vm">
     <div
       *ngIf="vm.bipScores || vm.isOwnProfile"
-      class="tw-bg-white tw-pb-6 tw-rounded-b-md tw-shadow-md tw-mb-4 tw-border-t-4 tw-border-slate-600"
+      class="tw-bg-white tw-pb-4 tw-rounded-b-md tw-shadow-md tw-mb-4 tw-border-t-4 tw-border-slate-600"
     >
       <!-- Top banner -->
       <div class="tw-col-span-2 lg:tw-col-span-4" *ngIf="vm.userOrcid">
@@ -18,7 +18,7 @@
               class="tw-w-10"
             />
             <h1 class="tw-text-[1.3rem] tw-font-semibold">
-              Bip! Scholar Statistics
+              Academic Profile Indicators
             </h1>
           </div>
           <a
@@ -43,6 +43,20 @@
             class="tw-h-full"
           ></bip-scholar-card>
         </div>
+      </div>
+      <div
+        class="tw-w-full tw-text-sm tw-text-right tw-px-4 tw-pt-2 tw-text-gray-500"
+      >
+        <em>
+          Provided by
+          <a
+            href="https://bip.imsi.athenarc.gr/scholar"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="tw-text-blue-500 hover:tw-underline"
+            >Bip! Scholar</a
+          >
+        </em>
       </div>
 
       <!-- Create profile section -->
