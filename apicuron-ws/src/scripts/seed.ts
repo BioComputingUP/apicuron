@@ -11,7 +11,7 @@ import { FileUploadDto } from 'src/util/file-upload.helper';
 import { assertIsDefined } from 'src/util/type-assertion.helper';
 import { AppModule } from '../app.module';
 import { UsersService } from '../auth/users/services/users.service';
-import { PrivacyType } from '../core/enums';
+import { PrivacyType, ResourceCategory } from '../core/enums';
 import { Report, ReportModel } from '../core/schemas/reports.schema';
 import {
 	PartnerResource,
@@ -69,6 +69,7 @@ async function bootstrap() {
 			resource_id: 'example_resource',
 			resource_uri: faker.internet.url(),
 			resource_url: faker.internet.url(),
+			category: ResourceCategory.Database,
 		},
 		testingOrcidId,
 		await FileUploadDto.fromPicsum('https://picsum.photos/300/200.jpg', http),
@@ -95,6 +96,7 @@ async function bootstrap() {
 			resource_id: 'second_resource',
 			resource_uri: faker.internet.url(),
 			resource_url: faker.internet.url(),
+			category: ResourceCategory.Database,
 		},
 		testingOrcidId,
 		await FileUploadDto.fromPicsum('https://picsum.photos/300/200.jpg', http),
@@ -115,6 +117,23 @@ async function bootstrap() {
 	logger.verbose(
 		`Assigned testing resources to testing user: ${testingOrcidId}`,
 	);
+
+	// // Assign resources to test user
+	// userModel.updateOne(
+	// 	{ orcid_id: testingOrcidId },
+	// 	{
+	// 		$set: {
+	// 			resources: [
+	// 				{
+	// 					resource_id: exampleResource.resource_id,
+	// 				},
+	// 				{
+	// 					resource_id: secondResource.resource_id,
+	// 				},
+	// 			],
+	// 		},
+	// 	},
+	// );
 
 	//create terms for resource
 	const terms$: Promise<TermDocument>[] = [];
@@ -263,6 +282,13 @@ export async function mockReport(
 }
 
 if (require.main === module) {
+	const env = process.env.NODE_ENV;
+	if (env === 'production' || env === 'development') {
+		console.log(
+			'Seeding is disabled in production or development environments.',
+		);
+		process.exit(1);
+	}
 	console.log('called directly');
 	bootstrap();
 }

@@ -1,5 +1,6 @@
 import {
 	IsEmpty,
+	IsEnum,
 	IsHexColor,
 	IsNotEmpty,
 	IsString,
@@ -10,6 +11,8 @@ import {
 } from 'class-validator';
 import { UniqueRule } from '../../shared/validators/unique.validator';
 import { Resource } from '../../core/schemas/resource/resource.schema';
+import { ResourceCategory } from 'src/core/enums';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateResourceDto {
 	@IsString()
@@ -88,4 +91,10 @@ export class CreateResourceDto {
 
 	@IsEmpty()
 	logo?: string;
+	
+	@ApiProperty({ enum: ResourceCategory })
+	@IsEnum(ResourceCategory)
+	@IsString()
+	@IsNotEmpty()
+	category: ResourceCategory;
 }

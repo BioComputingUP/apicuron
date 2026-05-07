@@ -5,12 +5,18 @@ import {
 	Model,
 	ProjectionType,
 	QueryOptions,
-	Types,
+	Types
 } from 'mongoose';
-import { PrivacyType } from '../../enums';
+import { PrivacyType, ResourceCategories, ResourceCategory } from '../../enums';
 import { AchievementDef } from '../achievements-def/achievement-def.schema';
+import {
+	LeaderboardSettings,
+	LeaderboardType,
+} from '../components/leaderboard-preferences.schema';
+import { GitRepository } from '../components/git-repository.schema';
 import { League, LeagueSchema } from '../league/league.schema';
 import { Term } from '../terms.schema';
+import { isCategory, requiresGithubRepo } from './resource-category.helpers';
 import { ResourceStats, ResourceStatsSchema } from './resource-stats.schema';
 
 type PartnerResourceDocumentOverride = {
@@ -102,9 +108,32 @@ export class PartnerResource {
 	})
 	allowedUrlsPrefix: string[];
 
+	@Prop({ required: false, type: LeaderboardSettings })
+	leaderboard_preferences: LeaderboardSettings;
+
+	getLeaderBoardSettings<T extends LeaderboardType>(
+		leaderboardType: T,
+	): LeaderboardSettings[T] {
+		return this.leaderboard_preferences[leaderboardType];
+	}
+
 	getLeague(leagueName: string): League | undefined {
 		return this.leagues.find((league: League) => league.name == leagueName);
 	}
+
+	@Prop({
+		type: String,
+		required: true,
+		default: ResourceCategory.Database,
+		enum: ResourceCategories,
+	})
+	category: ResourceCategory;
+
+	@Prop({
+		type: GitRepository,
+		required: requiresGithubRepo(),
+	})
+	repository: GitRepository;
 
 	created_at: Date;
 	updated_at: Date;

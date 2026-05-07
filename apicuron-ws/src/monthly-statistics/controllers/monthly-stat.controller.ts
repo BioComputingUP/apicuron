@@ -31,20 +31,20 @@ export class MonthlyStatisticsController {
 	) {}
 
 	@ApiOperation({
-		summary: 'Leaderboard for the last week',
+		summary: 'Leaderboard for the last month',
 		description:
-			'This endpoint is used to get the weekly leaderboard for a given resource.',
+			'This endpoint is used to get the monthly leaderboard for a given resource.',
 	})
 	@ApiResponsePaginated(
 		MonthlyLeaderboardDto,
 		200,
-		'The weekly leaderboard for the given resource',
+		'The monthly leaderboard for the given resource',
 	)
 	@AuthProtected()
 	@Public()
 	@Get(':resource_id/leaderboard')
 	@SerializeOptions({ type: Paginated<MonthlyLeaderboardDto> })
-	async getWeeklyLeaderboard(
+	async getMonthlyLeaderboard(
 		@Param('resource_id') resource_id: string,
 		@Query() pagination: BasePaginationDto,
 		@UserReq() user: User | null,

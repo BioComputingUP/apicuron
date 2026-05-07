@@ -1,8 +1,12 @@
 import { Paginated } from "../../../../../../../src/app/interfaces/paginated";
+import { MonthlyLeaderboardColumns } from "../../interfaces/leaderboard-columns.types";
 import { LeaderboardDef } from "../../interfaces/leaderboard-def.interface";
 import { MonthlyLeaderboardEntry } from "./monthly-leaderboard.entry";
 
-export const leaderboardDef: LeaderboardDef<MonthlyLeaderboardEntry> = {
+export const leaderboardDef: LeaderboardDef<
+  MonthlyLeaderboardEntry,
+  MonthlyLeaderboardColumns
+> = {
   name: "monthly-leaderboard",
   label: "Monthly Leaderboard",
   description: "The total leaderboard of the current month",

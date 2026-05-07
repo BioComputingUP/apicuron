@@ -133,6 +133,7 @@
           [showClear]="true"
           [readonlyInput]="true"
           styleClass="tw-w-full tw-p-2 !tw-px-4  tw-border tw-border-gray-300 tw-rounded-md"
+          appendTo="body"
         ></p-calendar>
         <small
           class="tw-pt-2 tw-block tw-leading-tight tw-text-xs tw-text-gray-500"
@@ -147,7 +148,8 @@
           [minDate]="form.get('startDate').value"
           [showClear]="true"
           [readonlyInput]="true"
-          styleClass="tw-w-full tw-p-2 !tw-px-4 tw-border tw-border-gray-300 tw-rounded-md"
+          appendTo="body"
+          styleClass="tw-w-full tw-p-2 !tw-px-4 tw-border tw-border-gray-300 tw-rounded-md tw-z-50"
         ></p-calendar>
         <small
           class="tw-pt-2 tw-block tw-leading-tight tw-text-xs tw-text-gray-500"

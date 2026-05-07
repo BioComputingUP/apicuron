@@ -1,0 +1,19 @@
+.option[aria-selected="true"] {
+  @apply tw-bg-violet-100;
+
+}
+// transition: color 500ms, background-color 500ms;
+// background-color: #d6bfec;
+// color: #441324;
+// position: relative;
+// padding-left: 25px;
+// .option[aria-selected="true"]::before {
+//   content: "";
+//   display: block;
+//   width: 20px;
+//   height: 20px;
+//   background-image: url('/assets/svg/check.svg');
+//   background-size: cover;
+//   position: absolute;
+//   right: 25px;
+// }

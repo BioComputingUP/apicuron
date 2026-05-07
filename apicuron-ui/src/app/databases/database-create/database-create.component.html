@@ -96,6 +96,27 @@
           </small>
         </div>
         <div class="form-control-element tw-w-1/2">
+          <label for="category">Resource Type</label>
+          <select formControlName="category" class="text-input">
+            <option [ngValue]="null"></option>
+            <option
+              *ngFor="let category of ResourceCategories"
+              [value]="category"
+            >
+              {{ category }}
+            </option>
+          </select>
+          <small
+            class="tw-text-red-500 tw-text-sm tw-font-light"
+            *ngIf="
+              form.get('category')?.hasError('required') &&
+              form.get('category')?.touched
+            "
+          >
+            The Resource Category is required
+          </small>
+        </div>
+        <div class="form-control-element tw-w-1/2">
           <label for="resource_name">Resource Name</label>
           <input type="text" formControlName="resource_name" />
           <small
@@ -103,24 +124,6 @@
             *ngIf="resource_name.hasError('required') && resource_name.touched"
           >
             The Resource Name is required
-          </small>
-        </div>
-        <div class="form-control-element tw-w-1/2">
-          <label for="resource_uri">Resource URI</label>
-          <input type="text" formControlName="resource_uri" />
-          <small
-            class="tw-text-red-500 tw-text-sm tw-font-light"
-            *ngIf="resource_uri.hasError('required') && resource_uri.touched"
-            >The Resource URI is required
-          </small>
-        </div>
-        <div class="form-control-element tw-w-1/2">
-          <label for="resource_url">Resource URL</label>
-          <input type="text" formControlName="resource_url" />
-          <small
-            class="tw-text-red-500 tw-text-sm tw-font-light"
-            *ngIf="resource_url.hasError('required') && resource_url.touched"
-            >The Resource URL is required
           </small>
         </div>
         <div class="form-control-element tw-w-1/2">
@@ -136,14 +139,51 @@
           </small>
         </div>
         <div class="form-control-element tw-w-1/2">
-          <label>Upload Resource Logo</label>
+          <label for="resource_uri">Resource URI</label>
           <input
-            id="file_input"
-            type="file"
-            (change)="onFileSelected($event)"
+            type="text"
+            formControlName="resource_uri"
+            placeholder="https://example.com"
           />
+          <small
+            class="tw-text-red-500 tw-text-sm tw-font-light"
+            *ngIf="resource_uri.invalid && resource_uri.touched"
+          >
+            <ng-container *ngIf="resource_uri.hasError('required')">
+              The Resource URI is required
+            </ng-container>
+            <ng-container *ngIf="resource_uri.hasError('pattern')">
+              The Resource URI must be a valid URL (e.g., https://example.com)
+            </ng-container>
+          </small>
         </div>
         <div class="form-control-element tw-w-1/2">
+          <label for="resource_url">Resource URL</label>
+          <input
+            type="text"
+            formControlName="resource_url"
+            placeholder="https://example.com"
+          />
+          <small
+            class="tw-text-red-500 tw-text-sm tw-font-light"
+            *ngIf="resource_url.invalid && resource_url.touched"
+          >
+            <ng-container *ngIf="resource_url.hasError('required')">
+              The Resource URL is required
+            </ng-container>
+            <ng-container *ngIf="resource_url.hasError('pattern')">
+              The Resource URL must be a valid URL (e.g., https://example.com)
+            </ng-container>
+          </small>
+          <small
+            class="tw-text-red-500 tw-text-sm tw-font-light"
+            *ngIf="form.hasError('invalidGithubUrl') && resource_url.touched"
+          >
+            The Resource URL must be a valid GitHub URL for Software resources
+          </small>
+        </div>
+
+        <div class="form-control-element tw-w-full">
           <label for="resource_description">Resource Description</label>
           <textarea
             class="text-input"
@@ -162,6 +202,7 @@
             >The Resource Description is required
           </small>
         </div>
+
         <div class="form-control-element tw-w-1/2">
           <label for="color">Resource Color</label>
           <div class="tw-flex tw-items-center tw-flex-row">
@@ -174,17 +215,25 @@
             >The Resource Color is required
           </small>
         </div>
+        <div class="form-control-element tw-w-1/2">
+          <label>Upload Resource Logo</label>
+          <input
+            id="file_input"
+            type="file"
+            (change)="onFileSelected($event)"
+          />
+        </div>
       </div>
 
       <div class="tw-flex tw-justify-center">
         <input
           type="submit"
-          value="Create Partner Resource"
-          [disabled]="form.invalid || clicked"
+          value="Request Partnership"
+          [disabled]="form.invalid || isSubmitting"
           [ngClass]="{
-            'tw-bg-gray-300 tw-text-gray-600': form.invalid || clicked,
+            'tw-bg-gray-300 tw-text-gray-600': form.invalid || isSubmitting,
             'tw-bg-apicuron-purple tw-text-white tw-shadow-md':
-              !form.invalid || clicked
+              !form.invalid && !isSubmitting,
           }"
           class="tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded"
         />

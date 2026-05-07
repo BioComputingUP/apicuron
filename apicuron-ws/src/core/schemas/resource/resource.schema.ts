@@ -52,13 +52,6 @@ export class Resource {
 		enum: [SubmittedResource.name, PartnerResource.name],
 	})
 	state: string;
-
-	// @Prop({
-	// 	type: [Types.ObjectId],
-	// 	ref: Term.name,
-	// 	default: () => []
-	// })
-	// terms: Term[]
 }
 
 const ResourceSchema = SchemaFactory.createForClass(Resource);

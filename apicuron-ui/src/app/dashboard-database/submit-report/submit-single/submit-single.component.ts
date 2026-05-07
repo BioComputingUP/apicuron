@@ -16,6 +16,7 @@ import { dateTimeValidator } from "../validators/date-time.validator";
 import { orcidIdValidator } from "../validators/orcid-id.validator";
 import { Report } from "../../../models/report.model";
 import { Term } from "../../../models/term.model";
+import { HttpErrorResponse } from "@angular/common/http";
 
 @Component({
   selector: "submit-single",
@@ -90,11 +91,12 @@ export class SubmitSingleComponent implements OnInit {
           return this.dashboardService.submit_report(report);
         })
       )
-      .subscribe(
-        (response) => {
+      .subscribe({
+        next: () => {
           this.toast.success("Report Sucessfully Submitted");
         },
-        (error) => {
+        error: (err: HttpErrorResponse) => {
+          const { error } = err;
           if (error.message && error.statusCode == 400) {
             let errors = Array.isArray(error.message)
               ? error.message.join("\n")
@@ -106,8 +108,8 @@ export class SubmitSingleComponent implements OnInit {
               "Error"
             );
           }
-        }
-      );
+        },
+      });
   }
 
   get activity_term(): AbstractControl<string> {

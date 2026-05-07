@@ -1,0 +1,42 @@
+<div class="tw-flex tw-flex-col">
+  <div
+    class="tw-flex tw-align-top tw-text-lg tw-font-semibold tw-mb-6 tw-justify-between"
+  >
+    <div>
+      <svg-icon
+        [src]="sectionIcon"
+        svgClass="tw-w-8 tw-h-8 tw-fill-apicuron-bright-purple tw-mr-2 tw-inline-block"
+      />
+      <span class="tw-text-gray-700 tw-font-bold">{{ sectionLabel }}</span>
+    </div>
+    <button
+      type="button"
+      (click)="toggleSelection()"
+      class="tw-text-sm tw-ml-2 tw-font-medium tw-text-gray-500 tw-p-1 hover:tw-bg-gray-100 tw-rounded-md"
+    >
+      {{ allSelected ? "Deselect All" : "Select All" }}
+    </button>
+  </div>
+  <ul
+    cdkListbox
+    cdkListboxMultiple
+    [cdkListboxValue]="selectedPreferences"
+    (cdkListboxValueChange)="onSelectionChange($event.value)"
+    class="tw-flex tw-flex-row tw-flex-wrap tw-gap-2 tw-justify-stretch"
+  >
+    @for (preference of preferences; track preference) {
+      <li
+        [cdkOption]="preference"
+        class="option tw-cursor-pointer hover:tw-bg-violet-100 tw-p-2 tw-my-1 tw-rounded-md tw-text-gray-800 tw-shadow-sm tw-font-medium tw-bg-gray-100 tw-border tw-border-gray-300 hover:tw-border-violet-300"
+      >
+        <input
+          type="checkbox"
+          [checked]="selectedPreferences.includes(preference)"
+          readonly
+          class="tw-pointer-events-none tw-accent-apicuron-bright-purple tw-mr-1"
+        />
+        {{ preference }}
+      </li>
+    }
+  </ul>
+</div>

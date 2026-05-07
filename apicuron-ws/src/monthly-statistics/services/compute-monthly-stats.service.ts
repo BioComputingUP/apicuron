@@ -52,8 +52,12 @@ export class ComputeMonthlyStatsService {
 			resource_id: report.resource_id,
 			league: report.league,
 			curator_orcid: report.curator_orcid,
+			// To check if there's a more recent report within the month:
+			// check if there's a report that has a higher date than the current report, but also within the same month
+			// no need to check for month start since we are searching for latest report within the month
 			timestamp: {
-				$gte: report.timestamp,
+				$gt: report.timestamp,
+				$lt: getMonthEnd(moment(report.timestamp)),
 			},
 		}));
 
@@ -61,6 +65,7 @@ export class ComputeMonthlyStatsService {
 			resource: report.resource ?? resource,
 			user: report.user ?? curator ?? null,
 			league_data: report.league_data,
+			privacy: computePrivacyField(report.resource, report.user, {league: report.league}),
 		};
 		if (reportIsLast) {
 			setObj.last_contribution = report.timestamp;
@@ -146,7 +151,6 @@ export class ComputeMonthlyStatsService {
 				curator_orcid,
 				resource_id,
 				league,
-				privacy,
 				activity_category,
 				score,
 				year,

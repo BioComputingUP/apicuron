@@ -171,10 +171,9 @@ export function userResourceEntityPrivacyFilter(
  * @param filter - The filter query to select the entities to be updated.
  * @returns A promise that resolves to an array containing the results of the two update operations.
  */
-export async function updateUserAggregatePrivacy<T extends Model<IUserLeagueEntityDocument>>(
-	model: T,
-	filter: FilterQuery<IUserLeagueEntityDocument>,
-) {
+export async function updateUserAggregatePrivacy<
+	T extends Model<IUserLeagueEntityDocument>,
+>(model: T, filter: FilterQuery<IUserLeagueEntityDocument>) {
 	const privateUpdate$ = await model.updateMany(
 		{
 			$and: [
@@ -222,4 +221,14 @@ export async function updateUserAggregatePrivacy<T extends Model<IUserLeagueEnti
 	);
 
 	return await Promise.all([privateUpdate$, publicUpdate$]);
+}
+/**
+ * Gets the privacy level of a user entity. If the user is not registered, default to private
+ * @param user The user entity to check.
+ * @returns The privacy level of the user entity.
+ */
+export function getUserEntityPrivacy(
+	user: { privacy: PrivacyType } | undefined | null,
+): PrivacyType {
+	return user?.privacy ?? PrivacyType.private;
 }

@@ -1,12 +1,22 @@
-import { FilterQuery, HydratedDocument, LeanDocument, Model, ProjectionType, QueryOptions } from 'mongoose';
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import {
+	FilterQuery,
+	HydratedDocument,
+	LeanDocument,
+	Model,
+	ProjectionType,
+	QueryOptions,
+} from 'mongoose';
+import { ResourceCategories, ResourceCategory } from '../../enums';
+import { GitRepository } from '../components/git-repository.schema';
+import { isCategory, requiresGithubRepo } from './resource-category.helpers';
 
 export type SubmittedResourceDocument = HydratedDocument<SubmittedResource>; // this class defines a partnerSubmittedResource that has been validated and has the ability to have Models, Badges and so on
 export type SubmittedResourceModel = Model<SubmittedResource>;
 export type LeanSubmittedResourceDoc = LeanDocument<SubmittedResource>;
 export type SubmittedResourceFilter = FilterQuery<SubmittedResource>;
 export type SubmittedResourceProjection = ProjectionType<SubmittedResource>;
-export type SubmittedResourceQueryOptions= QueryOptions<SubmittedResource>;
+export type SubmittedResourceQueryOptions = QueryOptions<SubmittedResource>;
 
 @Schema()
 export class SubmittedResource {
@@ -41,6 +51,14 @@ export class SubmittedResource {
 
 	@Prop({ type: String })
 	creator: string;
+
+	@Prop({
+		type: String,
+		required: true,
+		default: ResourceCategory.Database,
+		enum: ResourceCategories,
+	})
+	category: ResourceCategory;
 
 	state: string;
 

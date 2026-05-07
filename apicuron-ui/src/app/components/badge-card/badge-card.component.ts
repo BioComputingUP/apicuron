@@ -57,7 +57,7 @@ export class BadgeCardComponent implements OnInit {
   terms$: ReplaySubject<Term[]> = new ReplaySubject();
   termNames$: Observable<string[]>;
 
-  thresholdDate = moment().subtract(30, "days").toDate();
+  thresholdDate = moment().subtract(1, "days").toDate();
 
   @Input()
   enableShadow = true;

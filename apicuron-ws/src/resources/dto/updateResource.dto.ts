@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
 	IsEmpty,
+	IsEnum,
 	IsNotEmpty,
 	IsOptional,
 	IsString,
@@ -8,13 +9,18 @@ import {
 	Matches,
 	MaxLength,
 	Validate,
+	ValidateNested,
 } from 'class-validator';
-import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
+import { FilterQuery } from 'mongoose';
+
+import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
 import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../../core/schemas/resource/partner-resource.schema';
-import { FilterQuery } from 'mongoose';
+import { EntryExistsRule } from '../../shared/validators/entry-exists.validator';
+import { LeaderboardSettingsDto } from './leaderboard-settings.dto';
+import { ResourceCategory } from 'src/core/enums';
 
 export class UpdatePartnerResourceDto {
 	@Validate(EntryExistsRule, [
@@ -66,4 +72,36 @@ export class UpdatePartnerResourceDto {
 	@IsString()
 	@IsOptional()
 	defaultLeague: string;
+
+	@IsOptional()
+	@ValidateNested()
+	@Transform(({ value }) => {
+		// multipart/form-data sends nested objects as stringified JSON.
+		// `plainToInstance` is then required to convert the parsed object
+		// into a class instance, enabling nested validation to work correctly.
+		if (typeof value === 'string') {
+			try {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+				const parsed = JSON.parse(value);
+				const instance = plainToInstance(LeaderboardSettingsDto, parsed, {
+					excludeExtraneousValues: true,
+					enableCircularCheck: true,
+				});
+				return instance;
+			} catch (e) {
+				return value;
+			}
+		}
+		return value;
+	})
+	@Type(() => LeaderboardSettingsDto)
+	@Expose()
+	leaderboard_preferences?: LeaderboardSettingsDto;
+
+	@ApiProperty({ enum: ResourceCategory })
+	@IsEnum(ResourceCategory)
+	@IsString()
+	@IsOptional()
+	category: ResourceCategory;
+
 }

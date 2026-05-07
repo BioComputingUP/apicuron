@@ -30,9 +30,7 @@ import {
 	ApiTags,
 } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
-import * as mime from 'mime-types';
-import * as mv from 'mv';
-import { join } from 'path';
+import { PartnerResourceDocument } from 'src/core/schemas/resource/partner-resource.schema';
 import { AuthService } from '../../../auth/auth.service';
 import { HasAResourceGuard } from '../../../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../../../auth/guards/local-auth.guard';
@@ -46,6 +44,7 @@ import { PublicPartnerResourceDto } from '../../dto/public-partner-resource.dto'
 import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
 import { ResourceLogoValidationPipe } from '../../validators/logo-validation.pipe';
 import { PartnerResourcesService } from '../services/partner-resources.service';
+import { Request } from 'express';
 
 @ApiTags('Partner Resources')
 @ApiHeader(VersionHeader)
@@ -82,7 +81,7 @@ export class PartnerResourcesController {
 			},
 		);
 
-		console.log(`Parsed Data ${resourceEntities.map((r) => r.resource_name)}`);
+		this.logger.debug(`Partner Resources retrieved`);
 
 		return resourceEntities;
 	}
@@ -143,48 +142,22 @@ export class PartnerResourcesController {
 			dest: '/tmp/apicuron/resources',
 		}),
 	)
+	@SerializeOptions({ type: PartnerResourceEntity })
 	async update_resource_values(
 		@Body() update_resource: UpdatePartnerResourceDto,
-		@Req() request,
+		@Req() request: Request,
 		@UploadedFile(ResourceLogoValidationPipe(), SvgSanitationValidationPipe)
 		logo: Express.Multer.File,
 	) {
 		const { resource_id } = update_resource;
-
 		// check if the user has a permission to edit the PartnerResource
 		this.authService.user_has_resource(request.user, resource_id);
-		const public_files_path =
-			this.configService.getOrThrow<string>('PUBLIC_FILES_PATH');
-		// if there's an uploaded file
-		if (logo) {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			const ext = mime.extension(logo.mimetype);
-			const public_path = join(
-				public_files_path,
-				'resources',
-				`${logo.filename}.${ext}`,
-			);
 
-			mv(logo.path, public_path, { mkdirp: true }, (err: Error) => {
-				if (err) {
-					this.logger.error(err.message, err.stack, err.name);
-					throw new InternalServerErrorException();
-				}
-			});
-
-			const logo_link = public_path.replace(
-				public_files_path,
-				this.configService.getOrThrow('PUBLIC_FILES_URL_PATH'),
-			);
-
-			await this.partnerResourceService.update_resource({
-				...update_resource,
-				logo: logo_link,
-			});
-		} else {
-			await this.partnerResourceService.update_resource(update_resource);
-		}
-
-		return await this.partnerResourceService.get_resource(resource_id);
+		const res: PartnerResourceDocument =
+			await this.partnerResourceService.update_resource(update_resource, logo);
+		return plainToInstance(PartnerResourceEntity, res, {
+			excludeExtraneousValues: true,
+			enableCircularCheck: true,
+		});
 	}
 }

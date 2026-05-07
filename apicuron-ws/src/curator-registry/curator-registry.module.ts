@@ -5,9 +5,16 @@ import { ResourcesModule } from 'src/resources/resources.module';
 import { CuratorRegistryController } from './curator-registry.controller';
 import { CuratorRegistryService } from './curator-registry.service';
 import { CuratorRegistryAggregatorService } from './services/curator-registry-aggregator.service';
+import { RegistryQueryService } from './services/registry-query.service';
+import { RegistryFilterStrategy } from './strategies/registry-filter.strategy';
 @Module({
 	imports: [CoreApicuronModule, AuthModule, ResourcesModule],
-	providers: [CuratorRegistryAggregatorService, CuratorRegistryService],
+	providers: [
+		CuratorRegistryAggregatorService,
+		CuratorRegistryService,
+		RegistryQueryService,
+		RegistryFilterStrategy,
+	],
 	controllers: [CuratorRegistryController],
 })
 export class CuratorRegistryModule {}

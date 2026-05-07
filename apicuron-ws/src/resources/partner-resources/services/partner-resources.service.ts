@@ -1,8 +1,18 @@
 import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	Logger,
+	NotFoundException,
+} from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, LeanDocument, Model, Types } from 'mongoose';
+import { readFile } from 'fs/promises';
+import { FilterQuery, LeanDocument, Types } from 'mongoose';
+import { join } from 'path';
+import { PartnerResourceRepository } from 'src/core/repositories/partner-resource.repository';
+import { StorageType } from 'src/storage/storage.config';
+import { FileUploadDto } from 'src/util/file-upload.helper';
 import { assertIsDefined } from 'src/util/type-assertion.helper';
 import {
 	League,
@@ -13,7 +23,6 @@ import {
 	PartnerResourceDocument,
 } from '../../../core/schemas/resource/partner-resource.schema';
 import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
-import { PartnerResourceUpdatedEvent } from '../events/resource-updated.event';
 import { AddMemberToLeague } from '../leagues/dto/add-member-to-league.dto';
 import { DeleteLeagueDTO } from '../leagues/dto/delete-league.dto';
 import { LeagueDeletedEvent } from '../leagues/events/league-deleted-event';
@@ -22,16 +31,16 @@ import { LeagueDeletedEvent } from '../leagues/events/league-deleted-event';
 export class PartnerResourcesService {
 	constructor(
 		@InjectModel(PartnerResource.name)
-		private partnerResourceModel: Model<PartnerResourceDocument>, // protected transformService: TransformerService
+		private partnerResourceRepo: PartnerResourceRepository,
 		protected eventEmitter: EventEmitter2,
-		protected storage: StorageService,
+		private storageService: StorageService,
 	) {}
 
 	logger = new Logger(PartnerResourcesService.name);
 	async get_resources(
 		filter: FilterQuery<PartnerResourceDocument> = {},
 	): Promise<PartnerResourceDocument[]> {
-		const resources = await this.partnerResourceModel.find(filter).sort({
+		const resources = await this.partnerResourceRepo.find(filter).sort({
 			'stats.contributionCount': -1,
 			'stats.uniqueContributors': -1,
 		});
@@ -40,7 +49,7 @@ export class PartnerResourcesService {
 	}
 
 	async addMemberToLeague(addMemberToLeague: AddMemberToLeague) {
-		const resourceUpdated = await this.partnerResourceModel.findOneAndUpdate(
+		const resourceUpdated = await this.partnerResourceRepo.findOneAndUpdate(
 			{
 				resource_id: addMemberToLeague.resource_id,
 			},
@@ -65,7 +74,7 @@ export class PartnerResourcesService {
 	async removeMemberFromLeague(
 		removeMemberFromLeague: AddMemberToLeague,
 	): Promise<PartnerResourceDocument> {
-		const resourceUpdated = await this.partnerResourceModel.findOneAndUpdate(
+		const resourceUpdated = await this.partnerResourceRepo.findOneAndUpdate(
 			{
 				resource_id: removeMemberFromLeague.resource_id,
 			},
@@ -92,7 +101,7 @@ export class PartnerResourcesService {
 	async deleteLeague(
 		deleteLeague: DeleteLeagueDTO,
 	): Promise<PartnerResourceDocument> {
-		const resource = await this.partnerResourceModel.findOne({
+		const resource = await this.partnerResourceRepo.findOne({
 			resource_id: deleteLeague.resource_id,
 		});
 		assertIsDefined(
@@ -110,7 +119,7 @@ export class PartnerResourcesService {
 				`The League ${deleteLeague.league} is set as  the default league for resource ${resource.resource_name}. Change the default league for the resource to proceed to delete it, use the PUT route (/partner-resources)`,
 			);
 		}
-		const resourceUpdated = await this.partnerResourceModel.findOneAndUpdate(
+		const resourceUpdated = await this.partnerResourceRepo.findOneAndUpdate(
 			{
 				resource_id: deleteLeague.resource_id,
 			},
@@ -135,11 +144,11 @@ export class PartnerResourcesService {
 	}
 
 	async count() {
-		return await this.partnerResourceModel.count();
+		return await this.partnerResourceRepo.count();
 	}
 
 	async retrieve_uri(resource_id: string) {
-		const resource = await this.partnerResourceModel.findOne({ resource_id });
+		const resource = await this.partnerResourceRepo.findOne({ resource_id });
 		if (!resource) {
 			// this.transformService.warn('resource_id', `Incorrect resource_id: ${resource_id} Not found, parameter ignored`)
 			return null;
@@ -149,35 +158,46 @@ export class PartnerResourcesService {
 	}
 
 	async get_resource(resource_id: string): Promise<PartnerResourceDocument> {
-		const doc = await this.partnerResourceModel.findOne({ resource_id });
-		assertIsDefined(doc, `Resource with ID ${resource_id} not found.`);
+		const doc = await this.partnerResourceRepo.findOne({ resource_id });
+		assertIsDefined(
+			doc,
+			`Resource with ID ${resource_id} not found.`,
+			NotFoundException,
+		);
 		return doc;
 	}
 
 	async exists(resource_id: string): Promise<boolean> {
-		return !!(await this.partnerResourceModel.exists({ resource_id }));
+		return !!(await this.partnerResourceRepo.exists({ resource_id }));
 	}
 
 	async update_resource(
-		resource_update: UpdatePartnerResourceDto & { logo?: string },
-	) {
-		const { resource_id } = resource_update;
+		resource_update: UpdatePartnerResourceDto,
+		logo?: Express.Multer.File
+	): Promise<PartnerResourceDocument> {
+		const { resource_id, ...updates } = resource_update;
 
-		const resource = await this.get_resource(resource_id);
+		if (logo) {
+			const logoFile = FileUploadDto.fromMulter(logo);
+			logoFile.buffer = logo.buffer || await readFile(logo.path);
+			const publicEngine = this.storageService.getEngine(StorageType.public);
+			const logoReference = await publicEngine.put(
+					join('resources', logoFile.filename),
+					logoFile.buffer,
+				);
+			updates.logo = logoReference;
+			this.logger.debug(`Updating logo for resource ${resource_id} to ${logoReference}`);
+		}
 
-		// const update = await resource.update({ $set: resource_update });
-
-		const newResource = await this.partnerResourceModel.findOneAndUpdate(
+		const newResource = await this.partnerResourceRepo.findOneAndUpdate(
 			{ resource_id },
-			{ $set: resource_update },
+			{ $set: updates },
 			{ new: true },
 		);
-		assertIsDefined(newResource, `Resource with ID ${resource_id} not found.`);
-		await this.eventEmitter.emitAsync(
-			PartnerResourceUpdatedEvent.name,
-			new PartnerResourceUpdatedEvent(resource, newResource),
-		);
 
+
+
+		assertIsDefined(newResource, `Resource with ID ${resource_id} not found.`);
 		return newResource;
 	}
 
