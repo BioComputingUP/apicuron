@@ -1,5 +1,9 @@
-import { S3Client } from '@aws-sdk/client-s3';
-import { LocalFsEngine, S3Engine } from '@biocomputingup/nest-storage-manager';
+import { S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
+import {
+	LocalFsEngine,
+	S3Engine,
+	S3StorageConfig,
+} from '@biocomputingup/nest-storage-manager';
 import {
 	AnyAsyncEngineDefinition,
 	StorageModuleConfig,
@@ -19,6 +23,16 @@ const storageConfigMapper = {
 	[StorageType.private]: 'PRIVATE_STORAGE',
 	[StorageType.public]: 'PUBLIC_STORAGE',
 };
+
+type AnyStorageConfig =
+	| {
+			engineType: 'LocalFs';
+			config: LocalFsEngine['config'];
+	  }
+	| {
+			engineType: 'S3';
+			config: S3StorageConfig;
+	  };
 
 /**
  * Creates a definition for an asynchronous storage engine based on the provided storage type.
@@ -40,7 +54,7 @@ const storageDefFactory = (
 		if (!storageConfigKey) {
 			throw new Error('Invalid storage type');
 		}
-		const configObject = config.get(storageConfigKey);
+		const configObject = config.getOrThrow<AnyStorageConfig>(storageConfigKey);
 
 		if (configObject.engineType === 'LocalFs') {
 			return {
@@ -48,13 +62,13 @@ const storageDefFactory = (
 			};
 		}
 		if (configObject.engineType === 'S3') {
-			const [clientConfig, engineConfig] = configObject.config;
+			const engineConfig = configObject.config;
 			return {
-				engine: new S3Engine(engineConfig, new S3Client(clientConfig)),
+				engine: new S3Engine(engineConfig),
 			};
 		}
 		throw new NotImplementedException(
-			`Unsupported storage engine type: ${configObject.engineType}`,
+			`Unsupported storage engine type: ${configObject}`,
 		);
 	},
 });

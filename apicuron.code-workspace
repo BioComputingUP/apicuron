@@ -15,6 +15,5 @@
   "settings": {
     "typescript.tsdk": "apicuron/apicuron-ws/node_modules/typescript/lib",
     "vsicons.presets.nestjs": true,
-    "js/ts.tsdk.path": "/home/adel/projects/apicuron/apicuron-ws/node_modules/typescript/lib",
   }
 }

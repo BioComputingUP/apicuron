@@ -14,10 +14,16 @@ export const ConnectionFactoryProvider: MongooseModuleAsyncOptions = {
 	useFactory: async (
 		configService: ConfigService,
 	): Promise<MongooseModuleOptions> => {
-		const db_host = configService.get<string>('db_host');
-		const database = configService.get<string>('database');
-		const port = configService.get<number>('db_port');
-		const uri = `mongodb://${db_host}:${port}/${database}`;
+		const db_host = configService.getOrThrow<string>('db_host');
+		const database = configService.getOrThrow<string>('database');
+		const port = configService.getOrThrow<number>('db_port');
+		const mongodbUser = configService.get<string>('MONGODB_USER');
+		const mongodbPassword = configService.get<string>('MONGODB_PASSWORD');
+		let auth = '';
+		if (!!mongodbPassword && !!mongodbUser) {
+			auth = `${mongodbUser}:${encodeURIComponent(mongodbPassword)}@`;
+		}
+		const uri = `mongodb://${auth}${db_host}:${port}/${database}?authSource=${database}`;
 		logger.log(`MongoDB Connection setup uri: ${uri}`);
 		return {
 			uri,

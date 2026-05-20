@@ -19,11 +19,13 @@ services:
       options:
         max-size: "5mb"
         max-file: "5"
-    environment:
-      - DATABASE_HOST=mongo-db
-      - DATABASE=apicuron_test
-      - DB_PORT=27017
-      - NODE_ENV=local
+    env_file:
+      - .env
+    # environment:
+    #   - DATABASE_HOST=mongodb
+    #   - DATABASE=apicuron_test
+    #   - DB_PORT=27017
+    #   - NODE_ENV=local
     # dns: 10.69.69.1
     # logging:
     #   driver: local
@@ -32,7 +34,7 @@ services:
     #     max-file: 5
     command: "npm run start:dev"
     depends_on:
-      - mongo-db
+      - mongodb
     
   
   apicuron-ui:
@@ -71,59 +73,42 @@ services:
     ports:
       - 3000:3000
   
-  mongo-db:
-    container_name: mongo-db
+  mongodb:
+    container_name: apicuron-mongodb
     image: mongo
     volumes:
       - ./db:/data/db
+      - ./mongo/init:/docker-entrypoint-initdb.d/
+      - ./mongo/mongd.conf:/etc/mongod.conf:ro
     networks:
       - apicuron-network
     ports:
       - 27017:27017
+    env_file:
+      - .env
   
-    # broker:
-    #   image: apache/kafka:latest
-    #   ports:
-    #     - 9092:9092
-    #   container_name: broker
-    #   networks:
-    #     - apicuron-network
-    #   environment:
-    #     KAFKA_LISTENERS: PLAINTEXT://broker:9092,CONTROLLER://localhost:9093
-    #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092
-    #     # KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-    #     # KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092
-    #     KAFKA_NODE_ID: 1
-    #     KAFKA_PROCESS_ROLES: broker,controller
-    #     KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-    #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-    #     KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
-    #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    #     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-    #     KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-    #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-    #     KAFKA_NUM_PARTITIONS: 3
-    
-# apicuron-docs:
-#   container_name: apicuron-docs
-#   working_dir: "/home/node/app"
-#   image: "node:16.14"
-#   volumes:
-#     - "./docs:/home/node/app"
-#   user: $DOCKER_USER
+# broker:
+#   image: apache/kafka:latest
+#   ports:
+#     - 9092:9092
+#   container_name: broker
 #   networks:
 #     - apicuron-network
-#   ports:
-#     - "8080:8080"
-#   # dns: 10.69.69.1
-#   command: "npm run dev"
-
-
+#   environment:
+#     KAFKA_LISTENERS: PLAINTEXT://broker:9092,CONTROLLER://localhost:9093
+#     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092
+#     # KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+#     # KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092
+#     KAFKA_NODE_ID: 1
+#     KAFKA_PROCESS_ROLES: broker,controller
+#     KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+#     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+#     KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+#     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+#     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+#     KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+#     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+#     KAFKA_NUM_PARTITIONS: 3
 networks:
   apicuron-network:
     name: apicuron-network
-
-
-    # network_mode: "host"
-
-  # uid=1002 && gid=1002 && groupmod -g ${gid} node && usermod -u ${uid} -g ${gid} node

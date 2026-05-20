@@ -3,3 +3,4 @@ proxy
 .vscode/settings.json
 .vscode
 .env
+.env.production

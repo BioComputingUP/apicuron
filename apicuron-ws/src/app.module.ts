@@ -34,7 +34,7 @@ import { getGlobalInterceptorChain } from './shared/interceptors';
 import {
 	EntriesExistRule,
 	EntryExistsRule,
-	UniqueRule
+	UniqueRule,
 } from './shared/validators';
 import { StatisticsModule } from './statistics/statistics.module';
 import { ServeFilesController } from './storage/serve-files.controller';

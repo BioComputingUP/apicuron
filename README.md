@@ -44,3 +44,9 @@ The side panels in the user profile are defined as standalone components because
 
 ## The backend
 
+### Deployment
+
+The APICURON API has two main deployment targets dev.apicuron.org and apicuron.org
+[docker-compose.dev.yaml](./docker-compose.dev.yaml) -> is for dev.apicuron.org
+[docker-compose.prod.yaml](./docker-compose.prod.yaml) -> is for apicuron.org
+the additional [docker-compose.build.yaml](./docker-compose.build.yaml) contains build instructions for both environments with according image tagging configuration

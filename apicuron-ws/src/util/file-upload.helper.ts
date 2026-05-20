@@ -31,6 +31,11 @@ export class FileUploadDto {
 				responseType: 'arraybuffer',
 			});
 			fileRef.buffer = Buffer.from(response.data as string);
+			if (typeof response.headers['content-type'] != 'string') {
+				throw new Error(
+					`Headers content Type different is not a string found ${response.headers['content-type']} instead`,
+				);
+			}
 			fileRef.mimetype = response.headers['content-type'];
 			fileRef.filename =
 				response.headers['picsum-id'] + '.' + mime.extension(fileRef.mimetype);
