@@ -28,6 +28,8 @@ services:
   
   # Mongodb initialization service
   # Loads the init directory in volume
+  # This service is used to initialize the database with the initial data
+  # ensuring the user 'apicuron' with admin role is created with a password from .env.production
   mongo-init:
     container_name: apicuron-mongo-init
     build:
@@ -36,7 +38,7 @@ services:
       - mongo-init-vol:/docker-entrypoint-initdb.d
   # Database service
   mongodb:
-    image: mongo
+    image: mongo:7
     container_name: apicuron-mongo
     restart: always
     depends_on:

@@ -7,5 +7,8 @@ db = db.getSiblingDB(dbName);
 db.createUser({
   user: mongoUser,
   pwd: mongoPasswd,
-  roles: [{ role: "readWrite", db: dbName }],
+  roles: [
+    { role: "readWrite", db: dbName },
+    { role: "dbAdmin", db: dbName }
+  ],
 });
