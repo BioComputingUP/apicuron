@@ -29,11 +29,11 @@ export class AuthConfirmationComponent {
     const msg = {
       access_token: accessTokenElement.content,
     };
-    console.log(msg);
 
-    [environment.ws, environment.host].map((url: string) => {
-        const origin =  new URL(url).origin;
-        window?.opener.postMessage(msg, origin);
+    [location.origin, environment.ws, environment.host].map((url: string) => {
+
+      const origin = new URL(url).origin;
+      window?.opener.postMessage(msg, origin);
     })
 
   }

@@ -20,7 +20,7 @@ export class ReportsService {
   ws = environment.ws + "/";
 
   getReports(reportFilter: ReportFilter): Observable<Paginated<Report>> {
-    const url = new URL(`reports`, this.ws).href;
+    const url = `${this.ws}/reports`;
 
     const httpParams = new HttpParams({ fromObject: reportFilter.serialize() });
     return this.http

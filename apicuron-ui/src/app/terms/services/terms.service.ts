@@ -1,16 +1,23 @@
+import { PlatformLocation } from "@angular/common";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { map, pluck, tap } from "rxjs/operators";
+import { map, pluck } from "rxjs/operators";
 import { Term } from "src/app/models/term.model";
 import { TermsFilter } from "src/app/terms/models/terms-filter";
 import { environment } from "src/environments/environment";
 
 @Injectable()
 export class TermsService {
-  ws = environment.ws + "/";
-  url = new URL("terms", this.ws).href;
-  constructor(protected http: HttpClient) {}
+  ws: string;
+  url: string;
+  constructor(
+    protected http: HttpClient,
+
+    protected platformLocation: PlatformLocation
+  ) {
+    this.url = `${environment.ws}/terms`;
+  }
 
   getTerms(termsFilter: TermsFilter): Observable<Term[]> {
     const params = new HttpParams({ fromObject: { ...termsFilter } });
@@ -23,7 +30,7 @@ export class TermsService {
         params,
       })
       .pipe(
-        pluck("data"),
+        map((response) => response['data'] as Term[]),
         map((data: Term[]) => {
           return data.map((term: Term) => new Term().deserialize(term));
         })

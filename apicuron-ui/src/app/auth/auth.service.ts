@@ -137,7 +137,7 @@ export class AuthService implements OnDestroy {
     const windowMessageEventListener = (event: MessageEvent) => {
       const allowedOrigins = [
         new URL(environment.host).origin,
-        new URL(environment.ws).origin,
+        new URL(environment.ws, location.origin).origin,
       ];
       if (allowedOrigins.includes(event.origin)) {
         if (_.isObject(event.data) && event.data["access_token"]) {

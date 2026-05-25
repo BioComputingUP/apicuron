@@ -15,8 +15,8 @@ import { ToastrService } from "ngx-toastr";
 
 @Injectable()
 export class BadgeDefService {
-  constructor(protected http: HttpClient, protected toastr: ToastrService) {}
-  url: string = new URL("achievements-def/badges/", environment.ws + "/").href;
+  constructor(protected http: HttpClient, protected toastr: ToastrService) { }
+  url: string = `${environment.ws}/achievements-def/badges/`
 
   getBadgeDefs(
     badgeDefFilter: BadgeDefFilter

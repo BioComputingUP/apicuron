@@ -7,7 +7,7 @@ export const environment = {
   env: "local",
   domain: 'localhost',
   host: "http://localhost:3000",
-  ws: "http://localhost:3000/api",
+  ws: "/api",
   auth_ws: "http://localhost:3000/api",
   public_file_url: "http://localhost:3000/api/files",
   resource_logo_path: "resources",

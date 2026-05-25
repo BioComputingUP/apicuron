@@ -20,7 +20,7 @@ type ResourceLinks = {
 })
 export class DashboardSidebarComponent implements OnInit {
   links$: Observable<
-  ResourceLinks[]
+    ResourceLinks[]
   >;
   user$: Observable<User>;
   managedResources$: Observable<Resource[]>;
@@ -103,7 +103,7 @@ export class DashboardSidebarComponent implements OnInit {
   }
 
   openDetails(resourceLinks: ResourceLinks) {
-    const currentUrl =  this.route.snapshot.pathFromRoot.map((snap) => snap.url).join('/')
+    const currentUrl = this.route.snapshot.pathFromRoot.map((snap) => snap.url).join('/')
     return resourceLinks.links.some((link) => currentUrl.startsWith(link.href.join('/')))
   }
 
@@ -116,15 +116,14 @@ export class DashboardSidebarComponent implements OnInit {
     if (logo.startsWith("assets")) {
       return logo;
     } else {
-      return new URL(
-        logo
-          .split("/")
-          .filter((el) => el)
-          .join("/"),
-        environment.ws + "/"
-      );
+      const path = logo
+        .split("/")
+        .filter((el) => el)
+        .join("/");
+      return `${environment.ws}/${path}`
+
     }
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 }

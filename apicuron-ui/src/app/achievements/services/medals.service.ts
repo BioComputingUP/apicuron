@@ -16,10 +16,10 @@ export class MedalsService {
 
 
     getMedals(params: AchievementFilter): Observable<Paginated<Medal>> {
-        const url = new URL(this.wsUrl)
+        const url: string = this.wsUrl
 
         const httpParams = new HttpParams({ fromObject: params.serialize() })
-        return this.http.get(url.href, {
+        return this.http.get(url, {
             headers: {
                 version: '2'
             },
