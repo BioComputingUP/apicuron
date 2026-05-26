@@ -18,7 +18,7 @@
         class="tw-w-10 tw-h-10 tw-rounded-full tw-p-2 tw-bg-gray-200 tw-flex tw-items-center tw-justify-center tw-text-gray-400 tw-text-2xl tw-self-start"
       >
         <img
-          [src]="medal?.user?.avatar?.href ?? '/assets/user.svg'"
+          [src]="medal?.user?.avatar?.href ?? 'assets/user.svg'"
           class="tw-w-full tw-h-full"
           alt=""
           srcset=""
@@ -69,7 +69,7 @@
     >
       <!-- [Badge Icon] -->
       <img
-        src="/assets/svg/gold_medal.svg"
+        src="assets/svg/gold_medal.svg"
         [ngClass]="{ 'tw-grayscale': medal.state == 'progress' }"
         alt="Medal icon"
         srcset=""

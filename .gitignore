@@ -3,3 +3,7 @@ proxy
 .vscode/settings.json
 .vscode
 .env
+# Ignore sensitive environements
+.env.staging
+.env.development
+.env.production

@@ -4,7 +4,7 @@ export const environment = {
   // ws: window.location.protocol + '//' + window.location.hostname + '/api/',
   domain: 'apicuron.org',
   host: "https://apicuron.org",
-  ws: "https://apicuron.org/api",
+  ws: "/api",
   auth_ws: "https://apicuron.org/api",
   public_file_url: "https://apicuron.org/api/files",
   resource_logo_path: "resources",

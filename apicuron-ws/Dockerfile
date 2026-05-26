@@ -42,7 +42,7 @@ COPY --chown=node:node . .
 
 
 
-CMD ["npm", "run", "start:dev"]
+CMD ["yarn", "run", "start:dev"]
 
 ###################
 # BUILD FOR PRODUCTION
@@ -56,11 +56,12 @@ WORKDIR /home/node/app
 COPY --chown=node:node package.json package-lock.json ./
 
 # Keep dev dependencies to build the application
-RUN npm ci 
+RUN yarn install --frozen-lockfile
+
 
 COPY --chown=node:node . .
 
-RUN npm run build
+RUN yarn build
 
 ###################
 # RUNTIME (PRODUCTION & DEV)
@@ -69,12 +70,7 @@ RUN npm run build
 FROM node:${NODE_VERSION} AS runtime
 
 ARG APP_DIR=/home/node/app
-ARG UID
-ARG GID
 
-# change node uid and gid to the defined one
-RUN groupmod -g ${GID} node && \
-    usermod -u ${UID} -g ${GID} node
 
 USER node
 WORKDIR ${APP_DIR}

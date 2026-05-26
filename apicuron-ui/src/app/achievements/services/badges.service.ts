@@ -12,16 +12,16 @@ import { environment } from "src/environments/environment";
 
 @Injectable()
 export class BadgesService {
-  constructor(protected http: HttpClient) {}
+  constructor(protected http: HttpClient) { }
 
   wsUrl = environment.ws + "/achievements";
 
   getBadges(params: AchievementFilter): Observable<Paginated<Badge>> {
-    const url = new URL(this.wsUrl + "/badges");
+    const url = this.wsUrl + "/badges";
 
     const httpParams = new HttpParams({ fromObject: params.serialize() });
     return this.http
-      .get(url.href, {
+      .get(url, {
         headers: {
           version: "2",
         },

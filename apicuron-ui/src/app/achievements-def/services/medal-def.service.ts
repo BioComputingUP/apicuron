@@ -14,8 +14,8 @@ import { Medal } from "src/app/models/medal.model";
 
 @Injectable()
 export class MedalDefService {
-  constructor(protected http: HttpClient) {}
-  url: string = new URL("achievements-def/medals/", environment.ws + "/").href;
+  constructor(protected http: HttpClient) { }
+  url: string = `${environment.ws}/achievements-def/medals/`;
 
   getMedalDefs(
     medalDefFilter: MedalDefFilter

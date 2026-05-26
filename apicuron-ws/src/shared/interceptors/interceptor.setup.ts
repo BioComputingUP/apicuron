@@ -6,7 +6,6 @@ import {
 import { APP_INTERCEPTOR, Reflector } from '@nestjs/core';
 import { TransformInterceptor } from '../transformer/transform.interceptor';
 import { StorageReferenceInterceptor } from './storage-reference.interceptor';
-import { tap } from 'rxjs';
 
 export function getGlobalInterceptorChain(): Provider<NestInterceptor>[] {
 	return [

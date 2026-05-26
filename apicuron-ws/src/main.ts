@@ -1,18 +1,15 @@
-import { BaseExceptionFilter, NestFactory } from '@nestjs/core';
+import './plugins/sentry';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import {
-	ClassSerializerInterceptor,
-	Logger,
-	ValidationPipe,
-	VersioningType,
-} from '@nestjs/common';
+import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { useContainer } from 'class-validator';
 import { setupSwagger } from 'src/plugins/swagger/setup';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
-import { setupSentry } from 'src/plugins/sentry';
+import { setupExpressErrorHandler } from '@sentry/node';
+// import { SentryGlobalFilter } from '@sentry/nestjs/setup';
 
 async function bootstrap() {
 	// App creation
@@ -23,12 +20,11 @@ async function bootstrap() {
 	const configService: ConfigService = app.get(ConfigService);
 
 	// retrieving port, host and other configurations
-	const port = configService.get('PORT');
-	const host = configService.get('HOST');
-	const envConfig = configService.get<string>('environment');
+	const port = configService.getOrThrow<number>('PORT');
+	const host = configService.getOrThrow<string>('HOST');
+	const envConfig = configService.getOrThrow<string>('environment');
 
 	// setup sentry
-	setupSentry(app, appLogger, configService);
 
 	// class-validator setup
 	useContainer(app.select(AppModule), { fallbackOnErrors: true });
@@ -36,7 +32,8 @@ async function bootstrap() {
 	// set the global transform pipe
 	// const transformer = app.get(TransformInterceptor);
 	// app.useGlobalInterceptors(transformer);
-	// app.useGlobalFilters(new BaseExceptionFilter());
+	const expressApp = app.getHttpAdapter().getInstance();
+	setupExpressErrorHandler(expressApp);
 
 	// Load global interceptors
 
@@ -44,7 +41,7 @@ async function bootstrap() {
 	app.use(cookieParser());
 
 	// swagger UI setup
-	setupSwagger(app, configService.get<string>('API_DOCS_PREFIX'));
+	setupSwagger(app, configService.getOrThrow<string>('API_DOCS_PREFIX'));
 
 	// setup basic validation Pipes
 	app.useGlobalPipes(
@@ -79,7 +76,10 @@ async function bootstrap() {
 	app.enableShutdownHooks();
 
 	// starting to listen to requests
+	// await app.listen(port, host);
 	await app.listen(port, host);
 }
 
-bootstrap();
+if (require.main === module) {
+	void bootstrap();
+}

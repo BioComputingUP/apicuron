@@ -6,24 +6,15 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from "@angular/forms";
-import { AngularSvgIconModule } from "angular-svg-icon";
 import { ToastrModule, ToastrService } from "ngx-toastr";
 import { CalendarModule } from "primeng/calendar";
 import { createDestroy$ } from "projects/apicuron-util/src/lib/util/destroy-observable";
-import {
-  BehaviorSubject,
-  filter,
-  map,
-  Observable,
-  startWith,
-  switchMap,
-} from "rxjs";
+import { filter, map, Observable, startWith, switchMap } from "rxjs";
 import { MedalDefService } from "src/app/achievements-def/services/medal-def.service";
 import { Paginated } from "src/app/interfaces/paginated";
 import { MedalDef } from "src/app/models/medal-def.model";
 import { Medal } from "src/app/models/medal.model";
 import { Term } from "src/app/models/term.model";
-import { environment } from "src/environments/environment.dev";
 import { SelectActivitiesComponent } from "../select-activities/select-activities.component";
 import { UserMedalCardComponent } from "../user-medal-card/user-medal-card.component";
 
@@ -47,7 +38,7 @@ export class MedalFormComponent implements OnInit {
   constructor(
     protected formBuilder: FormBuilder,
     protected toastr: ToastrService,
-    protected medalDefService: MedalDefService
+    protected medalDefService: MedalDefService,
   ) {}
 
   destroy$ = createDestroy$();
@@ -61,14 +52,14 @@ export class MedalFormComponent implements OnInit {
     if (this.type == "create") {
       this.form = MedalDef.buildCreateMedalForm(
         this.formBuilder,
-        this.medal.resource_id
+        this.medal.resource_id,
       );
     }
 
     const formUpdated$ = this.form.valueChanges.pipe(
       startWith(this.form.value),
       map(() => this.form.value),
-      filter(() => this.form.valid)
+      filter(() => this.form.valid),
     );
 
     this.medalPreview$ = formUpdated$.pipe(
@@ -83,11 +74,9 @@ export class MedalFormComponent implements OnInit {
       }),
       switchMap(({ medalDef, skip, limit }) => {
         return this.medalDefService.loadMedalDefPreview(medalDef, skip, limit);
-      })
+      }),
     );
   }
-
-  orcid_main_url = environment.orcid_main_url;
 
   @Input()
   type: "create" | "update" = "create";

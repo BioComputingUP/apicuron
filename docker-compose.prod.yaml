@@ -2,24 +2,44 @@ services:
   apicuron-webserver:
     container_name: apicuron-webserver
     image: registry.biocomputingup.it/apicuron-ws:prod
-    environment: # !! This one overrides any variables set inside env files listed in attribute `env_file` below
-      - NODE_ENV=production
+    # environment: # !! This one overrides any variables set inside env files listed in attribute `env_file` below
+    #   - DATABASE_HOST=mongodb
+    #   - DATABASE=apicuron
+    #   - DB_PORT=27017
+    #   - NODE_ENV=production
+    env_file:
+      - .env.production
     # env_file: # Add this if you want to override configuration
     #   - prod.env
     restart: "unless-stopped"
-      
+    depends_on:
+      - mongodb
 
   
   apicuron-proxy-ui:
-    image: registry.biocomputingup.it/apicuron-ui:dev    
+    image: registry.biocomputingup.it/apicuron-ui:prod    
     container_name: apicuron-proxy-ui
-    environment:
-      - NODE_ENV=production
-    volumes:
-      - ./prod.nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
       - "${PORT:-8089}:8080"
     depends_on:
       - apicuron-webserver
-        
+
+  # Database service
+  mongodb:
+    image: registry.biocomputingup.it/apicuron-db:prod
+    container_name: apicuron-db
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:/data/db
+    env_file:
+      - .env.production
+volumes:
+  mongo-data:
+    name: apicuron-mongo-data
+  
+  
+  
+
 

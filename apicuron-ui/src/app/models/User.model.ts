@@ -114,7 +114,7 @@ export class UpdateUser implements Deserializable, Serializable {
     this.acceptsEmails = input.acceptsEmails ?? null;
     return this;
   }
-  emails?: Array<EmailInput>;
+  emails?: Array<EmailInput> = [];
   privacy?: PrivacyType;
   orcid_id: string;
   isNewLogin?: boolean;

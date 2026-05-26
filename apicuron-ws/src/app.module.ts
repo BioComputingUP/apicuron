@@ -24,7 +24,6 @@ import { OrcidClientModuleOptions } from './orcid/orcid-client/interfaces/orcid.
 import { OrcidClientModule } from './orcid/orcid-client/orcid-client.module';
 import { OrcidSubmissionModule } from './orcid/orcid-submission/orcid-submission.module';
 import { OrcidSyncModule } from './orcid/orcid-sync/orcid-sync.module';
-import { loadSentryModule } from './plugins/sentry';
 import { ReportsModule } from './reports/reports.module';
 import { ResourceManagerModule } from './resource-manager/resource-manager.module';
 import { ResourceStatsModule } from './resource-stats/resource-stats.module';
@@ -35,7 +34,7 @@ import { getGlobalInterceptorChain } from './shared/interceptors';
 import {
 	EntriesExistRule,
 	EntryExistsRule,
-	UniqueRule
+	UniqueRule,
 } from './shared/validators';
 import { StatisticsModule } from './statistics/statistics.module';
 import { ServeFilesController } from './storage/serve-files.controller';
@@ -43,10 +42,12 @@ import { StorageModuleOptions } from './storage/storage.config';
 import { SubmitReportModule } from './submit-reports/submit-reports.module';
 import { TermsModule } from './terms/terms.module';
 import { WeeklyStatisticsModule } from './weekly-statistics/weekly-statistics.module';
+import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
+import { APP_FILTER } from '@nestjs/core';
 @Module({
 	imports: [
 		// Sentry Setup
-		...loadSentryModule(),
+		SentryModule.forRoot(),
 		EventEmitterModule.forRoot({
 			// wildcard: true,
 			global: true,
@@ -120,6 +121,10 @@ import { WeeklyStatisticsModule } from './weekly-statistics/weekly-statistics.mo
 	],
 	controllers: [AppController, ServeFilesController],
 	providers: [
+		{
+			provide: APP_FILTER,
+			useClass: SentryGlobalFilter,
+		},
 		AppService,
 		UniqueRule,
 		EntryExistsRule,

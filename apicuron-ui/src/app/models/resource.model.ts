@@ -11,6 +11,7 @@ import {
 } from "src/app/interfaces/deserializable.model";
 import { environment } from "src/environments/environment";
 import { ResourceCategory } from "./types/enums";
+
 export class ResourceStats implements Deserializable {
   contributionCount: any;
   uniqueContributors: any;
@@ -79,7 +80,7 @@ export class Resource implements Deserializable, Serializable {
       if (input.logo.startsWith("assets")) {
         this.logo = new URL(input.logo, environment.host + "/");
       } else {
-        this.logo = new URL(input.logo, environment.ws);
+        this.logo = input.logo;
       }
     }
 
