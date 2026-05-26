@@ -1,4 +1,5 @@
-FROM alpine:latest
-COPY ./init /init-files
-# Copy files to the shared volume on startup
-CMD cp -a /init-files/ /docker-entrypoint-initdb.d/
+FROM mongo:7
+
+COPY ./init /docker-entrypoint-initdb.d/
+
+COPY mongod.conf /etc/mongod.conf

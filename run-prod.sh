@@ -1,25 +1,29 @@
 #!/bin/bash
 REGISTRY="registry.biocomputingup.it"
-COMPOSE_FILE="docker-compose.prod.yaml"
-DIRECTORY="/home/biocomp/apicuron"
+CONTEXT="ermes2"
 
-update_repo() {
-  echo "Pulling repository..."
-  git pull
-  if [ $? -ne 0 ]; then
-    echo "Git pull failed. Aborting deployment."
-    exit 1
-  fi
-  echo "Repository updated successfully."
-}
+
+
+if [[ "$1" != "dev" && "$1" != "prod" ]]; then
+  echo "Expected arg1 target to be (prod/dev) to select deployment target"
+  exit 1
+else
+  ENV=$1
+fi
 
 # Get current commit hash or use 'latest' tag
-if [ -z "$1" ]; then
-  echo "No commit hash provided, using 'latest' tag"
+if [ -z "$2" ]; then
+  echo "No commit hash provided in arg2, using 'latest' tag"
   CURRENT_HASH="latest"
 else
-  CURRENT_HASH="$1"
+  CURRENT_HASH="$2"
 fi
+
+
+## SET Varibles
+
+project_name="apicuron-$ENV"
+COMPOSE_FILE="docker-compose.$ENV.yaml"
 
 fail() {
   echo "Failed to $1. Aborting deployment."
@@ -27,27 +31,24 @@ fail() {
 }
 
 pull_images() {
-  echo "Pulling images from registry with tag: $CURRENT_HASH"
-  CURRENT_HASH=$CURRENT_HASH docker compose -f $COMPOSE_FILE pull || fail 'pull images'
+  echo "Pulling images from registry with $COMPOSE_FILE with tag $CURRENT_HASH on $CONTEXT"
+  CURRENT_HASH=$CURRENT_HASH docker -c $CONTEXT compose -f $COMPOSE_FILE -p $project_name pull || fail 'pull images'
 }
 
-recreate_containers() {
+restart_containers() {
   echo "Starting containers with tag: $CURRENT_HASH"
-  CURRENT_HASH=$CURRENT_HASH docker compose -f $COMPOSE_FILE up -d --force-recreate || fail 'recreate containers'
+  CURRENT_HASH=$CURRENT_HASH docker -c $CONTEXT compose -f $COMPOSE_FILE -p $project_name up -d --force-recreate --pull always || fail 'recreate containers'
 }
 
 follow_logs() {
   echo "Following container logs (Ctrl+C to exit)..."
-  CURRENT_HASH=$CURRENT_HASH docker compose -f $COMPOSE_FILE logs -f || fail 'follow logs'
+  CURRENT_HASH=$CURRENT_HASH docker -c $CONTEXT compose -f $COMPOSE_FILE -p $project_name logs -f || fail 'follow logs'
 }
 
-# Enter the directory
-cd $DIRECTORY || fail "cd to $DIRECTORY"
 
 # Execute steps
-update_repo
 pull_images
-recreate_containers
+restart_containers
 
 echo "Production run completed successfully!"
 

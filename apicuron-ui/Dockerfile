@@ -59,6 +59,7 @@ CMD ["nginx", "-g", "daemon off;"]
 FROM nginx:${NGINX_VERSION} AS dev
 
 COPY --chown=nginx:nginx --from=build-dev /app/dist/apicuron-ui /usr/share/nginx/html
+COPY --chown=nginx:nginx prod.nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
