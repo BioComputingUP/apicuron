@@ -77,6 +77,7 @@ WORKDIR ${APP_DIR}
 
 COPY --chown=node:node --from=build /home/node/app/node_modules ${APP_DIR}/node_modules
 COPY --chown=node:node --from=build /home/node/app/dist ${APP_DIR}/dist
+COPY --chown=node:node views/ /home/node/app/views
 
 
 EXPOSE 3000
