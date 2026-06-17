@@ -9,7 +9,6 @@ import {
   Deserializable,
   Serializable,
 } from "src/app/interfaces/deserializable.model";
-import { environment } from "src/environments/environment";
 import { ResourceCategory } from "./types/enums";
 
 export class ResourceStats implements Deserializable {
@@ -65,7 +64,7 @@ export class Resource implements Deserializable, Serializable {
     this.color = input.color;
     this.joined_date = new Date(input.joined_date);
     this.leaderboard_preferences = new LeaderboardPreferences().deserialize(
-      input.leaderboard_preferences || {}
+      input.leaderboard_preferences || {},
     );
     if (input.stats) {
       this.stats = new ResourceStats().deserialize(input.stats);
@@ -78,7 +77,7 @@ export class Resource implements Deserializable, Serializable {
 
     if (input.logo && typeof input.logo == "string") {
       if (input.logo.startsWith("assets")) {
-        this.logo = new URL(input.logo, environment.host + "/");
+        this.logo = new URL(input.logo, location.origin + "/");
       } else {
         this.logo = input.logo;
       }

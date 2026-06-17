@@ -2,24 +2,26 @@ import { Injectable } from "@angular/core";
 import { BadgeDefFilter } from "../interfaces/badge-def.filter";
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
-import { Observable, of, throwError } from "rxjs";
+import { Observable, throwError } from "rxjs";
 import { Paginated } from "../../interfaces/paginated";
 import {
   BadgeDef,
   DeleteBadgeDef,
   UpdateBadgeDef,
 } from "../../models/badge-def.model";
-import { Badge } from "../../models/badge.model";
 import { catchError, map, pluck, tap } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
 
 @Injectable()
 export class BadgeDefService {
-  constructor(protected http: HttpClient, protected toastr: ToastrService) { }
-  url: string = `${environment.ws}/achievements-def/badges/`
+  constructor(
+    protected http: HttpClient,
+    protected toastr: ToastrService,
+  ) {}
+  url: string = `${environment.ws}/achievements-def/badges/`;
 
   getBadgeDefs(
-    badgeDefFilter: BadgeDefFilter
+    badgeDefFilter: BadgeDefFilter,
   ): Observable<Paginated<BadgeDef>> {
     return this.http.get<Paginated<BadgeDef>>(this.url, {
       headers: {
@@ -41,7 +43,7 @@ export class BadgeDefService {
           if (error instanceof HttpErrorResponse) {
             this.toastr.error(
               `${error.error.message}`,
-              `Error (${error.status}) occured while creating badge`
+              `Error (${error.status}) occured while creating badge`,
             );
           }
           return throwError(error);
@@ -50,15 +52,15 @@ export class BadgeDefService {
         tap((badgeDef: BadgeDef) => {
           this.toastr.success(
             `Badge ${badgeDef.name} sucessfully Created`,
-            "Badge Creation Sucessfull"
+            "Badge Creation Sucessfull",
           );
-        })
+        }),
       );
   }
 
   updateBadgeDef(updateBadgeDef: UpdateBadgeDef): Observable<BadgeDef> {
     return this.http
-      .put(new URL("edit/", this.url).href, updateBadgeDef, {
+      .put(`${this.url}/edit`, updateBadgeDef, {
         headers: {
           version: "2",
         },
@@ -68,7 +70,7 @@ export class BadgeDefService {
           if (error instanceof HttpErrorResponse) {
             this.toastr.error(
               `${error.error.message}`,
-              `Error (${error.status}) occured while updating badge ${updateBadgeDef.displayedName}`
+              `Error (${error.status}) occured while updating badge ${updateBadgeDef.displayedName}`,
             );
           }
           return throwError(error);
@@ -78,16 +80,15 @@ export class BadgeDefService {
         tap((badgeDef: BadgeDef) => {
           this.toastr.success(
             `Badge (${badgeDef.displayedName}) sucessfully Updated`,
-            "Badge Update Sucessfull"
+            "Badge Update Sucessfull",
           );
-        })
+        }),
       );
   }
 
-  deleteBadge({ name, resource_id }: DeleteBadgeDef) {
-    const link = new URL(`${name}/partner-resource/${resource_id}`, this.url)
-      .href;
-    return this.http.delete(link, {
+  deleteBadge({ name: badgeName, resource_id }: DeleteBadgeDef) {
+    const href = `${this.url}/${badgeName}/partner-resource/${resource_id}`;
+    return this.http.delete(href, {
       headers: {
         version: "2",
       },

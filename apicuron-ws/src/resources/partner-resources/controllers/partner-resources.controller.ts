@@ -16,12 +16,11 @@ import {
 } from '@nestjs/common';
 import { SvgSanitationValidationPipe } from '../../../shared/pipes/svg-sanitation.pipe';
 
-import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
-import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
 	ApiBody,
 	ApiConsumes,
+	// ApiConsumes,
 	ApiHeader,
 	ApiNotFoundResponse,
 	ApiOkResponse,

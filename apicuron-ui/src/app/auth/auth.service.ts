@@ -66,7 +66,10 @@ export class AuthService implements OnDestroy {
   orcidPopup: Window;
   destroy$ = new Subject<boolean>();
 
-  constructor(public router: Router, private http: HttpClient) {
+  constructor(
+    public router: Router,
+    private http: HttpClient,
+  ) {
     this.loadTokens();
 
     // Header are built using latest orcid token and jwt
@@ -93,7 +96,7 @@ export class AuthService implements OnDestroy {
           return header[0] === next[index][0] && header[1] === next[index][1];
         });
       }),
-      shareReplay(1)
+      shareReplay(1),
     );
 
     // Anytime the headers change, recheck the login state
@@ -102,7 +105,7 @@ export class AuthService implements OnDestroy {
         return headers.length > 0;
       }),
 
-      shareReplay(1)
+      shareReplay(1),
     );
     // this.loggedIn$ = combineLatest([this.orcidToken$, this.jwtToken$]).pipe(
     //   map(([orcid, jwt]: [string, string]) => {
@@ -123,15 +126,15 @@ export class AuthService implements OnDestroy {
                 ..._.fromPairs(headers),
               },
             });
-          })
-        )
+          }),
+        ),
       ),
       shareReplay(1),
       map((user: User) => new User().deserialize(user)),
       tap((user: User) => {
         // whenever the user changes, update the logged in orcid
         this.logged_in_orcid.next(user.orcid_id);
-      })
+      }),
     );
     // Whenever the user changes, update the logged in orcid
     const windowMessageEventListener = (event: MessageEvent) => {
@@ -189,8 +192,8 @@ export class AuthService implements OnDestroy {
         if (token) {
           return of(token);
         } else {
-          const url = new URL("auth/token", environment.ws + "/");
-          const request: Observable<Object> = this.http.get(url.href);
+          const href = `${environment.ws}/auth/token`;
+          const request: Observable<Object> = this.http.get(href);
           return request;
         }
       }),
@@ -198,7 +201,7 @@ export class AuthService implements OnDestroy {
       map((token: string) => {
         const [prefix, key] = token.split(" ");
         return key;
-      })
+      }),
     );
   }
 
@@ -250,7 +253,7 @@ export class AuthService implements OnDestroy {
    * @returns An observable emitting `true` if the requested ORCID matches the logged-in user's ORCID, otherwise `false`.
    */
   public isOwnProfile(
-    requestedOrcid$: Observable<string>
+    requestedOrcid$: Observable<string>,
   ): Observable<boolean> {
     return combineLatest([requestedOrcid$, this.loggedInOrcid$]).pipe(
       map(([routeOrcid, loggedInOrcid]) => {
@@ -259,7 +262,7 @@ export class AuthService implements OnDestroy {
         }
         return routeOrcid === loggedInOrcid;
       }),
-      shareReplay(1)
+      shareReplay(1),
     );
   }
 }

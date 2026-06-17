@@ -6,9 +6,12 @@ import {
 	PartnerResource,
 	PartnerResourceDocument,
 } from '../../core/schemas/resource/partner-resource.schema';
+import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
 	const app = await NestFactory.createApplicationContext(AppModule);
+
+	const logger = new Logger('AddResourceIDToLeague');
 
 	const resourceModel: Model<PartnerResourceDocument> = app.get(
 		getModelToken(PartnerResource.name),
@@ -28,7 +31,7 @@ async function bootstrap() {
 		}
 
 		const save = resource.save().then(() => {
-			console.log(`Updated resource ${resource.resource_id}`);
+			logger.log(`Updated resource ${resource.resource_id}`);
 		});
 		saves$.push(save);
 	}

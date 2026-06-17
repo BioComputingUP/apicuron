@@ -14,11 +14,11 @@ import { Medal } from "src/app/models/medal.model";
 
 @Injectable()
 export class MedalDefService {
-  constructor(protected http: HttpClient) { }
+  constructor(protected http: HttpClient) {}
   url: string = `${environment.ws}/achievements-def/medals/`;
 
   getMedalDefs(
-    medalDefFilter: MedalDefFilter
+    medalDefFilter: MedalDefFilter,
   ): Observable<Paginated<MedalDef>> {
     return this.http
       .get<Paginated<MedalDef>>(this.url, {
@@ -30,10 +30,10 @@ export class MedalDefService {
       .pipe(
         map((paginatedMedals: Paginated<MedalDef>) => {
           paginatedMedals.data = paginatedMedals.data.map((medal) =>
-            new MedalDef().deserialize(medal)
+            new MedalDef().deserialize(medal),
           );
           return paginatedMedals;
-        })
+        }),
       );
   }
 
@@ -46,7 +46,7 @@ export class MedalDefService {
   }
 
   updateMedalDef(updateMedal: UpdateMedalDef) {
-    return this.http.put(new URL("edit/", this.url).href, updateMedal, {
+    return this.http.put(`${this.url}/edit/`, updateMedal, {
       headers: {
         version: "2",
       },
@@ -54,8 +54,7 @@ export class MedalDefService {
   }
 
   deleteMedal({ name, resource_id }: DeleteMedalDef) {
-    const link = new URL(`${name}/partner-resource/${resource_id}`, this.url)
-      .href;
+    const link = `${this.url}/${name}/partner-resource/${resource_id}`;
     return this.http.delete(link, {
       headers: {
         version: "2",
@@ -66,11 +65,11 @@ export class MedalDefService {
   loadMedalDefPreview(
     medalDef: MedalDef,
     skip: number,
-    limit: number
+    limit: number,
   ): Observable<Paginated<Medal>> {
     return this.http
       .post<Paginated<Medal>>(
-        new URL("preview", this.url).href,
+        `${this.url}/preview`,
         {
           medalDef: medalDef.serialize(),
           skip,
@@ -80,15 +79,15 @@ export class MedalDefService {
           headers: {
             version: "2",
           },
-        }
+        },
       )
       .pipe(
         map((paginatedMedals: Paginated<Medal>) => {
           paginatedMedals.data = paginatedMedals.data.map((medal) =>
-            new Medal().deserialize(medal)
+            new Medal().deserialize(medal),
           );
           return paginatedMedals;
-        })
+        }),
       );
   }
 }
