@@ -4,7 +4,6 @@ import { ActivatedRoute } from "@angular/router";
 import {
   catchError,
   map,
-  shareReplay,
   startWith,
   take,
   takeUntil,
@@ -44,7 +43,7 @@ export class GroupsService implements OnDestroy {
     protected route: ActivatedRoute,
     protected dialog: Dialog,
     protected confirmationService: ConfirmationService,
-    protected toastr: ToastrService
+    protected toastr: ToastrService,
   ) {}
 
   resourceGroups$: Observable<{ data: ResourceGroup[] }>;
@@ -65,10 +64,15 @@ export class GroupsService implements OnDestroy {
         },
       })
       .pipe(
-        pluck("data"),
+        map((response): any[] => {
+          if ("data" in response && Array.isArray(response.data)) {
+            return response.data;
+          }
+          throw new Error(`invalid Data response`);
+        }),
         map((data: any[]) =>
-          data.map((data: any) => new ResourceGroup().deserialize(data))
-        )
+          data.map((data: any) => new ResourceGroup().deserialize(data)),
+        ),
       );
   }
 
@@ -76,7 +80,7 @@ export class GroupsService implements OnDestroy {
     this.resource_id$ = resource_id$;
     const resourceGroupList$ = this.resource_id$.pipe(
       switchMap((resource_id: string) => this.fetchResourceGroups(resource_id)),
-      map((groups: ResourceGroup[]) => ({ data: groups }))
+      map((groups: ResourceGroup[]) => ({ data: groups })),
     );
 
     this.resourceGroups$ = combineLatest([
@@ -86,17 +90,17 @@ export class GroupsService implements OnDestroy {
       map(
         ([resourceGroupList, groupUpdates]: [
           { data: ResourceGroup[] },
-          GroupOperation
+          GroupOperation,
         ]) => {
           return this.loadGroupsList(resourceGroupList, groupUpdates);
-        }
-      )
+        },
+      ),
     );
   }
 
   loadGroupsList(
     resourceGroupList: { data: ResourceGroup[] },
-    groupUpdates: GroupOperation
+    groupUpdates: GroupOperation,
   ): { data: ResourceGroup[] } {
     if (!!groupUpdates) {
       switch (groupUpdates.operation) {
@@ -108,14 +112,14 @@ export class GroupsService implements OnDestroy {
           break;
         case "delete":
           resourceGroupList.data = resourceGroupList.data.filter(
-            (group) => group.name != groupUpdates.group.name
+            (group) => group.name != groupUpdates.group.name,
           );
           break;
         case "update":
           resourceGroupList.data = resourceGroupList.data.map((group) =>
             // if the group matches the updated group we replace the value with the new one.
             // otherwise we keep the old group
-            group.name == groupUpdates.group.name ? groupUpdates.group : group
+            group.name == groupUpdates.group.name ? groupUpdates.group : group,
           );
           break;
       }
@@ -142,7 +146,7 @@ export class GroupsService implements OnDestroy {
           this.groupUpdates$.next({ group, operation: "create" });
           return group;
         }),
-        takeUntil(merge(this.destroy$, component.destroy$))
+        takeUntil(merge(this.destroy$, component.destroy$)),
       )
       .subscribe(() => {});
   }
@@ -168,7 +172,7 @@ export class GroupsService implements OnDestroy {
           this.groupUpdates$.next({ group: data, operation: "update" });
           return data;
         }),
-        takeUntil(merge(this.destroy$, component.destroy$))
+        takeUntil(merge(this.destroy$, component.destroy$)),
       )
       .subscribe(() => {});
   }
@@ -195,9 +199,9 @@ export class GroupsService implements OnDestroy {
         tap((group: ResourceGroup) => {
           this.toastr.success(
             `Group ${group.displayedName} is successfully created`,
-            `Group Created`
+            `Group Created`,
           );
-        })
+        }),
       );
   }
 
@@ -213,7 +217,7 @@ export class GroupsService implements OnDestroy {
             league: group.name,
           },
         });
-      })
+      }),
     );
   }
 
@@ -229,7 +233,7 @@ export class GroupsService implements OnDestroy {
             league: group.name,
           },
         });
-      })
+      }),
     );
   }
 
@@ -263,9 +267,9 @@ export class GroupsService implements OnDestroy {
               const errorMessage =
                 error.error?.message || error.message || "Unknown error";
               return of([null, errorMessage]);
-            })
+            }),
           );
-      })
+      }),
     );
     return new Promise((resolve, reject) => {
       deletion$.subscribe(
@@ -277,7 +281,7 @@ export class GroupsService implements OnDestroy {
           }
           if (response["data"]) {
             this.toastr.success(
-              `Group ${group.displayedName} is successfully deleted`
+              `Group ${group.displayedName} is successfully deleted`,
             );
             this.groupUpdates$.next({ group, operation: "delete" });
             resolve(response);
@@ -286,15 +290,15 @@ export class GroupsService implements OnDestroy {
         (error) => {
           this.toastr.error(`${error}`, `Group Delete Error`);
           reject(error);
-        }
+        },
       );
     });
   }
 
   updateGroup(group: ResourceGroup): Observable<ResourceGroup> {
-    const updateUrl = new URL("leagues", environment.ws + "/");
+    const updateUrl = `${environment.ws}/leagues`;
     return this.http
-      .put(updateUrl.href, group.serialize(), {
+      .put(updateUrl, group.serialize(), {
         headers: {
           version: "2",
         },
@@ -308,9 +312,9 @@ export class GroupsService implements OnDestroy {
         tap((group: ResourceGroup) => {
           this.toastr.success(
             `Group ${group.displayedName} is successfully updated`,
-            `Group Updated`
+            `Group Updated`,
           );
-        })
+        }),
       );
   }
 
