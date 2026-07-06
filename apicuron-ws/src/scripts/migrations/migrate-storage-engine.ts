@@ -1,5 +1,5 @@
 import { Engine, LocalFsEngine } from "@biocomputingup/nest-storage-manager";
-import { StorageService } from "@biocomputingup/nest-storage-manager/dist/services/storage.service";
+import { StorageService } from "@biocomputingup/nest-storage-manager";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { getModelToken } from "@nestjs/mongoose";

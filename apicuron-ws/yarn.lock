@@ -1337,12 +1337,11 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@biocomputingup/nest-storage-manager@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@biocomputingup/nest-storage-manager/-/nest-storage-manager-1.1.1.tgz#6025fbe0c11243188c3b98acba2d34bdb1cde339"
-  integrity sha512-4fJDDYbvo/PLEi1wkDP6g/IQFgSLbGwg9xe5qTPUslLLtoDKNPm0ha03z51mKoXkEXx1mt1YsKkpSr+KwWeWlQ==
+"@biocomputingup/nest-storage-manager@1.1.3":
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@biocomputingup/nest-storage-manager/-/nest-storage-manager-1.1.3.tgz#da8ac3642976d2f1e81f9ceba35e46478d55d26e"
+  integrity sha512-bkUyhvbg6c54eg4gLZNbdmSv+PuCFizQYpEQT0baERfZ0EIHkuJcAGC8Wbn6F7KT//cZdQK+B9PgHkO2UVYrpQ==
   dependencies:
-    "@aws-sdk/s3-request-presigner" "3.717.0"
     mime "1.6.0"
 
 "@borewit/text-codec@^0.2.1":
