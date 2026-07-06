@@ -1,4 +1,4 @@
-import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
+import { StorageService } from '@biocomputingup/nest-storage-manager';
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';

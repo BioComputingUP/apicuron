@@ -9,7 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { join } from 'path';
 // import { TransformerService } from '../../shared/transformer/transformer.service';
-import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
+import { StorageService } from '@biocomputingup/nest-storage-manager';
 import { UsersService } from '../../auth/users/services/users.service';
 import {
 	PartnerResource,

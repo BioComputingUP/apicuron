@@ -8,7 +8,7 @@ import {
 	AchievementDef,
 	AchievementDefModel,
 } from './core/schemas/achievements-def/achievement-def.schema';
-import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
+import { StorageService } from '@biocomputingup/nest-storage-manager';
 @Controller()
 export class AppController {
 	constructor(

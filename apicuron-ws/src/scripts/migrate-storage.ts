@@ -1,4 +1,4 @@
-import { StorageService } from "@biocomputingup/nest-storage-manager/dist/services/storage.service";
+import { StorageService } from "@biocomputingup/nest-storage-manager";
 import { NestFactory } from "@nestjs/core";
 import { getModelToken } from "@nestjs/mongoose";
 import { Model } from "mongoose";

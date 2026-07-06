@@ -1,4 +1,4 @@
-import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
+import { StorageService } from '@biocomputingup/nest-storage-manager';
 import {
 	Injectable,
 	NestInterceptor,

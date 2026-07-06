@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Res } from '@nestjs/common';
 import * as mime from 'mime';
 import { StorageType } from './storage.config';
-import { StorageService } from '@biocomputingup/nest-storage-manager/dist/services/storage.service';
+import { StorageService } from '@biocomputingup/nest-storage-manager';
 import { Response } from 'express';
 
 @Controller('storage')
