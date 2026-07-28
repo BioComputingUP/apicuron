@@ -44,6 +44,7 @@ import { TermsModule } from './terms/terms.module';
 import { WeeklyStatisticsModule } from './weekly-statistics/weekly-statistics.module';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
+import { SoftwareModule } from './software/software.module';
 @Module({
 	imports: [
 		// Sentry Setup
@@ -118,6 +119,7 @@ import { APP_FILTER } from '@nestjs/core';
 		OrcidFetcherModule,
 		OrcidSyncModule,
 		AdminModule,
+		SoftwareModule,
 	],
 	controllers: [AppController, ServeFilesController],
 	providers: [
