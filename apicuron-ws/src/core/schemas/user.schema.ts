@@ -228,7 +228,7 @@ export class User {
 	acceptsEmails?: boolean;
 
 	@Prop({ required: false, type: String })
-	github_login: string;
+	github_login?: string;
 
 	// THese methods are commented out because they are added to the schema decorator using the methods property.
 	// hasResourcePutCode(resource_id: string): boolean {
