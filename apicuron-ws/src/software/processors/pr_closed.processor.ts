@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PRPayloadDto } from '../dto/pr_payload.dto';
 import { GithubOrcidResolver } from '../helpers/github-orcid.resolver';
 import { Logger } from '@nestjs/common';
@@ -35,14 +35,21 @@ export class PrContributionProcessor {
 			try {
 				await this.submitReportsService.insertReport(contribution);
 			} catch (error) {
-				this.logger.error(
-					`Failed to submit report for github_login ${
-						c.github_login
-					} (ORCID: ${orcid}): ${
-						error instanceof Error ? error.message : String(error)
-					}`,
-					error instanceof Error ? error.stack : undefined,
-				);
+				if (error instanceof ConflictException) {
+					this.logger.warn(
+						`Attempt at duplicate report insertion. Skipping gracefully.`,
+					);
+				} else {
+					this.logger.error(
+						`Failed to submit report for github_login ${
+							c.github_login
+						} (ORCID: ${orcid}): ${
+							error instanceof Error ? error.message : String(error)
+						}`,
+						error instanceof Error ? error.stack : undefined,
+					);
+					throw error;
+				}
 			}
 		}
 	}

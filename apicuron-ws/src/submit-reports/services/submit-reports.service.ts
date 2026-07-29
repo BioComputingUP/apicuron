@@ -1,5 +1,6 @@
 import {
 	BadRequestException,
+	ConflictException,
 	Injectable,
 	InternalServerErrorException,
 	Logger,
@@ -136,7 +137,7 @@ export class SubmitReportService {
 						submittedReport.resource_id
 					} with the exact timestamp ${submittedReport.timestamp.toISOString()} already exists`,
 				);
-				throw new BadRequestException('Duplicate report submission attempt', {
+				throw new ConflictException('Duplicate report submission attempt', {
 					cause: error,
 					description: error.message,
 				});
