@@ -45,6 +45,7 @@ import { WeeklyStatisticsModule } from './weekly-statistics/weekly-statistics.mo
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
 import { SoftwareModule } from './software/software.module';
+import { PendingReportsModule } from './pending_reports/pending_reports.module';
 @Module({
 	imports: [
 		// Sentry Setup
@@ -120,6 +121,7 @@ import { SoftwareModule } from './software/software.module';
 		OrcidSyncModule,
 		AdminModule,
 		SoftwareModule,
+		PendingReportsModule,
 	],
 	controllers: [AppController, ServeFilesController],
 	providers: [
