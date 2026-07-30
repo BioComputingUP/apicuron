@@ -5,7 +5,7 @@ import {
 	Model,
 	ProjectionType,
 	QueryOptions,
-	Types
+	Types,
 } from 'mongoose';
 import { PrivacyType, ResourceCategories, ResourceCategory } from '../../enums';
 import { AchievementDef } from '../achievements-def/achievement-def.schema';
@@ -13,10 +13,8 @@ import {
 	LeaderboardSettings,
 	LeaderboardType,
 } from '../components/leaderboard-preferences.schema';
-import { GitRepository } from '../components/git-repository.schema';
 import { League, LeagueSchema } from '../league/league.schema';
 import { Term } from '../terms.schema';
-import { isCategory, requiresGithubRepo } from './resource-category.helpers';
 import { ResourceStats, ResourceStatsSchema } from './resource-stats.schema';
 
 type PartnerResourceDocumentOverride = {
@@ -32,7 +30,7 @@ export type PartnerResourceDocument = HydratedDocument<
 // this class defines a partnerResource that has been validated and has the ability to have Models, Badges and so on
 export type PartnerResourceModel = Model<
 	PartnerResource,
-	{},
+	Record<string, never>,
 	PartnerResourceDocumentOverride
 >;
 export type PartnerResourceFilter = FilterQuery<PartnerResource>;
@@ -70,7 +68,7 @@ export class PartnerResource {
 	@Prop({
 		required: true,
 		type: [LeagueSchema],
-		default: function (): League[] {
+		default: function (this: PartnerResource): League[] {
 			return [
 				{
 					name: 'default',
@@ -94,7 +92,7 @@ export class PartnerResource {
 	@Prop({
 		type: ResourceStatsSchema,
 		required: true,
-		default: (val) => ({ resource_id: val.resource_id }),
+		default: (val: PartnerResource) => ({ resource_id: val.resource_id }),
 	})
 	stats: ResourceStats;
 
@@ -128,12 +126,6 @@ export class PartnerResource {
 		enum: ResourceCategories,
 	})
 	category: ResourceCategory;
-
-	@Prop({
-		type: GitRepository,
-		required: requiresGithubRepo(),
-	})
-	repository: GitRepository;
 
 	created_at: Date;
 	updated_at: Date;
