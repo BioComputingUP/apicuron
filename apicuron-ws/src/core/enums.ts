@@ -1,6 +1,7 @@
 // Generics
 export type ObjectValues<T> = T[keyof T];
-export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType[number];
+export type ArrayElement<ArrayType extends readonly unknown[]> =
+	ArrayType[number];
 
 // Types
 export const PrivacyType = {
@@ -67,7 +68,7 @@ export type Month = ArrayElement<typeof months>;
 
 export const ResourceCategory = {
 	Database: 'Database',
-    KnowledgeBase: 'KnowledgeBase',
+	KnowledgeBase: 'KnowledgeBase',
 	Software: 'Software',
 	Training: 'Training',
 } as const;
@@ -75,3 +76,12 @@ export const ResourceCategory = {
 export const ResourceCategories = Object.values(ResourceCategory);
 
 export type ResourceCategory = ObjectValues<typeof ResourceCategory>;
+
+export const ContributorIndetifierType = {
+	GITHUB: 'GITHUB',
+	ORCID: 'ORCID',
+} as const;
+
+export type ContributorIndetifierType = ObjectValues<
+	typeof ContributorIndetifierType
+>;

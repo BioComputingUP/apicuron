@@ -29,7 +29,6 @@ import { Notification, NotificationSchema } from './notification.schema';
 import { Report, ReportSchema } from './reports.schema';
 import {
 	PartnerResource,
-	PartnerResourceSchema,
 	PartnerResourceSchemaFactory,
 } from './resource/partner-resource.schema';
 import { Resource, ResourceSchema } from './resource/resource.schema';
@@ -38,11 +37,15 @@ import {
 	SubmittedResourceSchema,
 } from './resource/submitted-resource.schema';
 import { Term, TermSchema } from './terms.schema';
-import { User, UserSchema, userCollectionSchemaFactory } from './user.schema';
+import { User, userCollectionSchemaFactory } from './user.schema';
 import {
 	CuratorRegistryEntry,
 	CuratorRegistryEntrySchema,
 } from './curator-registry/curator-entry.schema';
+import {
+	PendingReport,
+	PendingReportSchema,
+} from './pending reports/pending-report.schema';
 
 export const ModelFactories: AsyncModelFactory[] = [
 	{
@@ -122,5 +125,9 @@ export const ModelDefinitions: ModelDefinition[] = [
 	{
 		name: CuratorRegistryEntry.name,
 		schema: CuratorRegistryEntrySchema,
+	},
+	{
+		name: PendingReport.name,
+		schema: PendingReportSchema,
 	},
 ];

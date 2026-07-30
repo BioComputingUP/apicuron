@@ -27,7 +27,11 @@ export type StatisticsDocument = HydratedDocument<
 	Statistics,
 	StatisticsDocumentOverride
 >;
-export type StatisticsModel = Model<Statistics, {}, StatisticsDocumentOverride>;
+export type StatisticsModel = Model<
+	Statistics,
+	Record<string, never>,
+	StatisticsDocumentOverride
+>;
 export type StatisticsFilter = FilterQuery<Statistics>;
 export type StatisticsProjection = ProjectionType<Statistics>;
 export type StatisticsQueryOptions = QueryOptions<Statistics>;

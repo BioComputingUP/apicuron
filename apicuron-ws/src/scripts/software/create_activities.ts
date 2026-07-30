@@ -12,7 +12,7 @@ async function bootstrap() {
 	const resourceService = app.get(PartnerResourcesService);
 	const logger = new Logger('CreateActivitiesScript');
 
-	const resource_to_create_for = 'disprot';
+	const resource_to_create_for = 'apicuron';
 
 	const resource = await resourceService.get_resource(resource_to_create_for);
 
