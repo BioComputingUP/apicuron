@@ -20,6 +20,15 @@ import { Resource } from "../../models/resource.model";
 import { Term } from "../../models/term.model";
 import { TermsService } from "../../terms/services/terms.service";
 import { DatabasesService } from "../services/databases.service";
+
+interface StatCard extends Record<string, unknown> {
+  label: string;
+  valueKey: string;
+  iconSrc: string;
+  description: string;
+  show: boolean;
+}
+
 @Component({
   selector: "app-database-page",
   templateUrl: "./database-page.component.html",
@@ -38,6 +47,37 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
   firstMedals$: Observable<Paginated<MedalDef>>;
   lastMedals$: Observable<Paginated<MedalDef>>;
   leaderboardOptions$: Observable<LeaderboardOptions>;
+
+  statCards: StatCard[] = [
+    {
+      label: "Unique Contributors",
+      valueKey: "uniqueContributors",
+      iconSrc: "assets/svg/member.svg",
+      description: `The total number of distinct individuals who have contributed to this resource`,
+      show: true,
+    },
+    {
+      label: "Contribution Record",
+      valueKey: "contributionCount",
+      iconSrc: "assets/svg/contribution.svg",
+      description: "The overall count of contributions recorded for this resource in APICURON.",
+      show: true,
+    },
+    {
+      label: "First Contribution Date",
+      valueKey: "firstContributionDate",
+      iconSrc: "assets/svg/joined.svg",
+      description: "The date of the first contribution that was captured for this resource.",
+      show: true,
+    },
+    {
+      label: "Most Recent Contribution",
+      valueKey: "lastContributionDate",
+      iconSrc: "assets/svg/clock-plus.svg",
+      description: "The date of the most recent contribution recorded by this resource.",
+      show: true,
+    },
+  ];
 
   constructor(
     private databaseService: DatabasesService,
@@ -143,3 +183,4 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
     );
   }
 }
+

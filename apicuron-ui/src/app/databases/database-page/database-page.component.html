@@ -30,7 +30,6 @@
   >
     <div
       class="tw-w-full tw-flex tw-flex-col"
-      *ngIf="terms$ | async as terms"
       #mainPanel
     >
       <p
@@ -40,42 +39,21 @@
       </p>
       <div *ngIf="resource.stats">
         <span class="tw-font-bold">Database statistics</span>
-
-        <div class="tw-flex tw-py-2 tw-mb-2 tw-gap-1 tw-flex-row tw-flex-wrap">
-          <div class="tw-flex-grow">
-            <number-card
-              label="Unique Contributors"
-              [value]="resource?.stats?.uniqueContributors"
-              iconSrc="assets/svg/member.svg"
-            >
-            </number-card>
-          </div>
-
-          <div class="tw-flex-grow">
-            <number-card
-              label="Contributions committed"
-              [value]="resource?.stats?.contributionCount"
-              iconSrc="assets/svg/contribution.svg"
-            ></number-card>
-          </div>
-          <div class="tw-flex-grow">
-            <number-card
-              label="Joined APICURON"
-              [value]="
-                resource?.stats?.firstContributionDate | date : 'dd/MM/yyyy'
-              "
-              iconSrc="assets/svg/joined.svg"
-            ></number-card>
-          </div>
-          <div class="tw-flex-grow">
-            <number-card
-              label="Most Recent Contribution"
-              [value]="
-                resource?.stats?.lastContributionDate | date : 'dd/MM/yyyy'
-              "
-              iconSrc="assets/svg/clock-plus.svg"
-            ></number-card>
-          </div>
+        <div class="tw-flex tw-py-2 tw-mb-2 tw-gap-1 tw-flex-row md:tw-flex-nowrap tw-items-stretch tw-flex-wrap">
+          <ng-container *ngFor="let card of statCards">
+            <div *ngIf="card.show" class="md:tw-w-1/4 tw-w-1/2 tw-flex tw-flex-col">
+              <number-card
+                [label]="card.label"
+                [value]="
+                  card.valueKey.includes( 'Date')
+                    ? (resource?.stats?.[card.valueKey] | date: 'dd/MM/yyyy')
+                    : resource?.stats?.[card.valueKey]
+                "
+                [iconSrc]="card.iconSrc"
+                [description]="card.description"
+              ></number-card>
+            </div>
+          </ng-container>
         </div>
 
         <div *ngIf="leaderboardOptions$ | async as leaderboardOptions">
@@ -213,7 +191,6 @@
                 </div>
               </div>
 
-              <!-- expansion -->
               <div
                 #collapsedMedals
                 class="tw-grid tw-overflow-hidden tw-transform tw-transition-all tw-duration-300 tw-ease-in-out"
@@ -244,3 +221,4 @@
     </div>
   </div>
 </div>
+<!-- expansion -->

@@ -2,16 +2,16 @@ import { CommonModule } from "@angular/common";
 import { Component, Input } from "@angular/core";
 import { AngularSvgIconModule } from "angular-svg-icon";
 
-
 @Component({
-	standalone: true,
-	imports: [CommonModule, AngularSvgIconModule],
-	selector: 'number-card',
-	templateUrl: './number-card.component.html',
-	styleUrls: []
+  standalone: true,
+  imports: [CommonModule, AngularSvgIconModule],
+  selector: "number-card",
+  templateUrl: "./number-card.component.html",
+  styleUrls: ["./number-card.component.scss"],
 })
 export class NumberCardComponent {
-	@Input() label: string;
-	@Input() value: string | number;
-	@Input() iconSrc: string;
+  @Input() label: string;
+  @Input() value: string | number;
+  @Input() description: string;
+  @Input() iconSrc: string;
 }
