@@ -9,7 +9,8 @@ export function ResourceLogoValidationPipe(required = false) {
 		validators: [
 			new MaxFileSizeValidator({ maxSize: 1000000 }),
 			new FileTypeValidator({
-				fileType: /(^image)(\/)(jpeg|png|svg\+xml|webp)*/gm,
+				fileType: /^image\/(jpeg|png|svg\+xml|webp)$/i,
+				skipMagicNumbersValidation: true
 			}),
 		],
 		fileIsRequired: required,
