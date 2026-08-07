@@ -23,7 +23,7 @@ export class CuratorsPageComponent implements OnInit, OnDestroy {
   biocurators_list$: Observable<Array<any>>;
   biocurators_count$: Observable<number>;
 
-  query_params$ = new BehaviorSubject<{ page: number, query?: string }>({ page: 1 });
+  query_params$ = new BehaviorSubject<{ page: number; query?: string; resources?: string }>({ page: 1 });
   destroy$: Subject<Boolean> = new Subject();
 
   constructor(
@@ -44,23 +44,27 @@ export class CuratorsPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
-
+      let updated: any = { ...this.query_params$.value };
       if (!!params["search"]) {
-        this.query_params$.next({ ...this.query_params$.value, query: params['search'] });
+        updated.query = params['search'];
       }
+      if (!!params["resources"]) {
+        updated.resources = params['resources'];
+      }
+      this.query_params$.next(updated);
     });
 
     const users_list_response$ = this.query_params$.pipe(
       switchMap((query_params) => {
-        
-        const skip = ((query_params['page'] || 1) - 1) * this.limit
-
+        const skip = ((query_params['page'] || 1) - 1) * this.limit;
+        const { resources, page, ...rest } = query_params;
+        const paramsObject: any = { ...rest, skip, limit: this.limit };
+        if (resources) {
+          paramsObject['resources[]'] = resources;
+        }
         return this.curatorService.search_curators(
-          new HttpParams({
-            
-            fromObject: {...query_params, skip, limit: this.limit },
-          })
-        ).pipe(shareReplay())
+          new HttpParams({ fromObject: paramsObject })
+        ).pipe(shareReplay());
       }),
       shareReplay()
     );

@@ -56,6 +56,103 @@
           </ng-container>
         </div>
 
+        <!-- Resource Contributors Credit Section & Login CTA -->
+        <div class="tw-my-4 tw-flex tw-flex-col tw-gap-3">
+          <!-- Resource Contributors Credit Card -->
+          <div class="tw-bg-white tw-rounded-lg tw-border tw-border-gray-200 tw-p-4 tw-shadow-sm tw-flex tw-flex-col tw-gap-4">
+            <div class="tw-flex tw-flex-col sm:tw-flex-row tw-items-start sm:tw-items-center tw-justify-between tw-gap-4">
+              <div class="tw-flex tw-items-center tw-gap-3">
+                <div class="tw-p-2.5 tw-bg-purple-50 tw-rounded-lg tw-text-apicuron-purple-500">
+                  <img src="assets/svg/member.svg" class="tw-w-6 tw-h-6" alt="Contributors" />
+                </div>
+                <div>
+                  <div class="tw-flex tw-items-center tw-gap-2">
+                    <h4 class="tw-font-bold tw-text-gray-900 tw-text-base">Resource Contributors</h4>
+                    <span class="tw-bg-purple-100 tw-text-apicuron-purple-700 tw-text-xs tw-font-semibold tw-px-2.5 tw-py-0.5 tw-rounded-full">
+                      {{ resource.stats?.uniqueContributors || 0 }} total
+                    </span>
+                  </div>
+                  <p class="tw-text-xs tw-text-gray-600 tw-mt-0.5">
+                    Researchers and contributors whose work and non-traditional research outcomes have been reported and credited for {{ resource.resource_name }}.
+                  </p>
+                </div>
+              </div>
+
+              <!-- View All Contributors Link -->
+              <a
+                [routerLink]="['/curators']"
+                [queryParams]="{ resources: resource.resource_id }"
+                class="tw-shrink-0 tw-px-4 tw-py-2 tw-text-sm tw-font-bold tw-text-apicuron-purple-500 tw-bg-purple-50 hover:tw-bg-purple-100 tw-rounded-md tw-transition-colors tw-flex tw-items-center tw-gap-1.5 tw-border tw-border-purple-200"
+              >
+                <span>View all contributors</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-4 tw-w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            </div>
+
+            <!-- Top Contributors Preview List -->
+            <div *ngIf="topContributors$ | async as topContributors">
+              <div *ngIf="topContributors.length > 0; else noContributors" class="tw-flex tw-flex-wrap tw-gap-2.5 tw-pt-3 tw-border-t tw-border-gray-100">
+                <a
+                  *ngFor="let item of topContributors"
+                  [routerLink]="['/curators', item.user.orcid_id]"
+                  class="tw-flex tw-items-center tw-gap-2.5 tw-px-3 tw-py-1.5 tw-bg-gray-50 hover:tw-bg-purple-50 tw-border tw-border-gray-200 hover:tw-border-purple-300 tw-rounded-full tw-transition-all group"
+                  [title]="item.user.displayedName + ' (' + item.user.orcid_id + ')'"
+                >
+                  <img
+                    [src]="item.user.avatar"
+                    class="tw-w-7 tw-h-7 tw-rounded-full tw-bg-white tw-border tw-border-gray-200 tw-object-cover"
+                    alt="{{ item.user.displayedName }}"
+                  />
+                  <span class="tw-text-xs tw-font-semibold tw-text-gray-800 group-hover:tw-text-apicuron-purple-600">
+                    {{ item.user.displayedName }}
+                  </span>
+                  <span *ngIf="item.events_count" class="tw-text-[10px] tw-font-bold tw-text-gray-500 tw-bg-gray-200/70 group-hover:tw-bg-purple-100 group-hover:tw-text-purple-700 tw-px-2 tw-py-0.5 tw-rounded-full">
+                    {{ item.events_count }} contributions
+                  </span>
+                </a>
+              </div>
+              <ng-template #noContributors>
+                <div class="tw-pt-2 tw-border-t tw-border-gray-100">
+                  <p class="tw-text-xs tw-text-gray-500 tw-italic">No recorded contributors yet for this resource.</p>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+
+          <!-- Credit & Recognition Call-To-Action Banner (for non-logged in users) -->
+          <div
+            *ngIf="!(authService.loggedIn$ | async)"
+            class="tw-bg-gradient-to-r tw-from-gray-900 tw-to-slate-800 tw-rounded-xl tw-p-5 tw-text-white tw-shadow-md tw-flex tw-flex-col md:tw-flex-row tw-items-center tw-justify-between tw-gap-5 tw-border tw-border-gray-700"
+          >
+            <div class="tw-space-y-1">
+              <div class="tw-flex tw-items-center tw-gap-2">
+                <span class="tw-inline-block tw-w-2 tw-h-2 tw-rounded-full tw-bg-emerald-400"></span>
+                <span class="tw-text-xs tw-font-semibold tw-text-gray-300 tw-uppercase tw-tracking-wider">Contributor Recognition</span>
+              </div>
+              <h3 class="tw-text-lg tw-font-bold tw-font-dm-sans tw-text-white">
+                Do you contribute to {{ resource.resource_name }}?
+              </h3>
+              <p class="tw-text-xs tw-text-gray-300 tw-max-w-2xl tw-leading-relaxed">
+                Connect your ORCID iD to claim credit for your research outcomes, track your contributions over time, and ensure your work is formally recognized.
+              </p>
+            </div>
+
+            <button
+              (click)="authService.openOauthDialog('database')"
+              class="tw-shrink-0 tw-px-5 tw-py-2.5 tw-font-bold tw-text-white tw-rounded-lg tw-shadow hover:tw-shadow-lg tw-transition-all tw-flex tw-items-center tw-gap-2.5 tw-text-sm hover:tw-opacity-95"
+              style="background-color: #a6ce39"
+            >
+              <svg class="tw-w-4 tw-h-4 tw-fill-current" viewBox="0 0 256 256">
+                <path d="M256 128c0 70.7-57.3 128-128 128S0 198.7 0 128 57.3 0 128 0s128 57.3 128 128z" fill="#a6ce39"/>
+                <path d="M86.3 186.2H70.9V79.1h15.4v107.1zM108.9 79.1h41.6c39.6 0 57 28.3 57 53.6 0 27.5-21.5 53.5-56.8 53.5h-41.8V79.1zm15.4 92.4h24.5c34.5 0 41.7-25.5 41.7-38.9 0-17.5-11.2-38.8-42.6-38.8h-23.6v77.7z"/>
+              </svg>
+              <span>Sign in with ORCID</span>
+            </button>
+          </div>
+        </div>
+
         <div *ngIf="leaderboardOptions$ | async as leaderboardOptions">
           <resource-leaderboard
             [resource]="resource"

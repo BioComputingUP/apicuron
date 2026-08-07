@@ -17,9 +17,14 @@ import { Paginated } from "../../interfaces/paginated";
 import { BadgeDef } from "../../models/badge-def.model";
 import { MedalDef } from "../../models/medal-def.model";
 import { Resource } from "../../models/resource.model";
+import { User } from "../../models/User.model";
 import { Term } from "../../models/term.model";
 import { TermsService } from "../../terms/services/terms.service";
 import { DatabasesService } from "../services/databases.service";
+
+import { HttpParams } from "@angular/common/http";
+import { CuratorService } from "../../curator/curator.service";
+import { AuthService } from "../../auth/auth.service";
 
 interface StatCard extends Record<string, unknown> {
   label: string;
@@ -80,7 +85,9 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
   ];
 
   constructor(
+    public authService: AuthService,
     private databaseService: DatabasesService,
+    private curatorService: CuratorService,
     private badgeDefService: BadgeDefService,
     private medalDefService: MedalDefService,
     private termService: TermsService,
@@ -108,6 +115,8 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
   @ViewChild("mainPanel") mainPanel: ElementRef;
   @ViewChild("leaderboardPanel") leaderboardPanel: ElementRef;
 
+  topContributors$: Observable<Array<{ user: User; events_count?: number }>>;
+
   ngOnInit(): void {
     Observable;
 
@@ -122,6 +131,31 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
         return this.databaseService.get_resource_leaderboard(resource_id);
       }),
       shareReplay()
+    );
+
+    this.topContributors$ = this.resourceId$.pipe(
+      switchMap((resource_id: string) => {
+        return this.curatorService.search_curators(
+          new HttpParams({
+            fromObject: { "resources[]": resource_id, limit: "6", skip: "0" },
+          })
+        );
+      }),
+      pluck("data"),
+      map((data: any[]) => {
+        if (!data || !Array.isArray(data)) return [];
+        return data.map((entry: any) => {
+          const { stats, ...userData } = entry;
+          const user = new User().deserialize(userData);
+          const events_count =
+            stats?.events_count ??
+            stats?.submitted_events_count ??
+            stats?.activity_count ??
+            0;
+          return { user, events_count };
+        });
+      }),
+      shareReplay(1)
     );
 
     this.resource$ = this.resourceId$.pipe(
