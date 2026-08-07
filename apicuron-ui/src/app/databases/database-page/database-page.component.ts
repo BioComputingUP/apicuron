@@ -8,7 +8,7 @@ import {
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { LeaderboardOptions } from "projects/apicuron-util/src/lib/leaderboard/interfaces/leaderboard-options";
 import { combineLatest, interval, Observable, of } from "rxjs";
-import { delay, map, pluck, shareReplay, switchMap, tap } from "rxjs/operators";
+import { delay, map, pluck, shareReplay, startWith, switchMap, tap } from "rxjs/operators";
 import { BadgeDefFilter } from "../../achievements-def/interfaces/badge-def.filter";
 import { MedalDefFilter } from "../../achievements-def/interfaces/medal-def.filter";
 import { BadgeDefService } from "../../achievements-def/services/badge-def.service";
@@ -116,9 +116,16 @@ export class DatabasePageComponent implements OnInit, AfterViewInit {
   @ViewChild("leaderboardPanel") leaderboardPanel: ElementRef;
 
   topContributors$: Observable<Array<{ user: User; events_count?: number }>>;
+  isLoggedOut$: Observable<boolean>;
 
   ngOnInit(): void {
     Observable;
+
+    this.isLoggedOut$ = this.authService.loggedIn$.pipe(
+      map((loggedIn) => !loggedIn),
+      startWith(true),
+      shareReplay(1)
+    );
 
     this.resourceId$ = this.route.paramMap.pipe(
       map((params: ParamMap) => {
