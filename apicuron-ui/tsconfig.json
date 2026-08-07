@@ -9,28 +9,17 @@
     "declaration": false,
     "module": "es2020",
     "paths": {
-      "apicuron-util": [
-        "dist/apicuron-util"
-      ],
-      "leaderboard-lib": [
-        "dist/leaderboard-lib"
-      ],
-      "@app/svg/*": [
-        "src/app/svg/*"
-      ]
+      "apicuron-util": ["dist/apicuron-util"],
+      "leaderboard-lib": ["dist/leaderboard-lib"],
+      "@app/svg/*": ["src/app/svg/*"]
     },
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "importHelpers": true,
     "allowJs": true,
     "target": "ES2022",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "lib": [
-      "es2018",
-      "dom"
-    ],
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2018", "dom", "DOM.Iterable"],
     "useDefineForClassFields": false
   },
   "angularCompilerOptions": {

@@ -127,7 +127,7 @@ export class PartnerResourcesController {
 		description: 'Returns an update confirmation Object',
 		type: PartnerResourceEntity,
 	})
-	// nestjs logic decorators
+	
 	@Put('')
 	@Patch('')
 	@UseGuards(LocalAuthGuard, HasAResourceGuard)
