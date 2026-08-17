@@ -4,6 +4,7 @@ import { ContributorIndetifierType as ContributorIdentifierType } from 'src/core
 
 @Schema({
 	collection: 'pending-reports',
+	timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
 })
 export class PendingReport {
 	@Prop({ required: true })
@@ -16,9 +17,6 @@ export class PendingReport {
 	activity_term: string;
 
 	@Prop({ required: true })
-	curator_orcid: string;
-
-	@Prop({ required: true })
 	timestamp: Date;
 
 	@Prop({ required: true })
@@ -26,6 +24,9 @@ export class PendingReport {
 
 	@Prop({ required: true, enum: ContributorIdentifierType, type: String })
 	contributor_identifier_type: ContributorIdentifierType;
+
+	created_at: Date;
+	updated_at: Date;
 }
 
 export type PendingReportDocument = HydratedDocument<PendingReport>;
