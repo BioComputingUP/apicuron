@@ -43,7 +43,7 @@ import {
 	CuratorRegistryEntrySchema,
 } from './curator-registry/curator-entry.schema';
 import {
-	PendingReport,
+	PendingReportDB,
 	PendingReportSchema,
 } from './pending reports/pending-report.schema';
 
@@ -127,7 +127,7 @@ export const ModelDefinitions: ModelDefinition[] = [
 		schema: CuratorRegistryEntrySchema,
 	},
 	{
-		name: PendingReport.name,
+		name: PendingReportDB.name,
 		schema: PendingReportSchema,
 	},
 ];

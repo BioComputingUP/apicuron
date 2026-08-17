@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { ContributorIndetifierType as ContributorIdentifierType } from 'src/core/enums';
+import { ContributorIdentifierType } from 'src/core/enums';
 
 @Schema({
 	collection: 'pending-reports',
 	timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
 })
-export class PendingReport {
+export class PendingReportDB {
 	@Prop({ required: true })
 	resource_id: string;
 
@@ -29,5 +29,6 @@ export class PendingReport {
 	updated_at: Date;
 }
 
-export type PendingReportDocument = HydratedDocument<PendingReport>;
-export const PendingReportSchema = SchemaFactory.createForClass(PendingReport);
+export type PendingReportDocument = HydratedDocument<PendingReportDB>;
+export const PendingReportSchema =
+	SchemaFactory.createForClass(PendingReportDB);

@@ -77,11 +77,11 @@ export const ResourceCategories = Object.values(ResourceCategory);
 
 export type ResourceCategory = ObjectValues<typeof ResourceCategory>;
 
-export const ContributorIndetifierType = {
+export const ContributorIdentifierType = {
 	GITHUB: 'GITHUB',
 	ORCID: 'ORCID',
 } as const;
 
-export type ContributorIndetifierType = ObjectValues<
-	typeof ContributorIndetifierType
+export type ContributorIdentifierType = ObjectValues<
+	typeof ContributorIdentifierType
 >;
