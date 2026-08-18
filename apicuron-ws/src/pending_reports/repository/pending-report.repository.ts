@@ -6,6 +6,7 @@ import {
 	PendingReportDB,
 	PendingReportDocument,
 } from 'src/core/schemas/pending reports/pending-report.schema';
+import { ContributorIdentifierType } from 'src/core/enums';
 
 @Injectable()
 export class PendingReportsRepository {
@@ -32,6 +33,18 @@ export class PendingReportsRepository {
 
 	async findByResourceId(resourceId: string): Promise<PendingReport[]> {
 		const docs = await this.model.find({ resource_id: resourceId }).exec();
+		return docs.map(PendingReport.fromMongooseDocument);
+	}
+	async findByContributorIdentifier(
+		contributorIdentifier: string,
+		contributorIdentifierType: ContributorIdentifierType,
+	): Promise<PendingReport[]> {
+		const docs = await this.model
+			.find({
+				contributor_identifier: contributorIdentifier,
+				contributor_identifier_type: contributorIdentifierType,
+			})
+			.exec();
 		return docs.map(PendingReport.fromMongooseDocument);
 	}
 }

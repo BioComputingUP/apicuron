@@ -7,6 +7,7 @@ import {
 import { MongoServerError } from 'mongodb';
 import { PendingReport } from '../entities/pending-report.entity';
 import { PendingReportsRepository } from '../repository/pending-report.repository';
+import { ContributorIdentifierType } from 'src/core/enums';
 
 @Injectable()
 export class PendingReportsService {
@@ -37,5 +38,21 @@ export class PendingReportsService {
 			this.logger.error;
 			throw new InternalServerErrorException('Could not create pending report');
 		}
+	}
+
+	async findPendingReportsForContributor(
+		contributorIdentifier: string,
+		contributorIdentifierType: ContributorIdentifierType,
+	): Promise<PendingReport[]> {
+		return this.repository.findByContributorIdentifier(
+			contributorIdentifier,
+			contributorIdentifierType,
+		);
+	}
+
+	async findPendingReportsForResource(
+		resourceId: string,
+	): Promise<PendingReport[]> {
+		return this.repository.findByResourceId(resourceId);
 	}
 }
