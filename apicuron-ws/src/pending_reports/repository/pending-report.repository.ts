@@ -6,7 +6,7 @@ import {
 	PendingReportDB,
 	PendingReportDocument,
 } from 'src/core/schemas/pending reports/pending-report.schema';
-import { ContributorIdentifierType } from 'src/core/enums';
+import { ContributorIdentifierType, PendingReportStatus } from 'src/core/enums';
 
 @Injectable()
 export class PendingReportsRepository {
@@ -46,5 +46,22 @@ export class PendingReportsRepository {
 			})
 			.exec();
 		return docs.map(PendingReport.fromMongooseDocument);
+	}
+
+	async archive(report_id: string): Promise<void> {
+		await this.model.findByIdAndUpdate(report_id, {
+			status: PendingReportStatus.SUBMITTED,
+			reconciled_at: new Date(),
+		});
+	}
+	async markAsFailed(report_id: string, error: unknown): Promise<void> {
+		await this.model.findByIdAndUpdate(report_id, {
+			status: PendingReportStatus.FAILED,
+			error:
+				error instanceof Error
+					? JSON.stringify(error, Object.getOwnPropertyNames(error))
+					: JSON.stringify(error),
+			$inc: { reconciliation_attempt_count: 1 },
+		});
 	}
 }

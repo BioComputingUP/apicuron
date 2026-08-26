@@ -85,3 +85,11 @@ export const ContributorIdentifierType = {
 export type ContributorIdentifierType = ObjectValues<
 	typeof ContributorIdentifierType
 >;
+
+export const PendingReportStatus = {
+	PENDING: 'PENDING',
+	SUBMITTED: 'SUBMITTED',
+	FAILED: 'FAILED',
+} as const;
+
+export type PendingReportStatus = ObjectValues<typeof PendingReportStatus>;
