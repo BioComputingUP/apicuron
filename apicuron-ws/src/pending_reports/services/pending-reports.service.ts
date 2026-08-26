@@ -1,10 +1,9 @@
 import {
-	BadRequestException,
+	ConflictException,
 	Injectable,
 	InternalServerErrorException,
 	Logger,
 } from '@nestjs/common';
-import { MongoServerError } from 'mongodb';
 import { PendingReport } from '../entities/pending-report.entity';
 import { PendingReportsRepository } from '../repository/pending-report.repository';
 import { ContributorIdentifierType } from 'src/core/enums';
@@ -32,11 +31,13 @@ export class PendingReportsService {
 				contributor_identifier_type,
 			});
 		} catch (error: unknown) {
-			if (error instanceof MongoServerError && error.code === 11000) {
-				throw new BadRequestException('Pending report already exists');
+			if (error instanceof ConflictException) {
+				throw new ConflictException('Pending report already exists');
 			}
 			this.logger.error(error);
-			throw new InternalServerErrorException('Could not create pending report');
+			throw new InternalServerErrorException(
+				'Could not create pending report. If this error persists, please contact support.',
+			);
 		}
 	}
 

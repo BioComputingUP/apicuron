@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PendingReport } from '../entities/pending-report.entity';
@@ -7,6 +7,7 @@ import {
 	PendingReportDocument,
 } from 'src/core/schemas/pending reports/pending-report.schema';
 import { ContributorIdentifierType, PendingReportStatus } from 'src/core/enums';
+import { MongoServerError } from 'mongodb';
 
 @Injectable()
 export class PendingReportsRepository {
@@ -16,14 +17,21 @@ export class PendingReportsRepository {
 	) {}
 
 	async save(report: Omit<PendingReport, 'id'>): Promise<void> {
-		await this.model.create({
-			resource_id: report.resource_id,
-			entity_uri: report.entity_uri,
-			activity_term: report.activity_term,
-			timestamp: report.timestamp,
-			contributor_identifier: report.contributor_identifier,
-			contributor_identifier_type: report.contributor_identifier_type,
-		});
+		try {
+			await this.model.create({
+				resource_id: report.resource_id,
+				entity_uri: report.entity_uri,
+				activity_term: report.activity_term,
+				timestamp: report.timestamp,
+				contributor_identifier: report.contributor_identifier,
+				contributor_identifier_type: report.contributor_identifier_type,
+			});
+		} catch (error: unknown) {
+			if (error instanceof MongoServerError && error.code === 11000) {
+				throw new ConflictException('Pending report already exists');
+			}
+			throw error;
+		}
 	}
 
 	async findAll(status?: PendingReportStatus): Promise<PendingReport[]> {
