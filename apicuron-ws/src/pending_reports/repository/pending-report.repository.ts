@@ -35,7 +35,7 @@ export class PendingReportsRepository {
 		const docs = await this.model.find({ resource_id: resourceId }).exec();
 		return docs.map(PendingReport.fromMongooseDocument);
 	}
-	async findByContributorIdentifier(
+	async findPendingByContributorIdentifier(
 		contributorIdentifier: string,
 		contributorIdentifierType: ContributorIdentifierType,
 	): Promise<PendingReport[]> {
@@ -43,6 +43,7 @@ export class PendingReportsRepository {
 			.find({
 				contributor_identifier: contributorIdentifier,
 				contributor_identifier_type: contributorIdentifierType,
+				status: PendingReportStatus.PENDING,
 			})
 			.exec();
 		return docs.map(PendingReport.fromMongooseDocument);
