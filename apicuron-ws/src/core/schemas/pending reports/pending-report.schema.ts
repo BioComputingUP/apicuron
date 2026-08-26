@@ -55,3 +55,15 @@ PendingReportSchema.index({
 	contributor_identifier_type: 1,
 	status: 1,
 });
+
+PendingReportSchema.index(
+	{
+		resource_id: 1,
+		contributor_identifier: 1,
+		contributor_identifier_type: 1,
+		timestamp: 1,
+		activity_term: 1,
+		entity_uri: 1,
+	},
+	{ unique: true, name: 'pending_reports_unique_index' },
+);

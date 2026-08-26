@@ -20,11 +20,15 @@ export class ReconcilationService {
 
 	@OnEvent(UserOrcidIdentifiedEvent.eventName, { async: true })
 	async handleUserOrcidIdentified(eventPayload: UserOrcidIdentifiedEvent) {
-		await this.reconcile(
-			eventPayload.contributor_identifier,
-			eventPayload.contributor_identifier_type,
-			eventPayload.orcid,
-		);
+		try {
+			await this.reconcile(
+				eventPayload.contributor_identifier,
+				eventPayload.contributor_identifier_type,
+				eventPayload.orcid,
+			);
+		} catch (error: unknown) {
+			this.logger.error(error);
+		}
 	}
 
 	async reconcile(

@@ -15,7 +15,7 @@ export class PendingReportsRepository {
 		private readonly model: Model<PendingReportDocument>,
 	) {}
 
-	async save(report: PendingReport): Promise<void> {
+	async save(report: Omit<PendingReport, 'id'>): Promise<void> {
 		await this.model.create({
 			resource_id: report.resource_id,
 			entity_uri: report.entity_uri,
@@ -31,7 +31,7 @@ export class PendingReportsRepository {
 		return docs.map(PendingReport.fromMongooseDocument);
 	}
 
-	async findAllByResourceId(
+	async findByResourceId(
 		resourceId: string,
 		status?: PendingReportStatus,
 	): Promise<PendingReport[]> {

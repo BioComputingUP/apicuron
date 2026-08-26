@@ -35,7 +35,7 @@ export class PendingReportsService {
 			if (error instanceof MongoServerError && error.code === 11000) {
 				throw new BadRequestException('Pending report already exists');
 			}
-			this.logger.error;
+			this.logger.error(error);
 			throw new InternalServerErrorException('Could not create pending report');
 		}
 	}
