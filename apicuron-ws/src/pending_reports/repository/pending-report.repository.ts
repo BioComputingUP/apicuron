@@ -26,24 +26,30 @@ export class PendingReportsRepository {
 		});
 	}
 
-	async findAll(): Promise<PendingReport[]> {
-		const docs = await this.model.find().exec();
+	async findAll(status?: PendingReportStatus): Promise<PendingReport[]> {
+		const docs = await this.model.find({ status }).exec();
 		return docs.map(PendingReport.fromMongooseDocument);
 	}
 
-	async findByResourceId(resourceId: string): Promise<PendingReport[]> {
-		const docs = await this.model.find({ resource_id: resourceId }).exec();
+	async findAllByResourceId(
+		resourceId: string,
+		status?: PendingReportStatus,
+	): Promise<PendingReport[]> {
+		const docs = await this.model
+			.find({ resource_id: resourceId, status })
+			.exec();
 		return docs.map(PendingReport.fromMongooseDocument);
 	}
-	async findPendingByContributorIdentifier(
+	async findByContributorIdentifier(
 		contributorIdentifier: string,
 		contributorIdentifierType: ContributorIdentifierType,
+		status: PendingReportStatus = PendingReportStatus.PENDING,
 	): Promise<PendingReport[]> {
 		const docs = await this.model
 			.find({
 				contributor_identifier: contributorIdentifier,
 				contributor_identifier_type: contributorIdentifierType,
-				status: PendingReportStatus.PENDING,
+				status,
 			})
 			.exec();
 		return docs.map(PendingReport.fromMongooseDocument);
