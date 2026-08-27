@@ -20,7 +20,7 @@ export class PendingReportsService {
 		timestamp,
 		contributor_identifier,
 		contributor_identifier_type,
-	}: PendingReport) {
+	}: Omit<PendingReport, 'id'>) {
 		try {
 			await this.repository.save({
 				resource_id,

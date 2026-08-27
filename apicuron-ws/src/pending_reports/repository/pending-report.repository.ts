@@ -16,9 +16,9 @@ export class PendingReportsRepository {
 		private readonly model: Model<PendingReportDocument>,
 	) {}
 
-	async save(report: Omit<PendingReport, 'id'>): Promise<void> {
+	async save(report: Omit<PendingReport, 'id'>): Promise<string> {
 		try {
-			await this.model.create({
+			const newPendingReport = await this.model.create({
 				resource_id: report.resource_id,
 				entity_uri: report.entity_uri,
 				activity_term: report.activity_term,
@@ -26,6 +26,7 @@ export class PendingReportsRepository {
 				contributor_identifier: report.contributor_identifier,
 				contributor_identifier_type: report.contributor_identifier_type,
 			});
+			return newPendingReport._id.toString();
 		} catch (error: unknown) {
 			if (error instanceof MongoServerError && error.code === 11000) {
 				throw new ConflictException('Pending report already exists');

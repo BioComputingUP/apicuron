@@ -3,12 +3,15 @@ import { PrContributionProcessor } from './pr_closed.processor';
 import { GithubOrcidResolver } from '../helpers/github-orcid.resolver';
 import { SubmitReportService } from 'src/submit-reports/services/submit-reports.service';
 import { PRPayloadDto } from '../dto/pr_payload.dto';
-import { Logger } from '@nestjs/common';
+import { InternalServerErrorException, Logger } from '@nestjs/common';
+import { PendingReportsService } from 'src/pending_reports/services/pending-reports.service';
+import { ContributorIdentifierType } from 'src/core/enums';
 
 describe('PrContributionProcessor', () => {
 	let processor: PrContributionProcessor;
 	let orcidResolverMock: { resolve: jest.Mock };
 	let submitReportsServiceMock: { insertReport: jest.Mock };
+	let pendingReportsServiceMock: { createPendingReport: jest.Mock };
 
 	const mockPayload: PRPayloadDto = {
 		event_type: 'pull_request',
@@ -22,7 +25,7 @@ describe('PrContributionProcessor', () => {
 			pr_url: 'https://github.com/org/repo/pull/1',
 			target_branch: 'main',
 			labels: ['bug'],
-			reviewers: ['reviewer_user'],
+			reviewers: ['reviewer_user', 'reviewer2'],
 			title: 'Fix issue',
 		},
 	};
@@ -41,6 +44,9 @@ describe('PrContributionProcessor', () => {
 				report: {} as unknown,
 			}),
 		};
+		pendingReportsServiceMock = {
+			createPendingReport: jest.fn().mockResolvedValue(null),
+		};
 
 		const module: TestingModule = await Test.createTestingModule({
 			providers: [
@@ -52,6 +58,10 @@ describe('PrContributionProcessor', () => {
 				{
 					provide: SubmitReportService,
 					useValue: submitReportsServiceMock,
+				},
+				{
+					provide: PendingReportsService,
+					useValue: pendingReportsServiceMock,
 				},
 			],
 		}).compile();
@@ -68,9 +78,10 @@ describe('PrContributionProcessor', () => {
 	it('should process contributions and submit reports for resolved ORCIDs', async () => {
 		await processor.process(mockPayload);
 
-		expect(orcidResolverMock.resolve).toHaveBeenCalledTimes(2);
+		expect(orcidResolverMock.resolve).toHaveBeenCalledTimes(3);
 		expect(orcidResolverMock.resolve).toHaveBeenCalledWith('author_user');
 		expect(orcidResolverMock.resolve).toHaveBeenCalledWith('reviewer_user');
+		expect(orcidResolverMock.resolve).toHaveBeenCalledWith('reviewer2');
 
 		expect(submitReportsServiceMock.insertReport).toHaveBeenCalledTimes(2);
 		expect(submitReportsServiceMock.insertReport).toHaveBeenNthCalledWith(1, {
@@ -110,19 +121,24 @@ describe('PrContributionProcessor', () => {
 		);
 	});
 
-	it('should log an error and continue loop when insertReport fails for a contribution', async () => {
-		const insertError = new Error('Database insertion failed');
-		submitReportsServiceMock.insertReport
-			.mockRejectedValueOnce(insertError)
-			.mockResolvedValueOnce({ report: {} as unknown });
-
-		await processor.process(mockPayload);
-
+	it('should log an error when pending report fails to be saved', async () => {
+		const pendingSaveError = new Error('Database Connection Error');
+		pendingReportsServiceMock.createPendingReport.mockRejectedValueOnce(
+			pendingSaveError,
+		);
+		await expect(processor.process(mockPayload)).rejects.toThrow(
+			InternalServerErrorException,
+		);
 		expect(Logger.prototype.error).toHaveBeenCalledWith(
 			expect.stringContaining(
-				'Failed to submit report for github_login author_user',
+				'Failed to save report as Pending for contribution:',
 			),
 			expect.any(String),
+			pendingSaveError,
+		);
+
+		expect(Logger.prototype.error).toHaveBeenCalledWith(
+			expect.stringContaining('Failed to process 1 contributions:'),
 		);
 
 		expect(submitReportsServiceMock.insertReport).toHaveBeenCalledTimes(2);
@@ -134,6 +150,22 @@ describe('PrContributionProcessor', () => {
 			timestamp: new Date('2026-07-29T10:00:00.000Z'),
 			league: 'default',
 		});
+	});
+	it('should create pending report when orcid is unknown for the contribution contributor', async () => {
+		await processor.process(mockPayload);
+		expect(pendingReportsServiceMock.createPendingReport).toHaveBeenCalledTimes(
+			1,
+		);
+		expect(pendingReportsServiceMock.createPendingReport).toHaveBeenCalledWith(
+			expect.objectContaining({
+				resource_id: 'res_456',
+				entity_uri: 'https://github.com/org/repo/pull/1',
+				activity_term: 'generic_review_activity',
+				timestamp: new Date('2026-07-29T10:00:00.000Z'),
+				contributor_identifier: 'reviewer2',
+				contributor_identifier_type: ContributorIdentifierType.GITHUB,
+			}),
+		);
 	});
 
 	it('should handle payloads with no reviewers', async () => {
