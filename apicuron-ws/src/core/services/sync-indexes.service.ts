@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
+import { MongoServerError } from 'mongodb';
 
 @Injectable()
 export class SyncIndexesService implements OnModuleInit {
@@ -34,22 +35,22 @@ export class SyncIndexesService implements OnModuleInit {
 			try {
 				await model.syncIndexes();
 				synced = true;
-			} catch (err) {
-				if (err.code == 11000) {
-					// Duplicate key error
-					// extract the key causing the error
-					this.logger.error(
-						`Duplicate key error: while syncing indexes for model: ${model.modelName}. Deleting culprits`,
-					);
-					const errorKey = err.keyValue;
-					await model.deleteMany(errorKey);
-					continue;
-				}
+			} catch (error) {
+				const isDuplicate =
+					error instanceof MongoServerError && error.code === 11000;
+				const detail = isDuplicate
+					? `duplicate key ${JSON.stringify(
+							error.keyValue,
+					  )} blocks a unique index`
+					: error instanceof Error
+					? error.message
+					: String(error);
 				this.logger.error(
-					`Error syncing indexes for model: ${model.modelName}, not handled`,
-					err,
+					`Index sync failed for model ${model.modelName}: ${detail}. ` +
+						`Resolve the conflicting documents, No data was modified.`,
+					error instanceof Error ? error.stack : undefined,
 				);
-				synced = true;
+				throw error; // refuse to start rather than run without the constraint
 			}
 		}
 	}
