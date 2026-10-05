@@ -13,6 +13,7 @@ import {
 	LeaderboardSettings,
 	LeaderboardType,
 } from '../components/leaderboard-preferences.schema';
+import { ResourceSource, ResourceSourceSchema } from '../components/resource-source.schema';
 import { League, LeagueSchema } from '../league/league.schema';
 import { Term } from '../terms.schema';
 import { ResourceStats, ResourceStatsSchema } from './resource-stats.schema';
@@ -127,6 +128,9 @@ export class PartnerResource {
 	})
 	category: ResourceCategory;
 
+	@Prop({ type: [ResourceSourceSchema], default: [] })
+	sources: ResourceSource[];
+
 	created_at: Date;
 	updated_at: Date;
 }
@@ -151,6 +155,15 @@ export function PartnerResourceSchemaFactory() {
 			resource_url: 1,
 		},
 		{ unique: true, name: 'unique_resource' },
+	);
+
+	ResourceSchema.index(
+		{ 'sources.system': 1, 'sources.repository_id': 1 },
+		{
+			unique: true,
+			name: 'unique_resource_source',
+			partialFilterExpression: { 'sources.repository_id': { $exists: true } },
+		},
 	);
 
 	return ResourceSchema;
