@@ -93,3 +93,22 @@ export const PendingReportStatus = {
 } as const;
 
 export type PendingReportStatus = ObjectValues<typeof PendingReportStatus>;
+
+
+// == Contribution Event Enums == 
+export const EventProcessingStatus = {
+	RECEIVED: 'RECEIVED',
+	PROCESSED: 'PROCESSED',
+	FAILED: 'FAILED',
+} as const;
+export type EventProcessingStatus = (typeof EventProcessingStatus)[keyof typeof EventProcessingStatus];
+
+export const EventOutputKind = { REPORT: 'REPORT', PENDING: 'PENDING' } as const;
+export type EventOutputKind = (typeof EventOutputKind)[keyof typeof EventOutputKind];
+
+export const EventOutputStatus = {
+	CREATED: 'CREATED',
+	ALREADY_EXISTED: 'ALREADY_EXISTED',
+	FAILED: 'FAILED',
+} as const;
+export type EventOutputStatus = (typeof EventOutputStatus)[keyof typeof EventOutputStatus];

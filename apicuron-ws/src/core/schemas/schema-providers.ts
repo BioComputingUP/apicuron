@@ -46,6 +46,7 @@ import {
 	PendingReportDB,
 	PendingReportSchema,
 } from './pending reports/pending-report.schema';
+import { ContributionEventDB, ContributionEventSchema } from './contribution-events/contribution-event.schema';
 
 export const ModelFactories: AsyncModelFactory[] = [
 	{
@@ -130,4 +131,8 @@ export const ModelDefinitions: ModelDefinition[] = [
 		name: PendingReportDB.name,
 		schema: PendingReportSchema,
 	},
+	{
+		name: ContributionEventDB.name,
+		schema: ContributionEventSchema
+	}
 ];
