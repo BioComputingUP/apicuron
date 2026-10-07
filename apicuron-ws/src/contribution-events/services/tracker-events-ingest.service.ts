@@ -1,6 +1,12 @@
-import { BadRequestException, ForbiddenException, Injectable, UnprocessableEntityException } from '@nestjs/common';
-import { User } from '@sentry/node';
+import {
+	BadRequestException,
+	ForbiddenException,
+	Injectable,
+	UnprocessableEntityException,
+} from '@nestjs/common';
 import { SourceSystem } from 'src/core/schemas/components/resource-source.schema';
+import { User } from 'src/core/schemas/user.schema';
+import { assertUserManagesResource } from 'src/util/authrization.helpers';
 import { TrackerEventDto } from '../dto/tracker-event.dto';
 import { ContributionEventsRepository } from '../repository/contribution-events.repository';
 import { ResourceSourceRepository } from '../repository/resource-source.repository';
@@ -25,6 +31,9 @@ export class TrackerEventsIngestService {
 		return this.store(raw, dto, resourceId);
 	}
 
+	/**
+	 * Verify the correctness of the source and that the user is allowed to submit events for the resource linked to the source
+	 */
 	private async authorize(
 		dto: TrackerEventDto,
 		user: User,
@@ -48,15 +57,7 @@ export class TrackerEventsIngestService {
 				`No resource is linked to source "${dto.source}"`,
 			);
 		}
-
-		const managesResource = (user.resources ?? []).some(
-			(r) => r.resource_id === resourceId,
-		);
-		if (!managesResource) {
-			throw new ForbiddenException(
-				`Not allowed to submit events for resource "${resourceId}"`,
-			);
-		}
+		assertUserManagesResource(user, resourceId);
 		return resourceId;
 	}
 
