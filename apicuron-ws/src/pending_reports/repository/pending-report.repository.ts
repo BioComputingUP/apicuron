@@ -25,6 +25,7 @@ export class PendingReportsRepository {
 				timestamp: report.timestamp,
 				contributor_identifier: report.contributor_identifier,
 				contributor_identifier_type: report.contributor_identifier_type,
+				contributor_login: report.contributor_login,
 			});
 			return newPendingReport._id.toString();
 		} catch (error: unknown) {
