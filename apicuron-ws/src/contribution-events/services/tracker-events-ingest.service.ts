@@ -12,6 +12,7 @@ import { TrackerEventDto } from '../dto/tracker-event.dto';
 import { ContributionEventsRepository } from '../repository/contribution-events.repository';
 import { ResourceSourceRepository } from '../repository/resource-source.repository';
 import { BatchIngestResult, IngestResult } from '../types/types';
+import { ContributionEventProcessor } from './contribution-event-processor.service';
 
 const GITHUB_SOURCE = /^github:repository:(\d+)$/; // helper to separate the source system from the repository id, e.g. github:repository:123456789
 type RawEvent = Record<string, unknown>;
@@ -21,6 +22,7 @@ export class TrackerEventsIngestService {
 	constructor(
 		private readonly sources: ResourceSourceRepository,
 		private readonly events: ContributionEventsRepository,
+		private readonly processor: ContributionEventProcessor,
 	) {}
 
 	async ingest(
@@ -29,7 +31,9 @@ export class TrackerEventsIngestService {
 		user: User,
 	): Promise<IngestResult> {
 		const resourceId = await this.authorize(dto, user, new Map());
-		return this.store(raw, dto, resourceId);
+		const result = await this.store(raw, dto, resourceId);
+		if (result.stored) void this.processor.process(result.id); // not awaited: response goes out first
+		return result;
 	}
 
 	async ingestBatch(
@@ -68,6 +72,10 @@ export class TrackerEventsIngestService {
 			results.push(await this.store(raws[i], dtos[i], resourceIds[i]));
 		}
 		const stored = results.filter((r) => r.stored).length;
+		// trigger processing for any newly stored events
+		const newIds = results.filter((r) => r.stored).map((r) => r.id);
+		if (newIds.length > 0) void this.processor.processSequentially(newIds); // not awaited
+		
 		return {
 			received: results.length,
 			stored,
