@@ -23,14 +23,19 @@ export class ContributionEventsRepository {
 	) {}
 
 	/** Inserts the event. A duplicate (same source + event_id) means "already received", not an error. */
-	async save(event: NewContributionEvent): Promise<{ stored: boolean; id: string }> {
+	async save(
+		event: NewContributionEvent,
+	): Promise<{ stored: boolean; id: string }> {
 		try {
 			const doc = await this.model.create(event);
 			return { stored: true, id: doc._id.toString() };
 		} catch (error) {
 			if (error instanceof MongoServerError && error.code === 11000) {
 				const existing = await this.model
-					.findOne({ source: event.source, event_id: event.event_id }, { _id: 1 })
+					.findOne(
+						{ source: event.source, event_id: event.event_id },
+						{ _id: 1 },
+					)
 					.lean();
 				if (existing) return { stored: false, id: existing._id.toString() };
 			}
@@ -43,7 +48,10 @@ export class ContributionEventsRepository {
 		return doc ? this.toEntity(doc) : null;
 	}
 
-	async findByStatus(status: EventProcessingStatus, limit = 100): Promise<ContributionEvent[]> {
+	async findByStatus(
+		status: EventProcessingStatus,
+		limit = 100,
+	): Promise<ContributionEvent[]> {
 		const docs = await this.model
 			.find({ 'processing.status': status })
 			.sort({ received_at: 1 })
@@ -72,13 +80,23 @@ export class ContributionEventsRepository {
 		);
 	}
 
-	async markFailed(id: string, error: unknown): Promise<void> {
+	async markFailed(
+		id: string,
+		error: unknown,
+		outputs?: ContributionEventOutput[],
+		interpreter_version?: string,
+	): Promise<void> {
 		await this.model.updateOne(
 			{ _id: id },
 			{
 				$set: {
 					'processing.status': EventProcessingStatus.FAILED,
-					'processing.error': error instanceof Error ? error.message : String(error),
+					'processing.error':
+						error instanceof Error ? error.message : String(error),
+					...(outputs && { outputs }),
+					...(interpreter_version && {
+						'processing.interpreter_version': interpreter_version,
+					}),
 				},
 				$inc: { 'processing.attempts': 1 },
 			},
