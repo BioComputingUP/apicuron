@@ -13,6 +13,10 @@ import { PrivacyType } from '../enums';
 import { UserResource } from '../interfaces/user-resource';
 import { UserResourcePutCode } from '../interfaces/user-resource-put-code';
 import {
+	GithubAccount,
+	GithubAccountSchema,
+} from './components/github-account.schema';
+import {
 	UserEmailEntry,
 	UserEmailEntrySchema,
 } from './components/user-email.schema';
@@ -227,9 +231,8 @@ export class User {
 	@Prop({ required: false, default: false })
 	acceptsEmails?: boolean;
 
-	@Prop({ required: false, type: String })
-	github_login?: string;
-
+	@Prop({ type: [GithubAccountSchema], default: [] })
+	github_accounts: GithubAccount[];
 	// THese methods are commented out because they are added to the schema decorator using the methods property.
 	// hasResourcePutCode(resource_id: string): boolean {
 	// 	return (
@@ -269,6 +272,7 @@ export function userCollectionSchemaFactory() {
 		{ orcid_id: 1 },
 		{ unique: true, name: 'unique_users' },
 	);
+	UserSchema.index({ 'github_accounts.github_id': 1 }, { name: 'users_github_account_index' }); // just for lookup
 
 	UserCollectionSchema.methods.hasResourcePutCode;
 
