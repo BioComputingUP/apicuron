@@ -1,6 +1,7 @@
 import {
 	BadRequestException,
 	ForbiddenException,
+	HttpException,
 	Injectable,
 	UnprocessableEntityException,
 } from '@nestjs/common';
@@ -10,7 +11,7 @@ import { assertUserManagesResource } from 'src/util/authrization.helpers';
 import { TrackerEventDto } from '../dto/tracker-event.dto';
 import { ContributionEventsRepository } from '../repository/contribution-events.repository';
 import { ResourceSourceRepository } from '../repository/resource-source.repository';
-import { IngestResult } from '../types/types';
+import { BatchIngestResult, IngestResult } from '../types/types';
 
 const GITHUB_SOURCE = /^github:repository:(\d+)$/; // helper to separate the source system from the repository id, e.g. github:repository:123456789
 type RawEvent = Record<string, unknown>;
@@ -29,6 +30,50 @@ export class TrackerEventsIngestService {
 	): Promise<IngestResult> {
 		const resourceId = await this.authorize(dto, user, new Map());
 		return this.store(raw, dto, resourceId);
+	}
+
+	async ingestBatch(
+		raws: RawEvent[],
+		dtos: TrackerEventDto[],
+		user: User,
+	): Promise<BatchIngestResult> {
+		// All-or-nothing: authorise every event before storing any
+		const cache = new Map<string, string | null>();
+		const resourceIds: string[] = [];
+		const failures: Array<{ index: number; event_id: string; reason: string }> =
+			[];
+
+		for (let i = 0; i < dtos.length; i++) {
+			try {
+				resourceIds[i] = await this.authorize(dtos[i], user, cache);
+			} catch (error) {
+				failures.push({
+					index: i,
+					event_id: dtos[i].id,
+					reason:
+						error instanceof HttpException ? error.message : String(error),
+				});
+			}
+		}
+		if (failures.length > 0) {
+			throw new UnprocessableEntityException({
+				message: 'Batch rejected; no events were stored',
+				failures,
+			});
+		}
+
+		// start ingesting events
+		const results: IngestResult[] = [];
+		for (let i = 0; i < dtos.length; i++) {
+			results.push(await this.store(raws[i], dtos[i], resourceIds[i]));
+		}
+		const stored = results.filter((r) => r.stored).length;
+		return {
+			received: results.length,
+			stored,
+			duplicates: results.length - stored,
+			events: results,
+		};
 	}
 
 	/**
