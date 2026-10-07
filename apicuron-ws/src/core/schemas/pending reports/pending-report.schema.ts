@@ -25,6 +25,9 @@ export class PendingReportDB {
 	@Prop({ required: true, enum: ContributorIdentifierType, type: String })
 	contributor_identifier_type: ContributorIdentifierType;
 
+	@Prop({ type: String })
+	contributor_login?: string; // for GitHub accounts, useful for display, the identifier is the authoritative value for reconciliation
+
 	@Prop({
 		required: true,
 		enum: PendingReportStatus,

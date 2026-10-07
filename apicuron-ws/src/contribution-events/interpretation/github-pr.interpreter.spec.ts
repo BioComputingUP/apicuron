@@ -1,4 +1,4 @@
-import events from './__fixtures__/disprot-events.json';
+const events: any[] = require('./__fixtures__/disprot-events.json');
 import { InterpretationError, interpretMergedPullRequest } from './github-pr.interpreter';
 
 const eventFor = (pr: number) => events.find((e) => e.subject === `pull_request/${pr}`);

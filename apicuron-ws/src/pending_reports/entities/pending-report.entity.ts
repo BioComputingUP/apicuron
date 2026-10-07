@@ -9,6 +9,7 @@ export class PendingReport {
 	timestamp: Date;
 	contributor_identifier: string;
 	contributor_identifier_type: ContributorIdentifierType;
+	contributor_login?: string;
 
 	constructor({
 		id,
@@ -18,6 +19,7 @@ export class PendingReport {
 		timestamp,
 		contributor_identifier,
 		contributor_identifier_type,
+		contributor_login,
 	}: {
 		id: string;
 		resource_id: string;
@@ -26,6 +28,7 @@ export class PendingReport {
 		timestamp: Date;
 		contributor_identifier: string;
 		contributor_identifier_type: ContributorIdentifierType;
+		contributor_login?: string;
 	}) {
 		this.id = id;
 		this.resource_id = resource_id;
@@ -34,6 +37,7 @@ export class PendingReport {
 		this.timestamp = timestamp;
 		this.contributor_identifier = contributor_identifier;
 		this.contributor_identifier_type = contributor_identifier_type;
+		this.contributor_login = contributor_login;
 	}
 
 	static fromMongooseDocument(document: PendingReportDocument) {
@@ -45,6 +49,7 @@ export class PendingReport {
 			timestamp: document.timestamp,
 			contributor_identifier: document.contributor_identifier,
 			contributor_identifier_type: document.contributor_identifier_type,
+			contributor_login: document.contributor_login,
 		});
 	}
 }

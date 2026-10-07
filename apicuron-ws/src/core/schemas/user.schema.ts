@@ -232,7 +232,7 @@ export class User {
 	acceptsEmails?: boolean;
 
 	@Prop({ type: [GithubAccountSchema], default: [] })
-	github_accounts: GithubAccount[];
+	github_accounts?: GithubAccount[];
 	// THese methods are commented out because they are added to the schema decorator using the methods property.
 	// hasResourcePutCode(resource_id: string): boolean {
 	// 	return (
@@ -272,7 +272,10 @@ export function userCollectionSchemaFactory() {
 		{ orcid_id: 1 },
 		{ unique: true, name: 'unique_users' },
 	);
-	UserSchema.index({ 'github_accounts.github_id': 1 }, { name: 'users_github_account_index' }); // just for lookup
+	UserCollectionSchema.index(
+		{ 'github_accounts.github_id': 1 },
+		{ name: 'users_github_account_index' },
+	); // just for lookup
 
 	UserCollectionSchema.methods.hasResourcePutCode;
 

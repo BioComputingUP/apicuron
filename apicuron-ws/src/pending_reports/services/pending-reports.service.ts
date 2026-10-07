@@ -20,6 +20,7 @@ export class PendingReportsService {
 		timestamp,
 		contributor_identifier,
 		contributor_identifier_type,
+		contributor_login
 	}: Omit<PendingReport, 'id'>) {
 		try {
 			await this.repository.save({
@@ -29,6 +30,7 @@ export class PendingReportsService {
 				timestamp,
 				contributor_identifier,
 				contributor_identifier_type,
+				contributor_login
 			});
 		} catch (error: unknown) {
 			if (error instanceof ConflictException) {
