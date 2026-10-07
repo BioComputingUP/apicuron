@@ -1,0 +1,211 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`interpretMergedPullRequest matches the recorded baseline for all fixture events 1`] = `
+Array [
+  Object {
+    "pr": "pull_request/10",
+    "reports": Array [
+      "adelbke:change_integration",
+      "geekn0rd:feature_building",
+    ],
+  },
+  Object {
+    "pr": "pull_request/100",
+    "reports": Array [
+      "adelbke:change_integration",
+      "adelbke:change_reviewing",
+      "geekn0rd:change_shipped",
+    ],
+  },
+  Object {
+    "pr": "pull_request/101",
+    "reports": Array [
+      "adelbke:change_integration",
+      "geekn0rd:change_shipped",
+      "adelbke:technical_discussion",
+    ],
+  },
+  Object {
+    "pr": "pull_request/106",
+    "reports": Array [
+      "adelbke:change_integration",
+      "geekn0rd:change_shipped",
+    ],
+  },
+  Object {
+    "pr": "pull_request/11",
+    "reports": Array [
+      "adelbke:change_integration",
+      "geekn0rd:change_shipped",
+    ],
+  },
+  Object {
+    "pr": "pull_request/111",
+    "reports": Array [
+      "adelbke:change_integration",
+      "geekn0rd:change_shipped",
+    ],
+  },
+  Object {
+    "pr": "pull_request/115",
+    "reports": Array [
+      "adelbke:change_integration",
+      "adelbke:change_reviewing",
+      "geekn0rd:feature_building",
+      "adelbke:technical_discussion",
+    ],
+  },
+  Object {
+    "pr": "pull_request/116",
+    "reports": Array [
+      "geekn0rd:bug_fixing",
+      "adelbke:change_integration",
+      "adelbke:change_reviewing",
+    ],
+  },
+  Object {
+    "pr": "pull_request/117",
+    "reports": Array [
+      "adelbke:feature_building",
+    ],
+  },
+  Object {
+    "pr": "pull_request/120",
+    "reports": Array [
+      "adelbke:bug_fixing",
+    ],
+  },
+  Object {
+    "pr": "pull_request/122",
+    "reports": Array [
+      "adelbke:change_integration",
+      "geekn0rd:feature_building",
+    ],
+  },
+  Object {
+    "pr": "pull_request/125",
+    "reports": Array [
+      "adelbke:change_integration",
+      "adelbke:change_reviewing",
+      "geekn0rd:feature_building",
+    ],
+  },
+  Object {
+    "pr": "pull_request/127",
+    "reports": Array [
+      "geekn0rd:bug_fixing",
+      "adelbke:change_integration",
+      "adelbke:change_reviewing",
+    ],
+  },
+  Object {
+    "pr": "pull_request/13",
+    "reports": Array [
+      "geekn0rd:bug_fixing",
+      "adelbke:change_integration",
+      "adelbke:change_reviewing",
+      "adelbke:technical_discussion",
+    ],
+  },
+  Object {
+    "pr": "pull_request/2",
+    "reports": Array [
+      "geekn0rd:bug_fixing",
+      "adelbke:change_integration",
+      "adelbke:change_reviewing",
+    ],
+  },
+  Object {
+    "pr": "pull_request/3",
+    "reports": Array [
+      "adelbke:change_integration",
+      "geekn0rd:feature_building",
+    ],
+  },
+  Object {
+    "pr": "pull_request/4",
+    "reports": Array [
+      "geekn0rd:bug_fixing",
+      "adelbke:change_integration",
+    ],
+  },
+  Object {
+    "pr": "pull_request/5",
+    "reports": Array [
+      "adelbke:change_integration",
+      "adelbke:change_reviewing",
+      "geekn0rd:change_shipped",
+    ],
+  },
+  Object {
+    "pr": "pull_request/6",
+    "reports": Array [
+      "geekn0rd:bug_fixing",
+      "adelbke:change_integration",
+      "adelbke:change_reviewing",
+    ],
+  },
+  Object {
+    "pr": "pull_request/78",
+    "reports": Array [
+      "adelbke:change_integration",
+      "geekn0rd:change_shipped",
+    ],
+  },
+  Object {
+    "pr": "pull_request/79",
+    "reports": Array [
+      "geekn0rd:bug_fixing",
+      "adelbke:change_integration",
+      "adelbke:change_reviewing",
+    ],
+  },
+  Object {
+    "pr": "pull_request/8",
+    "reports": Array [
+      "adelbke:change_shipped",
+      "geekn0rd:technical_discussion",
+    ],
+  },
+  Object {
+    "pr": "pull_request/84",
+    "reports": Array [
+      "geekn0rd:bug_fixing",
+      "adelbke:change_integration",
+      "adelbke:change_reviewing",
+    ],
+  },
+  Object {
+    "pr": "pull_request/87",
+    "reports": Array [
+      "geekn0rd:bug_fixing",
+      "adelbke:change_integration",
+      "adelbke:change_reviewing",
+      "adelbke:technical_discussion",
+    ],
+  },
+  Object {
+    "pr": "pull_request/88",
+    "reports": Array [
+      "geekn0rd:bug_fixing",
+      "adelbke:change_integration",
+    ],
+  },
+  Object {
+    "pr": "pull_request/93",
+    "reports": Array [
+      "geekn0rd:bug_fixing",
+      "adelbke:change_integration",
+      "adelbke:change_reviewing",
+    ],
+  },
+  Object {
+    "pr": "pull_request/94",
+    "reports": Array [
+      "adelbke:change_integration",
+      "adelbke:change_reviewing",
+      "geekn0rd:feature_building",
+    ],
+  },
+]
+`;
