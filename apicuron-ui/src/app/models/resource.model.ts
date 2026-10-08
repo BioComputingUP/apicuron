@@ -46,6 +46,7 @@ export class Resource implements Deserializable, Serializable {
       resource_uri: this.resource_uri.href,
       resource_url: this.resource_url.href,
       color: this.color,
+      category: this.category,
       leaderboard_preferences: {
         monthly: this.leaderboard_preferences.monthly,
         weekly: this.leaderboard_preferences.weekly,
