@@ -15,6 +15,7 @@ import { URL_PATTERN } from "src/app/models/types/constants";
 import {
   ResourceCategories,
   ResourceCategory,
+  ResourceCategoryLabels,
 } from "src/app/models/types/enums";
 import { toFormData } from "../../util/toFormData";
 import { DatabasesService } from "../services/databases.service";
@@ -45,6 +46,7 @@ export class DatabaseCreateComponent implements OnDestroy {
   destroy$ = new Subject<Boolean>();
 
   readonly ResourceCategories = ResourceCategories;
+  readonly ResourceCategoryLabels = ResourceCategoryLabels;
   constructor(
     private formBuilder: FormBuilder,
     protected databasesService: DatabasesService,
