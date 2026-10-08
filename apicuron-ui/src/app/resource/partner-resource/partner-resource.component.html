@@ -13,6 +13,14 @@
       >
       </svg-icon>
     </a>
+    <span
+      *ngIf="resource.category"
+      title="Resource type"
+      class="tw-text-xs tw-font-dm-sans tw-border tw-rounded-full tw-px-2 tw-py-0.5 tw-ml-2 tw-self-start tw-shrink-0 tw-whitespace-nowrap"
+      [ngClass]="categoryColor"
+    >
+      {{ resource.categoryLabel() }}
+    </span>
   </div>
   <span class="tw-text-gray-500 tw-font-normal tw-text-left tw-font-dm-sans">
     {{ resource.resource_long_name }}
