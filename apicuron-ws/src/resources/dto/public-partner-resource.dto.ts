@@ -1,5 +1,6 @@
-import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, IsUrl } from 'class-validator';
 import { Expose, Type } from 'class-transformer';
+import { ResourceCategory } from 'src/core/enums';
 import { SelectPartnerResourceDto } from './partner-resources.entity';
 import { ResourceStatsDto } from './resource-stat.dto';
 import { StorageReference } from 'src/shared/decorators/storage-reference.decorator';
@@ -38,6 +39,10 @@ export class PublicPartnerResourceDto extends SelectPartnerResourceDto {
 
 	@Expose()
 	joined_date: Date;
+
+	@IsEnum(ResourceCategory)
+	@Expose()
+	category: ResourceCategory;
 
 	@IsNotEmpty()
 	@IsString()
