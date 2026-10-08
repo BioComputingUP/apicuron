@@ -121,7 +121,6 @@ import { ContributionEventsModule } from './contribution-events/contribution-eve
 		OrcidFetcherModule,
 		OrcidSyncModule,
 		AdminModule,
-		SoftwareModule,
 		PendingReportsModule,
 		ContributionEventsModule
 	],
