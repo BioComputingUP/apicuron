@@ -18,7 +18,7 @@ export class ReconcilationService {
 		protected eventEmitter: EventEmitter2,
 	) {}
 
-	@OnEvent(UserOrcidIdentifiedEvent.eventName, { async: true })
+	@OnEvent(UserOrcidIdentifiedEvent.eventName, { async: true, promisify: true })
 	async handleUserOrcidIdentified(eventPayload: UserOrcidIdentifiedEvent) {
 		try {
 			await this.reconcile(

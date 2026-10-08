@@ -3,6 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-oauth2';
+import { GithubIdentitySyncService } from 'src/github-identity/github-identity-sync.service';
 import { OrcidClientService } from 'src/orcid/orcid-client/orcid-client.service';
 import { AuthService } from '../auth.service';
 import { UsersService } from '../users/services/users.service';
@@ -17,6 +18,7 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 		usersService: UsersService,
 		protected httpService: HttpService,
 		protected orcid_client: OrcidClientService,
+		protected githubIdentitySync: GithubIdentitySyncService
 	) {
 		const logger = new Logger(OrcidStrategy.name);
 		super(
@@ -48,7 +50,12 @@ export class OrcidStrategy extends PassportStrategy(Strategy, 'orcid') {
 						employment: user_info.user_employment,
 						links: user_info.links,
 					});
-
+					// not awaited on purpose to avoid blocking login
+					void githubIdentitySync
+						.syncUser(orcid_id)
+						.catch((e) =>
+							logger.warn(`GitHub identity sync failed for ${orcid_id}: ${e}`),
+						);
 					done(null, user);
 				} catch (error) {
 					logger.error(`Error Orcid Oauth for user ${orcid_id} ! `);

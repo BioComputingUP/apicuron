@@ -15,6 +15,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CoreApicuronModule } from '../core/core.module';
 import { UsersEventHandlers } from './users/services/users-event-handlers.service';
 import { OrcidClientModule } from 'src/orcid/orcid-client/orcid-client.module';
+import { GithubIdentityModule } from 'src/github-identity/github-identity.module';
 
 @Module({
 	providers: [
@@ -39,6 +40,7 @@ import { OrcidClientModule } from 'src/orcid/orcid-client/orcid-client.module';
 			}),
 		}),
 		OrcidClientModule,
+		GithubIdentityModule
 	],
 	exports: [UsersService, JwtModule, OrcidExists, AuthService],
 	controllers: [AuthController, UsersController, UserControllerV2],
