@@ -21,7 +21,9 @@ export class ResourceStats implements Deserializable {
   deserialize(input: any): this {
     this.contributionCount = input.contributionCount;
     this.uniqueContributors = input.uniqueContributors;
-    this.lastContributionDate = new Date(input.lastContributionDate);
+    this.lastContributionDate = input.lastContributionDate
+      ? new Date(input.lastContributionDate)
+      : null;
     this.firstContributionDate = input.firstContributionDate
       ? new Date(input.firstContributionDate)
       : null;

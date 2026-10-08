@@ -1,89 +1,103 @@
 <div
-  class="tw-border-2 tw-border-gray-400 tw-bg-white tw-rounded-md tw-p-2 md:tw-p-4 focus:tw-shadow-2xl tw-h-full tw-flex tw-flex-col"
+  class="tw-border tw-border-gray-300 tw-bg-white tw-rounded-md tw-p-4 tw-h-full tw-flex tw-flex-col tw-font-dm-sans"
 >
-  <div class="tw-flex tw-flex-row tw-justify-between">
+  <!-- Name and type -->
+  <div class="tw-flex tw-flex-row tw-justify-between tw-items-start tw-gap-2">
     <a
-      class="tw-text-xl tw-font-bold hover:tw-underline hover:tw-text-apicuron-bright-purple tw-text-gray-800 tw-cursor-pointer tw-inline tw-align-middle"
+      class="tw-text-xl tw-font-bold hover:tw-underline hover:tw-text-apicuron-bright-purple tw-text-gray-800 tw-min-w-0 tw-break-words"
       [routerLink]="['/databases', resource.resource_id]"
       >{{ resource.resource_name }}
       <svg-icon
         src="assets/svg/right-arrow.svg"
-        svgClass="tw-h-6 tw-w-6 tw-pt-2"
-        class="tw-inline-flex tw-h-full tw-items-center"
+        svgClass="tw-h-4 tw-w-4 tw-inline"
+        aria-hidden="true"
       >
       </svg-icon>
     </a>
     <span
       *ngIf="resource.category"
       title="Resource type"
-      class="tw-text-xs tw-font-dm-sans tw-border tw-rounded-full tw-px-2 tw-py-0.5 tw-ml-2 tw-self-start tw-shrink-0 tw-whitespace-nowrap"
-      [ngClass]="categoryColor"
+      class="tw-inline-flex tw-items-center tw-gap-1.5 tw-text-xs tw-font-medium tw-text-gray-700 tw-bg-gray-100 tw-rounded-full tw-px-2 tw-py-1 tw-shrink-0 tw-whitespace-nowrap"
     >
+      <span
+        class="tw-h-2 tw-w-2 tw-rounded-full"
+        [ngClass]="categoryColor"
+      ></span>
       {{ resource.categoryLabel() }}
     </span>
   </div>
-  <span class="tw-text-gray-500 tw-font-normal tw-text-left tw-font-dm-sans">
+  <span class="tw-text-sm tw-text-gray-500" *ngIf="hasDistinctLongName">
     {{ resource.resource_long_name }}
   </span>
-  <p
-    class="tw-font-medium tw-text-gray-800 tw-pt-2 md:tw-pt-4 tw-overflow-ellipsis tw-text-justify tw-line-clamp-3"
-  >
-    {{ description_formatted }}
+
+  <p class="tw-text-gray-700 tw-pt-3 tw-line-clamp-3">
+    {{ resource.resource_description }}
   </p>
+
+  <!-- Statistics and logo, kept at the bottom of the card -->
   <div
-    class="tw-flex tw-flex-row tw-justify-between tw-pt-2 lg:tw-pt-4 tw-items-end"
+    class="tw-flex tw-flex-row tw-justify-between tw-items-end tw-gap-4 tw-mt-auto tw-pt-4"
   >
-    <div class="tw-flex tw-flex-col">
-      <span
-        class="tw-text-gray-800 tw-font-dm-sans tw-flex tw-flex-col tw-pt-2"
-        *ngIf="resource?.stats?.hasLastActivity()"
+    <dl class="tw-grid tw-grid-cols-2 tw-gap-x-6 tw-gap-y-2 tw-m-0">
+      <ng-container *ngIf="resource.stats?.hasLastActivity()">
+        <div>
+          <dt class="tw-text-xs tw-text-gray-500 tw-font-normal">
+            Contributors
+          </dt>
+          <dd class="tw-text-sm tw-font-medium tw-text-gray-800 tw-m-0">
+            {{ resource.stats.uniqueContributors | number }}
+          </dd>
+        </div>
+        <div>
+          <dt class="tw-text-xs tw-text-gray-500 tw-font-normal">
+            Contribution events
+          </dt>
+          <dd class="tw-text-sm tw-font-medium tw-text-gray-800 tw-m-0">
+            {{ resource.stats.contributionCount | number }}
+          </dd>
+        </div>
+      </ng-container>
+      <div>
+        <dt class="tw-text-xs tw-text-gray-500 tw-font-normal">Joined</dt>
+        <dd class="tw-text-sm tw-font-medium tw-text-gray-800 tw-m-0">
+          {{ resource.joined_date | date : "dd-MM-yyyy" : "UTC" }}
+        </dd>
+      </div>
+      <div
+        *ngIf="resource.stats?.hasLastActivity()"
+        title="Includes curation events, updates to the resource data"
       >
-        <span>
-          Contributors:
-          {{ resource?.stats?.uniqueContributors }}
-        </span>
-        <span>
-          Contribution Events:
-          {{ resource?.stats?.contributionCount }}
-        </span>
-      </span>
-      <span class="tw-block tw-text-gray-800 tw-font-dm-sans">
-        <span>
-          Joined APICURON on:
-          {{ resource?.joined_date | date : "dd-MM-yyyy" : "UTC" }}
-        </span>
-      </span>
-      <span
-        class="tw-block tw-text-gray-800 tw-font-dm-sans"
-        *ngIf="resource.lastSubmissionDate"
-      >
-        <span title="Includes curation events, updates to the resource data">
-          Last Activity:
+        <dt class="tw-text-xs tw-text-gray-500 tw-font-normal">
+          Last activity
+        </dt>
+        <dd class="tw-text-sm tw-font-medium tw-text-gray-800 tw-m-0">
           {{ resource.lastSubmissionDate | date : "dd-MM-yyyy" : "UTC" }}
-        </span>
-      </span>
+        </dd>
+      </div>
+    </dl>
+
+    <div class="tw-flex tw-flex-col tw-items-end tw-gap-2 tw-shrink-0">
+      <!-- Fixed box so that every logo takes the same space, whatever its proportions -->
+      <img
+        *ngIf="resource.logo"
+        [src]="resource.logo"
+        [alt]="'Logo of ' + resource.resource_name"
+        loading="lazy"
+        class="tw-h-14 tw-w-32 tw-object-contain tw-object-right"
+      />
+      <a
+        target="_blank"
+        rel="noopener"
+        class="tw-text-sm tw-text-blue-600 hover:tw-text-blue-700 hover:tw-underline tw-whitespace-nowrap"
+        [href]="resource.resource_url"
+        >Visit Website
+        <svg-icon
+          src="assets/svg/external-link.svg"
+          svgClass="tw-h-3 tw-w-3 tw-inline"
+          aria-hidden="true"
+        >
+        </svg-icon
+      ></a>
     </div>
-    <div class="tw-self-center">
-      <a target="_blank" [href]="resource.resource_url">
-        <img
-          [src]="resource.logo"
-          [alt]="'Logo of ' + resource.resource_name"
-          class="tw-h-20 tw-max-h-20"
-        />
-      </a>
-    </div>
-  </div>
-  <div class="tw-self-end tw-grow tw-flex tw-items-end">
-    <a
-      target="_blank"
-      class="tw-text-md tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer hover:tw-underline"
-      [href]="resource.resource_url"
-      >Visit Website
-      <svg-icon
-        src="assets/svg/external-link.svg"
-        svgClass="tw-h-3 tw-w-3 tw-inline"
-      >
-      </svg-icon
-    ></a>
   </div>
 </div>
