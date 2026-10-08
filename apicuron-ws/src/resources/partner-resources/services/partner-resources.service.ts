@@ -1,6 +1,7 @@
 import { StorageService } from '@biocomputingup/nest-storage-manager';
 import {
 	BadRequestException,
+	ConflictException,
 	Injectable,
 	Logger,
 	NotFoundException,
@@ -11,6 +12,7 @@ import { readFile } from 'fs/promises';
 import { FilterQuery, LeanDocument, Types } from 'mongoose';
 import { join } from 'path';
 import { PartnerResourceRepository } from 'src/core/repositories/partner-resource.repository';
+import { SourceSystem } from 'src/core/schemas/components/resource-source.schema';
 import { StorageType } from 'src/storage/storage.config';
 import { FileUploadDto } from 'src/util/file-upload.helper';
 import { assertIsDefined } from 'src/util/type-assertion.helper';
@@ -21,6 +23,7 @@ import {
 import {
 	PartnerResource,
 	PartnerResourceDocument,
+	PartnerResourceModel,
 } from '../../../core/schemas/resource/partner-resource.schema';
 import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
 import { AddMemberToLeague } from '../leagues/dto/add-member-to-league.dto';
@@ -34,6 +37,8 @@ export class PartnerResourcesService {
 		private partnerResourceRepo: PartnerResourceRepository,
 		protected eventEmitter: EventEmitter2,
 		private storageService: StorageService,
+		@InjectModel(PartnerResource.name)
+		protected readonly partnerResourceModel: PartnerResourceModel,
 	) {}
 
 	logger = new Logger(PartnerResourcesService.name);
@@ -173,20 +178,22 @@ export class PartnerResourcesService {
 
 	async update_resource(
 		resource_update: UpdatePartnerResourceDto,
-		logo?: Express.Multer.File
+		logo?: Express.Multer.File,
 	): Promise<PartnerResourceDocument> {
 		const { resource_id, ...updates } = resource_update;
 
 		if (logo) {
 			const logoFile = FileUploadDto.fromMulter(logo);
-			logoFile.buffer = logo.buffer || await readFile(logo.path);
+			logoFile.buffer = logo.buffer || (await readFile(logo.path));
 			const publicEngine = this.storageService.getEngine(StorageType.public);
 			const logoReference = await publicEngine.put(
-					join('resources', logoFile.filename),
-					logoFile.buffer,
-				);
+				join('resources', logoFile.filename),
+				logoFile.buffer,
+			);
 			updates.logo = logoReference;
-			this.logger.debug(`Updating logo for resource ${resource_id} to ${logoReference}`);
+			this.logger.debug(
+				`Updating logo for resource ${resource_id} to ${logoReference}`,
+			);
 		}
 
 		const newResource = await this.partnerResourceRepo.findOneAndUpdate(
@@ -194,8 +201,6 @@ export class PartnerResourcesService {
 			{ $set: updates },
 			{ new: true },
 		);
-
-
 
 		assertIsDefined(newResource, `Resource with ID ${resource_id} not found.`);
 		return newResource;
@@ -230,5 +235,38 @@ export class PartnerResourcesService {
 		});
 
 		return resource.defaultLeague;
+	}
+
+	async linkSource(
+		resource_id: string,
+		source: { system: SourceSystem; repository_id: string; full_name: string },
+	): Promise<{ linked: boolean }> {
+		const linkedElsewhere = await this.partnerResourceModel
+			.findOne({
+				resource_id: { $ne: resource_id },
+				'sources.system': source.system,
+				'sources.repository_id': source.repository_id,
+			})
+			.lean();
+		if (linkedElsewhere) {
+			throw new ConflictException(
+				`Repository ${source.repository_id} (${source.full_name}) is already linked to resource "${linkedElsewhere.resource_id} (${linkedElsewhere.resource_name})".`,
+			);
+		}
+
+		// Push only if not already linked to this resource (array uniqueness is not enforced by the index)
+		const result = await this.partnerResourceModel.updateOne(
+			{ resource_id, 'sources.repository_id': { $ne: source.repository_id } },
+			{ $push: { sources: { ...source, linked_at: new Date() } } },
+		);
+
+		if (source.system === SourceSystem.GITHUB) {
+			await this.partnerResourceModel.updateOne(
+				{ resource_id },
+				{ $addToSet: { allowedUrlsPrefix: 'https://github.com' } },
+			);
+		}
+
+		return { linked: result.modifiedCount === 1 };
 	}
 }

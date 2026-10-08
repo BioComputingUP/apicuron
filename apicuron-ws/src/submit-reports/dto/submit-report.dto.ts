@@ -111,5 +111,5 @@ export class SubmitReportsDto {
 	@IsArray()
 	@IsString({ each: true })
 	@IsOptional()
-	delete_all: Array<string>;
+	delete_all?: Array<string>;
 }

@@ -74,6 +74,7 @@ async function bootstrap() {
 	app.setViewEngine('hbs');
 
 	app.enableShutdownHooks();
+	app.useBodyParser('json', { limit: '1mb' });
 
 	// starting to listen to requests
 	// await app.listen(port, host);

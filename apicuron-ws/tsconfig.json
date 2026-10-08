@@ -22,7 +22,8 @@
 		"noImplicitAny": false,
 		"strictBindCallApply": true,
 		"forceConsistentCasingInFileNames": false,
-		"noFallthroughCasesInSwitch": false
+		"noFallthroughCasesInSwitch": false,
+		"resolveJsonModule": true,
 	},
 	"exclude": ["node_modules", "dist"]
 }

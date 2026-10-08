@@ -3,12 +3,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Model, UpdateWriteOpResult } from 'mongoose';
 import { User, UserDocument } from 'src/core/schemas/user.schema';
+import { GithubIdentitySyncService } from 'src/github-identity/github-identity-sync.service';
 import { OrcidClientService } from '../orcid-client/orcid-client.service';
 
 export class OrcidSyncService {
 	constructor(
 		@InjectModel(User.name) protected userModel: Model<UserDocument>,
 		protected orcidClientService: OrcidClientService,
+		protected githubIdentitySync: GithubIdentitySyncService,
 	) {}
 	logger = new Logger(OrcidSyncService.name);
 	private batch_size = 100;
@@ -19,10 +21,18 @@ export class OrcidSyncService {
 			const extra_orcid_info = await this.orcidClientService.get_user_info(
 				user.orcid_id,
 			);
-			return this.userModel.updateOne(
+			const result = await this.userModel.updateOne(
 				{ orcid_id: user.orcid_id },
 				{ $set: extra_orcid_info },
 			);
+			await this.githubIdentitySync
+				.syncUser(user.orcid_id)
+				.catch((e) =>
+					this.logger.warn(
+						`GitHub identity sync failed for ${user.orcid_id}: ${e}`,
+					),
+				);
+			return result;
 		} catch (error) {
 			this.logger.error(`Error getting infor for user ${user.orcid_id}`);
 			this.logger.error(error);

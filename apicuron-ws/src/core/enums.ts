@@ -1,6 +1,7 @@
 // Generics
 export type ObjectValues<T> = T[keyof T];
-export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType[number];
+export type ArrayElement<ArrayType extends readonly unknown[]> =
+	ArrayType[number];
 
 // Types
 export const PrivacyType = {
@@ -67,7 +68,7 @@ export type Month = ArrayElement<typeof months>;
 
 export const ResourceCategory = {
 	Database: 'Database',
-    KnowledgeBase: 'KnowledgeBase',
+	KnowledgeBase: 'KnowledgeBase',
 	Software: 'Software',
 	Training: 'Training',
 } as const;
@@ -75,3 +76,39 @@ export const ResourceCategory = {
 export const ResourceCategories = Object.values(ResourceCategory);
 
 export type ResourceCategory = ObjectValues<typeof ResourceCategory>;
+
+export const ContributorIdentifierType = {
+	GITHUB: 'GITHUB',
+	ORCID: 'ORCID',
+} as const;
+
+export type ContributorIdentifierType = ObjectValues<
+	typeof ContributorIdentifierType
+>;
+
+export const PendingReportStatus = {
+	PENDING: 'PENDING',
+	SUBMITTED: 'SUBMITTED',
+	FAILED: 'FAILED',
+} as const;
+
+export type PendingReportStatus = ObjectValues<typeof PendingReportStatus>;
+
+
+// == Contribution Event Enums == 
+export const EventProcessingStatus = {
+	RECEIVED: 'RECEIVED',
+	PROCESSED: 'PROCESSED',
+	FAILED: 'FAILED',
+} as const;
+export type EventProcessingStatus = (typeof EventProcessingStatus)[keyof typeof EventProcessingStatus];
+
+export const EventOutputKind = { REPORT: 'REPORT', PENDING: 'PENDING' } as const;
+export type EventOutputKind = (typeof EventOutputKind)[keyof typeof EventOutputKind];
+
+export const EventOutputStatus = {
+	CREATED: 'CREATED',
+	ALREADY_EXISTED: 'ALREADY_EXISTED',
+	FAILED: 'FAILED',
+} as const;
+export type EventOutputStatus = (typeof EventOutputStatus)[keyof typeof EventOutputStatus];

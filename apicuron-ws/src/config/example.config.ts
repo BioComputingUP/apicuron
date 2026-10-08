@@ -25,4 +25,5 @@ export default () => ({
 	SCHEDULER_TASK: 'apicuron_dev', // The task used by APICURON on this scheduler
 	API_DOCS_PREFIX: '',
 	RELEASE: '2.0.0',
+	GITHUB_TOKEN: process.env.GITHUB_TOKEN,
 });
