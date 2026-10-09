@@ -1,7 +1,7 @@
 <div class="tw-text-sm tw-font-medium tw-text-center tw-text-gray-500 tw-border-b tw-border-gray-200 tw-mt-4">
     <ul class="tw-flex tw-flex-wrap tw--mb-px">
         <li class="tw-mr-2">
-            <a [routerLink]="['/curators', curator.orcid_id ]" [fragment]="resource['resource_id']"
+            <a [routerLink]="['/contributors', curator.orcid_id ]" [fragment]="resource['resource_id']"
                 class="tw-inline-block tw-text-lg tw-px-4 tw-pb-2 tw-pt-4 tw-rounded-t-lg tw-border-b-2"
                 [ngClass]="{'tw-font-bold tw-text-apicuron-purple tw-border-apicuron-purple hover:tw-text-apicuron-purple': resource.resource_id == current_stat.resource_id, 'hover:tw-text-gray-600 tw-border-gray-300': current_stat.resource_id != resource.resource_id }">{{
                 resource['resource_name'] }}

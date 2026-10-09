@@ -20,7 +20,7 @@ import { AngularSvgIconModule } from "angular-svg-icon";
       </div>
       <a
         class="tw-text-lg tw-block hover:tw-underline tw-whitespace-pre"
-        [routerLink]="['/curators', user.orcid_id]"
+        [routerLink]="['/contributors', user.orcid_id]"
       >
         <span>{{ user.displayedName }}</span>
       </a>

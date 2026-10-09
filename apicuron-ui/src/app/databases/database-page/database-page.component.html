@@ -129,7 +129,7 @@
 
               <!-- View All Contributors Link -->
               <a
-                [routerLink]="['/curators']"
+                [routerLink]="['/contributors']"
                 [queryParams]="{ resources: resource.resource_id }"
                 class="tw-shrink-0 tw-px-4 tw-py-2 tw-text-sm tw-font-bold tw-text-apicuron-purple-500 tw-bg-purple-50 hover:tw-bg-purple-100 tw-rounded-md tw-transition-colors tw-flex tw-items-center tw-gap-1.5 tw-border tw-border-purple-200"
               >
@@ -159,7 +159,7 @@
               >
                 <a
                   *ngFor="let item of topContributors"
-                  [routerLink]="['/curators', item.user.orcid_id]"
+                  [routerLink]="['/contributors', item.user.orcid_id]"
                   class="tw-flex tw-items-center tw-gap-2.5 tw-px-3 tw-py-1.5 tw-bg-gray-50 hover:tw-bg-purple-50 tw-border tw-border-gray-200 hover:tw-border-purple-300 tw-rounded-full tw-transition-all group"
                   [title]="
                     item.user.displayedName + ' (' + item.user.orcid_id + ')'

@@ -1,5 +1,6 @@
 import { Expose, Type } from 'class-transformer';
-import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { ResourceCategory } from 'src/core/enums';
 import { StorageReference } from 'src/shared/decorators/storage-reference.decorator';
 import { LeagueEntity } from '../partner-resources/leagues/dto/league.dto';
 import { LeaderboardSettingsDto } from './leaderboard-settings.dto';
@@ -46,6 +47,10 @@ export class PartnerResourceEntity extends SelectPartnerResourceDto {
 
 	@Expose()
 	joined_date: Date;
+
+	@IsEnum(ResourceCategory)
+	@Expose()
+	category: ResourceCategory;
 
 	@IsNotEmpty()
 	@IsString()

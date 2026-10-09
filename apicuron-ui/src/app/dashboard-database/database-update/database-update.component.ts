@@ -14,6 +14,10 @@ import {
   tap
 } from "rxjs/operators";
 import { Resource } from "../../models/resource.model";
+import {
+  ResourceCategories,
+  ResourceCategoryLabels,
+} from "../../models/types/enums";
 import { ResourcesService } from "../../resource/service/resources.service";
 
 @Component({
@@ -30,6 +34,9 @@ export class DatabaseUpdateComponent implements OnDestroy {
   resource$: Observable<Object>;
 
   JSON = JSON;
+
+  readonly ResourceCategories = ResourceCategories;
+  readonly ResourceCategoryLabels = ResourceCategoryLabels;
 
   form: FormGroup;
 
@@ -94,6 +101,7 @@ export class DatabaseUpdateComponent implements OnDestroy {
             ),
           ],
         ],
+        category: [null, [Validators.required]],
         leaderboard_preferences: this.leaderboardForm,
       },
       { validators: Validators.required, updateOn: "change" }

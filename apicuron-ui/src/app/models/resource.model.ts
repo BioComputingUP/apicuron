@@ -9,7 +9,7 @@ import {
   Deserializable,
   Serializable,
 } from "src/app/interfaces/deserializable.model";
-import { ResourceCategory } from "./types/enums";
+import { ResourceCategory, ResourceCategoryLabels } from "./types/enums";
 
 export class ResourceStats implements Deserializable {
   contributionCount: any;
@@ -21,7 +21,9 @@ export class ResourceStats implements Deserializable {
   deserialize(input: any): this {
     this.contributionCount = input.contributionCount;
     this.uniqueContributors = input.uniqueContributors;
-    this.lastContributionDate = new Date(input.lastContributionDate);
+    this.lastContributionDate = input.lastContributionDate
+      ? new Date(input.lastContributionDate)
+      : null;
     this.firstContributionDate = input.firstContributionDate
       ? new Date(input.firstContributionDate)
       : null;
@@ -46,6 +48,7 @@ export class Resource implements Deserializable, Serializable {
       resource_uri: this.resource_uri.href,
       resource_url: this.resource_url.href,
       color: this.color,
+      category: this.category,
       leaderboard_preferences: {
         monthly: this.leaderboard_preferences.monthly,
         weekly: this.leaderboard_preferences.weekly,
@@ -63,6 +66,7 @@ export class Resource implements Deserializable, Serializable {
     this.resource_url = new URL(input.resource_url);
     this.color = input.color;
     this.joined_date = new Date(input.joined_date);
+    this.category = input.category;
     this.leaderboard_preferences = new LeaderboardPreferences().deserialize(
       input.leaderboard_preferences || {},
     );
@@ -91,6 +95,10 @@ export class Resource implements Deserializable, Serializable {
 
   faviconLink(): string {
     return new URL("/favicon.ico", this.resource_url).href;
+  }
+
+  categoryLabel(): string {
+    return ResourceCategoryLabels[this.category];
   }
 
   compare(other: Resource): boolean {

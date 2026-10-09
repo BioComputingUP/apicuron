@@ -59,7 +59,7 @@ export class AuthService implements OnDestroy {
   // Source to target mapper, maps sources to target redirection urls
   loginUrlMapper = new Map<string, string[]>([
     ["home", ["/"]],
-    ["curator", ["/curators"]],
+    ["curator", ["/contributors"]],
   ]);
 
   // authentication JWT token key and value

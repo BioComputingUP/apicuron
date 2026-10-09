@@ -1,318 +1,258 @@
 <div
-  class="tw-container tw-mx-auto sm:tw-px-2 2xl:tw-px-4 tw-max-w-full tw-container-wide sm:tw-pb-4"
+  class="tw-container tw-mx-auto tw-max-w-full tw-px-4 sm:tw-px-6 2xl:tw-px-8 tw-pt-4 tw-pb-12"
 >
-  <div class="tw-flex tw-flex-wrap tw-pt-3">
-    <div
-      class="tw-w-full sm:tw-w-1/4 tw-px-2 2xl:tw-px-4 lg:tw-block xl:tw-block"
-    >
-      <div class="sm:tw-sticky sm:tw-top-28 tw-sidebar">
-        <div class="tw-flex tw-flex-wrap">
-          <div
-            class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1 2xl:tw-px-4"
-          >
-            <details open
-              class="tw-relative tw-flex tw-flex-col tw-min-w-0 tw-rounded tw-break-words tw-border tw-bg-white tw-border-1 tw-border-gray-300"
-            >
-              <summary
-                class="tw-py-3 tw-px-6 tw-mb-0 tw-bg-gray-200 tw-border-b-1 tw-border-gray-300 tw-text-gray-900 tw-text-xl tw-block tw-cursor-pointer"
-              >
-                Table of contents
-              </summary>
-              <div class="tw-flex-auto tw-p-6">
-                <h6><a routerLink="." fragment="top">About</a></h6>
-                <ul class="disc-list">
-                  <li>
-                    <a routerLink="." fragment="how-to-cite">How to Cite</a>
-                  </li>
-                  <li><a routerLink="." fragment="license">License</a></li>
-                  <!-- <li><a routerLink="." fragment="intro">Introduction to APICURON</a></li> -->
-                  <!-- <li><a routerLink="." fragment="activities">Biocuration activities</a></li>
+  <div class="tw-flex tw-flex-col lg:tw-flex-row tw-gap-6 lg:tw-gap-10">
+    <aside class="lg:tw-w-64 lg:tw-shrink-0">
+      <details
+        open
+        class="toc lg:tw-sticky lg:tw-top-28 tw-rounded tw-border tw-border-gray-300 tw-bg-white"
+      >
+        <summary
+          class="tw-cursor-pointer tw-px-4 tw-py-3 tw-font-semibold tw-text-gray-900"
+        >
+          On this page
+        </summary>
+        <nav
+          aria-label="Table of contents"
+          class="tw-border-t tw-border-gray-200 tw-p-4"
+        >
+          <ul>
+            @for (section of sections; track section.id) {
+              <li>
+                <a routerLink="." [fragment]="section.id">{{
+                  section.label
+                }}</a>
+              </li>
+            }
+          </ul>
+        </nav>
+      </details>
+    </aside>
 
-                  <li><a routerLink="." fragment="gamification">Badges and scores</a></li> -->
-
-                  <li>
-                    <a routerLink="." fragment="becomemember"
-                      >Become a member</a
-                    >
-                  </li>
-                  <li><a routerLink="." fragment="contact">Contact</a></li>
-                  <li><a routerLink="." fragment="team">APICURON Team</a></li>
-                  <li><a routerLink="." fragment="funding">Funding</a></li>
-                  <li>
-                    <a routerLink="." fragment="qa-life-cycle-plan"
-                      >QA Life Cycle Plan</a
-                    >
-                  </li>
-                  <li><a routerLink="." fragment="sab">SAB</a></li>
-                  <li>
-                    <a routerLink="." fragment="elsi-policy"
-                      >ELSI Policy and Equal Opportunity</a
-                    >
-                  </li>
-                  <li>
-                    <a routerLink="." fragment="privacy">Privacy notice</a>
-                  </li>
-                  <!-- <ul class="disc-list">
-                  </ul>
-                  
-                  <ul class="disc-list">
-
-                  </ul> -->
-                </ul>
-              </div>
-            </details>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="tw-w-full sm:tw-w-3/4 tw-pr-4 tw-pl-2 sm:tw-pl-0 sm:tw-pr-8">
+    <article class="about-content tw-min-w-0 tw-flex-1 tw-max-w-4xl">
       <h1 id="top">About APICURON</h1>
-      <div class="tw-flex tw-flex-wrap">
-        <div class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1">
-          <h2 class="tw-pt-3 tw-pb-2" id="how-to-cite">How to cite</h2>
-          <p class="tw-text-justify">
-            <span class="tw-font-bold"
-              >APICURON: a database to credit and acknowledge the work of
-              biocurators</span
-            >
-            <br />
+
+      <section id="how-to-cite">
+        <h2>How to cite</h2>
+        <div class="card citation">
+          <p class="tw-font-semibold tw-text-gray-900">
+            APICURON: a database to credit and acknowledge the work of
+            biocurators
+          </p>
+          <p class="!tw-mt-1">
             András Hatos, Federica Quaglia, Damiano Piovesan, Silvio Tosatto
-            <br />
-            <i>Database</i> 2021; PubMed:
+          </p>
+          <p class="!tw-mt-1 tw-text-sm">
+            <i>Database</i> 2021 · PubMed:
             <a href="https://pubmed.ncbi.nlm.nih.gov/33882120/" target="_blank"
               >PMID: 33882120</a
             >
-            DOI:
+            · DOI:
             <a href="https://doi.org/10.1093/database/baab019" target="_blank"
               >10.1093/database/baab019</a
             >
           </p>
+        </div>
+      </section>
 
-          <h2 class="tw-pt-3 tw-pb-2" id="related-articles">
-            Related articles
-          </h2>
-
-          <ul class="tw-list-none">
-            <li>
-              <em
-                >Quaglia, F., Bouhraoua, K. E. A., Farrell, G., & Tosatto, S.
-                (2025).</em
-              >
-              <br />ELIXIR Commissioned Service Report: M3.3 Use Cases for
-              APICURON Evaluated. Zenodo. <br />
-              <a target="_blank" href="https://doi.org/10.5281/zenodo.15789620"
-                >doi:10.5281/zenodo.15789620</a
-              >
-            </li>
-          </ul>
-          <!-- <p class="tw-text-justify">
-        </p> -->
-
-          <div class="tw-flex tw-flex-wrap" id="license">
-            <div class="tw-relative tw-flex-grow tw-max-w-full tw-flex-1">
-              <h2 class="tw-pt-3 tw-pb-2">License</h2>
-              <div class="tw-self-center">
-                <a
-                  rel="license"
-                  href="http://creativecommons.org/licenses/by/4.0/"
+      <section id="related-articles">
+        <h2>Related articles</h2>
+        <ul class="tw-space-y-4">
+          @for (article of relatedArticles; track article.doi) {
+            <li class="card">
+              <p class="tw-font-semibold tw-text-gray-900">
+                {{ article.title }}
+              </p>
+              <p class="!tw-mt-1 tw-text-sm">
+                <em>{{ article.authors }}</em>
+              </p>
+              <p class="!tw-mt-1 tw-text-sm">
+                <a target="_blank" href="https://doi.org/{{ article.doi }}"
+                  >doi:{{ article.doi }}</a
                 >
-                  <img
-                    alt="Creative Commons License"
-                    style="border-width: 0"
-                    src="https://i.creativecommons.org/l/by/4.0/88x31.png"
-                  />
-                </a>
-                This work is licensed under a
-                <a
-                  rel="license"
-                  href="http://creativecommons.org/licenses/by/4.0/"
-                >
-                  Creative Commons Attribution 4.0 International License
-                </a>
-              </div>
-            </div>
-          </div>
+              </p>
+            </li>
+          }
+        </ul>
+      </section>
 
-          <!-- <h2 class="tw-pt-3 tw-pb-2" id="intro">Introduction</h2>
-          <p class="tw-text-justify">
-            Biocuration plays an essential role in making research data available to the scientific community and
-            shareable, therefore increasing their intrinsic value. However, the contribution and effort of biocurators
-            are extremely difficult to quantify and to acknowledge. This is relevant not only in the case of
-            hired-curators but especially in the case of databases relying on community curation. APICURON provides
-            partner biological databases with a real-time automatic tracking system of the biocuration activities,
-            allowing them to acknowledge and recognize the work of their biocurators. APICURON is based on the key
-            concept of gamification, therefore relying on a system of badges and scores that are used to recognize the
-            work of biocurators and at the same time encourage and motivate them.
-          </p>
-
+      <section id="license">
+        <h2>License</h2>
+        <div class="tw-flex tw-flex-wrap tw-items-center tw-gap-3">
+          <a
+            class="plain-link tw-shrink-0"
+            rel="license"
+            href="https://creativecommons.org/licenses/by/4.0/"
+            target="_blank"
+          >
+            <img
+              alt="Creative Commons License"
+              src="https://i.creativecommons.org/l/by/4.0/88x31.png"
+            />
+          </a>
           <p>
-            APICURON serves as an external tracker of biocuration activities of each one of its partner resource,
-            playing a crucial role not only in well-known and established databases but also in smaller,
-            newer manually curated resources and, behind a firewall, also for non-academic institutions and research
-            companies
-            where biocuration is required with the aim of properly crediting the work of biocurators,
-            raising awareness to the crucial role played by biocuration in scientific research and promoting good
-            practices.
-          </p>
-
-          <p class="tw-text-justify">
-            Registered resources (Member databases) submit biocuration events to the APICURON web server.
-            APICURON stores biocuration activities and calculates achievements (medals, badges) and leaderboards on the
-            fly.
-            Results are served through a public API. APICURON can be cross-referenced by ORCID. Third-party databases
-            can use APICURON to monitor biocurators work and human users can visit the APICURON website to see
-            biocurators achievements and ranking.
-          </p>
-
-          <div class="tw-flex tw-flex-wrap tw-justify-center">
-            <div class="tw-w-4/5">
-              <img class="tw-max-w-full tw-h-auto tw-my-3" src="assets/apicuron workflow_transparent.png">
-
-            </div>
-          </div>
-
-
-          <h2 class="tw-mt-4" id="activities">Biocuration activities</h2>
-          <p class="tw-text-justify">The description of a curation event in APICURON is provided by four key components:
-            entity, activity, agent and timestamp. These key elements fulfill the recommendations of
-            <a href="https://datascience.codata.org/articles/10.5334/dsj-2019-054/">Thessen et al.</a>
-          </p>
-          <ul class="disc-list">
-            <li>
-              <strong>Entity</strong>
-              it corresponds to the curated data object, which is identified by using the identifiers.org
-              resolving system.
-            </li>
-            <li>
-              <strong>Activity</strong>
-              this is the actual curation activity, such as “entry_creation” or “evidence_update”. Although
-              different databases can define different activities, those need to be mapped to PROV term PROV is a W3C
-              recommendation that provides a way to define the life cycle of an object. PROV terms are: generation,
-              revision and invalidation.
-            </li>
-            <li>
-              <strong>Agent</strong>
-              the biocurator that has performed the biocuration activity. In APICURON biocurators are
-              identified by their ORCID, allowing them to make their contributions citable.
-            </li>
-            <li>
-              <strong>Timestamp</strong>
-              it provides the information, i.e. the date and time of the day, of when a biocuration
-              activity was performed. Each curation report is accessible by users via API.
-            </li>
-          </ul>
-          A list of the entity and activity terms for each one of our partner databases is available.
-
-          <h2 class="tw-mt-2" id="gamification">Badges and scores</h2>
-          <p class="tw-text-justify">
-            Gamification is a trending topic that consists of providing motivational affordances and “gameful”
-            experiences
-            in non-game related settings. In <strong>APICURON</strong> it is used to support biocurators engagement by
-            acknowledging
-            their
-            work and effort. Badges and scores are assigned to each biocurator based on their achievements, as a
-            positive
-            feedback mechanism that keeps users engaged and motivated and increases their competitiveness.
-          </p>
-          <p class="tw-text-justify">
-            A list of the badges and scores applied by each one of our partner databases is available.
-          </p> -->
-          <h2 class="tw-pt-3 tw-pb-2" id="becomemember">Become a member</h2>
-          <!-- <p class="tw-text-justify">
-
-            We welcome all manually curated resources or biocuration organizations, especially those relying on
-            community curation, to become APICURON partners.
-            Becoming an APICURON partner is free of charge.
-            Each registered resource can directly
-            submit data through the APICURON API after receiving credentials.
-
-            We provide support for the definition of the
-            biocuration activities, associated scores, badges and medals.
-
-            We encourage the submission through the API but we are still open to include small or brand new resources
-            that do not have enough resources to implement a web server able to push data. In that case APICURON
-            developers will take care of collecting (pulling) curation activities manually directly from the connecting
-            resource.
-          </p> -->
-
-          <p>
-            To become an APICURON member database and open an account to submit
-            data, a thorough guide can be found
-            <a href="/docs/developer-guide/integration">here</a>
-            <br />
-            <!-- If an issue or questions arise, you can <strong>contact us</strong> by joining <a href="http://https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w">The APICURON Slack</a>, using the <a href="https://github.com/BioComputingUP/apicuron-issue-tracker"> Github Issues Tracker</a> or sending an email to
-            <a class="tw-underline hover:tw-blue-500"
-              href="mailto:info@apicuron.org?subject=Database membership request">info@apicuron.org</a> -->
+            This work is licensed under a
+            <a
+              rel="license"
+              href="https://creativecommons.org/licenses/by/4.0/"
+              target="_blank"
+              >Creative Commons Attribution 4.0 International License</a
+            >.
           </p>
         </div>
-      </div>
+      </section>
 
-      <h2 id="contact" class="tw-pt-3 tw-pb-2">Contact</h2>
+      <section id="becomemember">
+        <h2>Become a member</h2>
+        <p>
+          To become an APICURON member database and open an account to submit
+          data, follow our
+          <a href="/docs/developer-guide/integration">integration guide</a>.
+        </p>
+      </section>
 
-      <p>
-        If you wish to get in touch with our team, we offer several channels.
-        You can reach out to us through
-        <a
-          href="http://https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w"
-          >Slack</a
-        >, where we maintain an active presence for real-time communication.
-        Alternatively, you may choose to contact us via
-        <a href="mailto:info@apicuron.org">email</a>, and we will promptly
-        respond to your inquiries. <br />
-        For more technical discussions or to report issues, our
-        <a href="https://github.com/BioComputingUP/apicuron-issue-tracker"
-          >Issue Tracker</a
-        >
-        is at your disposal. We appreciate your interest and look forward to
-        assisting you in the best way possible.
-      </p>
+      <section id="contact">
+        <h2>Contact</h2>
+        <p>
+          If you wish to get in touch with our team, we offer several channels.
+          We appreciate your interest and look forward to assisting you in the
+          best way possible.
+        </p>
+        <div class="tw-mt-4 tw-grid tw-gap-4 sm:tw-grid-cols-3">
+          <a
+            class="plain-link card contact-card"
+            href="https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w"
+            target="_blank"
+          >
+            <svg-icon
+              src="assets/svg/message-bubble.svg"
+              svgClass="tw-h-5 tw-w-5"
+              class="icon-bubble"
+              aria-hidden="true"
+            ></svg-icon>
+            <span>
+              <span class="tw-block tw-font-semibold tw-text-gray-900"
+                >Slack</span
+              >
+              <span class="tw-block tw-text-sm"
+                >Real-time conversation with the team.</span
+              >
+            </span>
+          </a>
+          <a
+            class="plain-link card contact-card"
+            href="mailto:info@apicuron.org"
+          >
+            <svg-icon
+              src="assets/svg/envelope.svg"
+              svgClass="tw-h-5 tw-w-5"
+              class="icon-bubble"
+              aria-hidden="true"
+            ></svg-icon>
+            <span>
+              <span class="tw-block tw-font-semibold tw-text-gray-900"
+                >Email</span
+              >
+              <span class="tw-block tw-text-sm tw-break-all"
+                >info&#64;apicuron.org</span
+              >
+            </span>
+          </a>
+          <a
+            class="plain-link card contact-card"
+            href="https://github.com/BioComputingUP/apicuron-issue-tracker"
+            target="_blank"
+          >
+            <svg-icon
+              src="assets/svg/bug.svg"
+              svgClass="tw-h-5 tw-w-5"
+              class="icon-bubble"
+              aria-hidden="true"
+            ></svg-icon>
+            <span>
+              <span class="tw-block tw-font-semibold tw-text-gray-900"
+                >Issue tracker</span
+              >
+              <span class="tw-block tw-text-sm"
+                >Technical discussions and bug reports.</span
+              >
+            </span>
+          </a>
+        </div>
+      </section>
 
-      <!-- APICURON Team -->
-      <div id="team">
-        <h2>APICURON Team</h2>
-        <p class="tw-whitespace-pre-wrap">
+      <section id="team">
+        <h2>APICURON team</h2>
+        <p>
           The <strong>APICURON</strong> resource is maintained at the
-          <a href="https://biocomputingup.it/">BioComputingUP</a> lab,
-          <a href="https://www.unipd.it/en/dsb"
+          <a href="https://biocomputingup.it/" target="_blank"
+            >BioComputingUP</a
+          >
+          lab,
+          <a href="https://www.unipd.it/en/dsb" target="_blank"
             >Department of Biomedical Sciences</a
-          >, <a href="https://www.unipd.it/">University of Padova</a> - italy
-
-          <br />
-          <span class="tw-font-bold">Team members</span>
+          >,
+          <a href="https://www.unipd.it/" target="_blank"
+            >University of Padova</a
+          >, Italy.
         </p>
 
-        <ul class="disc-list">
-          <li>Silvio CE Tosatto - Team leader (Full Professor)</li>
-          <li>
-            Damiano Piovesan - Team leader & software developer (Associate
-            Professor)
-          </li>
-          <li>Bouhraoua Kamel Eddine Adel - Web Developer (PhD Student)</li>
-          <li>Ivan Micetic - System administrator & support</li>
+        <h3>Team members</h3>
+        <ul class="tw-grid tw-gap-4 sm:tw-grid-cols-2 xl:tw-grid-cols-3">
+          @for (person of teamMembers.current; track person.name) {
+            <li class="card">
+              <div class="tw-flex tw-items-center tw-gap-2">
+                <span class="tw-font-semibold tw-text-gray-900">{{
+                  person.name
+                }}</span>
+                @if (person.orcid) {
+                  <app-orcid-button [orcid]="person.orcid"></app-orcid-button>
+                }
+              </div>
+              <div class="tw-text-sm">{{ person.role }}</div>
+              @if (person.title) {
+                <div class="tw-text-sm tw-text-gray-500">
+                  {{ person.title }}
+                </div>
+              }
+            </li>
+          }
         </ul>
 
-        <span class="tw-font-bold tw-text-gray-700">Previous contributors</span>
+        <h3>Previous contributors</h3>
         <ul class="disc-list">
-          <li>András Hatos - Web Developer (PhD Student)</li>
+          @for (person of teamMembers.previous; track person.name) {
+            <li>
+              <span class="tw-font-semibold tw-text-gray-900">{{
+                person.name
+              }}</span>
+              – {{ person.role }}
+              @if (person.title) {
+                <span class="tw-text-gray-500">({{ person.title }})</span>
+              }
+            </li>
+          }
         </ul>
-      </div>
+      </section>
 
-      <!-- Funding -->
-      <div id="funding">
+      <section id="funding">
         <h2>Funding</h2>
-        <p class="tw-whitespace-pre-line">
+        <p>
           APICURON is currently supported by the University of Padova, which
           provides the necessary hardware infrastructure and personnel for
           software maintenance, both via its core funding and ELIXIR-Italy
           funding. In addition, APICURON has received support from ELIXIR's Data
           Platform, which has provided funding to improve integration with core
           data resources and to enhance guidelines and standardization processes
-          for connecting resources.<br /><br />
-
+          for connecting resources.
+        </p>
+        <p>
           To ensure the long-term sustainability of APICURON, we plan to pursue
           additional funding opportunities from both public and private sources.
           We will also explore partnerships with relevant organizations and
-          stakeholders to increase the visibility and impact of the platform.<br /><br />
+          stakeholders to increase the visibility and impact of the platform.
+        </p>
+        <p>
           Additionally, we plan to explore potential revenue streams, such as
           charging for premium features or offering consulting services, to
           supplement existing funding sources; especially for private entities
@@ -321,50 +261,46 @@
           development practices to ensure that the platform remains stable,
           secure, and efficient.
         </p>
-      </div>
+      </section>
 
-      <!-- QA Life Cycle Plan -->
-      <div id="qa-life-cycle-plan">
-        <h2>QA Life Cycle Plan</h2>
-        <p class="tw-whitespace-pre-wrap">
-          The goal of the Quality Assurance (QA) Life Cycle Plan is to ensure
-          the continuous improvement, reliability, and accuracy of APICURON,
-          focusing on the implementation of effective QA and QC practices. The
-          document outlines the standard operating procedures (SOPs), roadmap,
-          resource improvement plan, and QA/QC implementation strategies for
-          maintaining the quality of APICURON.
-          <br />
-          <br />
-
-          The QA Life Cycle Plan for APICURON serves as a roadmap for ensuring
-          the ongoing quality and reliability of the database. By following the
-          defined SOPs, adhering to the roadmap, implementing the resource
-          improvement plan, and executing effective QA/QC practices, we aim to
-          provide users with a robust and accurate resource for contribution
-          (curation) recognition. Regular reviews, internal audits, and
-          continuous improvement efforts will be integral to maintaining the
-          high standards expected from APICURON.
-          <br />
+      <section id="qa-life-cycle-plan">
+        <h2>QA life cycle plan</h2>
+        <p>
+          The Quality Assurance Life Cycle Plan defines the framework for
+          maintaining and continuously improving the quality, reliability, and
+          accuracy of APICURON. It establishes the Standard Operating Procedures
+          (SOPs), implementation roadmap, resource improvement plan, and Quality
+          Assurance (QA) and Quality Control (QC) practices required to ensure
+          the database meets its intended objectives.
+        </p>
+        <p>
+          The plan supports the consistent application of quality standards
+          through regular reviews, internal audits, and continuous improvement
+          activities. It also provides a framework for integrating future
+          preservation policies to support the long-term integrity,
+          accessibility, and sustainability of APICURON.
+        </p>
+        <p>
+          <svg-icon
+            src="assets/svg/document-text.svg"
+            svgClass="tw-h-5 tw-w-5 tw-inline"
+            class="tw-align-text-bottom"
+            aria-hidden="true"
+          ></svg-icon>
           <a
             href="https://docs.google.com/document/d/1kJxmbaMwzrbKhNa6i7ntdkzg2G7rt6B3pGcr8ZZWQF4/edit?usp=sharing"
-            >Quality Assurance Life Cycle Plan document
-            <svg-icon
-              src="assets/svg/document-text.svg"
-              alt="Quality Assurance Life Cycle Plan Document"
-              svgClass="tw-h-5 tw-w-5 tw-inline "
-              class="tw-align-text-bottom"
-            ></svg-icon>
-          </a>
+            target="_blank"
+            >Quality Assurance Life Cycle Plan document</a
+          >
         </p>
-      </div>
+      </section>
 
-      <!-- SAB -->
-      <div id="sab">
-        <h2>SAB</h2>
-        <p class="tw-whitespace-pre-line">
-          APICURON does not currently have a separate Scientific Advisory Board,
-          it is reviewed through the SAB of
-          <a href="https://elixir-italy.org/about/sab/"
+      <section id="sab">
+        <h2>Scientific Advisory Board</h2>
+        <p>
+          APICURON does not currently have a separate Scientific Advisory Board
+          (SAB), it is reviewed through the SAB of
+          <a href="https://elixir-italy.org/about/sab/" target="_blank"
             >the Italian ELIXIR node</a
           >. Moreover, it is involved in the ELIXIR Biocuration Focus Group and
           linked to the International Society for Biocuration (ISB). These
@@ -372,12 +308,11 @@
           guidance and feedback to help ensure that the platform operates in
           accordance with best practices and standards.
         </p>
-      </div>
+      </section>
 
-      <!-- elsi policy -->
-      <div id="elsi-policy">
-        <h2 class="tw-pt-4 tw-pb-2">ELSI Policy and Equal Opportunity</h2>
-        <p class="tw-whitespace-pre-line">
+      <section id="elsi-policy">
+        <h2>ELSI policy and equal opportunity</h2>
+        <p>
           APICURON is committed to upholding ethical, legal, and social
           implications (ELSI) policies and providing equal opportunity research
           support. These principles ensure that the resource operates in a fair
@@ -386,7 +321,7 @@
           researchers.
         </p>
 
-        <h5>ELSI Policy</h5>
+        <h3>ELSI policy</h3>
         <ul class="disc-list">
           <li>
             <strong>Data Privacy and Consent: </strong>APICURON adheres to
@@ -415,7 +350,7 @@
           </li>
         </ul>
 
-        <h5>Equal Opportunity Research Support</h5>
+        <h3>Equal opportunity research support</h3>
         <ul class="disc-list">
           <li>
             <strong>Accessibility: </strong>APICURON strives to provide an
@@ -424,7 +359,7 @@
             web accessibility standards.
           </li>
           <li>
-            <strong>User Support and Training: </strong> APICURON provides user
+            <strong>User Support and Training: </strong>APICURON provides user
             support and training resources to assist researchers in utilizing
             the resource effectively. This support is offered to users
             regardless of their background, institution, or research experience,
@@ -439,10 +374,10 @@
           </li>
         </ul>
 
-        <h5>Diversity and Inclusion</h5>
+        <h3>Diversity and inclusion</h3>
         <ul class="disc-list">
           <li>
-            <strong>Accessibility: </strong>APICURON values diversity and
+            <strong>Representation: </strong>APICURON values diversity and
             inclusion and strives to ensure representation across various
             dimensions, including gender, ethnicity, geography, and research
             fields. Efforts are made to include underrepresented groups and
@@ -465,7 +400,7 @@
           </li>
         </ul>
 
-        <p>
+        <p class="tw-mt-4">
           By implementing an ELSI policy and providing equal opportunity
           research support, APICURON aims to create a welcoming and inclusive
           environment for users, researchers and institutions. These principles
@@ -474,29 +409,27 @@
           contribute, and benefit from the resources and knowledge available on
           the platform.
         </p>
-      </div>
+      </section>
 
-      <!-- Privacy Notice -->
-      <div>
-        <h2 id="privacy" class="tw-pt-3 tw-pb-2">Privacy notice</h2>
+      <section id="privacy">
+        <h2>Privacy notice</h2>
         <p>
-          This privacy notice is available in the docs
-          <a routerLink="/docs/developer-guide/privacy">here</a> Or in a PDF
-          format, downloadable
+          The privacy notice is available
+          <a routerLink="/docs/developer-guide/privacy">in the documentation</a>
+          or as a
           <a
             href="assets/documents/apicuron_privacy_policy.pdf"
             download="APICURON_Privacy_Policy.pdf"
-            >here
-
-            <svg-icon
-              src="assets/svg/document-text.svg"
-              alt="Quality Assurance Life Cycle Plan Document"
-              svgClass="tw-h-5 tw-w-5 tw-inline "
-              class="tw-align-text-bottom"
-            ></svg-icon>
-          </a>
+            >downloadable PDF</a
+          >
+          <svg-icon
+            src="assets/svg/document-text.svg"
+            svgClass="tw-h-5 tw-w-5 tw-inline"
+            class="tw-align-text-bottom"
+            aria-hidden="true"
+          ></svg-icon>
         </p>
-      </div>
-    </div>
+      </section>
+    </article>
   </div>
 </div>

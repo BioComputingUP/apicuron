@@ -1,3 +1,4 @@
+import { legacyPathRedirect } from "../guards/legacy-path.redirect";
 import { inject, NgModule } from "@angular/core";
 import {
   ActivatedRouteSnapshot,
@@ -69,12 +70,14 @@ const routes: Routes = [
     ],
   },
   {
-    path: "database",
+    path: "resource",
     loadChildren: () =>
       import("../dashboard-database/dashboard-database.module").then(
         (m) => m.DashboardDatabaseModule
       ),
   },
+  // Old route name, kept so existing links keep working
+  legacyPathRedirect("database", "resource"),
 ];
 
 @NgModule({

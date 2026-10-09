@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AboutRoutingModule } from './about-routing.module';
 import { AboutComponent } from './about.component';
 import { AngularSvgIconModule } from 'angular-svg-icon';
+import { OrcidButtonComponent } from '../components/orcid-button/orcid-button.component';
 
 
 @NgModule({
@@ -13,7 +14,8 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
   imports: [
     CommonModule,
     AboutRoutingModule,
-    AngularSvgIconModule
+    AngularSvgIconModule,
+    OrcidButtonComponent
   ]
 })
 export class AboutModule { }

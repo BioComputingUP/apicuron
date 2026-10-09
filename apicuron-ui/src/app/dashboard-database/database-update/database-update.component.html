@@ -51,6 +51,18 @@
         </div>
 
         <div class="form-control-element">
+          <label for="category">Resource Type</label>
+          <select formControlName="category" class="text-input">
+            <option
+              *ngFor="let category of ResourceCategories"
+              [value]="category"
+            >
+              {{ ResourceCategoryLabels[category] }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-control-element">
           <label for="resource_description">Resource Description</label>
           <textarea
             class="text-input tw-h-40"
