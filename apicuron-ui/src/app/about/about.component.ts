@@ -46,7 +46,7 @@ export class AboutComponent {
       },
       {
         name: "Federica Quaglia",
-        role: "Project Manager",
+        role: "Project & Community Manager",
         title: "PhD",
         orcid: "0000-0002-0341-4888",
       },
