@@ -38,7 +38,7 @@ export class DocumentationComponent implements OnInit, OnDestroy {
   display_toc = true;
 
   data = {
-    "database-create-form": `${environment.host}/databases/create`,
+    "database-create-form": `${environment.host}/resources/create`,
   };
   anchors: any;
 

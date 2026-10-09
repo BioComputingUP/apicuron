@@ -46,29 +46,29 @@ export class DashboardSidebarComponent implements OnInit {
             resource,
             links: [
               {
-                href: ["/dashboard", "database", resource.resource_id],
+                href: ["/dashboard", "resource", resource.resource_id],
                 name: `Overview`,
                 icon: "assets/svg/overview.svg",
               },
               {
-                href: ["/dashboard", "database", resource.resource_id, "edit"],
+                href: ["/dashboard", "resource", resource.resource_id, "edit"],
                 name: `Edit ${resource.resource_name}`,
                 icon: "assets/svg/pencil.svg",
               },
               {
-                href: ["/dashboard", "database", resource.resource_id, "groups"],
+                href: ["/dashboard", "resource", resource.resource_id, "groups"],
                 name: `Manage ${resource.resource_name} Groups`,
                 icon: "assets/svg/groups.svg",
               },
               {
-                href: ["/dashboard", "database", resource.resource_id, "terms"],
+                href: ["/dashboard", "resource", resource.resource_id, "terms"],
                 name: `Manage ${resource.resource_name} Activities`,
                 icon: "assets/svg/settings.svg",
               },
               {
                 href: [
                   "/dashboard",
-                  "database",
+                  "resource",
                   resource.resource_id,
                   "reports",
                 ],
@@ -78,7 +78,7 @@ export class DashboardSidebarComponent implements OnInit {
               {
                 href: [
                   "/dashboard",
-                  "database",
+                  "resource",
                   resource.resource_id,
                   "medals",
                 ],
@@ -88,7 +88,7 @@ export class DashboardSidebarComponent implements OnInit {
               {
                 href: [
                   "/dashboard",
-                  "database",
+                  "resource",
                   resource.resource_id,
                   "badges",
                 ],

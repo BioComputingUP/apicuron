@@ -16,7 +16,7 @@
     <div>
       <a
         class="tw-font-extrabold tw-text-xl tw-text-slate-800 hover:tw-text-slate-600 hover:tw-underline"
-        [routerLink]="['/curators', (entry$ | async).curator.orcid_id]"
+        [routerLink]="['/contributors', (entry$ | async).curator.orcid_id]"
       >
         {{ (entry$ | async).curator.displayedName }}
       </a>

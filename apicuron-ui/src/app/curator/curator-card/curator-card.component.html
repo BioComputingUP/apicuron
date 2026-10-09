@@ -7,7 +7,7 @@
     </div>
     <div class="tw-flex tw-flex-col" [ngClass]="{'tw-items-center': vertical, 'tw-ml-2': !vertical}">
         <div class="tw-gap-2">
-            <a [routerLink]="['/curators', orcid_id]"
+            <a [routerLink]="['/contributors', orcid_id]"
                 class="tw-text-xl tw-font-dm-sans tw-text-gray-900 hover:tw-text-gray-900 tw-font-bold hover:tw-underline tw-truncate">{{
                 displayedName
                 }}
@@ -51,7 +51,7 @@
             <ng-container *ngIf="resources$ | async as converter">
                 <!-- if the element is the last, output empty string otherwise, output a comma -->
 
-                <a *ngFor="let resource of resources; let last= last" [routerLink]="['/databases', resource ]"
+                <a *ngFor="let resource of resources; let last= last" [routerLink]="['/resources', resource ]"
                     class="tw-text-gray-700 tw-cursor-pointer hover:tw-text-gray-800 tw-font-bold tw-text-sm tw-rounded-2xl tw-mr-1 hover:tw-underline">{{
                     converter[resource] }}{{ last ? '' : ',' }}</a>
 

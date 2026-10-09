@@ -4,6 +4,7 @@ import { RouterModule, Routes } from "@angular/router";
 import { environment } from "../environments/environment";
 import { AppComponent } from "./app.component";
 import { AuthGuard } from "./auth/auth.guard";
+import { legacyPathRedirect } from "./guards/legacy-path.redirect";
 import { RedirectGuard } from "./guards/redirect.guard";
 import { MainLayoutComponent } from "./main-layout/main-layout.component";
 import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
@@ -31,7 +32,7 @@ const routes: Routes = [
     loadChildren: () => import("./help/help.module").then((m) => m.HelpModule),
   },
   {
-    path: "databases",
+    path: "resources",
     component: MainLayoutComponent,
     loadChildren: () =>
       import("./databases/databases.module").then((m) => m.DatabasesModule),
@@ -43,13 +44,16 @@ const routes: Routes = [
       import("./curator/curator.module").then((m) => m.CuratorModule),
   },
   {
-    path: "curators",
+    path: "contributors",
     component: MainLayoutComponent,
     loadChildren: () =>
       import("./curator-registry/curator-registry.module").then(
         (m) => m.CuratorRegistryModule,
       ),
   },
+  // Old route names, kept so existing links and records keep working
+  legacyPathRedirect("databases", "resources"),
+  legacyPathRedirect("curators", "contributors"),
 
   // {
   //   path: '',
