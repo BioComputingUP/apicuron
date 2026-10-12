@@ -106,6 +106,9 @@ export type EventProcessingStatus = (typeof EventProcessingStatus)[keyof typeof 
 export const EventOutputKind = { REPORT: 'REPORT', PENDING: 'PENDING' } as const;
 export type EventOutputKind = (typeof EventOutputKind)[keyof typeof EventOutputKind];
 
+export const EventOutputTypeSource = { PR_LABEL: 'pr_label', ISSUE_LABEL: 'issue_label', NONE: 'none' } as const;
+export type EventOutputTypeSource = (typeof EventOutputTypeSource)[keyof typeof EventOutputTypeSource];
+
 export const EventOutputStatus = {
 	CREATED: 'CREATED',
 	ALREADY_EXISTED: 'ALREADY_EXISTED',

@@ -74,6 +74,8 @@ export class ContributionEventProcessor {
 			activity_term: report.activity_term,
 			contributor_identifier: report.github_id,
 			contributor_identifier_type: ContributorIdentifierType.GITHUB,
+			contributor_github_id: report.github_id,
+			...(report.type_source && { type_source: report.type_source }),
 			status: EventOutputStatus.CREATED,
 		};
 

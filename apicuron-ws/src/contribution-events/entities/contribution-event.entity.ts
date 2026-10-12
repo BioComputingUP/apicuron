@@ -1,10 +1,12 @@
-import { EventOutputKind, ContributorIdentifierType, EventOutputStatus, EventProcessingStatus } from "src/core/enums";
+import { EventOutputKind, EventOutputTypeSource, ContributorIdentifierType, EventOutputStatus, EventProcessingStatus } from "src/core/enums";
 
 export interface ContributionEventOutput {
 	kind: EventOutputKind;
 	activity_term: string;
 	contributor_identifier: string;
 	contributor_identifier_type: ContributorIdentifierType;
+	contributor_github_id: string;
+	type_source?: EventOutputTypeSource;
 	status: EventOutputStatus;
 	error?: string;
 }
