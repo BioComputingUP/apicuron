@@ -1,6 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
-import { ContributorIdentifierType, EventOutputKind, EventOutputStatus, EventProcessingStatus } from 'src/core/enums';
+import {
+	ContributorIdentifierType,
+	EventOutputKind,
+	EventOutputStatus,
+	EventOutputTypeSource,
+	EventProcessingStatus,
+} from 'src/core/enums';
 
 @Schema({ _id: false })
 export class EventOutput {
@@ -15,6 +21,12 @@ export class EventOutput {
 
 	@Prop({ required: true, type: String, enum: Object.values(ContributorIdentifierType) })
 	contributor_identifier_type: ContributorIdentifierType;
+
+	@Prop({ required: true, type: String })
+	contributor_github_id: string;
+
+	@Prop({ type: String, enum: Object.values(EventOutputTypeSource) })
+	type_source?: EventOutputTypeSource;
 
 	@Prop({ required: true, type: String, enum: Object.values(EventOutputStatus) })
 	status: EventOutputStatus;

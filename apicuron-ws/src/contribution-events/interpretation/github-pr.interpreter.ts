@@ -1,3 +1,5 @@
+import { EventOutputTypeSource } from 'src/core/enums';
+
 export const INTERPRETER_VERSION = 'github-pr-roles@1';
 export const GITHUB_PR_MERGED_TYPE = 'it.unipd.biocomputingup.github.pull_request.merged';
 
@@ -10,6 +12,7 @@ export interface IntendedReport {
 	activity_term: string;
 	timestamp: Date;
 	entity_uri: string;
+	type_source?: EventOutputTypeSource; // authored credits only: where the type came from
 }
 
 type Account = { id: string; login: string };
@@ -57,7 +60,7 @@ export function interpretMergedPullRequest(payload: any): IntendedReport[] {
 
 	const timestamp = new Date(pr.closed_at);
 	const reports = new Map<string, IntendedReport>(); // key: term + account to avoid duplicates
-	const credit = (account: Account | undefined, activity_term: string) => {
+	const credit = (account: Account | undefined, activity_term: string, type_source?: EventOutputTypeSource) => {
 		if (!account?.id) return;
 		const key = `${activity_term}|${account.id}`;
 		if (!reports.has(key)) {
@@ -67,6 +70,7 @@ export function interpretMergedPullRequest(payload: any): IntendedReport[] {
 				activity_term,
 				timestamp,
 				entity_uri: pr.url,
+				...(type_source && { type_source }),
 			});
 		}
 	};
@@ -79,9 +83,15 @@ export function interpretMergedPullRequest(payload: any): IntendedReport[] {
 		const closingIssueLabels: string[] = (payload.data.relationships ?? []).flatMap(
 			(r: any) => r?.target?.labels ?? [],
 		);
-		const term =
-			typeTermFromLabels(pr.labels ?? []) ?? typeTermFromLabels(closingIssueLabels) ?? TERMS.untyped;
-		credit(author, term);
+		const prTerm = typeTermFromLabels(pr.labels ?? []);
+		const issueTerm = prTerm ? null : typeTermFromLabels(closingIssueLabels);
+		const term = prTerm ?? issueTerm ?? TERMS.untyped;
+		const type_source = prTerm
+			? EventOutputTypeSource.PR_LABEL
+			: issueTerm
+			? EventOutputTypeSource.ISSUE_LABEL
+			: EventOutputTypeSource.NONE;
+		credit(author, term, type_source);
 	}
 
 	// Reviewers: once each, author excluded. 
