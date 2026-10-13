@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
+import { CoreApicuronModule } from 'src/core/core.module';
 import { ResourceManagerGuard } from './guards/resource-manager-only.guard';
+import { ResourceManagerService } from './services/resource-manager.service';
 
 @Module({
-	imports: [],
+	imports: [CoreApicuronModule],
 	controllers: [],
-	providers: [ResourceManagerGuard],
-	exports: [ResourceManagerGuard],
+	providers: [ResourceManagerGuard, ResourceManagerService],
+	exports: [ResourceManagerGuard, ResourceManagerService],
 })
 export class ResourceManagerModule {}
