@@ -5,8 +5,10 @@
 	"author": "adelbouhraoua23@gmail.com",
 	"private": true,
 	"license": "UNLICENSED",
+	"packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
 	"scripts": {
 		"prebuild": "rimraf dist",
+		"preinstall": "npx only-allow@1.2.2 yarn",
 		"build": "nest build",
 		"format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
 		"start": "nest start",
@@ -31,7 +33,6 @@
 	"dependencies": {
 		"@automapper/classes": "^8.8.1",
 		"@automapper/core": "^8.8.1",
-		"@automapper/nestjs": "^8.8.1",
 		"@aws-sdk/client-s3": "3.717.0",
 		"@aws-sdk/lib-storage": "3.717.0",
 		"@aws-sdk/s3-request-presigner": "3.717.0",
@@ -52,7 +53,6 @@
 		"@nestjs/platform-express": "^10.4.20",
 		"@nestjs/schedule": "^4.1.2",
 		"@nestjs/swagger": "^7.4.2",
-		"@ntegral/nestjs-sentry": "^4.0.0",
 		"@openapi-contrib/openapi-schema-to-json-schema": "^5.1.0",
 		"@prisma/client": "^3.13.0",
 		"@sentry/cli": "^2.18.1",
@@ -119,6 +119,7 @@
 		"eslint-plugin-prettier": "^4.0.0",
 		"jest": "^27.2.5",
 		"nodemon": "^2.0.19",
+		"only-allow": "^1.2.2",
 		"prettier": "^2.3.2",
 		"prisma": "^3.13.0",
 		"source-map-support": "^0.5.20",
@@ -128,6 +129,14 @@
 		"ts-node": "^10.0.0",
 		"tsconfig-paths": "^3.10.1",
 		"typescript": "^4.9.5"
+	},
+	"engines": {
+		"node": ">=20"
+	},
+	"overrides": {
+		"@golevelup/nestjs-discovery": {
+			"@nestjs/core": "$@nestjs/core"
+		}
 	},
 	"jest": {
 		"silent": false,

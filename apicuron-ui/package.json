@@ -71,7 +71,7 @@
     "plotly.js-dist-min": "^2.18.1",
     "primeicons": "^6.0.1",
     "primeng": "^17.18.15",
-    "primeng-sass-theme": "github:primefaces/primeng-sass-theme",
+    "primeng-sass-theme": "https://github.com/primefaces/primeng-sass-theme.git",
     "rxjs": "^7.4.0",
     "swiper": "^8.3.2",
     "tslib": "^2.3.1",
@@ -103,6 +103,7 @@
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.5.0",
     "ng-packagr": "^17.3.0",
+    "only-allow": "^1.2.2",
     "postcss": "^8.4.13",
     "protractor": "~7.0.0",
     "tailwindcss": "^3.3.3",
@@ -111,5 +112,6 @@
     "typescript": "~5.4.5",
     "webpack": "^5.95.0",
     "webpack-sources": "^3.2.3"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

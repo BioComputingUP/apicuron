@@ -1,6 +1,5 @@
 # Global Arguments for all build stages
-ARG BUILD_NODE_VERSION=iron-bullseye
-ARG NODE_VERSION=iron-bullseye-slim
+ARG NODE_VERSION=iron-trixie-slim
 ARG APP_DIR=/home/node/app
 ARG UID
 ARG GID
@@ -15,11 +14,14 @@ ARG UID
 ARG GID
 
 # install ps command for hot reload
-RUN apt-get update && apt-get install -y procps && rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install -y procps git && rm -rf /var/lib/apt/lists/*
 
 # change node uid and gid to the defined one
 RUN groupmod -g ${GID} node && \
     usermod -u ${UID} -g ${GID} node
+
+# Enable corepack
+RUN corepack enable
 
 # Use the node user from the image (instead of the root user)
 USER node
@@ -30,17 +32,10 @@ RUN mkdir ${APP_DIR}
 WORKDIR ${APP_DIR}
 
 # Copy application dependency manifests to the container image.
-# A wildcard is used to ensure copying both package.json AND package-lock.json (when available).
-# Copying this first prevents re-running npm install on every code change.
-COPY --chown=node:node package*.json ./
-
-# # Install app dependencies using the `npm ci` command instead of `npm install`
-# RUN npm ci
+COPY --chown=node:node package.json yarn.lock ./
 
 # Bundle app source
 COPY --chown=node:node . .
-
-
 
 CMD ["yarn", "run", "start:dev"]
 
@@ -48,12 +43,14 @@ CMD ["yarn", "run", "start:dev"]
 # BUILD FOR PRODUCTION
 ###################
 
-FROM node:${BUILD_NODE_VERSION} AS build
+FROM node:${NODE_VERSION} AS build
+
+RUN corepack enable
 
 USER node
 WORKDIR /home/node/app
 
-COPY --chown=node:node package.json package-lock.json ./
+COPY --chown=node:node package.json yarn.lock ./
 
 # Keep dev dependencies to build the application
 RUN yarn install --frozen-lockfile

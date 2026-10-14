@@ -1,4 +1,4 @@
-ARG NODE_VERSION=iron-bullseye-slim
+ARG NODE_VERSION=iron-trixie-slim
 ARG NGINX_VERSION=alpine3.21
 
 FROM node:${NODE_VERSION} AS local
@@ -8,10 +8,15 @@ ARG GID
 
 ENV APP_DIR=/home/node/app
 
+# install ps command for hot reload
+RUN apt-get update && apt-get install -y procps git && rm -rf /var/lib/apt/lists/*
+
+
 # change node uid and gid to match the running user's machine
 RUN groupmod -g ${GID} node && \
     usermod -u ${UID} -g ${GID} node
 
+RUN corepack enable
 
 USER node
 
