@@ -14,7 +14,7 @@ import { RouterModule } from "@angular/router";
 export class FootComponent implements OnInit {
   constructor() {}
 
-
+  constants = environment.constants;
   host = environment.host;
   ws = environment.ws + '/';
 

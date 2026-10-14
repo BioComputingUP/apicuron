@@ -7,6 +7,8 @@ import { environment } from "../../environments/environment";
   styleUrls: ["./help.component.scss"],
 })
 export class HelpComponent implements OnInit {
+
+  constants = environment.constants;
   navigation_panel = [
     { text: "Web interface", href: "gui" },
     { text: "API", href: "api" },

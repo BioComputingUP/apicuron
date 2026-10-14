@@ -2,7 +2,10 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+import { APP_CONSTANTS } from "src/constants";
+
 export const environment = {
+  constants: APP_CONSTANTS,
   production: false,
   env: "local",
   domain: 'localhost',

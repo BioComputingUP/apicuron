@@ -153,7 +153,7 @@
               svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1 tw-text-apicuron-purple-100 tw-opacity-75"
             ></svg-icon>
             <a
-              href="https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w"
+              [href]="constants.slackInvite"
               >Join Slack</a
             >
           </li>
@@ -162,14 +162,14 @@
               src="assets/svg/envelope.svg"
               svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1"
             ></svg-icon>
-            <a href="mailto:info@apicuron.org">E-mail</a>
+            <a [href]="constants.contactEmail">E-mail</a>
           </li>
           <li>
             <svg-icon
               src="assets/svg/bug.svg"
               svgClass="xl:tw-h-6 xl:tw-w-6 tw-h-4 tw-h-4 tw-inline tw-pr-1"
             ></svg-icon>
-            <a href="https://github.com/BioComputingUP/apicuron-issue-tracker"
+            <a [href]="constants.issueTracker"
               >Issue Tracker</a
             >
           </li>

@@ -1,4 +1,7 @@
+import { APP_CONSTANTS } from "src/constants";
+
 export const environment = {
+  constants: APP_CONSTANTS,
   production: true,
   env: "production",
   // ws: window.location.protocol + '//' + window.location.hostname + '/api/',
