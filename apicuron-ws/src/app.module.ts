@@ -16,7 +16,10 @@ import { CuratorRegistryModule } from './curator-registry/curator-registry.modul
 import { DetailedStatisticsModule } from './detailed-statistics/detailed-statistics.module';
 import { EmailModule } from './email/email.module';
 import { EventOrchestratorModule } from './event-orchestrator/event-orchestrator.module';
-import { OrcidFetcherModule } from './github-scraper/github-scraper.module';
+import {
+	GithubScraperModule,
+	GithubScraperModuleOptions,
+} from './github-scraper';
 import { MedalsModule } from './medals/medals.module';
 import { MonthlyStatisticsModule } from './monthly-statistics/monthly-statistics.module';
 import { NotificationsModule } from './notifications/notifications.module';
@@ -117,11 +120,16 @@ import { ContributionEventsModule } from './contribution-events/contribution-eve
 		EventOrchestratorModule,
 		ResourceStatsModule,
 		CuratorRegistryModule,
-		OrcidFetcherModule,
+		GithubScraperModule.registerAsync({
+			inject: [ConfigService],
+			useFactory: (config: ConfigService): GithubScraperModuleOptions => ({
+				github_token: config.getOrThrow<string>('GITHUB_TOKEN'),
+			}),
+		}),
 		OrcidSyncModule,
 		AdminModule,
 		PendingReportsModule,
-		ContributionEventsModule
+		ContributionEventsModule,
 	],
 	controllers: [AppController, ServeFilesController],
 	providers: [

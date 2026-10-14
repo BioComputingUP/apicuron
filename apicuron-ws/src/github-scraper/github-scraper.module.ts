@@ -1,11 +1,12 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { OrcidFetcherController } from './github-scrapper.controller';
+import { GithubScraperController } from './github-scrapper.controller';
 import { GithubScraperService } from './github-scraper.service';
+import { ConfigurableModuleClass } from './github-scraper.providers';
 
 @Module({
 	imports: [HttpModule],
-	controllers: [OrcidFetcherController],
+	controllers: [GithubScraperController],
 	providers: [GithubScraperService],
 })
-export class OrcidFetcherModule {}
+export class GithubScraperModule extends ConfigurableModuleClass {}
