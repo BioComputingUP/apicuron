@@ -34,7 +34,6 @@ import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
 import { VersionHeader } from '../../plugins/swagger/config';
 import { ReportDto } from '../../reports/dto/report.dto';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
-import { SchedulerClientService } from '../../scheduler-client/services/scheduler-client.service';
 import {
 	SubmitBulkDto,
 	SubmitReportDto,
@@ -47,7 +46,6 @@ import { SubmitReportService } from '../services/submit-reports.service';
 export class SubmitReportsController {
 	constructor(
 		protected reportService: SubmitReportService,
-		private schedulerClientService: SchedulerClientService,
 		private resourceService: PartnerResourcesService,
 		private submitBulkTask: SubmitBulkTask,
 	) {}

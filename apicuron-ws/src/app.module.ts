@@ -31,7 +31,6 @@ import { ReportsModule } from './reports/reports.module';
 import { ResourceManagerModule } from './resource-manager/resource-manager.module';
 import { ResourceStatsModule } from './resource-stats/resource-stats.module';
 import { ResourcesModule } from './resources/resources.module';
-import { SchedulerClientModule } from './scheduler-client/scheduler-client.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { getGlobalInterceptorChain } from './shared/interceptors';
 import {
@@ -109,7 +108,6 @@ import { ContributionEventsModule } from './contribution-events/contribution-eve
 		NotificationsModule,
 		ResourceManagerModule,
 		SchedulerModule,
-		SchedulerClientModule,
 		EmailModule,
 		DetailedStatisticsModule,
 		WeeklyStatisticsModule,
