@@ -1,52 +1,268 @@
-# APICURON Technical Documentation
-
 <p align="center">
-  <img src="https://raw.githubusercontent.com/BioComputingUP/apicuron-ui/master/src/assets/APICURON.svg?token=GHSAT0AAAAAACISPHUXNF5TWXEEYAVTLGTSZKDRAKA" />
+  <img src="apicuron-ui/src/assets/APICURON.svg" alt="APICURON Logo" />
 </p>
 
+<p align="center">
+  <strong>A gamified platform to credit and acknowledge the contributions of biocurators.</strong>
+</p>
 
-APICURON is currently composed of two elements
-- The backend uses nestjs has a fairly modular implementation that has some nice features
-- The frontend is an Angular app. The implementation is quite chaotically organized
+<p align="center">
+  <a href="https://doi.org/10.1093/database/baab019"><img src="https://img.shields.io/badge/DOI-10.1093%2Fdatabase%2Fbaab019-blue" alt="DOI"></a>
+  <a href="https://pubmed.ncbi.nlm.nih.gov/33882120/"><img src="https://img.shields.io/badge/PubMed-33882120-green" alt="PubMed"></a>
+  <img src="https://img.shields.io/badge/NestJS-10.x-E0234E?logo=nestjs&logoColor=white" alt="NestJS">
+  <img src="https://img.shields.io/badge/Angular-17.x-DD0031?logo=angular&logoColor=white" alt="Angular">
+  <img src="https://img.shields.io/badge/MongoDB-7.x-47A248?logo=mongodb&logoColor=white" alt="MongoDB">
+  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white" alt="Docker">
+  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
+</p>
 
+---
 
 ## Table of Contents
 
-- [The frontend](#the-frontend)
-- [The backend](#the-backend)
+- [About APICURON](#about-apicuron)
+- [Key Features](#key-features)
+- [How It Works](#how-it-works)
+- [Repository Structure](#repository-structure)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Environment Setup](#environment-setup)
+  - [Running with Docker Compose (Recommended)](#running-with-docker-compose-recommended)
+  - [Manual / Local Development](#manual--local-development)
+- [Service Architecture & Ports](#service-architecture--ports)
+- [Testing](#testing)
+- [Citation](#citation)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## About APICURON
+
+Biocuration plays an essential role in scientific research, turning raw biological data into structured, FAIR (Findable, Accessible, Interoperable, and Reusable) knowledge. Despite its vital importance, acknowledging and quantifying curator contributions—especially across community-driven and distributed databases—has historically been difficult.
+
+**APICURON** is an open-source platform designed to address this challenge. It provides biological databases and scientific resources with an automated tracking system to monitor, credit, and reward the work of biocurators. By leveraging **gamification** (badges, medals, scores, and leaderboards) and linking contributions directly to **ORCID** records, APICURON makes scientific curation activities visible, measurable, and citable.
+
+---
+
+## Key Features
+
+- **Automated Activity Ingestion**: Receive curation events directly via REST API or automated synchronization from partner databases.
+- **ORCID Authentication & Attribution**: Seamlessly associate curation efforts with verifiable researcher identities via ORCID.
+- **Gamification Engine**: Dynamic calculation of scores, badges, medals, and activity rankings on the fly.
+- **Embeddable Widgets**: Standalone leaderboard web components ready to be embedded directly into third-party database interfaces.
+- **W3C PROV-O Compliance**: Curation actions map to standard lifecycle concepts (`generation`, `revision`, `invalidation`) and resolvers via `identifiers.org`.
+- **Administrative Dashboard**: Intuitive management interfaces for resource owners to configure curation activities, scoring systems, and badge requirements.
+
+---
+
+## How It Works
+
+Curation events submitted to APICURON consist of five core dimensions:
+
+1. **Entity**: The curated data object, resolved via `identifiers.org`.
+2. **Activity**: The action performed (e.g. `entry_creation`, `evidence_update`), mapped to W3C provenance lifecycle terms.
+3. **Agent**: The biocurator responsible for the activity, identified by their unique ORCID ID.
+4. **Timestamp**: The date and time when the curation activity took place.
+5. **Score**: A weighted value assigned by the resource platform reflecting the effort required.
+
+APICURON aggregates these events, calculates achievements, and exposes rankings and statistics via both its interactive web portal and public REST APIs.
+
+---
+
+## Repository Structure
+
+This repository is organized as a monorepo containing both backend and frontend applications along with local and production deployment setups:
+
+```text
+apicuron/
+├── apicuron-ws/               # NestJS backend API service
+│   ├── src/                   # Controllers, modules, services, CQRS handlers
+│   ├── test/                  # Unit and E2E test suites
+│   ├── Dockerfile             # Multi-stage Dockerfile for the web server
+│   └── package.json           # Backend dependencies and scripts
+├── apicuron-ui/               # Angular frontend application
+│   ├── src/                   # Angular components, services, and models
+│   │   ├── app/               # Main application modules and pages
+│   │   └── assets/            # Static assets, SVGs, and documentation
+│   ├── projects/leaderboard/  # Embeddable leaderboard widget
+│   ├── Dockerfile             # Multi-stage Dockerfile for UI
+│   └── package.json           # Frontend dependencies and scripts
+├── mongo/                     # MongoDB initialization scripts and configs
+├── nginx.conf                 # Nginx reverse proxy configuration for development
+├── docker-compose.yaml        # Main Docker Compose configuration
+├── docker-compose.dev.yaml    # Development overlay configuration
+├── docker-compose.prod.yaml   # Production overlay configuration
+├── .env.example               # Example environment variable configuration
+└── README.md                  # Project documentation
+```
+
+---
+
+## Tech Stack
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Backend** (`apicuron-ws`) | [NestJS](https://nestjs.com/), TypeScript, [MongoDB](https://www.mongodb.com/) / Mongoose, CQRS, EventEmitter, Swagger/OpenAPI |
+| **Frontend** (`apicuron-ui`)| [Angular](https://angular.dev/) (v17+), TypeScript, Angular Material, Tailwind CSS, Angular Elements (Widget) |
+| **Database & Cache** | MongoDB 7, Memory Cache |
+| **Infrastructure & Proxy** | Docker & Docker Compose, Nginx |
+| **External Integrations** | ORCID OAuth API, Identifiers.org |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+Ensure you have the following installed on your machine:
+
+- [Docker](https://docs.docker.com/get-docker/) & [Docker Compose](https://docs.docker.com/compose/)
+- [Node.js](https://nodejs.org/) (v20 LTS recommended)
+- [Yarn](https://yarnpkg.com/) (`corepack enable`)
+
+### Environment Setup
+
+Create your local `.env` configuration file from the template:
+
+```bash
+cp .env.example .env
+```
+
+Review `.env` and adjust database credentials or provide a GitHub token if needed:
+
+```dotenv
+MONGO_INITDB_ROOT_USERNAME=admin
+MONGO_INITDB_ROOT_PASSWORD=secret
+MONGODB_USER=apicuron
+MONGODB_PASSWORD=secret
+DATABASE_HOST=mongodb
+DATABASE=apicuron
+DB_PORT=27017
+NODE_ENV=development
+GITHUB_TOKEN=
+```
 
 
-## The frontend
 
-### Structure
+### Running with Docker Compose (Recommended)
 
-The project is composed of mostly feature modules, standalone components, some logic regarding the models loaded in API requests or query construction.
+The easiest way to start the entire APICURON stack (Frontend, Backend, Database, and Nginx proxy) is with Docker Compose:
 
-### Model Classes definitions
+```bash
+docker compose up --build
+```
 
-There's a top level directory (in the src directory) named *models* that contains classes of entities that are manipulated from different API requests.
+To run in the background (detached mode):
 
-These classes implement Deserializable when they need to be loaded in from json response Or serializable when They need to be sent back to the server
+```bash
+docker compose up -d
+```
 
-### Modules and services
+### Manual / Local Development
 
-There are three main categories of modules 🗃 that are implemented in the frontend.
+If you prefer to run services individually for active development:
 
-- Lazy-loaded routes modules. Their whole purpose is to define routes that should be lazy-loaded. They allow for the app not to have to be entirely loaded for a single page to work
-- Modules that encapsulate logic related to a model or a concept (ex: curatorModule...etc)
-- Modules that do both, and implement features "exclusive" to their respective routes.
+#### 1. Start MongoDB
+You can run a local MongoDB container:
 
-### standalone components
+```bash
+docker compose up -d mongodb
+```
 
-Standalone Components have been fairly used in this project. They allow for better reusability throughout the project. They are defined in the *components* directory and they normally contain 0 to no APP logic. Although many now do implement some APP related features.
+#### 2. Backend (`apicuron-ws`)
+Navigate to the backend directory, install dependencies, and start the development server:
 
-The side panels in the user profile are defined as standalone components because They might prove usefull in another place. (reusability is still not well-tested)
+```bash
+cd apicuron-ws
+yarn install
+yarn start:dev
+```
+The API server will start on `http://localhost:3000` (or the port defined in your configuration). Interactive API documentation is available at `http://localhost:3000/api/docs`.
 
-## The backend
+#### 3. Frontend (`apicuron-ui`)
+Navigate to the frontend directory, install dependencies, and launch the Angular development server:
 
-### Deployment
+```bash
+cd apicuron-ui
+yarn install
+yarn start-dev
+```
+The frontend application will be accessible at `http://localhost:4200`.
 
-The APICURON API has two main deployment targets dev.apicuron.org and apicuron.org
-[docker-compose.dev.yaml](./docker-compose.dev.yaml) -> is for dev.apicuron.org
-[docker-compose.prod.yaml](./docker-compose.prod.yaml) -> is for apicuron.org
-the additional [docker-compose.build.yaml](./docker-compose.build.yaml) contains build instructions for both environments with according image tagging configuration
+---
+
+## Service Architecture & Ports
+
+When running through the provided Docker Compose and Nginx proxy:
+
+| Service | Internal Port | Host / Proxy URL | Description |
+| :--- | :--- | :--- | :--- |
+| **Proxy (Nginx)** | `3000` | `http://localhost:3000` | Unified gateway routing UI and API |
+| **Web UI** (`apicuron-ui`) | `4200` | `http://localhost:3000/` or `http://localhost:4200` | Angular frontend client |
+| **API Server** (`apicuron-ws`)| `3000` | `http://localhost:3000/api` | NestJS backend REST API |
+| **API Swagger Docs** | `3000` | `http://localhost:3000/api/docs` | OpenAPI / Swagger interactive documentation |
+| **Database** (`mongodb`) | `27017` | `localhost:27017` | MongoDB database engine |
+
+---
+
+## Testing
+
+### Backend Unit & E2E Tests
+```bash
+cd apicuron-ws
+yarn test        # Unit tests
+yarn test:cov    # Test coverage
+yarn test:e2e    # End-to-end tests
+```
+
+### Frontend Unit Tests
+```bash
+cd apicuron-ui
+npm test         # Angular test suite
+```
+
+---
+
+## Citation
+
+If you use APICURON in your research or integrate it into your biological database, please cite:
+
+> **APICURON: a database to credit and acknowledge the work of biocurators**  
+> *Database: The Journal of Biological Databases and Curation*, Volume 2021, 2021, baab019  
+> DOI: [10.1093/database/baab019](https://doi.org/10.1093/database/baab019)  
+> PMID: [33882120](https://pubmed.ncbi.nlm.nih.gov/33882120/)  
+
+```bibtex
+@article{apicuron2021,
+  author    = {Apicuron Consortium},
+  title     = {APICURON: a database to credit and acknowledge the work of biocurators},
+  journal   = {Database},
+  volume    = {2021},
+  pages     = {baab019},
+  year      = {2021},
+  publisher = {Oxford University Press},
+  doi       = {10.1093/database/baab019}
+}
+```
+
+---
+
+## Contributing
+
+Contributions, suggestions, and bug reports are welcome!
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+For larger changes or proposals, please open an issue first to discuss what you would like to change.
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
