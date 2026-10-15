@@ -120,7 +120,7 @@ const articles: ArticleReference[] = [
 
 // Routed through environment to allow per-env overrides
 export const APP_CONSTANTS = {
-  issueTracker: "https://github.com/BioComputingUP/apicuron-issue-tracker",
+  issueTracker: "https://github.com/BioComputingUP/apicuron/issues",
   slackInvite:
     "https://join.slack.com/t/apicuron/shared_invite/zt-1jir4nfu9-gDItsCVg7f0JoY8_mOht7w",
   contactEmail: "mailto:info@apicuron.org",
