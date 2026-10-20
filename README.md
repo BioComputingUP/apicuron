@@ -265,4 +265,4 @@ For larger changes or proposals, please open an issue first to discuss what you 
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the GPL License - see the LICENSE file for details.
