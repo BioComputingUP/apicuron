@@ -16,7 +16,8 @@ import {
 import { OrcidChecksum } from '../validators/orcid-checksum';
 import { ApiProperty } from '@nestjs/swagger';
 import { EntityUriValid } from '../validators/entity-uri';
-import { Type } from 'class-transformer';
+import { plainToInstance, Transform, Type } from 'class-transformer';
+import { isPlainObject, pick } from 'lodash';
 export class SubmitReportDto {
 	@IsString()
 	@IsNotEmpty()
@@ -99,14 +100,77 @@ export class SubmitBulkDto {
 	reports: string;
 }
 
+/**
+ * Report fields that can be set once at the root of a submission instead of
+ * being repeated in every report. A value set on a report overrides the global one.
+ */
+export const SUBMISSION_GLOBAL_FIELDS = [
+	'resource_id',
+	'activity_term',
+	'curator_orcid',
+	'entity_uri',
+	'timestamp',
+	'league',
+] as const;
+
+/**
+ * Merges the global fields of a submission into each of its reports.
+ * Non-object entries are left untouched so that validation reports them.
+ */
+export function mergeGlobalFields(
+	submission: Record<string, unknown> | undefined,
+): unknown {
+	const reports: unknown = submission?.reports;
+	if (!Array.isArray(reports)) {
+		return reports;
+	}
+	const globals = pick(submission, SUBMISSION_GLOBAL_FIELDS);
+	return reports.map((report: unknown) =>
+		isPlainObject(report) || report instanceof SubmitReportDto
+			? plainToInstance(SubmitReportDto, { ...globals, ...(report as object) })
+			: report,
+	);
+}
+
 export class SubmitReportsDto {
+	@ApiProperty({
+		type: [SubmitReportDto],
+		description:
+			'The list of reports, fields omitted from a report are taken from the global fields of the submission',
+	})
 	@IsArray()
 	@ValidateNested({ each: true })
 	@ArrayMaxSize(50)
 	@ArrayMinSize(0)
 	@IsNotEmpty()
 	@Type(() => SubmitReportDto)
+	@Transform(({ obj }) => mergeGlobalFields(obj))
 	reports: SubmitReportDto[];
+
+	// Global fields, validated on each report after being merged into it
+	@ApiProperty({ required: false, description: 'Global resource_id' })
+	@IsOptional()
+	resource_id?: string;
+
+	@ApiProperty({ required: false, description: 'Global activity_term' })
+	@IsOptional()
+	activity_term?: string;
+
+	@ApiProperty({ required: false, description: 'Global curator_orcid' })
+	@IsOptional()
+	curator_orcid?: string;
+
+	@ApiProperty({ required: false, description: 'Global entity_uri' })
+	@IsOptional()
+	entity_uri?: string;
+
+	@ApiProperty({ required: false, description: 'Global timestamp' })
+	@IsOptional()
+	timestamp?: string;
+
+	@ApiProperty({ required: false, description: 'Global league' })
+	@IsOptional()
+	league?: string;
 
 	@IsArray()
 	@IsString({ each: true })
