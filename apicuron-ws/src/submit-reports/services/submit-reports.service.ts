@@ -1,6 +1,7 @@
 import {
 	BadRequestException,
 	ConflictException,
+	HttpException,
 	Injectable,
 	InternalServerErrorException,
 	Logger,
@@ -20,7 +21,7 @@ import {
 	ReportSubmittedEvent,
 } from '../events/events';
 
-import { MongoServerError } from 'mongodb';
+import { MongoBulkWriteError, MongoServerError } from 'mongodb';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { ReportValidatorService } from './report-validator.service';
 type InsertManyReportsResult = Omit<InsertManyResult<Report>, 'insertedIds'> & {
@@ -166,12 +167,12 @@ export class SubmitReportService {
 	): Promise<
 		InsertManyReportsResult | Omit<InsertManyReportsResult, 'callback'>
 	> {
+		let deleteResponses = {};
 		try {
 			const validatedReports = await this.reportValidator.validateReports(
 				submission.reports,
 			);
 
-			let deleteResponses = {};
 			if (submission.delete_all) {
 				deleteResponses = await this.deleteAllManyResourcesReports(
 					submission.delete_all,
@@ -219,11 +220,25 @@ export class SubmitReportService {
 				);
 			}
 			if (err instanceof MongoServerError && err.code === 11000) {
-				this.logger.error(`Attempt at duplicate report insertion`);
-				// Duplicate key error, return 403
-				throw err;
+				// insertMany is ordered, the reports preceding the duplicate are inserted
+				const insertedCount =
+					err instanceof MongoBulkWriteError ? err.insertedCount : 0;
+				const writeErrors =
+					err instanceof MongoBulkWriteError ? [err.writeErrors].flat() : [];
+				const duplicateIndex = writeErrors[0]?.index;
+				const message = `Duplicate report${
+					duplicateIndex !== undefined ? ` at index ${duplicateIndex}` : ''
+				}: a report from the same curator to the same resource with the same timestamp already exists. ${insertedCount} report(s) preceding it were inserted`;
+				this.logger.warn(`Duplicate report insertion attempt, ${message}`);
+				throw new ConflictException({
+					statusCode: 409,
+					error: 'Conflict',
+					message,
+					insertedCount,
+					deletedReports: deleteResponses,
+				});
 			}
-			if (err instanceof BadRequestException) {
+			if (err instanceof HttpException) {
 				throw err;
 			}
 

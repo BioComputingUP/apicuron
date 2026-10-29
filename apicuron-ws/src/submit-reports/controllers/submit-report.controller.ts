@@ -4,11 +4,13 @@ import {
 	Controller,
 	ForbiddenException,
 	InternalServerErrorException,
+	Logger,
 	Post,
 	Query,
 	Request,
 	Res,
 	UploadedFile,
+	UseFilters,
 	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common';
@@ -23,7 +25,7 @@ import {
 	ApiTags,
 } from '@nestjs/swagger';
 import { Response } from 'express';
-import { isArray } from 'lodash';
+import { isArray, uniq } from 'lodash';
 import {
 	SubmitBulkTask,
 	SubmitBulkTaskArgs,
@@ -39,16 +41,20 @@ import {
 	SubmitReportDto,
 	SubmitReportsDto,
 } from '../dto/submit-report.dto';
+import { SubmissionLoggingFilter } from '../filters/submission-logging.filter';
 import { SubmitReportService } from '../services/submit-reports.service';
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
 @Controller({ path: 'reports', version: '2' })
+@UseFilters(SubmissionLoggingFilter)
 export class SubmitReportsController {
 	constructor(
 		protected reportService: SubmitReportService,
 		private resourceService: PartnerResourcesService,
 		private submitBulkTask: SubmitBulkTask,
 	) {}
+
+	private readonly logger = new Logger(SubmitReportsController.name);
 
 	private can_edit_resource(user, resource_id) {
 		// get the resources list that belong to the current user
@@ -186,14 +192,62 @@ export class SubmitReportsController {
 		@Request() req,
 		@Res() res: Response,
 	) {
+		const user = req.user as {
+			orcid_id: string;
+			resources?: { resource_id: string }[];
+		};
+		const submitter = user.orcid_id;
+		const submittedCount = reportSubmission.reports.length;
+		const resource_ids = uniq(
+			reportSubmission.reports.map((report) => report.resource_id),
+		);
+		const delete_all = reportSubmission.delete_all ?? [];
+		const resources = `resource(s) [${resource_ids.join(', ')}]`;
+		const deletion =
+			delete_all.length > 0
+				? `, deleting all previous reports of [${delete_all.join(', ')}]`
+				: '';
+		this.logger.verbose(
+			`Received ${submittedCount} report(s) from ${submitter} for ${resources}${deletion}`,
+		);
+
+		// the user has to manage every resource it submits to or deletes from
+		const user_resources = (user.resources ?? []).map(
+			(resource) => resource.resource_id,
+		);
+		const forbidden = uniq([...resource_ids, ...delete_all]).filter(
+			(resource_id) => !user_resources.includes(resource_id),
+		);
+		if (forbidden.length > 0) {
+			throw new ForbiddenException(
+				`You either do not have the authorization to perform CRUD operation on the reports of the resource(s) (${forbidden.join(
+					', ',
+				)}) or they do not exist`,
+			);
+		}
+
 		const { insertedCount, deletedReports, callback } =
 			await this.reportService.insertReports(reportSubmission, {
 				preventEvents: true,
 			});
 		const response = {
-			deletedReports: deletedReports,
+			message: `Successfully submitted ${insertedCount} of ${submittedCount} report(s)`,
+			submittedCount,
 			insertedCount: insertedCount,
+			resource_ids,
+			deletedReports: deletedReports,
 		};
+		const deleted = Object.entries(deletedReports)
+			.map(
+				([resource_id, result]) =>
+					`, deleted ${
+						result?.deletedCount ?? 0
+					} previous report(s) of ${resource_id}`,
+			)
+			.join('');
+		this.logger.verbose(
+			`Inserted ${insertedCount}/${submittedCount} report(s) from ${submitter} for ${resources}${deleted}`,
+		);
 
 		// send the insertion response
 		res.send(response);

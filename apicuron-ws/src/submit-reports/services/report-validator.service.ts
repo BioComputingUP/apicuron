@@ -187,16 +187,29 @@ export class ReportValidatorService {
 			new Map<string, PartnerResourceDocument>(),
 		);
 
+		const unknownResourceIds = resourceIds.filter(
+			(id) => !resourcesMap.has(id),
+		);
+		if (unknownResourceIds.length > 0) {
+			throw new BadRequestException(
+				`Resource(s) not found: ${unknownResourceIds.join(', ')}`,
+			);
+		}
+
 		// obtain a map of activities based on the activity terms/league/resource_id
 		const activities: Map<string, ITermIdentifier> = reports
 			// populate the league field of the report
-			.map((report) => {
+			.map((report, index) => {
 				const resource_from_report = resourcesMap.get(report.resource_id);
 				assertIsDefined(resource_from_report, 'Resource not found');
-				report.league = this.assignDefaultLeague(
-					report,
-					resource_from_report,
-				).name;
+				try {
+					report.league = this.assignDefaultLeague(
+						report,
+						resource_from_report,
+					).name;
+				} catch (err) {
+					throw this.withReportIndex(err, index);
+				}
 				return report;
 			})
 			.reduce((acc, curr) => {
@@ -240,12 +253,22 @@ export class ReportValidatorService {
 				);
 				results.push(result);
 			} catch (err) {
-				if (err instanceof BadRequestException) {
-					err.message = `Error at index ${index}: ${err.message}`;
-					throw err;
-				}
+				throw this.withReportIndex(err, index);
 			}
 		}
 		return results;
+	}
+
+	/**
+	 * Prefixes the message of a BadRequestException with the index of the report that caused it,
+	 * other errors are returned as is.
+	 */
+	private withReportIndex(err: unknown, index: number) {
+		if (err instanceof BadRequestException) {
+			return new BadRequestException(`reports.${index}: ${err.message}`, {
+				cause: err,
+			});
+		}
+		return err;
 	}
 }
