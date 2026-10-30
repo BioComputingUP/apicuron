@@ -31,6 +31,7 @@
   - [Running with Docker Compose (Recommended)](#running-with-docker-compose-recommended)
   - [Manual / Local Development](#manual--local-development)
 - [Service Architecture & Ports](#service-architecture--ports)
+- [Production Logs](#production-logs)
 - [Testing](#testing)
 - [Citation](#citation)
 - [Contributing](#contributing)
@@ -204,6 +205,19 @@ When running through the provided Docker Compose and Nginx proxy:
 | **API Server** (`apicuron-ws`)| `3000` | `http://localhost:3000/api` | NestJS backend REST API |
 | **API Swagger Docs** | `3000` | `http://localhost:3000/api/docs` | OpenAPI / Swagger interactive documentation |
 | **Database** (`mongodb`) | `27017` | `localhost:27017` | MongoDB database engine |
+
+---
+
+## Production Logs
+
+Containers log to the host's systemd journal, so logs persist across deployments. On the host:
+
+```bash
+journalctl CONTAINER_NAME=apicuron-webserver --since "1 hour ago"
+journalctl CONTAINER_NAME=apicuron-webserver -f
+```
+
+Other containers: `apicuron-proxy-ui`, `apicuron-db`. Dev containers use the `-dev` suffix, except the database, which is `apicuron-mongo-dev`.
 
 ---
 

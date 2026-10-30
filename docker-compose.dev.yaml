@@ -1,6 +1,13 @@
+# Logs go to the host journal so they survive `up --force-recreate` in run-prod.sh
+x-logging: &logging
+  driver: journald
+  options:
+    tag: "{{.Name}}"
+
 services:
   apicuron-webserver:
     container_name: apicuron-webserver-dev
+    logging: *logging
     image: registry.biocomputingup.it/apicuron-ws:dev
     env_file:
       - .env.development
@@ -13,6 +20,7 @@ services:
   apicuron-proxy-ui:
     image: registry.biocomputingup.it/apicuron-ui:dev    
     container_name: apicuron-proxy-ui-dev
+    logging: *logging
     env_file:
       - .env.development
     restart: "unless-stopped"
@@ -24,6 +32,7 @@ services:
   mongodb:
     image: registry.biocomputingup.it/apicuron-db:dev
     container_name: apicuron-mongo-dev
+    logging: *logging
     restart: always
     ports:
       - 27016:27017
