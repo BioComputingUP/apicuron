@@ -1,6 +1,13 @@
+# Logs go to the host journal so they survive `up --force-recreate` in run-prod.sh
+x-logging: &logging
+  driver: journald
+  options:
+    tag: "{{.Name}}"
+
 services:
   apicuron-webserver:
     container_name: apicuron-webserver
+    logging: *logging
     image: registry.biocomputingup.it/apicuron-ws:prod
     # environment: # !! This one overrides any variables set inside env files listed in attribute `env_file` below
     #   - DATABASE_HOST=mongodb
@@ -19,6 +26,7 @@ services:
   apicuron-proxy-ui:
     image: registry.biocomputingup.it/apicuron-ui:prod    
     container_name: apicuron-proxy-ui
+    logging: *logging
     ports:
       - "${PORT:-8089}:8080"
     depends_on:
@@ -28,6 +36,7 @@ services:
   mongodb:
     image: registry.biocomputingup.it/apicuron-db:prod
     container_name: apicuron-db
+    logging: *logging
     restart: always
     ports:
       - 27017:27017
