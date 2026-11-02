@@ -38,6 +38,7 @@ describe('SubmitReportsController POST /reports', () => {
 	let app: INestApplication;
 	let currentUser: { orcid_id: string; resources: { resource_id: string }[] };
 	let reportServiceMock: { insertReports: jest.Mock };
+	let bulkTaskMock: { run: jest.Mock };
 	let resourcesMock: { get_resource: jest.Mock; exists: jest.Mock };
 	let callback: jest.Mock;
 	let warnSpy: jest.SpyInstance;
@@ -60,6 +61,7 @@ describe('SubmitReportsController POST /reports', () => {
 					callback,
 				})),
 		};
+		bulkTaskMock = { run: jest.fn().mockResolvedValue(undefined) };
 		resourcesMock = {
 			get_resource: jest.fn().mockResolvedValue(RESOURCE),
 			exists: jest.fn().mockResolvedValue(true),
@@ -73,7 +75,7 @@ describe('SubmitReportsController POST /reports', () => {
 				EntityUriValid,
 				{ provide: SubmitReportService, useValue: reportServiceMock },
 				{ provide: PartnerResourcesService, useValue: resourcesMock },
-				{ provide: SubmitBulkTask, useValue: {} },
+				{ provide: SubmitBulkTask, useValue: bulkTaskMock },
 				{ provide: ConfigService, useValue: { get: () => 'local' } },
 			],
 		})
@@ -85,7 +87,7 @@ describe('SubmitReportsController POST /reports', () => {
 				},
 			})
 			.overrideGuard(HasAResourceGuard)
-			.useValue({ canActivate: () => true })
+			.useValue({ canActivate: () => currentUser.resources.length > 0 })
 			.compile();
 
 		app = moduleFixture.createNestApplication();
@@ -173,6 +175,68 @@ describe('SubmitReportsController POST /reports', () => {
 
 		expect(response.body.message).toContain('(another_resource)');
 		expect(reportServiceMock.insertReports).not.toHaveBeenCalled();
+	});
+
+	describe('POST /reports/bulk', () => {
+		const postBulk = (path = '/reports/bulk') =>
+			request(app.getHttpServer())
+				.post(path)
+				.set('version', '2')
+				.attach('reports', Buffer.from('{"reports":[]}'), 'reports.json');
+
+		it('forbids deleting the reports of a resource the user does not manage', async () => {
+			const response = await postBulk()
+				.field('delete_all[]', 'another_resource')
+				.expect(403);
+
+			expect(response.body.message).toContain('(another_resource)');
+			expect(bulkTaskMock.run).not.toHaveBeenCalled();
+		});
+
+		it('applies the same check to the delete-all query parameter', async () => {
+			await postBulk('/reports/bulk?delete-all=another_resource').expect(403);
+
+			expect(bulkTaskMock.run).not.toHaveBeenCalled();
+		});
+
+		it('forbids the request when only some of the resources are managed', async () => {
+			const response = await postBulk()
+				.field('delete_all[]', 'disprot')
+				.field('delete_all[]', 'another_resource')
+				.expect(403);
+
+			expect(response.body.message).toContain('(another_resource)');
+			expect(bulkTaskMock.run).not.toHaveBeenCalled();
+		});
+
+		it('lets a manager delete the reports of their resource', async () => {
+			await postBulk().field('delete_all[]', 'disprot').expect(201);
+
+			expect(bulkTaskMock.run).toHaveBeenCalledWith(
+				[],
+				expect.objectContaining({
+					orcid_id: ORCID,
+					delete_existing: ['disprot'],
+				}),
+			);
+		});
+
+		it('forbids users that do not manage any resource', async () => {
+			currentUser = { orcid_id: ORCID, resources: [] };
+
+			await postBulk().expect(403);
+
+			expect(bulkTaskMock.run).not.toHaveBeenCalled();
+		});
+
+		it('leaves the per-report permission check to the task when not deleting', async () => {
+			await postBulk().expect(201);
+
+			expect(bulkTaskMock.run).toHaveBeenCalledWith(
+				[],
+				expect.objectContaining({ delete_existing: [] }),
+			);
+		});
 	});
 
 	it('responds with the conflict raised on duplicate reports', async () => {
