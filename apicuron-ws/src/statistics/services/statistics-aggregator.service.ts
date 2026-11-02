@@ -77,9 +77,6 @@ export class StatisticsAggregator implements Aggregator {
 
 	async updatedUser(event: UserCreatedEvent | UserUpdatedEvent) {
 		const user: User = getEventSubject(event);
-		this.logger.log(
-			`Handling Update user stat privacy event in statistics service ${user.orcid_id} ${user.privacy} `,
-		);
 
 		await this.statModel.updateMany(
 			{

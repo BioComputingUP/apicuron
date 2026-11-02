@@ -56,12 +56,10 @@ export class RegistryQueryService {
 				userAdministeredResourceIds,
 				showAll: showAll,
 			};
-			this.logger.log('Count before filtering: ' + entries.length);
 			const filteredResults = this.privacyStrategy.filter(
 				strategyContext,
 				entries,
 			);
-			this.logger.log('Count after filtering: ' + filteredResults.length);
 			const count: number = await this.registryEntryModel.count(query_filter);
 
 			return {
