@@ -98,6 +98,15 @@ export class SubmitReportService {
 		return { deletedCount, acknowledged };
 	}
 
+	/**
+	 * Runs the checks of insertReport (resource, league, activity term) without writing anything.
+	 *
+	 * @throws an error describing the first check that failed.
+	 */
+	async checkReport(submittedReport: SubmitReportDto): Promise<void> {
+		await this.reportValidator.validateReport(submittedReport);
+	}
+
 	async insertReport(
 		submittedReport: SubmitReportDto,
 		options?: { preventEvents: true },

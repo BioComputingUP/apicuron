@@ -30,7 +30,6 @@ import {
 	SubmitBulkTask,
 	SubmitBulkTaskArgs,
 } from 'src/scheduler/tasks/submit_bulk.task';
-import { AuthProtected } from '../../auth/decorators/auth.decorator';
 import { HasAResourceGuard } from '../../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
 import { VersionHeader } from '../../plugins/swagger/config';
@@ -87,8 +86,9 @@ export class SubmitReportsController {
 		required: false,
 	})
 	@ApiConsumes('multipart/form-data')
-	@AuthProtected()
+	@ApiSecurity('basic')
 	@Post('bulk')
+	@UseGuards(LocalAuthGuard, HasAResourceGuard)
 	@UseInterceptors(
 		FileInterceptor('reports', {
 			dest: '/tmp/apicuron/reports/',
@@ -109,6 +109,21 @@ export class SubmitReportsController {
 			if (isArray(deleteAllInput)) {
 				delete_all = deleteAllInput;
 			}
+		}
+
+		// the user has to manage every resource it deletes from
+		const user_resources = ((req.user.resources ?? []) as { resource_id: string }[]).map(
+			(resource) => resource.resource_id,
+		);
+		const forbidden = uniq(delete_all).filter(
+			(resource_id) => !user_resources.includes(resource_id),
+		);
+		if (forbidden.length > 0) {
+			throw new ForbiddenException(
+				`You either do not have the authorization to perform CRUD operation on the reports of the resource(s) (${forbidden.join(
+					', ',
+				)}) or they do not exist`,
+			);
 		}
 
 		// handle if a resource_id that is passed does not exist

@@ -37,12 +37,15 @@ export class CuratorRegistryController {
 		summary:
 			'Get a single curator entry from the registry based on their orcid id',
 	})
+	@AuthProtected()
+	@Public()
 	@Get('curator/:id')
 	async getCuratorEntry(
 		@Param('id') user_orcid: string,
+		@UserReq() user: User | null,
 	): Promise<RegistrySearchResultDto> {
 
-			const result = await this.registryQueryService.findCuratorEntryByOrcid(user_orcid);
+			const result = await this.registryQueryService.findVisibleContributorEntry(user_orcid, user);
 			if (!result){
 				throw new NotFoundException(`Contributor with ORCID ${user_orcid} not found`);
 			}

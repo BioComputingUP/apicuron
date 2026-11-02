@@ -33,7 +33,7 @@ export class BadgesController {
 		const privacyFilter = userResourceEntityPrivacyFilter(user);
 		const query = {
 			...filter.getQuery(),
-			privacyFilter,
+			...privacyFilter,
 		};
 
 		const { count, data } = await this.badgesQueryService.getBadges(

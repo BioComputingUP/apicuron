@@ -97,10 +97,19 @@ export class SubmitBulkTask extends Task {
 				2,
 			)}`,
 		);
-		if (delete_existing) {
+		if (delete_existing && delete_existing.length > 0) {
 			this.logger.log(
 				`User specified resources ${delete_existing} to be deleted before proceeding`,
 			);
+
+			const canDelete = await this.can_delete_existing(
+				file,
+				orcid_id,
+				delete_existing,
+			);
+			if (!canDelete) {
+				return;
+			}
 
 			for (let i = 0; i < delete_existing.length; i++) {
 				const currentResourceId = delete_existing[i];
@@ -117,6 +126,86 @@ export class SubmitBulkTask extends Task {
 		return await this.main(file, orcid_id);
 		// }
 		// return await this.unbuffered_submission(file, orcid_id);
+	}
+
+	/**
+	 * Checks the whole file without writing anything, as the deletion cannot be undone.
+	 * Every report has to be valid and each deleted resource has to be resubmitted,
+	 * otherwise the submitter is notified and nothing should be deleted.
+	 */
+	private async can_delete_existing(
+		file: string,
+		submitter_orcid: string,
+		delete_existing: string[],
+	): Promise<boolean> {
+		const problems: string[] = [];
+		const submitted_resources = new Set<string>();
+		let index = 0;
+
+		try {
+			const defaultReport = await this.parse_default_report(file);
+			const user = await this.userModel.findOne({
+				orcid_id: submitter_orcid,
+			});
+			if (!user) {
+				throw new Error(
+					`User with the ORCID ID ${submitter_orcid} does not exist`,
+				);
+			}
+
+			const reportStream = this.build_report_stream(
+				file,
+				defaultReport,
+				user,
+			) as unknown as AsyncIterable<ValidatedReport>;
+			for await (const { report, errors } of reportStream) {
+				const reportErrors = errors.flatMap((error) =>
+					Object.values(error.constraints ?? {}),
+				);
+				if (reportErrors.length === 0) {
+					try {
+						await this.submitReports.checkReport(report);
+					} catch (e) {
+						reportErrors.push(e.message);
+					}
+				}
+
+				if (reportErrors.length > 0) {
+					problems.push(`reports.${index}: ${reportErrors.join('; ')}`);
+				} else {
+					submitted_resources.add(report.resource_id);
+				}
+				index++;
+			}
+		} catch (e) {
+			this.logger.error(`Error checking file ${file}: ${e.message}`);
+			problems.push(`The file could not be processed: ${e.message}`);
+		}
+
+		if (problems.length === 0) {
+			for (const resource_id of delete_existing) {
+				if (!submitted_resources.has(resource_id)) {
+					problems.push(`The file contains no reports for ${resource_id}`);
+				}
+			}
+		}
+
+		if (problems.length === 0) {
+			return true;
+		}
+
+		const maxListed = 50;
+		const notListed = problems.length - maxListed;
+		await this.notificationsService.create_user_notification(
+			'Submission Failed',
+			[
+				`No reports were deleted or submitted. Found ${problems.length} problem(s), fix them and submit the file again:`,
+				...problems.slice(0, maxListed),
+				...(notListed > 0 ? [`...and ${notListed} more`] : []),
+			].join('\n'),
+			submitter_orcid,
+		);
+		return false;
 	}
 
 	public async unbuffered_submission(file: string, submitter_orcid: string) {
@@ -511,7 +600,7 @@ export class SubmitBulkTask extends Task {
 					return { ...defaultReport, ...report };
 				}, // merge the defaultReport and the report
 				this.convert_object_to_report, // convert instances to SubmitReportDto,
-				this.validate_report, // validate report and extract errors
+				this.validate_report.bind(this), // validate report and extract errors
 				this.user_can_report(user), // validate if user has permission to submit report
 			]),
 		);
