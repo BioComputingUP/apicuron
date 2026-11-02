@@ -24,7 +24,7 @@ export const ConnectionFactoryProvider: MongooseModuleAsyncOptions = {
 			auth = `${mongodbUser}:${encodeURIComponent(mongodbPassword)}@`;
 		}
 		const uri = `mongodb://${auth}${db_host}:${port}/${database}?authSource=${database}`;
-		logger.log(`MongoDB Connection setup uri: ${uri}`);
+		logger.log(`MongoDB Connection setup: ${db_host}:${port}/${database}`);
 		return {
 			uri,
 			connectionFactory: (connection: Connection) => {
