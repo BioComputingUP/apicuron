@@ -16,7 +16,6 @@ import {
 	skip,
 	switchMap,
 	take,
-	tap,
 } from 'rxjs';
 import { PartnerResourceDocument } from 'src/core/schemas/index';
 import { assertIsDefined } from 'src/util/type-assertion.helper';
@@ -193,18 +192,17 @@ export class MedalDefCommandsService {
 				};
 				return medalDefDoc;
 			}),
-			tap(console.log),
 			switchMap(
 				this.computeMedals.streamMedalsForMedalDef.bind<
 					ComputeMedalsService['streamMedalsForMedalDef']
 				>(this.computeMedals),
 			),
-			tap(console.log),
 			skip(skipN),
 			take(limit),
 			bufferCount(limit),
 		);
 
-		return obs$;
+		// the medals are converted to MedalDto when they are paginated in the controller
+		return obs$ as unknown as Observable<MedalDto[]>;
 	}
 }

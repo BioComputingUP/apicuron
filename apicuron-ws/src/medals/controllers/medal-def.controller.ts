@@ -33,7 +33,7 @@ import { MedalDefCommandsService } from '../services/medal-def-commands.service'
 import { MedalDefQueriesService } from '../services/medal-def-queries.service';
 import { MedalDefFilter } from '../dto/filter-medal-def.dto';
 import { MedalDefDto, MedalDto } from '../dto/medal.dto';
-import { firstValueFrom, map, tap } from 'rxjs';
+import { firstValueFrom, map } from 'rxjs';
 import { BasePaginationDto } from 'src/pagination/dto/paginate.dto';
 import { PreviewMedalsDto as PreviewMedalsDto } from '../dto/compute-medal-def.dto';
 
@@ -132,14 +132,13 @@ export class MedalsDefController {
 
 	@AuthProtected()
 	@Post('preview')
-	async previewMedalsforDef(@Body() previewDto: PreviewMedalsDto) {
+	async previewMedalsforDef(@Body() previewDto: PreviewMedalsDto, @Req() req) {
+		this.can_edit_resource(req.user, previewDto.medalDef.resource_id);
 		const medals$ = this.commandsService.previewMedalsForDef(
 			previewDto.medalDef,
 			previewDto.skip,
 			previewDto.limit,
-		).pipe(
-			tap(console.log)
-		)
+		);
 		// return medals$;
 		let medals: MedalDto[] = [];
 		try {
