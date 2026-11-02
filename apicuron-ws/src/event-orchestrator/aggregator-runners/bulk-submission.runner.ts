@@ -81,7 +81,6 @@ export class SubmissionRunner implements IRunner, OnModuleInit {
 		try {
 			await fn(this.reportAggregator);
 			completed_aggregators.push(this.reportAggregator.constructor.name);
-			this.logger.log('Report aggregator completed successfully');
 		} catch (error) {
 			failed_aggregators.push(this.reportAggregator.constructor.name);
 			throw new Error(
@@ -104,10 +103,6 @@ export class SubmissionRunner implements IRunner, OnModuleInit {
 				try {
 					await fn(aggregator);
 					completed_aggregators.push(aggregator.constructor.name);
-
-					this.logger.log(
-						`Sequential aggregator ${aggregator.constructor.name} completed successfully`,
-					);
 				} catch (error) {
 					const didntComplete = sequentialAggregators
 						.slice(sequentialAggregators.indexOf(aggregator))
@@ -125,7 +120,6 @@ export class SubmissionRunner implements IRunner, OnModuleInit {
 			sequentialResults$,
 			...parallelizableResults$,
 		]);
-		this.logger.log('SubmissionRunner completed');
 		if (seqRes.status === 'rejected') {
 			this.logger.error(
 				`Sequential aggregators failed: ${seqRes.reason.message}${
@@ -147,7 +141,7 @@ export class SubmissionRunner implements IRunner, OnModuleInit {
 				completed_aggregators.push(aggregatorName);
 			}
 		});
-		this.logger.log(
+		this.logger.verbose(
 			`Completed aggregators [${
 				completed_aggregators.length
 			}]: ${completed_aggregators.join(', ')}`,

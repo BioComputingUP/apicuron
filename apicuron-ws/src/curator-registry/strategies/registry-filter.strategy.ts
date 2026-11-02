@@ -15,7 +15,6 @@ export class RegistryFilterStrategy {
 		let filteredEntries: CuratorRegistryEntry[] = unfilteredEntries;
 		for (const rule of this.filterPipeline) {
 			if (rule.shouldApply(context)) {
-				this.logger.verbose(`Applying filter rule: ${rule.name}`);
 				filteredEntries = rule.applyFilter(context, unfilteredEntries);
 			}
 		}

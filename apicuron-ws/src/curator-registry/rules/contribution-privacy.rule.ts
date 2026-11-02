@@ -32,9 +32,6 @@ export class ContributionPrivacyFilterRule implements FilterStrategyRule {
 					(contribution): contribution is ContributionEntry =>
 						contribution.groups.length > 0,
 				);
-			this.logger.log(
-				`${filteredContributions.length} contributions after filtering`,
-			);
 
 			return this.restrictToRequestedResources(
 				{
