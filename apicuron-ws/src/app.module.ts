@@ -5,7 +5,6 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MulterModule } from '@nestjs/platform-express';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AchievementsModule } from './achievements/achievements.module';
-import { AdminModule } from './admin/admin.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -125,7 +124,6 @@ import { ContributionEventsModule } from './contribution-events/contribution-eve
 			}),
 		}),
 		OrcidSyncModule,
-		AdminModule,
 		PendingReportsModule,
 		ContributionEventsModule,
 	],
