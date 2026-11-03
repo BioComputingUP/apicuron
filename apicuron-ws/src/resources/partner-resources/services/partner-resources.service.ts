@@ -25,6 +25,10 @@ import {
 	PartnerResourceDocument,
 	PartnerResourceModel,
 } from '../../../core/schemas/resource/partner-resource.schema';
+import {
+	MAX_ALLOWED_HOSTS,
+	UpdateAllowedHostsDto,
+} from '../../dto/allowed-hosts.dto';
 import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
 import { AddMemberToLeague } from '../leagues/dto/add-member-to-league.dto';
 import { DeleteLeagueDTO } from '../leagues/dto/delete-league.dto';
@@ -206,6 +210,47 @@ export class PartnerResourcesService {
 		return newResource;
 	}
 
+	/**
+	 * Adds and removes hosts allowed in the entity_uri of the resource reports.
+	 * Entries are compared by host and added ones are stored as https://<host>.
+	 */
+	async update_allowed_hosts(
+		resource_id: string,
+		{ add = [], remove = [] }: UpdateAllowedHostsDto,
+	): Promise<PartnerResourceDocument> {
+		const resource = await this.get_resource(resource_id);
+
+		const removedHosts = remove.map(getHost);
+		const allowed = resource.allowedUrlsPrefix.filter(
+			(url) => !removedHosts.includes(getHost(url)),
+		);
+		for (const url of add) {
+			const host = getHost(url);
+			if (!allowed.some((allowedUrl) => getHost(allowedUrl) === host)) {
+				allowed.push(`https://${host}`);
+			}
+		}
+		if (allowed.length > MAX_ALLOWED_HOSTS) {
+			throw new BadRequestException(
+				`A resource can allow at most ${MAX_ALLOWED_HOSTS} hosts, this change would make ${allowed.length}.`,
+			);
+		}
+
+		// the model is used directly, as on linkSource: the copies of the resource kept by
+		// other collections are not updated, as nothing reads the allowed hosts from them
+		const updated = await this.partnerResourceModel.findOneAndUpdate(
+			{ resource_id },
+			{ $set: { allowedUrlsPrefix: allowed } },
+			{ new: true },
+		);
+		assertIsDefined(
+			updated,
+			`Resource with ID ${resource_id} not found.`,
+			NotFoundException,
+		);
+		return updated;
+	}
+
 	public getResourceLeagues(
 		resource: PartnerResourceDocument | LeanDocument<PartnerResourceDocument>,
 	): [
@@ -269,4 +314,19 @@ export class PartnerResourcesService {
 
 		return { linked: result.modifiedCount === 1 };
 	}
+}
+
+/**
+ * Reads the host of a URL or of a bare host such as doi.org.
+ */
+function getHost(urlOrHost: string): string {
+	const value = urlOrHost.trim();
+	if (value.includes('://')) {
+		try {
+			return new URL(value).host;
+		} catch {
+			// compared as a bare host below
+		}
+	}
+	return value.toLowerCase().replace(/\/+$/, '');
 }

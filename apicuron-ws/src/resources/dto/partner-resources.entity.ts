@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsString, IsUrl } from 'class-validator';
 import { ResourceCategory } from 'src/core/enums';
@@ -75,4 +76,12 @@ export class PartnerResourceEntity extends SelectPartnerResourceDto {
 	@Expose()
 	@Type(() => LeaderboardSettingsDto)
 	leaderboard_preferences: LeaderboardSettingsDto;
+
+	// besides the hosts of resource_url and resource_uri
+	@ApiProperty({
+		description: 'URLs whose host is allowed in the entity_uri of reports',
+		type: [String],
+	})
+	@Expose()
+	allowedUrlsPrefix: string[];
 }
