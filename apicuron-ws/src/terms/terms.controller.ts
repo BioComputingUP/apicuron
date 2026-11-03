@@ -9,7 +9,6 @@ import {
 	Body,
 	UseGuards,
 	Req,
-	ForbiddenException,
 	Res,
 	SerializeOptions,
 } from '@nestjs/common';
@@ -34,6 +33,7 @@ import { AuthProtected } from '../auth/decorators/auth.decorator';
 import { UserReq } from '../auth/decorators/applyUser.decorator';
 import { User } from '../core/schemas/user.schema';
 import { resourceEntityPrivacyFilter } from '../util/privacy.helper';
+import { assertUserManagesResource } from '../util/authrization.helpers';
 @ApiTags('Curation Terms')
 @ApiHeader(VersionHeader)
 @Controller({
@@ -47,18 +47,7 @@ export class TermsController {
 	) {}
 
 	private canEditResource(user, resource_id) {
-		// get the resources list that belong to the current user
-		const user_resources: Array<{ resource_id: string }> = user.resources;
-		// check if the resource belongs to the user
-		const resource_found = user_resources.find(
-			(resource) => resource.resource_id == resource_id,
-		);
-		// if it doesn't, we respond with  a 403 exception
-		if (!resource_found) {
-			throw new ForbiddenException(
-				`You either do not have the authorization to update the terms of the (${resource_id}) resource or the resource does not exist`,
-			);
-		}
+		assertUserManagesResource(user, resource_id);
 	}
 	// swagger decorators
 	@ApiOkResponse({

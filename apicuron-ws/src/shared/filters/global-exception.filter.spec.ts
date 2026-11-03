@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ForbiddenException, Logger } from '@nestjs/common';
+import { ForbiddenException, Logger, NotFoundException } from '@nestjs/common';
 import { captureException } from '@sentry/nestjs';
 import { GlobalExceptionFilter } from './global-exception.filter';
 
@@ -16,8 +16,17 @@ describe('GlobalExceptionFilter', () => {
 	let error: jest.SpyInstance;
 	let filter: GlobalExceptionFilter;
 
-	const catchFor = (exception: unknown, url = '/reports') => {
-		const req = { method: 'POST', originalUrl: url, user: { orcid_id: ORCID } };
+	const catchFor = (
+		exception: unknown,
+		url = '/reports',
+		headers: Record<string, string> = {},
+	) => {
+		const req = {
+			method: 'POST',
+			originalUrl: url,
+			headers,
+			user: { orcid_id: ORCID },
+		};
 		const res = { locals: { request_id: 'abc-123', started_at: Date.now() } };
 		filter.catch(exception, {
 			switchToHttp: () => ({ getRequest: () => req, getResponse: () => res }),
@@ -91,6 +100,20 @@ describe('GlobalExceptionFilter', () => {
 
 		expect(warn.mock.calls[0][0]).toContain('/auth/orcid/redirect by');
 		expect(warn.mock.calls[0][0]).not.toContain('secret');
+	});
+
+	it('hints at the version header when an unknown route is called without it', () => {
+		catchFor(new NotFoundException('Cannot POST /reports'));
+		catchFor(new NotFoundException('Cannot POST /reports'), '/reports', {
+			version: '2',
+		});
+
+		expect(httpAdapter.reply.mock.calls[0][1].message).toBe(
+			'Cannot POST /reports. Most API routes require the header version: 2',
+		);
+		expect(httpAdapter.reply.mock.calls[1][1].message).toBe(
+			'Cannot POST /reports',
+		);
 	});
 
 	it('only ends the response when it was already sent', () => {

@@ -1,6 +1,7 @@
 import {
 	CanActivate,
 	ExecutionContext,
+	ForbiddenException,
 	Injectable,
 	Logger,
 } from '@nestjs/common';
@@ -43,13 +44,24 @@ export class LocalAuthGuard extends AuthGuard('jwt') implements CanActivate {
 
 		const [orcidAuth, jwtAuth] = await Promise.all([orcidAuth$, jwtAuth$]);
 
-		if (isPublic) {
-			// if the request is public, we return true
+		if (isPublic || jwtAuth || orcidAuth) {
 			return true;
-		} else {
-			// otherwise we return the verification of one of these two verifications
-			return jwtAuth || orcidAuth;
 		}
+		throw new ForbiddenException(this.getFailureReason(req));
+	}
+
+	/**
+	 * Tells the caller why the request could not be authenticated.
+	 */
+	private getFailureReason(req): string {
+		const header = req.headers['authorization'] as string | undefined;
+		if (!header && !req.headers[this.orcidHeader]) {
+			return 'This endpoint needs an API token. Send: Authorization: Bearer <token>';
+		}
+		if (header && !/^bearer\s+\S/i.test(header)) {
+			return 'Your token has no "Bearer " prefix. Send: Authorization: Bearer <token>';
+		}
+		return 'This API token is not valid on this site. Tokens from dev.apicuron.org and apicuron.org are not interchangeable.';
 	}
 
 	async checkOrcidAuth(req): Promise<boolean> {

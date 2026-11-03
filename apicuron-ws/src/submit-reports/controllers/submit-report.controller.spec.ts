@@ -25,6 +25,7 @@ import { SubmitReportsController } from './submit-report.controller';
 
 describe('SubmitReportsController POST /reports', () => {
 	const ORCID = '0000-0002-1825-0097';
+	const FORBIDDEN_MESSAGE = `Your account (${ORCID}) does not manage "another_resource". It manages [disprot].`;
 	const RESOURCE = {
 		resource_id: 'disprot',
 		resource_uri: 'https://registry.identifiers.org/registry/disprot',
@@ -171,7 +172,7 @@ describe('SubmitReportsController POST /reports', () => {
 			reports: [REPORT, { ...REPORT, resource_id: 'another_resource' }],
 		}).expect(403);
 
-		expect(response.body.message).toContain('(another_resource)');
+		expect(response.body.message).toBe(FORBIDDEN_MESSAGE);
 		expect(reportServiceMock.insertReports).not.toHaveBeenCalled();
 		expect(warnSpy).toHaveBeenCalledWith(failedLog(403, ''));
 	});
@@ -183,7 +184,7 @@ describe('SubmitReportsController POST /reports', () => {
 			delete_all: ['another_resource'],
 		}).expect(403);
 
-		expect(response.body.message).toContain('(another_resource)');
+		expect(response.body.message).toBe(FORBIDDEN_MESSAGE);
 		expect(reportServiceMock.insertReports).not.toHaveBeenCalled();
 	});
 
@@ -199,7 +200,7 @@ describe('SubmitReportsController POST /reports', () => {
 				.field('delete_all[]', 'another_resource')
 				.expect(403);
 
-			expect(response.body.message).toContain('(another_resource)');
+			expect(response.body.message).toBe(FORBIDDEN_MESSAGE);
 			expect(bulkTaskMock.run).not.toHaveBeenCalled();
 		});
 
@@ -215,7 +216,7 @@ describe('SubmitReportsController POST /reports', () => {
 				.field('delete_all[]', 'another_resource')
 				.expect(403);
 
-			expect(response.body.message).toContain('(another_resource)');
+			expect(response.body.message).toBe(FORBIDDEN_MESSAGE);
 			expect(bulkTaskMock.run).not.toHaveBeenCalled();
 		});
 

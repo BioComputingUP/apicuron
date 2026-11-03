@@ -2,7 +2,6 @@ import {
 	BadRequestException,
 	Body,
 	Controller,
-	ForbiddenException,
 	InternalServerErrorException,
 	Logger,
 	Post,
@@ -40,6 +39,7 @@ import {
 	SubmitReportsDto,
 } from '../dto/submit-report.dto';
 import { SubmitReportService } from '../services/submit-reports.service';
+import { assertUserManagesResource } from 'src/util/authrization.helpers';
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
 @Controller({ path: 'reports', version: '2' })
@@ -53,18 +53,7 @@ export class SubmitReportsController {
 	private readonly logger = new Logger(SubmitReportsController.name);
 
 	private can_edit_resource(user, resource_id) {
-		// get the resources list that belong to the current user
-		const user_resources: Array<{ resource_id: string }> = user.resources;
-		// check if the resource belongs to the user
-		const resource_found = user_resources.find(
-			(resource) => resource.resource_id == resource_id,
-		);
-		// if it doesn't, we respond with  a 403 exception
-		if (!resource_found) {
-			throw new ForbiddenException(
-				`You either do not have the authorization to perform CRUD operation on the reports of the (${resource_id}) resource or the resource does not exist`,
-			);
-		}
+		assertUserManagesResource(user, resource_id);
 	}
 
 	@ApiOperation({
@@ -109,19 +98,7 @@ export class SubmitReportsController {
 		}
 
 		// the user has to manage every resource it deletes from
-		const user_resources = (
-			(req.user.resources ?? []) as { resource_id: string }[]
-		).map((resource) => resource.resource_id);
-		const forbidden = uniq(delete_all).filter(
-			(resource_id) => !user_resources.includes(resource_id),
-		);
-		if (forbidden.length > 0) {
-			throw new ForbiddenException(
-				`You either do not have the authorization to perform CRUD operation on the reports of the resource(s) (${forbidden.join(
-					', ',
-				)}) or they do not exist`,
-			);
-		}
+		assertUserManagesResource(req.user, delete_all);
 
 		// handle if a resource_id that is passed does not exist
 		const existsPromises = delete_all.map((res_id) =>
@@ -224,19 +201,7 @@ export class SubmitReportsController {
 		);
 
 		// the user has to manage every resource it submits to or deletes from
-		const user_resources = (user.resources ?? []).map(
-			(resource) => resource.resource_id,
-		);
-		const forbidden = uniq([...resource_ids, ...delete_all]).filter(
-			(resource_id) => !user_resources.includes(resource_id),
-		);
-		if (forbidden.length > 0) {
-			throw new ForbiddenException(
-				`You either do not have the authorization to perform CRUD operation on the reports of the resource(s) (${forbidden.join(
-					', ',
-				)}) or they do not exist`,
-			);
-		}
+		assertUserManagesResource(user, [...resource_ids, ...delete_all]);
 
 		const { insertedCount, deletedReports, callback } =
 			await this.reportService.insertReports(reportSubmission, {
