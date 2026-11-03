@@ -6,6 +6,7 @@ import { useContainer } from 'class-validator';
 import { mkdtempSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
+import { Readable } from 'stream';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { EntityUriValid } from '../../submit-reports/validators/entity-uri';
 import { SubmitBulkTask } from './submit_bulk.task';
@@ -31,6 +32,7 @@ describe('SubmitBulkTask', () => {
 	let reportModel: { deleteMany: jest.Mock };
 	let notifications: { create_user_notification: jest.Mock };
 	let submitReports: { checkReport: jest.Mock; insertReport: jest.Mock };
+	let eventEmitter: { emitAsync: jest.Mock };
 
 	const writeFile = (content: unknown) => {
 		const file = join(dir, 'reports.json');
@@ -73,6 +75,7 @@ describe('SubmitBulkTask', () => {
 			checkReport: jest.fn().mockResolvedValue(undefined),
 			insertReport: jest.fn().mockResolvedValue({}),
 		};
+		eventEmitter = { emitAsync: jest.fn().mockResolvedValue([]) };
 		task = new SubmitBulkTask(
 			reportModel as any,
 			{
@@ -81,7 +84,7 @@ describe('SubmitBulkTask', () => {
 				}),
 			} as any,
 			notifications as any,
-			{ emitAsync: jest.fn().mockResolvedValue([]) } as any,
+			eventEmitter as any,
 			submitReports as any,
 		);
 	});
@@ -189,6 +192,55 @@ describe('SubmitBulkTask', () => {
 			expect(notificationBody()).toContain(
 				'does not have permission to submit to the resource another_resource',
 			);
+		});
+	});
+
+	describe('when inserting reports', () => {
+		it('waits for every insert before notifying and updating the statistics', async () => {
+			submitReports.insertReport.mockImplementation(
+				() => new Promise((resolve) => setTimeout(() => resolve({}), 20)),
+			);
+
+			await run({ reports: [REPORT, REPORT, REPORT] }, []);
+
+			expect(notificationBody()).toContain('Successfully submitted 3/3');
+			expect(eventEmitter.emitAsync).toHaveBeenCalledTimes(1);
+			expect(eventEmitter.emitAsync.mock.calls[0][1].resource_ids).toEqual([
+				'disprot',
+			]);
+			const [insertOrder] = submitReports.insertReport.mock.invocationCallOrder;
+			const [emitOrder] = eventEmitter.emitAsync.mock.invocationCallOrder;
+			expect(insertOrder).toBeLessThan(emitOrder);
+		});
+
+		it('counts the failed inserts and does not update the statistics when none succeeded', async () => {
+			submitReports.insertReport.mockRejectedValue(new Error('duplicate key'));
+
+			await run({ reports: [REPORT, REPORT] }, []);
+
+			expect(notificationBody()).toContain('Submission failed!');
+			expect(notificationBody()).toContain('Failed to submit 2');
+			expect(notificationBody()).toContain('InsertionError: duplicate key');
+			expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
+		});
+
+		it('keeps the reports read before a stream error and notifies the failure', async () => {
+			jest.spyOn(task as any, 'build_report_stream').mockReturnValue(
+				Readable.from(
+					(async function* () {
+						yield { report: REPORT, errors: [] };
+						throw new Error('Unexpected end of file');
+					})(),
+				),
+			);
+
+			await run({ reports: [REPORT] }, []);
+
+			const [title, body] = notifications.create_user_notification.mock.calls[0];
+			expect(title).toBe('Submission Failed');
+			expect(body).toContain('could not be read completely: Unexpected end of file');
+			expect(body).toContain('Successfully submitted 1/1');
+			expect(eventEmitter.emitAsync).toHaveBeenCalledTimes(1);
 		});
 	});
 });

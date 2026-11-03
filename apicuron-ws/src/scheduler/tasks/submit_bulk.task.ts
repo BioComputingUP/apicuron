@@ -36,6 +36,7 @@ export type SubmissionProcessingReport = {
 	success_count: number;
 	total_report_count: number;
 	resource_ids: string[];
+	file_read_error?: string;
 };
 export interface SubmitBulkTaskArgs {
 	file: string;
@@ -392,7 +393,7 @@ export class SubmitBulkTask extends Task {
 	}
 
 	private async main(file: string, submitter_orcid: string) {
-		let reportStream: Stream | null = null;
+		let reportStream: Stream;
 		try {
 			const defaultReport = await this.parse_default_report(file);
 			const user = await this.userModel.findOne({
@@ -412,104 +413,95 @@ export class SubmitBulkTask extends Task {
 			);
 
 			this.logger.error(`Error: ${e.message}`);
-		} finally {
-			if (!reportStream) {
-				return;
-			}
-			const { errors, success_count, total_report_count, resource_ids } =
-				await this.process_report_stream(reportStream);
+			return;
+		}
+
+		const {
+			errors,
+			success_count,
+			total_report_count,
+			resource_ids,
+			file_read_error,
+		} = await this.process_report_stream(reportStream);
+
+		if (success_count > 0) {
+			this.logger.log(`Success count ${success_count}`);
 			await this.eventEmitter.emitAsync(
 				BulkSubmissionEvent.name,
 				new BulkSubmissionEvent(submitter_orcid, resource_ids),
 			);
-
-			const notification_body = this.build_notification_body(
-				errors,
-				success_count,
-				total_report_count,
-			);
-
-			await this.notificationsService.create_user_notification(
-				'Submission report',
-				notification_body,
-				submitter_orcid,
-			);
-
-			if (success_count > 0) {
-				this.logger.log(`Success count ${success_count}`);
-				await this.eventEmitter.emitAsync(
-					BulkSubmissionEvent.name,
-					new BulkSubmissionEvent(submitter_orcid, resource_ids),
-				);
-			}
 		}
+
+		const notification_body = this.build_notification_body(
+			errors,
+			success_count,
+			total_report_count,
+		);
+
+		await this.notificationsService.create_user_notification(
+			file_read_error ? 'Submission Failed' : 'Submission report',
+			file_read_error
+				? `The file could not be read completely: ${file_read_error}\n${notification_body}`
+				: notification_body,
+			submitter_orcid,
+		);
 	}
 
+	/**
+	 * Inserts the valid reports one at a time, so the counts are complete once it resolves.
+	 * When the file cannot be read until the end, the reports read so far are kept
+	 * and the error is returned with the counts.
+	 */
 	private async process_report_stream(
-		reportsStream,
+		reportsStream: Stream,
 	): Promise<SubmissionProcessingReport> {
 		let error_report: ValidationError[] = [];
 		let successful_reports_count = 0;
 		let total_report_count = 0;
+		let file_read_error: string | undefined;
 
 		const affected_resource_ids = new Set<string>();
-		return new Promise((resolve, reject) => {
-			reportsStream.on('data', async ({ errors, report }: ValidatedReport) => {
+		try {
+			for await (const {
+				errors,
+				report,
+			} of reportsStream as unknown as AsyncIterable<ValidatedReport>) {
 				total_report_count++;
-				if (errors.length == 0) {
-					try {
-						await this.submitReports
-							.insertReport(report, {
-								preventEvents: true,
-							})
-							.then(() => {
-								this.logger.log(
-									`Sucessfully inserted Report for ${report.resource_id} by ${report.curator_orcid}`,
-								);
-								successful_reports_count += 1;
-							});
-					} catch (e) {
-						if (e) {
-							this.logger.error(e.message);
-							error_report.push({
-								target: report,
-								property: 'all',
-								constraints: {
-									InsertionError: e?.message,
-								},
-							});
-						} else {
-							this.logger.error(`Error Inserting the report \n ${report}`);
-							error_report.push({
-								target: report,
-								property: 'all',
-								constraints: {
-									InsertionError: 'Error Inserting the report',
-								},
-							});
-						}
-					} finally {
-						affected_resource_ids.add(report.resource_id);
-					}
-				} else {
+				if (errors.length > 0) {
 					error_report = error_report.concat(errors);
+					continue;
 				}
-			});
+				try {
+					await this.submitReports.insertReport(report, {
+						preventEvents: true,
+					});
+					successful_reports_count += 1;
+					affected_resource_ids.add(report.resource_id);
+				} catch (e) {
+					const message =
+						e instanceof Error ? e.message : 'Error Inserting the report';
+					this.logger.error(message);
+					error_report.push({
+						target: report,
+						property: 'all',
+						constraints: {
+							InsertionError: message,
+						},
+					});
+				}
+			}
+		} catch (e) {
+			file_read_error = e instanceof Error ? e.message : String(e);
+			this.logger.error(`Error reading the report stream: ${file_read_error}`);
+		}
 
-			reportsStream.on('end', async () => {
-				resolve({
-					errors: error_report,
-					success_count: successful_reports_count,
-					total_report_count,
-					resource_ids: Array.from(affected_resource_ids),
-				});
-			});
-
-			reportsStream.on('error', (error) => {
-				this.logger.error(error);
-				reject(error);
-			});
-		});
+		return {
+			errors: error_report,
+			success_count: successful_reports_count,
+			total_report_count,
+			resource_ids: Array.from(affected_resource_ids),
+			file_read_error,
+		};
 	}
 
 	private build_notification_body(
