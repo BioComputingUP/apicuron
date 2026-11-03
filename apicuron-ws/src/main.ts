@@ -9,6 +9,10 @@ import { setupSwagger } from 'src/plugins/swagger/setup';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { setupExpressErrorHandler } from '@sentry/node';
+import {
+	REQUEST_ID_HEADER,
+	requestIdMiddleware,
+} from './shared/middlewares/request-id.middleware';
 // import { SentryGlobalFilter } from '@sentry/nestjs/setup';
 
 async function bootstrap() {
@@ -38,6 +42,7 @@ async function bootstrap() {
 	// Load global interceptors
 
 	// setup express middlewares
+	app.use(requestIdMiddleware);
 	app.use(cookieParser());
 
 	// swagger UI setup
@@ -57,7 +62,8 @@ async function bootstrap() {
 		}),
 	);
 
-	app.enableCors();
+	// lets the UI read the request ID of a failed request
+	app.enableCors({ exposedHeaders: [REQUEST_ID_HEADER] });
 
 	// Logging startup
 	appLogger.log(`Loaded ${envConfig} Configuration`);

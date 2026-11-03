@@ -43,7 +43,8 @@ import { StorageModuleOptions } from './storage/storage.config';
 import { SubmitReportModule } from './submit-reports/submit-reports.module';
 import { TermsModule } from './terms/terms.module';
 import { WeeklyStatisticsModule } from './weekly-statistics/weekly-statistics.module';
-import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
+import { SentryModule } from '@sentry/nestjs/setup';
+import { GlobalExceptionFilter } from './shared/filters/global-exception.filter';
 import { APP_FILTER } from '@nestjs/core';
 import { PendingReportsModule } from './pending_reports/pending_reports.module';
 import { ContributionEventsModule } from './contribution-events/contribution-events.module';
@@ -131,7 +132,7 @@ import { ContributionEventsModule } from './contribution-events/contribution-eve
 	providers: [
 		{
 			provide: APP_FILTER,
-			useClass: SentryGlobalFilter,
+			useClass: GlobalExceptionFilter,
 		},
 		AppService,
 		UniqueRule,

@@ -10,7 +10,6 @@ import {
 	Request,
 	Res,
 	UploadedFile,
-	UseFilters,
 	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common';
@@ -40,12 +39,10 @@ import {
 	SubmitReportDto,
 	SubmitReportsDto,
 } from '../dto/submit-report.dto';
-import { SubmissionLoggingFilter } from '../filters/submission-logging.filter';
 import { SubmitReportService } from '../services/submit-reports.service';
 @ApiTags('Reports')
 @ApiHeader(VersionHeader)
 @Controller({ path: 'reports', version: '2' })
-@UseFilters(SubmissionLoggingFilter)
 export class SubmitReportsController {
 	constructor(
 		protected reportService: SubmitReportService,
@@ -112,9 +109,9 @@ export class SubmitReportsController {
 		}
 
 		// the user has to manage every resource it deletes from
-		const user_resources = ((req.user.resources ?? []) as { resource_id: string }[]).map(
-			(resource) => resource.resource_id,
-		);
+		const user_resources = (
+			(req.user.resources ?? []) as { resource_id: string }[]
+		).map((resource) => resource.resource_id);
 		const forbidden = uniq(delete_all).filter(
 			(resource_id) => !user_resources.includes(resource_id),
 		);

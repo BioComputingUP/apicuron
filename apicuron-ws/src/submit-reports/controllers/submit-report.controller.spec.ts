@@ -8,6 +8,7 @@ import {
 	VersioningType,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { HttpAdapterHost } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import { useContainer } from 'class-validator';
 import * as request from 'supertest';
@@ -15,6 +16,8 @@ import { SubmitBulkTask } from 'src/scheduler/tasks/submit_bulk.task';
 import { HasAResourceGuard } from '../../auth/guards/belongs-to-resource.guard';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
+import { GlobalExceptionFilter } from '../../shared/filters/global-exception.filter';
+import { requestIdMiddleware } from '../../shared/middlewares/request-id.middleware';
 import { SubmitReportsDto } from '../dto/submit-report.dto';
 import { SubmitReportService } from '../services/submit-reports.service';
 import { EntityUriValid } from '../validators/entity-uri';
@@ -42,6 +45,13 @@ describe('SubmitReportsController POST /reports', () => {
 	let resourcesMock: { get_resource: jest.Mock; exists: jest.Mock };
 	let callback: jest.Mock;
 	let warnSpy: jest.SpyInstance;
+
+	const failedLog = (status: number, reason: string) =>
+		expect.stringMatching(
+			new RegExp(
+				`^\\[[\\w-]+\\] POST /reports by ${ORCID} failed with ${status} in \\d+ms: ${reason}`,
+			),
+		);
 
 	const post = (body: unknown) =>
 		request(app.getHttpServer())
@@ -91,8 +101,10 @@ describe('SubmitReportsController POST /reports', () => {
 			.compile();
 
 		app = moduleFixture.createNestApplication();
-		// same setup as main.ts
+		// same setup as main.ts and app.module.ts
 		useContainer(app, { fallbackOnErrors: true });
+		app.use(requestIdMiddleware);
+		app.useGlobalFilters(new GlobalExceptionFilter(app.get(HttpAdapterHost)));
 		app.useGlobalPipes(
 			new ValidationPipe({
 				transformOptions: {
@@ -144,7 +156,7 @@ describe('SubmitReportsController POST /reports', () => {
 		]);
 		expect(reportServiceMock.insertReports).not.toHaveBeenCalled();
 		expect(warnSpy).toHaveBeenCalledWith(
-			`POST /reports by ${ORCID} failed with 400: reports.0.resource_id should not be empty`,
+			failedLog(400, 'reports.0.resource_id should not be empty'),
 		);
 	});
 
@@ -161,9 +173,7 @@ describe('SubmitReportsController POST /reports', () => {
 
 		expect(response.body.message).toContain('(another_resource)');
 		expect(reportServiceMock.insertReports).not.toHaveBeenCalled();
-		expect(warnSpy).toHaveBeenCalledWith(
-			expect.stringContaining(`POST /reports by ${ORCID} failed with 403`),
-		);
+		expect(warnSpy).toHaveBeenCalledWith(failedLog(403, ''));
 	});
 
 	it('forbids deleting the reports of a resource the user does not manage', async () => {
@@ -258,9 +268,10 @@ describe('SubmitReportsController POST /reports', () => {
 		expect(response.body).toMatchObject({
 			message: 'Duplicate report at index 0',
 			insertedCount: 0,
+			request_id: response.headers['x-request-id'],
 		});
 		expect(warnSpy).toHaveBeenCalledWith(
-			`POST /reports by ${ORCID} failed with 409: Duplicate report at index 0`,
+			failedLog(409, 'Duplicate report at index 0'),
 		);
 	});
 });
