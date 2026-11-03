@@ -24,6 +24,20 @@ import {
 import { MongoBulkWriteError, MongoServerError } from 'mongodb';
 import { PartnerResourcesService } from '../../resources/partner-resources/services/partner-resources.service';
 import { ReportValidatorService } from './report-validator.service';
+/**
+ * Names the fields of the unique report index, so the submitter can find the existing report.
+ */
+function describeReportKey(report?: Partial<Record<keyof Report, unknown>>) {
+	if (!report) {
+		return 'a report with the same resource_id, league, entity_uri, activity_term, curator_orcid and timestamp';
+	}
+	const timestamp =
+		report.timestamp instanceof Date
+			? report.timestamp.toISOString()
+			: report.timestamp;
+	return `a report with resource_id "${report.resource_id}", league "${report.league}", entity_uri "${report.entity_uri}", activity_term "${report.activity_term}", curator_orcid "${report.curator_orcid}" and timestamp "${timestamp}"`;
+}
+
 type InsertManyReportsResult = Omit<InsertManyResult<Report>, 'insertedIds'> & {
 	reports: Report[];
 	deletedReports: { [keyof: string]: DeleteResult };
@@ -140,17 +154,11 @@ export class SubmitReportService {
 			return { report, callback: emitEvent };
 		} catch (error) {
 			if (error instanceof MongoServerError && error.code === 11000) {
-				this.logger.error(`Attempt at duplicate report insertion`);
-				// Duplicate key error, return 403
-				const error = new Error(
-					`Report from user ${submittedReport.curator_orcid} to resource ${
-						submittedReport.resource_id
-					} with the exact timestamp ${submittedReport.timestamp.toISOString()} already exists`,
-				);
-				throw new ConflictException('Duplicate report submission attempt', {
-					cause: error,
-					description: error.message,
-				});
+				const message = `Duplicate report: ${describeReportKey(
+					error.keyValue,
+				)} already exists`;
+				this.logger.warn(message);
+				throw new ConflictException(message);
 			}
 			if (error instanceof BadRequestException) {
 				throw error;
@@ -176,7 +184,8 @@ export class SubmitReportService {
 	): Promise<
 		InsertManyReportsResult | Omit<InsertManyReportsResult, 'callback'>
 	> {
-		let deleteResponses = {};
+		let deleteResponses: { [key: string]: DeleteResult } = {};
+		let reportDocuments: Report[] = [];
 		try {
 			const validatedReports = await this.reportValidator.validateReports(
 				submission.reports,
@@ -188,7 +197,7 @@ export class SubmitReportService {
 				);
 			}
 
-			const reportDocuments = validatedReports.map(
+			reportDocuments = validatedReports.map(
 				(reportEntry) => reportEntry.report,
 			);
 
@@ -235,9 +244,19 @@ export class SubmitReportService {
 				const writeErrors =
 					err instanceof MongoBulkWriteError ? [err.writeErrors].flat() : [];
 				const duplicateIndex = writeErrors[0]?.index;
-				const message = `Duplicate report${
-					duplicateIndex !== undefined ? ` at index ${duplicateIndex}` : ''
-				}: a report from the same curator to the same resource with the same timestamp already exists. ${insertedCount} report(s) preceding it were inserted`;
+				const deletedCount = Object.values(deleteResponses).reduce(
+					(total, response) => total + (response?.deletedCount ?? 0),
+					0,
+				);
+				const message =
+					`Duplicate report${
+						duplicateIndex !== undefined ? ` at index ${duplicateIndex}` : ''
+					}: ${describeReportKey(
+						reportDocuments[duplicateIndex],
+					)} already exists. ${insertedCount} report(s) preceding it were inserted` +
+					(deletedCount > 0
+						? `, and the ${deletedCount} report(s) removed by delete_all are not restored`
+						: '');
 				this.logger.warn(`Duplicate report insertion attempt, ${message}`);
 				throw new ConflictException({
 					statusCode: 409,
