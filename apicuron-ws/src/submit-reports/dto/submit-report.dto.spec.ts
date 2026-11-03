@@ -138,7 +138,7 @@ describe('SubmitReportsDto global fields', () => {
 					reports: [{ ...REPORT, entity_uri: 'https://example.com/DP00034' }],
 				}),
 			).resolves.toEqual([
-				'reports.0."entity_uri" must share the same host as the resource "disprot"',
+				'reports.0.entity_uri "https://example.com/DP00034" is not allowed for "disprot": host "example.com" is not in [identifiers.org, registry.identifiers.org, disprot.org]. Subdomains count as separate hosts.',
 			]);
 		});
 

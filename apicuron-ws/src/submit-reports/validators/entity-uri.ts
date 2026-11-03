@@ -12,6 +12,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 @ValidatorConstraint({ name: 'isBefore', async: false })
 @Injectable()
 export class EntityUriValid implements ValidatorConstraintInterface {
+	// the hosts last allowed for each resource, so the error message can list them
+	private readonly allowedHosts = new Map<string, string[]>();
+
 	constructor(
 		protected resourcesService: PartnerResourcesService,
 		protected config: ConfigService,
@@ -39,7 +42,10 @@ export class EntityUriValid implements ValidatorConstraintInterface {
 		if (resource) {
 			const host_whitelist: string[] = resource.allowedUrlsPrefix
 				.concat([resource.resource_uri, resource.resource_url])
-				.map((url: string) => new URL(url).host);
+				.map(getHost)
+				// a stored URL that cannot be read must not fail every submission
+				.filter((host): host is string => !!host);
+			this.allowedHosts.set(resource_id, host_whitelist);
 
 			return isURL(propertyValue, {
 				protocols:
@@ -56,8 +62,28 @@ export class EntityUriValid implements ValidatorConstraintInterface {
 		}
 	}
 
-	defaultMessage({ constraints, object, property }: ValidationArguments) {
-		const resId = constraints[0](object);
-		return `"${property}" must share the same host as the resource "${resId}"`;
+	defaultMessage({
+		constraints,
+		object,
+		property,
+		value,
+	}: ValidationArguments) {
+		const resId: string = constraints[0](object);
+		const host = getHost(value);
+		if (!host) {
+			return `${property} "${value}" is not a full URL, e.g. https://identifiers.org/...`;
+		}
+		const hosts = this.allowedHosts.get(resId) ?? [];
+		return `${property} "${value}" is not allowed for "${resId}": host "${host}" is not in [${hosts.join(
+			', ',
+		)}]. Subdomains count as separate hosts.`;
+	}
+}
+
+function getHost(url: unknown): string | undefined {
+	try {
+		return new URL(String(url)).host;
+	} catch {
+		return undefined;
 	}
 }

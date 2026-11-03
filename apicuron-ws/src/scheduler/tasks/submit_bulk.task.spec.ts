@@ -121,7 +121,9 @@ describe('SubmitBulkTask', () => {
 			expect(submitReports.insertReport).not.toHaveBeenCalled();
 			expect(notificationBody()).toContain('No reports were deleted');
 			expect(notificationBody()).toContain('reports.1: ');
-			expect(notificationBody()).toContain('"entity_uri" must share the same host');
+			expect(notificationBody()).toContain(
+				'entity_uri "https://elsewhere.org/DP00034" is not allowed for "disprot"',
+			);
 		});
 
 		it('deletes nothing when a report fails the activity term check', async () => {
