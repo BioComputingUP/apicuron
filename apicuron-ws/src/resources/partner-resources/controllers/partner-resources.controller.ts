@@ -38,6 +38,7 @@ import {
 	PartnerResourceEntity,
 	SelectPartnerResourceDto,
 } from '../../dto/partner-resources.entity';
+import { UpdateAllowedHostsDto } from '../../dto/allowed-hosts.dto';
 import { PublicPartnerResourceDto } from '../../dto/public-partner-resource.dto';
 import { UpdatePartnerResourceDto } from '../../dto/updateResource.dto';
 import { ResourceLogoValidationPipe } from '../../validators/logo-validation.pipe';
@@ -149,6 +150,36 @@ export class PartnerResourcesController {
 
 		const res: PartnerResourceDocument =
 			await this.partnerResourceService.update_resource(update_resource, logo);
+		return plainToInstance(PartnerResourceEntity, res, {
+			excludeExtraneousValues: true,
+			enableCircularCheck: true,
+		});
+	}
+
+	@ApiSecurity('basic')
+	@ApiOperation({
+		summary: 'Add or remove the hosts allowed in the entity_uri of reports',
+		description:
+			'The hosts of resource_url and resource_uri are always allowed and are not part of this list.',
+	})
+	@ApiOkResponse({
+		description: 'The updated resource',
+		type: PartnerResourceEntity,
+	})
+	@Patch(':resource_id/allowed-hosts')
+	@UseGuards(LocalAuthGuard, HasAResourceGuard)
+	@SerializeOptions({ type: PartnerResourceEntity })
+	async update_allowed_hosts(
+		@Param() { resource_id }: SelectPartnerResourceDto,
+		@Body() update: UpdateAllowedHostsDto,
+		@Req() request: Request,
+	) {
+		this.authService.user_has_resource(request.user, resource_id);
+
+		const res = await this.partnerResourceService.update_allowed_hosts(
+			resource_id,
+			update,
+		);
 		return plainToInstance(PartnerResourceEntity, res, {
 			excludeExtraneousValues: true,
 			enableCircularCheck: true,
