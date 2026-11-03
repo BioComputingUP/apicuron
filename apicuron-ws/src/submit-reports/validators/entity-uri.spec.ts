@@ -14,11 +14,12 @@ describe('EntityUriValid', () => {
 	let validator: EntityUriValid;
 	let resourcesMock: { get_resource: jest.Mock };
 
-	const argsFor = (resource_id?: string): ValidationArguments =>
+	const argsFor = (resource_id?: string, value?: string): ValidationArguments =>
 		({
 			constraints: [(report: { resource_id?: string }) => report.resource_id],
 			object: { resource_id },
 			property: 'entity_uri',
+			value,
 		} as any);
 
 	beforeEach(() => {
@@ -72,9 +73,34 @@ describe('EntityUriValid', () => {
 		).rejects.toThrow('connection lost');
 	});
 
-	it('names the resource in the error message', () => {
-		expect(validator.defaultMessage(argsFor('disprot'))).toBe(
-			'"entity_uri" must share the same host as the resource "disprot"',
+	it('skips a stored URL of the resource that cannot be read', async () => {
+		resourcesMock.get_resource.mockResolvedValue({
+			...RESOURCE,
+			resource_url: 'disprot.org',
+		});
+
+		await expect(
+			validator.validate(
+				'https://identifiers.org/disprot:DP00034',
+				argsFor('disprot'),
+			),
+		).resolves.toBe(true);
+	});
+
+	it('names the URL, its host and the allowed hosts in the error message', async () => {
+		const url = 'https://www.disprot.org/DP00034';
+		await validator.validate(url, argsFor('disprot', url));
+
+		expect(validator.defaultMessage(argsFor('disprot', url))).toBe(
+			'entity_uri "https://www.disprot.org/DP00034" is not allowed for "disprot": host "www.disprot.org" is not in [identifiers.org, registry.identifiers.org, disprot.org]. Subdomains count as separate hosts.',
+		);
+	});
+
+	it('says when the entity_uri is not a full URL', () => {
+		expect(
+			validator.defaultMessage(argsFor('disprot', 'disprot.org/DP00034')),
+		).toBe(
+			'entity_uri "disprot.org/DP00034" is not a full URL, e.g. https://identifiers.org/...',
 		);
 	});
 });
