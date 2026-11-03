@@ -111,7 +111,7 @@ export class ReportValidatorService {
 
 		if (!resource || resource.resource_id != report.resource_id) {
 			throw new BadRequestException(
-				`You either do not have the authorization to perform CRUD operation on the reports of the (${report.resource_id}) resource or the resource does not exist`,
+				`Resource "${report.resource_id}" does not exist.`,
 			);
 		}
 		return { report, resource };

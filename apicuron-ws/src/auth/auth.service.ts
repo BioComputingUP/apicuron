@@ -1,8 +1,9 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { uuid } from 'uuidv4';
 import { UsersService } from './users/services/users.service';
+import { assertUserManagesResource } from '../util/authrization.helpers';
 
 export interface userJWT {
 	orcid_id: string;
@@ -40,18 +41,6 @@ export class AuthService {
 	}
 
 	public user_has_resource(user, resource_id) {
-		// get the resources list that belong to the current user
-		const user_resources: Array<{ resource_id: string }> =
-			user?.resources ?? [];
-		// check if the resource belongs to the user
-		const resource_found = user_resources.find(
-			(resource) => resource.resource_id == resource_id,
-		);
-		// if it doesn't, we respond with  a 403 exception
-		if (!resource_found) {
-			throw new ForbiddenException(
-				`You either do not have the authorization to update the terms of the (${resource_id}) resource or the resource does not exist`,
-			);
-		}
+		assertUserManagesResource(user ?? {}, resource_id);
 	}
 }

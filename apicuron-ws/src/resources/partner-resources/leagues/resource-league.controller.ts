@@ -25,6 +25,7 @@ import { DeleteLeagueDTO } from './dto/delete-league.dto';
 import { LeagueEntity } from './dto/league.dto';
 import { UpdateLeagueDto } from './dto/update-league.dto';
 import { LeagueService } from './services/league.service';
+import { assertUserManagesResource } from '../../../util/authrization.helpers';
 
 @ApiTags('Leagues')
 @ApiHeader(VersionHeader)
@@ -41,11 +42,7 @@ export class ResourceLeagueController {
 				'You must be logged in to access this resource',
 			);
 		}
-		if (!user.resources.map((r) => r.resource_id).includes(resourceId)) {
-			throw new ForbiddenException(
-				`You do not have access to update the resource (${resourceId})`,
-			);
-		}
+		assertUserManagesResource(user, resourceId);
 	}
 
 	@ApiOperation({
