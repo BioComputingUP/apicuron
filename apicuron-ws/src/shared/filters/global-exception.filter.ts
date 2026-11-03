@@ -27,6 +27,15 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 		const res = http.getResponse<Response>();
 		const request_id = res.locals?.request_id as string | undefined;
 		const { status, body } = this.buildResponse(exception);
+		// an unknown route is often a missing version header, as the API routes are versioned
+		if (
+			status === HttpStatus.NOT_FOUND &&
+			!req.headers?.version &&
+			typeof body.message === 'string' &&
+			body.message.startsWith('Cannot ')
+		) {
+			body.message = `${body.message}. Most API routes require the header version: 2`;
+		}
 
 		if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
 			captureException(exception, { tags: { request_id } });
@@ -52,7 +61,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 				status,
 				body:
 					typeof response === 'object'
-						? (response as Record<string, unknown>)
+						? { ...(response as Record<string, unknown>) }
 						: { statusCode: status, message: response },
 			};
 		}
