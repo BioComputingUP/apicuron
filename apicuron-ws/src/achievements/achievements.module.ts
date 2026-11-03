@@ -4,7 +4,6 @@ import { AuthModule } from '../auth/auth.module';
 import { CoreApicuronModule } from '../core/core.module';
 import { ResourcesModule } from '../resources/resources.module';
 import { AchievementsService } from './achievements.service';
-import { AchievementsController } from './controllers/achievements.controller';
 
 @Module({
 	providers: [AchievementsService],
@@ -18,6 +17,5 @@ import { AchievementsController } from './controllers/achievements.controller';
 		ResourcesModule,
 	],
 	exports: [AchievementsService],
-	controllers: [AchievementsController],
 })
 export class AchievementsModule {}
