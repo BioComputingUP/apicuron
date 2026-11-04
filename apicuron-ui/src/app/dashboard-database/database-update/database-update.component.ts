@@ -1,9 +1,11 @@
-import { Component, OnDestroy } from "@angular/core";
+import { Component, HostListener, OnDestroy } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { MessageService } from "primeng/api";
-import { BehaviorSubject, combineLatest, Observable, Subject } from "rxjs";
+import { BehaviorSubject, combineLatest, Observable, of, Subject } from "rxjs";
+import { ConfirmationService } from "../../../../projects/apicuron-util/src/lib/confirmation";
+import { ConfirmationResponse } from "../../../../projects/apicuron-util/src/lib/confirmation/interfaces/confirmation";
 import {
   map,
   shareReplay,
@@ -66,7 +68,8 @@ export class DatabaseUpdateComponent implements OnDestroy {
     private formBuilder: FormBuilder,
     protected resourceService: ResourcesService,
     private messageService: MessageService,
-    protected sanitizer: DomSanitizer
+    protected sanitizer: DomSanitizer,
+    private confirmationService: ConfirmationService
   ) {
     this.resource_id$ = this.route.paramMap.pipe(
       map((params: ParamMap) => {
@@ -219,6 +222,33 @@ export class DatabaseUpdateComponent implements OnDestroy {
           }
         },
       });
+  }
+
+  // called by the route's canDeactivate, switching tabs only changes the query param and does not ask
+  confirmLeave(): Observable<boolean> {
+    if (!this.form.dirty) {
+      return of(true);
+    }
+    this.confirmationService.confirm({
+      title: "Unsaved changes",
+      message: "Your changes to this resource are not saved. Leave the page?",
+      confirmationText: "Leave",
+      cancelText: "Stay",
+      accept: () => {},
+      reject: () => {},
+    });
+    // closing the dialog with Escape or a click outside counts as staying
+    return this.confirmationService.dialog.closed.pipe(
+      map((response) => response == ConfirmationResponse.accepted)
+    );
+  }
+
+  // closing or reloading the browser tab, where only the browser's own prompt can be shown
+  @HostListener("window:beforeunload", ["$event"])
+  onBeforeUnload(event: BeforeUnloadEvent) {
+    if (this.form.dirty) {
+      event.preventDefault();
+    }
   }
 
   discard() {
