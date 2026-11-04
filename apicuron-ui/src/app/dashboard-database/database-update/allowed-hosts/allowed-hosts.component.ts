@@ -11,6 +11,7 @@ import { ResourcesService } from "../../../resource/service/resources.service";
 @Component({
   selector: "allowed-hosts",
   templateUrl: "./allowed-hosts.component.html",
+  styleUrls: ["./allowed-hosts.component.scss"],
 })
 export class AllowedHostsComponent implements OnInit {
   @Input() resource: Resource;

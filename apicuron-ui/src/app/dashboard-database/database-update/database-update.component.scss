@@ -1,5 +1,17 @@
 label {
-    @apply tw-font-bold tw-mb-2 tw-text-lg
+    @apply tw-font-semibold tw-mb-1 tw-text-gray-800
+}
+
+.section-card {
+    @apply tw-bg-white tw-border tw-border-gray-200 tw-rounded-lg tw-p-6 tw-mb-6;
+
+    h3 {
+        @apply tw-text-lg tw-font-semibold
+    }
+
+    > p {
+        @apply tw-text-gray-600 tw-text-sm tw-mb-2
+    }
 }
 
 input[type="text"],

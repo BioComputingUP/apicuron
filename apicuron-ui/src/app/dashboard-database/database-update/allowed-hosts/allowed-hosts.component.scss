@@ -1,0 +1,18 @@
+// no PrimeNG theme is loaded, so the chips box is styled like the other inputs of the page
+:host ::ng-deep {
+    .p-chips-multiple-container {
+        @apply tw-w-full tw-gap-2 tw-border tw-border-gray-300 tw-rounded tw-bg-white tw-px-2 tw-py-2;
+    }
+
+    .p-chips.p-focus .p-chips-multiple-container {
+        @apply tw-ring-1 tw-ring-apicuron-purple tw-border-apicuron-purple tw-bg-purple-50;
+    }
+
+    .p-chips.p-disabled .p-chips-multiple-container {
+        @apply tw-opacity-60;
+    }
+
+    .p-chips-input-token input {
+        @apply tw-min-w-[16rem] tw-px-2 tw-py-1 tw-text-gray-900;
+    }
+}

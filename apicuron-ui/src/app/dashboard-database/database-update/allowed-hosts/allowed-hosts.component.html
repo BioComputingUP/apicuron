@@ -1,17 +1,33 @@
-<div class="tw-mb-2">
-  <label for="allowed_hosts" class="tw-font-bold tw-pl-1"
-    >Allowed hosts for entity URLs</label
+<h3 class="tw-text-lg tw-font-semibold">Allowed hosts for entity URLs</h3>
+<p class="tw-text-gray-600 tw-text-sm tw-mb-4">
+  The entity_uri of each report must start with one of these hosts, otherwise
+  the report is rejected. Subdomains count as separate hosts. Changes are saved
+  right away.
+</p>
+
+<span class="tw-block tw-font-semibold tw-text-gray-800 tw-mb-1"
+  >Always allowed</span
+>
+<p class="tw-text-gray-600 tw-text-sm tw-mb-2">
+  The hosts of the Resource URL and URI, change them in the Profile tab.
+</p>
+<div class="tw-flex tw-flex-wrap tw-gap-2 tw-mb-6">
+  <span
+    *ngFor="let host of resourceHosts"
+    class="tw-px-3 tw-py-1 tw-rounded-full tw-bg-gray-100 tw-text-gray-700 tw-text-sm"
+    >{{ host }}</span
   >
-  <p class="tw-text-gray-600 tw-text-sm tw-pl-1 tw-font-medium">
-    The entity_uri of your reports must be on one of these hosts. Subdomains
-    count as separate hosts. Type an https URL and press Enter to add a host,
-    changes are saved right away.
-  </p>
-  <p class="tw-text-gray-600 tw-text-sm tw-pl-1 tw-font-medium">
-    Always allowed, from the Resource URL and URI:
-    <span class="tw-font-bold">{{ resourceHosts.join(", ") }}</span>
-  </p>
 </div>
+
+<label
+  for="allowed_hosts"
+  class="tw-block tw-font-semibold tw-text-gray-800 tw-mb-1"
+  >Other allowed hosts</label
+>
+<p class="tw-text-gray-600 tw-text-sm tw-mb-2">
+  Type a URL in the box and press Enter to add its host. Click × on a host to
+  remove it.
+</p>
 <p-chips
   inputId="allowed_hosts"
   [(ngModel)]="hosts"
@@ -24,7 +40,7 @@
 ></p-chips>
 <small
   *ngIf="hasGithub"
-  class="tw-block tw-text-gray-600 tw-text-sm tw-pl-1 tw-mt-1"
+  class="tw-block tw-text-gray-600 tw-text-sm tw-mt-2"
 >
   https://github.com is needed by the GitHub contribution tracker linked to this
   resource.

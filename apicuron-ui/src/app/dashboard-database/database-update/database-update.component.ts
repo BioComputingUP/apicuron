@@ -32,6 +32,14 @@ export class DatabaseUpdateComponent implements OnDestroy {
   resource_id$: Observable<string>;
   resource$: Observable<Resource>;
 
+  // the open tab is kept in the ?tab= query param, so it can be linked and survives a reload
+  readonly tabs = [
+    { id: "profile", label: "Profile" },
+    { id: "leaderboards", label: "Leaderboards" },
+    { id: "allowed-hosts", label: "Allowed hosts" },
+  ];
+  tab$: Observable<string>;
+
   JSON = JSON;
 
   readonly ResourceCategories = ResourceCategories;
@@ -61,6 +69,12 @@ export class DatabaseUpdateComponent implements OnDestroy {
     this.resource_id$ = this.route.paramMap.pipe(
       map((params: ParamMap) => {
         return params.get("resource_id");
+      })
+    );
+    this.tab$ = this.route.queryParamMap.pipe(
+      map((params: ParamMap) => {
+        const tab = params.get("tab");
+        return this.tabs.some(({ id }) => id == tab) ? tab : "profile";
       })
     );
 
