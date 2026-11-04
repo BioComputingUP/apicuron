@@ -37,13 +37,9 @@
                 type="text"
                 id="resource_name"
                 formControlName="resource_name"
+                [class.invalid]="showErrors('resource_name')"
               />
-              <small
-                class="tw-text-red-500 tw-text-sm tw-font-light"
-                *ngIf="
-                  resource_name.hasError('required') && resource_name.touched
-                "
-              >
+              <small class="field-error" *ngIf="showErrors('resource_name')">
                 The Resource Name is required
               </small>
             </div>
@@ -54,13 +50,11 @@
                 type="text"
                 id="resource_long_name"
                 formControlName="resource_long_name"
+                [class.invalid]="showErrors('resource_long_name')"
               />
               <small
-                class="tw-text-red-500 tw-text-sm tw-font-light"
-                *ngIf="
-                  resource_long_name.hasError('required') &&
-                  resource_long_name.touched
-                "
+                class="field-error"
+                *ngIf="showErrors('resource_long_name')"
               >
                 The Resource Long Name is required
               </small>
@@ -80,6 +74,9 @@
                   {{ ResourceCategoryLabels[category] }}
                 </option>
               </select>
+              <small class="field-error" *ngIf="showErrors('category')">
+                Choose the Resource Type
+              </small>
             </div>
           </div>
 
@@ -92,13 +89,11 @@
               id="resource_description"
               cols="30"
               rows="10"
+              [class.invalid]="showErrors('resource_description')"
             ></textarea>
             <small
-              class="tw-text-red-500 tw-text-sm tw-font-light"
-              *ngIf="
-                resource_description.hasError('required') &&
-                resource_description.touched
-              "
+              class="field-error"
+              *ngIf="showErrors('resource_description')"
             >
               The Resource Description is required
             </small>
@@ -111,12 +106,18 @@
           <div class="tw-grid tw-gap-x-6 lg:tw-grid-cols-2">
             <div class="form-control-element">
               <label for="color">Resource Color</label>
-              <input type="text" id="color" formControlName="color" />
-              <small
-                class="tw-text-red-500 tw-text-sm tw-font-light"
-                *ngIf="color.hasError('required') && color.touched"
-              >
-                The Resource Color is required
+              <input
+                type="text"
+                id="color"
+                formControlName="color"
+                [class.invalid]="showErrors('color')"
+              />
+              <small class="field-error" *ngIf="showErrors('color')">
+                {{
+                  color.hasError("required")
+                    ? "The Resource Color is required"
+                    : "Use a hex colour such as #63452c"
+                }}
               </small>
             </div>
 
@@ -188,14 +189,14 @@
                 type="text"
                 id="resource_url"
                 formControlName="resource_url"
+                [class.invalid]="showErrors('resource_url')"
               />
-              <small
-                class="tw-text-red-500 tw-text-sm tw-font-light"
-                *ngIf="
-                  resource_url.hasError('required') && resource_url.touched
-                "
-              >
-                The Resource URL is required
+              <small class="field-error" *ngIf="showErrors('resource_url')">
+                {{
+                  resource_url.hasError("required")
+                    ? "The Resource URL is required"
+                    : "Enter a full URL starting with https://"
+                }}
               </small>
             </div>
 
@@ -205,14 +206,14 @@
                 type="text"
                 id="resource_uri"
                 formControlName="resource_uri"
+                [class.invalid]="showErrors('resource_uri')"
               />
-              <small
-                class="tw-text-red-500 tw-text-sm tw-font-light"
-                *ngIf="
-                  resource_uri.hasError('required') && resource_uri.touched
-                "
-              >
-                The Resource URI is required
+              <small class="field-error" *ngIf="showErrors('resource_uri')">
+                {{
+                  resource_uri.hasError("required")
+                    ? "The Resource URI is required"
+                    : "Enter a full URL starting with https://"
+                }}
               </small>
             </div>
           </div>
@@ -230,21 +231,44 @@
         ></leaderboard-preferences>
       </div>
 
-      <div [hidden]="tab == 'allowed-hosts'">
-        <div class="tw-flex tw-justify-end">
-          <input
-            type="submit"
-            [value]="'Update ' + resource['resource_name']"
-            [disabled]="form.invalid || !form.dirty || (blocked$ | async)"
-            class="tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded-md disabled:tw-bg-gray-300 disabled:tw-text-gray-600 enabled:tw-bg-apicuron-purple enabled:tw-text-white enabled:tw-shadow-md enabled:tw-cursor-pointer"
-          />
-        </div>
-      </div>
     </form>
 
     <section class="section-card" *ngIf="tab == 'allowed-hosts'">
       <allowed-hosts [resource]="resource"></allowed-hosts>
     </section>
+
+    <!-- outside the form, so it stays at the bottom of the screen on every tab -->
+    <div
+      *ngIf="form.dirty"
+      role="status"
+      class="tw-sticky tw-bottom-4 tw-flex tw-flex-wrap tw-items-center tw-justify-between tw-gap-4 tw-bg-white tw-border tw-border-gray-200 tw-rounded-lg tw-shadow-lg tw-px-6 tw-py-3"
+    >
+      <span *ngIf="invalidTabs.length; else unsaved" class="tw-text-red-600">
+        Some fields on the {{ invalidTabs.join(" and ") }}
+        {{ invalidTabs.length > 1 ? "tabs" : "tab" }} need fixing
+      </span>
+      <ng-template #unsaved>
+        <span class="tw-text-gray-700">You have unsaved changes</span>
+      </ng-template>
+      <div class="tw-flex tw-gap-3">
+        <button
+          type="button"
+          (click)="discard()"
+          [disabled]="blocked$ | async"
+          class="tw-font-semibold tw-px-4 tw-py-2 tw-rounded-md tw-text-gray-700 hover:tw-bg-gray-100 disabled:tw-text-gray-400"
+        >
+          Discard
+        </button>
+        <button
+          type="button"
+          (click)="submit()"
+          [disabled]="form.invalid || (blocked$ | async)"
+          class="tw-font-bold tw-px-4 tw-py-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded-md disabled:tw-bg-gray-300 disabled:tw-text-gray-600 enabled:tw-bg-apicuron-purple enabled:tw-text-white enabled:tw-shadow-md"
+        >
+          {{ (blocked$ | async) ? "Saving…" : "Save changes" }}
+        </button>
+      </div>
+    </div>
   </ng-container>
 </div>
 

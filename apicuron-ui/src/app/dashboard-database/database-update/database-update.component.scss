@@ -21,6 +21,15 @@ input[type="file"],
     @apply tw-border-gray-300 tw-text-gray-900 tw-border tw-px-4 tw-py-2 tw-rounded focus:tw-outline-none focus:tw-ring-1 focus:tw-ring-apicuron-purple focus:tw-border-apicuron-purple focus:tw-bg-purple-50;
 }
 
+// nested, to win over the input[type="text"] rule above
+.form-control-element .invalid {
+    @apply tw-border-red-500 focus:tw-ring-red-500 focus:tw-border-red-500;
+}
+
+.field-error {
+    @apply tw-text-red-600 tw-text-sm tw-mt-1;
+}
+
 .form-control-element {
     @apply tw-flex tw-flex-col tw-my-2 tw-py-1
 }

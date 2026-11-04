@@ -46,6 +46,8 @@ export class DatabaseUpdateComponent implements OnDestroy {
   readonly ResourceCategoryLabels = ResourceCategoryLabels;
 
   form: FormGroup;
+  // the values last loaded or saved, restored by discard()
+  savedValue: Object;
 
   logoLink$: Observable<SafeUrl | string>;
 
@@ -128,10 +130,11 @@ export class DatabaseUpdateComponent implements OnDestroy {
         // const leaderBoardPrefs = this.parseLeaderBoardPreferences(
         //   resource.leaderboard_preferences
         // );
-        this.form.setValue({
+        this.savedValue = {
           ...resource.serialize(),
           logo: null,
-        });
+        };
+        this.form.setValue(this.savedValue);
       })
     );
 
@@ -177,6 +180,7 @@ export class DatabaseUpdateComponent implements OnDestroy {
       .subscribe({
         next: () => {
           this.blocked$.next(false);
+          this.savedValue = this.form.value;
           this.form.markAsPristine();
           this.messageService.add({
             severity: "success",
@@ -212,12 +216,36 @@ export class DatabaseUpdateComponent implements OnDestroy {
       });
   }
 
+  discard() {
+    // reset() also marks the form pristine and untouched, and a null logo shows the saved one again
+    this.form.reset(this.savedValue);
+  }
+
+  // once anything is edited every invalid field shows its error, even one loaded invalid and never touched
+  showErrors(name: string): boolean {
+    const control = this.form.get(name);
+    return control.invalid && (control.touched || this.form.dirty);
+  }
+
+  // the tabs holding a field that blocks the save, as the bar can be seen from any tab
+  get invalidTabs(): string[] {
+    const profileInvalid = Object.entries(this.form.controls).some(
+      ([name, control]) => name != "leaderboard_preferences" && control.invalid
+    );
+    return [
+      ...(profileInvalid ? ["Profile"] : []),
+      ...(this.leaderboardForm.invalid ? ["Leaderboards"] : []),
+    ];
+  }
+
   async onFileSelected(event) {
     if (event.currentTarget) {
       const fileInput: HTMLInputElement = event.currentTarget;
       if (fileInput.files.length > 0) {
         this.form.get("logo").setValue(fileInput.files[0]);
         this.form.get("logo").markAsDirty();
+        // so the same file can be picked again after a discard
+        fileInput.value = "";
       }
     }
   }
