@@ -94,8 +94,12 @@ export class DatabaseUpdateComponent implements OnDestroy {
         ],
         resource_description: [null, [Validators.required]],
         resource_id: [null, [Validators.required]],
-        resource_long_name: [null, [Validators.required]],
-        resource_name: [null, [Validators.required]],
+        // the same limits as UpdateResourceDto
+        resource_long_name: [
+          null,
+          [Validators.required, Validators.maxLength(60)],
+        ],
+        resource_name: [null, [Validators.required, Validators.maxLength(20)]],
         resource_url: [
           null,
           [
@@ -149,7 +153,8 @@ export class DatabaseUpdateComponent implements OnDestroy {
 
           return safeUrl;
         } else {
-          return resource.logo.href;
+          // deserialize() keeps the logo as a string unless it is under assets/
+          return resource.logo ? resource.logo.toString() : null;
         }
       })
     );

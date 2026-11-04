@@ -1,6 +1,6 @@
 <div
   class="tw-px-10 tw-pt-6 tw-pb-10 tw-flex-auto"
-  *ngIf="resource$ | async as resource"
+  *ngIf="resource$ | async as resource; else loading"
 >
   <ng-container *ngIf="tab$ | async as tab">
     <h2 class="tw-text-2xl tw-font-bold">Edit {{ resource.resource_name }}</h2>
@@ -39,9 +39,18 @@
                 formControlName="resource_name"
                 [class.invalid]="showErrors('resource_name')"
               />
-              <small class="field-error" *ngIf="showErrors('resource_name')">
-                The Resource Name is required
-              </small>
+              <div class="tw-flex tw-justify-between tw-gap-4">
+                <small class="field-error">
+                  <ng-container *ngIf="showErrors('resource_name')">{{
+                    resource_name.hasError("required")
+                      ? "The Resource Name is required"
+                      : "The Resource Name can be at most 20 characters"
+                  }}</ng-container>
+                </small>
+                <small class="field-counter">
+                  {{ resource_name.value?.length ?? 0 }}/20
+                </small>
+              </div>
             </div>
 
             <div class="form-control-element">
@@ -52,12 +61,18 @@
                 formControlName="resource_long_name"
                 [class.invalid]="showErrors('resource_long_name')"
               />
-              <small
-                class="field-error"
-                *ngIf="showErrors('resource_long_name')"
-              >
-                The Resource Long Name is required
-              </small>
+              <div class="tw-flex tw-justify-between tw-gap-4">
+                <small class="field-error">
+                  <ng-container *ngIf="showErrors('resource_long_name')">{{
+                    resource_long_name.hasError("required")
+                      ? "The Resource Long Name is required"
+                      : "The Resource Long Name can be at most 60 characters"
+                  }}</ng-container>
+                </small>
+                <small class="field-counter">
+                  {{ resource_long_name.value?.length ?? 0 }}/60
+                </small>
+              </div>
             </div>
 
             <div class="form-control-element">
@@ -106,12 +121,21 @@
           <div class="tw-grid tw-gap-x-6 lg:tw-grid-cols-2">
             <div class="form-control-element">
               <label for="color">Resource Color</label>
-              <input
-                type="text"
-                id="color"
-                formControlName="color"
-                [class.invalid]="showErrors('color')"
-              />
+              <div class="tw-flex tw-gap-2">
+                <!-- shows the typed colour, invalid values leave it empty -->
+                <span
+                  aria-hidden="true"
+                  class="tw-w-10 tw-flex-none tw-rounded tw-border tw-border-gray-300"
+                  [style.background-color]="color.valid ? color.value : null"
+                ></span>
+                <input
+                  type="text"
+                  id="color"
+                  formControlName="color"
+                  class="tw-flex-1"
+                  [class.invalid]="showErrors('color')"
+                />
+              </div>
               <small class="field-error" *ngIf="showErrors('color')">
                 {{
                   color.hasError("required")
@@ -135,14 +159,19 @@
                   </span>
                   <div
                     class="tw-flex tw-w-full tw-justify-center tw-items-center tw-m-1"
-                    *ngIf="logoLink$ | async as logoLink"
+                    *ngIf="logoLink$ | async as logoLink; else noLogo"
                   >
                     <img
                       class="tw-max-w-48 sm:tw-max-w-44 xl:tw-max-w-40"
                       [src]="logoLink"
-                      alt=""
+                      [alt]="resource.resource_name + ' logo'"
                     />
                   </div>
+                  <ng-template #noLogo>
+                    <p class="tw-text-center tw-text-sm tw-text-gray-500 tw-m-2">
+                      No logo uploaded yet
+                    </p>
+                  </ng-template>
                 </div>
                 <div class="tw-flex tw-justify-center tw-mt-2">
                   <input
@@ -271,5 +300,15 @@
     </div>
   </ng-container>
 </div>
+
+<!-- placeholder in the shape of the page while the resource loads -->
+<ng-template #loading>
+  <div class="tw-px-10 tw-pt-6 tw-animate-pulse" aria-busy="true">
+    <div class="tw-h-7 tw-w-64 tw-rounded tw-bg-gray-200 tw-mb-3"></div>
+    <div class="tw-h-4 tw-w-96 tw-max-w-full tw-rounded tw-bg-gray-200 tw-mb-8"></div>
+    <div class="tw-h-64 tw-rounded-lg tw-bg-gray-200 tw-mb-6"></div>
+    <div class="tw-h-48 tw-rounded-lg tw-bg-gray-200"></div>
+  </div>
+</ng-template>
 
 <p-toast></p-toast>

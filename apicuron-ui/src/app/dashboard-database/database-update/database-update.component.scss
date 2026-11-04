@@ -30,6 +30,10 @@ input[type="file"],
     @apply tw-text-red-600 tw-text-sm tw-mt-1;
 }
 
+.field-counter {
+    @apply tw-text-gray-500 tw-text-sm tw-mt-1 tw-flex-none;
+}
+
 .form-control-element {
     @apply tw-flex tw-flex-col tw-my-2 tw-py-1
 }
