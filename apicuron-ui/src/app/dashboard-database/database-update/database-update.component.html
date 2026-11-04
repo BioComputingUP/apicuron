@@ -16,7 +16,7 @@
       <div class="tw-w-full lg:tw-w-1/2">
         <div class="form-control-element">
           <label for="resource_name">Resource Name</label>
-          <input type="text" formControlName="resource_name" />
+          <input type="text" id="resource_name" formControlName="resource_name" />
           <small
             class="tw-text-red-500 tw-text-sm tw-font-light"
             *ngIf="resource_name.hasError('required') && resource_name.touched"
@@ -27,7 +27,11 @@
 
         <div class="form-control-element">
           <label for="resource_long_name">Resource Long Name</label>
-          <input type="text" formControlName="resource_long_name" />
+          <input
+            type="text"
+            id="resource_long_name"
+            formControlName="resource_long_name"
+          />
           <small
             class="tw-text-red-500 tw-text-sm tw-font-light"
             *ngIf="
@@ -40,19 +44,19 @@
         </div>
 
         <div class="form-control-element">
-          <label for="resource_long_name">Resource Color</label>
-          <input type="text" formControlName="color" />
+          <label for="color">Resource Color</label>
+          <input type="text" id="color" formControlName="color" />
           <small
             class="tw-text-red-500 tw-text-sm tw-font-light"
             *ngIf="color.hasError('required') && color.touched"
           >
-            The Resource URI Name is required
+            The Resource Color is required
           </small>
         </div>
 
         <div class="form-control-element">
           <label for="category">Resource Type</label>
-          <select formControlName="category" class="text-input">
+          <select id="category" formControlName="category" class="text-input">
             <option
               *ngFor="let category of ResourceCategories"
               [value]="category"
@@ -68,7 +72,7 @@
             class="text-input tw-h-40"
             name="resource_description"
             formControlName="resource_description"
-            id="resource_description_textarea"
+            id="resource_description"
             cols="30"
             rows="10"
           ></textarea>
@@ -88,7 +92,7 @@
       <div class="tw-w-full lg:tw-w-1/2">
         <div class="form-control-element">
           <label for="resource_url">Resource URL</label>
-          <input type="text" formControlName="resource_url" />
+          <input type="text" id="resource_url" formControlName="resource_url" />
           <small
             class="tw-text-red-500 tw-text-sm tw-font-light"
             *ngIf="resource_url.hasError('required') && resource_url.touched"
@@ -98,18 +102,18 @@
         </div>
 
         <div class="form-control-element">
-          <label for="resource_long_name">Resource URI</label>
-          <input type="text" formControlName="resource_uri" />
+          <label for="resource_uri">Resource URI</label>
+          <input type="text" id="resource_uri" formControlName="resource_uri" />
           <small
             class="tw-text-red-500 tw-text-sm tw-font-light"
             *ngIf="resource_uri.hasError('required') && resource_uri.touched"
           >
-            The Resource URI Name is required
+            The Resource URI is required
           </small>
         </div>
 
         <div class="form-control-element">
-          <label>Upload Resource Logo</label>
+          <label for="logo">Upload Resource Logo</label>
 
           <div
             class="tw-bg-white tw-border-gray-300 tw-rounded tw-border tw-p-4 tw-flex tw-flex-col tw-gap-2"
@@ -137,7 +141,7 @@
                 type="file"
                 class="tw-hidden"
                 (change)="onFileSelected($event)"
-                id=""
+                id="logo"
               />
               <button
                 type="button"
@@ -181,7 +185,7 @@
       <input
         type="submit"
         [value]="'Update ' + resource['resource_name']"
-        [disabled]="form.invalid || !form.dirty"
+        [disabled]="form.invalid || !form.dirty || (blocked$ | async)"
         class="tw-font-bold tw-p-2 focus:tw-ring-1 tw-ring-purple-900 tw-rounded-md disabled:tw-bg-gray-300 disabled:tw-text-gray-600 enabled:tw-bg-apicuron-purple enabled:tw-text-white enabled:tw-shadow-md enabled:tw-cursor-pointer"
       />
     </div>

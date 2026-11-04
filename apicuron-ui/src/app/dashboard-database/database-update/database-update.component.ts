@@ -5,7 +5,6 @@ import { ActivatedRoute, ParamMap } from "@angular/router";
 import { MessageService } from "primeng/api";
 import { BehaviorSubject, combineLatest, Observable, Subject } from "rxjs";
 import {
-  catchError,
   map,
   shareReplay,
   startWith,
@@ -160,41 +159,43 @@ export class DatabaseUpdateComponent implements OnDestroy {
         new Resource().deserialize(resourceData),
         this.form.get("logo").value
       )
-      .pipe(
-        catchError(({ error }, caught) => {
-          if (error.message && error.statusCode == 400) {
-            let errors = Array.isArray(error.message)
-              ? error.message.join("\n")
-              : error.message;
-            this.messageService.add({
-              severity: "warn",
-              summary: "Validation Error",
-              detail: errors,
-            });
-            throw new Error(error);
-          } else {
-            this.messageService.add({
-              severity: "error",
-              summary: "Error",
-              detail:
-                "An error occured while sending the form, please contact the developers",
-            });
-            throw new Error(error);
-          }
-          // return 'handled'
-        }),
-        tap(() => {
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
           this.blocked$.next(false);
+          this.form.markAsPristine();
           this.messageService.add({
             severity: "success",
             summary: "Resource Updated Sucessfully",
             detail: "",
             life: 5000,
           });
-        }),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(() => {});
+        },
+        error: ({ status, error }) => {
+          this.blocked$.next(false);
+          const message = Array.isArray(error?.message)
+            ? error.message.join("\n")
+            : error?.message;
+          if (message && status == 400) {
+            this.messageService.add({
+              severity: "warn",
+              summary: "Validation Error",
+              detail: message,
+            });
+          } else {
+            const reference = error?.request_id
+              ? ` (reference ${error.request_id})`
+              : "";
+            this.messageService.add({
+              severity: "error",
+              summary: "The resource was not updated",
+              detail:
+                (message ?? "An error occured while sending the form") +
+                reference,
+            });
+          }
+        },
+      });
   }
 
   async onFileSelected(event) {
