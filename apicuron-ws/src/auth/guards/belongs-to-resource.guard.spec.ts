@@ -25,6 +25,14 @@ describe('HasAResourceGuard', () => {
 		).resolves.toBe(true);
 	});
 
+	it('lets an admin through without any resource', async () => {
+		usersService.getByOrcid.mockResolvedValue({ role: 'admin', resources: [] });
+
+		await expect(
+			guard.canActivate(contextFor({ orcid_id: ORCID })),
+		).resolves.toBe(true);
+	});
+
 	it('tells an account with no resource how to get one', async () => {
 		usersService.getByOrcid.mockResolvedValue({ resources: [] });
 

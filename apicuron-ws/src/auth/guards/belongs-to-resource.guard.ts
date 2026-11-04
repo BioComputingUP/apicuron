@@ -15,6 +15,10 @@ export class HasAResourceGuard implements CanActivate {
 
 		if (req.user?.orcid_id) {
 			const user = await this.userService.getByOrcid(req.user.orcid_id);
+			// admins manage every resource, even when they are not listed as a manager
+			if (user?.role === 'admin') {
+				return true;
+			}
 			if (
 				!!user &&
 				!!user.resources &&

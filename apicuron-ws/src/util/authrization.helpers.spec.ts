@@ -24,6 +24,15 @@ describe('assertUserManagesResource', () => {
 		);
 	});
 
+	it('accepts any resource for an admin', () => {
+		expect(() =>
+			assertUserManagesResource(
+				{ orcid_id: ORCID, role: 'admin', resources: [] },
+				['disprot', 'pdb'],
+			),
+		).not.toThrow();
+	});
+
 	it('says when the user manages no resource', () => {
 		expect(() =>
 			assertUserManagesResource({ orcid_id: ORCID, resources: [] }, 'disprot'),
