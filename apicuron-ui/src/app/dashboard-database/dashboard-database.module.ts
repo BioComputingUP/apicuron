@@ -6,6 +6,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 import { AngularSvgIconModule } from "angular-svg-icon";
 import { MessageService } from "primeng/api";
 import { CalendarModule } from "primeng/calendar";
+import { ChipsModule } from "primeng/chips";
 import { FileUploadModule } from "primeng/fileupload";
 import { MultiSelectModule } from "primeng/multiselect";
 import { ProgressSpinnerModule } from "primeng/progressspinner";
@@ -32,6 +33,7 @@ import { ModifyGroupsComponent } from "./curator-groups/modify-groups/modify-gro
 import { GroupsService } from "./curator-groups/services/groups.service";
 import { DashboardDatabaseRoutingModule } from "./dashboard-database-routing.module";
 import { DatabaseOverviewComponent } from "./database-overview/database-overview.component";
+import { AllowedHostsComponent } from "./database-update/allowed-hosts/allowed-hosts.component";
 import { DatabaseUpdateComponent } from "./database-update/database-update.component";
 import { LeaderboardPreferencesComponent } from "./database-update/leaderboard-preferences/leaderboard-preferences.component";
 import { ManageBadgesComponent } from "./manage-badges/manage-badges.component";
@@ -48,6 +50,7 @@ import { SubmitSingleComponent } from "./submit-report/submit-single/submit-sing
     ErrorMessagePipe,
     DatabaseUpdateComponent,
     LeaderboardPreferencesComponent,
+    AllowedHostsComponent,
     SubmitReportComponent,
     SubmitSingleComponent,
     SubmitBulkComponent,
@@ -73,6 +76,7 @@ import { SubmitSingleComponent } from "./submit-report/submit-single/submit-sing
     MedalDefCardComponent,
     ResourceModule,
     CalendarModule,
+    ChipsModule,
     FileUploadModule,
     MultiSelectModule,
     ReportsByDateChartComponent,

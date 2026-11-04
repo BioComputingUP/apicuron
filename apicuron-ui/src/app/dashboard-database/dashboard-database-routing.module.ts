@@ -26,6 +26,9 @@ const databaseDashboardRoutes: Routes = [
         path: "edit",
         component: DatabaseUpdateComponent,
         canActivate: [AuthGuard],
+        canDeactivate: [
+          (component: DatabaseUpdateComponent) => component.confirmLeave(),
+        ],
         title: "Edit Resource",
       },
       {
