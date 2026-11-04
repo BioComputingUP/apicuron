@@ -118,4 +118,28 @@ export class ResourcesService {
 
     return data;
   }
+
+  /**
+   * Adds and removes the hosts allowed in the entity_uri of the resource reports.
+   */
+  updateAllowedHosts(
+    resource_id: string,
+    update: { add?: string[]; remove?: string[] }
+  ): Observable<Resource> {
+    return this.http
+      .patch(
+        `${this.partnerResourcesPath}/${resource_id}/allowed-hosts`,
+        update,
+        {
+          responseType: "json",
+          headers: {
+            version: "2",
+          },
+        }
+      )
+      .pipe(
+        pluck("data"),
+        map((resource) => new Resource().deserialize(resource))
+      );
+  }
 }

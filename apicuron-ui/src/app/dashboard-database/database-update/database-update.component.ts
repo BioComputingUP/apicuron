@@ -31,7 +31,7 @@ import { ResourcesService } from "../../resource/service/resources.service";
 })
 export class DatabaseUpdateComponent implements OnDestroy {
   resource_id$: Observable<string>;
-  resource$: Observable<Object>;
+  resource$: Observable<Resource>;
 
   JSON = JSON;
 

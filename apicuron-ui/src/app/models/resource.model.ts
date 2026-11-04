@@ -70,6 +70,8 @@ export class Resource implements Deserializable, Serializable {
     this.leaderboard_preferences = new LeaderboardPreferences().deserialize(
       input.leaderboard_preferences || {},
     );
+    // not serialized, as it is updated through its own route
+    this.allowedUrlsPrefix = input.allowedUrlsPrefix ?? [];
     if (input.stats) {
       this.stats = new ResourceStats().deserialize(input.stats);
       this.lastSubmissionDate = _.max([
@@ -119,6 +121,7 @@ export class Resource implements Deserializable, Serializable {
   lastSubmissionDate?: Date;
   leaderboard_preferences: LeaderboardPreferences;
   category: ResourceCategory;
+  allowedUrlsPrefix: string[];
 }
 
 export class LeaderboardPreferences {
