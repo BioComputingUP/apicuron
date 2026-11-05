@@ -24,7 +24,7 @@ import { EntityUriValid } from '../validators/entity-uri';
 import { SubmitReportsController } from './submit-report.controller';
 
 describe('SubmitReportsController POST /reports', () => {
-	const ORCID = '0000-0002-1825-0097';
+	const ORCID = '0000-0002-0341-4888';
 	const FORBIDDEN_MESSAGE = `Your account (${ORCID}) does not manage "another_resource". It manages [disprot].`;
 	const RESOURCE = {
 		resource_id: 'disprot',

@@ -12,7 +12,7 @@ describe('ContributionEventProcessor', () => {
 	const payload = events.find((e) => e.subject === 'pull_request/115');
 	const AUTHOR_ID = '70889826';
 	const OTHER_ID = '39879172';
-	const ORCID = '0000-0002-1825-0097';
+	const ORCID = '0000-0002-0341-4888';
 
 	let processor: ContributionEventProcessor;
 	let eventsMock: { findById: jest.Mock; markProcessed: jest.Mock; markFailed: jest.Mock };

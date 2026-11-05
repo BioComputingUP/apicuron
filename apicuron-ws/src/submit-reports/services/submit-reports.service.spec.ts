@@ -15,11 +15,11 @@ describe('SubmitReportService', () => {
 		league: 'default',
 		entity_uri: 'https://identifiers.org/disprot:DP00034',
 		activity_term: 'region_first_generation',
-		curator_orcid: '0000-0002-1825-0097',
+		curator_orcid: '0000-0002-0341-4888',
 		timestamp: new Date('2016-08-11T09:59:17.000Z'),
 	};
 	const REPORT_KEY =
-		'a report with resource_id "disprot", league "default", entity_uri "https://identifiers.org/disprot:DP00034", activity_term "region_first_generation", curator_orcid "0000-0002-1825-0097" and timestamp "2016-08-11T09:59:17.000Z"';
+		'a report with resource_id "disprot", league "default", entity_uri "https://identifiers.org/disprot:DP00034", activity_term "region_first_generation", curator_orcid "0000-0002-0341-4888" and timestamp "2016-08-11T09:59:17.000Z"';
 	const submission = (fields: Partial<SubmitReportsDto> = {}) =>
 		({
 			reports: [REPORT, REPORT, REPORT],

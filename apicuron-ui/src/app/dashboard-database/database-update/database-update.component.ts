@@ -39,6 +39,7 @@ export class DatabaseUpdateComponent implements OnDestroy {
     { id: "profile", label: "Profile" },
     { id: "leaderboards", label: "Leaderboards" },
     { id: "allowed-hosts", label: "Allowed hosts" },
+    { id: "managers", label: "Managers" },
   ];
   tab$: Observable<string>;
 
@@ -207,6 +208,7 @@ export class DatabaseUpdateComponent implements OnDestroy {
               severity: "warn",
               summary: "Validation Error",
               detail: message,
+              life: 10000,
             });
           } else {
             const reference = error?.request_id
@@ -218,6 +220,7 @@ export class DatabaseUpdateComponent implements OnDestroy {
               detail:
                 (message ?? "An error occured while sending the form") +
                 reference,
+              life: 10000,
             });
           }
         },

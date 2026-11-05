@@ -71,6 +71,7 @@ export class AllowedHostsComponent implements OnInit {
             severity: "warn",
             summary: "The allowed hosts were not updated",
             detail: message ?? "Please try again later",
+            life: 10000,
           });
         },
       });

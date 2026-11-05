@@ -4,7 +4,7 @@ import { BadgeFilter } from '../dto/badge-filter.dto';
 import { BadgesController } from './badges.controller';
 
 describe('BadgesController GET achievements/badges', () => {
-	const ORCID = '0000-0002-1825-0097';
+	const ORCID = '0000-0002-0341-4888';
 	let queryService: { getBadges: jest.Mock };
 	let controller: BadgesController;
 

@@ -142,4 +142,44 @@ export class ResourcesService {
         map((resource) => new Resource().deserialize(resource))
       );
   }
+
+  // the add and remove calls return the managers after the change
+  getManagers(resource_id: string): Observable<ResourceManager[]> {
+    return this.http
+      .get<{ data: ResourceManager[] }>(
+        `${this.partnerResourcesPath}/${resource_id}/managers`,
+        { headers: { version: "2" } }
+      )
+      .pipe(map(({ data }) => data));
+  }
+
+  addManager(
+    resource_id: string,
+    orcid_id: string
+  ): Observable<ResourceManager[]> {
+    return this.http
+      .post<{ data: ResourceManager[] }>(
+        `${this.partnerResourcesPath}/${resource_id}/managers`,
+        { orcid_id },
+        { headers: { version: "2" } }
+      )
+      .pipe(map(({ data }) => data));
+  }
+
+  removeManager(
+    resource_id: string,
+    orcid_id: string
+  ): Observable<ResourceManager[]> {
+    return this.http
+      .delete<{ data: ResourceManager[] }>(
+        `${this.partnerResourcesPath}/${resource_id}/managers/${orcid_id}`,
+        { headers: { version: "2" } }
+      )
+      .pipe(map(({ data }) => data));
+  }
+}
+
+export interface ResourceManager {
+  orcid_id: string;
+  displayedName: string;
 }

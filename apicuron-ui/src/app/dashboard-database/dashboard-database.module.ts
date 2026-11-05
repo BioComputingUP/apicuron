@@ -36,6 +36,7 @@ import { DatabaseOverviewComponent } from "./database-overview/database-overview
 import { AllowedHostsComponent } from "./database-update/allowed-hosts/allowed-hosts.component";
 import { DatabaseUpdateComponent } from "./database-update/database-update.component";
 import { LeaderboardPreferencesComponent } from "./database-update/leaderboard-preferences/leaderboard-preferences.component";
+import { ResourceManagersComponent } from "./database-update/resource-managers/resource-managers.component";
 import { ManageBadgesComponent } from "./manage-badges/manage-badges.component";
 import { ManageMedalsComponent } from "./manage-medals/manage-medals.component";
 import { ManageTermsComponent } from "./manage-terms/manage-terms.component";
@@ -51,6 +52,7 @@ import { SubmitSingleComponent } from "./submit-report/submit-single/submit-sing
     DatabaseUpdateComponent,
     LeaderboardPreferencesComponent,
     AllowedHostsComponent,
+    ResourceManagersComponent,
     SubmitReportComponent,
     SubmitSingleComponent,
     SubmitBulkComponent,

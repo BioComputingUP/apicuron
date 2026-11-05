@@ -120,6 +120,10 @@ export class PrivateUserEntity {
 	@Expose()
 	privacy: PrivacyType;
 
+	// lets the UI show every resource to admins, the API checks the role on its own
+	@Expose()
+	role: 'user' | 'admin';
+
 	@Expose()
 	@Type(() => UserResource)
 	@Transform((params) => params.value ?? [], { toClassOnly: true })

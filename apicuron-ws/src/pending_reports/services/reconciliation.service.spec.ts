@@ -91,7 +91,7 @@ describe('ReconcilationService', () => {
 			const result = await service.reconcile(
 				'github_user1',
 				ContributorIdentifierType.GITHUB,
-				'0000-0002-1825-0097',
+				'0000-0002-0341-4888',
 			);
 
 			expect(repositoryMock.findByContributorIdentifier).toHaveBeenCalledWith(
@@ -102,7 +102,7 @@ describe('ReconcilationService', () => {
 			expect(submitServiceMock.insertReport).toHaveBeenCalledTimes(2);
 			expect(submitServiceMock.insertReport).toHaveBeenNthCalledWith(1, {
 				activity_term: 'term_1',
-				curator_orcid: '0000-0002-1825-0097',
+				curator_orcid: '0000-0002-0341-4888',
 				entity_uri: 'https://example.com/entity/1',
 				resource_id: 'res_1',
 				timestamp: mockReport1.timestamp,
@@ -125,7 +125,7 @@ describe('ReconcilationService', () => {
 			const result = await service.reconcile(
 				'github_user1',
 				ContributorIdentifierType.GITHUB,
-				'0000-0002-1825-0097',
+				'0000-0002-0341-4888',
 			);
 
 			expect(repositoryMock.archive).toHaveBeenCalledWith('report_1');
@@ -143,7 +143,7 @@ describe('ReconcilationService', () => {
 			const result = await service.reconcile(
 				'github_user1',
 				ContributorIdentifierType.GITHUB,
-				'0000-0002-1825-0097',
+				'0000-0002-0341-4888',
 			);
 
 			expect(repositoryMock.markAsFailed).toHaveBeenCalledWith(
@@ -165,7 +165,7 @@ describe('ReconcilationService', () => {
 			const result = await service.reconcile(
 				'unknown_user',
 				ContributorIdentifierType.GITHUB,
-				'0000-0002-1825-0097',
+				'0000-0002-0341-4888',
 			);
 
 			expect(submitServiceMock.insertReport).not.toHaveBeenCalled();
@@ -180,7 +180,7 @@ describe('ReconcilationService', () => {
 		it('should invoke reconcile with payload parameters', async () => {
 			const eventPayload = UserOrcidIdentifiedEvent.fromGithub(
 				'github_user1',
-				'0000-0002-1825-0097',
+				'0000-0002-0341-4888',
 			);
 			const reconcileSpy = jest.spyOn(service, 'reconcile').mockResolvedValue({
 				submitted: 1,
@@ -192,14 +192,14 @@ describe('ReconcilationService', () => {
 			expect(reconcileSpy).toHaveBeenCalledWith(
 				'github_user1',
 				ContributorIdentifierType.GITHUB,
-				'0000-0002-1825-0097',
+				'0000-0002-0341-4888',
 			);
 		});
 
 		it('should catch error and log it if reconcile throws unexpectedly', async () => {
 			const eventPayload = UserOrcidIdentifiedEvent.fromGithub(
 				'github_user1',
-				'0000-0002-1825-0097',
+				'0000-0002-0341-4888',
 			);
 			const error = new Error('Fatal error during reconciliation');
 			jest.spyOn(service, 'reconcile').mockRejectedValueOnce(error);

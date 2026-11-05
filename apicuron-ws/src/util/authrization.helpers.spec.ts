@@ -2,7 +2,7 @@ import { ForbiddenException } from '@nestjs/common';
 import { assertUserManagesResource } from './authrization.helpers';
 
 describe('assertUserManagesResource', () => {
-	const ORCID = '0000-0002-1825-0097';
+	const ORCID = '0000-0002-0341-4888';
 	const manager = {
 		orcid_id: ORCID,
 		resources: [{ resource_id: 'disprot' }, { resource_id: 'mobidb' }],
@@ -22,6 +22,15 @@ describe('assertUserManagesResource', () => {
 				`Your account (${ORCID}) does not manage "pdb", "uniprot". It manages [disprot, mobidb].`,
 			),
 		);
+	});
+
+	it('accepts any resource for an admin', () => {
+		expect(() =>
+			assertUserManagesResource(
+				{ orcid_id: ORCID, role: 'admin', resources: [] },
+				['disprot', 'pdb'],
+			),
+		).not.toThrow();
 	});
 
 	it('says when the user manages no resource', () => {

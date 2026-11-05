@@ -3,7 +3,7 @@ import { ForbiddenException } from '@nestjs/common';
 import { HasAResourceGuard } from './belongs-to-resource.guard';
 
 describe('HasAResourceGuard', () => {
-	const ORCID = '0000-0002-1825-0097';
+	const ORCID = '0000-0002-0341-4888';
 	let usersService: { getByOrcid: jest.Mock };
 	let guard: HasAResourceGuard;
 
@@ -19,6 +19,14 @@ describe('HasAResourceGuard', () => {
 		usersService.getByOrcid.mockResolvedValue({
 			resources: [{ resource_id: 'disprot' }],
 		});
+
+		await expect(
+			guard.canActivate(contextFor({ orcid_id: ORCID })),
+		).resolves.toBe(true);
+	});
+
+	it('lets an admin through without any resource', async () => {
+		usersService.getByOrcid.mockResolvedValue({ role: 'admin', resources: [] });
 
 		await expect(
 			guard.canActivate(contextFor({ orcid_id: ORCID })),

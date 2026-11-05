@@ -4,11 +4,19 @@ import { uniq } from 'lodash';
 /**
  * Throws a 403 naming the resources the user manages
  * when the user does not manage one of the given resources.
+ * Admins manage every resource.
  */
 export function assertUserManagesResource(
-	user: { orcid_id?: string; resources?: { resource_id: string }[] },
+	user: {
+		orcid_id?: string;
+		role?: string;
+		resources?: { resource_id: string }[];
+	},
 	resourceIds: string | string[],
 ) {
+	if (user.role === 'admin') {
+		return;
+	}
 	const managed = (user.resources ?? []).map((r) => r.resource_id);
 	const forbidden = uniq([resourceIds].flat()).filter(
 		(resourceId) => !managed.includes(resourceId),

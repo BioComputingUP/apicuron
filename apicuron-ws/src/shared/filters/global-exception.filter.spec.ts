@@ -6,7 +6,7 @@ import { GlobalExceptionFilter } from './global-exception.filter';
 jest.mock('@sentry/nestjs', () => ({ captureException: jest.fn() }));
 
 describe('GlobalExceptionFilter', () => {
-	const ORCID = '0000-0002-1825-0097';
+	const ORCID = '0000-0002-0341-4888';
 	let httpAdapter: {
 		isHeadersSent: jest.Mock;
 		reply: jest.Mock;

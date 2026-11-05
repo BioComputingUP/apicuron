@@ -4,7 +4,14 @@ import { CuratorStatisticsService } from "../../curator-statistics/services/cura
 import { ResourcesService } from "../../resource/service/resources.service";
 import { UsersService } from "./users.service";
 import { User } from "../../models/User.model";
-import { combineLatest, Observable, pipe, ReplaySubject, Subject } from "rxjs";
+import {
+  combineLatest,
+  Observable,
+  of,
+  pipe,
+  ReplaySubject,
+  Subject,
+} from "rxjs";
 import { CuratorStatistics } from "../../models/statistics.model";
 import { Resource } from "../../models/resource.model";
 import { Injectable } from "@angular/core";
@@ -28,7 +35,9 @@ export class DashboardService {
   init() {
     this.user$ = this.getCurrentUser();
     this.userStats$ = this.getCuratorStatistics();
-    const managedResourceIds$ = this.getManagedResourceIds();
+    const managedResourceIds$ = this.getManagedResourceIds().pipe(
+      shareReplay(1)
+    );
     const contributedResourceIds$ = this.getContributedResourceIds(
       this.userStats$
     );
@@ -74,10 +83,15 @@ export class DashboardService {
     return this.auth.user$;
   }
 
+  // admins manage every resource, without being listed in user.resources
   getManagedResourceIds(): Observable<string[]> {
     return this.auth.user$.pipe(
-      map((user: User) =>
-        user.resources.map((resource) => resource.resource_id)
+      switchMap((user: User) =>
+        user.role === "admin"
+          ? this.resourceService
+              .getAllResources()
+              .pipe(map((resources) => resources.map((r) => r.resource_id)))
+          : of(user.resources.map((resource) => resource.resource_id))
       )
     );
   }

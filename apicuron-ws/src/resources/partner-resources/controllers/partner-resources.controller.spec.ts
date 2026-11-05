@@ -4,7 +4,7 @@ import { AuthService } from '../../../auth/auth.service';
 import { PartnerResourcesController } from './partner-resources.controller';
 
 describe('PartnerResourcesController', () => {
-	const ORCID = '0000-0002-1825-0097';
+	const ORCID = '0000-0002-0341-4888';
 	let serviceMock: { update_allowed_hosts: jest.Mock };
 	let controller: PartnerResourcesController;
 
