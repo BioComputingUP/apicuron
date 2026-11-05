@@ -266,6 +266,10 @@
       <allowed-hosts [resource]="resource"></allowed-hosts>
     </section>
 
+    <section class="section-card" *ngIf="tab == 'managers'">
+      <resource-managers [resource]="resource"></resource-managers>
+    </section>
+
     <!-- outside the form, so it stays at the bottom of the screen on every tab -->
     <div
       *ngIf="form.dirty"
