@@ -5,10 +5,10 @@ import { SelectPartnerResourceDto } from 'src/resources/dto/partner-resources.en
 import { OrcidChecksum } from 'src/submit-reports/validators/orcid-checksum';
 
 const ORCID_PATTERN = /^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/;
-const ORCID_MESSAGE = 'orcid_id must be an ORCID iD like 0000-0002-1825-0097';
+const ORCID_MESSAGE = 'orcid_id must be an ORCID iD like 0000-0002-0341-4888';
 
 export class AddManagerDto {
-	@ApiProperty({ example: '0000-0002-1825-0097' })
+	@ApiProperty({ example: '0000-0002-0341-4888' })
 	@Validate(OrcidChecksum)
 	@Matches(ORCID_PATTERN, { message: ORCID_MESSAGE })
 	orcid_id: string;

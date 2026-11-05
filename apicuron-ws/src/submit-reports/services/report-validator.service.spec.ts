@@ -19,7 +19,7 @@ describe('ReportValidatorService', () => {
 		({
 			resource_id: 'disprot',
 			activity_term: 'region_first_generation',
-			curator_orcid: '0000-0002-1825-0097',
+			curator_orcid: '0000-0002-0341-4888',
 			entity_uri: 'https://identifiers.org/disprot:DP00034',
 			timestamp: new Date('2016-08-11T09:59:17.000Z'),
 			...fields,

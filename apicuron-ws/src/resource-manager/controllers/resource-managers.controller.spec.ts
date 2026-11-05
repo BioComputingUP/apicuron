@@ -4,7 +4,7 @@ import { User } from 'src/core/schemas/user.schema';
 import { ResourceManagersController } from './resource-managers.controller';
 
 describe('ResourceManagersController', () => {
-	const ALICE = { orcid_id: '0000-0002-1825-0097', displayedName: 'Alice' };
+	const ALICE = { orcid_id: '0000-0002-0341-4888', displayedName: 'Alice' };
 	const BOB = { orcid_id: '0000-0001-5109-3700', displayedName: 'Bob' };
 	const caller = {
 		...ALICE,

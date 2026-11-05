@@ -12,7 +12,7 @@ import { EntityUriValid } from '../../submit-reports/validators/entity-uri';
 import { SubmitBulkTask } from './submit_bulk.task';
 
 describe('SubmitBulkTask', () => {
-	const ORCID = '0000-0002-1825-0097';
+	const ORCID = '0000-0002-0341-4888';
 	const REPORT = {
 		activity_term: 'region_first_generation',
 		timestamp: '2016-08-11T09:59:17.000Z',

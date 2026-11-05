@@ -6,7 +6,7 @@ import { RegistryQueryService } from './services/registry-query.service';
 import { RegistryFilterStrategy } from './strategies/registry-filter.strategy';
 
 describe('CuratorRegistryController GET registry/curator/:id', () => {
-	const CONTRIBUTOR = '0000-0002-1825-0097';
+	const CONTRIBUTOR = '0000-0002-0341-4888';
 	const contribution = (
 		resource_id: string,
 		visibility: PrivacyType = PrivacyType.public,

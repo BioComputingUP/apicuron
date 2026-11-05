@@ -3,7 +3,7 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { ResourceManagerService } from './resource-manager.service';
 
 describe('ResourceManagerService', () => {
-	const ORCID = '0000-0002-1825-0097';
+	const ORCID = '0000-0002-0341-4888';
 	const RESOURCE = { resource_id: 'disprot', resource_name: 'DisProt' };
 	const managedEntry = { resource_id: 'disprot', name: 'DisProt' };
 

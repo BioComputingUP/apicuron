@@ -14,21 +14,21 @@ describe('AddManagerDto', () => {
 
 	it('accepts a valid ORCID iD', async () => {
 		await expect(
-			errorsFor({ orcid_id: '0000-0002-1825-0097' }),
+			errorsFor({ orcid_id: '0000-0002-0341-4888' }),
 		).resolves.toEqual([]);
 	});
 
 	it('rejects a wrong check digit', async () => {
 		await expect(
-			errorsFor({ orcid_id: '0000-0002-1825-0098' }),
+			errorsFor({ orcid_id: '0000-0002-0341-4889' }),
 		).resolves.toEqual([
-			'Failed Orcid Checksum validation on (0000-0002-1825-0098)',
+			'Failed Orcid Checksum validation on (0000-0002-0341-4889)',
 		]);
 	});
 
 	it('reports the format, not a crash, when the ORCID iD is missing', async () => {
 		await expect(errorsFor({})).resolves.toEqual([
-			'orcid_id must be an ORCID iD like 0000-0002-1825-0097',
+			'orcid_id must be an ORCID iD like 0000-0002-0341-4888',
 		]);
 	});
 });

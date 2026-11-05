@@ -18,7 +18,7 @@ describe('SubmitReportsDto global fields', () => {
 	const REPORT = {
 		activity_term: 'region_first_generation',
 		timestamp: '2016-08-11T09:59:17.000Z',
-		curator_orcid: '0000-0002-1825-0097',
+		curator_orcid: '0000-0002-0341-4888',
 		entity_uri: 'https://identifiers.org/disprot:DP00034',
 	};
 

@@ -2,7 +2,7 @@ import { ForbiddenException } from '@nestjs/common';
 import { assertUserManagesResource } from './authrization.helpers';
 
 describe('assertUserManagesResource', () => {
-	const ORCID = '0000-0002-1825-0097';
+	const ORCID = '0000-0002-0341-4888';
 	const manager = {
 		orcid_id: ORCID,
 		resources: [{ resource_id: 'disprot' }, { resource_id: 'mobidb' }],

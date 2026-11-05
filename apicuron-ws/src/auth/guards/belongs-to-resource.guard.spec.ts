@@ -3,7 +3,7 @@ import { ForbiddenException } from '@nestjs/common';
 import { HasAResourceGuard } from './belongs-to-resource.guard';
 
 describe('HasAResourceGuard', () => {
-	const ORCID = '0000-0002-1825-0097';
+	const ORCID = '0000-0002-0341-4888';
 	let usersService: { getByOrcid: jest.Mock };
 	let guard: HasAResourceGuard;
 
