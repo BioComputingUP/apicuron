@@ -78,21 +78,12 @@ export class SubmittedResourcesController {
 
 	@ApiExcludeEndpoint(true)
 	@Post('make_partner')
+	@HttpCode(204)
 	@SetMetadata('roles', ['admin'])
 	@UseGuards(LocalAuthGuard, RoleGuard)
 	async make_resource_partner_resource(@Body() resource_id_obj: MakePartner) {
-		const { resource_id } = resource_id_obj;
-		try {
-			this.resourcesService.make_partner(resource_id);
-			return 'true';
-		} catch (e) {
-			this.logger.error(
-				`Failed making ${resource_id} a partner-resource`,
-				e.stack,
-				e.message,
-			);
-			return 'false';
-		}
+		// a 404 or 409 when the resource is unknown or already approved
+		await this.resourcesService.make_partner(resource_id_obj.resource_id);
 	}
 
 	@ApiExcludeEndpoint(true)
