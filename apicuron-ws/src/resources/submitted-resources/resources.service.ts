@@ -1,7 +1,9 @@
 import {
+	ConflictException,
 	Injectable,
 	InternalServerErrorException,
 	Logger,
+	NotFoundException,
 	NotImplementedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -81,43 +83,73 @@ export class SubmittedResourcesService {
 		return await !!this.submittedResourceModel.exists({ resource_id });
 	}
 
+	/**
+	 * Turns a submitted resource into a partner resource, and makes its creator a manager.
+	 * Safe to run again after a failure: submitted and partner resources share one collection,
+	 * so the switch is a single update of the same document, and the logo is copied before it
+	 * and only deleted from the private storage after it.
+	 */
 	async make_partner(resource_id: string) {
-		// retrieve the resource object
 		const resource = await this.submittedResourceModel.findOne({ resource_id });
 		if (!resource) {
-			throw new Error(`Resource with id ${resource_id} not found`);
+			const approved = await this.partnerResourceModel.exists({ resource_id });
+			throw approved
+				? new ConflictException(`Resource ${resource_id} is already approved`)
+				: new NotFoundException(`No submitted resource with id ${resource_id}`);
 		}
 
+		// adds the partner defaults (leagues, allowed hosts...) and fails before anything is changed
+		// mongoose refuses to set the discriminator key, the new document has its own
+		const { state: _state, ...resourceData } = resource.toObject();
+		const partnerResource = new this.partnerResourceModel({
+			...resourceData,
+			joined_date: new Date(),
+		});
+		await partnerResource.validate();
+
+		const logoPath = this.storageService.parseCanonicalUrl(resource.logo).path;
 		const logoRef = await this.storageService.move(
 			StorageType.private,
 			StorageType.public,
-			this.storageService.parseCanonicalUrl(resource.logo).path,
-			{ deleteFromSource: true },
+			logoPath,
+			{ deleteFromSource: false },
 		);
-		const newLogoRef = this.storageService
+		partnerResource.logo = this.storageService
 			.getEngine(StorageType.public)
 			.buildCanonicalUrl(logoRef);
-		this.logger.debug(`Moved logo from private to public: ${newLogoRef}`);
 
-		const resourceData = resource.toObject();
-		const partnerResource = new this.partnerResourceModel({
-			...resourceData,
-			logo: newLogoRef,
-			joined_date: new Date(),
-		});
-
-		await this.submittedResourceModel.deleteOne({ resource_id });
-
-		await this.partnerResourceModel.create(partnerResource.toObject());
-
-		this.logger.debug(
-			`Creating PartnerResource with logo ${partnerResource.logo}`,
+		// through the driver, as mongoose casts an update against a single discriminator's schema
+		const { _id, ...fields } = partnerResource.toObject();
+		const { modifiedCount } = await this.resourceModel.collection.updateOne(
+			{ _id, state: SubmittedResource.name },
+			{
+				$set: { ...fields, state: PartnerResource.name, updatedAt: new Date() },
+			},
 		);
+		if (!modifiedCount) {
+			throw new ConflictException(
+				`Resource ${resource_id} changed while it was being approved, try again`,
+			);
+		}
 
-		// if the submitted resource has a creator, we set it as an owner of the resource
-		const { creator } = resource;
-		if (creator) {
-			await this.userService.addManagedResource(creator, resource);
+		// the resource is live from here, so failures are logged and the approval goes on
+		if (resource.creator) {
+			try {
+				await this.userService.addManagedResource(resource.creator, resource);
+			} catch (e) {
+				this.logger.error(
+					`Approved ${resource_id} but could not make ${resource.creator} a manager, add them from the Managers tab`,
+					e.stack,
+				);
+			}
+		}
+
+		try {
+			await this.storageService.getEngine(StorageType.private).delete(logoPath);
+		} catch (e) {
+			this.logger.warn(
+				`Approved ${resource_id} but could not delete its private logo ${logoPath}`,
+			);
 		}
 	}
 

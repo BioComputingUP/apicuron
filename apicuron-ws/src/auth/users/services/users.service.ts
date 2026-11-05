@@ -202,14 +202,18 @@ export class UsersService {
 	}
 
 	async addManagedResource(orcid_id: string, resource: ResourceDocument) {
-		return await this.updateUser(orcid_id, {
-			$push: {
-				resources: {
-					resource_id: resource.resource_id,
-					name: resource.resource_name,
+		// the filter keeps a rerun from adding the resource twice
+		return await this.userRepository.updateOne(
+			{ orcid_id, 'resources.resource_id': { $ne: resource.resource_id } },
+			{
+				$push: {
+					resources: {
+						resource_id: resource.resource_id,
+						name: resource.resource_name,
+					},
 				},
 			},
-		});
+		);
 	}
 
 	async get_users_with_stats(params) {
