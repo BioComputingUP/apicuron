@@ -10,7 +10,7 @@ import {
 	Statistics,
 	StatisticsDocument,
 } from '../../core/schemas/statistics.schema';
-import { UserDocument } from '../../core/schemas/user.schema';
+import { User, UserDocument } from '../../core/schemas/user.schema';
 import { responseHasCode } from '../../orcid/orcid-client/helpers/response-with-code';
 import { OrcidWork } from '../../orcid/orcid-client/interfaces/orcid.interface';
 import { OrcidClientService } from '../../orcid/orcid-client/orcid-client.service';
@@ -23,6 +23,8 @@ export class SubmitOrcidWork implements OnModuleInit {
 		protected orcidClientService: OrcidClientService,
 		@InjectModel(Statistics.name)
 		protected statModel: Model<StatisticsDocument>,
+		@InjectModel(User.name)
+		protected userModel: Model<UserDocument>,
 		protected userRepository: UserRepository,
 		@Inject(OrcidWorkBuilderToken) protected orcidWorkBuilder: OrcidWorkBuilder,
 		@Inject(RunCronJobs) protected runCronJobs: boolean,
@@ -73,16 +75,10 @@ export class SubmitOrcidWork implements OnModuleInit {
 					continue;
 				}
 
-				const submissions$: Promise<void>[] = [];
+				// One at a time: each submission may store a put-code on this user
 				for (const stat of stats) {
-					const submission$ = this.submitSingleWork(
-						stat,
-						stat.resource.toObject(),
-						user,
-					);
-					submissions$.push(submission$);
+					await this.submitSingleWork(stat, stat.resource.toObject(), user);
 				}
-				await Promise.all(submissions$);
 			} catch (err: unknown) {
 				if (err instanceof Error) {
 					this.logger.error(
@@ -114,8 +110,13 @@ export class SubmitOrcidWork implements OnModuleInit {
 				this.logger.debug(
 					`received put code: ${submitResponse.putCode}, saving the user resource put code`,
 				);
+				await this.savePutCode(
+					user.orcid_id,
+					resource.resource_id,
+					submitResponse.putCode,
+				);
+				// keep the in-memory user in sync so later builds in this run use the new put-code
 				user.setResourcePutCode(resource.resource_id, submitResponse.putCode);
-				await user.save();
 			}
 		} catch (err) {
 			if (err instanceof Error) {
@@ -123,5 +124,28 @@ export class SubmitOrcidWork implements OnModuleInit {
 				this.logger.error(err.message, err.stack, err.name);
 			}
 		}
+	}
+
+	/**
+	 * Stores the put-code of a resource's work with a direct update on the user document,
+	 * replacing the existing entry for that resource or adding one.
+	 * Unlike user.save(), this does not depend on the document version loaded at the start of the run.
+	 */
+	private async savePutCode(
+		orcid_id: string,
+		resource_id: string,
+		putCode: string,
+	): Promise<void> {
+		const replaced = await this.userModel.updateOne(
+			{ orcid_id, 'orcid_work_put_codes.resource_id': resource_id },
+			{ $set: { 'orcid_work_put_codes.$.putCode': putCode } },
+		);
+		if (replaced.matchedCount > 0) {
+			return;
+		}
+		await this.userModel.updateOne(
+			{ orcid_id, 'orcid_work_put_codes.resource_id': { $ne: resource_id } },
+			{ $push: { orcid_work_put_codes: { resource_id, putCode } } },
+		);
 	}
 }
