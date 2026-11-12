@@ -65,13 +65,13 @@ describe('orcidWorkXmlSerializer', () => {
 		const xml = orcidWorkXmlSerializer({ ...work, url }).trim();
 		expect(XMLValidator.validate(xml)).toBe(true);
 		expect(xml.indexOf('</common:external-ids>')).toBeLessThan(
-			xml.indexOf('<work:url>'),
+			xml.indexOf('<common:url>'),
 		);
 		const parsed = new XMLParser({ parseTagValue: false }).parse(xml);
-		expect(parsed['work:work']['work:url']).toBe(url.href);
+		expect(parsed['work:work']['common:url']).toBe(url.href);
 	});
 
 	it('leaves out the url element when there is no url', () => {
-		expect(orcidWorkXmlSerializer(work)).not.toContain('work:url');
+		expect(orcidWorkXmlSerializer(work)).not.toContain('<common:url>');
 	});
 });

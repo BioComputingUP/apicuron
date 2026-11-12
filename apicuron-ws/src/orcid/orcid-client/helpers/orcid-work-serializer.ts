@@ -35,8 +35,8 @@ export function orcidWorkXmlSerializer(
 	options = { includeXmlHeader: true },
 ): string {
 	const { externalIds, title, shortDescription, type, url } = orcidWork;
-	// in the work-3.0 schema, url comes right after external-ids
-	const urlElement = url ? `<work:url>${escapeXml(url.href)}</work:url>` : '';
+	// in the work-3.0 schema, url is a common:url element right after external-ids
+	const urlElement = url ? `<common:url>${escapeXml(url.href)}</common:url>` : '';
 	const putCode = orcidWork.putCode
 		? `put-code="${escapeXml(orcidWork.putCode)}"`
 		: '';
