@@ -29,6 +29,8 @@ export interface OrcidWork {
 	type: string;
 	putCode?: string;
 	externalIds: OrcidExternalId[];
+	/** link shown on the work, e.g. the person's evidence page on APICURON */
+	url?: URL;
 }
 
 export type SubmitWorkReponseWithCode = {

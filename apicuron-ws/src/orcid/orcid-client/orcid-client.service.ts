@@ -82,13 +82,15 @@ export class OrcidClientService {
 	 * 2. Constructs the XML payload for the ORCID API request.
 	 * 3. Determines the appropriate URL path and HTTP method (POST or PUT) based on the presence of a put-code.
 	 * 4. Sends the request to the ORCID API using axios.
-	 * 5. Handles the response, including retrying the request if a conflict (409) occurs and the put-code is missing.
+	 * 5. Handles the response, including retrying the request if a conflict (409) occurs and the put-code is missing,
+	 *    and creating the work again (POST) if an update (PUT) returns 404 because the work no longer exists.
 	 * 6. Logs relevant information and errors.
 	 * 7. Returns the status and put-code if the submission is successful.
 	 */
 	async submitWork(
 		user: OrcidUser,
 		orcidWork: OrcidWork,
+		allowRecreate = true,
 	): Promise<SubmitWorkResponse> {
 		const { title } = orcidWork;
 
@@ -116,6 +118,18 @@ export class OrcidClientService {
 
 		const response = await this.httpService.axiosRef.request(options);
 
+		if (orcidWork.putCode && response.status == 404 && allowRecreate) {
+			// the work no longer exists on the record (e.g. the user deleted it), create it again
+			this.logger.warn(
+				`Work "${title}" with put-code ${orcidWork.putCode} not found for user ${user.orcid_id}, creating it again`,
+			);
+			return await this.submitWork(
+				user,
+				{ ...orcidWork, putCode: undefined },
+				false,
+			);
+		}
+
 		if (response.status < 200 || response.status >= 400) {
 			if (response.status == 409) {
 				// a conflict, work already exists but we do not have the put-code
@@ -128,10 +142,14 @@ export class OrcidClientService {
 				const putCodeMatch = response.data.toString().match(/put-code (\d+)/);
 				if (putCodeMatch && putCodeMatch.length > 1) {
 					// retry attempt
-					const response = await this.submitWork(user, {
-						...orcidWork,
-						putCode: putCodeMatch[1],
-					});
+					const response = await this.submitWork(
+						user,
+						{
+							...orcidWork,
+							putCode: putCodeMatch[1],
+						},
+						false,
+					);
 					// if response is successful, return the validated put-code
 					if (response.status >= 200 && response.status < 400) {
 						return {

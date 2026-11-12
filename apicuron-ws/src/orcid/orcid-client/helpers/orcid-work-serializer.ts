@@ -4,6 +4,7 @@ import {
 } from '../interfaces/api.types';
 import { OrcidWork } from '../interfaces/orcid.interface';
 import { buildExternalId } from './build-external-id';
+import { escapeXml } from './escape-xml';
 
 export function orcidWorkJsonSerializer(work: OrcidWork): OrcidApiJsonWork {
 	return {
@@ -25,6 +26,7 @@ export function orcidWorkJsonSerializer(work: OrcidWork): OrcidApiJsonWork {
 				}),
 			),
 		},
+		...(work.url && { url: { value: work.url.href } }),
 	};
 }
 
@@ -32,8 +34,12 @@ export function orcidWorkXmlSerializer(
 	orcidWork: OrcidWork,
 	options = { includeXmlHeader: true },
 ): string {
-	const { externalIds, title, shortDescription, type } = orcidWork;
-	const putCode = orcidWork.putCode ? `put-code="${orcidWork.putCode}"` : '';
+	const { externalIds, title, shortDescription, type, url } = orcidWork;
+	// in the work-3.0 schema, url is a common:url element right after external-ids
+	const urlElement = url ? `<common:url>${escapeXml(url.href)}</common:url>` : '';
+	const putCode = orcidWork.putCode
+		? `put-code="${escapeXml(orcidWork.putCode)}"`
+		: '';
 
 	const processedExternalIds = externalIds.map(buildExternalId).join('\n');
 	const xmlHeader = options.includeXmlHeader
@@ -47,13 +53,14 @@ export function orcidWorkXmlSerializer(
 			xsi:schemaLocation="http://www.orcid.org/ns/work /work-3.0.xsd"
 			${putCode}>
 			<work:title>
-				<common:title>${title}</common:title>
+				<common:title>${escapeXml(title)}</common:title>
 			</work:title>
-			<work:short-description>${shortDescription}</work:short-description>
-			<work:type>${type}</work:type>
+			<work:short-description>${escapeXml(shortDescription)}</work:short-description>
+			<work:type>${escapeXml(type)}</work:type>
 			<common:external-ids>
 			${processedExternalIds}
 			</common:external-ids>
+			${urlElement}
 		</work:work>
 		`;
 }

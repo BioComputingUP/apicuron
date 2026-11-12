@@ -121,7 +121,7 @@ import { ContributionEventsModule } from './contribution-events/contribution-eve
 		GithubScraperModule.registerAsync({
 			inject: [ConfigService],
 			useFactory: (config: ConfigService): GithubScraperModuleOptions => ({
-				github_token: config.getOrThrow<string>('GITHUB_TOKEN'),
+				github_token: config.get<string>('GITHUB_TOKEN') || undefined,
 			}),
 		}),
 		OrcidSyncModule,
