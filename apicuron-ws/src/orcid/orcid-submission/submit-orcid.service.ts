@@ -56,7 +56,14 @@ export class SubmitOrcidWork implements OnModuleInit {
 	defaultBatchSize = 100;
 	logger = new Logger(SubmitOrcidWork.name);
 
-	async submitAllWorks(filter: FilterQuery<UserDocument> = {}): Promise<void> {
+	/**
+	 * Pushes the works of every public user who gave ORCID permission and matches the filter.
+	 * Returns the ORCID iDs of the users it went through.
+	 */
+	async submitAllWorks(
+		filter: FilterQuery<UserDocument> = {},
+	): Promise<string[]> {
+		const processed: string[] = [];
 		const users = this.userRepository
 			.find({
 				$and: [
@@ -71,6 +78,7 @@ export class SubmitOrcidWork implements OnModuleInit {
 			.cursor({ batchSize: this.defaultBatchSize });
 
 		for await (const user of users) {
+			processed.push(user.orcid_id);
 			try {
 				const stats = await this.statModel.find({
 					curator_orcid: user.orcid_id,
@@ -104,6 +112,7 @@ export class SubmitOrcidWork implements OnModuleInit {
 				}
 			}
 		}
+		return processed;
 	}
 
 	async submitSingleWork(

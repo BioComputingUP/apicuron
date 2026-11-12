@@ -35,7 +35,10 @@ function setup({
 }) {
 	const user = makeUser();
 	const userModel = {
-		updateOne: jest.fn().mockResolvedValueOnce({ matchedCount }).mockResolvedValue({}),
+		updateOne: jest
+			.fn()
+			.mockResolvedValueOnce({ matchedCount })
+			.mockResolvedValue({}),
 	};
 	const userRepository = {
 		find: jest.fn(() => ({
@@ -91,8 +94,21 @@ describe('SubmitOrcidWork', () => {
 		expect(maxInFlight).toBe(1);
 	});
 
+	it('returns the ORCID iDs of the users it went through', async () => {
+		const { service } = setup({
+			stats: [makeStat('a')],
+			submitWork: jest.fn().mockResolvedValue({ status: 200 }),
+		});
+
+		await expect(service.submitAllWorks({ orcid_id: ORCID })).resolves.toEqual([
+			ORCID,
+		]);
+	});
+
 	it('pushes a new put-code with a direct update instead of user.save()', async () => {
-		const submitWork = jest.fn().mockResolvedValue({ status: 201, putCode: '42' });
+		const submitWork = jest
+			.fn()
+			.mockResolvedValue({ status: 201, putCode: '42' });
 		const { service, user, userModel } = setup({
 			stats: [makeStat('a')],
 			submitWork,
@@ -116,7 +132,9 @@ describe('SubmitOrcidWork', () => {
 	});
 
 	it('replaces an existing put-code without pushing a second entry', async () => {
-		const submitWork = jest.fn().mockResolvedValue({ status: 201, putCode: '43' });
+		const submitWork = jest
+			.fn()
+			.mockResolvedValue({ status: 201, putCode: '43' });
 		const { service, userModel } = setup({
 			stats: [makeStat('a')],
 			submitWork,
