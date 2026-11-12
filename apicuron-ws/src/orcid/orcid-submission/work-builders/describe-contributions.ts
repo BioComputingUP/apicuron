@@ -32,7 +32,7 @@ function joinWithAnd(items: string[]): string {
 	return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
 }
 
-/** Adds up counts of the same activity, most frequent first. */
+/** Adds up counts of the same activity, most frequent first, with tidied labels. */
 export function mergeActivities(
 	activities: CreditedActivity[],
 ): CreditedActivity[] {
@@ -42,7 +42,11 @@ export function mergeActivities(
 		if (existing) {
 			existing.count += activity.count;
 		} else {
-			byTerm.set(activity.activity_term, { ...activity });
+			byTerm.set(activity.activity_term, {
+				...activity,
+				// labels are written by each resource, e.g. "Region  revised"
+				activity_name: activity.activity_name.replace(/\s+/g, ' ').trim(),
+			});
 		}
 	}
 	return [...byTerm.values()]
@@ -56,7 +60,7 @@ export function mergeActivities(
 /**
  * Writes a short narrative of what a person was credited for on a resource, e.g.
  * "Between 2024 and 2026, credited on APICURON for 14 contributions to DisProt software,
- * mainly in Change Reviewing (5), Bug Fixing (4) and Feature Building (3),
+ * most often in Change Reviewing (5), Bug Fixing (4) and Feature Building (3),
  * plus 2 contributions in 2 other activities."
  * Activity labels come from the resource's own activity definitions.
  */
@@ -93,7 +97,8 @@ export function describeContributions(summary: ContributionSummary): string {
 		return `${opening}, in ${namedText}.`;
 	}
 	const restCount = rest.reduce((sum, activity) => sum + activity.count, 0);
-	return `${opening}, mainly in ${namedText}, plus ${plural(
+	// "most often" stays true even when the named activities are less than half of the total
+	return `${opening}, most often in ${namedText}, plus ${plural(
 		restCount,
 		'contribution',
 		'contributions',

@@ -28,7 +28,7 @@ describe('describeContributions', () => {
 			}),
 		).toBe(
 			'Between 2024 and 2026, credited on APICURON for 14 contributions to DisProt software, ' +
-				'mainly in Change Reviewing (5), Bug Fixing (4) and Feature Building (3), ' +
+				'most often in Change Reviewing (5), Bug Fixing (4) and Feature Building (3), ' +
 				'plus 2 contributions in 2 other activities.',
 		);
 	});
@@ -72,6 +72,17 @@ describe('describeContributions', () => {
 			}),
 		).toBe(
 			'Between 2024 and 2026, credited on APICURON for 5 contributions to DisProt software, all in Change Reviewing.',
+		);
+	});
+
+	it('collapses extra spaces in activity labels', () => {
+		expect(
+			describeContributions({
+				...base,
+				activities: [activity('region_revised', ' Region  revised ', 5)],
+			}),
+		).toBe(
+			'Between 2024 and 2026, credited on APICURON for 5 contributions to DisProt software, all in Region revised.',
 		);
 	});
 
