@@ -1,10 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LeanDocument } from 'mongoose';
+import { ResourceCategory } from '../../../core/enums';
 import { StatisticsDocument, UserDocument } from '../../../core/schemas';
 import { PartnerResource } from '../../../core/schemas/resource/partner-resource.schema';
 import { OrcidWork } from '../../../orcid/orcid-client/interfaces/orcid.interface';
 import { OrcidWorkBuilder } from '../interfaces/orcid-submission.interface';
+import {
+	CreditedActivity,
+	describeContributions,
+} from './describe-contributions';
+
+/** ORCID work type per resource category; anything not listed stays a data set. */
+const WORK_TYPES: Partial<Record<ResourceCategory, string>> = {
+	[ResourceCategory.Software]: 'software',
+	[ResourceCategory.Training]: 'other',
+};
+
+export function workTypeFor(category: ResourceCategory | undefined): string {
+	return (category && WORK_TYPES[category]) ?? 'data-set';
+}
 
 @Injectable()
 export class DefaultWorkBuilder implements OrcidWorkBuilder {
@@ -17,6 +32,7 @@ export class DefaultWorkBuilder implements OrcidWorkBuilder {
 		statsitics: LeanDocument<StatisticsDocument>,
 		resource: LeanDocument<PartnerResource>,
 		user: UserDocument,
+		activities: CreditedActivity[] = [],
 	): OrcidWork {
 		const profileUrl = new URL(
 			`${this.frontendHost}curators/${user.orcid_id}/${resource.resource_id}`,
@@ -35,8 +51,15 @@ export class DefaultWorkBuilder implements OrcidWorkBuilder {
 				},
 			],
 			title: `Contributions to ${resource.resource_name}`,
-			shortDescription: `Completed ${statsitics.total_count} Activities that contribute to ${resource.resource_name}`,
-			type: 'data-set',
+			shortDescription: describeContributions({
+				resourceName: resource.resource_name,
+				firstContribution: statsitics.first_contribution,
+				lastContribution: statsitics.last_contribution,
+				totalCount: statsitics.total_count,
+				activities,
+			}),
+			type: workTypeFor(resource.category),
+			url: profileUrl,
 			putCode: putCode,
 		};
 	}

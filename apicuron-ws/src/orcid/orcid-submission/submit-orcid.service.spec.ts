@@ -26,10 +26,12 @@ function setup({
 	stats,
 	submitWork,
 	matchedCount = 0,
+	detailedStats = [],
 }: {
 	stats: ReturnType<typeof makeStat>[];
 	submitWork: jest.Mock;
 	matchedCount?: number;
+	detailedStats?: object[];
 }) {
 	const user = makeUser();
 	const userModel = {
@@ -46,11 +48,17 @@ function setup({
 		})),
 	};
 	const statModel = { find: jest.fn().mockResolvedValue(stats) };
-	const builder = { buildWork: jest.fn(() => ({ title: 'work' })) };
+	const detailedStatModel = {
+		find: jest.fn(() => ({ lean: jest.fn().mockResolvedValue(detailedStats) })),
+	};
+	const builder = {
+		buildWork: jest.fn((..._args: unknown[]) => ({ title: 'work' })),
+	};
 
 	const service = new SubmitOrcidWork(
 		{ submitWork } as any,
 		statModel as any,
+		detailedStatModel as any,
 		userModel as any,
 		userRepository as any,
 		builder as any,
@@ -58,7 +66,7 @@ function setup({
 		{} as any,
 	);
 	service.logger = { debug: jest.fn(), error: jest.fn() } as any;
-	return { service, user, userModel };
+	return { service, user, userModel, builder };
 }
 
 describe('SubmitOrcidWork', () => {
@@ -133,5 +141,29 @@ describe('SubmitOrcidWork', () => {
 		await service.submitAllWorks({ orcid_id: ORCID });
 
 		expect(submitWork).toHaveBeenCalledTimes(2);
+	});
+
+	it('passes each resource its public per-activity counts', async () => {
+		const submitWork = jest.fn().mockResolvedValue({ status: 200 });
+		const changeReviewing = {
+			activity_term: 'change_reviewing',
+			activity_name: 'Change Reviewing',
+			count: 5,
+		};
+		const { service, builder } = setup({
+			stats: [makeStat('a'), makeStat('b')],
+			submitWork,
+			detailedStats: [
+				{
+					resource_id: 'a',
+					activities: [{ ...changeReviewing, score: 1, description: 'x' }],
+				},
+			],
+		});
+
+		await service.submitAllWorks({ orcid_id: ORCID });
+
+		expect(builder.buildWork.mock.calls[0][3]).toEqual([changeReviewing]);
+		expect(builder.buildWork.mock.calls[1][3]).toEqual([]);
 	});
 });

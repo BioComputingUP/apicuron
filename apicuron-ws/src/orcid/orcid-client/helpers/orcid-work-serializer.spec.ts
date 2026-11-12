@@ -59,4 +59,19 @@ describe('orcidWorkXmlSerializer', () => {
 			work.externalIds[0].url.href,
 		);
 	});
+
+	it('adds the work url after the external ids', () => {
+		const url = new URL('https://apicuron.org/curators/0000-0002-0341-4888/r-d');
+		const xml = orcidWorkXmlSerializer({ ...work, url }).trim();
+		expect(XMLValidator.validate(xml)).toBe(true);
+		expect(xml.indexOf('</common:external-ids>')).toBeLessThan(
+			xml.indexOf('<work:url>'),
+		);
+		const parsed = new XMLParser({ parseTagValue: false }).parse(xml);
+		expect(parsed['work:work']['work:url']).toBe(url.href);
+	});
+
+	it('leaves out the url element when there is no url', () => {
+		expect(orcidWorkXmlSerializer(work)).not.toContain('work:url');
+	});
 });

@@ -10,12 +10,17 @@ import {
 	Statistics,
 	StatisticsDocument,
 } from '../../core/schemas/statistics.schema';
+import {
+	DetailedStatistics,
+	DetailedStatisticsDocument,
+} from '../../core/schemas/statistics/detailed-statistics.schema';
 import { User, UserDocument } from '../../core/schemas/user.schema';
 import { responseHasCode } from '../../orcid/orcid-client/helpers/response-with-code';
 import { OrcidWork } from '../../orcid/orcid-client/interfaces/orcid.interface';
 import { OrcidClientService } from '../../orcid/orcid-client/orcid-client.service';
 import { OrcidWorkBuilderToken, RunCronJobs } from './constants';
 import { OrcidWorkBuilder } from './interfaces/orcid-submission.interface';
+import { CreditedActivity } from './work-builders/describe-contributions';
 
 @Injectable()
 export class SubmitOrcidWork implements OnModuleInit {
@@ -23,6 +28,8 @@ export class SubmitOrcidWork implements OnModuleInit {
 		protected orcidClientService: OrcidClientService,
 		@InjectModel(Statistics.name)
 		protected statModel: Model<StatisticsDocument>,
+		@InjectModel(DetailedStatistics.name)
+		protected detailedStatModel: Model<DetailedStatisticsDocument>,
 		@InjectModel(User.name)
 		protected userModel: Model<UserDocument>,
 		protected userRepository: UserRepository,
@@ -75,9 +82,18 @@ export class SubmitOrcidWork implements OnModuleInit {
 					continue;
 				}
 
+				const activitiesByResource = await this.loadCreditedActivities(
+					user.orcid_id,
+				);
+
 				// One at a time: each submission may store a put-code on this user
 				for (const stat of stats) {
-					await this.submitSingleWork(stat, stat.resource.toObject(), user);
+					await this.submitSingleWork(
+						stat,
+						stat.resource.toObject(),
+						user,
+						activitiesByResource.get(stat.resource_id) ?? [],
+					);
 				}
 			} catch (err: unknown) {
 				if (err instanceof Error) {
@@ -94,11 +110,13 @@ export class SubmitOrcidWork implements OnModuleInit {
 		statsitics: LeanDocument<StatisticsDocument>,
 		resource: LeanDocument<PartnerResourceDocument>,
 		user: UserDocument,
+		activities: CreditedActivity[] = [],
 	): Promise<void> {
 		const work: OrcidWork = this.orcidWorkBuilder.buildWork(
 			statsitics,
 			resource,
 			user,
+			activities,
 		);
 		try {
 			const submitResponse = await this.orcidClientService.submitWork(
@@ -124,6 +142,37 @@ export class SubmitOrcidWork implements OnModuleInit {
 				this.logger.error(err.message, err.stack, err.name);
 			}
 		}
+	}
+
+	/**
+	 * Loads the user's public per-activity counts (the ones behind the dashboard activity chart),
+	 * grouped by resource.
+	 */
+	private async loadCreditedActivities(
+		orcid_id: string,
+	): Promise<Map<string, CreditedActivity[]>> {
+		const detailedStats = await this.detailedStatModel
+			.find(
+				{ curator_orcid: orcid_id, privacy: PrivacyType.public },
+				{ resource_id: 1, activities: 1 },
+			)
+			.lean();
+
+		const byResource = new Map<string, CreditedActivity[]>();
+		for (const { resource_id, activities } of detailedStats) {
+			const credited = (activities ?? []).map(
+				({ activity_term, activity_name, count }) => ({
+					activity_term,
+					activity_name,
+					count,
+				}),
+			);
+			byResource.set(resource_id, [
+				...(byResource.get(resource_id) ?? []),
+				...credited,
+			]);
+		}
+		return byResource;
 	}
 
 	/**
