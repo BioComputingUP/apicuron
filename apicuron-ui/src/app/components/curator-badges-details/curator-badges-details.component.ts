@@ -28,7 +28,7 @@ import { Term } from "../../models/term.model";
 export class CuratorBadgesDetailsComponent implements OnInit {
 
     @Input() curator: User;
-    @Input() resource: Resource;
+    @Input() resource: Resource | null;
     badges$: Observable<Paginated<Badge>>;
     terms$: Observable<Term[]>;
 

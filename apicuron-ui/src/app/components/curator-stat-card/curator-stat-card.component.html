@@ -1,131 +1,137 @@
 <ng-container *ngIf="resource$ | async as resource">
-  <div
-    class="tw-h-full tw-w-full tw-bg-white tw-m-auto tw-p-1 sm:tw-p-2 tw-flex tw-flex-col tw-rounded-b-lg tw-shadow-lg tw-border-t-2 sm:tw-border-t-4"
-    [ngStyle]="{ 'border-color': resource.color }"
+  <article
+    class="tw-w-full tw-bg-white tw-rounded-lg tw-border tw-border-slate-200 tw-border-t-[3px] tw-shadow-sm tw-p-4 sm:tw-p-6 tw-flex tw-flex-col tw-gap-6"
+    [ngStyle]="{ 'border-top-color': resource.color }"
   >
-    <!-- top Title bar -->
-    <div
-      class="tw-flex tw-flex-row tw-w-full tw-flex-wrap sm:tw-flex-nowrap tw-items-center tw-justify-between"
+    <!-- Header: resource, category, active period, headline figures -->
+    <header
+      class="tw-flex tw-flex-col sm:tw-flex-row sm:tw-items-start sm:tw-justify-between tw-gap-2 sm:tw-gap-6 tw-pb-4 tw-border-b tw-border-slate-100"
     >
-      <div class="tw-flex tw-flex-col tw-items-start sm:tw-w-1/4">
+      <div class="tw-min-w-0 tw-flex tw-flex-row tw-items-center tw-gap-4">
+        <!-- Logo in a fixed box so every logo takes the same space; colour dot without one -->
         <a
-          class="tw-font-bold tw-text-lg sm:tw-text-xl tw-font-dm-sans sm:tw-pr-2 hover:tw-underline"
+          *ngIf="resource.logo && !logoFailed"
+          class="tw-shrink-0"
           [routerLink]="['/resources', resource.resource_id]"
-          [ngStyle]="{ color: resource.color }"
-          >{{ resource.resource_name }}</a
+          tabindex="-1"
+          aria-hidden="true"
         >
-        <span
-          class="tw-block tw-text-gray-500 tw-font-bold tw-font-dm-sans tw-text-xs sm:tw-text-sm tw-ml-1 sm:tw-ml-0 tw-align-middle"
-          >{{ resource.resource_long_name }}</span
-        >
+          <img
+            [src]="resource.logo"
+            alt=""
+            loading="lazy"
+            class="tw-h-12 tw-w-20 tw-object-contain tw-object-left"
+            (error)="logoFailed = true"
+          />
+        </a>
+        <div class="tw-min-w-0">
+          <div class="tw-flex tw-flex-row tw-items-center tw-gap-2">
+            <span
+              *ngIf="!resource.logo || logoFailed"
+              class="tw-h-2.5 tw-w-2.5 tw-shrink-0 tw-rounded-full tw-bg-slate-400"
+              [ngStyle]="{ 'background-color': resource.color }"
+            ></span>
+            <a
+              class="tw-font-semibold tw-text-lg tw-font-dm-sans tw-text-gray-900 hover:tw-underline"
+              [routerLink]="['/resources', resource.resource_id]"
+              >{{ resource.resource_name }}</a
+            >
+          </div>
+          <p class="tw-mt-0.5 tw-text-sm tw-text-slate-500">
+            {{ subtitle(resource) }}
+          </p>
+        </div>
       </div>
 
-      <div
-        class="sm:tw-grow tw-flex tw-flex-row tw-flex-wrap tw-justify-center sm:tw-justify-normal tw-w-full sm:tw-w-3/4"
+      <!-- Headline figures: this person's contributions to the resource -->
+      <dl
+        class="tw-flex tw-flex-row tw-flex-wrap tw-gap-x-6 sm:tw-gap-x-8 tw-gap-y-3 tw-shrink-0"
       >
+        <div>
+          <dt class="tw-text-xs tw-text-slate-500">Contributions</dt>
+          <dd class="tw-text-xl tw-font-semibold tw-text-gray-900 tw-tabular-nums">
+            {{ statistics.total_count | number }}
+          </dd>
+        </div>
+        <div *ngIf="statistics.badges_count > 0">
+          <dt class="tw-text-xs tw-text-slate-500">Badges</dt>
+          <dd class="tw-text-xl tw-font-semibold tw-text-gray-900 tw-tabular-nums">
+            {{ statistics.badges_count | number }}
+          </dd>
+        </div>
+        <div *ngIf="statistics.medals_count > 0">
+          <dt class="tw-text-xs tw-text-slate-500">Medals</dt>
+          <dd class="tw-text-xl tw-font-semibold tw-text-gray-900 tw-tabular-nums">
+            {{ statistics.medals_count | number }}
+          </dd>
+        </div>
+        <div *ngIf="firstContribution">
+          <dt class="tw-text-xs tw-text-slate-500">First contribution</dt>
+          <dd class="tw-text-xl tw-font-semibold tw-text-gray-900">
+            {{ firstContribution | date: "MMM y" }}
+          </dd>
+        </div>
+        <div *ngIf="latestContribution">
+          <dt class="tw-text-xs tw-text-slate-500">Latest contribution</dt>
+          <dd class="tw-text-xl tw-font-semibold tw-text-gray-900">
+            {{ latestContribution | date: "MMM y" }}
+          </dd>
+        </div>
+      </dl>
+    </header>
+
+    <!-- Left: what was done (activities, then latest contributions); right: achievements -->
+    <ng-container
+      *ngIf="{
+        bars: (activityBars$ | async) ?? [],
+        medals: (medals$ | async) ?? [],
+        badges: (badges$ | async) ?? [],
+        contributions: contributions$ | async
+      } as data"
+    >
+      <div class="tw-grid tw-grid-cols-1 lg:tw-grid-cols-3 tw-gap-8">
         <div
-          *ngFor="let reward of rewards$ | async"
-          class="tw-px-1 tw-py-2 tw-w-1/5"
+          class="tw-min-w-0 tw-flex tw-flex-col tw-gap-8"
+          [ngClass]="
+            data.medals.length || data.badges.length
+              ? 'lg:tw-col-span-2'
+              : 'lg:tw-col-span-3'
+          "
         >
-          <reward-card
-            [icon_src]="reward.icon_src"
-            [value_text]="reward.value_text"
-            [label_text]="reward.label_text"
-            [color]="resource.color"
-          ></reward-card>
+          <section *ngIf="data.bars.length">
+            <section-header heading="Contributions by activity"></section-header>
+            <activity-bars
+              [bars]="data.bars"
+              [color]="resource.color"
+            ></activity-bars>
+          </section>
+
+          <section *ngIf="data.contributions">
+            <section-header
+              heading="Latest contributions"
+              [actionLabel]="
+                data.contributions.length > 0 ? 'View all' : undefined
+              "
+              (action)="open_details = true"
+            ></section-header>
+            <contribution-list
+              [rows]="data.contributions"
+              [color]="resource.color"
+            ></contribution-list>
+          </section>
         </div>
-      </div>
-    </div>
-    <!-- Medals List -->
-    <ng-container *ngIf="medals$ | async as medals">
-      <div
-        class="tw-flex tw-flex-row tw-flex-wrap tw-justify-start"
-        *ngIf="medals.data.length > 0"
-      >
-        <div class="tw-w-full tw-flex tw-flex-row tw-justify-between">
-          <span
-            class="tw-font-bold tw-text-gray-500 tw-font-dm-sans tw-capitalize tw-text-sm"
-            >{{ curator.displayedName }}'s Earned Medals</span
-          >
-          <button
-            class="tw-text-sm tw-text-blue-500 tw-underline"
-            (click)="open_medal_details = true"
-          >
-            View Details
-          </button>
-        </div>
-        <div
-          *ngFor="let medal of medals.data"
-          class="tw-w-1/2 sm:tw-w-1/4 tw-p-1"
-        >
-          <medal-card [medal]="medal"></medal-card>
-        </div>
+
+        <achievement-list
+          *ngIf="data.medals.length || data.badges.length"
+          class="tw-min-w-0"
+          [medals]="data.medals"
+          [badges]="data.badges"
+          (allMedals)="open_medal_details = true"
+          (allBadges)="open_badge_details = true"
+        ></achievement-list>
       </div>
     </ng-container>
-
-    <div class="tw-flex tw-flex-row tw-flex-wrap sm:tw-flex-nowrap">
-      <!-- Badges list -->
-      <ng-container *ngIf="badges$ | async as badges">
-        <div
-          class="tw-w-full sm:tw-w-1/2 tw-flex-grow tw-flex tw-flex-col tw-content-start tw-px-1 tw-py-2 tw-z-10"
-          *ngIf="badges.data.length > 0"
-        >
-          <div
-            class="tw-w-full tw-flex tw-flex-row tw-justify-between sm:tw-px-2"
-          >
-            <span class="tw-text-sm tw-font-bold tw-text-gray-500"
-              >{{ curator.displayedName }}'s Earned Badges</span
-            >
-            <button
-              class="tw-text-sm tw-text-blue-500 tw-underline"
-              (click)="open_badge_details = true"
-            >
-              View Details
-            </button>
-          </div>
-          <div
-            class="tw-w-full tw-flex tw-flex-row tw-items-start tw-grow tw-flex-wrap tw-@container"
-            [ngClass]="{ 'tw-items-stretch': badges.data.length == 4 }"
-          >
-            <div
-              class="@2xl:tw-w-1/4 tw-w-1/2 tw-self-stretch tw-flex-shrink tw-p-2"
-              *ngFor="let badge of badges.data"
-            >
-              <badge-card [badge]="badge" [terms]="terms$ | async"></badge-card>
-            </div>
-          </div>
-        </div>
-      </ng-container>
-
-      <!-- Latest Contributions List -->
-      <div
-        class="tw-w-full sm:tw-w-1/2 tw-flex-grow tw-flex tw-flex-row tw-content-start tw-flex-wrap tw-px-1 tw-py-2 tw-@container"
-        *ngIf="reportsWithTerms$ | async as reports"
-      >
-        <div
-          class="tw-w-full tw-flex tw-flex-row tw-justify-between sm:tw-px-2"
-        >
-          <span
-            class="tw-text-sm tw-font-bold tw-text-gray-500 tw-font-dm-sans tw-capitalize"
-            >{{ curator.displayedName }}'s Latest Contributions</span
-          >
-          <button
-            class="tw-text-sm tw-text-blue-500 tw-underline"
-            (click)="open_details = true"
-          >
-            View Details
-          </button>
-        </div>
-
-        <div
-          class="@2xl:tw-w-1/4 tw-w-1/2 tw-flex-shrink tw-p-2"
-          *ngFor="let report of reports"
-        >
-          <report-card [term]="report.term" [report]="report"></report-card>
-        </div>
-      </div>
-    </div>
-  </div>
+  </article>
 </ng-container>
 
 <slide-over-panel [(openPanel)]="open_details">
@@ -137,7 +143,7 @@
         class="tw-text-base tw-font-semibold tw-leading-6 tw-text-gray-900"
         id="slide-over-title"
       >
-        {{ curator.displayedName }}'s Contributions to
+        {{ curator.displayedName }}'s contributions to
         <span [ngStyle]="{ color: resource.color }">{{
           resource.resource_name
         }}</span>
