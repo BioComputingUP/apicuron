@@ -1,0 +1,96 @@
+<section class="tw-bg-white tw-border-b tw-border-slate-200">
+  <div
+    class="tw-mx-auto tw-max-w-7xl tw-px-4 sm:tw-px-8 2xl:tw-px-0 tw-py-6 sm:tw-py-8 tw-flex tw-flex-col tw-gap-4"
+  >
+    <div class="tw-flex tw-flex-col sm:tw-flex-row tw-items-start tw-gap-4 sm:tw-gap-6">
+      <div class="tw-flex tw-flex-row tw-items-center tw-gap-4 sm:tw-gap-6 tw-min-w-0 tw-grow">
+        <img
+          [src]="user.avatar"
+          alt=""
+          class="tw-h-20 tw-w-20 sm:tw-h-24 sm:tw-w-24 tw-shrink-0 tw-rounded-full tw-bg-slate-100 tw-object-cover tw-ring-1 tw-ring-slate-200"
+        />
+        <div class="tw-min-w-0 tw-flex tw-flex-col tw-gap-1">
+          <h1
+            class="tw-text-2xl sm:tw-text-3xl tw-font-bold tw-font-dm-sans tw-text-gray-900 tw-break-words"
+          >
+            {{ user.displayedName }}
+          </h1>
+          <a
+            class="tw-inline-flex tw-items-center tw-gap-1.5 tw-w-fit tw-text-sm tw-text-slate-600 hover:tw-text-slate-900 hover:tw-underline"
+            [href]="user.orcid_url"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="ORCID record"
+          >
+            <img
+              class="tw-h-4 tw-w-4"
+              src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
+              alt="ORCID iD"
+            />
+            {{ user.orcid_id }}
+          </a>
+          <p *ngIf="user.affiliation" class="tw-text-sm tw-text-slate-600">
+            {{ user.affiliation }}
+          </p>
+        </div>
+      </div>
+
+      <div class="tw-flex tw-flex-row tw-flex-wrap tw-items-center tw-gap-3 sm:tw-shrink-0">
+        <social-links [links]="user.links"></social-links>
+        <button
+          type="button"
+          class="tw-inline-flex tw-items-center tw-gap-2 tw-rounded-md tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-1.5 tw-text-sm tw-font-medium tw-text-slate-700 hover:tw-bg-slate-50"
+          (click)="share()"
+        >
+          <svg
+            class="tw-h-4 tw-w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+            <polyline points="16 6 12 2 8 6" />
+            <line x1="12" y1="2" x2="12" y2="15" />
+          </svg>
+          <span aria-live="polite">{{
+            shareState === "copied"
+              ? "Link copied"
+              : shareState === "failed"
+              ? "Copy failed"
+              : "Share profile"
+          }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="biography" class="tw-max-w-4xl tw-text-sm sm:tw-text-base tw-text-slate-600">
+      <p
+        class="tw-leading-relaxed tw-whitespace-pre-line"
+        [ngClass]="{ 'tw-line-clamp-3': isLongBiography && !biographyExpanded }"
+      >
+        {{ biography }}
+      </p>
+      <button
+        *ngIf="isLongBiography"
+        type="button"
+        class="tw-mt-1 tw-text-sm tw-text-blue-600 hover:tw-underline"
+        (click)="toggleBiography()"
+      >
+        {{ biographyExpanded ? "Show less" : "Show more" }}
+      </button>
+    </div>
+
+    <ul *ngIf="keywords.length" class="tw-flex tw-flex-row tw-flex-wrap tw-gap-2">
+      <li
+        *ngFor="let keyword of keywords"
+        class="tw-rounded tw-border tw-border-slate-200 tw-bg-slate-50 tw-px-2 tw-py-0.5 tw-text-xs tw-font-medium tw-text-slate-600"
+      >
+        {{ keyword }}
+      </li>
+    </ul>
+  </div>
+</section>
