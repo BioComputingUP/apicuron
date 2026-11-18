@@ -24,6 +24,11 @@ export interface ProfileResourceEntry {
   resource: Resource | null;
 }
 
+/** the profile to show, or null when the API does not return it (private or unknown) */
+export interface ProfileView {
+  user: User | null;
+}
+
 /** up to this many resources, the profile opens on the "All" tab */
 const ALL_TAB_MAX_RESOURCES = 3;
 
@@ -34,6 +39,7 @@ const ALL_TAB_MAX_RESOURCES = 3;
 })
 export class CuratorPageComponent implements OnInit {
   curator$: Observable<User>;
+  profile$: Observable<ProfileView>;
   orcidId$: Observable<string>;
   statistics$: Observable<CuratorStatistics[]>;
   entries$: Observable<ProfileResourceEntry[]>;
@@ -67,6 +73,12 @@ export class CuratorPageComponent implements OnInit {
 
     this.curatorPageService.init(this.orcidId$);
     this.curator$ = this.curatorPageService.getCurator();
+    // the API answers the same for a private and an unknown profile; so does the page
+    this.profile$ = this.curator$.pipe(
+      map((user): ProfileView => ({ user })),
+      catchError(() => of<ProfileView>({ user: null })),
+      shareReplay(1)
+    );
     this.statistics$ = this.curatorPageService.getStatistics();
 
     this.entries$ = this.statistics$.pipe(

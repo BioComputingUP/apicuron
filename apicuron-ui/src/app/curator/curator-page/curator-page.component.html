@@ -1,8 +1,46 @@
-<ng-container *ngIf="curator$ | async as curator">
-  <!-- Who the person is: full-width band right under the navbar -->
-  <profile-header [user]="curator"></profile-header>
+<ng-container *ngIf="profile$ | async as profile">
+  <div
+    *ngIf="!profile.user"
+    class="tw-mx-auto tw-max-w-2xl tw-px-4 tw-py-16 tw-text-center"
+  >
+    <h1 class="tw-text-2xl tw-font-semibold tw-font-dm-sans tw-text-gray-900">
+      Profile not available
+    </h1>
+    <p class="tw-mt-3 tw-text-slate-600">
+      This profile is private or does not exist on APICURON.
+    </p>
+    <p class="tw-mt-1 tw-text-sm tw-text-slate-500">
+      If it is your profile, log in to see it.
+    </p>
+    <a
+      routerLink="/contributors"
+      class="tw-mt-6 tw-inline-flex tw-rounded-md tw-border tw-border-slate-300 tw-bg-white tw-px-4 tw-py-2 tw-text-sm tw-font-medium tw-text-slate-700 hover:tw-bg-slate-50"
+      >Browse contributors</a
+    >
+  </div>
+</ng-container>
+
+<ng-container *ngIf="(profile$ | async)?.user as contributor">
+  <profile-header [user]="contributor"></profile-header>
 
   <div class="tw-mx-auto tw-max-w-7xl tw-px-4 sm:tw-px-8 2xl:tw-px-0 tw-pt-6 tw-pb-10">
+    <div
+      *ngIf="contributor.privacy === 'private'"
+      role="status"
+      class="tw-mb-6 tw-flex tw-flex-col sm:tw-flex-row sm:tw-items-center sm:tw-justify-between tw-gap-3 tw-rounded-lg tw-border tw-border-amber-200 tw-bg-amber-50 tw-px-4 sm:tw-px-6 tw-py-3 tw-text-sm tw-text-amber-900"
+    >
+      <p>
+        <span class="tw-font-semibold">Your profile is private.</span>
+        Only you can see this page; other visitors are told it is not
+        available.
+      </p>
+      <a
+        routerLink="/dashboard/profile"
+        class="tw-shrink-0 tw-rounded-md tw-border tw-border-amber-300 tw-bg-white tw-px-3 tw-py-1.5 tw-font-medium tw-text-amber-900 hover:tw-bg-amber-100"
+        >Change privacy</a
+      >
+    </div>
+
     <!-- BIP! Scholar indicators stay on top of the resources -->
     <app-bip-scores-grid [orcidId]="orcidId$ | async"></app-bip-scores-grid>
 
@@ -59,7 +97,7 @@
           <curator-stat-card
             *ngIf="isShown(entry)"
             [statistics]="entry.statistics"
-            [curator]="curator"
+            [curator]="contributor"
             [resource]="entry.resource ?? undefined"
           ></curator-stat-card>
         </ng-container>
