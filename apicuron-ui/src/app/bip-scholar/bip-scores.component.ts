@@ -8,28 +8,11 @@ import {
 } from "rxjs";
 import { BipScholarSection } from "src/app/models/external/bip-scholar.model";
 
-import { Injectable } from "@angular/core";
-import { BehaviorSubject, map } from "rxjs";
+import { map } from "rxjs";
 import { environment } from "src/environments/environment";
 import { AuthService } from "../auth/auth.service";
 import { BipScholarService } from "./services/bip-scholar.service";
 
-@Injectable({
-  providedIn: "root",
-})
-export class BipScoresTooltipManager {
-  // This service manages the active tooltip state across different sections for the Bip Scholar component.
-  private activeTooltipSubject = new BehaviorSubject<string | null>(null);
-  activeTooltip$ = this.activeTooltipSubject.asObservable();
-
-  setActiveTooltip(tooltipId: string | null): void {
-    this.activeTooltipSubject.next(tooltipId);
-  }
-
-  clearTooltip(): void {
-    this.activeTooltipSubject.next(null);
-  }
-}
 @Component({
   selector: "app-bip-scores-grid",
   templateUrl: "bip-scores.component.html",
