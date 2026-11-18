@@ -9,7 +9,11 @@ import {
   Deserializable,
   Serializable,
 } from "src/app/interfaces/deserializable.model";
-import { ResourceCategory, ResourceCategoryLabels } from "./types/enums";
+import {
+  ResourceCategory,
+  ResourceCategoryLabels,
+  ResourceOutputTypes,
+} from "./types/enums";
 
 export class ResourceStats implements Deserializable {
   contributionCount: any;
@@ -101,6 +105,11 @@ export class Resource implements Deserializable, Serializable {
 
   categoryLabel(): string {
     return ResourceCategoryLabels[this.category];
+  }
+
+  /** NTO registry output type: Data, Software or Training */
+  outputType(): string {
+    return ResourceOutputTypes[this.category];
   }
 
   compare(other: Resource): boolean {

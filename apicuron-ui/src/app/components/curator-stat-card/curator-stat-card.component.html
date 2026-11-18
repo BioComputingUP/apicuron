@@ -36,11 +36,11 @@
               [routerLink]="['/resources', resource.resource_id]"
               >{{ resource.resource_name }}</a
             >
-            <!-- Resource type as a tag, so it does not read as part of the long name -->
+            <!-- Output type as a tag, so it does not read as part of the long name -->
             <span
-              *ngIf="resource.categoryLabel()"
+              *ngIf="resource.outputType()"
               class="tw-rounded tw-border tw-border-slate-200 tw-bg-slate-50 tw-px-2 tw-py-0.5 tw-text-xs tw-font-medium tw-text-slate-600"
-              >{{ resource.categoryLabel() }}</span
+              >{{ resource.outputType() }}</span
             >
           </div>
           <p

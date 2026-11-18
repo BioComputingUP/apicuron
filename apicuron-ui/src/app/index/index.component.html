@@ -43,8 +43,24 @@
           <strong class="tw-font-semibold tw-text-gray-900">public profile</strong>
           they can share.
         </p>
+        <!-- ORCID link: contributions of logged-in users are added to their ORCID record -->
+        <p class="tw-flex tw-flex-row tw-items-start tw-gap-2">
+          <img
+            src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
+            alt=""
+            class="tw-mt-1 tw-h-5 tw-w-5 tw-shrink-0"
+          />
+          <span>
+            Linked to <strong class="tw-font-semibold tw-text-gray-900">ORCID</strong>:
+            log in with your ORCID iD and APICURON adds your contributions to
+            your ORCID record.
+          </span>
+        </p>
+        <!-- One line per role: contributors, then resource managers -->
         <p class="tw-text-base tw-text-gray-600">
           Contributor to a partner resource or repository? Search your name.
+        </p>
+        <p class="tw-text-base tw-text-gray-600">
           Running a resource or repository? Contact us to join.
           <a
             routerLink="/about"
@@ -63,30 +79,49 @@
             What we track
           </h2>
           <ul class="tw-grid tw-grid-cols-1 sm:tw-grid-cols-3 tw-gap-3">
-            <li
-              *ngFor="let output of trackedOutputs"
-              class="tw-rounded-lg tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-shadow-sm"
-            >
-              <div
-                class="tw-flex tw-flex-row tw-items-center tw-gap-2 tw-font-semibold tw-text-gray-900"
+            <!-- the whole card links to the output type on the NTO Registry; the corner arrow shows it -->
+            <li *ngFor="let output of trackedOutputs">
+              <a
+                [href]="output.link"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="See on NTO Registry"
+                [attr.aria-label]="output.name + ': ' + output.description + '. On the NTO Registry (opens in a new tab)'"
+                class="tw-group tw-relative tw-block tw-h-full tw-rounded-lg tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-shadow-sm tw-transition hover:tw-border-apicuron-red/40 hover:tw-shadow-md focus-visible:tw-outline focus-visible:tw-outline-2 focus-visible:tw-outline-apicuron-red"
               >
                 <svg
-                  class="tw-h-5 tw-w-5 tw-shrink-0 tw-text-apicuron-red"
+                  class="tw-absolute tw-right-3 tw-top-3 tw-h-4 tw-w-4 tw-text-slate-400 tw-transition group-hover:tw-text-apicuron-red"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="1.8"
+                  stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   viewBox="0 0 24 24"
                   aria-hidden="true"
                 >
-                  <path [attr.d]="output.icon" />
+                  <path d="M7 17L17 7M8 7h9v9" />
                 </svg>
-                {{ output.name }}
-              </div>
-              <p class="tw-mt-1 tw-text-sm tw-text-slate-600">
-                {{ output.description }}
-              </p>
+                <div
+                  class="tw-flex tw-flex-row tw-items-center tw-gap-2 tw-pr-6 tw-font-semibold tw-text-gray-900"
+                >
+                  <svg
+                    class="tw-h-5 tw-w-5 tw-shrink-0 tw-text-apicuron-red"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path [attr.d]="output.icon" />
+                  </svg>
+                  {{ output.name }}
+                </div>
+                <p class="tw-mt-1 tw-text-sm tw-text-slate-600">
+                  {{ output.description }}
+                </p>
+              </a>
             </li>
           </ul>
         </div>
