@@ -1,6 +1,7 @@
 import { Component } from "@angular/core";
 import { Router } from "@angular/router";
 import { Observable } from "rxjs";
+import { shareReplay } from "rxjs/operators";
 import { Resource } from "../models/resource.model";
 import { ResourcesService } from "../resource/service/resources.service";
 
@@ -48,7 +49,8 @@ export class IndexComponent {
     protected resourceService: ResourcesService,
     private router: Router
   ) {
-    this.resources$ = this.resourceService.getAllResources();
+    // one request for the resource grid and the numbers band
+    this.resources$ = this.resourceService.getAllResources().pipe(shareReplay(1));
   }
 
   /** opens the profile for a full ORCID iD (names are the only searched field), otherwise searches names */

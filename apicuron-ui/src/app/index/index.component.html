@@ -136,7 +136,9 @@
     </div>
   </section>
 
-  <index-numbers-banner></index-numbers-banner>
+  <index-numbers-banner
+    [resources]="resources$ | async"
+  ></index-numbers-banner>
   <div class="tw-p-2 tw-pb-2 md:tw-pb-4">
     <h2
       class="tw-text-4xl tw-font-dm-sans tw-py-2 tw-font-bold tw-text-center tw-text-gray-900"
