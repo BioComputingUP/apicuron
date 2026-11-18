@@ -25,7 +25,7 @@
           />
         </a>
         <div class="tw-min-w-0">
-          <div class="tw-flex tw-flex-row tw-items-center tw-gap-2">
+          <div class="tw-flex tw-flex-row tw-flex-wrap tw-items-center tw-gap-x-2 tw-gap-y-1">
             <span
               *ngIf="!resource.logo || logoFailed"
               class="tw-h-2.5 tw-w-2.5 tw-shrink-0 tw-rounded-full tw-bg-slate-400"
@@ -36,9 +36,21 @@
               [routerLink]="['/resources', resource.resource_id]"
               >{{ resource.resource_name }}</a
             >
+            <!-- Resource type as a tag, so it does not read as part of the long name -->
+            <span
+              *ngIf="resource.categoryLabel()"
+              class="tw-rounded tw-border tw-border-slate-200 tw-bg-slate-50 tw-px-2 tw-py-0.5 tw-text-xs tw-font-medium tw-text-slate-600"
+              >{{ resource.categoryLabel() }}</span
+            >
           </div>
-          <p class="tw-mt-0.5 tw-text-sm tw-text-slate-500">
-            {{ subtitle(resource) }}
+          <p
+            *ngIf="
+              resource.resource_long_name &&
+              resource.resource_long_name !== resource.resource_name
+            "
+            class="tw-mt-0.5 tw-text-sm tw-text-slate-500"
+          >
+            {{ resource.resource_long_name }}
           </p>
         </div>
       </div>

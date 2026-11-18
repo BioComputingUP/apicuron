@@ -167,16 +167,7 @@ export class CuratorStatCardComponent implements OnInit {
       map((badges) => badges.data.filter((badge) => badge.state === "achieved")),
       catchError(() => of([]))
     );
-  }
-  /** long name (when it adds something) and category, e.g. "Intrinsically Disordered Protein Ontology · Software" */
-  subtitle(resource: Resource): string {
-    const longName =
-      resource.resource_long_name !== resource.resource_name
-        ? resource.resource_long_name
-        : "";
-    return [longName, resource.categoryLabel()].filter(Boolean).join(" · ");
-  }
-}
+  }}
 
 function validDate(value: Date | string | number | undefined): Date | null {
   const date = value ? new Date(value) : null;
