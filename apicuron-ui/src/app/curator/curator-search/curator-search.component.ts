@@ -113,7 +113,7 @@ export class CuratorSearchComponent
   search_fields = [
     {
       field: "displayedName",
-      text: "Biocurator name",
+      text: "Contributor name",
     },
     {
       field: "orcid_id",

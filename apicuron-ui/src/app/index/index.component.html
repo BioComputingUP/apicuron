@@ -1,88 +1,233 @@
-<div class="tw-bg-gray-200 tw-py-4 tw-px-0">
-  <div
-    class="tw-flex tw-flex-row tw-justify-between tw-flex-wrap world-map tw-mx-auto tw-max-w-7xl tw-px-2 sm:tw-px-8 2xl:tw-px-0 tw-py-4 2xl:tw-py-8"
-  >
-    <div class="tw-w-full tw-pb-4">
-      <svg-icon
-        svgClass="img-fluid tw-align-baseline"
-        src="../assets/APICURON.svg"
-      ></svg-icon>
-    </div>
-    <div class="lg:tw-w-1/3 xl:tw-1/4 tw-w-full">
-      <p
-        class="tw-font-dm-sans tw-leading-6 tw-text-lg tw-text-gray-800 tw-text-justify"
-      >
-        The platform to credit and acknowledge scientific contributions.<br /><br />
-
-        <strong class="tw-font-bold">APICURON</strong> collects and aggregates
-        activity events from third party resources and generates
-        <strong class="font-bold">statistics</strong>, <strong class="font-bold">achievements</strong> and
-        <strong class="tw-font-bold">leaderboards !</strong><br /><br />
-
-        If you are a contributor to a partner resource and want to appear here ask the partner resource
-        manager to contact us.
-        <a routerLink="/about" class="tw-underline tw-italic"> Read more</a>
-      </p>
-    </div>
-
+<div class="tw-bg-gray-200 tw-px-0">
+  <!-- Hero: what APICURON credits, what it tracks, and a way in for contributors -->
+  <section class="dot-grid tw-bg-slate-50 tw-border-b tw-border-slate-200">
     <div
-      class="lg:tw-w-1/3 xl:tw-1/4 tw-w-full tw-flex tw-justify-center sm:tw-justify-end lg:tw-tw-justify-start tw-mt-6 md:tw-mt-0"
+      class="tw-mx-auto tw-max-w-7xl tw-px-4 sm:tw-px-8 2xl:tw-px-0 tw-py-8 lg:tw-py-12"
     >
-      <div>
-        <label class="tw-font-dm-sans tw-text-gray-800" for=""
-          >Search Contributors</label
-        >
-        <div class="tw-flex tw-flex-row tw-items-stretch">
-          <input
-            class="tw-p-2 tw-font-dm-sans tw-text-gray-600 tw-text-lg xl:tw-w-64 tw-w-48 tw-outline-none tw-border tw-rounded-tl-md tw-rounded-bl-md tw-border-apicuron-purple"
-            placeholder="Search"
-            type="text"
-            name="search"
-            id="search-biocurators"
-            [(ngModel)]="search_biocurators_text"
-          />
-          <button
-            class="tw-bg-apicuron-purple tw-rounded-tr-md tw-rounded-br-md tw-text-white tw-p-2"
-            [routerLink]="'/contributors'"
-            [queryParams]="{ search: search_biocurators_text }"
+      <h1 class="tw-sr-only">APICURON</h1>
+      <svg-icon
+        svgClass="tw-h-10 sm:tw-h-12 tw-w-auto"
+        src="assets/APICURON.svg"
+        aria-hidden="true"
+      ></svg-icon>
+
+      <p
+        class="tw-mt-6 tw-max-w-4xl tw-font-dm-sans tw-text-3xl sm:tw-text-4xl lg:tw-text-5xl tw-font-bold tw-leading-tight tw-text-gray-900"
+      >
+        Credit for the work that keeps
+        <span class="tw-text-apicuron-red">science running.</span>
+      </p>
+
+      <div
+        class="tw-mt-5 tw-max-w-5xl tw-space-y-3 tw-text-base lg:tw-text-lg tw-leading-relaxed tw-text-gray-700"
+      >
+        <p>
+          Publications and their metrics capture only part of research. Much of
+          the work that sustains it goes unrecognised: curated data, research
+          software, training materials and more.
+          The
+          <a
+            href="https://nto-registry.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="tw-font-medium tw-text-apicuron-red tw-underline hover:tw-no-underline"
+            >NTO Registry</a
           >
-            <svg
-              class="tw-w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
+          calls these non-traditional research outputs (NTOs).
+          APICURON collects contribution events from partner resources,
+          currently covering data curation, research software and training. It
+          turns them into <strong class="tw-font-semibold tw-text-gray-900">statistics</strong>,
+          <strong class="tw-font-semibold tw-text-gray-900">achievements</strong>
+          and <strong class="tw-font-semibold tw-text-gray-900">leaderboards</strong>,
+          and gives every contributor a
+          <strong class="tw-font-semibold tw-text-gray-900">public profile</strong>
+          they can share.
+        </p>
+        <p class="tw-text-base tw-text-gray-600">
+          Contributor to a partner resource or repository? Search your name.
+          Running a resource or repository? Contact us to join.
+          <a
+            routerLink="/about"
+            class="tw-font-medium tw-text-apicuron-red tw-underline hover:tw-no-underline"
+            >Read more</a
+          >
+        </p>
+      </div>
+
+      <div class="tw-mt-8 tw-grid tw-grid-cols-1 lg:tw-grid-cols-4 tw-gap-6">
+        <!-- What we track: Data covers the Database and Knowledge Base categories -->
+        <div class="lg:tw-col-span-3">
+          <h2
+            class="tw-mb-2 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-wider tw-text-slate-500"
+          >
+            What we track
+          </h2>
+          <ul class="tw-grid tw-grid-cols-1 sm:tw-grid-cols-3 tw-gap-3">
+            <li
+              *ngFor="let output of trackedOutputs"
+              class="tw-rounded-lg tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-shadow-sm"
             >
-              <path
+              <div
+                class="tw-flex tw-flex-row tw-items-center tw-gap-2 tw-font-semibold tw-text-gray-900"
+              >
+                <svg
+                  class="tw-h-5 tw-w-5 tw-shrink-0 tw-text-apicuron-red"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path [attr.d]="output.icon" />
+                </svg>
+                {{ output.name }}
+              </div>
+              <p class="tw-mt-1 tw-text-sm tw-text-slate-600">
+                {{ output.description }}
+              </p>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Contributor search: a full ORCID iD opens the profile, anything else searches names -->
+        <div>
+          <h2
+            class="tw-mb-2 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-wider tw-text-slate-500"
+          >
+            <label for="search-contributors">Search contributors</label>
+          </h2>
+          <form
+            role="search"
+            class="tw-flex tw-flex-row tw-rounded-lg tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-shadow-sm"
+            (ngSubmit)="searchContributors()"
+          >
+            <input
+              id="search-contributors"
+              name="search"
+              type="search"
+              placeholder="Name or ORCID iD"
+              autocomplete="off"
+              class="tw-min-w-0 tw-flex-1 tw-rounded-l-md tw-border tw-border-r-0 tw-border-slate-300 tw-px-3 tw-py-2 tw-text-gray-800 focus:tw-border-apicuron-purple focus:tw-outline-none"
+              [(ngModel)]="searchText"
+            />
+            <button
+              type="submit"
+              class="tw-rounded-r-md tw-bg-apicuron-purple tw-px-3 tw-text-white hover:tw-bg-apicuron-red"
+              aria-label="Search contributors"
+            >
+              <svg
+                class="tw-h-5 tw-w-5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
-                d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"
-              />
-            </svg>
-          </button>
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" />
+              </svg>
+            </button>
+          </form>
         </div>
       </div>
     </div>
-  </div>
-  <index-numbers-banner></index-numbers-banner>
-  <div class="tw-p-2 tw-pb-2 md:tw-pb-4">
+  </section>
+
+  <index-numbers-banner
+    [resources]="resources$ | async"
+  ></index-numbers-banner>
+  <!-- Partner resources: filter by category chip and by name -->
+  <section
+    class="tw-mx-auto tw-max-w-7xl tw-px-4 sm:tw-px-8 2xl:tw-px-0 tw-pt-8 tw-pb-6"
+    *ngIf="browser$ | async as browser"
+  >
     <h2
-      class="tw-text-4xl tw-font-dm-sans tw-py-2 tw-font-bold tw-text-center tw-text-gray-900"
+      class="tw-text-3xl md:tw-text-4xl tw-font-dm-sans tw-font-bold tw-text-center tw-text-gray-900"
     >
       Partner Resources
     </h2>
+
     <div
-      class="tw-mx-auto tw-max-w-7xl tw-flex tw-flex-row tw-flex-wrap"
-      *ngIf="resources$ | async as resources"
+      class="tw-mt-5 tw-flex tw-flex-col md:tw-flex-row md:tw-items-center md:tw-justify-between tw-gap-3"
     >
       <div
-        *ngFor="let database of resources"
-        class="tw-w-full md:tw-w-1/2 tw-p-1 md:tw-p-2 xl:tw-p-4"
+        class="tw-flex tw-flex-row tw-flex-wrap tw-gap-2"
+        role="group"
+        aria-label="Filter by resource type"
       >
-        <partner-resource [resource]="database"></partner-resource>
+        <button
+          *ngFor="let chip of browser.chips"
+          type="button"
+          class="tw-rounded-full tw-border tw-px-3 tw-py-1 tw-text-sm tw-font-medium"
+          [ngClass]="
+            (category$ | async) === chip.category
+              ? 'tw-border-apicuron-red tw-bg-apicuron-red tw-text-white'
+              : 'tw-border-slate-300 tw-bg-white tw-text-slate-700 hover:tw-bg-slate-50'
+          "
+          [attr.aria-pressed]="(category$ | async) === chip.category"
+          (click)="category$.next(chip.category)"
+        >
+          {{ chip.label }}
+          <span class="tw-ml-1 tw-opacity-70 tw-tabular-nums">{{ chip.count }}</span>
+        </button>
+      </div>
+
+      <div class="tw-relative md:tw-w-72">
+        <label for="search-resources" class="tw-sr-only">Search resources</label>
+        <svg
+          class="tw-pointer-events-none tw-absolute tw-left-3 tw-top-1/2 tw-h-4 tw-w-4 tw--translate-y-1/2 tw-text-slate-400"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" />
+        </svg>
+        <input
+          id="search-resources"
+          type="search"
+          placeholder="Search resources"
+          autocomplete="off"
+          class="tw-w-full tw-rounded-md tw-border tw-border-slate-300 tw-bg-white tw-py-2 tw-pl-9 tw-pr-3 tw-text-sm tw-text-gray-800 focus:tw-border-apicuron-purple focus:tw-outline-none"
+          [value]="resourceQuery$ | async"
+          (input)="resourceQuery$.next($any($event.target).value)"
+        />
       </div>
     </div>
-  </div>
+
+    <p class="tw-mt-3 tw-text-sm tw-text-slate-500" aria-live="polite">
+      Showing {{ browser.shown.length }} of {{ browser.total }} resources
+    </p>
+
+    <div
+      *ngIf="browser.shown.length; else noResources"
+      class="tw-mt-2 tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-4 xl:tw-gap-6"
+    >
+      <partner-resource
+        *ngFor="let resource of browser.shown; trackBy: trackResource"
+        [resource]="resource"
+      ></partner-resource>
+    </div>
+    <ng-template #noResources>
+      <div
+        class="tw-mt-2 tw-rounded-lg tw-border tw-border-dashed tw-border-slate-300 tw-bg-white tw-px-4 tw-py-10 tw-text-center"
+      >
+        <p class="tw-text-slate-600">No resources match.</p>
+        <button
+          type="button"
+          class="tw-mt-3 tw-rounded-md tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-1.5 tw-text-sm tw-font-medium tw-text-slate-700 hover:tw-bg-slate-50"
+          (click)="clearResourceFilters()"
+        >
+          Clear filters
+        </button>
+      </div>
+    </ng-template>
+  </section>
   <app-credit></app-credit>
 </div>

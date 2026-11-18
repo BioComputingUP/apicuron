@@ -1,55 +1,81 @@
 import { HttpClient } from "@angular/common/http";
-import { Component, OnInit } from "@angular/core";
-import { environment } from "../../../environments/environment";
-import { map } from "rxjs/operators";
+import { Component, Input } from "@angular/core";
 import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { Resource } from "../../models/resource.model";
+import { ResourceCategory } from "../../models/types/enums";
+import { environment } from "../../../environments/environment";
+
+interface HomeCounts {
+  user_count: number;
+  resource_count: number;
+  report_count: number;
+  achievement_count: number;
+}
+
+interface NumberElement {
+  icon: string;
+  count: number;
+  text: string;
+}
+
+interface CategoryCount {
+  label: string;
+  count: number;
+}
+
 @Component({
   selector: "index-numbers-banner",
   templateUrl: "./numbers-banner.component.html",
   styleUrls: ["./numbers-banner.component.scss"],
 })
-export class NumbersBannerComponent implements OnInit {
-  constructor(private httpClient: HttpClient) {
-    const route = environment.ws + "/home";
-    this.numberElements$ = this.httpClient.get(route).pipe(
-      map((response) => {
-        const count_list = [
-          response["user_count"],
-          response["resource_count"],
-          response["report_count"],
-          response["achievement_count"],
-        ];
+export class NumbersBannerComponent {
+  /** the partner resources listed on the page, for the per-category breakdown */
+  @Input() resources: Resource[] | null = null;
 
-        const numberElements = [
+  numberElements$: Observable<NumberElement[]>;
+
+  constructor(private httpClient: HttpClient) {
+    this.numberElements$ = this.httpClient
+      .get<HomeCounts>(environment.ws + "/home")
+      .pipe(
+        map((counts) => [
           {
             icon: "assets/user.svg",
-            count: 88,
-            text: "Registered contributors",
+            count: counts.user_count,
+            text: "Registered Contributors",
           },
           {
             icon: "assets/database.svg",
-            count: 3,
-            text: "partner resources",
+            count: counts.resource_count,
+            text: "Partner Resources",
           },
           {
             icon: "assets/curation-events.svg",
-            count: 43700,
+            count: counts.report_count,
             text: "Contribution Events",
           },
           {
             icon: "assets/medal_icon.svg",
-            count: 133,
+            count: counts.achievement_count,
             text: "Achievements",
           },
-        ];
-        return numberElements.map((el, index) => {
-          return { ...el, count: count_list[index] };
-        });
-      })
-    );
+        ])
+      );
   }
 
-  numberElements$: Observable<any>;
-
-  ngOnInit(): void {}
+  /** resources per output type, Data being Database + Knowledge Base; empty types are left out */
+  get categoryCounts(): CategoryCount[] {
+    const resources = this.resources ?? [];
+    const count = (...categories: ResourceCategory[]) =>
+      resources.filter((r) => categories.includes(r.category)).length;
+    return [
+      {
+        label: "Data",
+        count: count(ResourceCategory.Database, ResourceCategory.KnowledgeBase),
+      },
+      { label: "Software", count: count(ResourceCategory.Software) },
+      { label: "Training", count: count(ResourceCategory.Training) },
+    ].filter((c) => c.count > 0);
+  }
 }

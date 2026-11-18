@@ -1,26 +1,12 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from "@angular/core";
 
+/** One figure of the numbers band: icon (projected), count and label */
 @Component({
-  selector: 'app-number-element',
-  templateUrl: './number-element.component.html',
-  styleUrls: ['./number-element.component.scss']
+  selector: "app-number-element",
+  templateUrl: "./number-element.component.html",
+  styleUrls: ["./number-element.component.scss"],
 })
-export class NumberElementComponent implements OnInit {
-
-  @Input('text') text = 'Biocurators';
-  @Input('count') count = 65;
-
-
-  get count_text (){
-    if(this.count >= 1000){
-      return `${this.count / 1000}k`
-    }
-    return this.count
-  }
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
+export class NumberElementComponent {
+  @Input() text = "";
+  @Input() count = 0;
 }
