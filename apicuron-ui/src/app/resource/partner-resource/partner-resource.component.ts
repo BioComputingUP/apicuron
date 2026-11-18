@@ -2,10 +2,10 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Resource } from 'src/app/models/resource.model';
 import { ResourceCategory } from 'src/app/models/types/enums';
 
-// Color of the dot shown next to each resource category
+// Color of the dot shown next to each resource category; Database and Knowledge Base are both Data
 const CATEGORY_COLORS: Record<ResourceCategory, string> = {
   Database: 'tw-bg-green-500',
-  KnowledgeBase: 'tw-bg-blue-500',
+  KnowledgeBase: 'tw-bg-green-500',
   Software: 'tw-bg-gray-800',
   Training: 'tw-bg-orange-500',
 };

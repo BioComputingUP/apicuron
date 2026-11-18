@@ -18,3 +18,11 @@ export const ResourceCategoryLabels: Record<ResourceCategory, string> = {
     Software: "Software",
     Training: "Training",
 };
+
+// Output type of each category, as named by the NTO registry (Data covers Database and Knowledge Base)
+export const ResourceOutputTypes: Record<ResourceCategory, string> = {
+    Database: "Data",
+    KnowledgeBase: "Data",
+    Software: "Software",
+    Training: "Training",
+};
