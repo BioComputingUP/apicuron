@@ -22,7 +22,7 @@ export class User implements Deserializable {
     this._generate_avatar(input.avatar);
     this.orcid_url = new URL(this.orcid_id, environment.orcid_main_url);
     this.privacy = input.privacy ?? "public";
-    this.biography = input.biography ?? "Empty";
+    this.biography = input.biography ?? "";
     this.affiliation = input.affiliation ?? "";
     this.keywords = input.keywords ?? null;
     this.links = input.links ?? null;

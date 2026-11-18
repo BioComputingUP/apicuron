@@ -1,76 +1,73 @@
 <div [loadable]="vm$">
   <ng-container *ngIf="vm$ | async as vm">
-    <div
+    <section
       *ngIf="vm.bipScores || vm.isOwnProfile"
-      class="tw-bg-white tw-pb-4 tw-rounded-b-md tw-shadow-md tw-mb-4 tw-border-t-4 tw-border-slate-600"
+      class="tw-mb-6 tw-overflow-hidden tw-rounded-lg tw-border tw-border-slate-200 tw-border-t-[3px] tw-border-t-[#449D44] tw-bg-white tw-shadow-sm"
     >
-      <!-- Top banner -->
-      <div class="tw-col-span-2 lg:tw-col-span-4" *ngIf="vm.userOrcid">
-        <div
-          class="tw-flex tw-flex-row tw-bg-slate-100 tw-justify-between tw-items-center tw-px-4"
-        >
-          <div
-            class="tw-flex tw-flex-row tw-items-center tw-gap-4 tw-mb-2 tw-py-4"
-          >
-            <img
-              src="assets/logos/bip-scholar.png"
-              alt="BIP! Scholar logo"
-              class="tw-w-10"
-            />
-            <h1 class="tw-text-[1.3rem] tw-font-semibold">
-              Academic Profile Indicators
-            </h1>
+      <!-- Top accent in BIP! Scholar green, like the resource colour on resource cards -->
+      <!-- Header band: what this block is and where it comes from -->
+      <header
+        class="tw-flex tw-flex-row tw-flex-wrap tw-items-center tw-justify-between tw-gap-3 tw-border-b tw-border-slate-200 tw-bg-slate-50 tw-px-4 sm:tw-px-6 tw-py-3"
+      >
+        <div class="tw-flex tw-flex-row tw-items-center tw-gap-3">
+          <img
+            src="assets/logos/bip-scholar.png"
+            alt="BIP! Scholar logo"
+            class="tw-h-7 tw-w-auto"
+          />
+          <div>
+            <h2 class="tw-text-base tw-font-semibold tw-font-dm-sans tw-text-gray-900">
+              Academic profile indicators
+            </h2>
+            <p class="tw-text-xs tw-text-slate-500">
+              Provided by
+              <a
+                href="https://bip.imsi.athenarc.gr/scholar"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="tw-text-blue-700 hover:tw-underline"
+                >BIP! Scholar</a
+              >
+            </p>
           </div>
-          <a
-            *ngIf="vm.bipScores"
-            [href]="vm.userBipUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="tw-px-2 tw-py-1 tw-border-[#449D44] tw-text-[#449D44] tw-rounded-md tw-border-2 hover:tw-bg-slate-200"
-            >Visit Profile
-          </a>
         </div>
-      </div>
+        <a
+          *ngIf="vm.bipScores"
+          [href]="vm.userBipUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="tw-inline-flex tw-items-center tw-gap-1 tw-rounded-md tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-1.5 tw-text-sm tw-font-medium tw-text-slate-700 hover:tw-bg-slate-50"
+          >View on BIP! Scholar ↗</a
+        >
+      </header>
 
-      <!-- Scores section -->
+      <!-- Indicators, one group per section -->
       <div
         *ngIf="vm.bipScores"
-        class="tw-grid tw-grid-cols-2 tw-gap-4 tw-px-4 tw-mt-6 lg:tw-grid-cols-4"
+        class="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-divide-y sm:tw-divide-y-0 tw-divide-slate-100"
       >
-        <div *ngFor="let sectionItem of vm.bipScores" class="tw-h-full">
-          <bip-scholar-card
-            [stats_section_info]="sectionItem.value"
-            class="tw-h-full"
-          ></bip-scholar-card>
-        </div>
-      </div>
-      <div
-        class="tw-w-full tw-text-sm tw-text-right tw-px-4 tw-pt-2 tw-text-gray-500"
-      >
-        <em>
-          Provided by
-          <a
-            href="https://bip.imsi.athenarc.gr/scholar"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="tw-text-blue-500 hover:tw-underline"
-            >BIP! Scholar</a
-          >
-        </em>
+        <bip-scholar-card
+          *ngFor="let sectionItem of vm.bipScores"
+          class="tw-block tw-px-4 sm:tw-px-6 tw-py-4 lg:tw-border-r lg:tw-border-slate-100 lg:last:tw-border-r-0"
+          [stats_section_info]="sectionItem.value"
+        ></bip-scholar-card>
       </div>
 
-      <!-- Create profile section -->
-      <div *ngIf="!vm.bipScores && vm.isOwnProfile" class="tw-px-4 tw-mt-6">
-        It looks like you haven't created a profile on BIP! Scholar yet. Please
-        visit
+      <!-- Owner without a BIP! Scholar profile -->
+      <p
+        *ngIf="!vm.bipScores && vm.isOwnProfile"
+        class="tw-px-4 sm:tw-px-6 tw-py-4 tw-text-sm tw-text-slate-600"
+      >
+        You don't have a BIP! Scholar profile yet. Create one on
         <a
           href="https://bip.imsi.athenarc.gr/scholar"
           target="_blank"
           rel="noopener noreferrer"
-          class="tw-text-blue-500 hover:tw-underline"
-          >BIP! Scholar Page </a
-        >. to create your profile and display your statistics to others here.
-      </div>
-    </div>
+          class="tw-text-blue-700 hover:tw-underline"
+          >BIP! Scholar</a
+        >
+        to show your academic indicators here.
+      </p>
+    </section>
   </ng-container>
 </div>

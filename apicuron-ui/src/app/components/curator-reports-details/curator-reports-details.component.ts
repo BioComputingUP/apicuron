@@ -169,7 +169,7 @@ export class CuratorReportsDetailsComponent implements OnInit {
 
   @Input() resource_id?: string;
 
-  @Input() resource?: Resource;
+  @Input() resource?: Resource | null;
 
-  @Input() terms: Term[];
+  @Input() terms: Term[] | null;
 }

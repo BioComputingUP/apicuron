@@ -44,7 +44,7 @@ export class CuratorMedalsDetailsComponent implements OnInit {
   constructor(protected medalService: MedalsService) {}
 
   @Input() curator: User;
-  @Input() resource: Resource;
+  @Input() resource: Resource | null;
 
   ngOnInit(): void {
     const medalFilter = AchievementFilter.create({

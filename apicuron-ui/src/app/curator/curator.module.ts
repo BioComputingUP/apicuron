@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AngularSvgIconModule } from "angular-svg-icon";
-import { CuratorProfileComponent } from "../components/curator-profile/curator-profile.component";
+import { ProfileHeaderComponent } from "../components/profile-header/profile-header.component";
 import { PaginationComponent } from "../pagination/pagination.component";
 import { SvgModule } from "../svg/svg.module";
 import { CuratorCardComponent } from "./curator-card/curator-card.component";
@@ -33,7 +33,7 @@ import { BipScholarModule } from "../bip-scholar/bip-scholar.module";
     SvgModule,
     HttpClientModule,
     PaginationComponent,
-    CuratorProfileComponent,
+    ProfileHeaderComponent,
     CuratorStatCardComponent,
     CommonModule,
     AchievementsModule,

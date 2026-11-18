@@ -1,17 +1,107 @@
-<div class="tw-px-2 tw-mx-auto tw-max-w-7xl sm:tw-px-8 2xl:tw-px-0">
-  <ng-container *ngIf="curator$ | async as curator">
-    <curator-profile [curator]="curator"></curator-profile>
+<ng-container *ngIf="profile$ | async as profile">
+  <div
+    *ngIf="!profile.user"
+    class="tw-mx-auto tw-max-w-2xl tw-px-4 tw-py-16 tw-text-center"
+  >
+    <h1 class="tw-text-2xl tw-font-semibold tw-font-dm-sans tw-text-gray-900">
+      Profile not available
+    </h1>
+    <p class="tw-mt-3 tw-text-slate-600">
+      This profile is private or does not exist on APICURON.
+    </p>
+    <p class="tw-mt-1 tw-text-sm tw-text-slate-500">
+      If it is your profile, log in to see it.
+    </p>
+    <a
+      routerLink="/contributors"
+      class="tw-mt-6 tw-inline-flex tw-rounded-md tw-border tw-border-slate-300 tw-bg-white tw-px-4 tw-py-2 tw-text-sm tw-font-medium tw-text-slate-700 hover:tw-bg-slate-50"
+      >Browse contributors</a
+    >
+  </div>
+</ng-container>
+
+<ng-container *ngIf="(profile$ | async)?.user as contributor">
+  <profile-header [user]="contributor"></profile-header>
+
+  <div class="tw-mx-auto tw-max-w-7xl tw-px-4 sm:tw-px-8 2xl:tw-px-0 tw-pt-6 tw-pb-10">
+    <div
+      *ngIf="contributor.privacy === 'private'"
+      role="status"
+      class="tw-mb-6 tw-flex tw-flex-col sm:tw-flex-row sm:tw-items-center sm:tw-justify-between tw-gap-3 tw-rounded-lg tw-border tw-border-amber-200 tw-bg-amber-50 tw-px-4 sm:tw-px-6 tw-py-3 tw-text-sm tw-text-amber-900"
+    >
+      <p>
+        <span class="tw-font-semibold">Your profile is private.</span>
+        Only you can see this page; other visitors are told it is not
+        available.
+      </p>
+      <a
+        routerLink="/dashboard/profile"
+        class="tw-shrink-0 tw-rounded-md tw-border tw-border-amber-300 tw-bg-white tw-px-3 tw-py-1.5 tw-font-medium tw-text-amber-900 hover:tw-bg-amber-100"
+        >Change privacy</a
+      >
+    </div>
+
+    <!-- BIP! Scholar indicators stay on top of the resources -->
     <app-bip-scores-grid [orcidId]="orcidId$ | async"></app-bip-scores-grid>
 
-    <div>
-      <div class="tw-flex tw-flex-col tw-gap-4 tw-pb-4">
-        <div *ngFor="let stats of statistics$ | async">
+    <ng-container *ngIf="entries$ | async as entries">
+      <div class="tw-flex tw-flex-col tw-gap-4">
+        <!-- Resource tabs, only when there is something to choose -->
+        <nav
+          *ngIf="entries.length > 1"
+          aria-label="Resources"
+          class="tw-flex tw-flex-row tw-gap-1 tw-overflow-x-auto tw-border-b tw-border-slate-200"
+        >
+          <button
+            type="button"
+            class="tw-px-3 tw-py-2 tw-text-sm tw-whitespace-nowrap tw-border-b-2 tw--mb-px"
+            [ngClass]="
+              selectedId === null
+                ? 'tw-border-apicuron-purple tw-text-gray-900 tw-font-semibold'
+                : 'tw-border-transparent tw-text-slate-500 hover:tw-text-slate-800'
+            "
+            [attr.aria-current]="selectedId === null ? 'page' : null"
+            (click)="select(null)"
+          >
+            All resources
+          </button>
+          <button
+            *ngFor="let entry of entries; trackBy: trackEntry"
+            type="button"
+            class="tw-inline-flex tw-items-center tw-gap-2 tw-px-3 tw-py-2 tw-text-sm tw-whitespace-nowrap tw-border-b-2 tw--mb-px"
+            [ngClass]="
+              selectedId === entry.resourceId
+                ? 'tw-border-apicuron-purple tw-text-gray-900 tw-font-semibold'
+                : 'tw-border-transparent tw-text-slate-500 hover:tw-text-slate-800'
+            "
+            [ngStyle]="
+              selectedId === entry.resourceId && entry.resource?.color
+                ? { 'border-color': entry.resource?.color }
+                : {}
+            "
+            [attr.aria-current]="selectedId === entry.resourceId ? 'page' : null"
+            (click)="select(entry.resourceId)"
+          >
+            <span
+              class="tw-h-2 tw-w-2 tw-rounded-full tw-bg-slate-400"
+              [ngStyle]="{ 'background-color': entry.resource?.color }"
+            ></span>
+            {{ entry.resource?.resource_name ?? entry.resourceId }}
+            <span class="tw-text-xs tw-font-normal tw-text-slate-400">{{
+              entry.statistics.total_count | number
+            }}</span>
+          </button>
+        </nav>
+
+        <ng-container *ngFor="let entry of entries; trackBy: trackEntry">
           <curator-stat-card
-            [statistics]="stats"
-            [curator]="curator"
+            *ngIf="isShown(entry)"
+            [statistics]="entry.statistics"
+            [curator]="contributor"
+            [resource]="entry.resource ?? undefined"
           ></curator-stat-card>
-        </div>
+        </ng-container>
       </div>
-    </div>
-  </ng-container>
-</div>
+    </ng-container>
+  </div>
+</ng-container>
