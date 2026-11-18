@@ -1,8 +1,13 @@
 import { Component } from "@angular/core";
 import { Router } from "@angular/router";
-import { Observable } from "rxjs";
-import { shareReplay } from "rxjs/operators";
+import { BehaviorSubject, Observable, combineLatest } from "rxjs";
+import { map, shareReplay } from "rxjs/operators";
 import { Resource } from "../models/resource.model";
+import {
+  ResourceCategories,
+  ResourceCategory,
+  ResourceCategoryLabels,
+} from "../models/types/enums";
 import { ResourcesService } from "../resource/service/resources.service";
 
 /** One kind of output APICURON credits; icon is an SVG path in a 24×24 box */
@@ -10,6 +15,20 @@ interface TrackedOutput {
   name: string;
   description: string;
   icon: string;
+}
+
+/** a category filter chip; null category is "All" */
+interface CategoryChip {
+  category: ResourceCategory | null;
+  label: string;
+  count: number;
+}
+
+/** what the partner resources section shows */
+interface ResourceBrowser {
+  chips: CategoryChip[];
+  shown: Resource[];
+  total: number;
 }
 
 /** a complete ORCID iD, e.g. 0000-0002-1825-0097 */
@@ -24,6 +43,11 @@ export class IndexComponent {
   resources$: Observable<Resource[]>;
 
   searchText = "";
+
+  /** partner resource filters: category chip and name search */
+  readonly category$ = new BehaviorSubject<ResourceCategory | null>(null);
+  readonly resourceQuery$ = new BehaviorSubject<string>("");
+  browser$: Observable<ResourceBrowser>;
 
   /** Data stands for the Database and Knowledge Base resource categories */
   readonly trackedOutputs: TrackedOutput[] = [
@@ -51,6 +75,31 @@ export class IndexComponent {
   ) {
     // one request for the resource grid and the numbers band
     this.resources$ = this.resourceService.getAllResources().pipe(shareReplay(1));
+
+    this.browser$ = combineLatest([
+      this.resources$,
+      this.category$,
+      this.resourceQuery$,
+    ]).pipe(
+      map(([resources, category, query]) => ({
+        chips: toChips(resources),
+        shown: resources.filter(
+          (r) =>
+            (category === null || r.category === category) &&
+            matchesName(r, query)
+        ),
+        total: resources.length,
+      }))
+    );
+  }
+
+  clearResourceFilters() {
+    this.category$.next(null);
+    this.resourceQuery$.next("");
+  }
+
+  trackResource(_index: number, resource: Resource) {
+    return resource.resource_id;
   }
 
   /** opens the profile for a full ORCID iD (names are the only searched field), otherwise searches names */
@@ -64,4 +113,25 @@ export class IndexComponent {
       });
     }
   }
+}
+
+/** "All" then one chip per category that has resources */
+function toChips(resources: Resource[]): CategoryChip[] {
+  const perCategory = ResourceCategories.map((category) => ({
+    category,
+    label: ResourceCategoryLabels[category],
+    count: resources.filter((r) => r.category === category).length,
+  })).filter((chip) => chip.count > 0);
+  return [{ category: null, label: "All", count: resources.length }, ...perCategory];
+}
+
+/** case-insensitive match on the short or long name */
+function matchesName(resource: Resource, query: string): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) {
+    return true;
+  }
+  return [resource.resource_name, resource.resource_long_name].some((name) =>
+    (name ?? "").toLowerCase().includes(q)
+  );
 }

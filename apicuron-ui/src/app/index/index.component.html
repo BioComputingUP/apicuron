@@ -139,23 +139,95 @@
   <index-numbers-banner
     [resources]="resources$ | async"
   ></index-numbers-banner>
-  <div class="tw-p-2 tw-pb-2 md:tw-pb-4">
+  <!-- Partner resources: filter by category chip and by name -->
+  <section
+    class="tw-mx-auto tw-max-w-7xl tw-px-4 sm:tw-px-8 2xl:tw-px-0 tw-pt-8 tw-pb-6"
+    *ngIf="browser$ | async as browser"
+  >
     <h2
-      class="tw-text-4xl tw-font-dm-sans tw-py-2 tw-font-bold tw-text-center tw-text-gray-900"
+      class="tw-text-3xl md:tw-text-4xl tw-font-dm-sans tw-font-bold tw-text-center tw-text-gray-900"
     >
       Partner Resources
     </h2>
+
     <div
-      class="tw-mx-auto tw-max-w-7xl tw-flex tw-flex-row tw-flex-wrap"
-      *ngIf="resources$ | async as resources"
+      class="tw-mt-5 tw-flex tw-flex-col md:tw-flex-row md:tw-items-center md:tw-justify-between tw-gap-3"
     >
       <div
-        *ngFor="let database of resources"
-        class="tw-w-full md:tw-w-1/2 tw-p-1 md:tw-p-2 xl:tw-p-4"
+        class="tw-flex tw-flex-row tw-flex-wrap tw-gap-2"
+        role="group"
+        aria-label="Filter by resource type"
       >
-        <partner-resource [resource]="database"></partner-resource>
+        <button
+          *ngFor="let chip of browser.chips"
+          type="button"
+          class="tw-rounded-full tw-border tw-px-3 tw-py-1 tw-text-sm tw-font-medium"
+          [ngClass]="
+            (category$ | async) === chip.category
+              ? 'tw-border-apicuron-red tw-bg-apicuron-red tw-text-white'
+              : 'tw-border-slate-300 tw-bg-white tw-text-slate-700 hover:tw-bg-slate-50'
+          "
+          [attr.aria-pressed]="(category$ | async) === chip.category"
+          (click)="category$.next(chip.category)"
+        >
+          {{ chip.label }}
+          <span class="tw-ml-1 tw-opacity-70 tw-tabular-nums">{{ chip.count }}</span>
+        </button>
+      </div>
+
+      <div class="tw-relative md:tw-w-72">
+        <label for="search-resources" class="tw-sr-only">Search resources</label>
+        <svg
+          class="tw-pointer-events-none tw-absolute tw-left-3 tw-top-1/2 tw-h-4 tw-w-4 tw--translate-y-1/2 tw-text-slate-400"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" />
+        </svg>
+        <input
+          id="search-resources"
+          type="search"
+          placeholder="Search resources"
+          autocomplete="off"
+          class="tw-w-full tw-rounded-md tw-border tw-border-slate-300 tw-bg-white tw-py-2 tw-pl-9 tw-pr-3 tw-text-sm tw-text-gray-800 focus:tw-border-apicuron-purple focus:tw-outline-none"
+          [value]="resourceQuery$ | async"
+          (input)="resourceQuery$.next($any($event.target).value)"
+        />
       </div>
     </div>
-  </div>
+
+    <p class="tw-mt-3 tw-text-sm tw-text-slate-500" aria-live="polite">
+      Showing {{ browser.shown.length }} of {{ browser.total }} resources
+    </p>
+
+    <div
+      *ngIf="browser.shown.length; else noResources"
+      class="tw-mt-2 tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-4 xl:tw-gap-6"
+    >
+      <partner-resource
+        *ngFor="let resource of browser.shown; trackBy: trackResource"
+        [resource]="resource"
+      ></partner-resource>
+    </div>
+    <ng-template #noResources>
+      <div
+        class="tw-mt-2 tw-rounded-lg tw-border tw-border-dashed tw-border-slate-300 tw-bg-white tw-px-4 tw-py-10 tw-text-center"
+      >
+        <p class="tw-text-slate-600">No resources match.</p>
+        <button
+          type="button"
+          class="tw-mt-3 tw-rounded-md tw-border tw-border-slate-300 tw-bg-white tw-px-3 tw-py-1.5 tw-text-sm tw-font-medium tw-text-slate-700 hover:tw-bg-slate-50"
+          (click)="clearResourceFilters()"
+        >
+          Clear filters
+        </button>
+      </div>
+    </ng-template>
+  </section>
   <app-credit></app-credit>
 </div>
