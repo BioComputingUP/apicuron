@@ -79,18 +79,57 @@
             What we track
           </h2>
           <ul class="tw-grid tw-grid-cols-1 sm:tw-grid-cols-3 tw-gap-3">
-            <!-- the whole card links to the output type on the NTO Registry; the corner arrow shows it -->
-            <li *ngFor="let output of trackedOutputs">
+            <!-- the card shows this type's partner resources below; the bottom link opens its NTO Registry entry -->
+            <li
+              *ngFor="let output of trackedOutputs"
+              class="tw-group tw-relative tw-flex tw-flex-col tw-rounded-lg tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-shadow-sm tw-transition hover:tw-border-apicuron-red/40 hover:tw-shadow-md focus-within:tw-border-apicuron-red/40"
+            >
+              <svg
+                class="tw-absolute tw-right-3 tw-top-3 tw-h-4 tw-w-4 tw-text-slate-400 tw-transition group-hover:tw-text-apicuron-red"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path d="M12 5v14M6 13l6 6 6-6" />
+              </svg>
+              <!-- the button's ::after covers the whole card, so a click anywhere filters -->
+              <button
+                type="button"
+                class="tw-flex tw-flex-row tw-items-center tw-gap-2 tw-pr-6 tw-text-left tw-font-semibold tw-text-gray-900 after:tw-absolute after:tw-inset-0 after:tw-rounded-lg after:tw-content-[''] focus-visible:tw-outline-none focus-visible:after:tw-outline focus-visible:after:tw-outline-2 focus-visible:after:tw-outline-apicuron-red"
+                [title]="'Show ' + output.name + ' partner resources'"
+                (click)="showResources(output.name)"
+              >
+                <svg
+                  class="tw-h-5 tw-w-5 tw-shrink-0 tw-text-apicuron-red"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path [attr.d]="output.icon" />
+                </svg>
+                {{ output.name }}
+              </button>
+              <p class="tw-mt-1 tw-text-sm tw-text-slate-600">
+                {{ output.description }}
+              </p>
+              <!-- above the button's overlay so it stays its own link -->
               <a
                 [href]="output.link"
                 target="_blank"
                 rel="noopener noreferrer"
-                title="See on NTO Registry"
-                [attr.aria-label]="output.name + ': ' + output.description + '. On the NTO Registry (opens in a new tab)'"
-                class="tw-group tw-relative tw-block tw-h-full tw-rounded-lg tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-shadow-sm tw-transition hover:tw-border-apicuron-red/40 hover:tw-shadow-md focus-visible:tw-outline focus-visible:tw-outline-2 focus-visible:tw-outline-apicuron-red"
-              >
+                class="tw-relative tw-z-10 tw-mt-auto tw-inline-flex tw-w-fit tw-items-center tw-gap-1 tw-pt-2 tw-text-xs tw-font-medium tw-text-slate-500 hover:tw-text-apicuron-red hover:tw-underline"
+                [attr.aria-label]="'Learn more about ' + output.name + ' on the NTO Registry (opens in a new tab)'"
+                >Learn more
                 <svg
-                  class="tw-absolute tw-right-3 tw-top-3 tw-h-4 tw-w-4 tw-text-slate-400 tw-transition group-hover:tw-text-apicuron-red"
+                  class="tw-h-3 tw-w-3"
                   fill="none"
                   stroke="currentColor"
                   stroke-width="2"
@@ -101,26 +140,6 @@
                 >
                   <path d="M7 17L17 7M8 7h9v9" />
                 </svg>
-                <div
-                  class="tw-flex tw-flex-row tw-items-center tw-gap-2 tw-pr-6 tw-font-semibold tw-text-gray-900"
-                >
-                  <svg
-                    class="tw-h-5 tw-w-5 tw-shrink-0 tw-text-apicuron-red"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path [attr.d]="output.icon" />
-                  </svg>
-                  {{ output.name }}
-                </div>
-                <p class="tw-mt-1 tw-text-sm tw-text-slate-600">
-                  {{ output.description }}
-                </p>
               </a>
             </li>
           </ul>
@@ -176,7 +195,8 @@
   ></index-numbers-banner>
   <!-- Partner resources: filter by category chip and by name -->
   <section
-    class="tw-mx-auto tw-max-w-7xl tw-px-4 sm:tw-px-8 2xl:tw-px-0 tw-pt-8 tw-pb-6"
+    id="partner-resources"
+    class="tw-mx-auto tw-max-w-7xl tw-px-4 sm:tw-px-8 2xl:tw-px-0 tw-pt-8 tw-pb-6 tw-scroll-mt-28"
     *ngIf="browser$ | async as browser"
   >
     <h2

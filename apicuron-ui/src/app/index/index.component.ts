@@ -94,6 +94,15 @@ export class IndexComponent {
     );
   }
 
+  /** filters the partner resources by output type (clearing the name search) and scrolls to them */
+  showResources(outputType: string) {
+    this.category$.next(outputType);
+    this.resourceQuery$.next("");
+    document
+      .getElementById("partner-resources")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   clearResourceFilters() {
     this.category$.next(null);
     this.resourceQuery$.next("");
